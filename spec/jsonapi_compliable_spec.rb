@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe JSONAPICompliable, type: :controller do
   controller(ActionController::Base) do
-    include JSONAPICompliable::Base
+    include JSONAPICompliable
     attr_accessor :serializer
 
     jsonapi do
