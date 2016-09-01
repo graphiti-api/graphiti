@@ -19,9 +19,9 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "rails"
   spec.add_dependency "jsonapi"
-  spec.add_dependency "kaminari"
-  spec.add_dependency "active_model_serializers"
-  spec.add_dependency  "nested_attribute_reassignable"
+  spec.add_development_dependency "kaminari"
+  spec.add_development_dependency "active_model_serializers"
+  spec.add_development_dependency  "nested_attribute_reassignable"
   spec.add_development_dependency "bundler", "~> 1.12"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec"
