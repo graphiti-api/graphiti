@@ -1,41 +1,124 @@
-# JsonapiCompliable
+[official documentation](https://bbgithub.dev.bloomberg.com/pages/InfrastructureExperience/jsonapi_compliable)
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/jsonapi_compliable`. To experiment with that code, run `bin/console` for an interactive prompt.
+### Getting Started
+Please read below documentation related to [jsonapi](http://jsonapi.org/format/#document-resource-objects)
 
-TODO: Delete this and the text above, and describe your gem
 
-## Installation
+### Adding JSONAPICompliable
+```
+class ApplicationController < ActionController::Base
+  include JSONAPICompliable
+end
 
-Add this line to your application's Gemfile:
+```
+### Define whitelist includes
+```
+class AuthorsController < ApplicationController
+  jsonapi do
+    includes whitelist: { index: [{ books: :genre }, :state] }
 
-```ruby
-gem 'jsonapi_compliable'
+    allow_filter :last_name
+
+    allow_filter :first_name, aliases: [:title], if: :can_filter_first_name?
+
+    allow_filter :first_name_prefix do |scope, filter|
+      scope.where('first_name like ?', "#{filter}%")
+    end
+  end
+end
+```
+Below url requesting state/foo as includes. 
+But foo include is ignored as it is not whitelist. 
+>authors?include=state,foo
+
+### Defining filter field 
+
+```
+class AuthorsController < ApplicationController
+  jsonapi do
+    allow_filter :last_name
+  end
+end
+```
+will allow us make request as below
+>/authors?filter[first_name]=john
+
+### Defining filter field alias 
+
+```
+class AuthorsController < ApplicationController
+  jsonapi do
+    allow_filter :last_name, aliases: [:name]
+  end
+end
+```
+will allow us make request as below
+>/authors?filter[name]=john
+
+### Adding guard to filter
+
+```
+class AuthorsController < ApplicationController
+  jsonapi do
+    allow_filter :last_name if: :can_filter?
+  end
+
+  def can_filter?
+    true
+  end
+end
 ```
 
-And then execute:
+### Defining default filter 
 
-    $ bundle
+```
+class AuthorsController < ApplicationController
+  jsonapi do
+    default_filter :first_name do |scope|
+      scope.where(first_name: 'Willaim')
+    end
+  end
+end
+```
+if no filter provided below request will filter authors first_name='Willaim'
 
-Or install it yourself as:
+>/authors
 
-    $ gem install jsonapi_compliable
+### Deserialize requests params which are coming jsonapi format
 
-## Usage
-
-TODO: Write usage instructions here
-
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
-## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/jsonapi_compliable. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
-
-
-## License
-
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
+```
+  class AuthorsController < ApplicationController
+    before_action :deserialize_jsonapi!, only: [:update, :create]
+  end
+```
+incoming parameters
+```
+  {
+    data: {
+      type: 'authors',
+      attributes: {
+        first_name: 'Stephen',
+        last_name: 'King'
+      },
+      relationships: {
+        books: {
+          data: [
+            { type: 'books', attributes: { title: 'The Shining' } }
+          ]
+        }
+      }
+    }
+  }
+```
+will be deserialized to
+```
+  {
+    authors: {
+      first_name: 'Stephen',
+      last_name: 'King'
+      books_attributes: [{
+        title: 'The Shingin'
+      }]
+    }
+  }
+```
