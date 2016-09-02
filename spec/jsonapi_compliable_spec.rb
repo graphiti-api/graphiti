@@ -249,19 +249,19 @@ RSpec.describe JSONAPICompliable, type: :controller do
     end
 
     context 'asc' do
-      let(:sort_param) { '-first_name' }
+      let(:sort_param) { 'first_name' }
 
       it { is_expected.to eq(%w(Philip Stephen)) }
     end
 
     context 'desc' do
-      let(:sort_param) { 'first_name' }
+      let(:sort_param) { '-first_name' }
 
       it { is_expected.to eq(%w(Stephen Philip)) }
     end
 
     context 'when given a custom sort function' do
-      let(:sort_param) { '-first_name' }
+      let(:sort_param) { 'first_name' }
 
       before do
         controller.class_eval do

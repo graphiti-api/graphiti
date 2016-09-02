@@ -160,8 +160,8 @@ module JSONAPICompliable
     end
 
     def jsonapi_sort(scope)
-      sort_param = params[:sort] || '-id'
-      dir = sort_param.starts_with?('-') ? :asc : :desc
+      sort_param = params[:sort] || 'id'
+      dir = sort_param.starts_with?('-') ? :desc : :asc
       att = sort_param.sub('-', '').to_sym
 
       scope = if custom_sort = _jsonapi_config._sort
