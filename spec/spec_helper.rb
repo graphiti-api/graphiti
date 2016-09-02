@@ -1,12 +1,10 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require File.expand_path("../dummy/config/environment.rb", __FILE__)
 require 'rspec/rails'
-require 'support/json_api_helper'
-
 
 RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
-  config.include JSONAPIHelper
+  config.include JsonapiSpecHelpers
 
   config.before(:suite) do
     DatabaseCleaner.strategy = :transaction
@@ -114,27 +112,27 @@ class ApplicationSerializer < ActiveModel::Serializer
   end
 end
 
-class AuthorSerializer < ApplicationSerializer 
+class AuthorSerializer < ApplicationSerializer
   attributes :first_name, :last_name
   belongs_to :state
   has_many :books
 end
 
-class StateSerializer < ApplicationSerializer 
+class StateSerializer < ApplicationSerializer
   attributes :name
 end
 
-class TagSerializer < ApplicationSerializer 
+class TagSerializer < ApplicationSerializer
   attributes :name
   belongs_to :book
 end
 
-class GenreSerializer < ApplicationSerializer 
+class GenreSerializer < ApplicationSerializer
   attributes :name
   has_many :books
 end
 
-class BookSerializer < ApplicationSerializer 
+class BookSerializer < ApplicationSerializer
   attributes :title
   belongs_to :genre
   belongs_to :author

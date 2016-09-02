@@ -65,16 +65,16 @@ RSpec.describe JSONAPICompliable, type: :controller do
               data: [
                 { type: 'books', attributes: { title: 'The Shining' } }
               ]
-            } 
+            }
           }
         }
       }
 
       expect(json_included_types)
         .to match_array(%w(states books))
-      expect(json_includes('states', :id))
-        .to match_array([virginia.id.to_s])
-      expect(json_includes('states', :id)[0]).to eq(virginia.id.to_s)
+      expect(json_include('states')['id'])
+        .to eq(virginia.id.to_s)
+      expect(json_include('states')['id']).to eq(virginia.id.to_s)
     end
   end
 
@@ -117,14 +117,14 @@ RSpec.describe JSONAPICompliable, type: :controller do
           relationships: {
             books: {
               data: [
-                { 
-                  type: 'books', 
-                  attributes: { 
-                     title: "The Firm", 
+                {
+                  type: 'books',
+                  attributes: {
+                     title: "The Firm",
                      genre_attributes: {
                       name: "Thriller"
-                    } 
-                  }  
+                    }
+                  }
                  }
               ]
             }
@@ -133,7 +133,7 @@ RSpec.describe JSONAPICompliable, type: :controller do
       }
 
       expect(json_included_types).to match_array(%w(books))
-      expect(json_includes('books', :id)).to match_array([Book.last.id.to_s])
+      expect(json_include('books')['id']).to eq(Book.last.id.to_s)
       author.reload
       expect(author.book_ids).to match_array(Book.pluck(:id))
     end
@@ -151,7 +151,7 @@ RSpec.describe JSONAPICompliable, type: :controller do
     Author.create!(first_name: "First", state: State.last)
     Author.create!(first_name: "Second", state: State.last)
     get :index
-    expect(json_ids).to eq(Author.pluck(:id))
+    expect(json_ids(true)).to eq(Author.pluck(:id))
   end
 
   it 'should be able to override options' do
@@ -297,7 +297,7 @@ RSpec.describe JSONAPICompliable, type: :controller do
 
     it 'should limit by size, offset by number' do
       get :index, params: { page: { number: 2, size: 2 } }
-      expect(json_ids).to eq([author3.id, author4.id])
+      expect(json_ids(true)).to eq([author3.id, author4.id])
     end
 
     context 'and a custom pagination function is given' do
@@ -394,14 +394,14 @@ RSpec.describe JSONAPICompliable, type: :controller do
 
     it 'should limit to only the requested fields' do
       get :index, params: { fields: { authors: 'first_name,updated_at' } }
-      expect(json_items(0).keys).to match_array(%w(first-name updated-at))
+      expect(json_items(0).keys).to match_array(%w(id jsonapi_type first-name updated-at))
     end
 
     it 'should still disallow fields guarded by :if' do
       allow_any_instance_of(custom_serializer)
         .to receive(:allow_hostname?) { false }
       get :index, params: { fields: { authors: 'hostname,updated_at' } }
-      expect(json_items(0).keys).to match_array(['updated-at'])
+      expect(json_items(0).keys).to match_array(%w(id jsonapi_type updated-at))
     end
 
     context 'when requesting extra fields' do
@@ -484,7 +484,7 @@ RSpec.describe JSONAPICompliable, type: :controller do
 
       it 'applies by default' do
         get :index
-        expect(json_ids).to eq([author3.id])
+        expect(json_ids(true)).to eq([author3.id])
       end
 
       it 'is overridable if an allowed filter' do
@@ -499,7 +499,7 @@ RSpec.describe JSONAPICompliable, type: :controller do
         end
 
         get :index, params: { filter: { last_name: author4.last_name } }
-        expect(json_ids).to eq([author4.id])
+        expect(json_ids(true)).to eq([author4.id])
       end
 
       it 'is overridable if an allowed filter has a corresponding alias' do
@@ -516,7 +516,7 @@ RSpec.describe JSONAPICompliable, type: :controller do
         end
 
         get :index, params: { filter: { title: author1.first_name } }
-        expect(json_ids).to eq([author1.id])
+        expect(json_ids(true)).to eq([author1.id])
       end
     end
 
@@ -524,28 +524,28 @@ RSpec.describe JSONAPICompliable, type: :controller do
       context 'and is customized with a block' do
         it 'should filter correctly via block' do
           get :index, params: { filter: { first_name_prefix: 'A' } }
-          expect(json_ids).to eq([author2.id, author4.id])
+          expect(json_ids(true)).to eq([author2.id, author4.id])
         end
       end
 
       context 'with alternate param name' do
         it 'should filter correctly' do
           get :index, params: { filter: { title: author2.first_name } }
-          expect(json_ids).to eq([author2.id])
+          expect(json_ids(true)).to eq([author2.id])
         end
       end
 
       context 'and is not customized with a block' do
         it 'should provide default ActiveRecord filter' do
           get :index, params: { filter: { first_name: author2.first_name } }
-          expect(json_ids).to eq([author2.id])
+          expect(json_ids(true)).to eq([author2.id])
         end
       end
 
       context 'and is comma-delimited' do
         it 'should automatically be parsed into a ruby array' do
           get :index, params: { filter: { first_name: [author2.first_name, author3.first_name].join(',') } }
-          expect(json_ids).to eq([author2.id, author3.id])
+          expect(json_ids(true)).to eq([author2.id, author3.id])
         end
       end
 
