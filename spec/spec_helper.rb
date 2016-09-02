@@ -140,3 +140,11 @@ class BookSerializer < ApplicationSerializer
 end
 
 ActiveModel::Serializer.config.adapter = :json_api
+
+JsonapiSpecHelpers::Payload.register(:book) do
+  key(:title)
+end
+
+JsonapiSpecHelpers::Payload.register(:genre) do
+  key(:name)
+end

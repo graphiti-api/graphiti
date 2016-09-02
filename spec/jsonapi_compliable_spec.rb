@@ -167,8 +167,8 @@ RSpec.describe JSONAPICompliable, type: :controller do
 
     get :index
     expect(json_included_types).to match_array(%w(books genres))
-    #assert_record_payload(:book, author.book, json_include('stages'))
-    #assert_record_payload(:stage_type, server.stage.type, json_include('stage_types'))
+    assert_payload(:book, author.books[0], json_include('books'))
+    assert_payload(:genre, author.books[0].genre, json_include('genres'))
   end
 
   context 'when including relations' do
