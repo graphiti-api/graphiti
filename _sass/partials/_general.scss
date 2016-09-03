@@ -1,0 +1,228 @@
+body{
+    font:{
+        family: $roboto;
+        weight: $light;
+        size: 22px;
+    }
+    line-height: 1.4;
+    background: $white;
+    color: $black;
+}
+
+.container{
+    max-width: 100%;
+    position: relative;
+    margin: 0 auto;
+}
+
+.overview{
+    width: 320px;
+    font-size: 18px;
+}
+
+.content{
+    counter-reset: h1-counter;
+    width: calc(100% - 320px);
+    position: absolute;
+    right: 0;
+    
+    @media screen and (max-width: $sidebar-collapse){
+        width: 100%;
+    }
+
+    .toggle{
+        position: absolute;
+        top: 5px;
+        left: 5px;
+    }
+}
+
+section{
+
+    &:last-of-type{
+        padding-bottom: 300px;
+    }
+
+    > p,
+    > ul,
+    > ol,
+    > div{
+        text-align: justify;
+        padding-left: 5%;
+        padding-right: 5%;
+        box-sizing: border-box;
+    }
+
+    pre {
+        margin-left: 5%;
+        margin-right: 5%;
+    }
+    > ol{
+        padding-left: calc(5% + 40px);
+    }
+}
+
+h1, h2, h3, h4, h5, h6{
+    text-transform: uppercase;
+    font-weight: $bold;
+    line-height: 1;
+    color: $green;
+}
+
+h1 {
+    font-size: 3.1em;
+    padding: 30px 0 0;
+    text-align: right;
+    border-bottom: $green 9px solid;
+    width: 100%;
+    line-height: 0.61;
+    margin: 0 0 20px;
+
+    &:before {
+        content: counter(h1-counter) " ";
+    }
+}
+
+.h1{
+    counter-increment: h1-counter;
+    counter-reset: h2-counter;
+    padding-top: 80px;
+}
+
+h2 {
+    font-size: 2em;
+    padding: 30px 0 0;
+    width: 90%;
+    text-align: center;
+    border-bottom: 5px solid $green;
+    margin: 0 auto 20px;
+    line-height: 0.63;
+
+    &:before {
+        content: counter(h1-counter) "." counter(h2-counter) " ";
+    }
+}
+
+.h2{
+    counter-increment: h2-counter;
+    counter-reset: h3-counter;
+    padding-top: 60px;
+}
+
+
+h3{
+    font-size: 1.7em;
+    padding: 20px 0 0;
+    width: 90%;
+    text-align: left;
+    border-bottom: 4px solid $green;
+    margin: 0 auto 20px;
+    line-height: 0.65;
+
+    &:before {
+        content: counter(h1-counter) "." counter(h2-counter) "." counter(h3-counter) " ";
+    }
+}
+
+.h3{
+    counter-increment: h3-counter;
+    counter-reset: h4-counter;
+    padding-top: 40px;
+}
+
+h4{
+    font-size: 1.5em;
+    padding: 18px 0 0;
+    width: 90%;
+    text-align: left;
+    border-bottom: 3px solid $green;
+    margin: 0 auto 18px;
+    line-height: 0.67;
+
+    &:before {
+        content: counter(h1-counter) "." counter(h2-counter) "." counter(h3-counter) "." counter(h4-counter) " ";
+    }
+}
+
+.h4{
+    counter-increment: h4-counter;
+    counter-reset: h5-counter 1;
+    padding-top: 30px;
+}
+
+
+h5{
+    font-size: 1.3em;
+    padding: 40px 0 0;
+    width: 90%;
+    text-align: left;
+    border-bottom: 2px solid $green;
+    margin: 0 auto 15px;
+    line-height: 0.68;
+
+    &:before {
+        content: counter(h1-counter) "." counter(h2-counter) "." counter(h3-counter) "." counter(h4-counter) "." counter(h5-counter) " ";
+    }
+}
+
+
+a{
+    transition: .3s all;
+    color: $green;
+    text-decoration: none;
+
+    .content &{
+        border-bottom: $darkgreen 1px solid;
+        padding: 0px 2px;
+
+        &:hover{
+            border-bottom: transparent 1px solid;
+        }
+    }
+
+    &:hover{
+        color: $darkgreen;
+    }
+}
+
+
+img{
+    display: block;
+    max-width: 100%;
+    margin: 20px 0;
+}
+
+code{
+    font-family: 'Source Code Pro', 'Courier New', monospace;
+}
+
+.video_container{
+    margin: 30px auto;
+    @include paddinghack(90%, 894, 510);
+
+    iframe{
+        @extend %paddinghack;
+    }
+}
+
+#intro{
+    padding-top: 20px;
+}
+
+code,
+pre{
+    white-space: pre-wrap;
+    border-radius: 0px;
+    border: 0;
+}
+
+iframe{
+    padding-left: 5%;
+    padding-right: 5%;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+p + p{
+    margin-top: 20px;
+}

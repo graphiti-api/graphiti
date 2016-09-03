@@ -1,0 +1,24 @@
+full_rebuild: true
+name: Docster Documentation
+author: DigitalMind
+version: V 1.0
+encoding: utf-8
+defaults:
+  -
+    values:
+      layout: "index"
+markdown: kramdown
+kramdown:
+  input: GFM
+relative_permalinks: false
+collections:
+- entries
+sass:
+  sass_dir: _sass
+  style: :compressed
+exclude: [
+.git,
+.gitignore,
+README.md,
+.sass-cache
+]

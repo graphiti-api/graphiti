@@ -1,0 +1,23 @@
+header{
+    background:{
+        size: auto;
+        repeat: repeat;
+        image: url(../img/bg.jpg);
+    }
+    height: 150px;
+    text-align: center;
+    position: relative;
+    max-width: 100%;
+
+    span{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -webkit-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+                transform: translate(-50%, -50%);
+        color: $white;
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+}

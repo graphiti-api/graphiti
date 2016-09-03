@@ -1,0 +1,158 @@
+//Mixins
+@mixin flexbox($direction, $wrap, $justify, $align){
+    display: flex;
+    flex-direction: $direction;
+    flex-wrap: $wrap;
+    justify-content: $justify;
+    align-items: $align;
+}
+//@include flexbox(direction, wrap, justify, align)
+
+@mixin rowMachine($numPerRow, $marginright, $marginbottom) {
+    width: ((100% - (($numPerRow - 1) * $marginright)) / $numPerRow);
+
+    &:nth-child(n) {
+        margin-bottom: $marginbottom;
+        margin-right: $marginright;
+    }
+
+    &:nth-child(#{$numPerRow}n) {
+        margin-right: 0;
+    }
+}
+//@include rowMachine(numPerRow, margin)
+
+@mixin paddinghack($containerwidth, $ratiowidth, $ratioheight){
+    position: relative;
+    width: $containerwidth;
+    height: 0;
+    padding: (($ratioheight / $ratiowidth) * $containerwidth) 0 0 0;
+}
+// @include paddinghack(width, ratiowidth, ratioheight)
+
+// Button
+@mixin button($c){
+    margin-top: 10px;
+    margin-right: 10px;
+    padding: 14px 26px;
+    font-size: 1em;
+    color: set-button-color($c);
+    display:inline-block;
+    vertical-align: middle;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.1s ease-in-out;
+    border-radius: 2px;
+    outline: 0 none;
+    background-color: $c;
+    box-shadow: 0px 3px 0px 0px darken($c, set-button-shadow($c));
+
+    &:hover,
+    &:focus{
+        background-color: saturate($c, 20%);
+    }
+
+    &:active,
+    &:focus{
+        padding-top: 15px;
+        margin-bottom: -1px;
+        outline: 0 none;
+        box-shadow: 0px 1px 0px 0px darken($c, 25%);
+    }
+}
+// @include button(color)
+
+// Basic Triangle
+@mixin triangle($bw, $dir, $c){
+    width: 0;
+    height: 0;
+    border-style: solid;
+    @if $dir == right{
+        border-color: transparent transparent transparent $c;
+    }
+    @if $dir == left {
+        border-color: transparent $c transparent transparent;
+    }
+    @if $dir == bottom or $dir == down {
+        border-color: $c transparent transparent transparent;
+    }
+    @if $dir == top or $dir == up {
+        border-color: transparent transparent $c transparent;
+    }
+    border-width: $bw;
+}
+// @include triangle(border-width, direction[use: right, left, top/up, bottom/down], color);
+
+// Right-Angled Triangle
+@mixin triangle_ra($w, $h, $dir, $c){
+    width: 0;
+    height: 0;
+    border-style: solid;
+    @if $dir == bottom-left{
+        border-color: transparent transparent transparent $c;
+        border-width: $h 0 0 $w;
+    }
+    @if $dir == bottom-right {
+        border-color: transparent transparent $c transparent;
+        border-width: 0 0 $h $w;
+    }
+    @if $dir == top-left {
+        border-color: $c transparent transparent transparent;
+        border-width: $h $w 0 0;
+    }
+    @if $dir == top-right {
+        border-color: transparent $c transparent transparent;
+        border-width: 0px $w $h 0px;
+    }
+}
+// @include triangle_ra(width, height, direction[use: bottom-left, bottom-right, top-left, top-right], color);
+
+// equilateral triangle
+@mixin triangle_eqla($sl, $dir, $c){
+    width: 0;
+    height: 0;
+    border-style: solid;
+    @if $dir == right{
+        border-color: transparent transparent transparent $c;
+    }
+    @if $dir == left {
+        border-color: transparent $c transparent transparent;
+    }
+    @if $dir == bottom or $dir == down {
+        border-color: $c transparent transparent transparent;
+    }
+    @if $dir == top or $dir == up {
+        border-color: transparent transparent $c transparent;
+    }
+    @if $dir == right or $dir == left {
+        border-width: ($sl/2) (1.73205*($sl/2));
+    }
+    @if $dir == top or $dir == down or $dir == bottom or $dir == up{
+        border-width: (1.73205*($sl/2)) ($sl/2);
+    }
+}
+// @include tirangle_eqla(sidelength, direction, color)
+
+// Flag
+@mixin flag($w, $h, $peak, $dir, $c){
+    width: 0;
+    height: 0;
+    border-style: solid;
+    @if $dir == top or $dir == up{
+        border-color: transparent $c $c $c;
+        border-width: $peak ($w / 2) ($h - $peak);
+    }
+    @if $dir == right{
+        border-color: $c transparent $c $c;
+        border-width: ($h / 2) $peak ($h / 2) ($w - $peak);
+    }
+    @if $dir == bottom or $dir == down{
+        border-color: $c $c transparent $c;
+        border-width: ($h - $peak) ($w / 2) $peak;
+    }
+    @if $dir == left{
+        border-color: $c $c $c transparent;
+        border-width: ($h / 2) ($w - $peak) ($h / 2) $peak;
+    }
+}
+// @include flag(width, height, peak, direction, color)
