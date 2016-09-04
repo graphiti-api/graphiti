@@ -9,6 +9,17 @@ body{
     color: $black;
 }
 
+ul {
+  margin-left: 2rem;
+  list-style-type: disc;
+}
+
+.note {
+  &.info {
+    background: grey;
+  }
+}
+
 .container{
     max-width: 100%;
     position: relative;
@@ -67,6 +78,10 @@ h1, h2, h3, h4, h5, h6{
     font-weight: $bold;
     line-height: 1;
     color: $green;
+
+    a {
+      border-bottom: none !important;
+    }
 }
 
 h1 {

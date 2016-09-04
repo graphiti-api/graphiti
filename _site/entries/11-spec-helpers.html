@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+<title>JSONAPI Suite</title>
+<meta name="viewport" content="width=device-width">
+<meta name="author" content="">
+<link rel="stylesheet" href="/css/main.css">
+<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:500,600' rel='stylesheet' type='text/css'>
+
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="overview">
+                <span class="toggle">close</span>
+                <header>
+  <span>JSONAPI Suite</span>
+</header>
+
+                <ul id="nav">
+    
+    
+    <li  class="parent current">
+        <a href="#intro">Introduction</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#features">Features</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li >
+        <a href="#installation">Installation</a>
+        
+    </li>
+    
+    <li  class="parent">
+        <a href="#reads">Reads</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#basics">The Basics</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#filtering">Filtering</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#includes">Includes</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li  class="parent">
+        <a href="#writes">Writes</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#deserialization">Deserialization</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#validations">Validations</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#strong_resources">Strong Resources</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li >
+        <a href="#error-handling">Error Handling</a>
+        
+    </li>
+    
+    <li >
+        <a href="#spec-helpers">Spec Helpers</a>
+        
+    </li>
+    
+    <li >
+        <a href="#swagger">Swagger</a>
+        
+    </li>
+    
+    <li >
+        <a href="#jsonapi-plus">JSON API Plus</a>
+        
+    </li>
+    
+</ul>
+            </div>
+
+            <div class="content">
+                <span class="toggle">open</span>
+                <p>Validating verbose JSON API responses in tests can be a pain. We could
+use something like <a href="https://github.com/thoughtbot/json_matchers">json_matchers</a> to validate a schema, but we hope to do one better - let’s validate full payloads with a few simple helpers, using full-stack <a href="https://github.com/rspec/rspec-rails#request-specs">rspec request specs</a>.</p>
+
+<p>Let’s say we’re testing the <code class="highlighter-rouge">show</code> action of our employees controller, sideloading the employee’s department. Here’s vanilla RSpec of what the test might look like:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'rails_helper'</span>
+
+<span class="no">RSpec</span><span class="p">.</span><span class="nf">describe</span> <span class="s1">'employees#show'</span><span class="p">,</span> <span class="ss">type: :request</span> <span class="k">do</span>
+  <span class="n">let!</span><span class="p">(</span><span class="ss">:homer</span><span class="p">)</span>  <span class="p">{</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">create!</span><span class="p">(</span><span class="ss">name: </span><span class="s1">'Homer Simpson'</span><span class="p">)</span> <span class="p">}</span>
+  <span class="n">let!</span><span class="p">(</span><span class="ss">:safety</span><span class="p">)</span> <span class="p">{</span> <span class="n">employee</span><span class="p">.</span><span class="nf">create_department!</span><span class="p">(</span><span class="ss">name: </span><span class="s1">'Safety'</span><span class="p">)</span> <span class="p">}</span>
+
+  <span class="n">it</span> <span class="s1">'renders an employee, sideloading department'</span> <span class="k">do</span>
+    <span class="n">get</span> <span class="s2">"/api/employees/</span><span class="si">#{</span><span class="n">homer</span><span class="p">.</span><span class="nf">id</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="ss">params: </span><span class="p">{</span>
+      <span class="ss">include: </span><span class="s1">'department'</span>
+    <span class="p">}</span>
+    <span class="c1"># ... code asserting json response ...</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>To validate the response, we’ll call <code class="highlighter-rouge">assert_payload</code>:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">assert_payload</span><span class="p">(</span><span class="ss">:employee</span><span class="p">,</span> <span class="n">homer</span><span class="p">,</span> <span class="n">json_item</span><span class="p">)</span>
+<span class="n">assert_payload</span><span class="p">(</span><span class="ss">:department</span><span class="p">,</span> <span class="n">safety</span><span class="p">,</span> <span class="n">json_include</span><span class="p">(</span><span class="s1">'departments'</span><span class="p">))</span>
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">assert_payload</code> takes three arguments:</p>
+<ul>
+  <li>The name of a payload we’ve defined (we haven’t done this yet).</li>
+  <li>The record we want to compare against</li>
+  <li>The relevant slice of json. <code class="highlighter-rouge">json_item</code> and <code class="highlighter-rouge">json_includes</code> are
+helpful methods to target the right slice. You can see all helpers in
+the documentation for <code class="highlighter-rouge">jsonapi_spec_helpers</code>.</li>
+</ul>
+
+<p>OK, so we want to take a record, response JSON, and compare them against
+something pre-defined. Let’s write those definitions; they look very similar to
+something you’d write for <a href="https://github.com/thoughtbot/factory_girl">factory_girl</a>:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># spec/payloads/employee.rb</span>
+<span class="no">JsonapiSpecHelpers</span><span class="o">::</span><span class="no">Payload</span><span class="p">.</span><span class="nf">register</span><span class="p">(</span><span class="ss">:employee</span><span class="p">)</span> <span class="k">do</span>
+  <span class="n">key</span><span class="p">(</span><span class="ss">:name</span><span class="p">)</span>
+  <span class="n">key</span><span class="p">(</span><span class="ss">:email</span><span class="p">)</span>
+
+  <span class="n">timestamps!</span>
+<span class="k">end</span>
+
+<span class="c1"># spec/payloads/department.rb</span>
+<span class="no">JsonapiSpecHelpers</span><span class="o">::</span><span class="no">Payload</span><span class="p">.</span><span class="nf">register</span><span class="p">(</span><span class="ss">:department</span><span class="p">)</span> <span class="k">do</span>
+  <span class="n">key</span><span class="p">(</span><span class="ss">:name</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">assert_payload</code> will do four things:</p>
+
+<ul>
+  <li>Ensure keys that are not in the payload definition are <strong>not</strong> present.</li>
+  <li>Ensure all keys in the registered payload <strong>are</strong> present.</li>
+  <li>Ensures no value in a key/value pair is <code class="highlighter-rouge">nil</code> (this is overrideable).</li>
+  <li>Ensures each key matches the expected record value. In other words,
+we’re doing something like <code class="highlighter-rouge">expect(json['email']).to eq(homer.email)</code>.</li>
+</ul>
+
+<p>The comparison value can be customized. Let’s say we serialize the
+<code class="highlighter-rouge">name</code> attribute as a combination of the employee’s <code class="highlighter-rouge">first_name</code> and
+<code class="highlighter-rouge">last_name</code>:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">key</span><span class="p">(</span><span class="ss">:name</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">record</span><span class="o">|</span> <span class="s2">"</span><span class="si">#{</span><span class="n">record</span><span class="p">.</span><span class="nf">first_name</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="n">record</span><span class="p">.</span><span class="nf">last_name</span><span class="si">}</span><span class="s2">"</span> <span class="p">}</span>
+</code></pre>
+</div>
+
+<p>You can also customize/override payloads at runtime in your test. Let’s
+say we only serialize <code class="highlighter-rouge">salary</code> when the current user is an admin. Your
+test could look something like:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">sign_in</span><span class="p">(</span><span class="ss">:user</span><span class="p">)</span>
+<span class="n">assert_payload</span><span class="p">(</span><span class="ss">:employee</span><span class="p">,</span> <span class="n">homer</span><span class="p">,</span> <span class="n">json_item</span><span class="p">)</span>
+<span class="n">sign_in</span><span class="p">(</span><span class="ss">:admin</span><span class="p">)</span>
+<span class="n">assert_payload</span><span class="p">(</span><span class="ss">:employee</span><span class="p">,</span> <span class="n">homer</span><span class="p">,</span> <span class="n">json_item</span><span class="p">)</span> <span class="k">do</span>
+  <span class="n">key</span><span class="p">(</span><span class="ss">:salary</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>For documentation on all the spec helpers we provide, check out
+<code class="highlighter-rouge">jsonapi_spec_helpers</code>.</p>
+
+<p>Todo link.</p>
+
+            </div>
+        </div>
+
+        <script src="/js/jquery-2.1.1.min.js"></script>
+        <script scr="/js/jquery.scrollTo.js"></script>
+        <script src="/js/jquery.nav.js"></script>
+        <script src="/js/scripts.js"></script>
+    </body>
+</html>

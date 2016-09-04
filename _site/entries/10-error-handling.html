@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+<title>JSONAPI Suite</title>
+<meta name="viewport" content="width=device-width">
+<meta name="author" content="">
+<link rel="stylesheet" href="/css/main.css">
+<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:500,600' rel='stylesheet' type='text/css'>
+
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="overview">
+                <span class="toggle">close</span>
+                <header>
+  <span>JSONAPI Suite</span>
+</header>
+
+                <ul id="nav">
+    
+    
+    <li  class="parent current">
+        <a href="#intro">Introduction</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#features">Features</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li >
+        <a href="#installation">Installation</a>
+        
+    </li>
+    
+    <li  class="parent">
+        <a href="#reads">Reads</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#basics">The Basics</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#filtering">Filtering</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#includes">Includes</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li  class="parent">
+        <a href="#writes">Writes</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#deserialization">Deserialization</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#validations">Validations</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#strong_resources">Strong Resources</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li >
+        <a href="#error-handling">Error Handling</a>
+        
+    </li>
+    
+    <li >
+        <a href="#spec-helpers">Spec Helpers</a>
+        
+    </li>
+    
+    <li >
+        <a href="#swagger">Swagger</a>
+        
+    </li>
+    
+    <li >
+        <a href="#jsonapi-plus">JSON API Plus</a>
+        
+    </li>
+    
+</ul>
+            </div>
+
+            <div class="content">
+                <span class="toggle">open</span>
+                <p>We touched on <a href="http://jsonapi.org/format/#errors">Error Objects</a> in the
+<a href="/entries#validations">validations section</a>. Let’s make this work for
+any random error our application might throw:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">API</span>
+  <span class="c1"># ... code ...</span>
+
+  <span class="n">rescue_from</span> <span class="no">Exception</span> <span class="k">do</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span>
+    <span class="n">handle_exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Now let’s say we had <code class="highlighter-rouge">raise 'foo'</code> somewhere. Our API would return a 500
+status code with:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="ss">errors: </span><span class="p">[</span>
+    <span class="ss">code: </span><span class="s1">'internal_server_error'</span><span class="p">,</span>
+    <span class="ss">status: </span><span class="s1">'500'</span><span class="p">,</span>
+    <span class="ss">title: </span><span class="s1">'Error'</span><span class="p">,</span>
+    <span class="ss">detail: </span><span class="s2">"We've notified our engineers and hope to address this issue shortly."</span><span class="p">,</span>
+    <span class="ss">meta: </span><span class="p">{}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>This can all be customized. Let’s say for all
+<code class="highlighter-rouge">ActiveRecord::RecordNotFound</code> errors we want a 404 response code, with
+the error <code class="highlighter-rouge">detail</code> providing a custom message:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">register_exception</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">RecordNotFound</span><span class="p">,</span>
+  <span class="ss">status: </span><span class="mi">422</span><span class="p">,</span>
+  <span class="ss">message: </span><span class="o">-&gt;</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="p">{</span> <span class="s2">"Couldn't find record with id </span><span class="si">#{</span><span class="n">e</span><span class="p">.</span><span class="nf">id</span><span class="si">}</span><span class="s2">"</span> <span class="p">}</span>
+</code></pre>
+</div>
+
+<p>Would output:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="ss">errors: </span><span class="p">[</span>
+    <span class="ss">code: </span><span class="s1">'not_found'</span><span class="p">,</span>
+    <span class="ss">status: </span><span class="s1">'404'</span><span class="p">,</span>
+    <span class="ss">title: </span><span class="s1">'Error'</span><span class="p">,</span>
+    <span class="ss">detail: </span><span class="s2">"Couldn't find record with id 123"</span><span class="p">,</span>
+    <span class="ss">meta: </span><span class="p">{}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>You can register exceptions in <code class="highlighter-rouge">ApplicationController</code>, or any subclass
+if you want a specific controller to handle a given error differently.</p>
+
+<p>For more customization options, see the <code class="highlighter-rouge">jsonapi_errorable</code> gem.</p>
+
+<p>Todo link.</p>
+
+            </div>
+        </div>
+
+        <script src="/js/jquery-2.1.1.min.js"></script>
+        <script scr="/js/jquery.scrollTo.js"></script>
+        <script src="/js/jquery.nav.js"></script>
+        <script src="/js/scripts.js"></script>
+    </body>
+</html>

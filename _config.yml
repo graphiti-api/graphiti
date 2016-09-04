@@ -1,10 +1,11 @@
 full_rebuild: true
-name: Docster Documentation
-author: DigitalMind
-version: V 1.0
+name: JSONAPI Suite
 encoding: utf-8
+markdown_ext: "markdown,mkdown,mkdn,mkd,md"
 defaults:
   -
+    scope:
+      path: ""
     values:
       layout: "index"
 markdown: kramdown
@@ -12,7 +13,14 @@ kramdown:
   input: GFM
 relative_permalinks: false
 collections:
-- entries
+  entries:
+    output: true
+    values:
+      layout: "index"
+  tutorials:
+    output: true
+    values:
+      layout: "index"
 sass:
   sass_dir: _sass
   style: :compressed

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+<title>JSONAPI Suite</title>
+<meta name="viewport" content="width=device-width">
+<meta name="author" content="">
+<link rel="stylesheet" href="/css/main.css">
+<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:500,600' rel='stylesheet' type='text/css'>
+
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="overview">
+                <span class="toggle">close</span>
+                <header>
+  <span>JSONAPI Suite</span>
+</header>
+
+                <ul id="nav">
+    
+    
+    <li  class="parent current">
+        <a href="#intro">Introduction</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#features">Features</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li >
+        <a href="#installation">Installation</a>
+        
+    </li>
+    
+    <li  class="parent">
+        <a href="#reads">Reads</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#basics">The Basics</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#filtering">Filtering</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#includes">Includes</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li  class="parent">
+        <a href="#writes">Writes</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#deserialization">Deserialization</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#validations">Validations</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#strong_resources">Strong Resources</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li >
+        <a href="#error-handling">Error Handling</a>
+        
+    </li>
+    
+    <li >
+        <a href="#spec-helpers">Spec Helpers</a>
+        
+    </li>
+    
+    <li >
+        <a href="#swagger">Swagger</a>
+        
+    </li>
+    
+    <li >
+        <a href="#jsonapi-plus">JSON API Plus</a>
+        
+    </li>
+    
+</ul>
+            </div>
+
+            <div class="content">
+                <span class="toggle">open</span>
+                <p>OK, we now have DSLs for both reads (<code class="highlighter-rouge">jsonapi { }</code>) and writes
+(<code class="highlighter-rouge">strong_resources</code>). That means we can introspect those DSLs to
+auto-generate our documentation!</p>
+
+<p>Note: I’m going to assume you already have <a href="http://swagger.io/swagger-ui">swagger-ui</a> set up, pointing to <code class="highlighter-rouge">/api/swagger_docs.json</code>.</p>
+
+<p>We’re going to build on top of <a href="https://github.com/fotinakis/swagger-blocks">swagger-blocks</a>, so let’s go ahead and add our <code class="highlighter-rouge">DocsController</code>:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># config/routes</span>
+<span class="n">scope</span> <span class="s1">'/api'</span> <span class="k">do</span>
+  <span class="n">resources</span> <span class="ss">:docs</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:index</span><span class="p">],</span> <span class="ss">path: </span><span class="s1">'/swagger_docs'</span>
+<span class="k">end</span>
+
+<span class="c1"># app/controllers/docs_controller.rb</span>
+<span class="k">class</span> <span class="nc">DocsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="kp">include</span> <span class="no">JsonapiSwaggerHelpers</span><span class="o">::</span><span class="no">DocsControllerMixin</span>
+
+  <span class="n">swagger_root</span> <span class="k">do</span>
+    <span class="n">key</span> <span class="ss">:swagger</span><span class="p">,</span> <span class="s1">'2.0'</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Now add <code class="highlighter-rouge">jsonapi_resource</code> for any endpoint you want to document:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi_resource</span> <span class="s1">'/api/employees'</span><span class="p">,</span> <span class="ss">tags: </span><span class="p">[</span><span class="s1">'employees'</span><span class="p">]</span>
+</code></pre>
+</div>
+
+<p>That’s it. The suite will introspect the URL, figure out the correct
+controller, introspect our DSL metadata and generate all the correct
+swagger documentation. We’ll even add some extra information for you,
+like which relationships can be included:</p>
+
+<p><img src="/img/endpoints.png" alt="endpoints" />
+<img src="/img/includes_filters.png" alt="endpoints" />
+<img src="/img/nested_relations.png" alt="endpoints" /></p>
+
+<p>The default actions are <code class="highlighter-rouge">create</code>, <code class="highlighter-rouge">update</code>, <code class="highlighter-rouge">index</code>, <code class="highlighter-rouge">show</code>, and
+<code class="highlighter-rouge">destroy</code>. You can customize using <code class="highlighter-rouge">only</code> and <code class="highlighter-rouge">except</code>. You can also
+provide a custom description per action:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi_resource</span> <span class="s1">'/api/employees'</span><span class="p">,</span>
+  <span class="ss">tags: </span><span class="p">[</span><span class="s1">'employees'</span><span class="p">],</span>
+  <span class="ss">except: </span><span class="p">[</span><span class="ss">:destroy</span><span class="p">,</span> <span class="ss">:update</span><span class="p">],</span>
+  <span class="ss">descriptions: </span><span class="p">{</span>
+    <span class="ss">create: </span><span class="s2">"Presence of name is validated"</span>
+  <span class="p">}</span>
+</code></pre>
+</div>
+
+            </div>
+        </div>
+
+        <script src="/js/jquery-2.1.1.min.js"></script>
+        <script scr="/js/jquery.scrollTo.js"></script>
+        <script src="/js/jquery.nav.js"></script>
+        <script src="/js/scripts.js"></script>
+    </body>
+</html>
