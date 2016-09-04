@@ -747,14 +747,12 @@ use something like <a href="https://github.com/thoughtbot/json_matchers">json_ma
 </code></pre>
 </div>
 
-<p><code class="highlighter-rouge">assert_payload</code> takes three arguments:</p>
-<ul>
-  <li>The name of a payload we’ve defined (we haven’t done this yet).</li>
-  <li>The record we want to compare against</li>
-  <li>The relevant slice of json. <code class="highlighter-rouge">json_item</code> and <code class="highlighter-rouge">json_includes</code> are
-helpful methods to target the right slice. You can see all helpers in
-the documentation for <code class="highlighter-rouge">jsonapi_spec_helpers</code>.</li>
-</ul>
+<p><code class="highlighter-rouge">assert_payload</code> takes three arguments:
+* The name of a payload we’ve defined (we haven’t done this yet).
+* The record we want to compare against
+* The relevant slice of json. <code class="highlighter-rouge">json_item</code> and <code class="highlighter-rouge">json_includes</code> are
+  helpful methods to target the right slice. You can see all helpers in
+the documentation for <code class="highlighter-rouge">jsonapi_spec_helpers</code>.</p>
 
 <p>OK, so we want to take a record, response JSON, and compare them against
 something pre-defined. Let’s write those definitions; they look very similar to
