@@ -5,7 +5,7 @@
 <title>JSONAPI Suite</title>
 <meta name="viewport" content="width=device-width">
 <meta name="author" content="">
-<link rel="stylesheet" href="/jsonapi_suite/css/main.css">
+<link rel="stylesheet" href="/css/main.css">
 <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:500,600' rel='stylesheet' type='text/css'>
 
     </head>
@@ -106,8 +106,28 @@
         
     </li>
     
-    <li >
+    <li  class="parent">
         <a href="#jsonapi-plus">JSON API Plus</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#nested-relationships">Nested Relationships</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#extra-fields">Extra Fields</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li >
+        <a href="#without-activerecord">Usage Without ActiveRecord</a>
         
     </li>
     
@@ -118,6 +138,8 @@
                 <span class="toggle">open</span>
                 
 
+
+    
 
     
         <section id="intro" class="h1">
@@ -141,9 +163,7 @@ glance at <a href="#basics">The Basics</a>.</p>
                   <h2><a href="#features" name="features">Features</a></h2>
                 
 
-            <p>Todo: corresponding libs for ember, ruby client</p>
-
-<ul>
+            <ul>
   <li>Get pagination, sorting, and sparse fieldsets for free.</li>
   <li>Simple, flexible DSL for providing filters.</li>
   <li>Whitelist available <code class="highlighter-rouge">?include</code> paramters.</li>
@@ -154,6 +174,7 @@ glance at <a href="#basics">The Basics</a>.</p>
   <li>Spec helpers to make integration testing simple and effective.</li>
   <li>Automatically document your API with <a href="http://swagger.io">swagger</a>.</li>
   <li>Type-checking of incoming payloads.</li>
+  <li>Corresponding client libraries for Ruby and Ember</li>
   <li>…and more!</li>
 </ul>
 
@@ -191,20 +212,18 @@ modules.</p>
 </code></pre>
 </div>
 
-<p>While not a requirement, you can get out-of-the-box pagination with any
-gem that adds <code class="highlighter-rouge">per</code> and <code class="highlighter-rouge">page</code> methods to your ActiveRecord scopes. We
-recommend <code class="highlighter-rouge">kamanari</code>:</p>
+<div class="note info">
+  <h6 id="pagination">Pagination</h6>
+  <div class="note-content">
+    <p>While not a requirement, you can get out-of-the-box pagination with any gem that adds <code class="highlighter-rouge">per</code> and <code class="highlighter-rouge">page</code> methods to your ActiveRecord scopes. We recommend <code class="highlighter-rouge">kaminari</code>:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># Gemfile</span>
+    <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># Gemfile</span>
 <span class="n">gem</span> <span class="s1">'kaminari'</span>
 </code></pre>
+    </div>
+  </div>
 </div>
-
-<p>You’re ready to go!</p>
-
-<p>todo: seed, model, migrate in subsection</p>
-
-<p>todo: note activerecord not dependency, just example</p>
+<div style="height: 15rem;"></div>
 
         </section>
     
@@ -349,6 +368,15 @@ on <code class="highlighter-rouge">salary</code> if the user is an admin:</p>
 </code></pre>
 </div>
 
+<div class="note info">
+  <h6 id="customizing-filters">Customizing Filters</h6>
+  <div class="note-content">
+    <p>There are a number of ways to customize filters. To see full
+  documentation, check out <code class="highlighter-rouge">jsonapi_compliable</code>.</p>
+  </div>
+</div>
+<div style="height: 7rem"></div>
+
         </section>
     
 
@@ -412,6 +440,18 @@ for performance reasons:</p>
     </div>
   </div>
 </div>
+<div style="height: 15rem"></div>
+
+        </section>
+    
+
+    
+        <section id="writes" class="h1">
+            
+                  <h1><a href="#writes" name="writes">Writes</a></h1>
+                
+
+            
 
         </section>
     
@@ -485,16 +525,14 @@ into an <a href="http://api.rubyonrails.org/classes/ActiveRecord/NestedAttribute
 </code></pre>
 </div>
 
-        </section>
-    
-
-    
-        <section id="writes" class="h1">
-            
-                  <h1><a href="#writes" name="writes">Writes</a></h1>
-                
-
-            
+<div class="note info">
+  <h6 id="rawparams">raw_params</h6>
+  <div class="note-content">
+    <p>If you ever need to reference the original parameters, use
+  <code class="highlighter-rouge">raw_params</code> instead of <code class="highlighter-rouge">params</code>.</p>
+  </div>
+</div>
+<div style="height: 7rem"></div>
 
         </section>
     
@@ -618,7 +656,7 @@ auto-documenting our API in swagger.</p>
   <span class="ss">type: </span><span class="no">Parameters</span><span class="p">.</span><span class="nf">enum</span><span class="p">(</span><span class="s1">'Safety'</span><span class="p">,</span> <span class="s1">'Sales'</span><span class="p">,</span> <span class="s1">'Accounting'</span><span class="p">)</span>
 
 <span class="n">strong_resource</span> <span class="ss">:department</span> <span class="k">do</span>
-  <span class="n">attribute</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:department_enum</span>
+  <span class="n">attribute</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:dep</span><span class="p">]</span><span class="n">rtment_enum</span>
 <span class="k">end</span>
 </code></pre>
 </div>
@@ -636,10 +674,14 @@ department name that is not ‘Safety’, ‘Sales’, or ‘Accounting’.</p>
 </code></pre>
 </div>
 
-<p>For documentation on the various things you can do with
-<code class="highlighter-rouge">strong_resources</code>, view the documentation for that project:</p>
-
-<p>Todo: link</p>
+<div class="note info">
+  <h6 id="further-reading">Further Reading</h6>
+  <div class="note-content">
+    <p>To learn more about strong resources, check out the <code class="highlighter-rouge">strong_resources</code>
+  libary as well as <a href="https://github.com/zendesk/stronger_parameters">stronger_parameters</a>, the library it uses under the covers.</p>
+  </div>
+</div>
+<div style="height: 7rem"></div>
 
         </section>
     
@@ -706,9 +748,14 @@ the error <code class="highlighter-rouge">detail</code> providing a custom messa
 <p>You can register exceptions in <code class="highlighter-rouge">ApplicationController</code>, or any subclass
 if you want a specific controller to handle a given error differently.</p>
 
-<p>For more customization options, see the <code class="highlighter-rouge">jsonapi_errorable</code> gem.</p>
-
-<p>Todo link.</p>
+<div style="height: 3rem"></div>
+<div class="note info">
+  <h6 id="custom-error-handling">Custom error handling</h6>
+  <div class="note-content">
+    <p>For more customization options, see the <code class="highlighter-rouge">jsonapi_errorable</code> gem.</p>
+  </div>
+</div>
+<div style="height: 7rem"></div>
 
         </section>
     
@@ -804,10 +851,15 @@ test could look something like:</p>
 </code></pre>
 </div>
 
-<p>For documentation on all the spec helpers we provide, check out
-<code class="highlighter-rouge">jsonapi_spec_helpers</code>.</p>
-
-<p>Todo link.</p>
+<div style="height: 3rem"></div>
+<div class="note info">
+  <h6 id="custom-error-handling">Custom error handling</h6>
+  <div class="note-content">
+    <p>For documentation on all the spec helpers we provide, check out the
+<code class="highlighter-rouge">jsonapi_errorable</code> gem.</p>
+  </div>
+</div>
+<div style="height: 7rem"></div>
 
         </section>
     
@@ -853,9 +905,9 @@ controller, introspect our DSL metadata and generate all the correct
 swagger documentation. We’ll even add some extra information for you,
 like which relationships can be included:</p>
 
-<p><img src="/img/endpoints.png" alt="endpoints" />
-<img src="/img/includes_filters.png" alt="endpoints" />
-<img src="/img/nested_relations.png" alt="endpoints" /></p>
+<p><img src="/img/endpoints.png" width="800px" />
+<img src="/img/includes_filters.png" width="800px" />
+<img src="/img/nested_relations.png" height="400px" /></p>
 
 <p>The default actions are <code class="highlighter-rouge">create</code>, <code class="highlighter-rouge">update</code>, <code class="highlighter-rouge">index</code>, <code class="highlighter-rouge">show</code>, and
 <code class="highlighter-rouge">destroy</code>. You can customize using <code class="highlighter-rouge">only</code> and <code class="highlighter-rouge">except</code>. You can also
@@ -870,6 +922,16 @@ provide a custom description per action:</p>
 </code></pre>
 </div>
 
+<div style="height: 3rem"></div>
+<div class="note info">
+  <h6 id="more-on-swagger-helper">More on Swagger Helper</h6>
+  <div class="note-content">
+    <p>For documentation on swagger helpers, check out
+<code class="highlighter-rouge">jsonapi_swagger_helpers</code>.</p>
+  </div>
+</div>
+<div style="height: 7rem"></div>
+
         </section>
     
 
@@ -883,13 +945,226 @@ provide a custom description per action:</p>
 something…but you have this use case <em>now</em> and need to get your work
 done. We support a few of these scenarios in a way that is compatible
 with the current specification, but not defined within it - we call this
-JSON API Plus.</p>
-
-<p>Todo</p>
+<strong>JSON API Plus</strong>.</p>
 
         </section>
     
 
+    
+        <section id="nested-relationships" class="h2">
+            
+                  <h2><a href="#nested-relationships" name="nested-relationships">Nested Relationships</a></h2>
+                
+
+            <p>We’ve already mentioned nested relationships, but this is actually not
+currently part of the core JSON API spec. We accept PUT or POST
+payloads with nested attributes, including <code class="highlighter-rouge">_delete</code> (disassociate) and
+<code class="highlighter-rouge">_destroy</code> attributes:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="ss">type: </span><span class="s1">'employees'</span><span class="p">,</span>
+  <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Homer Simpson'</span> <span class="p">},</span>
+  <span class="ss">relationships: </span><span class="p">{</span>
+    <span class="ss">department: </span><span class="p">{</span>
+      <span class="ss">data: </span><span class="p">{</span>
+        <span class="ss">type: </span><span class="s1">'departments'</span><span class="p">,</span>
+        <span class="ss">id: </span><span class="mi">1</span><span class="p">,</span>
+        <span class="ss">relationships: </span><span class="p">{</span>
+          <span class="ss">goals: </span><span class="p">{</span>
+            <span class="ss">data: </span><span class="p">{</span>
+              <span class="ss">type: </span><span class="s1">'goals'</span><span class="p">,</span>
+              <span class="ss">id: </span><span class="mi">2</span><span class="p">,</span>
+              <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">_delete: </span><span class="kp">true</span> <span class="p">}</span>
+            <span class="p">}</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>To honor this API we need to customize <code class="highlighter-rouge">accepts_nested_attributes_for</code>.
+Since we’re overring ActiveRecord, we require you to explicitly include
+this module:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Employee</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="kp">include</span> <span class="no">NestedAttributeReassignable</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>And instead of using <code class="highlighter-rouge">accepts_nested_attributes_for</code>, use
+<code class="highlighter-rouge">reassignable_nested_attributes_for</code>. Otherwise, everything is the same
+and will ‘just work’.</p>
+
+<div style="height: 3rem"></div>
+<div class="note info">
+  <h6 id="ensure-deletedestroy-are-whitelisted">Ensure _delete/_destroy are whitelisted</h6>
+  <div class="note-content">
+    <p><code class="highlighter-rouge">strong_resources</code> requires you to whitelist <code class="highlighter-rouge">_delete</code> and <code class="highlighter-rouge">_destroy</code>.
+  This is pretty simple to do:</p>
+
+    <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">strong_resource</span> <span class="ss">:employee</span> <span class="k">do</span>
+  <span class="n">belongs_to</span> <span class="ss">:department</span><span class="p">,</span> <span class="ss">delete: </span><span class="kp">true</span> <span class="k">do</span>
+    <span class="n">has_many</span> <span class="ss">:goals</span><span class="p">,</span> <span class="ss">destroy: </span><span class="kp">true</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+    </div>
+  </div>
+</div>
+<div style="height: 20rem"></div>
+
+
+        </section>
+    
+
+    
+        <section id="extra-fields" class="h2">
+            
+                  <h2><a href="#extra-fields" name="extra-fields">Extra Fields</a></h2>
+                
+
+            <p>We’ve already covered JSON API sparse fieldsets. But what about the
+opposite? Sometimes you have a field that should only be in the response
+when specifically requested. Maybe this extra field is computationally
+expensive and you don’t want to pay the penalty for every request. Maybe
+it’s a UI-specific value you just need to share between your website and
+mobile app.</p>
+
+<p>Enter <code class="highlighter-rouge">extra_fields</code>. We support URLs with the parameter <code class="highlighter-rouge">extra_fields</code>
+with the same signature as <code class="highlighter-rouge">fields</code>:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="sr">/api/em</span><span class="n">ployees?extra_fields</span><span class="p">[</span><span class="n">people</span><span class="p">]</span><span class="o">=</span><span class="n">net_worth</span>
+</code></pre>
+</div>
+
+<p>Now whitelist the field in your controller, and add to your serializer:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/controllers/employees_controller.rb</span>
+<span class="n">jsonapi</span> <span class="k">do</span>
+  <span class="n">extra_field</span> <span class="ss">:net_worth</span>
+<span class="k">end</span>
+
+<span class="c1"># app/serializers/employee_serializer.rb</span>
+<span class="k">class</span> <span class="nc">EmployeeSerializer</span> <span class="o">&lt;</span> <span class="no">ApplicationSerializer</span>
+  <span class="n">extra_attribute</span> <span class="ss">:net_worth</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>As this may require traversing relationships to derive the value, you
+may want to eager load some data when the extra field is requested:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi</span> <span class="k">do</span>
+  <span class="n">extra_field</span><span class="p">(</span><span class="ss">people: </span><span class="p">[</span><span class="ss">:net_worth</span><span class="p">])</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="o">|</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">includes</span><span class="p">(</span><span class="ss">:assets</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Finally, a special <code class="highlighter-rouge">allow_x?</code> method is overrideable in your serializer.
+This is if additional conditionals must fire aside from the field being
+requested:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">allow_net_worth?</span>
+  <span class="k">return</span> <span class="kp">false</span> <span class="k">unless</span> <span class="n">current_user</span><span class="p">.</span><span class="nf">admin?</span>
+  <span class="k">super</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+        </section>
+    
+
+    
+        <section id="without-activerecord" class="h1">
+            
+                  <h1><a href="#without-activerecord" name="without-activerecord">Usage Without ActiveRecord</a></h1>
+                
+
+            <p>So far our examples have assumed you are using <code class="highlighter-rouge">ActiveRecord</code>, and we do
+treat that as the default. But everything can be customized. The
+following shows how to use the <code class="highlighter-rouge">jsonapi {  }</code> DSL to build up a hash
+that can be passed to an alternate ORM:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi</span> <span class="k">do</span>
+  <span class="n">allow_filter</span> <span class="ss">:name</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+    <span class="n">scope</span><span class="p">[</span><span class="ss">:conditions</span><span class="p">]</span> <span class="o">||=</span> <span class="p">{}</span>
+    <span class="n">scope</span><span class="p">[</span><span class="ss">:conditions</span><span class="p">].</span><span class="nf">merge!</span><span class="p">(</span><span class="ss">name: </span><span class="n">value</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">sort</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">att</span><span class="p">,</span> <span class="n">dir</span><span class="o">|</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">merge!</span><span class="p">(</span><span class="ss">order: </span><span class="p">{</span> <span class="n">att</span> <span class="o">=&gt;</span> <span class="n">dir</span> <span class="p">})</span>
+  <span class="k">end</span>
+
+  <span class="n">paginate</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">current_page</span><span class="p">,</span> <span class="n">per_page</span><span class="o">|</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_page</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)</span> <span class="o">*</span> <span class="n">per_page</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">merge!</span><span class="p">(</span><span class="ss">limit: </span><span class="n">per_page</span><span class="p">,</span> <span class="ss">offset: </span><span class="n">offset</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">includes</span> <span class="ss">whitelist: :department</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">includes</span><span class="o">|</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">merge!</span><span class="p">(</span><span class="ss">include: </span><span class="n">includes</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">index</span>
+  <span class="nb">hash</span> <span class="o">=</span> <span class="n">jsonapi_scope</span><span class="p">({})</span>
+  <span class="nb">puts</span> <span class="nb">hash</span>
+  <span class="c1"># {</span>
+  <span class="c1">#   order: { id: :asc },</span>
+  <span class="c1">#   limit: 20,</span>
+  <span class="c1">#   offset: 0,</span>
+  <span class="c1">#   conditions: { name: 'foo' },</span>
+  <span class="c1">#   include: :department</span>
+  <span class="c1"># }</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>And here’s an example using the elasticsearch gem <a href="https://github.com/richmolj/trample">trample</a>:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">jsonapi</span> <span class="k">do</span>
+    <span class="n">allow_filter</span> <span class="ss">:name</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+      <span class="n">scope</span><span class="p">.</span><span class="nf">condition</span><span class="p">(</span><span class="ss">:name</span><span class="p">).</span><span class="nf">eq</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="n">allow_filter</span> <span class="ss">:name_prefix</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+      <span class="n">scope</span><span class="p">.</span><span class="nf">condition</span><span class="p">(</span><span class="ss">:name</span><span class="p">).</span><span class="nf">starts_with</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="n">paginate</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">current_page</span><span class="p">,</span> <span class="n">per_page</span><span class="o">|</span>
+      <span class="n">scope</span><span class="p">.</span><span class="nf">metadata</span><span class="p">.</span><span class="nf">pagination</span><span class="p">.</span><span class="nf">current_page</span> <span class="o">=</span> <span class="n">current_page</span>
+      <span class="n">scope</span><span class="p">.</span><span class="nf">metadata</span><span class="p">.</span><span class="nf">pagination</span><span class="p">.</span><span class="nf">per_page</span> <span class="o">=</span> <span class="n">per_page</span>
+      <span class="n">scope</span>
+    <span class="k">end</span>
+
+    <span class="n">sort</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">att</span><span class="p">,</span> <span class="n">dir</span><span class="o">|</span>
+      <span class="n">scope</span><span class="p">.</span><span class="nf">metadata</span><span class="p">.</span><span class="nf">sort</span> <span class="o">=</span> <span class="p">[{</span><span class="ss">att: </span><span class="n">att</span><span class="p">,</span> <span class="ss">dir: </span><span class="n">dir</span><span class="p">}]</span>
+      <span class="n">scope</span>
+    <span class="k">end</span>
+
+    <span class="n">includes</span> <span class="ss">whitelist: </span><span class="p">{</span> <span class="ss">index: :pets</span> <span class="p">}</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">includes</span><span class="o">|</span>
+      <span class="n">scope</span><span class="p">.</span><span class="nf">metadata</span><span class="p">.</span><span class="nf">records</span><span class="p">[</span><span class="ss">:includes</span><span class="p">]</span> <span class="o">=</span> <span class="n">includes</span>
+      <span class="n">scope</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="n">search</span> <span class="o">=</span> <span class="n">jsonapi_scope</span><span class="p">(</span><span class="no">Search</span><span class="o">::</span><span class="no">Employee</span><span class="p">.</span><span class="nf">new</span><span class="p">)</span>
+    <span class="n">search</span><span class="p">.</span><span class="nf">query!</span>
+
+    <span class="n">render_ams</span><span class="p">(</span><span class="n">search</span><span class="p">.</span><span class="nf">records</span><span class="p">.</span><span class="nf">to_a</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+        </section>
     
 
 

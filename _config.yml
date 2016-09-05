@@ -3,7 +3,7 @@ name: JSONAPI Suite
 encoding: utf-8
 markdown_ext: "markdown,mkdown,mkdn,mkd,md"
 github:
-  url: '/jsonapi_suite'
+  url: ''
 defaults:
   -
     scope:

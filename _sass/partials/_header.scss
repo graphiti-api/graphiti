@@ -1,23 +1,13 @@
 header{
-    background:{
-        size: auto;
-        repeat: repeat;
-        image: url(../img/bg.jpg);
-    }
-    height: 150px;
     text-align: center;
-    position: relative;
-    max-width: 100%;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
 
     span{
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        -webkit-transform: translate(-50%, -50%);
-            -ms-transform: translate(-50%, -50%);
-                transform: translate(-50%, -50%);
+        font-size: 110%;
+        display: block;
+        letter-spacing: 3px;
         color: $white;
-        text-transform: uppercase;
-        font-weight: bold;
+        transform: scale(1, 1.2);
     }
 }

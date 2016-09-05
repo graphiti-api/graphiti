@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+<title>JSONAPI Suite</title>
+<meta name="viewport" content="width=device-width">
+<meta name="author" content="">
+<link rel="stylesheet" href="/css/main.css">
+<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:500,600' rel='stylesheet' type='text/css'>
+
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="overview">
+                <span class="toggle">close</span>
+                <header>
+  <span>JSONAPI Suite</span>
+</header>
+
+                <ul id="nav">
+    
+    
+    <li  class="parent current">
+        <a href="#intro">Introduction</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#features">Features</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li >
+        <a href="#installation">Installation</a>
+        
+    </li>
+    
+    <li  class="parent">
+        <a href="#reads">Reads</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#basics">The Basics</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#filtering">Filtering</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#includes">Includes</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li  class="parent">
+        <a href="#writes">Writes</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#deserialization">Deserialization</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#validations">Validations</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#strong_resources">Strong Resources</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li >
+        <a href="#error-handling">Error Handling</a>
+        
+    </li>
+    
+    <li >
+        <a href="#spec-helpers">Spec Helpers</a>
+        
+    </li>
+    
+    <li >
+        <a href="#swagger">Swagger</a>
+        
+    </li>
+    
+    <li  class="parent">
+        <a href="#jsonapi-plus">JSON API Plus</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#nested-relationships">Nested Relationships</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#extra-fields">Extra Fields</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li >
+        <a href="#without-activerecord">Usage Without ActiveRecord</a>
+        
+    </li>
+    
+</ul>
+            </div>
+
+            <div class="content">
+                <span class="toggle">open</span>
+                <p>We’ve already mentioned nested relationships, but this is actually not
+currently part of the core JSON API spec. We accept PUT or POST
+payloads with nested attributes, including <code class="highlighter-rouge">_delete</code> (disassociate) and
+<code class="highlighter-rouge">_destroy</code> attributes:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="ss">type: </span><span class="s1">'employees'</span><span class="p">,</span>
+  <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Homer Simpson'</span> <span class="p">},</span>
+  <span class="ss">relationships: </span><span class="p">{</span>
+    <span class="ss">department: </span><span class="p">{</span>
+      <span class="ss">data: </span><span class="p">{</span>
+        <span class="ss">type: </span><span class="s1">'departments'</span><span class="p">,</span>
+        <span class="ss">id: </span><span class="mi">1</span><span class="p">,</span>
+        <span class="ss">relationships: </span><span class="p">{</span>
+          <span class="ss">goals: </span><span class="p">{</span>
+            <span class="ss">data: </span><span class="p">{</span>
+              <span class="ss">type: </span><span class="s1">'goals'</span><span class="p">,</span>
+              <span class="ss">id: </span><span class="mi">2</span><span class="p">,</span>
+              <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">_delete: </span><span class="kp">true</span> <span class="p">}</span>
+            <span class="p">}</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>To honor this API we need to customize <code class="highlighter-rouge">accepts_nested_attributes_for</code>.
+Since we’re overring ActiveRecord, we require you to explicitly include
+this module:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Employee</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="kp">include</span> <span class="no">NestedAttributeReassignable</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>And instead of using <code class="highlighter-rouge">accepts_nested_attributes_for</code>, use
+<code class="highlighter-rouge">reassignable_nested_attributes_for</code>. Otherwise, everything is the same
+and will ‘just work’.</p>
+
+<div style="height: 3rem"></div>
+<div class="note info">
+  <h6 id="ensure-deletedestroy-are-whitelisted">Ensure _delete/_destroy are whitelisted</h6>
+  <div class="note-content">
+    <p><code class="highlighter-rouge">strong_resources</code> requires you to whitelist <code class="highlighter-rouge">_delete</code> and <code class="highlighter-rouge">_destroy</code>.
+  This is pretty simple to do:</p>
+
+    <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">strong_resource</span> <span class="ss">:employee</span> <span class="k">do</span>
+  <span class="n">belongs_to</span> <span class="ss">:department</span><span class="p">,</span> <span class="ss">delete: </span><span class="kp">true</span> <span class="k">do</span>
+    <span class="n">has_many</span> <span class="ss">:goals</span><span class="p">,</span> <span class="ss">destroy: </span><span class="kp">true</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+    </div>
+  </div>
+</div>
+<div style="height: 20rem"></div>
+
+
+            </div>
+        </div>
+
+        <script src="/js/jquery-2.1.1.min.js"></script>
+        <script scr="/js/jquery.scrollTo.js"></script>
+        <script src="/js/jquery.nav.js"></script>
+        <script src="/js/scripts.js"></script>
+    </body>
+</html>

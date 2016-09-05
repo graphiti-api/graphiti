@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+<title>JSONAPI Suite</title>
+<meta name="viewport" content="width=device-width">
+<meta name="author" content="">
+<link rel="stylesheet" href="/css/main.css">
+<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:500,600' rel='stylesheet' type='text/css'>
+
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="overview">
+                <span class="toggle">close</span>
+                <header>
+  <span>JSONAPI Suite</span>
+</header>
+
+                <ul id="nav">
+    
+    
+    <li  class="parent current">
+        <a href="#intro">Introduction</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#features">Features</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li >
+        <a href="#installation">Installation</a>
+        
+    </li>
+    
+    <li  class="parent">
+        <a href="#reads">Reads</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#basics">The Basics</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#filtering">Filtering</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#includes">Includes</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li  class="parent">
+        <a href="#writes">Writes</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#deserialization">Deserialization</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#validations">Validations</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#strong_resources">Strong Resources</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li >
+        <a href="#error-handling">Error Handling</a>
+        
+    </li>
+    
+    <li >
+        <a href="#spec-helpers">Spec Helpers</a>
+        
+    </li>
+    
+    <li >
+        <a href="#swagger">Swagger</a>
+        
+    </li>
+    
+    <li  class="parent">
+        <a href="#jsonapi-plus">JSON API Plus</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#nested-relationships">Nested Relationships</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#extra-fields">Extra Fields</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li >
+        <a href="#without-activerecord">Usage Without ActiveRecord</a>
+        
+    </li>
+    
+</ul>
+            </div>
+
+            <div class="content">
+                <span class="toggle">open</span>
+                <p>By default, Rails doesn’t work too well with incoming JSON API payloads.
+You can fix that with <code class="highlighter-rouge">deserialize_jsonapi!</code>:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">before_action</span> <span class="ss">:deserialize_jsonapi!</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:create</span><span class="p">,</span> <span class="ss">:update</span><span class="p">]</span>
+</code></pre>
+</div>
+
+<p>This will transform params from this:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># POST /employees</span>
+<span class="p">{</span>
+  <span class="ss">data: </span><span class="p">{</span>
+    <span class="ss">type: </span><span class="s1">'employees'</span><span class="p">,</span>
+    <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Homer Simpson'</span> <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>To this:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="ss">employee: </span><span class="p">{</span>
+    <span class="ss">name: </span><span class="s1">'Homer Simpson'</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>As if it were vanilla Rails. This will also transform any relationships
+into an <a href="http://api.rubyonrails.org/classes/ActiveRecord/NestedAttributes/ClassMethods.html">accepts_nested_attributes_for</a>-compatible payload:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># POST /employees</span>
+<span class="p">{</span>
+  <span class="ss">data: </span><span class="p">{</span>
+    <span class="ss">type: </span><span class="s1">'employees'</span><span class="p">,</span>
+    <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Homer Simpson'</span> <span class="p">},</span>
+    <span class="ss">relationships: </span><span class="p">{</span>
+      <span class="ss">department: </span><span class="p">{</span>
+        <span class="ss">data: </span><span class="p">{</span>
+          <span class="ss">type: </span><span class="s1">'departments'</span><span class="p">,</span>
+          <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Safety'</span> <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>Becomes:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="ss">employee: </span><span class="p">{</span>
+    <span class="ss">name: </span><span class="s1">'Homer Simpson'</span><span class="p">,</span>
+    <span class="ss">department_attributes: </span><span class="p">{</span>
+      <span class="p">{</span> <span class="ss">name: </span><span class="s1">'Safety'</span> <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="note info">
+  <h6 id="rawparams">raw_params</h6>
+  <div class="note-content">
+    <p>If you ever need to reference the original parameters, use
+  <code class="highlighter-rouge">raw_params</code> instead of <code class="highlighter-rouge">params</code>.</p>
+  </div>
+</div>
+<div style="height: 7rem"></div>
+
+            </div>
+        </div>
+
+        <script src="/js/jquery-2.1.1.min.js"></script>
+        <script scr="/js/jquery.scrollTo.js"></script>
+        <script src="/js/jquery.nav.js"></script>
+        <script src="/js/scripts.js"></script>
+    </body>
+</html>

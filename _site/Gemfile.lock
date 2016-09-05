@@ -1,5 +1,5 @@
 GEM
-  remote: https://rubygems.org/
+  remote: http://artprod.dev.bloomberg.com/artifactory/api/gems/rubygems/
   specs:
     activesupport (4.2.7)
       i18n (~> 0.7)
@@ -133,8 +133,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  github-pages (= 94)
-  json
+  github-pages
+  jekyll
 
 BUNDLED WITH
    1.12.5

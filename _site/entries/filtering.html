@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+<title>JSONAPI Suite</title>
+<meta name="viewport" content="width=device-width">
+<meta name="author" content="">
+<link rel="stylesheet" href="/css/main.css">
+<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:500,600' rel='stylesheet' type='text/css'>
+
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="overview">
+                <span class="toggle">close</span>
+                <header>
+  <span>JSONAPI Suite</span>
+</header>
+
+                <ul id="nav">
+    
+    
+    <li  class="parent current">
+        <a href="#intro">Introduction</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#features">Features</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li >
+        <a href="#installation">Installation</a>
+        
+    </li>
+    
+    <li  class="parent">
+        <a href="#reads">Reads</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#basics">The Basics</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#filtering">Filtering</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#includes">Includes</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li  class="parent">
+        <a href="#writes">Writes</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#deserialization">Deserialization</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#validations">Validations</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#strong_resources">Strong Resources</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li >
+        <a href="#error-handling">Error Handling</a>
+        
+    </li>
+    
+    <li >
+        <a href="#spec-helpers">Spec Helpers</a>
+        
+    </li>
+    
+    <li >
+        <a href="#swagger">Swagger</a>
+        
+    </li>
+    
+    <li  class="parent">
+        <a href="#jsonapi-plus">JSON API Plus</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#nested-relationships">Nested Relationships</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#extra-fields">Extra Fields</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li >
+        <a href="#without-activerecord">Usage Without ActiveRecord</a>
+        
+    </li>
+    
+</ul>
+            </div>
+
+            <div class="content">
+                <span class="toggle">open</span>
+                <p>Let’s have some fun implementing <a href="http://jsonapi.org/format/#fetching-filtering">filtering</a>.</p>
+
+<p>Assume we’re using ActiveRecord and want to filter records based on name
+and email:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">jsonapi</span> <span class="k">do</span>
+    <span class="n">allow_filter</span> <span class="ss">:name</span>
+    <span class="n">allow_filter</span> <span class="ss">:email</span>
+  <span class="k">end</span>
+  <span class="c1"># ... code ...</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Congratulations! You can now filter on name, email, or both. In other
+words, these URLs now work:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">/api/employees?filter[name]=Homer</code></li>
+  <li><code class="highlighter-rouge">/api/employees?filter[email]=chunkylover53@hotmail.com</code></li>
+  <li><code class="highlighter-rouge">/api/employees?filter[name]=Homer&amp;email=chunkylover53@hotmail.com</code></li>
+</ul>
+
+<p>What if you want to filter on something that’s not an attribute, like
+all names starting with ‘hom’? Simply pass a block to <code class="highlighter-rouge">allow_filter</code> and
+chain onto your scope:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">allow_filter</span> <span class="ss">:name_prefix</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">([</span><span class="s2">"name LIKE ?"</span><span class="p">,</span> <span class="s2">"</span><span class="si">#{</span><span class="n">value</span><span class="si">}</span><span class="s2">%"</span><span class="p">])</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Or maybe we’re using <a href="https://github.com/mbleigh/acts-as-taggable-on">acts_as_taggable_on</a> and want to find all employees with a given tag:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">allow_filter</span> <span class="ss">:tag</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">tagged_with</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="ss">any: </span><span class="kp">true</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Filters can be conditional as well. Let’s say we want to allow filtering
+on <code class="highlighter-rouge">salary</code> if the user is an admin:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">allow_filter</span> <span class="ss">:salary</span><span class="p">,</span> <span class="ss">if: :admin?</span>
+
+<span class="c1"># ... code ...</span>
+
+<span class="k">def</span> <span class="nf">admin?</span>
+  <span class="n">current_user</span><span class="p">.</span><span class="nf">role</span> <span class="o">==</span> <span class="s1">'admin'</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<div class="note info">
+  <h6 id="customizing-filters">Customizing Filters</h6>
+  <div class="note-content">
+    <p>There are a number of ways to customize filters. To see full
+  documentation, check out <code class="highlighter-rouge">jsonapi_compliable</code>.</p>
+  </div>
+</div>
+<div style="height: 7rem"></div>
+
+            </div>
+        </div>
+
+        <script src="/js/jquery-2.1.1.min.js"></script>
+        <script scr="/js/jquery.scrollTo.js"></script>
+        <script src="/js/jquery.nav.js"></script>
+        <script src="/js/scripts.js"></script>
+    </body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+<title>JSONAPI Suite</title>
+<meta name="viewport" content="width=device-width">
+<meta name="author" content="">
+<link rel="stylesheet" href="/css/main.css">
+<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:500,600' rel='stylesheet' type='text/css'>
+
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="overview">
+                <span class="toggle">close</span>
+                <header>
+  <span>JSONAPI Suite</span>
+</header>
+
+                <ul id="nav">
+    
+    
+    <li  class="parent current">
+        <a href="#intro">Introduction</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#features">Features</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li >
+        <a href="#installation">Installation</a>
+        
+    </li>
+    
+    <li  class="parent">
+        <a href="#reads">Reads</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#basics">The Basics</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#filtering">Filtering</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#includes">Includes</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li  class="parent">
+        <a href="#writes">Writes</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#deserialization">Deserialization</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#validations">Validations</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#strong_resources">Strong Resources</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li >
+        <a href="#error-handling">Error Handling</a>
+        
+    </li>
+    
+    <li >
+        <a href="#spec-helpers">Spec Helpers</a>
+        
+    </li>
+    
+    <li >
+        <a href="#swagger">Swagger</a>
+        
+    </li>
+    
+    <li  class="parent">
+        <a href="#jsonapi-plus">JSON API Plus</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#nested-relationships">Nested Relationships</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#extra-fields">Extra Fields</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
+    <li >
+        <a href="#without-activerecord">Usage Without ActiveRecord</a>
+        
+    </li>
+    
+</ul>
+            </div>
+
+            <div class="content">
+                <span class="toggle">open</span>
+                <p>Let’s write a very simple controller:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">jsonapi</span> <span class="p">{</span> <span class="p">}</span>
+
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="n">employees</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">all</span>
+    <span class="n">render_ams</span><span class="p">(</span><span class="n">employees</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The above controller automatically supports:</p>
+
+<ul>
+  <li><a href="http://jsonapi.org/format/#fetching-pagination">Pagination</a></li>
+  <li><a href="http://jsonapi.org/format/#fetching-sorting">Sorting</a></li>
+  <li><a href="http://jsonapi.org/format/#fetching-sparse-fieldsets">Sparse Fieldsets</a></li>
+  <li>A <a href="http://jsonapi.org/format/#document-structure">jsonapi.org compatible response</a></li>
+</ul>
+
+<p>Let’s take a look at what this code does.</p>
+
+<p><code class="highlighter-rouge">jsonapi { }</code> sets up our controller. We’ll go into this in more detail
+later.</p>
+
+<p><code class="highlighter-rouge">render_ams</code> is similar to <code class="highlighter-rouge">render :json</code>. However, it’s going to do
+some extra work for you. For starters, it will pass relavant arguments -
+like which sparse fieldsets were requested - to <code class="highlighter-rouge">render</code> for you.</p>
+
+<p><code class="highlighter-rouge">render_ams</code> will also build the appropriate query scope. In this case
+we passed it an ActiveRecord scope (<code class="highlighter-rouge">Employee.all</code>) that can be chained
+off of. In this case we’re automatically adding pagination, sorting, and
+<code class="highlighter-rouge">select</code> to that scope.</p>
+
+<p>This means you could optionally provide a default scope:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">index</span>
+  <span class="n">employees</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
+  <span class="n">render_ams</span><span class="p">(</span><span class="n">employees</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>If you want to lower-level access to the scope we’re building, use
+<code class="highlighter-rouge">jsonapi_scope</code>. The following is equivalent:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">index</span>
+  <span class="n">scope</span> <span class="o">=</span> <span class="n">jsonapi_scope</span><span class="p">(</span><span class="no">Employee</span><span class="p">.</span><span class="nf">all</span><span class="p">)</span>
+  <span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
+
+  <span class="c1"># Here we'll pass the actual records instead of</span>
+  <span class="c1"># a scope, the scoping logic has already fired.</span>
+  <span class="n">render_ams</span><span class="p">(</span><span class="n">scope</span><span class="p">.</span><span class="nf">to_a</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+            </div>
+        </div>
+
+        <script src="/js/jquery-2.1.1.min.js"></script>
+        <script scr="/js/jquery.scrollTo.js"></script>
+        <script src="/js/jquery.nav.js"></script>
+        <script src="/js/scripts.js"></script>
+    </body>
+</html>

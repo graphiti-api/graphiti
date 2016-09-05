@@ -18,7 +18,7 @@
     overflow-y: auto;
     transition: .3s all;
     background: $white;
-    border-right: 3px solid $green;
+    border-right: 3px solid $orange;
     
     @media screen and (max-width: $sidebar-collapse){
         left: -320px;
@@ -50,18 +50,18 @@
         width: 100%;
         box-sizing: border-box;
         > li {
-            border-bottom: 1px solid rgba($green, .3);
+            border-bottom: 1px solid rgba($orange, .3);
             a {
                 display: block;
                 padding: 10px 20px;
                 line-height: 1;
-                border-bottom: 1px solid rgba($green, .2);
+                border-bottom: 1px solid rgba($orange, .2);
                 &:before {
                     content: counters(nested-counter, ".") " ";
                     font-size: 0;
                 }
                 &:hover {
-                    background: rgba($green, .1);
+                    background: rgba($orange, .1);
                 }
             }
             li {
