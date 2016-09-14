@@ -113,8 +113,10 @@ module JSONAPICompliable
 
     def deserialize_jsonapi!
       self.raw_params = self.params.deep_dup
-      self.params = ActionController::Parameters
-        .new(Deserialization.new(params.to_unsafe_h).deserialize)
+      hash = params.to_unsafe_h
+      hash = hash.with_indifferent_access if Rails::VERSION::MAJOR == 4
+      deserialized = Deserialization.new(hash).deserialize
+      self.params = ActionController::Parameters.new(deserialized)
     end
   end
 end

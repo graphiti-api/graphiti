@@ -14,6 +14,8 @@ RSpec.describe JSONAPICompliable, type: :controller do
       end
     end
 
+    prepend_before_action :fix_params!
+
     before_action :deserialize_jsonapi!, only: [:create, :update]
 
     def index
@@ -32,6 +34,15 @@ RSpec.describe JSONAPICompliable, type: :controller do
 
     def default_page_size
       20
+    end
+
+    # Honestly not sure why this is needed
+    # Otherwise params is { params: actual_params }
+    def fix_params!
+      if Rails::VERSION::MAJOR == 4
+        good_params = { action: action_name }.merge(params[:params] || {})
+        self.params = ActionController::Parameters.new(good_params)
+      end
     end
   end
 
