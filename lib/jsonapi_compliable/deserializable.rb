@@ -114,7 +114,7 @@ module JSONAPICompliable
     def deserialize_jsonapi!
       self.raw_params = self.params.deep_dup
       self.params = ActionController::Parameters
-      .new(Deserialization.new(params.to_unsafe_h).deserialize)
+        .new(Deserialization.new(params.to_unsafe_h).deserialize)
     end
   end
 end

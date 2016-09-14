@@ -1,9 +1,20 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
-require File.expand_path("../dummy/config/environment.rb", __FILE__)
+
+require 'jsonapi_spec_helpers'
+require 'rails'
+
+require 'kaminari'
+require 'active_record'
+require 'active_model_serializers'
+require File.expand_path(File.join(File.dirname(__FILE__), "./support/basic_rails_app"))
 require 'rspec/rails'
+require 'database_cleaner'
+
+require 'jsonapi_compliable'
+
+::Rails.application = BasicRailsApp.generate
 
 RSpec.configure do |config|
-  config.include FactoryGirl::Syntax::Methods
   config.include JsonapiSpecHelpers
 
   config.before(:suite) do
@@ -17,6 +28,8 @@ RSpec.configure do |config|
     end
   end
 end
+
+ActiveModel::Serializer.config.adapter = :json_api
 
 ActiveRecord::Migration.verbose = false
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
@@ -55,7 +68,6 @@ ActiveRecord::Schema.define(:version => 1) do
 end
 
 class ApplicationRecord < ActiveRecord::Base
-  include NestedAttributeReassignable
   self.abstract_class = true
 end
 
@@ -66,18 +78,18 @@ end
 class Author < ApplicationRecord
   belongs_to :state
   has_many :books
-  reassignable_nested_attributes_for :books
-  reassignable_nested_attributes_for :state
+  accepts_nested_attributes_for :books
+  accepts_nested_attributes_for :state
 end
 
 class Genre < ApplicationRecord
   has_many :books
-  reassignable_nested_attributes_for :books
+  accepts_nested_attributes_for :books
 end
 
 class Tag < ApplicationRecord
   belongs_to :book
-  reassignable_nested_attributes_for :book
+  accepts_nested_attributes_for :book
 end
 
 class Book < ApplicationRecord
@@ -85,31 +97,13 @@ class Book < ApplicationRecord
   belongs_to :genre
   has_many :tags
 
-  reassignable_nested_attributes_for :author
-  reassignable_nested_attributes_for :genre
-  reassignable_nested_attributes_for :tags
+  accepts_nested_attributes_for :author
+  accepts_nested_attributes_for :genre
+  accepts_nested_attributes_for :tags
 end
 
 class ApplicationSerializer < ActiveModel::Serializer
-  def self.extra_attribute(name)
-    attribute name, if: :"allow_#{name}?"
-
-    define_method :"allow_#{name}?" do
-      if extra_fields = instance_options[:extra_fields]
-        klass = ActiveModelSerializers::Adapter::JsonApi::ResourceIdentifier
-        resource_object = klass.new(self, {}).as_json
-        if extra_fields = extra_fields[resource_object[:type].to_sym]
-          extra_fields.include?(name)
-        end
-      end
-    end
-  end
-
-  def self.extra_attributes(*names)
-    names.each do |name|
-      extra_attribute name
-    end
-  end
+  include JsonapiAmsExtensions
 end
 
 class AuthorSerializer < ApplicationSerializer
@@ -138,8 +132,6 @@ class BookSerializer < ApplicationSerializer
   belongs_to :author
   has_many :tags
 end
-
-ActiveModel::Serializer.config.adapter = :json_api
 
 JsonapiSpecHelpers::Payload.register(:book) do
   key(:title)

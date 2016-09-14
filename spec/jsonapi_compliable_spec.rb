@@ -38,11 +38,14 @@ RSpec.describe JSONAPICompliable, type: :controller do
   let!(:virginia) { State.create(name: 'Virginia') }
   let!(:newyork)  { State.create(name: 'New York') }
   let!(:mystery)  { Genre.create(name: 'Mystery') }
+
   context 'when creating' do
     before do
       controller.class_eval do
         def create
-          author = Author.new(params.require(:author).permit!)
+          author_params = params.require(:author).permit!
+          author = Author.new(author_params.except(:state_attributes))
+          author.state = State.find_or_initialize_by(author_params[:state_attributes])
           author.save!(validate: false)
           render_ams(author)
         end
@@ -79,8 +82,8 @@ RSpec.describe JSONAPICompliable, type: :controller do
   end
 
   it 'should be able to override options' do
-    author = Author.create!(first_name: 'Stephen',last_name: 'King', state_attributes: { id: virginia.id })
-    author.books.create(title: "The Shining", genre_attributes: { id: mystery.id })
+    author = Author.create!(first_name: 'Stephen',last_name: 'King', state: virginia)
+    author.books.create(title: "The Shining", genre: mystery)
 
     controller.class_eval do
       def index
@@ -93,8 +96,9 @@ RSpec.describe JSONAPICompliable, type: :controller do
 
     expect(json_included_types).to match_array(%w(books genres states))
   end
+
   context 'when updating' do
-    let!(:author) { Author.create!(first_name: 'Stephen', last_name: 'King', state_attributes: { id: virginia.id }) }
+    let!(:author) { Author.create!(first_name: 'Stephen', last_name: 'King', state: virginia) }
     let!(:old_book) { author.books.create(title: "The Shining") }
 
     before do
@@ -102,14 +106,20 @@ RSpec.describe JSONAPICompliable, type: :controller do
 
       controller.class_eval do
         def update
-          author = Author.find(params[:author][:id])
-          author.update_attributes!(params.require(:author).permit!)
+          author_params = params.require(:author).permit!
+          author = Author.find(author_params[:id])
+          author_params[:books_attributes].each do |attrs|
+            book = Book.find_or_initialize_by(attrs)
+            author.association(:books).add_to_target(book, :skip_callbacks)
+          end
+          author.association(:books).loaded!
+          author.save!
           render_ams(author)
         end
       end
     end
 
-    it 'should only include relations send as part of payload' do
+    it 'should include relations sent as part of payload' do
       put :update, id: author.id, params: {
         data: {
           id: author.id,
@@ -120,12 +130,9 @@ RSpec.describe JSONAPICompliable, type: :controller do
                 {
                   type: 'books',
                   attributes: {
-                     title: "The Firm",
-                     genre_attributes: {
-                      name: "Thriller"
-                    }
+                    title: "The Firm"
                   }
-                 }
+                }
               ]
             }
           }
@@ -133,6 +140,7 @@ RSpec.describe JSONAPICompliable, type: :controller do
       }
 
       expect(json_included_types).to match_array(%w(books))
+      expect(json_includes('books').length).to eq(1)
       expect(json_include('books')['id']).to eq(Book.last.id.to_s)
       author.reload
       expect(author.book_ids).to match_array(Book.pluck(:id))
@@ -155,8 +163,8 @@ RSpec.describe JSONAPICompliable, type: :controller do
   end
 
   it 'should be able to override options' do
-    author = Author.create!(first_name: 'Stephen', last_name: 'King', state_attributes: { id: virginia.id })
-    author.books.create(title: "The Shining", genre_attributes: { id: mystery.id })
+    author = Author.create!(first_name: 'Stephen', last_name: 'King', state: virginia)
+    author.books.create(title: "The Shining", genre: mystery)
 
     controller.class_eval do
       def index
@@ -225,7 +233,7 @@ RSpec.describe JSONAPICompliable, type: :controller do
       end
     end
 
-    let!(:author) { Author.create!(first_name: 'Stephen', last_name: 'King', state_attributes: { id: virginia.id }) }
+    let!(:author) { Author.create!(first_name: 'Stephen', last_name: 'King', state: virginia) }
     let!(:book) { author.books.create(title: "The Shining") }
 
     it 'should not re-apply scopes' do
@@ -239,8 +247,8 @@ RSpec.describe JSONAPICompliable, type: :controller do
 
   context 'when sorting' do
     before do
-      Author.create!(first_name: 'Philip', last_name: 'Roth',state_attributes: { id: newyork.id })
-      Author.create!(first_name: 'Stephen',   last_name: 'King', state_attributes: { id: virginia.id })
+      Author.create!(first_name: 'Philip', last_name: 'Roth', state: newyork)
+      Author.create!(first_name: 'Stephen',   last_name: 'King', state: virginia)
     end
 
     subject do
@@ -284,10 +292,10 @@ RSpec.describe JSONAPICompliable, type: :controller do
   end
 
   context 'when paginating' do
-    let!(:author1) { Author.create!(first_name: 'Philip', last_name: 'Roth',state_attributes: { id: newyork.id }) }
-    let!(:author2) { Author.create!(first_name: 'Philip', last_name: 'Roth',state_attributes: { id: newyork.id }) }
-    let!(:author3) { Author.create!(first_name: 'Philip', last_name: 'Roth',state_attributes: { id: newyork.id }) }
-    let!(:author4) { Author.create!(first_name: 'Philip', last_name: 'Roth',state_attributes: { id: newyork.id }) }
+    let!(:author1) { Author.create!(first_name: 'Philip', last_name: 'Roth', state: newyork) }
+    let!(:author2) { Author.create!(first_name: 'Philip', last_name: 'Roth', state: newyork) }
+    let!(:author3) { Author.create!(first_name: 'Philip', last_name: 'Roth', state: newyork) }
+    let!(:author4) { Author.create!(first_name: 'Philip', last_name: 'Roth', state: newyork) }
 
     it 'should raise error when size > 1000' do
       expect {
@@ -344,7 +352,7 @@ RSpec.describe JSONAPICompliable, type: :controller do
   end
 
   context 'when requesting custom fieldset' do
-    let!(:author) { Author.create!(first_name: 'Philip', last_name: 'Roth',state_attributes: { id: newyork.id }) }
+    let!(:author) { Author.create!(first_name: 'Philip', last_name: 'Roth', state: newyork) }
 
     let(:custom_serializer) do
       Class.new(ApplicationSerializer) do
@@ -458,10 +466,10 @@ RSpec.describe JSONAPICompliable, type: :controller do
   end
 
   context 'when filtering' do
-    let!(:author1) { Author.create!(first_name: 'Stephen', last_name: 'King',state_attributes: { id: newyork.id }) }
-    let!(:author2) { Author.create!(first_name: 'Agartha', last_name: 'Christie',state_attributes: { id: newyork.id }) }
-    let!(:author3) { Author.create!(first_name: 'Willaim', last_name: 'Shakesphere',state_attributes: { id: newyork.id }) }
-    let!(:author4) { Author.create!(first_name: 'AHarold', last_name: 'Robbins',state_attributes: { id: newyork.id }) }
+    let!(:author1) { Author.create!(first_name: 'Stephen', last_name: 'King', state: newyork) }
+    let!(:author2) { Author.create!(first_name: 'Agartha', last_name: 'Christie', state: newyork) }
+    let!(:author3) { Author.create!(first_name: 'Willaim', last_name: 'Shakesphere', state: newyork) }
+    let!(:author4) { Author.create!(first_name: 'AHarold', last_name: 'Robbins', state: newyork) }
 
     context 'and the filter is not allowed' do
       it 'should raise an error' do
