@@ -12,6 +12,7 @@ if ENV['RAILS_ENV'] == 'test'
 end
 
 require "jsonapi_suite/version"
+require "jsonapi_suite/controller_mixin"
 
 module JsonapiSuite
 end
