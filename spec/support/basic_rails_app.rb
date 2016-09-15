@@ -61,9 +61,3 @@ module BasicRailsApp
     @app.initialize!
   end
 end
-
-#module ActiveSupport
-  #class TestCase
-    #include TestHelpers::Generation
-  #end
-#end
