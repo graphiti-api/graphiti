@@ -311,7 +311,7 @@ RSpec.describe JSONAPICompliable, type: :controller do
     it 'should raise error when size > 1000' do
       expect {
         get :index, params: { page: { number: 2, size: 1001 } }
-      }.to raise_error(JSONAPICompliable::UnsupportedPageSize)
+      }.to raise_error(JSONAPICompliable::Errors::UnsupportedPageSize)
     end
 
     it 'should limit by size, offset by number' do
@@ -486,7 +486,7 @@ RSpec.describe JSONAPICompliable, type: :controller do
       it 'should raise an error' do
         expect {
           get :index, params: { filter: { foo: 'bar' } }
-        }.to raise_error(JSONAPICompliable::BadFilter)
+        }.to raise_error(JSONAPICompliable::Errors::BadFilter)
       end
     end
 
@@ -576,7 +576,7 @@ RSpec.describe JSONAPICompliable, type: :controller do
         it 'should raise error' do
           expect {
             get :index, params: { filter: { first_name: author2.first_name } }
-          }.to raise_error(JSONAPICompliable::BadFilter)
+          }.to raise_error(JSONAPICompliable::Errors::BadFilter)
         end
       end
     end

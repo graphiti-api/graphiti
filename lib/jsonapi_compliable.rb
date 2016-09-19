@@ -3,6 +3,8 @@ require 'jsonapi'
 require 'jsonapi_ams_extensions'
 
 require "jsonapi_compliable/version"
+require "jsonapi_compliable/errors"
+require "jsonapi_compliable/dsl"
 
 module JSONAPICompliable
   autoload :Base,           'jsonapi_compliable/base'

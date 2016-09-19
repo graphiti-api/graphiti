@@ -1,120 +1,15 @@
 module JSONAPICompliable
-  class BadFilter < StandardError; end
-  class UnsupportedPageSize < StandardError; end
-
   module Base
     extend ActiveSupport::Concern
     include Deserializable
 
     MAX_PAGE_SIZE = 1_000
 
-    class JsonApiConfig
-      attr_accessor :_includes,
-        :_default_filters,
-        :_extra_fields,
-        :_filters,
-        :_sort,
-        :_paginate
-
-      def initialize
-        @_includes = {}
-        @_filters = {}
-        @_default_filters = {}
-        @_extra_fields = {}
-        @_sort = nil
-        @_paginate = nil
-      end
-
-      def includes(whitelist: nil, &blk)
-        whitelist = parse_includes(whitelist) if whitelist
-
-        @_includes = {
-          whitelist: whitelist,
-          custom_function: blk
-        }
-      end
-
-      def allow_filter(name, *args, &blk)
-        opts = args.extract_options!
-        aliases = [name, opts[:aliases]].flatten.compact
-        @_filters[name.to_sym] = {
-          aliases: aliases,
-          if: opts[:if],
-          filter: blk
-        }
-      end
-
-      def default_filter(name, &blk)
-        @_default_filters[name.to_sym] = {
-          filter: blk
-        }
-      end
-
-      def sort(&blk)
-        @_sort = blk
-      end
-
-      def paginate(&blk)
-        @_paginate = blk
-      end
-
-      def extra_field(field, &blk)
-        @_extra_fields[field.keys.first] ||= []
-        @_extra_fields[field.keys.first] << {
-          name: field.values.first,
-          proc: blk
-        }
-      end
-
-      def parse_includes(includes)
-        JSONAPI::IncludeDirective.new(includes)
-      end
-
-      def filter_scope(controller, scope, name, value)
-        name   = name.to_sym
-        filter = find_filter!(controller, name)
-        value  = value.split(',') if value.include?(',')
-
-        if custom_scope = filter.values.first[:filter]
-          custom_scope.call(scope, value)
-        else
-          scope.where(filter.keys.first => value)
-        end
-      end
-
-      def default_filter_scope(controller, scope)
-        @_default_filters.each_pair do |name, opts|
-          next if find_filter(controller, name)
-          scope = opts[:filter].call(scope)
-        end
-
-        scope
-      end
-
-      private
-
-      def find_filter(controller, name)
-        find_filter!(controller, name)
-      rescue BadFilter
-        nil
-      end
-
-      def find_filter!(controller, name)
-        filter_name, filter_value = \
-          @_filters.find { |_name, opts| opts[:aliases].include?(name.to_sym) }
-        raise BadFilter unless filter_name
-        if guard = filter_value[:if]
-          raise BadFilter if controller.send(guard) == false
-        end
-        { filter_name => filter_value }
-      end
-    end
-
     included do
-      class_attribute :_jsonapi_config
+      class_attribute :_jsonapi_compliable
 
       def self.inherited(klass)
-        klass._jsonapi_config = nil
+        klass._jsonapi_compliable = nil
       end
 
       before_action :parse_fieldsets!
@@ -141,8 +36,8 @@ module JSONAPICompliable
     def scrub_includes
       return unless params[:include]
 
-      includes = _jsonapi_config.parse_includes(params[:include])
-      whitelist = _jsonapi_config._includes[:whitelist][params[:action]]
+      includes = _jsonapi_compliable.parse_includes(params[:include])
+      whitelist = _jsonapi_compliable.sideloads[:whitelist][params[:action]]
       whitelist ? CompareIncludes.call(includes, whitelist) : {}
     end
 
@@ -150,7 +45,7 @@ module JSONAPICompliable
       scrubbed = scrub_includes
       return scope unless scrubbed
 
-      scope = if custom_include = _jsonapi_config._includes[:custom_function]
+      scope = if custom_include = _jsonapi_compliable.sideloads[:custom_function]
                 custom_include.call(scope, scrubbed)
               else
                 scope.includes(scrubbed)
@@ -164,7 +59,7 @@ module JSONAPICompliable
       dir = sort_param.starts_with?('-') ? :desc : :asc
       att = sort_param.sub('-', '').to_sym
 
-      scope = if custom_sort = _jsonapi_config._sort
+      scope = if custom_sort = _jsonapi_compliable.sorting
                 custom_sort.call(scope, att, dir)
               else
                 scope.order(att => dir)
@@ -179,10 +74,10 @@ module JSONAPICompliable
       size       = (page_param[:size]   || default_page_size).to_i
 
       if size > MAX_PAGE_SIZE
-        raise UnsupportedPageSize,"Requested page size #{size} is greater than max supported size #{MAX_PAGE_SIZE}" 
+        raise JSONAPICompliable::Errors::UnsupportedPageSize,"Requested page size #{size} is greater than max supported size #{MAX_PAGE_SIZE}" 
       end
 
-      scope = if custom_pagination = _jsonapi_config._paginate
+      scope = if custom_pagination = _jsonapi_compliable.pagination
                 custom_pagination.call(scope, number, size)
               else
                 scope.page(number).per(size)
@@ -193,16 +88,16 @@ module JSONAPICompliable
 
     def jsonapi_filter(scope)
       param_filters = params[:filter] || {}
-      scope = _jsonapi_config.default_filter_scope(self, scope)
+      scope = _jsonapi_compliable.default_filter_scope(self, scope)
       param_filters.each_pair do |param_name, param_value|
-        scope = _jsonapi_config.filter_scope(self, scope, param_name, param_value)
+        scope = _jsonapi_compliable.filter_scope(self, scope, param_name, param_value)
       end
 
       scope
     end
 
     def jsonapi_extra_fields(scope)
-      _jsonapi_config._extra_fields.each_pair do |namespace, extra_fields|
+      _jsonapi_compliable.extra_fields.each_pair do |namespace, extra_fields|
         extra_fields.each do |extra_field|
           if requested_extra_field?(namespace, extra_field[:name])
             scope = extra_field[:proc].call(scope)
@@ -311,9 +206,9 @@ module JSONAPICompliable
 
     module ClassMethods
       def jsonapi(&blk)
-        config = JsonApiConfig.new
-        config.instance_eval(&blk)
-        self._jsonapi_config = config
+        dsl = JsonapiCompliable::DSL.new
+        dsl.instance_eval(&blk)
+        self._jsonapi_compliable = dsl
       end
     end
  end
