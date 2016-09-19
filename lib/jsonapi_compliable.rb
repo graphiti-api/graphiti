@@ -5,6 +5,16 @@ require 'jsonapi_ams_extensions'
 require "jsonapi_compliable/version"
 require "jsonapi_compliable/errors"
 require "jsonapi_compliable/dsl"
+require "jsonapi_compliable/scope/base"
+require "jsonapi_compliable/scope/sort"
+require "jsonapi_compliable/scope/paginate"
+require "jsonapi_compliable/scope/sideload"
+require "jsonapi_compliable/scope/extra_fields"
+require "jsonapi_compliable/scope/filterable"
+require "jsonapi_compliable/scope/default_filter"
+require "jsonapi_compliable/scope/filter"
+require "jsonapi_compliable/util/include_params"
+require "jsonapi_compliable/util/field_params"
 
 module JSONAPICompliable
   autoload :Base,           'jsonapi_compliable/base'

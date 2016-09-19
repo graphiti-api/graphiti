@@ -17,11 +17,11 @@ module JsonapiCompliable
     end
 
     def includes(whitelist: nil, &blk)
-      whitelist = parse_includes(whitelist) if whitelist
+      whitelist = JSONAPI::IncludeDirective.new(whitelist) if whitelist
 
       @sideloads = {
         whitelist: whitelist,
-        custom_function: blk
+        custom_scope: blk
       }
     end
 
@@ -55,49 +55,6 @@ module JsonapiCompliable
         name: field.values.first,
         proc: blk
       }
-    end
-
-    def parse_includes(includes)
-      JSONAPI::IncludeDirective.new(includes)
-    end
-
-    def filter_scope(controller, scope, name, value)
-      name   = name.to_sym
-      filter = find_filter!(controller, name)
-      value  = value.split(',') if value.include?(',')
-
-      if custom_scope = filter.values.first[:filter]
-        custom_scope.call(scope, value)
-      else
-        scope.where(filter.keys.first => value)
-      end
-    end
-
-    def default_filter_scope(controller, scope)
-      @default_filters.each_pair do |name, opts|
-        next if find_filter(controller, name)
-        scope = opts[:filter].call(scope)
-      end
-
-      scope
-    end
-
-    private
-
-    def find_filter(controller, name)
-      find_filter!(controller, name)
-    rescue JSONAPICompliable::Errors::BadFilter
-      nil
-    end
-
-    def find_filter!(controller, name)
-      filter_name, filter_value = \
-        @filters.find { |_name, opts| opts[:aliases].include?(name.to_sym) }
-      raise JSONAPICompliable::Errors::BadFilter unless filter_name
-      if guard = filter_value[:if]
-        raise JSONAPICompliable::Errors::BadFilter if controller.send(guard) == false
-      end
-      { filter_name => filter_value }
     end
   end
 end
