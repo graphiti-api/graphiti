@@ -1,4 +1,4 @@
-module JSONAPICompliable
+module JsonapiCompliable
   module Util
     class FieldParams
       def self.parse!(params, name)

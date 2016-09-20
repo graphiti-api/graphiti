@@ -1,4 +1,4 @@
-module JSONAPICompliable
+module JsonapiCompliable
   module Scope
     class Base
       attr_reader :controller, :dsl, :params, :scope

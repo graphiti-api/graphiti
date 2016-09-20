@@ -1,4 +1,4 @@
-module JSONAPICompliable
+module JsonapiCompliable
   class Scope::Sideload < Scope::Base
     def apply
       params[:include] ? super : @scope

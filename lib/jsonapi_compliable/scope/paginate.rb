@@ -1,10 +1,10 @@
-module JSONAPICompliable
+module JsonapiCompliable
   class Scope::Paginate < Scope::Base
     MAX_PAGE_SIZE = 1_000
 
     def apply
       if size > MAX_PAGE_SIZE
-        raise JSONAPICompliable::Errors::UnsupportedPageSize
+        raise JsonapiCompliable::Errors::UnsupportedPageSize
           .new(size, MAX_PAGE_SIZE)
       else
         super

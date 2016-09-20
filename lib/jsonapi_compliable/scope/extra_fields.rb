@@ -1,4 +1,4 @@
-module JSONAPICompliable
+module JsonapiCompliable
   class Scope::ExtraFields < Scope::Base
     def apply
       each_extra_field do |extra_field|

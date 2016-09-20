@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe JSONAPICompliable, type: :controller do
+RSpec.describe JsonapiCompliable, type: :controller do
   controller(ApplicationController) do
     jsonapi { }
 

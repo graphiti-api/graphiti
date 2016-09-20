@@ -86,7 +86,7 @@ RSpec.describe 'filtering', type: :controller do
     it 'raises an error' do
       expect {
         get :index, params: { filter: { first_name: 'Stephen' } }
-      }.to raise_error(JSONAPICompliable::Errors::BadFilter)
+      }.to raise_error(JsonapiCompliable::Errors::BadFilter)
     end
   end
 
@@ -94,7 +94,7 @@ RSpec.describe 'filtering', type: :controller do
     it 'raises an error' do
       expect {
         get :index, params: { filter: { foo: 'bar' } }
-      }.to raise_error(JSONAPICompliable::Errors::BadFilter)
+      }.to raise_error(JsonapiCompliable::Errors::BadFilter)
     end
   end
 end

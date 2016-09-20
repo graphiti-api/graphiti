@@ -1,4 +1,4 @@
-module JSONAPICompliable
+module JsonapiCompliable
   class Scope::Filter < Scope::Base
     include Scope::Filterable
 

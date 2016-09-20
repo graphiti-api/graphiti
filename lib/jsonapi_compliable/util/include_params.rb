@@ -1,4 +1,4 @@
-module JSONAPICompliable
+module JsonapiCompliable
   module Util
     class IncludeParams
       def self.compare(includes, whitelist)

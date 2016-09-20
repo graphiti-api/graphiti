@@ -43,7 +43,7 @@
 #
 # before_action :deserialize_jsonapi!, only: [:my_action]
 
-module JSONAPICompliable
+module JsonapiCompliable
   module Deserializable
     extend ActiveSupport::Concern
 

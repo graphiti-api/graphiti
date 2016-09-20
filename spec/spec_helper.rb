@@ -142,7 +142,7 @@ JsonapiSpecHelpers::Payload.register(:genre) do
 end
 
 class ApplicationController < ActionController::Base
-  include JSONAPICompliable
+  include JsonapiCompliable
 
   prepend_before_action :fix_params!
 

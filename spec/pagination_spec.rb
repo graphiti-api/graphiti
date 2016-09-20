@@ -23,7 +23,7 @@ RSpec.describe 'pagination', type: :controller do
   it 'raises error when size > 1000' do
     expect {
       get :index, params: { page: { number: 1, size: 1001 } }
-    }.to raise_error(JSONAPICompliable::Errors::UnsupportedPageSize)
+    }.to raise_error(JsonapiCompliable::Errors::UnsupportedPageSize)
   end
 
   it 'limits by size, offsets by number' do

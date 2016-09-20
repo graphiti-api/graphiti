@@ -1,4 +1,4 @@
-module JSONAPICompliable
+module JsonapiCompliable
   class Scope::Sort < Scope::Base
     def custom_scope
       dsl.sorting

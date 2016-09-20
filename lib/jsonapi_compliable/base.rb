@@ -1,4 +1,4 @@
-module JSONAPICompliable
+module JsonapiCompliable
   module Base
     extend ActiveSupport::Concern
     include Deserializable
@@ -25,12 +25,12 @@ module JSONAPICompliable
                       paginate: true,
                       extra_fields: true,
                       sort: true)
-      scope = JSONAPICompliable::Scope::DefaultFilter.new(self, scope).apply
-      scope = JSONAPICompliable::Scope::Filter.new(self, scope).apply if filter
-      scope = JSONAPICompliable::Scope::ExtraFields.new(self, scope).apply if extra_fields
-      scope = JSONAPICompliable::Scope::Sideload.new(self, scope).apply if includes
-      scope = JSONAPICompliable::Scope::Sort.new(self, scope).apply if sort
-      scope = JSONAPICompliable::Scope::Paginate.new(self, scope).apply if paginate
+      scope = JsonapiCompliable::Scope::DefaultFilter.new(self, scope).apply
+      scope = JsonapiCompliable::Scope::Filter.new(self, scope).apply if filter
+      scope = JsonapiCompliable::Scope::ExtraFields.new(self, scope).apply if extra_fields
+      scope = JsonapiCompliable::Scope::Sideload.new(self, scope).apply if includes
+      scope = JsonapiCompliable::Scope::Sort.new(self, scope).apply if sort
+      scope = JsonapiCompliable::Scope::Paginate.new(self, scope).apply if paginate
       @_jsonapi_scoped = true
       scope
     end

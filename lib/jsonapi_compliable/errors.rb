@@ -1,4 +1,4 @@
-module JSONAPICompliable
+module JsonapiCompliable
   module Errors
     class BadFilter < StandardError; end
 
