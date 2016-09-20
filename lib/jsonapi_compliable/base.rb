@@ -8,6 +8,7 @@ module JSONAPICompliable
     included do
       class_attribute :_jsonapi_compliable
       before_action :parse_fieldsets!
+      after_action :reset_scope_flag
     end
 
     def default_page_number
@@ -30,7 +31,12 @@ module JSONAPICompliable
       scope = JSONAPICompliable::Scope::Sideload.new(self, scope).apply if includes
       scope = JSONAPICompliable::Scope::Sort.new(self, scope).apply if sort
       scope = JSONAPICompliable::Scope::Paginate.new(self, scope).apply if paginate
+      @_jsonapi_scoped = true
       scope
+    end
+
+    def reset_scope_flag
+      @_jsonapi_scoped = false
     end
 
     def parse_fieldsets!
@@ -38,10 +44,9 @@ module JSONAPICompliable
       Util::FieldParams.parse!(params, :extra_fields)
     end
 
-    # * Eager loads whitelisted includes
-    # * Merges opts and ams_default_options
     def render_ams(scope, opts = {})
-      scope = jsonapi_scope(scope) if scope.is_a?(ActiveRecord::Relation)
+      opts[:scope] = true unless opts[:scope] == false
+      scope = jsonapi_scope(scope) if !@_jsonapi_scoped && opts.delete(:scope)
       options = default_ams_options
       options[:include] = forced_includes || Util::IncludeParams.scrub(self)
       options[:json] = scope
@@ -60,6 +65,9 @@ module JSONAPICompliable
       end
     end
 
+    # TODO: This nastiness likely goes away once jsonapi standardizes
+    # a spec for nested relationships.
+    # See: https://github.com/json-api/json-api/issues/1089
     def forced_includes(data = nil)
       return unless force_includes?
       data = raw_params[:data] unless data
@@ -85,9 +93,11 @@ module JSONAPICompliable
 
     module ClassMethods
       def jsonapi(&blk)
-        dsl = JsonapiCompliable::DSL.new
-        dsl.instance_eval(&blk)
-        self._jsonapi_compliable = dsl
+        if !self._jsonapi_compliable
+          dsl = JsonapiCompliable::DSL.new
+          self._jsonapi_compliable = dsl
+        end
+        self._jsonapi_compliable.instance_eval(&blk)
       end
     end
   end

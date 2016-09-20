@@ -3,7 +3,7 @@
 source "http://artprod.dev.bloomberg.com/artifactory/api/gems/rubygems/"
 
 gem "active_model_serializers", :git => "https://github.com/richmolj/active_model_serializers.git"
-gem "rails", "~> 4.0"
+gem "rails", "~> 4.1"
 
 group :test do
   gem "appraisal"

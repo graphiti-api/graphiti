@@ -28,9 +28,5 @@ module JSONAPICompliable
         yield filter, value
       end
     end
-
-    def filter_param
-      params[:filter] || {}
-    end
   end
 end

@@ -1,6 +1,5 @@
 module JSONAPICompliable
   class Scope::ExtraFields < Scope::Base
-
     def apply
       each_extra_field do |extra_field|
         @scope = extra_field[:proc].call(@scope)

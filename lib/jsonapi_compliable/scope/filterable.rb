@@ -15,5 +15,9 @@ module JSONAPICompliable
       end
       { filter_name => filter_value }
     end
+
+    def filter_param
+      params[:filter] || {}
+    end
   end
 end

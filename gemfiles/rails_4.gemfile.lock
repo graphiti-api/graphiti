@@ -11,7 +11,7 @@ GIT
 PATH
   remote: ../
   specs:
-    jsonapi_compliable (0.3.1)
+    jsonapi_compliable (0.3.2)
       active_model_serializers (~> 0.10)
       jsonapi (~> 0.1.1.beta2)
       jsonapi_ams_extensions (~> 0.1)
@@ -208,7 +208,7 @@ DEPENDENCIES
   kaminari
   pry
   pry-byebug
-  rails (~> 4.0)
+  rails (~> 4.1)
   rake (~> 10.0)
   rspec-rails
   sqlite3
