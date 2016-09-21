@@ -44,7 +44,7 @@ RSpec.describe JsonapiCompliable, type: :controller do
           .once
           .and_call_original
         get :index
-        expect(json_items(0)['first-name']).to eq('Stephen')
+        expect(json_items(0)['first_name']).to eq('Stephen')
       end
     end
 

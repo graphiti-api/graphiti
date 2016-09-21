@@ -42,12 +42,12 @@ RSpec.describe 'extra_fields', type: :controller do
 
   it 'does not include extra fields when not requested' do
     get :index
-    expect(json_items(0).keys).to match_array(%w(id jsonapi_type first-name last-name))
+    expect(json_items(0).keys).to match_array(%w(id jsonapi_type first_name last_name))
   end
 
   it 'includes the extra fields in the response when requested' do
     get :index, params: { extra_fields: { authors: 'net_worth' } }
-    expect(json_items(0).keys).to match_array(%w(id jsonapi_type first-name last-name net-worth))
+    expect(json_items(0).keys).to match_array(%w(id jsonapi_type first_name last_name net_worth))
   end
 
   it 'alters the scope based on the supplied block' do
@@ -63,7 +63,7 @@ RSpec.describe 'extra_fields', type: :controller do
 
     it 'does not include the extra field in the response' do
       get :index, params: { extra_fields: { authors: 'net_worth' } }
-      expect(json_items(0).keys).to match_array(%w(id jsonapi_type first-name last-name))
+      expect(json_items(0).keys).to match_array(%w(id jsonapi_type first_name last_name))
     end
   end
 end

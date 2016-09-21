@@ -34,17 +34,17 @@ RSpec.describe 'fields', type: :controller do
 
   it 'limits to only the requested fields' do
     get :index
-    expect(json_items(0).keys).to match_array(%w(id jsonapi_type first-name last-name uuid))
+    expect(json_items(0).keys).to match_array(%w(id jsonapi_type first_name last_name uuid))
     get :index, params: { fields: { authors: 'first_name,last_name' } }
-    expect(json_items(0).keys).to match_array(%w(id jsonapi_type first-name last-name))
+    expect(json_items(0).keys).to match_array(%w(id jsonapi_type first_name last_name))
   end
 
   it 'disallows fields guarded by :if, even if specified' do
     allow(controller).to receive(:current_user) { 'admin' }
     get :index, params: { fields: { authors: 'first_name,salary' } }
-    expect(json_items(0).keys).to match_array(%w(id jsonapi_type first-name salary))
+    expect(json_items(0).keys).to match_array(%w(id jsonapi_type first_name salary))
     allow(controller).to receive(:current_user) { 'non-admin' }
     get :index, params: { fields: { authors: 'first_name,salary' } }
-    expect(json_items(0).keys).to match_array(%w(id jsonapi_type first-name))
+    expect(json_items(0).keys).to match_array(%w(id jsonapi_type first_name))
   end
 end

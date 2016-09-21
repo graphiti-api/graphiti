@@ -23,7 +23,7 @@ RSpec.describe 'sorting', type: :controller do
   context 'when passing sort param' do
     subject do
       get :index, params: { sort: sort_param }
-      json_items.map { |n| n['first-name'] }
+      json_items.map { |n| n['first_name'] }
     end
 
     context 'asc' do
