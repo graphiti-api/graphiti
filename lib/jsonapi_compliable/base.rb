@@ -7,6 +7,8 @@ module JsonapiCompliable
 
     included do
       class_attribute :_jsonapi_compliable
+      attr_reader :_jsonapi_scoped
+
       before_action :parse_fieldsets!
       after_action :reset_scope_flag
     end
@@ -45,8 +47,7 @@ module JsonapiCompliable
     end
 
     def render_ams(scope, opts = {})
-      opts[:scope] = true unless opts[:scope] == false
-      scope = jsonapi_scope(scope) if !@_jsonapi_scoped && opts.delete(:scope)
+      scope = jsonapi_scope(scope) if Util::Scoping.apply?(self, scope, opts.delete(:scope))
       options = default_ams_options
       options[:include] = forced_includes || Util::IncludeParams.scrub(self)
       options[:json] = scope

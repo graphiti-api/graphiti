@@ -15,6 +15,7 @@ require "jsonapi_compliable/scope/default_filter"
 require "jsonapi_compliable/scope/filter"
 require "jsonapi_compliable/util/include_params"
 require "jsonapi_compliable/util/field_params"
+require "jsonapi_compliable/util/scoping"
 
 module JsonapiCompliable
   autoload :Base,           'jsonapi_compliable/base'
