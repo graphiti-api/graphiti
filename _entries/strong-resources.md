@@ -73,7 +73,7 @@ strong_param :department_enum,
   type: Parameters.enum('Safety', 'Sales', 'Accounting')
 
 strong_resource :department do
-  attribute :name, :dep]rtment_enum
+  attribute :name, :department_enum
 end
 ```
 
