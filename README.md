@@ -1,6 +1,6 @@
 ### JsonapiCompliable
 
-[official documentation](https://bbgithub.dev.bloomberg.com/pages/InfrastructureExperience/jsonapi_compliable)
+[official documentation](https://jsonapi-suite.github.io/jsonapi_compliable)
 
 Supported Rails versions: >= 4.1
 
