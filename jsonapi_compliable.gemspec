@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Lee Richmond", "Venkata Pasupuleti"]
   spec.email         = ["richmolj@gmail.com", "spasupuleti4@bloomberg.net"]
 
-  spec.summary       = %q{JSON Compliable serializer for action controller}
+  spec.summary       = %q{Easily build jsonapi.org-compatible APIs}
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
