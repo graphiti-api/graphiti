@@ -154,10 +154,11 @@ modules.</p>
 </code></pre>
 </div>
 
-<p>In addition, this suite depends on <a href="github.com/rails-api/active_model_serializers">active_model_serializers</a>. However, to accomodate a <a href="https://github.com/rails-api/active_model_serializers/pull/1797">performance issue</a>, we currently suggest you run off of this fork:</p>
+<p>In addition, this suite depends on <a href="github.com/rails-api/active_model_serializers">active_model_serializers</a>. However, to accomodate a <a href="https://github.com/rails-api/active_model_serializers/pull/1931">performance issue</a>, we currently suggest you run off of this fork:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">gem</span> <span class="s1">'active_model_serializers'</span><span class="p">,</span>
-  <span class="ss">git: </span><span class="s1">'https://github.com/richmolj/active_model_serializers.git'</span>
+  <span class="ss">git: </span><span class="s1">'https://github.com/richmolj/active_model_serializers.git'</span><span class="p">,</span>
+  <span class="ss">branch: </span><span class="s1">'include_data_if_sideloaded'</span>
 </code></pre>
 </div>
 

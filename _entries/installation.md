@@ -23,11 +23,12 @@ class ApplicationSerializer < ActiveModel::Serializer
 end
 ```
 
-In addition, this suite depends on [active_model_serializers](github.com/rails-api/active_model_serializers). However, to accomodate a [performance issue](https://github.com/rails-api/active_model_serializers/pull/1797), we currently suggest you run off of this fork:
+In addition, this suite depends on [active_model_serializers](github.com/rails-api/active_model_serializers). However, to accomodate a [performance issue](https://github.com/rails-api/active_model_serializers/pull/1931), we currently suggest you run off of this fork:
 
 ```ruby
 gem 'active_model_serializers',
-  git: 'https://github.com/richmolj/active_model_serializers.git'
+  git: 'https://github.com/richmolj/active_model_serializers.git',
+  branch: 'include_data_if_sideloaded'
 ```
 
 {::options parse_block_html="true" /}
