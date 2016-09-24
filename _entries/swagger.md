@@ -63,7 +63,7 @@ jsonapi_resource '/api/employees',
 ###### More on Swagger Helper
   <div class='note-content'>
 For documentation on swagger helpers, check out
-`jsonapi_swagger_helpers`.
+[jsonapi_swagger_helpers](https://github.com/jsonapi-suite/jsonapi_swagger_helpers).
   </div>
 </div>
 <div style="height: 7rem"></div>

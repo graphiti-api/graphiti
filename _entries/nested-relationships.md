@@ -54,7 +54,7 @@ and will 'just work'.
 <div class='note info'>
 ###### Ensure _delete/_destroy are whitelisted
   <div class='note-content'>
-  `strong_resources` requires you to whitelist `_delete` and `_destroy`.
+  [strong_resources](https://github.com/jsonapi-suite/strong_resources) requires you to whitelist `_delete` and `_destroy`.
   This is pretty simple to do:
 
 ```ruby

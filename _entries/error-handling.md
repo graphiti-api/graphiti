@@ -67,7 +67,7 @@ if you want a specific controller to handle a given error differently.
 <div class='note info'>
 ###### Custom error handling
   <div class='note-content'>
-  For more customization options, see the `jsonapi_errorable` gem.
+  For more customization options, see the [jsonapi_errorable](https://github.com/jsonapi-suite/jsonapi_errorable) gem.
   </div>
 </div>
 <div style="height: 7rem"></div>

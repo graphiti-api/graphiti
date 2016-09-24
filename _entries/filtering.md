@@ -64,7 +64,7 @@ end
 ###### Customizing Filters
   <div class='note-content'>
   There are a number of ways to customize filters. To see full
-  documentation, check out `jsonapi_compliable`.
+  documentation, check out [jsonapi_compliable](https://github.com/jsonapi-suite/jsonapi_compliable).
   </div>
 </div>
 <div style="height: 7rem" />

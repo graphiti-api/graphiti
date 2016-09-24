@@ -91,10 +91,10 @@ end
 <div style="height: 3rem"></div>
 {::options parse_block_html="true" /}
 <div class='note info'>
-###### Custom error handling
+###### More on spec helpers
   <div class='note-content'>
 For documentation on all the spec helpers we provide, check out the
-`jsonapi_errorable` gem.
+[jsonapi_spec_helpers](https://github.com/jsonapi-suite/jsonapi_spec_helpers) gem.
   </div>
 </div>
 <div style="height: 7rem"></div>
