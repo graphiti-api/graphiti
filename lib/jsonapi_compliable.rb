@@ -17,6 +17,8 @@ require "jsonapi_compliable/util/include_params"
 require "jsonapi_compliable/util/field_params"
 require "jsonapi_compliable/util/scoping"
 
+require 'jsonapi_compliable/railtie' if defined?(::Rails)
+
 module JsonapiCompliable
   autoload :Base,           'jsonapi_compliable/base'
   autoload :Deserializable, 'jsonapi_compliable/deserializable'

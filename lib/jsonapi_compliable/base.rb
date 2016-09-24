@@ -50,7 +50,7 @@ module JsonapiCompliable
       scope = jsonapi_scope(scope) if Util::Scoping.apply?(self, scope, opts.delete(:scope))
       options = default_ams_options
       options[:include] = forced_includes || Util::IncludeParams.scrub(self)
-      options[:json] = scope
+      options[:jsonapi] = scope
       options[:fields] = Util::FieldParams.fieldset(params, :fields) if params[:fields]
       options[:extra_fields] = Util::FieldParams.fieldset(params, :extra_fields) if params[:extra_fields]
 

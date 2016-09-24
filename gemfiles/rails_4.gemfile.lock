@@ -11,14 +11,14 @@ GIT
 PATH
   remote: ../
   specs:
-    jsonapi_compliable (0.3.2)
+    jsonapi_compliable (0.3.4)
       active_model_serializers (~> 0.10)
       jsonapi (~> 0.1.1.beta2)
       jsonapi_ams_extensions (~> 0.1)
       rails (>= 4.1, < 6)
 
 GEM
-  remote: http://artprod.dev.bloomberg.com/artifactory/api/gems/rubygems/
+  remote: https://rubygems.org/
   specs:
     actionmailer (4.2.7.1)
       actionpack (= 4.2.7.1)
@@ -89,7 +89,7 @@ GEM
     json (1.8.3)
     jsonapi (0.1.1.beta2)
       json (~> 1.8)
-    jsonapi_ams_extensions (0.1.0)
+    jsonapi_ams_extensions (0.1.1)
       active_model_serializers (~> 0.10.x)
     jsonapi_spec_helpers (0.2.0)
     kaminari (0.17.0)
