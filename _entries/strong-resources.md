@@ -94,7 +94,8 @@ end
 <div class='note info'>
 ###### Further Reading
   <div class='note-content'>
-  To learn more about strong resources, check out the `strong_resources`
+  To learn more about strong resources, check out the
+  [strong_resources](https://github.com/jsonapi-suite/strong_resources)
   libary as well as [stronger_parameters](https://github.com/zendesk/stronger_parameters), the library it uses under the covers.
   </div>
 </div>
