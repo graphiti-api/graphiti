@@ -131,6 +131,21 @@
         
     </li>
     
+    <li  class="parent">
+        <a href="#customize">Customize</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#without-kaminari">Usage without Kaminari</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
     <li >
         <a href="#without-activerecord">Usage Without ActiveRecord</a>
         
@@ -141,10 +156,7 @@
 
             <div class="content">
                 <span class="toggle">open</span>
-                <p>So far our examples have assumed you are using <code class="highlighter-rouge">ActiveRecord</code>, and we do
-treat that as the default. But everything can be customized. The
-following shows how to use the <code class="highlighter-rouge">jsonapi {  }</code> DSL to build up a hash
-that can be passed to an alternate ORM:</p>
+                <p>The following shows how to use the <code class="highlighter-rouge">jsonapi {  }</code> DSL to build up a hash that can be passed to an alternate ORM:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi</span> <span class="k">do</span>
   <span class="n">allow_filter</span> <span class="ss">:name</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>

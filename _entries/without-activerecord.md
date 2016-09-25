@@ -2,13 +2,10 @@
 sectionid: without-activerecord
 sectionclass: h1
 title: Usage Without ActiveRecord
-number: 18
+number: 20
 ---
 
-So far our examples have assumed you are using `ActiveRecord`, and we do
-treat that as the default. But everything can be customized. The
-following shows how to use the `jsonapi {  }` DSL to build up a hash
-that can be passed to an alternate ORM:
+The following shows how to use the `jsonapi {  }` DSL to build up a hash that can be passed to an alternate ORM:
 
 ```ruby
 jsonapi do

@@ -131,6 +131,21 @@
         
     </li>
     
+    <li  class="parent">
+        <a href="#customize">Customize</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#without-kaminari">Usage without Kaminari</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
     <li >
         <a href="#without-activerecord">Usage Without ActiveRecord</a>
         
@@ -151,9 +166,9 @@ mobile app.</p>
 <p>Enter <code class="highlighter-rouge">extra_fields</code>. We support URLs with the parameter <code class="highlighter-rouge">extra_fields</code>
 with the same signature as <code class="highlighter-rouge">fields</code>:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="sr">/api/em</span><span class="n">ployees?extra_fields</span><span class="p">[</span><span class="n">people</span><span class="p">]</span><span class="o">=</span><span class="n">net_worth</span>
-</code></pre>
-</div>
+<ul>
+  <li><code class="highlighter-rouge">/api/employees?extra_fields[people]=net_worth</code></li>
+</ul>
 
 <p>Now whitelist the field in your controller, and add to your serializer:</p>
 

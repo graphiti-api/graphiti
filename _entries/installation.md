@@ -41,6 +41,9 @@ gem 'active_model_serializers',
 # Gemfile
 gem 'kaminari'
 ```
+
+  If you'd prefer to use a different pagination scheme, [see the
+  customization section](#without-kaminari)
   </div>
 </div>
-<div style="height: 15rem;" />
+<div style="height: 20rem;" />

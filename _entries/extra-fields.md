@@ -16,9 +16,7 @@ mobile app.
 Enter `extra_fields`. We support URLs with the parameter `extra_fields`
 with the same signature as `fields`:
 
-```ruby
-/api/employees?extra_fields[people]=net_worth
-```
+* `/api/employees?extra_fields[people]=net_worth`
 
 Now whitelist the field in your controller, and add to your serializer:
 

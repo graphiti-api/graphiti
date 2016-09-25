@@ -26,6 +26,12 @@ The above controller automatically supports:
 * [Sparse Fieldsets](http://jsonapi.org/format/#fetching-sparse-fieldsets)
 * A [jsonapi.org compatible response](http://jsonapi.org/format/#document-structure)
 
+In other words, we now support these URLs:
+
+* `http://localhost:3000/api/employees?page[number]=2&page[size]=1`
+* `http://localhost:3000/api/employees?sort=-name`
+* `http://localhost:3000/api/employees?fields[employees]=name,age`
+
 Let's take a look at what this code does.
 
 `jsonapi { }` sets up our controller. We'll go into this in more detail

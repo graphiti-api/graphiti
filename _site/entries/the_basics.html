@@ -131,6 +131,21 @@
         
     </li>
     
+    <li  class="parent">
+        <a href="#customize">Customize</a>
+        
+            <ul>
+                
+                
+                    <li >
+                        <a href="#without-kaminari">Usage without Kaminari</a>
+                        
+                    </li>
+                
+            </ul>
+        
+    </li>
+    
     <li >
         <a href="#without-activerecord">Usage Without ActiveRecord</a>
         
@@ -161,6 +176,14 @@
   <li><a href="http://jsonapi.org/format/#fetching-sorting">Sorting</a></li>
   <li><a href="http://jsonapi.org/format/#fetching-sparse-fieldsets">Sparse Fieldsets</a></li>
   <li>A <a href="http://jsonapi.org/format/#document-structure">jsonapi.org compatible response</a></li>
+</ul>
+
+<p>In other words, we now support these URLs:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">http://localhost:3000/api/employees?page[number]=2&amp;page[size]=1</code></li>
+  <li><code class="highlighter-rouge">http://localhost:3000/api/employees?sort=-name</code></li>
+  <li><code class="highlighter-rouge">http://localhost:3000/api/employees?fields[employees]=name,age</code></li>
 </ul>
 
 <p>Let’s take a look at what this code does.</p>
