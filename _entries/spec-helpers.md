@@ -8,7 +8,7 @@ number: 13
 Validating verbose JSON API responses in tests can be a pain. We could
 use something like [json_matchers](https://github.com/thoughtbot/json_matchers) to validate a schema, but we hope to do one better - let's validate full payloads with a few simple helpers, using full-stack [rspec request specs](https://github.com/rspec/rspec-rails#request-specs).
 
-Let's say we're testing the `show` action of our employees controller, sideloading the employee's department. Here's vanilla RSpec of what the test might look like:
+Let's say we're testing the `show` action of our employees controller, sideloading the employee's department. Let's begin with vanilla RSpec of what the test might look like:
 
 ```ruby
 require 'rails_helper'
@@ -26,7 +26,18 @@ RSpec.describe 'employees#show', type: :request do
 end
 ```
 
-To validate the response, we'll call `assert_payload`:
+To avoid painful json assertions, let's use [jsonapi_spec_helpers](https://github.com/jsonapi-suite/jsonapi_spec_helpers). Start by adding some setup code:
+
+```ruby
+# spec/rails_helper.rb
+require 'jsonapi_spec_helpers'
+
+RSpec.configure do |config|
+  config.include JsonapiSpecHelpers
+end
+```
+
+And now to validate the response, we'll call `assert_payload`:
 
 ```ruby
 assert_payload(:employee, homer, json_item)

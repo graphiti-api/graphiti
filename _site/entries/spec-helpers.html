@@ -139,7 +139,7 @@
                 <p>Validating verbose JSON API responses in tests can be a pain. We could
 use something like <a href="https://github.com/thoughtbot/json_matchers">json_matchers</a> to validate a schema, but we hope to do one better - let’s validate full payloads with a few simple helpers, using full-stack <a href="https://github.com/rspec/rspec-rails#request-specs">rspec request specs</a>.</p>
 
-<p>Let’s say we’re testing the <code class="highlighter-rouge">show</code> action of our employees controller, sideloading the employee’s department. Here’s vanilla RSpec of what the test might look like:</p>
+<p>Let’s say we’re testing the <code class="highlighter-rouge">show</code> action of our employees controller, sideloading the employee’s department. Let’s begin with vanilla RSpec of what the test might look like:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'rails_helper'</span>
 
@@ -157,7 +157,18 @@ use something like <a href="https://github.com/thoughtbot/json_matchers">json_ma
 </code></pre>
 </div>
 
-<p>To validate the response, we’ll call <code class="highlighter-rouge">assert_payload</code>:</p>
+<p>To avoid painful json assertions, let’s use <a href="https://github.com/jsonapi-suite/jsonapi_spec_helpers">jsonapi_spec_helpers</a>. Start by adding some setup code:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># spec/rails_helper.rb</span>
+<span class="nb">require</span> <span class="s1">'jsonapi_spec_helpers'</span>
+
+<span class="no">RSpec</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">include</span> <span class="no">JsonapiSpecHelpers</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>And now to validate the response, we’ll call <code class="highlighter-rouge">assert_payload</code>:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">assert_payload</span><span class="p">(</span><span class="ss">:employee</span><span class="p">,</span> <span class="n">homer</span><span class="p">,</span> <span class="n">json_item</span><span class="p">)</span>
 <span class="n">assert_payload</span><span class="p">(</span><span class="ss">:department</span><span class="p">,</span> <span class="n">safety</span><span class="p">,</span> <span class="n">json_include</span><span class="p">(</span><span class="s1">'departments'</span><span class="p">))</span>
