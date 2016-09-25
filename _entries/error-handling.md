@@ -61,13 +61,27 @@ Would output:
 You can register exceptions in `ApplicationController`, or any subclass
 if you want a specific controller to handle a given error differently.
 
+For more customization options, see the [jsonapi_errorable](https://github.com/jsonapi-suite/jsonapi_errorable) gem.
 
 <div style="height: 3rem"></div>
 {::options parse_block_html="true" /}
 <div class='note info'>
-###### Custom error handling
+###### Error Handling in Tests
   <div class='note-content'>
-  For more customization options, see the [jsonapi_errorable](https://github.com/jsonapi-suite/jsonapi_errorable) gem.
+  You may want your test suite to throw errors, instead of returning
+  this friendly output. Configure this using `JsonapiErrorable.disable!`:
+
+```ruby
+config.before :each do
+  JsonapiErrorable.disable!
+end
+
+# enable for specific test
+it 'does something' do
+  JsonapiErrorable.enable!
+  # ... code ...
+end
+```
   </div>
 </div>
-<div style="height: 7rem"></div>
+<div style="height: 25rem"></div>

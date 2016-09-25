@@ -40,9 +40,9 @@ controller, introspect our DSL metadata and generate all the correct
 swagger documentation. We'll even add some extra information for you,
 like which relationships can be included:
 
-<img src="{{ site.github.url }}/img/endpoints.png" width="800px"/>
-<img src="{{ site.github.url }}/img/includes_filters.png" width="800px"/>
-<img src="{{ site.github.url }}/img/nested_relations.png" height="400px"/>
+<img src="img/endpoints.png" width="800px"/>
+<img src="img/includes_filters.png" width="800px"/>
+<img src="img/nested_relations.png" height="400px"/>
 
 The default actions are `create`, `update`, `index`, `show`, and
 `destroy`. You can customize using `only` and `except`. You can also

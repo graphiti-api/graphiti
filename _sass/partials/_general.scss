@@ -82,7 +82,7 @@ body{
 
 .note {
   $notebg: #37474f;
-  $darkbg: darken($notebg, 10%);
+  $darkbg: darken($notebg, 5%);
   &:before {
     content: "";
     position: absolute;

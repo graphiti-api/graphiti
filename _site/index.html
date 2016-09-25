@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8">
+        
+<base href="https://jsonapi-suite.github.io/jsonapi_suite/" target="_blank">
+
+
+<meta charset="UTF-8">
 <title>JSONAPI Suite</title>
 <meta name="viewport" content="width=device-width">
 <meta name="author" content="">
-<link rel="stylesheet" href="/jsonapi_suite/css/main.css">
+<link rel="stylesheet" href="css/main.css">
 <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:500,600' rel='stylesheet' type='text/css'>
 
     </head>
 
     <body>
         <div class="container">
-            <div class="overview" style='background-image: url("/jsonapi_suite/img/vertical_cloth.png") !important'>
+            <div class="overview" style='background-image: url("img/vertical_cloth.png") !important'>
                 <span class="toggle">close</span>
                 <header>
   <span>JSONAPI Suite</span>
@@ -752,14 +756,29 @@ the error <code class="highlighter-rouge">detail</code> providing a custom messa
 <p>You can register exceptions in <code class="highlighter-rouge">ApplicationController</code>, or any subclass
 if you want a specific controller to handle a given error differently.</p>
 
+<p>For more customization options, see the <a href="https://github.com/jsonapi-suite/jsonapi_errorable">jsonapi_errorable</a> gem.</p>
+
 <div style="height: 3rem"></div>
 <div class="note info">
-  <h6 id="custom-error-handling">Custom error handling</h6>
+  <h6 id="error-handling-in-tests">Error Handling in Tests</h6>
   <div class="note-content">
-    <p>For more customization options, see the <a href="https://github.com/jsonapi-suite/jsonapi_errorable">jsonapi_errorable</a> gem.</p>
+    <p>You may want your test suite to throw errors, instead of returning
+  this friendly output. Configure this using <code class="highlighter-rouge">JsonapiErrorable.disable!</code>:</p>
+
+    <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">config</span><span class="p">.</span><span class="nf">before</span> <span class="ss">:each</span> <span class="k">do</span>
+  <span class="no">JsonapiErrorable</span><span class="p">.</span><span class="nf">disable!</span>
+<span class="k">end</span>
+
+<span class="c1"># enable for specific test</span>
+<span class="n">it</span> <span class="s1">'does something'</span> <span class="k">do</span>
+  <span class="no">JsonapiErrorable</span><span class="p">.</span><span class="nf">enable!</span>
+  <span class="c1"># ... code ...</span>
+<span class="k">end</span>
+</code></pre>
+    </div>
   </div>
 </div>
-<div style="height: 7rem"></div>
+<div style="height: 25rem"></div>
 
         </section>
     
@@ -920,9 +939,9 @@ controller, introspect our DSL metadata and generate all the correct
 swagger documentation. We’ll even add some extra information for you,
 like which relationships can be included:</p>
 
-<p><img src="/jsonapi_suite/img/endpoints.png" width="800px" />
-<img src="/jsonapi_suite/img/includes_filters.png" width="800px" />
-<img src="/jsonapi_suite/img/nested_relations.png" height="400px" /></p>
+<p><img src="img/endpoints.png" width="800px" />
+<img src="img/includes_filters.png" width="800px" />
+<img src="img/nested_relations.png" height="400px" /></p>
 
 <p>The default actions are <code class="highlighter-rouge">create</code>, <code class="highlighter-rouge">update</code>, <code class="highlighter-rouge">index</code>, <code class="highlighter-rouge">show</code>, and
 <code class="highlighter-rouge">destroy</code>. You can customize using <code class="highlighter-rouge">only</code> and <code class="highlighter-rouge">except</code>. You can also
@@ -1187,9 +1206,9 @@ that can be passed to an alternate ORM:</p>
             </div>
         </div>
 
-        <script src="/jsonapi_suite/js/jquery-2.1.1.min.js"></script>
-        <script scr="/jsonapi_suite/js/jquery.scrollTo.js"></script>
-        <script src="/jsonapi_suite/js/jquery.nav.js"></script>
-        <script src="/jsonapi_suite/js/scripts.js"></script>
+        <script src="js/jquery-2.1.1.min.js"></script>
+        <script scr="js/jquery.scrollTo.js"></script>
+        <script src="js/jquery.nav.js"></script>
+        <script src="js/scripts.js"></script>
     </body>
 </html>
