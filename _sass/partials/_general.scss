@@ -76,6 +76,12 @@ body{
   }
 }
 
+.github-fork-ribbon {
+  &:before {
+    background-color: darken($orange, 15%) !important;
+  }
+}
+
 .note-spacer {
   height: 300px;
 }
