@@ -6,7 +6,8 @@ number: 3
 ---
 
 To get up and running, we need to install the gem and include a few
-modules.
+modules. We're making this a manual step so the code is more obvious
+to an outside developer:
 
 ```ruby
 # Gemfile
@@ -18,12 +19,13 @@ class ApplicationController < ActionController::API
 end
 
 # create app/serializers/application_serializer.rb
+# All serializers should subclass ApplicationSerializer
 class ApplicationSerializer < ActiveModel::Serializer
   include JsonapiAmsExtensions
 end
 ```
 
-In addition, this suite depends on [active_model_serializers](github.com/rails-api/active_model_serializers). However, to accomodate a [performance issue](https://github.com/rails-api/active_model_serializers/pull/1931), we currently suggest you run off of this fork:
+This suite depends on [active_model_serializers](github.com/rails-api/active_model_serializers). However, to accomodate a [performance issue](https://github.com/rails-api/active_model_serializers/pull/1931), we currently suggest you run off of this fork:
 
 ```ruby
 gem 'active_model_serializers',

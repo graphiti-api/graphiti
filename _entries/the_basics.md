@@ -68,3 +68,13 @@ def index
   render_ams(scope.to_a)
 end
 ```
+
+{::options parse_block_html="true" /}
+<div class='note info'>
+###### Remember Your Serializers!
+  <div class='note-content'>
+  This documentation assumes you're roughly familiar with
+  [active_model_serializers](https://github.com/rails-api/active_model_serializers). Note the above code would not output jsonapi unless an `EmployeeSerializer` is defined.
+  </div>
+</div>
+<div style="height: 8rem;" />

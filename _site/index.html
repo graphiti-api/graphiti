@@ -212,7 +212,8 @@ glance at <a href="#basics">The Basics</a>.</p>
                 
 
             <p>To get up and running, we need to install the gem and include a few
-modules.</p>
+modules. We’re making this a manual step so the code is more obvious
+to an outside developer:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># Gemfile</span>
 <span class="n">gem</span> <span class="s1">'jsonapi_suite'</span>
@@ -223,13 +224,14 @@ modules.</p>
 <span class="k">end</span>
 
 <span class="c1"># create app/serializers/application_serializer.rb</span>
+<span class="c1"># All serializers should subclass ApplicationSerializer</span>
 <span class="k">class</span> <span class="nc">ApplicationSerializer</span> <span class="o">&lt;</span> <span class="no">ActiveModel</span><span class="o">::</span><span class="no">Serializer</span>
   <span class="kp">include</span> <span class="no">JsonapiAmsExtensions</span>
 <span class="k">end</span>
 </code></pre>
 </div>
 
-<p>In addition, this suite depends on <a href="github.com/rails-api/active_model_serializers">active_model_serializers</a>. However, to accomodate a <a href="https://github.com/rails-api/active_model_serializers/pull/1931">performance issue</a>, we currently suggest you run off of this fork:</p>
+<p>This suite depends on <a href="github.com/rails-api/active_model_serializers">active_model_serializers</a>. However, to accomodate a <a href="https://github.com/rails-api/active_model_serializers/pull/1931">performance issue</a>, we currently suggest you run off of this fork:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">gem</span> <span class="s1">'active_model_serializers'</span><span class="p">,</span>
   <span class="ss">git: </span><span class="s1">'https://github.com/richmolj/active_model_serializers.git'</span><span class="p">,</span>
@@ -339,6 +341,15 @@ off of. In this case we’re automatically adding pagination, sorting, and
 <span class="k">end</span>
 </code></pre>
 </div>
+
+<div class="note info">
+  <h6 id="remember-your-serializers">Remember Your Serializers!</h6>
+  <div class="note-content">
+    <p>This documentation assumes you’re roughly familiar with
+  <a href="https://github.com/rails-api/active_model_serializers">active_model_serializers</a>. Note the above code would not output jsonapi unless an <code class="highlighter-rouge">EmployeeSerializer</code> is defined.</p>
+  </div>
+</div>
+<div style="height: 8rem;"></div>
 
         </section>
     
