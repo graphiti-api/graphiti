@@ -1,3 +1,6 @@
+require 'jsonapi'
+require 'jsonapi/include_directive'
+
 require 'active_model_serializers'
 require 'strong_resources'
 require 'jsonapi_compliable'
