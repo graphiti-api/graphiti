@@ -21,6 +21,10 @@ module JsonapiCompliable
       20
     end
 
+    def default_sort
+      'id'
+    end
+
     def jsonapi_scope(scope,
                       filter: true,
                       includes: true,

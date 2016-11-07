@@ -14,10 +14,13 @@ RSpec.describe 'sorting', type: :controller do
     Author.create!(first_name: 'Philip')
   end
 
-  it 'defaults sort to id asc' do
+  it 'defaults sort to controller default_sort' do
+    expect(controller).to receive(:default_sort) { 'id' }
     get :index
-    expect(json_ids.length).to eq(2)
     expect(json_ids(true)).to eq(Author.pluck(:id))
+    expect(controller).to receive(:default_sort) { '-id' }
+    get :index
+    expect(json_ids(true)).to eq(Author.pluck(:id).reverse)
   end
 
   context 'when passing sort param' do

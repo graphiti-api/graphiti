@@ -15,7 +15,7 @@ module JsonapiCompliable
     private
 
     def sort_param
-      @sort_param ||= (params[:sort] || 'id')
+      @sort_param ||= (params[:sort] || @controller.default_sort)
     end
 
     def direction
