@@ -8,6 +8,21 @@ module JsonapiCompliable
       :pagination
 
     def initialize
+      clear!
+    end
+
+    def copy
+      instance = self.class.new
+      instance.sideloads = sideloads.deep_dup
+      instance.filters = filters.deep_dup
+      instance.default_filters = default_filters.deep_dup
+      instance.extra_fields = extra_fields.deep_dup
+      instance.sorting = sorting.deep_dup
+      instance.pagination = pagination.deep_dup
+      instance
+    end
+
+    def clear!
       @sideloads = {}
       @filters = {}
       @default_filters = {}

@@ -101,7 +101,10 @@ module JsonapiCompliable
         if !self._jsonapi_compliable
           dsl = JsonapiCompliable::DSL.new
           self._jsonapi_compliable = dsl
+        else
+          self._jsonapi_compliable = self._jsonapi_compliable.copy
         end
+
         self._jsonapi_compliable.instance_eval(&blk)
       end
     end

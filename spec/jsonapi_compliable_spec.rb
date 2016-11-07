@@ -10,6 +10,42 @@ RSpec.describe JsonapiCompliable, type: :controller do
     end
   end
 
+  describe '.jsonapi' do
+    let(:subclass1) do
+      Class.new(controller.class) do
+        jsonapi do
+          allow_filter :id
+          allow_filter :foo
+        end
+      end
+    end
+
+    let(:subclass2) do
+      Class.new(subclass1) do
+        jsonapi do
+          allow_filter :foo do |scope, value|
+            'foo'
+          end
+        end
+      end
+    end
+
+    context 'when subclassing and customizing' do
+      it 'preserves values from superclass' do
+        expect(subclass2._jsonapi_compliable.filters[:id]).to_not be_nil
+      end
+
+      it 'does not alter superclass when overriding' do
+        expect(subclass1._jsonapi_compliable)
+          .to_not eq(subclass2._jsonapi_compliable)
+        expect(subclass1._jsonapi_compliable.filters[:id].object_id)
+          .to_not eq(subclass2._jsonapi_compliable.filters[:id].object_id)
+        expect(subclass1._jsonapi_compliable.filters[:foo][:filter]).to be_nil
+        expect(subclass2._jsonapi_compliable.filters[:foo][:filter]).to_not be_nil
+      end
+    end
+  end
+
   describe '#render_ams' do
     it 'is able to override options' do
       author = Author.create!(first_name: 'Stephen', last_name: 'King')
