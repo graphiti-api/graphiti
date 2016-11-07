@@ -93,7 +93,7 @@ module JsonapiCompliable
 
     def force_includes?
       %w(PUT PATCH POST).include?(request.method) and
-        raw_params[:data][:relationships].present?
+        raw_params.try(:[], :data).try(:[], :relationships).present?
     end
 
     module ClassMethods
