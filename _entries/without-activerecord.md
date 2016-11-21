@@ -2,7 +2,7 @@
 sectionid: without-activerecord
 sectionclass: h1
 title: Usage Without ActiveRecord
-number: 20
+number: 21
 ---
 
 The following shows how to use the `jsonapi {  }` DSL to build up a hash that can be passed to an alternate ORM:
