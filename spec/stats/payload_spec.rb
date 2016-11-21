@@ -31,6 +31,15 @@ RSpec.describe JsonapiCompliable::Stats::Payload do
         attr2: { maximum: 3 }
       })
     end
+
+    # We may be auto-parsing comma-delimited values
+    context 'when the calculation string is already parsed' do
+      let(:params) { { stats: { attr1: ['count', 'average'] } } }
+
+      it 'generates correct payload' do
+        expect(subject).to eq(attr1: { count: 2, average: 1 })
+      end
+    end
   end
 
   describe '.new' do
@@ -47,8 +56,7 @@ RSpec.describe JsonapiCompliable::Stats::Payload do
 
       it 'uses that scope' do
         instance = described_class.new(controller, 'a')
-        expect(instance.instance_variable_get(:@scope))
-          .to eq('a')
+        expect(instance.instance_variable_get(:@scope)).to eq('a')
       end
     end
   end

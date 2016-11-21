@@ -12,7 +12,7 @@ module JsonapiCompliable
           @directive.each_pair do |name, calculation|
             stats[name] = {}
 
-            each_calculation(name, calculation) do |calc, function|
+            each_calculation(name, parse_calculation(calculation)) do |calc, function|
               stats[name][calc] = function.call(@scope, name)
             end
           end
@@ -21,12 +21,18 @@ module JsonapiCompliable
 
       private
 
-      def each_calculation(name, calculation_string)
-        calculations = calculation_string.split(',').map(&:to_sym)
-
+      def each_calculation(name, calculations)
         calculations.each do |calc|
           function = @dsl.stat(name, calc)
           yield calc, function
+        end
+      end
+
+      def parse_calculation(calculation)
+        if calculation.is_a?(String)
+          calculation.split(',').map(&:to_sym)
+        else
+          calculation.map(&:to_sym)
         end
       end
     end
