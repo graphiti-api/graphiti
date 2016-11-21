@@ -9,7 +9,7 @@ RSpec.describe JsonapiCompliable::Util::Scoping do
     subject { described_class.apply?(controller, object, force) }
 
     before do
-      allow(controller).to receive(:_jsonapi_scoped) { nil }
+      allow(controller).to receive(:_jsonapi_scope) { nil }
     end
 
     it { is_expected.to be(true) }
@@ -22,7 +22,7 @@ RSpec.describe JsonapiCompliable::Util::Scoping do
 
     context 'when controller has already scoped' do
       before do
-        allow(controller).to receive(:_jsonapi_scoped) { true }
+        allow(controller).to receive(:_jsonapi_scope) { Author.where(name: 'asdf') }
       end
 
       it { is_expected.to be(false) }

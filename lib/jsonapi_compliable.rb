@@ -13,9 +13,12 @@ require "jsonapi_compliable/scope/extra_fields"
 require "jsonapi_compliable/scope/filterable"
 require "jsonapi_compliable/scope/default_filter"
 require "jsonapi_compliable/scope/filter"
+require "jsonapi_compliable/stats/dsl"
+require "jsonapi_compliable/stats/payload"
 require "jsonapi_compliable/util/include_params"
 require "jsonapi_compliable/util/field_params"
 require "jsonapi_compliable/util/scoping"
+require "jsonapi_compliable/util/pagination"
 
 require 'jsonapi_compliable/railtie' if defined?(::Rails)
 

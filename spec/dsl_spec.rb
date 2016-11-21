@@ -46,6 +46,12 @@ RSpec.describe JsonapiCompliable::DSL do
       expect(copy.pagination).to eq(instance.pagination)
       expect(copy.pagination.object_id).to_not eq(instance.pagination.object_id)
     end
+
+    it 'copies stats' do
+      instance.stats = { foo: 'bar' }
+      expect(copy.stats).to eq(foo: 'bar')
+      expect(copy.stats.object_id).to_not eq(instance.stats.object_id)
+    end
   end
 
   describe '#clear' do
@@ -54,6 +60,7 @@ RSpec.describe JsonapiCompliable::DSL do
       instance.filters = { foo: 'bar' }
       instance.default_filters = { foo: 'bar' }
       instance.extra_fields = { foo: 'bar' }
+      instance.stats = { foo: 'bar' }
       instance.sorting = 'a'
       instance.pagination = 'a'
     end
@@ -92,6 +99,48 @@ RSpec.describe JsonapiCompliable::DSL do
       expect {
         instance.clear!
       }.to change { instance.pagination }.to(nil)
+    end
+
+    it 'resets stats' do
+      expect {
+        instance.clear!
+      }.to change { instance.stats }.to({})
+    end
+  end
+
+  describe '#stat' do
+    let(:avg_proc) { proc { |scope, attr| 1 } }
+
+    before do
+      dsl = JsonapiCompliable::Stats::DSL.new(:myattr)
+      dsl.average(&avg_proc)
+      instance.stats = { myattr: dsl }
+    end
+
+    context 'when passing strings' do
+      it 'returns the corresponding proc' do
+        expect(instance.stat('myattr', 'average')).to eq(avg_proc)
+      end
+    end
+
+    context 'when passing symbols' do
+      it 'returns the corresponding proc' do
+        expect(instance.stat(:myattr, :average)).to eq(avg_proc)
+      end
+    end
+
+    context 'when no corresponding attribute' do
+      it 'raises error' do
+        expect { instance.stat(:foo, 'average') }
+          .to raise_error(JsonapiCompliable::Errors::StatNotFound, "No stat configured for calculation 'average' on attribute :foo")
+      end
+    end
+
+    context 'when no corresponding calculation' do
+      it 'raises error' do
+        expect { instance.stat('myattr', :median) }
+          .to raise_error(JsonapiCompliable::Errors::StatNotFound, "No stat configured for calculation :median on attribute :myattr")
+      end
     end
   end
 end

@@ -31,6 +31,14 @@ RSpec.describe 'pagination', type: :controller do
     expect(json_ids(true)).to eq([author3.id, author4.id])
   end
 
+  # for metadata
+  context 'with page size 0' do
+    it 'should not respond with records, but still respond' do
+      get :index, params: { page: { size: 0 } }
+      expect(json_ids).to eq([])
+    end
+  end
+
   context 'and a custom pagination function is given' do
     before do
       controller.class_eval do
