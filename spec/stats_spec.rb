@@ -169,4 +169,12 @@ RSpec.describe 'stats', type: :controller do
       expect(json['meta']['stats']).to eq({ 'total' => { 'count' => 1 } })
     end
   end
+
+  context 'when requested stat not configured' do
+    it 'raises error' do
+      expect {
+        get :index, params: { stats: { asdf: :count} }
+      }.to raise_error(JsonapiCompliable::Errors::StatNotFound, "No stat configured for calculation :count on attribute 'asdf'")
+    end
+  end
 end
