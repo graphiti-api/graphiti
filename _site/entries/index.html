@@ -2,8 +2,6 @@
 <html>
     <head>
         
-<base href="https://jsonapi-suite.github.io/jsonapi_suite/" target="_blank">
-
 
 <meta charset="UTF-8">
 <title>JSONAPI Suite</title>
@@ -124,6 +122,11 @@
                 
                     <li >
                         <a href="#extra-fields">Extra Fields</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#stats">Stats</a>
                         
                     </li>
                 
@@ -1148,6 +1151,71 @@ requested:</p>
 <span class="k">end</span>
 </code></pre>
 </div>
+
+        </section>
+    
+
+    
+        <section id="stats" class="h2">
+            
+                  <h2><a href="#stats" name="stats">Stats</a></h2>
+                
+
+            <p>Imagine a grid listing records. The <a href="https://jsonapi-suite.github.io/jsonapi_suite/#reads">Reads</a> section covers populating the grid, but what about “X total records”, or “average cost”?</p>
+
+<p>These calculations are supported via <code class="highlighter-rouge">allow_stat</code>:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi</span> <span class="k">do</span>
+  <span class="n">allow_stat</span> <span class="ss">total: </span><span class="p">[</span><span class="ss">:count</span><span class="p">]</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>A GET to <code class="highlighter-rouge">/api/employees?stats[total]=count</code> would return:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="ss">data: </span><span class="p">[.</span><span class="nf">.</span><span class="o">.</span><span class="p">],</span>
+  <span class="ss">meta: </span><span class="p">{</span>
+    <span class="ss">stats: </span><span class="p">{</span>
+      <span class="ss">total: </span><span class="p">{</span>
+        <span class="ss">count: </span><span class="mi">100</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>A few ‘default calculations’ are provided: <code class="highlighter-rouge">count</code>, <code class="highlighter-rouge">sum</code>, <code class="highlighter-rouge">average</code>,
+<code class="highlighter-rouge">maximum</code> and <code class="highlighter-rouge">minimum</code>. These will work out-of-the-box with ActiveRecord.
+Alternatively, override these calculation functions:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi</span> <span class="k">do</span>
+  <span class="n">allow_stat</span> <span class="ss">:salary</span> <span class="k">do</span>
+    <span class="n">average</span> <span class="p">{</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="kp">attr</span><span class="o">|</span> <span class="n">scope</span><span class="p">.</span><span class="nf">average</span><span class="p">(</span><span class="kp">attr</span><span class="p">)</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Or support your own custom calculations:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi</span> <span class="k">do</span>
+  <span class="n">allow_stat</span> <span class="ss">salary: </span><span class="p">[</span><span class="ss">:average</span><span class="p">]</span> <span class="k">do</span>
+    <span class="n">standard_deviation</span> <span class="p">{</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="kp">attr</span><span class="o">|</span> <span class="p">.</span><span class="nf">.</span><span class="o">.</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<div class="note info">
+  <h6 id="further-reading">Further Reading</h6>
+  <div class="note-content">
+    <p>To learn more about the stats API, see
+  <a href="https://github.com/jsonapi-suite/jsonapi_compliable">jsonapi_compliable</a></p>
+  </div>
+</div>
+<div style="height: 5rem"></div>
 
         </section>
     
