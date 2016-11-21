@@ -5,6 +5,7 @@ module JsonapiCompliable
       :extra_fields,
       :filters,
       :sorting,
+      :stats,
       :pagination
 
     def initialize
@@ -19,6 +20,7 @@ module JsonapiCompliable
       instance.extra_fields = extra_fields.deep_dup
       instance.sorting = sorting.deep_dup
       instance.pagination = pagination.deep_dup
+      instance.stats = stats.deep_dup
       instance
     end
 
@@ -27,6 +29,7 @@ module JsonapiCompliable
       @filters = {}
       @default_filters = {}
       @extra_fields = {}
+      @stats = {}
       @sorting = nil
       @pagination = nil
     end
@@ -50,6 +53,12 @@ module JsonapiCompliable
       }
     end
 
+    def allow_stat(symbol_or_hash, &blk)
+      dsl = Stats::DSL.new(symbol_or_hash)
+      dsl.instance_eval(&blk) if blk
+      @stats[dsl.name] = dsl
+    end
+
     def default_filter(name, &blk)
       @default_filters[name.to_sym] = {
         filter: blk
@@ -70,6 +79,12 @@ module JsonapiCompliable
         name: field.values.first,
         proc: blk
       }
+    end
+
+    def stat(attribute, calculation)
+      stats_dsl = @stats[attribute] || @stats[attribute.to_sym]
+      raise Errors::StatNotFound.new(attribute, calculation) unless stats_dsl
+      stats_dsl.calculation(calculation)
     end
   end
 end

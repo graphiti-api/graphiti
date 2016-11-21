@@ -85,10 +85,11 @@ RSpec.describe JsonapiCompliable, type: :controller do
     end
 
     it 'resets scope flag after action' do
+      controller.instance_variable_set(:@_jsonapi_scope, 'a')
       expect {
         get :index
-      }.to change { controller.instance_variable_get(:@_jsonapi_scoped) }
-        .from(nil).to(false)
+      }.to change { controller.instance_variable_get(:@_jsonapi_scope) }
+        .from('a').to(nil)
     end
 
     context 'when passing scope: false' do

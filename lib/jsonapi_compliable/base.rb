@@ -7,7 +7,7 @@ module JsonapiCompliable
 
     included do
       class_attribute :_jsonapi_compliable
-      attr_reader :_jsonapi_scoped
+      attr_reader :_jsonapi_scope
 
       before_action :parse_fieldsets!
       after_action :reset_scope_flag
@@ -36,13 +36,14 @@ module JsonapiCompliable
       scope = JsonapiCompliable::Scope::ExtraFields.new(self, scope).apply if extra_fields
       scope = JsonapiCompliable::Scope::Sideload.new(self, scope).apply if includes
       scope = JsonapiCompliable::Scope::Sort.new(self, scope).apply if sort
+      # This is set before pagination so it can be re-used for stats
+      @_jsonapi_scope = scope
       scope = JsonapiCompliable::Scope::Paginate.new(self, scope).apply if paginate
-      @_jsonapi_scoped = true
       scope
     end
 
     def reset_scope_flag
-      @_jsonapi_scoped = false
+      @_jsonapi_scope = nil
     end
 
     def parse_fieldsets!
@@ -51,14 +52,16 @@ module JsonapiCompliable
     end
 
     def render_ams(scope, opts = {})
-      scope = jsonapi_scope(scope) if Util::Scoping.apply?(self, scope, opts.delete(:scope))
+      scoped = Util::Scoping.apply?(self, scope, opts.delete(:scope)) ? jsonapi_scope(scope) : scope
       options = default_ams_options
       options[:include] = forced_includes || Util::IncludeParams.scrub(self)
-      options[:jsonapi] = scope
+      options[:jsonapi] = JsonapiCompliable::Util::Pagination.zero?(params) ? [] : scoped
       options[:fields] = Util::FieldParams.fieldset(params, :fields) if params[:fields]
       options[:extra_fields] = Util::FieldParams.fieldset(params, :extra_fields) if params[:extra_fields]
-
+      options[:meta] ||= {}
       options.merge!(opts)
+      options[:meta][:stats] = Stats::Payload.new(self, scoped).generate if params[:stats]
+
       render(options)
     end
 
