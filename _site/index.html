@@ -1210,6 +1210,16 @@ Alternatively, override these calculation functions:</p>
 </code></pre>
 </div>
 
+<p>Multiple stats are supported with one request:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">GET</span> <span class="sr">/api/em</span><span class="n">ployees?stats</span><span class="p">[</span><span class="n">salary</span><span class="p">]</span><span class="o">=</span><span class="n">average</span><span class="p">,</span><span class="n">maximum</span><span class="o">&amp;</span><span class="n">stats</span><span class="p">[</span><span class="n">total</span><span class="p">]</span><span class="o">=</span><span class="n">count</span>
+</code></pre>
+</div>
+
+<p>If you want <strong>only</strong> stats, and no records (for performance), simple pass page size 0:</p>
+
+<p><code class="highlighter-rouge">GET /api/employees?stats[salary]=average&amp;page[size]=0</code></p>
+
 <div class="note info">
   <h6 id="further-reading">Further Reading</h6>
   <div class="note-content">
