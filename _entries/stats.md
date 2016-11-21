@@ -53,6 +53,16 @@ jsonapi do
 end
 ```
 
+Multiple stats are supported with one request:
+
+```ruby
+GET /api/employees?stats[salary]=average,maximum&stats[total]=count
+```
+
+If you want **only** stats, and no records (for performance), simple pass page size 0:
+
+`GET /api/employees?stats[salary]=average&page[size]=0`
+
 {::options parse_block_html="true" /}
 <div class='note info'>
 ###### Further Reading
