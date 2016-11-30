@@ -1,28 +1,30 @@
 require 'spec_helper'
+require 'jsonapi/serializable/conditional_fields'
 
 RSpec.describe 'fields', type: :controller do
   controller(ApplicationController) do
     jsonapi {}
 
-    class TestFieldsSerializer < ActiveModel::Serializer
-      attributes :first_name, :last_name, :uuid
-      attribute :salary, if: :admin?
+    class SerializableTestFields < JSONAPI::Serializable::Resource
+      prepend JSONAPI::Serializable::ConditionalFields
+      type 'authors'
 
-      def uuid
+      attribute :first_name
+      attribute :last_name
+      attribute :uuid do
         SecureRandom.uuid
+      end
+      attribute :salary, if: proc { @context.current_user == 'admin' } do
+        50_000
       end
 
       def admin?
         scope == 'admin'
       end
-
-      def salary
-        50_000
-      end
     end
 
     def index
-      render_ams(Author.all, each_serializer: TestFieldsSerializer)
+      render_ams(Author.all, class: SerializableTestFields)
     end
 
     def current_user

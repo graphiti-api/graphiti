@@ -1,6 +1,4 @@
-require 'active_model_serializers'
-require 'jsonapi'
-require 'jsonapi_ams_extensions'
+require 'jsonapi/rails'
 
 require "jsonapi_compliable/version"
 require "jsonapi_compliable/errors"
@@ -19,6 +17,8 @@ require "jsonapi_compliable/util/include_params"
 require "jsonapi_compliable/util/field_params"
 require "jsonapi_compliable/util/scoping"
 require "jsonapi_compliable/util/pagination"
+require "jsonapi_compliable/extensions/extra_attribute"
+require "jsonapi_compliable/extensions/boolean_attribute"
 
 require 'jsonapi_compliable/railtie' if defined?(::Rails)
 

@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 # Specify your gem's dependencies in jsonapi_compliable.gemspec
 gemspec
-gem 'active_model_serializers', git: 'https://github.com/richmolj/active_model_serializers.git'
+gem 'jsonapi-serializable', path: '../serializable'
 
 group :test do
   gem 'appraisal'

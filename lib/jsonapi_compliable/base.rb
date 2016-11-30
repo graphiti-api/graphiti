@@ -57,10 +57,12 @@ module JsonapiCompliable
       options[:include] = forced_includes || Util::IncludeParams.scrub(self)
       options[:jsonapi] = JsonapiCompliable::Util::Pagination.zero?(params) ? [] : scoped
       options[:fields] = Util::FieldParams.fieldset(params, :fields) if params[:fields]
-      options[:extra_fields] = Util::FieldParams.fieldset(params, :extra_fields) if params[:extra_fields]
       options[:meta] ||= {}
       options.merge!(opts)
       options[:meta][:stats] = Stats::Payload.new(self, scoped).generate if params[:stats]
+      options[:expose] ||= {}
+      options[:expose][:context] = self
+      options[:expose][:extra_fields] = Util::FieldParams.fieldset(params, :extra_fields) if params[:extra_fields]
 
       render(options)
     end
@@ -69,7 +71,6 @@ module JsonapiCompliable
     # render json: foo, ams_default_options
     def default_ams_options
       {}.tap do |options|
-        options[:adapter] = :json_api
       end
     end
 

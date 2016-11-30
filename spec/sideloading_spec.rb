@@ -48,11 +48,11 @@ RSpec.describe 'sideloading', type: :controller do
     end
 
     it 'uses the custom include function' do
-      scope = double.as_null_object
+      scope = Author.all
+      allow(Author).to receive(:all) { scope }
+
       expect(scope).to receive(:special_include)
-        .and_return(scope)
-        .with(books: { genre: {} })
-      expect(Author).to receive(:all) { scope }
+        .with(books: { genre: {} }).and_return(scope)
 
       get :index, params: { include: 'books.genre' }
     end
