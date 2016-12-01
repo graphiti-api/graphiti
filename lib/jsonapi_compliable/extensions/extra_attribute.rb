@@ -1,4 +1,4 @@
-require 'jsonapi/serializable/conditional_fields'
+require 'jsonapi/serializable/resource/conditional_fields'
 
 module JsonapiCompliable
   module Extensions
@@ -29,6 +29,6 @@ module JsonapiCompliable
 end
 
 JSONAPI::Serializable::Resource.class_eval do
-  prepend JSONAPI::Serializable::ConditionalFields
+  prepend JSONAPI::Serializable::Resource::ConditionalFields
   include JsonapiCompliable::Extensions::ExtraAttribute
 end

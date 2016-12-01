@@ -19,7 +19,7 @@ RSpec.describe 'stats', type: :controller do
     end
 
     def index
-      render_ams(Author.all, meta: { other: 'things' })
+      render_jsonapi(Author.all, meta: { other: 'things' })
     end
   end
 
@@ -158,7 +158,7 @@ RSpec.describe 'stats', type: :controller do
         end
 
         def index
-          render_ams([Author.first])
+          render_jsonapi([Author.first])
         end
       end
     end

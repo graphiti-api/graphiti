@@ -1,12 +1,10 @@
 require 'spec_helper'
-require 'jsonapi/serializable/conditional_fields'
 
 RSpec.describe 'fields', type: :controller do
   controller(ApplicationController) do
     jsonapi {}
 
     class SerializableTestFields < JSONAPI::Serializable::Resource
-      prepend JSONAPI::Serializable::ConditionalFields
       type 'authors'
 
       attribute :first_name
@@ -24,7 +22,7 @@ RSpec.describe 'fields', type: :controller do
     end
 
     def index
-      render_ams(Author.all, class: SerializableTestFields)
+      render_jsonapi(Author.all, class: SerializableTestFields)
     end
 
     def current_user

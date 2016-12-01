@@ -1,5 +1,3 @@
-require 'jsonapi/serializable/conditional_fields'
-
 module JsonapiCompliable
   module Extensions
     module BooleanAttribute

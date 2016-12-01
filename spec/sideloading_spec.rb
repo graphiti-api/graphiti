@@ -7,7 +7,7 @@ RSpec.describe 'sideloading', type: :controller do
     end
 
     def index
-      render_ams(Author.all)
+      render_jsonapi(Author.all)
     end
   end
 

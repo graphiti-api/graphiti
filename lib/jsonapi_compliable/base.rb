@@ -51,7 +51,7 @@ module JsonapiCompliable
       Util::FieldParams.parse!(params, :extra_fields)
     end
 
-    def render_ams(scope, opts = {})
+    def render_jsonapi(scope, opts = {})
       scoped = Util::Scoping.apply?(self, scope, opts.delete(:scope)) ? jsonapi_scope(scope) : scope
       options = default_ams_options
       options[:include] = forced_includes || Util::IncludeParams.scrub(self)
@@ -67,7 +67,7 @@ module JsonapiCompliable
       render(options)
     end
 
-    # render_ams(foo) equivalent to
+    # render_jsonapi(foo) equivalent to
     # render json: foo, ams_default_options
     def default_ams_options
       {}.tap do |options|

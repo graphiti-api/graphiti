@@ -1,9 +1,7 @@
 require 'spec_helper'
-require 'jsonapi/serializable/conditional_fields'
 
 RSpec.describe 'extra_fields', type: :controller do
   class SerializableTestExtraFields < JSONAPI::Serializable::Resource
-    prepend JSONAPI::Serializable::ConditionalFields
     type 'authors'
     attributes :first_name, :last_name
     extra_attribute :net_worth, if: proc { @context.allow_net_worth? } do
@@ -23,7 +21,7 @@ RSpec.describe 'extra_fields', type: :controller do
     end
 
     def index
-      render_ams(Author.all, class: SerializableTestExtraFields)
+      render_jsonapi(Author.all, class: SerializableTestExtraFields)
     end
   end
 

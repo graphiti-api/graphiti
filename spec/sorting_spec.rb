@@ -5,7 +5,7 @@ RSpec.describe 'sorting', type: :controller do
     jsonapi {}
 
     def index
-      render_ams(Author.all)
+      render_jsonapi(Author.all)
     end
   end
 

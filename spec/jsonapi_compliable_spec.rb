@@ -6,7 +6,7 @@ RSpec.describe JsonapiCompliable, type: :controller do
 
     def index
       scope = Author.all
-      render_ams(scope)
+      render_jsonapi(scope)
     end
   end
 
@@ -46,7 +46,7 @@ RSpec.describe JsonapiCompliable, type: :controller do
     end
   end
 
-  describe '#render_ams' do
+  describe '#render_jsonapi' do
     it 'is able to override options' do
       author = Author.create!(first_name: 'Stephen', last_name: 'King')
       author.books.create(title: "The Shining", genre: Genre.new(name: 'horror'))
@@ -54,7 +54,7 @@ RSpec.describe JsonapiCompliable, type: :controller do
       controller.class_eval do
         def index
           scope = Author.all
-          render_ams(scope, include: { books: :genre })
+          render_jsonapi(scope, include: { books: :genre })
         end
       end
 
@@ -67,7 +67,7 @@ RSpec.describe JsonapiCompliable, type: :controller do
         controller.class_eval do
           def index
             people = jsonapi_scope(Author.all).to_a
-            render_ams(people)
+            render_jsonapi(people)
           end
         end
       end
@@ -97,7 +97,7 @@ RSpec.describe JsonapiCompliable, type: :controller do
         controller.class_eval do
           def index
             people = Author.all
-            render_ams(people, scope: false)
+            render_jsonapi(people, scope: false)
           end
         end
       end
