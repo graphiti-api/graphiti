@@ -21,12 +21,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rails', ['>= 4.1', '< 6']
   spec.add_dependency 'jsonapi', '0.1.1.beta2'
   spec.add_dependency 'strong_resources', '~> 0.1'
-  spec.add_dependency 'jsonapi_compliable', '~> 0.3'
+  spec.add_dependency 'jsonapi_compliable', '~> 0.4'
   spec.add_dependency 'jsonapi_errorable', '~> 0.1'
   spec.add_dependency 'jsonapi_spec_helpers', '~> 0.2'
-  spec.add_dependency 'jsonapi_ams_extensions', '~> 0.1'
   spec.add_dependency 'jsonapi_swagger_helpers', '~> 0.1'
-  spec.add_dependency 'active_model_serializers', '~> 0.10'
   spec.add_dependency 'nested_attribute_reassignable', '~> 0.6'
 
   spec.add_development_dependency "bundler", "~> 1.12"
