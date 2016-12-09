@@ -19,7 +19,7 @@ class ApplicationController < ActionController::API
 end
 ```
 
-This suite is built on top of the mighty [jsonapi-rb](jsonapi-rb.org),
+This suite is built on top of the mighty [jsonapi-rb](http://jsonapi-rb.org),
  hat tip [@beauby](https://github.com/beauby). Please read up on
  jsonapi-rb to understand serialization.
 
