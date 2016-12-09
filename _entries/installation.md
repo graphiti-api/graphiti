@@ -17,6 +17,7 @@ gem 'jsonapi_suite'
 class ApplicationController < ActionController::API
   include JsonapiSuite::ControllerMixin
 end
+```
 
 This suite is built on top of the mighty [jsonapi-rb](jsonapi-rb.org),
  hat tip [@beauby](https://github.com/beauby). Please read up on
