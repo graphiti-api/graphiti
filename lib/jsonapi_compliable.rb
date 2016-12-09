@@ -20,8 +20,6 @@ require "jsonapi_compliable/util/pagination"
 require "jsonapi_compliable/extensions/extra_attribute"
 require "jsonapi_compliable/extensions/boolean_attribute"
 
-require 'jsonapi_compliable/railtie' if defined?(::Rails)
-
 module JsonapiCompliable
   autoload :Base,           'jsonapi_compliable/base'
   autoload :Deserializable, 'jsonapi_compliable/deserializable'
