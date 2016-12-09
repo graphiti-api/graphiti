@@ -37,8 +37,7 @@ Let's take a look at what this code does.
 `jsonapi { }` sets up our controller. We'll go into this in more detail
 later.
 
-`render_jsonapi` is similar to `render :json` (actually `render
-:jsonapi` under-the-hood). However, it's going to do
+`render_jsonapi` is similar to `render :json` (actually `render :jsonapi` under-the-hood). However, it's going to do
 some extra work for you. For starters, it will pass relavant arguments -
 like which sparse fieldsets were requested - to `render` for you.
 
