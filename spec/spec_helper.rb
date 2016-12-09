@@ -5,7 +5,8 @@ require 'rails'
 
 require 'kaminari'
 require 'active_record'
-require 'active_model_serializers'
+require 'action_controller'
+
 require File.expand_path(File.join(File.dirname(__FILE__), "./support/basic_rails_app"))
 require 'rspec/rails'
 require 'database_cleaner'
@@ -28,8 +29,6 @@ RSpec.configure do |config|
     end
   end
 end
-
-ActiveModel::Serializer.config.adapter = :json_api
 
 ActiveRecord::Migration.verbose = false
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
@@ -102,35 +101,53 @@ class Book < ApplicationRecord
   accepts_nested_attributes_for :tags
 end
 
-class ApplicationSerializer < ActiveModel::Serializer
-  include JsonapiAmsExtensions
+class SerializableAbstract < JSONAPI::Serializable::Resource
 end
 
-class AuthorSerializer < ApplicationSerializer
-  attributes :first_name, :last_name
+class SerializableAuthor < SerializableAbstract
+  type 'authors'
+
+  attribute :first_name
+  attribute :last_name
+
   belongs_to :state
   has_many :books
 end
 
-class StateSerializer < ApplicationSerializer
-  attributes :name
+class SerializableState < SerializableAbstract
+  type 'states'
+
+  attribute :name
 end
 
-class TagSerializer < ApplicationSerializer
-  attributes :name
+class SerializableTag < SerializableAbstract
+  type 'tags'
+
+  attribute :name
   belongs_to :book
 end
 
-class GenreSerializer < ApplicationSerializer
-  attributes :name
+class SerializableGenre < SerializableAbstract
+  type 'genres'
+
+  attribute :name
   has_many :books
 end
 
-class BookSerializer < ApplicationSerializer
-  attributes :title
+class SerializableBook < SerializableAbstract
+  type 'books'
+
+  attribute :title
   belongs_to :genre
   belongs_to :author
   has_many :tags
+end
+
+# supports `render jsonapi: double`
+class RSpec::Mocks::SerializableDouble < SerializableAbstract
+  type 'doubles'
+
+  id { rand(99999) }
 end
 
 JsonapiSpecHelpers::Payload.register(:book) do

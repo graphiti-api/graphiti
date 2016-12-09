@@ -10,7 +10,7 @@ RSpec.describe 'create/update', type: :controller do
       author = Author.new(author_params.except(:state_attributes))
       author.state = State.find_or_initialize_by(author_params[:state_attributes])
       author.save!(validate: false)
-      render_ams(author, scope: false)
+      render_jsonapi(author, scope: false)
     end
 
     def update
@@ -21,7 +21,7 @@ RSpec.describe 'create/update', type: :controller do
       end
       author.association(:books).loaded!
       author.save!
-      render_ams(author, scope: false)
+      render_jsonapi(author, scope: false)
     end
 
     private

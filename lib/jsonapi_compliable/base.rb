@@ -51,25 +51,26 @@ module JsonapiCompliable
       Util::FieldParams.parse!(params, :extra_fields)
     end
 
-    def render_ams(scope, opts = {})
+    def render_jsonapi(scope, opts = {})
       scoped = Util::Scoping.apply?(self, scope, opts.delete(:scope)) ? jsonapi_scope(scope) : scope
-      options = default_ams_options
+      options = default_jsonapi_render_options
       options[:include] = forced_includes || Util::IncludeParams.scrub(self)
       options[:jsonapi] = JsonapiCompliable::Util::Pagination.zero?(params) ? [] : scoped
       options[:fields] = Util::FieldParams.fieldset(params, :fields) if params[:fields]
-      options[:extra_fields] = Util::FieldParams.fieldset(params, :extra_fields) if params[:extra_fields]
       options[:meta] ||= {}
       options.merge!(opts)
       options[:meta][:stats] = Stats::Payload.new(self, scoped).generate if params[:stats]
+      options[:expose] ||= {}
+      options[:expose][:context] = self
+      options[:expose][:extra_fields] = Util::FieldParams.fieldset(params, :extra_fields) if params[:extra_fields]
 
       render(options)
     end
 
-    # render_ams(foo) equivalent to
-    # render json: foo, ams_default_options
-    def default_ams_options
+    # render_jsonapi(foo) equivalent to
+    # render jsonapi: foo, default_jsonapi_render_options
+    def default_jsonapi_render_options
       {}.tap do |options|
-        options[:adapter] = :json_api
       end
     end
 

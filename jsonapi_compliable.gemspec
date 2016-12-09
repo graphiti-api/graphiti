@@ -18,9 +18,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "rails", ['>= 4.1', '< 6']
-  spec.add_dependency "jsonapi", '~> 0.1.1.beta2'
-  spec.add_dependency "active_model_serializers", "~> 0.10"
-  spec.add_dependency "jsonapi_ams_extensions", "~> 0.1"
+
+  spec.add_dependency 'jsonapi-rails', '~> 0.1'
 
   spec.add_development_dependency "kaminari"
   spec.add_development_dependency "active_model_serializers"

@@ -1,12 +1,10 @@
 require 'spec_helper'
 
 RSpec.describe 'extra_fields', type: :controller do
-  class TestExtraFieldsSerializer < ActiveModel::Serializer
-    include JsonapiAmsExtensions
+  class SerializableTestExtraFields < JSONAPI::Serializable::Resource
+    type 'authors'
     attributes :first_name, :last_name
-    extra_attribute :net_worth
-
-    def net_worth
+    extra_attribute :net_worth, if: proc { @context.allow_net_worth? } do
       100_000_000
     end
   end
@@ -18,8 +16,12 @@ RSpec.describe 'extra_fields', type: :controller do
       end
     end
 
+    def allow_net_worth?
+      true
+    end
+
     def index
-      render_ams(Author.all, each_serializer: TestExtraFieldsSerializer)
+      render_jsonapi(Author.all, class: SerializableTestExtraFields)
     end
   end
 
@@ -57,8 +59,7 @@ RSpec.describe 'extra_fields', type: :controller do
 
   context 'when extra field is requested but guarded' do
     before do
-      allow_any_instance_of(TestExtraFieldsSerializer)
-        .to receive(:allow_net_worth?) { false }
+      allow(controller).to receive(:allow_net_worth?) { false }
     end
 
     it 'does not include the extra field in the response' do

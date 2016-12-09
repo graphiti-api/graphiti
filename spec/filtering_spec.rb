@@ -12,7 +12,7 @@ RSpec.describe 'filtering', type: :controller do
     end
 
     def index
-      render_ams(Author.all)
+      render_jsonapi(Author.all)
     end
 
     def can_filter_first_name?
