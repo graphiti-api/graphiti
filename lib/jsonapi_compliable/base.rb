@@ -53,7 +53,7 @@ module JsonapiCompliable
 
     def render_jsonapi(scope, opts = {})
       scoped = Util::Scoping.apply?(self, scope, opts.delete(:scope)) ? jsonapi_scope(scope) : scope
-      options = default_ams_options
+      options = default_jsonapi_render_options
       options[:include] = forced_includes || Util::IncludeParams.scrub(self)
       options[:jsonapi] = JsonapiCompliable::Util::Pagination.zero?(params) ? [] : scoped
       options[:fields] = Util::FieldParams.fieldset(params, :fields) if params[:fields]
@@ -68,8 +68,8 @@ module JsonapiCompliable
     end
 
     # render_jsonapi(foo) equivalent to
-    # render json: foo, ams_default_options
-    def default_ams_options
+    # render jsonapi: foo, default_jsonapi_render_options
+    def default_jsonapi_render_options
       {}.tap do |options|
       end
     end
