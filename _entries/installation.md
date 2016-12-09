@@ -23,6 +23,8 @@ This suite is built on top of the mighty [jsonapi-rb](jsonapi-rb.org),
  hat tip [@beauby](https://github.com/beauby). Please read up on
  jsonapi-rb to understand serialization.
 
+ <div style="height: 2rem;"></div>
+
 {::options parse_block_html="true" /}
 <div class='note info'>
 ###### Pagination
