@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "rails", ['>= 4.1', '< 6']
 
-  spec.add_dependency 'jsonapi-rails'
+  spec.add_dependency 'jsonapi-rails', '~> 0.1'
 
   spec.add_development_dependency "kaminari"
   spec.add_development_dependency "active_model_serializers"
