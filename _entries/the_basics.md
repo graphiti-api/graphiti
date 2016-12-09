@@ -38,7 +38,7 @@ Let's take a look at what this code does.
 later.
 
 `render_jsonapi` is similar to `render :json` (actually `render :jsonapi` under-the-hood). However, it's going to do
-some extra work for you. For starters, it will pass relavant arguments -
+some extra work for you. For starters, it will pass relevant arguments -
 like which sparse fieldsets were requested - to `render` for you.
 
 `render_jsonapi` will also build the appropriate query scope. In this case
