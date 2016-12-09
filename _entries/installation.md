@@ -18,20 +18,9 @@ class ApplicationController < ActionController::API
   include JsonapiSuite::ControllerMixin
 end
 
-# create app/serializers/application_serializer.rb
-# All serializers should subclass ApplicationSerializer
-class ApplicationSerializer < ActiveModel::Serializer
-  include JsonapiAmsExtensions
-end
-```
-
-This suite depends on [active_model_serializers](github.com/rails-api/active_model_serializers). However, to accomodate a [performance issue](https://github.com/rails-api/active_model_serializers/pull/1931), we currently suggest running off of master:
-
-```ruby
-gem 'active_model_serializers',
-  git: 'https://github.com/rails-api/active_model_serializers.git',
-  ref: '2145540'
-```
+This suite is built on top of the mighty [jsonapi-rb](jsonapi-rb.org),
+ hat tip [@beauby](https://github.com/beauby). Please read up on
+ jsonapi-rb to understand serialization.
 
 {::options parse_block_html="true" /}
 <div class='note info'>

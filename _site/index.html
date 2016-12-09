@@ -226,37 +226,28 @@ to an outside developer:</p>
   <span class="kp">include</span> <span class="no">JsonapiSuite</span><span class="o">::</span><span class="no">ControllerMixin</span>
 <span class="k">end</span>
 
-<span class="c1"># create app/serializers/application_serializer.rb</span>
-<span class="c1"># All serializers should subclass ApplicationSerializer</span>
-<span class="k">class</span> <span class="nc">ApplicationSerializer</span> <span class="o">&lt;</span> <span class="no">ActiveModel</span><span class="o">::</span><span class="no">Serializer</span>
-  <span class="kp">include</span> <span class="no">JsonapiAmsExtensions</span>
-<span class="k">end</span>
-</code></pre>
+<span class="no">This</span> <span class="n">suite</span> <span class="n">is</span> <span class="n">built</span> <span class="n">on</span> <span class="n">top</span> <span class="n">of</span> <span class="n">the</span> <span class="n">mighty</span> <span class="p">[</span><span class="n">jsonapi</span><span class="o">-</span><span class="n">rb</span><span class="p">](</span><span class="n">jsonapi</span><span class="o">-</span><span class="n">rb</span><span class="p">.</span><span class="nf">org</span><span class="p">),</span>
+ <span class="n">hat</span> <span class="n">tip</span> <span class="p">[</span><span class="vi">@beauby</span><span class="p">](</span><span class="n">https</span><span class="ss">:/</span><span class="o">/</span><span class="n">github</span><span class="p">.</span><span class="nf">com</span><span class="o">/</span><span class="n">beauby</span><span class="p">)</span><span class="o">.</span> <span class="no">Please</span> <span class="n">read</span> <span class="n">up</span> <span class="n">on</span>
+ <span class="n">jsonapi</span><span class="o">-</span><span class="n">rb</span> <span class="n">to</span> <span class="n">understand</span> <span class="n">serialization</span><span class="o">.</span>
+
+<span class="p">{</span><span class="o">::</span><span class="n">options</span> <span class="n">parse_block_html</span><span class="o">=</span><span class="s2">"true"</span> <span class="o">/</span><span class="p">}</span>
+<span class="o">&lt;</span><span class="n">div</span> <span class="k">class</span><span class="o">=</span><span class="s1">'note info'</span><span class="o">&gt;</span>
+<span class="c1">###### Pagination</span>
+  <span class="o">&lt;</span><span class="n">div</span> <span class="k">class</span><span class="o">=</span><span class="s1">'note-content'</span><span class="o">&gt;</span>
+  <span class="no">While</span> <span class="n">not</span> <span class="n">a</span> <span class="n">requirement</span><span class="p">,</span> <span class="n">you</span> <span class="n">can</span> <span class="n">get</span> <span class="n">out</span><span class="o">-</span><span class="n">of</span><span class="o">-</span><span class="n">the</span><span class="o">-</span><span class="n">box</span> <span class="n">pagination</span> <span class="n">with</span> <span class="n">any</span> <span class="n">gem</span> <span class="n">that</span> <span class="n">adds</span> <span class="sb">`per`</span> <span class="n">and</span> <span class="sb">`page`</span> <span class="nb">methods</span> <span class="n">to</span> <span class="n">your</span> <span class="no">ActiveRecord</span> <span class="n">scopes</span><span class="o">.</span> <span class="no">We</span> <span class="n">recommend</span> <span class="sb">`kaminari`</span><span class="p">:</span>
+
+<span class="sb">```ruby
+# Gemfile
+gem 'kaminari'
+</span></code></pre>
 </div>
 
-<p>This suite depends on <a href="github.com/rails-api/active_model_serializers">active_model_serializers</a>. However, to accomodate a <a href="https://github.com/rails-api/active_model_serializers/pull/1931">performance issue</a>, we currently suggest running off of master:</p>
+<p>If you’d prefer to use a different pagination scheme, <a href="#without-kaminari">see the
+  customization section</a>
+  &lt;/div&gt;
+&lt;/div&gt;</p>
+<div style="height: 20rem;" />
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">gem</span> <span class="s1">'active_model_serializers'</span><span class="p">,</span>
-  <span class="ss">git: </span><span class="s1">'https://github.com/rails-api/active_model_serializers.git'</span><span class="p">,</span>
-  <span class="ss">ref: </span><span class="s1">'2145540'</span>
-</code></pre>
-</div>
-
-<div class="note info">
-  <h6 id="pagination">Pagination</h6>
-  <div class="note-content">
-    <p>While not a requirement, you can get out-of-the-box pagination with any gem that adds <code class="highlighter-rouge">per</code> and <code class="highlighter-rouge">page</code> methods to your ActiveRecord scopes. We recommend <code class="highlighter-rouge">kaminari</code>:</p>
-
-    <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># Gemfile</span>
-<span class="n">gem</span> <span class="s1">'kaminari'</span>
-</code></pre>
-    </div>
-
-    <p>If you’d prefer to use a different pagination scheme, <a href="#without-kaminari">see the
-  customization section</a></p>
-  </div>
-</div>
-<div style="height: 20rem;"></div>
 
         </section>
     
@@ -285,7 +276,7 @@ to an outside developer:</p>
 
   <span class="k">def</span> <span class="nf">index</span>
     <span class="n">employees</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">all</span>
-    <span class="n">render_ams</span><span class="p">(</span><span class="n">employees</span><span class="p">)</span>
+    <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">employees</span><span class="p">)</span>
   <span class="k">end</span>
 <span class="k">end</span>
 </code></pre>
@@ -313,11 +304,12 @@ to an outside developer:</p>
 <p><code class="highlighter-rouge">jsonapi { }</code> sets up our controller. We’ll go into this in more detail
 later.</p>
 
-<p><code class="highlighter-rouge">render_ams</code> is similar to <code class="highlighter-rouge">render :json</code>. However, it’s going to do
+<p><code class="highlighter-rouge">render_jsonapi</code> is similar to <code class="highlighter-rouge">render :json</code> (actually <code class="highlighter-rouge">render
+:jsonapi</code> under-the-hood). However, it’s going to do
 some extra work for you. For starters, it will pass relavant arguments -
 like which sparse fieldsets were requested - to <code class="highlighter-rouge">render</code> for you.</p>
 
-<p><code class="highlighter-rouge">render_ams</code> will also build the appropriate query scope. In this case
+<p><code class="highlighter-rouge">render_jsonapi</code> will also build the appropriate query scope. In this case
 we passed it an ActiveRecord scope (<code class="highlighter-rouge">Employee.all</code>) that can be chained
 off of. In this case we’re automatically adding pagination, sorting, and
 <code class="highlighter-rouge">select</code> to that scope.</p>
@@ -326,7 +318,7 @@ off of. In this case we’re automatically adding pagination, sorting, and
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">index</span>
   <span class="n">employees</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
-  <span class="n">render_ams</span><span class="p">(</span><span class="n">employees</span><span class="p">)</span>
+  <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">employees</span><span class="p">)</span>
 <span class="k">end</span>
 </code></pre>
 </div>
@@ -340,7 +332,7 @@ off of. In this case we’re automatically adding pagination, sorting, and
 
   <span class="c1"># Here we'll pass the actual records instead of</span>
   <span class="c1"># a scope, the scoping logic has already fired.</span>
-  <span class="n">render_ams</span><span class="p">(</span><span class="n">scope</span><span class="p">.</span><span class="nf">to_a</span><span class="p">)</span>
+  <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">scope</span><span class="p">.</span><span class="nf">to_a</span><span class="p">)</span>
 <span class="k">end</span>
 </code></pre>
 </div>
@@ -349,7 +341,7 @@ off of. In this case we’re automatically adding pagination, sorting, and
   <h6 id="remember-your-serializers">Remember Your Serializers!</h6>
   <div class="note-content">
     <p>This documentation assumes you’re roughly familiar with
-  <a href="https://github.com/rails-api/active_model_serializers">active_model_serializers</a>. Note the above code would not output jsonapi unless an <code class="highlighter-rouge">EmployeeSerializer</code> is defined.</p>
+  <a href="http://jsonapi-rb.org">jsonapi-rb</a>. Note the above code would not output jsonapi unless a <code class="highlighter-rouge">SerializableEmployee</code> is defined. By convention, we would put this in <code class="highlighter-rouge">app/resources/serializable_employee.rb</code>.</p>
   </div>
 </div>
 <div style="height: 8rem;"></div>
@@ -601,7 +593,7 @@ Object</a>. You can just use
   <span class="n">employee</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">employee_params</span><span class="p">)</span>
 
   <span class="k">if</span> <span class="n">employee</span><span class="p">.</span><span class="nf">save</span>
-    <span class="n">render_ams</span><span class="p">(</span><span class="n">employee</span><span class="p">)</span>
+    <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">employee</span><span class="p">)</span>
   <span class="k">else</span>
     <span class="n">render_errors_for</span><span class="p">(</span><span class="n">employee</span><span class="p">)</span>
   <span class="k">end</span>
@@ -1125,8 +1117,8 @@ with the same signature as <code class="highlighter-rouge">fields</code>:</p>
   <span class="n">extra_field</span> <span class="ss">:net_worth</span>
 <span class="k">end</span>
 
-<span class="c1"># app/serializers/employee_serializer.rb</span>
-<span class="k">class</span> <span class="nc">EmployeeSerializer</span> <span class="o">&lt;</span> <span class="no">ApplicationSerializer</span>
+<span class="c1"># app/resources/serializable_employee.rb</span>
+<span class="k">class</span> <span class="nc">SerializableEmployee</span> <span class="o">&lt;</span> <span class="no">JSONAPI</span><span class="o">::</span><span class="no">Serializable</span><span class="o">::</span><span class="no">Resource</span>
   <span class="n">extra_attribute</span> <span class="ss">:net_worth</span>
 <span class="k">end</span>
 </code></pre>
@@ -1378,7 +1370,7 @@ Note that each block must return a ‘scopeable’ that will be passed on:</p>
     <span class="n">search</span> <span class="o">=</span> <span class="n">jsonapi_scope</span><span class="p">(</span><span class="no">Search</span><span class="o">::</span><span class="no">Employee</span><span class="p">.</span><span class="nf">new</span><span class="p">)</span>
     <span class="n">search</span><span class="p">.</span><span class="nf">query!</span>
 
-    <span class="n">render_ams</span><span class="p">(</span><span class="n">search</span><span class="p">.</span><span class="nf">records</span><span class="p">.</span><span class="nf">to_a</span><span class="p">)</span>
+    <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">search</span><span class="p">.</span><span class="nf">records</span><span class="p">.</span><span class="nf">to_a</span><span class="p">)</span>
   <span class="k">end</span>
 <span class="k">end</span>
 </code></pre>

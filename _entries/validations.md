@@ -15,7 +15,7 @@ def create
   employee = Employee.new(employee_params)
 
   if employee.save
-    render_ams(employee)
+    render_jsonapi(employee)
   else
     render_errors_for(employee)
   end

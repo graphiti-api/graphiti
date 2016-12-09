@@ -14,7 +14,7 @@ class EmployeesController < ApplicationController
 
   def index
     employees = Employee.all
-    render_ams(employees)
+    render_jsonapi(employees)
   end
 end
 ```
@@ -37,11 +37,12 @@ Let's take a look at what this code does.
 `jsonapi { }` sets up our controller. We'll go into this in more detail
 later.
 
-`render_ams` is similar to `render :json`. However, it's going to do
+`render_jsonapi` is similar to `render :json` (actually `render
+:jsonapi` under-the-hood). However, it's going to do
 some extra work for you. For starters, it will pass relavant arguments -
 like which sparse fieldsets were requested - to `render` for you.
 
-`render_ams` will also build the appropriate query scope. In this case
+`render_jsonapi` will also build the appropriate query scope. In this case
 we passed it an ActiveRecord scope (`Employee.all`) that can be chained
 off of. In this case we're automatically adding pagination, sorting, and
 `select` to that scope.
@@ -51,7 +52,7 @@ This means you could optionally provide a default scope:
 ```ruby
 def index
   employees = Employee.where(active: true)
-  render_ams(employees)
+  render_jsonapi(employees)
 end
 ```
 
@@ -65,7 +66,7 @@ def index
 
   # Here we'll pass the actual records instead of
   # a scope, the scoping logic has already fired.
-  render_ams(scope.to_a)
+  render_jsonapi(scope.to_a)
 end
 ```
 
@@ -74,7 +75,7 @@ end
 ###### Remember Your Serializers!
   <div class='note-content'>
   This documentation assumes you're roughly familiar with
-  [active_model_serializers](https://github.com/rails-api/active_model_serializers). Note the above code would not output jsonapi unless an `EmployeeSerializer` is defined.
+  [jsonapi-rb](http://jsonapi-rb.org). Note the above code would not output jsonapi unless a `SerializableEmployee` is defined. By convention, we would put this in `app/resources/serializable_employee.rb`.
   </div>
 </div>
 <div style="height: 8rem;" />

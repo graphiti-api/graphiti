@@ -75,7 +75,7 @@ class EmployeesController < ApplicationController
     search = jsonapi_scope(Search::Employee.new)
     search.query!
 
-    render_ams(search.records.to_a)
+    render_jsonapi(search.records.to_a)
   end
 end
 ```

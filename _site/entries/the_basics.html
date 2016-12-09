@@ -166,7 +166,7 @@
 
   <span class="k">def</span> <span class="nf">index</span>
     <span class="n">employees</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">all</span>
-    <span class="n">render_ams</span><span class="p">(</span><span class="n">employees</span><span class="p">)</span>
+    <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">employees</span><span class="p">)</span>
   <span class="k">end</span>
 <span class="k">end</span>
 </code></pre>
@@ -194,11 +194,12 @@
 <p><code class="highlighter-rouge">jsonapi { }</code> sets up our controller. We’ll go into this in more detail
 later.</p>
 
-<p><code class="highlighter-rouge">render_ams</code> is similar to <code class="highlighter-rouge">render :json</code>. However, it’s going to do
+<p><code class="highlighter-rouge">render_jsonapi</code> is similar to <code class="highlighter-rouge">render :json</code> (actually <code class="highlighter-rouge">render
+:jsonapi</code> under-the-hood). However, it’s going to do
 some extra work for you. For starters, it will pass relavant arguments -
 like which sparse fieldsets were requested - to <code class="highlighter-rouge">render</code> for you.</p>
 
-<p><code class="highlighter-rouge">render_ams</code> will also build the appropriate query scope. In this case
+<p><code class="highlighter-rouge">render_jsonapi</code> will also build the appropriate query scope. In this case
 we passed it an ActiveRecord scope (<code class="highlighter-rouge">Employee.all</code>) that can be chained
 off of. In this case we’re automatically adding pagination, sorting, and
 <code class="highlighter-rouge">select</code> to that scope.</p>
@@ -207,7 +208,7 @@ off of. In this case we’re automatically adding pagination, sorting, and
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">index</span>
   <span class="n">employees</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
-  <span class="n">render_ams</span><span class="p">(</span><span class="n">employees</span><span class="p">)</span>
+  <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">employees</span><span class="p">)</span>
 <span class="k">end</span>
 </code></pre>
 </div>
@@ -221,7 +222,7 @@ off of. In this case we’re automatically adding pagination, sorting, and
 
   <span class="c1"># Here we'll pass the actual records instead of</span>
   <span class="c1"># a scope, the scoping logic has already fired.</span>
-  <span class="n">render_ams</span><span class="p">(</span><span class="n">scope</span><span class="p">.</span><span class="nf">to_a</span><span class="p">)</span>
+  <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">scope</span><span class="p">.</span><span class="nf">to_a</span><span class="p">)</span>
 <span class="k">end</span>
 </code></pre>
 </div>
@@ -230,7 +231,7 @@ off of. In this case we’re automatically adding pagination, sorting, and
   <h6 id="remember-your-serializers">Remember Your Serializers!</h6>
   <div class="note-content">
     <p>This documentation assumes you’re roughly familiar with
-  <a href="https://github.com/rails-api/active_model_serializers">active_model_serializers</a>. Note the above code would not output jsonapi unless an <code class="highlighter-rouge">EmployeeSerializer</code> is defined.</p>
+  <a href="http://jsonapi-rb.org">jsonapi-rb</a>. Note the above code would not output jsonapi unless a <code class="highlighter-rouge">SerializableEmployee</code> is defined. By convention, we would put this in <code class="highlighter-rouge">app/resources/serializable_employee.rb</code>.</p>
   </div>
 </div>
 <div style="height: 8rem;"></div>

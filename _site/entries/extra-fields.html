@@ -180,8 +180,8 @@ with the same signature as <code class="highlighter-rouge">fields</code>:</p>
   <span class="n">extra_field</span> <span class="ss">:net_worth</span>
 <span class="k">end</span>
 
-<span class="c1"># app/serializers/employee_serializer.rb</span>
-<span class="k">class</span> <span class="nc">EmployeeSerializer</span> <span class="o">&lt;</span> <span class="no">ApplicationSerializer</span>
+<span class="c1"># app/resources/serializable_employee.rb</span>
+<span class="k">class</span> <span class="nc">SerializableEmployee</span> <span class="o">&lt;</span> <span class="no">JSONAPI</span><span class="o">::</span><span class="no">Serializable</span><span class="o">::</span><span class="no">Resource</span>
   <span class="n">extra_attribute</span> <span class="ss">:net_worth</span>
 <span class="k">end</span>
 </code></pre>

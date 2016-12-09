@@ -26,8 +26,8 @@ jsonapi do
   extra_field :net_worth
 end
 
-# app/serializers/employee_serializer.rb
-class EmployeeSerializer < ApplicationSerializer
+# app/resources/serializable_employee.rb
+class SerializableEmployee < JSONAPI::Serializable::Resource
   extra_attribute :net_worth
 end
 ```
