@@ -55,7 +55,7 @@ RSpec.describe 'filtering', type: :controller do
 
   context 'when a default filter' do
     before do
-      controller.class_eval do
+      controller.class.class_eval do
         jsonapi do
           default_filter :first_name do |scope|
             scope.where(first_name: 'William')

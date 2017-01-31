@@ -12,11 +12,11 @@ module JsonapiCompliable
     end
 
     def custom_scope
-      dsl.pagination
+      resource.pagination
     end
 
     def apply_standard_scope
-      @scope.page(number).per(size)
+      resource.adapter.paginate(@scope, number, size)
     end
 
     def apply_custom_scope
@@ -30,11 +30,11 @@ module JsonapiCompliable
     end
 
     def number
-      (page_param[:number] || dsl.default_page_number).to_i
+      (page_param[:number] || resource.default_page_number).to_i
     end
 
     def size
-      (page_param[:size] || dsl.default_page_size).to_i
+      (page_param[:size] || resource.default_page_size).to_i
     end
   end
 end

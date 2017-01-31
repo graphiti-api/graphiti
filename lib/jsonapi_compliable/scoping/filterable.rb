@@ -8,10 +8,10 @@ module JsonapiCompliable
 
     def find_filter!(name)
       filter_name, filter_value = \
-        dsl.filters.find { |_name, opts| opts[:aliases].include?(name.to_sym) }
+        resource.filters.find { |_name, opts| opts[:aliases].include?(name.to_sym) }
       raise JsonapiCompliable::Errors::BadFilter unless filter_name
       if guard = filter_value[:if]
-        raise JsonapiCompliable::Errors::BadFilter if dsl.context[:object].send(guard) == false
+        raise JsonapiCompliable::Errors::BadFilter if resource.context[:object].send(guard) == false
       end
       { filter_name => filter_value }
     end

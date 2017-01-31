@@ -3,19 +3,10 @@ module JsonapiCompliable
     class DSL
       attr_reader :name, :calculations
 
-      def self.defaults
-        {
-          count: ->(scope, attr) { scope.count },
-          average: ->(scope, attr) { scope.average(attr).to_f },
-          sum: ->(scope, attr) { scope.sum(attr) },
-          maximum: ->(scope, attr) { scope.maximum(attr) },
-          minimum: ->(scope, attr) { scope.minimum(attr) }
-        }
-      end
-
-      def initialize(config)
+      def initialize(adapter, config)
         config = { config => [] } if config.is_a?(Symbol)
 
+        @adapter = adapter
         @calculations = {}
         @name = config.keys.first
         Array(config.values.first).each { |c| send(:"#{c}!") }
@@ -31,23 +22,23 @@ module JsonapiCompliable
       end
 
       def count!
-        @calculations[:count] = self.class.defaults[:count]
+        @calculations[:count] = @adapter.method(:count)
       end
 
       def sum!
-        @calculations[:sum] = self.class.defaults[:sum]
+        @calculations[:sum] = @adapter.method(:sum)
       end
 
       def average!
-        @calculations[:average] = self.class.defaults[:average]
+        @calculations[:average] = @adapter.method(:average)
       end
 
       def maximum!
-        @calculations[:maximum] = self.class.defaults[:maximum]
+        @calculations[:maximum] = @adapter.method(:maximum)
       end
 
       def minimum!
-        @calculations[:minimum] = self.class.defaults[:minimum]
+        @calculations[:minimum] = @adapter.method(:minimum)
       end
     end
   end

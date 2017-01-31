@@ -35,22 +35,25 @@ RSpec.describe JsonapiCompliable, type: :controller do
     end
 
     context 'when subclassing and customizing' do
+      def config(obj)
+        obj._jsonapi_compliable.config
+      end
+
       it 'preserves values from superclass' do
-        expect(subclass2._jsonapi_compliable.filters[:id]).to_not be_nil
+        expect(config(subclass2)[:filters][:id]).to_not be_nil
       end
 
       it 'does not alter superclass when overriding' do
-        expect(subclass1._jsonapi_compliable)
-          .to_not eq(subclass2._jsonapi_compliable)
-        expect(subclass1._jsonapi_compliable.filters[:id].object_id)
-          .to_not eq(subclass2._jsonapi_compliable.filters[:id].object_id)
-        expect(subclass1._jsonapi_compliable.filters[:foo][:filter]).to be_nil
-        expect(subclass2._jsonapi_compliable.filters[:foo][:filter]).to_not be_nil
+        expect(config(subclass1)).to_not eq(config(subclass2))
+        expect(config(subclass1)[:filters][:id].object_id)
+          .to_not eq(config(subclass2)[:filters][:id].object_id)
+        expect(config(subclass1)[:filters][:foo][:filter]).to be_nil
+        expect(config(subclass2)[:filters][:foo][:filter]).to_not be_nil
       end
 
       it 'overrides type for subclass' do
-        expect(subclass2._jsonapi_compliable.type).to eq(:subclass_2)
-        expect(subclass1._jsonapi_compliable.type).to eq(:subclass_1)
+        expect(config(subclass2)[:type]).to eq(:subclass_2)
+        expect(config(subclass1)[:type]).to eq(:subclass_1)
       end
     end
   end

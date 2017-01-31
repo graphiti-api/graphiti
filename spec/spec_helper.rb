@@ -13,6 +13,7 @@ require 'database_cleaner'
 
 require 'pry'
 require 'jsonapi_compliable'
+require 'jsonapi_compliable/adapters/active_record'
 
 ::Rails.application = BasicRailsApp.generate
 
@@ -161,6 +162,10 @@ end
 
 class ApplicationController < ActionController::Base
   include JsonapiCompliable
+
+  jsonapi do
+    use_adapter JsonapiCompliable::Adapters::ActiveRecord
+  end
 
   prepend_before_action :fix_params!
 

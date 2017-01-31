@@ -2,7 +2,7 @@
 
 module JsonapiCompliable
   class Query
-    attr_reader :params, :dsl
+    attr_reader :params, :resource
 
     def self.default_hash
       {
@@ -16,14 +16,14 @@ module JsonapiCompliable
       }
     end
 
-    def initialize(dsl, params)
-      @dsl = dsl
+    def initialize(resource, params)
+      @resource = resource
       @params = params
     end
 
     def to_hash
-      hash = { dsl.type => self.class.default_hash }
-      dsl.association_names.each do |name|
+      hash = { resource.type => self.class.default_hash }
+      resource.association_names.each do |name|
         hash[name] = self.class.default_hash.except(:include)
       end
 
@@ -58,23 +58,23 @@ module JsonapiCompliable
     private
 
     def association?(name)
-      dsl.association_names.include?(name)
+      resource.association_names.include?(name)
     end
 
     # TODO: maybe walk the graph and apply to all
     def parse_include(hash)
-      hash[dsl.type][:include] = JSONAPI::IncludeDirective.new(params[:include] || {}).to_hash
+      hash[resource.type][:include] = JSONAPI::IncludeDirective.new(params[:include] || {}).to_hash
     end
 
     def parse_stats(hash)
       if params[:stats]
         params[:stats].each_pair do |namespace, calculations|
-          if namespace == dsl.type || association?(namespace)
+          if namespace == resource.type || association?(namespace)
             calculations.each_pair do |name, calcs|
               hash[namespace][:stats][name] = calcs.split(',').map(&:to_sym)
             end
           else
-            hash[dsl.type][:stats][namespace] = calculations.split(',').map(&:to_sym)
+            hash[resource.type][:stats][namespace] = calculations.split(',').map(&:to_sym)
           end
         end
       end
@@ -95,7 +95,7 @@ module JsonapiCompliable
           if association?(key)
             hash[key][:filter].merge!(value)
           else
-            hash[dsl.type][:filter][key] = value
+            hash[resource.type][:filter][key] = value
           end
         end
       end
@@ -114,7 +114,7 @@ module JsonapiCompliable
 
             hash[type.to_sym][:sort] << sort_attr(attr)
           else
-            hash[dsl.type][:sort] << sort_attr(s)
+            hash[resource.type][:sort] << sort_attr(s)
           end
         end
       end
@@ -126,7 +126,7 @@ module JsonapiCompliable
           key = key.to_sym
 
           if [:number, :size].include?(key)
-            hash[dsl.type][:page][key] = value.to_i
+            hash[resource.type][:page][key] = value.to_i
           else
             hash[key][:page] = { number: value[:number].to_i, size: value[:size].to_i }
           end

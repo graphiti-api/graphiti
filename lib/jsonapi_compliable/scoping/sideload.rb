@@ -5,11 +5,11 @@ module JsonapiCompliable
     end
 
     def custom_scope
-      dsl.sideloads[:custom_scope]
+      resource.sideloads[:custom_scope]
     end
 
     def apply_standard_scope
-      @scope.includes(scrubbed)
+      resource.adapter.sideload(@scope, scrubbed)
     end
 
     def apply_custom_scope
@@ -19,7 +19,7 @@ module JsonapiCompliable
     private
 
     def scrubbed
-      Util::IncludeParams.scrub(query_hash[:include], dsl.allowed_sideloads)
+      Util::IncludeParams.scrub(query_hash[:include], resource.allowed_sideloads)
     end
   end
 end

@@ -17,7 +17,11 @@ RSpec.describe 'pagination', type: :controller do
   let!(:author4) { Author.create! }
 
   it 'applies default pagination' do
-    controller._jsonapi_compliable.default_page_size(2)
+    controller.class.class_eval do
+      jsonapi do
+        default_page_size 2
+      end
+    end
     get :index
     expect(json_ids.length).to eq(2)
   end
@@ -43,7 +47,7 @@ RSpec.describe 'pagination', type: :controller do
 
   context 'and a custom pagination function is given' do
     before do
-      controller.class_eval do
+      controller.class.class_eval do
         jsonapi do
           paginate do |scope, page, per_page|
             scope.limit(0)

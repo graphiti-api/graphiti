@@ -14,7 +14,7 @@ module JsonapiCompliable
       if custom_scope = filter.values.first[:filter]
         custom_scope.call(@scope, value)
       else
-        @scope.where(filter.keys.first => value)
+        resource.adapter.filter(@scope, filter.keys.first, value)
       end
     end
 

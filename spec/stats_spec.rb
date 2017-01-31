@@ -150,7 +150,7 @@ RSpec.describe 'stats', type: :controller do
 
   context 'when not AR scope' do
     before do
-      controller.class_eval do
+      controller.class.class_eval do
         jsonapi do
           allow_stat :total do
             count { |scope| scope.length }

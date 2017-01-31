@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 RSpec.describe JsonapiCompliable::Query do
-  let(:dsl)      { double(type: :authors, association_names: [:books]).as_null_object }
+  let(:resource) { double(type: :authors, association_names: [:books]).as_null_object }
   let(:params)   { {} }
-  let(:instance) { described_class.new(dsl, params) }
+  let(:instance) { described_class.new(resource, params) }
 
   describe '#to_hash' do
     subject { instance.to_hash }

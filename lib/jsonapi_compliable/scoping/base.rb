@@ -1,11 +1,11 @@
 module JsonapiCompliable
   module Scoping
     class Base
-      attr_reader :dsl, :query_hash
+      attr_reader :resource, :query_hash
 
-      def initialize(dsl, query_hash, scope)
+      def initialize(resource, query_hash, scope)
         @query_hash = query_hash
-        @dsl        = dsl
+        @resource   = resource
         @scope      = scope
       end
 

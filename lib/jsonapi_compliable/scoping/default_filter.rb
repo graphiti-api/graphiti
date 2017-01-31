@@ -3,7 +3,7 @@ module JsonapiCompliable
     include Scoping::Filterable
 
     def apply
-      dsl.default_filters.each_pair do |name, opts|
+      resource.default_filters.each_pair do |name, opts|
         next if overridden?(name)
         @scope = opts[:filter].call(@scope)
       end

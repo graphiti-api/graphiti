@@ -3,11 +3,11 @@
 module JsonapiCompliable
   class Scoping::Sort < Scoping::Base
     def custom_scope
-      dsl.sorting
+      resource.sorting
     end
 
     def apply_standard_scope
-      @scope.order(attribute => direction)
+      resource.adapter.order(@scope, attribute, direction)
     end
 
     def apply_custom_scope
@@ -25,7 +25,7 @@ module JsonapiCompliable
     end
 
     def sort_param
-      @sort_param ||= query_hash[:sort].empty? ? dsl.default_sort : query_hash[:sort]
+      @sort_param ||= query_hash[:sort].empty? ? resource.default_sort : query_hash[:sort]
     end
   end
 end

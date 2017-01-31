@@ -1,7 +1,8 @@
 require 'spec_helper'
 
-RSpec.describe JsonapiCompliable::DSL do
-  let(:instance) { described_class.new }
+RSpec.describe JsonapiCompliable::Resource do
+  let(:klass) { Class.new(described_class) }
+  let(:instance) { klass.new }
 
   describe '#copy' do
     let(:copy) { instance.copy }
@@ -11,100 +12,16 @@ RSpec.describe JsonapiCompliable::DSL do
       expect(copy.object_id).to_not eq(instance.object_id)
     end
 
-    it 'copies sideloads' do
-      instance.sideloads = { foo: 'bar' }
-      expect(copy.sideloads).to eq(foo: 'bar')
-      expect(copy.sideloads.object_id).to_not eq(instance.sideloads.object_id)
+    it 'copies the config' do
+      instance.set_config(foo: 'bar')
+      expect(copy.instance_variable_get(:@config)).to eq(foo: 'bar')
+      expect(copy.instance_variable_get(:@config).object_id)
+        .to_not eq(instance.instance_variable_get(:@config))
     end
 
-    it 'copies filters' do
-      instance.filters = { foo: 'bar' }
-      expect(copy.filters).to eq(foo: 'bar')
-      expect(copy.filters.object_id).to_not eq(instance.filters.object_id)
-    end
-
-    it 'copies default filters' do
-      instance.default_filters = { foo: 'bar' }
-      expect(copy.default_filters).to eq(foo: 'bar')
-      expect(copy.default_filters.object_id).to_not eq(instance.default_filters.object_id)
-    end
-
-    it 'copies extra fields' do
-      instance.extra_fields = { foo: 'bar' }
-      expect(copy.extra_fields).to eq(foo: 'bar')
-      expect(copy.extra_fields.object_id).to_not eq(instance.extra_fields.object_id)
-    end
-
-    it 'copies sorting' do
-      instance.sorting = 'a'
-      expect(copy.sorting).to eq(instance.sorting)
-      expect(copy.sorting.object_id).to_not eq(instance.sorting.object_id)
-    end
-
-    it 'copies pagination' do
-      instance.pagination = 'a'
-      expect(copy.pagination).to eq(instance.pagination)
-      expect(copy.pagination.object_id).to_not eq(instance.pagination.object_id)
-    end
-
-    it 'copies stats' do
-      instance.stats = { foo: 'bar' }
-      expect(copy.stats).to eq(foo: 'bar')
-      expect(copy.stats.object_id).to_not eq(instance.stats.object_id)
-    end
-  end
-
-  describe '#clear' do
-    before do
-      instance.sideloads = { foo: 'bar' }
-      instance.filters = { foo: 'bar' }
-      instance.default_filters = { foo: 'bar' }
-      instance.extra_fields = { foo: 'bar' }
-      instance.stats = { foo: 'bar' }
-      instance.sorting = 'a'
-      instance.pagination = 'a'
-    end
-
-    it 'resets sideloads' do
-      expect {
-        instance.clear!
-      }.to change { instance.sideloads }.to({})
-    end
-
-    it 'resets filters' do
-      expect {
-        instance.clear!
-      }.to change { instance.filters }.to({})
-    end
-
-    it 'resets default filters' do
-      expect {
-        instance.clear!
-      }.to change { instance.default_filters }.to({})
-    end
-
-    it 'resets extra fields' do
-      expect {
-        instance.clear!
-      }.to change { instance.extra_fields }.to({})
-    end
-
-    it 'resets sorting' do
-      expect {
-        instance.clear!
-      }.to change { instance.sorting }.to(nil)
-    end
-
-    it 'resets pagination' do
-      expect {
-        instance.clear!
-      }.to change { instance.pagination }.to(nil)
-    end
-
-    it 'resets stats' do
-      expect {
-        instance.clear!
-      }.to change { instance.stats }.to({})
+    it 'assigns instance variables' do
+      instance.set_config(foo: 'bar')
+      expect(copy.instance_variable_get(:@foo)).to eq('bar')
     end
   end
 
@@ -112,9 +29,10 @@ RSpec.describe JsonapiCompliable::DSL do
     let(:avg_proc) { proc { |scope, attr| 1 } }
 
     before do
-      dsl = JsonapiCompliable::Stats::DSL.new(:myattr)
+      adapter = JsonapiCompliable::Adapters::ActiveRecord.new
+      dsl = JsonapiCompliable::Stats::DSL.new(adapter, :myattr)
       dsl.average(&avg_proc)
-      instance.stats = { myattr: dsl }
+      instance.instance_variable_set(:@stats, { myattr: dsl })
     end
 
     context 'when passing strings' do
@@ -167,7 +85,7 @@ RSpec.describe JsonapiCompliable::DSL do
 
   describe '#default_sort' do
     it 'gets/sets correctly' do
-      instance.default_sort([{ name: :desc }])
+      klass.default_sort([{ name: :desc }])
       expect(instance.default_sort).to eq([{ name: :desc }])
     end
 
@@ -178,7 +96,7 @@ RSpec.describe JsonapiCompliable::DSL do
 
   describe '#default_page_number' do
     it 'gets/sets correctly' do
-      instance.default_page_number(2)
+      klass.default_page_number(2)
       expect(instance.default_page_number).to eq(2)
     end
 
@@ -189,7 +107,7 @@ RSpec.describe JsonapiCompliable::DSL do
 
   describe '#default_page_size' do
     it 'gets/sets correctly' do
-      instance.default_page_size(10)
+      klass.default_page_size(10)
       expect(instance.default_page_size).to eq(10)
     end
 
@@ -200,7 +118,7 @@ RSpec.describe JsonapiCompliable::DSL do
 
   describe '#type' do
     it 'gets/sets correctly' do
-      instance.type :authors
+      klass.type :authors
       expect(instance.type).to eq(:authors)
     end
 
@@ -211,7 +129,7 @@ RSpec.describe JsonapiCompliable::DSL do
 
   describe '#association_names' do
     it 'collects all keys in all whitelists, without dupes' do
-      instance.includes whitelist: { index: [{ books: :genre }, :state], show: [:state, :bio] }
+      klass.includes whitelist: { index: [{ books: :genre }, :state], show: [:state, :bio] }
       expect(instance.association_names).to eq([:books, :genre, :state, :bio])
     end
 
@@ -223,18 +141,25 @@ RSpec.describe JsonapiCompliable::DSL do
   end
 
   describe '#allowed_sideloads' do
-    subject { instance.allowed_sideloads }
+    subject do
+      instance.allowed_sideloads
+    end
 
     context 'when no whitelist' do
+      before do
+        instance.instance_variable_set(:@sideloads, {})
+      end
+
       it { is_expected.to eq({}) }
     end
 
     context 'when a whitelist' do
       before do
-        instance.includes whitelist: {
+        klass.includes whitelist: {
           index: [{ foo: :bar }, :baz],
           show: :blah
         }
+        instance.set_config(klass.config)
       end
 
       context 'and a namespace is set' do

@@ -11,7 +11,7 @@ module JsonapiCompliable
     private
 
     def each_extra_field
-      dsl.extra_fields.each_pair do |name, callable|
+      resource.extra_fields.each_pair do |name, callable|
         if extra_fields.include?(name)
           yield callable
         end

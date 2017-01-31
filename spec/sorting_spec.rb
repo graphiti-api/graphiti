@@ -16,11 +16,11 @@ RSpec.describe 'sorting', type: :controller do
     Author.create!(first_name: 'Philip')
   end
 
-  it 'defaults sort to controller default_sort' do
-    controller._jsonapi_compliable.default_sort([{ id: :asc }])
+  it 'defaults sort to resource default_sort' do
+    controller.resource.instance_variable_set(:@default_sort, [{ id: :asc }])
     get :index
     expect(json_ids(true)).to eq(Author.pluck(:id))
-    controller._jsonapi_compliable.default_sort([{ id: :desc }])
+    controller.resource.instance_variable_set(:@default_sort, [{ id: :desc }])
     get :index
     expect(json_ids(true)).to eq(Author.pluck(:id).reverse)
   end
@@ -47,7 +47,7 @@ RSpec.describe 'sorting', type: :controller do
       let(:sort_param) { 'first_name' }
 
       before do
-        controller.class_eval do
+        controller.class.class_eval do
           jsonapi do
             sort do |scope, att, dir|
               scope.order(id: :desc)

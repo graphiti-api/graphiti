@@ -6,35 +6,49 @@ module JsonapiCompliable
     MAX_PAGE_SIZE = 1_000
 
     included do
-      class_attribute :_jsonapi_compliable
-      attr_reader :_jsonapi_scope
+      class << self
+        attr_accessor :_jsonapi_compliable
+      end
 
       around_action :wrap_context
+
+      def self.inherited(klass)
+        super
+        klass._jsonapi_compliable = Class.new(_jsonapi_compliable)
+      end
+    end
+
+    def resource
+      @resource ||= self.class._jsonapi_compliable.new
+    end
+
+    def resource!
+      @resource = self.class._jsonapi_compliable.new
     end
 
     # TODO pass controller and action name here to guard
     def wrap_context
-      _jsonapi_compliable.with_context(self, action_name.to_sym) do
+      resource.with_context(self, action_name.to_sym) do
         yield
       end
     end
 
     def jsonapi_scope(scope, opts = {})
-      query = Query.new(_jsonapi_compliable, params)
-      _jsonapi_compliable.build_scope(scope, query, opts)
+      query = Query.new(resource, params)
+      resource.build_scope(scope, query, opts)
     end
 
     # TODO: refactor
     def render_jsonapi(scope, opts = {})
-      query = Query.new(_jsonapi_compliable, params)
-      query_hash = query.to_hash[_jsonapi_compliable.type]
+      query = Query.new(resource, params)
+      query_hash = query.to_hash[resource.type]
 
       scoped = scope
       scoped = jsonapi_scope(scoped) unless opts[:scope] == false || scoped.is_a?(JsonapiCompliable::Scope)
       resolved = scoped.respond_to?(:resolve) ? scoped.resolve : scoped
 
       options = default_jsonapi_render_options
-      options[:include] = forced_includes || Util::IncludeParams.scrub(query_hash[:include], _jsonapi_compliable.allowed_sideloads)
+      options[:include] = forced_includes || Util::IncludeParams.scrub(query_hash[:include], resource.allowed_sideloads)
       options[:jsonapi] = resolved
       options[:fields] = query.fieldsets
       options[:meta] ||= {}
@@ -88,15 +102,16 @@ module JsonapiCompliable
     end
 
     module ClassMethods
-      def jsonapi(&blk)
-        if !self._jsonapi_compliable
-          dsl = JsonapiCompliable::DSL.new
-          self._jsonapi_compliable = dsl
+      def jsonapi(resource: nil, &blk)
+        if resource
+          self._jsonapi_compliable = resource
         else
-          self._jsonapi_compliable = self._jsonapi_compliable.copy
+          if !self._jsonapi_compliable
+            self._jsonapi_compliable = JsonapiCompliable::Resource
+          end
         end
 
-        self._jsonapi_compliable.instance_eval(&blk)
+        self._jsonapi_compliable.class_eval(&blk) if blk
       end
     end
   end
