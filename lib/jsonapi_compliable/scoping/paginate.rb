@@ -1,5 +1,5 @@
 module JsonapiCompliable
-  class Scope::Paginate < Scope::Base
+  class Scoping::Paginate < Scoping::Base
     MAX_PAGE_SIZE = 1_000
 
     def apply
@@ -26,15 +26,15 @@ module JsonapiCompliable
     private
 
     def page_param
-      @page_param ||= (params[:page] || {})
+      @page_param ||= (query_hash[:page] || {})
     end
 
     def number
-      (page_param[:number] || controller.default_page_number).to_i
+      (page_param[:number] || dsl.default_page_number).to_i
     end
 
     def size
-      (page_param[:size] || controller.default_page_size).to_i
+      (page_param[:size] || dsl.default_page_size).to_i
     end
   end
 end

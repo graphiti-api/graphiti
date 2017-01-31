@@ -8,6 +8,8 @@ module JsonapiCompliable
       :stats,
       :pagination
 
+    attr_reader :context
+
     def initialize
       clear!
     end
@@ -32,6 +34,73 @@ module JsonapiCompliable
       @stats = {}
       @sorting = nil
       @pagination = nil
+      @context = {}
+    end
+
+    def with_context(object, namespace = nil)
+      begin
+        prior = @context
+        @context = { object: object, namespace: namespace }
+        yield
+      ensure
+        @context = prior
+      end
+    end
+
+    def build_scope(base, query, opts = {})
+      Scope.new(base, self, query, opts)
+    end
+
+    def default_sort(val = nil)
+      if val
+        @default_sort = val
+      else
+        @default_sort || [{ id: :asc }]
+      end
+    end
+
+    def default_page_number(val = nil)
+      if val
+        @default_page_number = val
+      else
+        @default_page_number || 1
+      end
+    end
+
+    def default_page_size(val = nil)
+      if val
+        @default_page_size = val
+      else
+        @default_page_size || 20
+      end
+    end
+
+    def association_names
+      @association_names ||= begin
+        if whitelist = @sideloads[:whitelist]
+          Util::Hash.keys(whitelist.to_hash.values.reduce(&:merge))
+        else
+          []
+        end
+      end
+    end
+
+    def allowed_sideloads
+      return {} if @sideloads.empty?
+
+      if namespace = @context[:namespace]
+        @sideloads[:whitelist][namespace].to_hash
+      else
+        @sideloads[:whitelist].to_hash.values.reduce(&:merge)
+      end
+    end
+
+    def type(value = nil)
+      if value
+        @type = value
+      else
+        @type || :undefined_jsonapi_type
+      end
     end
 
     def includes(whitelist: nil, &blk)
@@ -73,12 +142,8 @@ module JsonapiCompliable
       @pagination = blk
     end
 
-    def extra_field(field, &blk)
-      @extra_fields[field.keys.first] ||= []
-      @extra_fields[field.keys.first] << {
-        name: field.values.first,
-        proc: blk
-      }
+    def extra_field(name, &blk)
+      @extra_fields[name] = blk
     end
 
     def stat(attribute, calculation)

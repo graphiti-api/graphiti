@@ -1,5 +1,7 @@
+# TODO: multisort
+
 module JsonapiCompliable
-  class Scope::Sort < Scope::Base
+  class Scoping::Sort < Scoping::Base
     def custom_scope
       dsl.sorting
     end
@@ -14,16 +16,16 @@ module JsonapiCompliable
 
     private
 
-    def sort_param
-      @sort_param ||= (params[:sort] || @controller.default_sort)
+    def attribute
+      sort_param[0].keys.first
     end
 
     def direction
-      sort_param.starts_with?('-') ? :desc : :asc
+      sort_param[0].values.first
     end
 
-    def attribute
-      sort_param.dup.sub('-', '').to_sym
+    def sort_param
+      @sort_param ||= query_hash[:sort].empty? ? dsl.default_sort : query_hash[:sort]
     end
   end
 end

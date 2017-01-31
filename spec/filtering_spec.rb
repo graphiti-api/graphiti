@@ -3,6 +3,8 @@ require 'spec_helper'
 RSpec.describe 'filtering', type: :controller do
   controller(ApplicationController) do
     jsonapi do
+      type :authors
+
       allow_filter :id
       allow_filter :first_name, aliases: [:name], if: :can_filter_first_name?
 

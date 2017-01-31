@@ -2,7 +2,9 @@ require 'spec_helper'
 
 RSpec.describe 'sorting', type: :controller do
   controller(ApplicationController) do
-    jsonapi {}
+    jsonapi do
+      type :authors
+    end
 
     def index
       render_jsonapi(Author.all)
@@ -15,10 +17,10 @@ RSpec.describe 'sorting', type: :controller do
   end
 
   it 'defaults sort to controller default_sort' do
-    expect(controller).to receive(:default_sort) { 'id' }
+    controller._jsonapi_compliable.default_sort([{ id: :asc }])
     get :index
     expect(json_ids(true)).to eq(Author.pluck(:id))
-    expect(controller).to receive(:default_sort) { '-id' }
+    controller._jsonapi_compliable.default_sort([{ id: :desc }])
     get :index
     expect(json_ids(true)).to eq(Author.pluck(:id).reverse)
   end
@@ -48,18 +50,15 @@ RSpec.describe 'sorting', type: :controller do
         controller.class_eval do
           jsonapi do
             sort do |scope, att, dir|
-              scope.special_sort(att, dir)
+              scope.order(id: :desc)
             end
           end
         end
       end
 
       it 'uses the custom sort function' do
-        scope = double(is_a?: true).as_null_object
-        expect(Author).to receive(:all) { scope }
-        expect(scope).to receive(:special_sort)
-          .with(:first_name, :asc).and_return(scope)
         get :index, params: { sort: sort_param }
+        expect(json_ids(true)).to eq(Author.pluck(:id).reverse)
       end
     end
   end

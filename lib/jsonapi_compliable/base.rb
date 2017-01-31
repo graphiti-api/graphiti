@@ -9,60 +9,45 @@ module JsonapiCompliable
       class_attribute :_jsonapi_compliable
       attr_reader :_jsonapi_scope
 
-      before_action :parse_fieldsets!
-      after_action :reset_scope_flag
+      around_action :wrap_context
     end
 
-    def default_page_number
-      1
+    # TODO pass controller and action name here to guard
+    def wrap_context
+      _jsonapi_compliable.with_context(self, action_name.to_sym) do
+        yield
+      end
     end
 
-    def default_page_size
-      20
+    def jsonapi_scope(scope, opts = {})
+      query = Query.new(_jsonapi_compliable, params)
+      _jsonapi_compliable.build_scope(scope, query, opts)
     end
 
-    def default_sort
-      'id'
-    end
-
-    def jsonapi_scope(scope,
-                      filter: true,
-                      includes: true,
-                      paginate: true,
-                      extra_fields: true,
-                      sort: true)
-      scope = JsonapiCompliable::Scope::DefaultFilter.new(self, scope).apply
-      scope = JsonapiCompliable::Scope::Filter.new(self, scope).apply if filter
-      scope = JsonapiCompliable::Scope::ExtraFields.new(self, scope).apply if extra_fields
-      scope = JsonapiCompliable::Scope::Sideload.new(self, scope).apply if includes
-      scope = JsonapiCompliable::Scope::Sort.new(self, scope).apply if sort
-      # This is set before pagination so it can be re-used for stats
-      @_jsonapi_scope = scope
-      scope = JsonapiCompliable::Scope::Paginate.new(self, scope).apply if paginate
-      scope
-    end
-
-    def reset_scope_flag
-      @_jsonapi_scope = nil
-    end
-
-    def parse_fieldsets!
-      Util::FieldParams.parse!(params, :fields)
-      Util::FieldParams.parse!(params, :extra_fields)
-    end
-
+    # TODO: refactor
     def render_jsonapi(scope, opts = {})
-      scoped = Util::Scoping.apply?(self, scope, opts.delete(:scope)) ? jsonapi_scope(scope) : scope
+      query = Query.new(_jsonapi_compliable, params)
+      query_hash = query.to_hash[_jsonapi_compliable.type]
+
+      scoped = scope
+      scoped = jsonapi_scope(scoped) unless opts[:scope] == false || scoped.is_a?(JsonapiCompliable::Scope)
+      resolved = scoped.respond_to?(:resolve) ? scoped.resolve : scoped
+
       options = default_jsonapi_render_options
-      options[:include] = forced_includes || Util::IncludeParams.scrub(self)
-      options[:jsonapi] = JsonapiCompliable::Util::Pagination.zero?(params) ? [] : scoped
-      options[:fields] = Util::FieldParams.fieldset(params, :fields) if params[:fields]
+      options[:include] = forced_includes || Util::IncludeParams.scrub(query_hash[:include], _jsonapi_compliable.allowed_sideloads)
+      options[:jsonapi] = resolved
+      options[:fields] = query.fieldsets
       options[:meta] ||= {}
       options.merge!(opts)
-      options[:meta][:stats] = Stats::Payload.new(self, scoped).generate if params[:stats]
+
+      if scoped.respond_to?(:resolve_stats)
+        stats = scoped.resolve_stats
+        options[:meta][:stats] = stats unless stats.empty?
+      end
+
       options[:expose] ||= {}
       options[:expose][:context] = self
-      options[:expose][:extra_fields] = Util::FieldParams.fieldset(params, :extra_fields) if params[:extra_fields]
+      options[:expose][:extra_fields] = query_hash[:extra_fields]
 
       render(options)
     end
@@ -74,6 +59,7 @@ module JsonapiCompliable
       end
     end
 
+    # Legacy
     # TODO: This nastiness likely goes away once jsonapi standardizes
     # a spec for nested relationships.
     # See: https://github.com/json-api/json-api/issues/1089
@@ -95,6 +81,7 @@ module JsonapiCompliable
       end
     end
 
+    # Legacy
     def force_includes?
       %w(PUT PATCH POST).include?(request.method) and
         raw_params.try(:[], :data).try(:[], :relationships).present?

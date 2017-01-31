@@ -11,6 +11,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), "./support/basic_rail
 require 'rspec/rails'
 require 'database_cleaner'
 
+require 'pry'
 require 'jsonapi_compliable'
 
 ::Rails.application = BasicRailsApp.generate

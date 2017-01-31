@@ -1,16 +1,14 @@
 module JsonapiCompliable
   module Util
     class FieldParams
-      def self.parse!(params, name)
-        return unless params[name]
+      def self.parse(params)
+        return {} if params.nil?
 
-        params[name].each_pair do |key, value|
-          params[name][key] = value.split(',').map(&:to_sym)
+        {}.tap do |parsed|
+          params.each_pair do |key, value|
+            parsed[key.to_sym] = value.split(',').map(&:to_sym)
+          end
         end
-      end
-
-      def self.fieldset(params, name)
-        params[name].to_unsafe_hash.deep_symbolize_keys
       end
     end
   end

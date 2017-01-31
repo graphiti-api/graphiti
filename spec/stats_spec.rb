@@ -158,7 +158,8 @@ RSpec.describe 'stats', type: :controller do
         end
 
         def index
-          render_jsonapi([Author.first])
+          scope = jsonapi_scope([Author.first], sort: false, paginate: false)
+          render_jsonapi(scope)
         end
       end
     end

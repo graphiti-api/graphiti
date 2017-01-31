@@ -143,4 +143,113 @@ RSpec.describe JsonapiCompliable::DSL do
       end
     end
   end
+
+  describe '#with_context' do
+    it 'sets/resets correct context' do
+      dbl = double
+      instance.with_context(dbl, :index) do
+        expect(instance.context).to eq(object: dbl, namespace: :index)
+      end
+      expect(instance.context).to eq({})
+    end
+
+    context 'when an error' do
+      it 'resets the context' do
+        expect {
+          instance.with_context({}, :index) do
+            raise 'foo'
+          end
+        }.to raise_error('foo')
+        expect(instance.context).to eq({})
+      end
+    end
+  end
+
+  describe '#default_sort' do
+    it 'gets/sets correctly' do
+      instance.default_sort([{ name: :desc }])
+      expect(instance.default_sort).to eq([{ name: :desc }])
+    end
+
+    it 'defaults' do
+      expect(instance.default_sort).to eq([{ id: :asc }])
+    end
+  end
+
+  describe '#default_page_number' do
+    it 'gets/sets correctly' do
+      instance.default_page_number(2)
+      expect(instance.default_page_number).to eq(2)
+    end
+
+    it 'defaults' do
+      expect(instance.default_page_number).to eq(1)
+    end
+  end
+
+  describe '#default_page_size' do
+    it 'gets/sets correctly' do
+      instance.default_page_size(10)
+      expect(instance.default_page_size).to eq(10)
+    end
+
+    it 'defaults' do
+      expect(instance.default_page_size).to eq(20)
+    end
+  end
+
+  describe '#type' do
+    it 'gets/sets correctly' do
+      instance.type :authors
+      expect(instance.type).to eq(:authors)
+    end
+
+    it 'defaults' do
+      expect(instance.type).to eq(:undefined_jsonapi_type)
+    end
+  end
+
+  describe '#association_names' do
+    it 'collects all keys in all whitelists, without dupes' do
+      instance.includes whitelist: { index: [{ books: :genre }, :state], show: [:state, :bio] }
+      expect(instance.association_names).to eq([:books, :genre, :state, :bio])
+    end
+
+    context 'when no whitelist' do
+      it 'defaults to empty array' do
+        expect(instance.association_names).to eq([])
+      end
+    end
+  end
+
+  describe '#allowed_sideloads' do
+    subject { instance.allowed_sideloads }
+
+    context 'when no whitelist' do
+      it { is_expected.to eq({}) }
+    end
+
+    context 'when a whitelist' do
+      before do
+        instance.includes whitelist: {
+          index: [{ foo: :bar }, :baz],
+          show: :blah
+        }
+      end
+
+      context 'and a namespace is set' do
+        around do |e|
+          instance.with_context({}, :show) do
+            e.run
+          end
+        end
+
+        it { is_expected.to eq({ blah: {} }) }
+      end
+
+      context 'and a namespace is not set' do
+        it { is_expected.to eq({ foo: { bar: {} }, baz: {}, blah: {} }) }
+      end
+    end
+  end
 end

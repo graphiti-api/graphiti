@@ -11,7 +11,9 @@ RSpec.describe 'extra_fields', type: :controller do
 
   controller(ApplicationController) do
     jsonapi do
-      extra_field(authors: :net_worth) do |scope|
+      type :authors
+
+      extra_field :net_worth do |scope|
         scope.include_foo!
       end
     end

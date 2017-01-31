@@ -2,7 +2,9 @@ require 'spec_helper'
 
 RSpec.describe 'pagination', type: :controller do
   controller(ApplicationController) do
-    jsonapi {}
+    jsonapi do
+      type :authors
+    end
 
     def index
       render_jsonapi(Author.all)
@@ -15,7 +17,7 @@ RSpec.describe 'pagination', type: :controller do
   let!(:author4) { Author.create! }
 
   it 'applies default pagination' do
-    allow(controller).to receive(:default_page_size) { 2 }
+    controller._jsonapi_compliable.default_page_size(2)
     get :index
     expect(json_ids.length).to eq(2)
   end
@@ -44,18 +46,15 @@ RSpec.describe 'pagination', type: :controller do
       controller.class_eval do
         jsonapi do
           paginate do |scope, page, per_page|
-            scope.special_pagination(page, per_page)
+            scope.limit(0)
           end
         end
       end
     end
 
     it 'uses the custom pagination function' do
-      scope = double(is_a?: true).as_null_object
-      expect(Author).to receive(:all) { scope }
-      expect(scope).to receive(:special_pagination)
-        .with(3, 2).and_return(scope)
       get :index, params: { page: { number: 3, size: 2 } }
+      expect(json_ids).to eq([])
     end
   end
 end

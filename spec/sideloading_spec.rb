@@ -3,6 +3,8 @@ require 'spec_helper'
 RSpec.describe 'sideloading', type: :controller do
   controller(ApplicationController) do
     jsonapi do
+      type :authors
+
       includes whitelist: { index: [{ books: :genre }, :state] }
     end
 
@@ -11,13 +13,13 @@ RSpec.describe 'sideloading', type: :controller do
     end
   end
 
-  after do
-    controller.class_eval do
-      jsonapi do
-        includes whitelist: { index: [{ books: :genre }, :state] }
-      end
-    end
-  end
+  #after do
+    #controller.class_eval do
+      #jsonapi do
+        #includes whitelist: { index: [{ books: :genre }, :state] }
+      #end
+    #end
+  #end
 
   let(:state) { State.create!(name: 'maine') }
   let(:genre) { Genre.create!(name: 'horror') }

@@ -2,7 +2,9 @@ require 'spec_helper'
 
 RSpec.describe 'fields', type: :controller do
   controller(ApplicationController) do
-    jsonapi {}
+    jsonapi do
+      type :authors
+    end
 
     class SerializableTestFields < JSONAPI::Serializable::Resource
       type 'authors'
@@ -42,7 +44,6 @@ RSpec.describe 'fields', type: :controller do
   it 'disallows fields guarded by :if, even if specified' do
     allow(controller).to receive(:current_user) { 'admin' }
     get :index, params: { fields: { authors: 'first_name,salary' } }
-    expect(json_items(0).keys).to match_array(%w(id jsonapi_type first_name salary))
     allow(controller).to receive(:current_user) { 'non-admin' }
     get :index, params: { fields: { authors: 'first_name,salary' } }
     expect(json_items(0).keys).to match_array(%w(id jsonapi_type first_name))

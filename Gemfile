@@ -4,6 +4,8 @@ source "https://rubygems.org"
 gemspec
 
 group :test do
+  gem 'pry'
+  gem 'pry-byebug', platform: [:mri]
   gem 'appraisal'
   gem 'guard'
   gem 'guard-rspec'

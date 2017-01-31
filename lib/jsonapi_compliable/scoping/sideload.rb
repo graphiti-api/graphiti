@@ -1,7 +1,7 @@
 module JsonapiCompliable
-  class Scope::Sideload < Scope::Base
+  class Scoping::Sideload < Scoping::Base
     def apply
-      params[:include] ? super : @scope
+      query_hash[:include].empty? ? @scope : super
     end
 
     def custom_scope
@@ -19,7 +19,7 @@ module JsonapiCompliable
     private
 
     def scrubbed
-      Util::IncludeParams.scrub(controller)
+      Util::IncludeParams.scrub(query_hash[:include], dsl.allowed_sideloads)
     end
   end
 end

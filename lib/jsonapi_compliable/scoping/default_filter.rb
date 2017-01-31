@@ -1,6 +1,6 @@
 module JsonapiCompliable
-  class Scope::DefaultFilter < Scope::Base
-    include Scope::Filterable
+  class Scoping::DefaultFilter < Scoping::Base
+    include Scoping::Filterable
 
     def apply
       dsl.default_filters.each_pair do |name, opts|

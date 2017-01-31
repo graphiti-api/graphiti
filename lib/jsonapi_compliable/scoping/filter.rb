@@ -1,6 +1,6 @@
 module JsonapiCompliable
-  class Scope::Filter < Scope::Base
-    include Scope::Filterable
+  class Scoping::Filter < Scoping::Base
+    include Scoping::Filterable
 
     def apply
       each_filter do |filter, value|
