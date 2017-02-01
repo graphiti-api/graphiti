@@ -44,11 +44,11 @@ RSpec.describe JsonapiCompliable::Query do
 
     describe 'fields' do
       it 'defaults main entity' do
-        expect(subject[:authors][:fields]).to eq([])
+        expect(subject[:authors][:fields]).to eq({})
       end
 
       it 'defaults associations' do
-        expect(subject[:books][:fields]).to eq([])
+        expect(subject[:books][:fields]).to eq({})
       end
 
       context 'when fields param' do
@@ -57,22 +57,24 @@ RSpec.describe JsonapiCompliable::Query do
         end
 
         it 'applies to main entity' do
-          expect(subject[:authors][:fields]).to eq([:first_name, :last_name])
+          expect(subject[:authors][:fields])
+            .to eq(authors: [:first_name, :last_name], books: [:title])
         end
 
         it 'applies to associations' do
-          expect(subject[:books][:fields]).to eq([:title])
+          expect(subject[:books][:fields])
+            .to eq(authors: [:first_name, :last_name], books: [:title])
         end
       end
     end
 
     describe 'extra_fields' do
       it 'defaults main entity' do
-        expect(subject[:authors][:extra_fields]).to eq([])
+        expect(subject[:authors][:extra_fields]).to eq({})
       end
 
       it 'defaults associations' do
-        expect(subject[:books][:extra_fields]).to eq([])
+        expect(subject[:books][:extra_fields]).to eq({})
       end
 
       context 'when extra_fields param' do
@@ -81,11 +83,13 @@ RSpec.describe JsonapiCompliable::Query do
         end
 
         it 'applies to main entity' do
-          expect(subject[:authors][:extra_fields]).to eq([:first_name, :last_name])
+          expect(subject[:authors][:extra_fields])
+            .to eq(authors: [:first_name, :last_name], books: [:title])
         end
 
         it 'applies to associations' do
-          expect(subject[:books][:extra_fields]).to eq([:title])
+          expect(subject[:books][:extra_fields])
+            .to eq(authors: [:first_name, :last_name], books: [:title])
         end
       end
     end
@@ -222,19 +226,6 @@ RSpec.describe JsonapiCompliable::Query do
           })
         end
       end
-    end
-  end
-
-  describe '#fieldsets' do
-    before do
-      params[:fields] = { authors: 'first_name,last_name', books: 'title' }
-    end
-
-    it 'hydrates to a typical fields query param' do
-      expect(instance.fieldsets).to eq({
-        authors: [:first_name, :last_name],
-        books: [:title]
-      })
     end
   end
 

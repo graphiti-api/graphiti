@@ -19,7 +19,7 @@ module JsonapiCompliable
     end
 
     def extra_fields
-      query_hash[:extra_fields] || []
+      query_hash[:extra_fields][resource.type] || []
     end
   end
 end

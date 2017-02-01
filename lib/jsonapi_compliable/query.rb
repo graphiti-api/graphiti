@@ -10,9 +10,9 @@ module JsonapiCompliable
         sort: [],
         page: {},
         include: {},
-        extra_fields: [],
-        fields: [],
-        stats: {}
+        stats: {},
+        fields: {},
+        extra_fields: {}
       }
     end
 
@@ -27,8 +27,13 @@ module JsonapiCompliable
         hash[name] = self.class.default_hash.except(:include)
       end
 
-      parse_fields(hash, :fields)
-      parse_fields(hash, :extra_fields)
+      fields = parse_fields({}, :fields)
+      extra_fields = parse_fields({}, :extra_fields)
+      hash.each_pair do |type, query_hash|
+        hash[type][:fields] = fields
+        hash[type][:extra_fields] = extra_fields
+      end
+
       parse_filter(hash)
       parse_sort(hash)
       parse_pagination(hash)
@@ -36,17 +41,6 @@ module JsonapiCompliable
       parse_stats(hash)
 
       hash
-    end
-
-    # TODO: test
-    def fieldsets
-      {}.tap do |fs|
-        to_hash.each_pair do |namespace, query_hash|
-          if query_hash[:fields] and !query_hash[:fields].empty?
-            fs[namespace] = query_hash[:fields]
-          end
-        end
-      end
     end
 
     def zero_results?
@@ -61,7 +55,6 @@ module JsonapiCompliable
       resource.association_names.include?(name)
     end
 
-    # TODO: maybe walk the graph and apply to all
     def parse_include(hash)
       hash[resource.type][:include] = JSONAPI::IncludeDirective.new(params[:include] || {}).to_hash
     end
@@ -82,9 +75,7 @@ module JsonapiCompliable
 
     def parse_fields(hash, type)
       field_params = Util::FieldParams.parse(params[type])
-      field_params.each_pair do |namespace, fields|
-        hash[namespace][type] = fields
-      end
+      hash[type] = field_params
     end
 
     def parse_filter(hash)

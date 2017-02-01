@@ -13,6 +13,7 @@ require 'database_cleaner'
 
 require 'pry'
 require 'jsonapi_compliable'
+require 'jsonapi_compliable/adapters/null'
 require 'jsonapi_compliable/adapters/active_record'
 
 ::Rails.application = BasicRailsApp.generate
@@ -42,6 +43,12 @@ ActiveRecord::Schema.define(:version => 1) do
     t.string :last_name
     t.integer :state_id
     t.timestamps
+  end
+
+  create_table :bios do |t|
+    t.integer :author_id
+    t.string :description
+    t.string :picture
   end
 
   create_table :genres do |t|
@@ -79,8 +86,13 @@ end
 class Author < ApplicationRecord
   belongs_to :state
   has_many :books
+  has_one :bio
   accepts_nested_attributes_for :books
   accepts_nested_attributes_for :state
+end
+
+class Bio < ApplicationRecord
+  belongs_to :author
 end
 
 class Genre < ApplicationRecord
@@ -114,12 +126,30 @@ class SerializableAuthor < SerializableAbstract
 
   belongs_to :state
   has_many :books
+  has_one :bio
+end
+
+class SerializableBio < SerializableAbstract
+  type 'bios'
+
+  attribute :description
+  attribute :picture
+  extra_attribute :created_at do
+    Time.now
+  end
 end
 
 class SerializableState < SerializableAbstract
   type 'states'
 
   attribute :name
+  attribute :abbreviation do
+    'abbr'
+  end
+
+  extra_attribute :population do
+    10_000
+  end
 end
 
 class SerializableTag < SerializableAbstract
@@ -140,6 +170,15 @@ class SerializableBook < SerializableAbstract
   type 'books'
 
   attribute :title
+
+  attribute :pages do
+    500
+  end
+
+  extra_attribute :alternate_title do
+    'alt title'
+  end
+
   belongs_to :genre
   belongs_to :author
   has_many :tags

@@ -34,6 +34,13 @@ RSpec.describe JsonapiCompliable, type: :controller do
       end
     end
 
+    it 'assigns a subclass of Resource by default' do
+      expect(controller.class._jsonapi_compliable.ancestors)
+        .to include(JsonapiCompliable::Resource)
+      expect(controller.class._jsonapi_compliable.object_id)
+        .to_not eq(JsonapiCompliable::Resource.object_id)
+    end
+
     context 'when subclassing and customizing' do
       def config(obj)
         obj._jsonapi_compliable.config

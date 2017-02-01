@@ -128,9 +128,12 @@ RSpec.describe JsonapiCompliable::Resource do
   end
 
   describe '#association_names' do
-    it 'collects all keys in all whitelists, without dupes' do
-      klass.includes whitelist: { index: [{ books: :genre }, :state], show: [:state, :bio] }
-      expect(instance.association_names).to eq([:books, :genre, :state, :bio])
+    it 'collects all sideloads' do
+      klass.allow_sideload :books do
+        allow_sideload :genre
+      end
+      klass.allow_sideload :state
+      expect(instance.association_names).to eq([:books, :genre, :state])
     end
 
     context 'when no whitelist' do
@@ -145,7 +148,7 @@ RSpec.describe JsonapiCompliable::Resource do
       instance.allowed_sideloads
     end
 
-    context 'when no whitelist' do
+    context 'when no sideloads' do
       before do
         instance.instance_variable_set(:@sideloads, {})
       end
@@ -153,12 +156,18 @@ RSpec.describe JsonapiCompliable::Resource do
       it { is_expected.to eq({}) }
     end
 
-    context 'when a whitelist' do
+    # TODO only/as
+    context 'when sideloads' do
       before do
-        klass.includes whitelist: {
-          index: [{ foo: :bar }, :baz],
+        klass.allow_sideload :foo do
+          allow_sideload :bar
+        end
+        klass.allow_sideload :baz
+        klass.allow_sideload :blah
+        klass.sideload_whitelist \
+          index: [{ foo: :bar }],
           show: :blah
-        }
+
         instance.set_config(klass.config)
       end
 

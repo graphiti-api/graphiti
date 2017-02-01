@@ -7,9 +7,10 @@ module JsonapiCompliable
       :default_page_number,
       :sorting,
       :stats,
-      :sideloads,
+      :sideload_whitelist,
       :pagination,
       :extra_fields,
+      :sideloading,
       :adapter,
       :type,
       :context
@@ -18,17 +19,27 @@ module JsonapiCompliable
       attr_accessor :config
     end
 
+    delegate :sideload, to: :sideloading
+
+    # Incorporate custom adapter methods
+    def self.method_missing(meth, *args, &blk)
+      if sideloading.respond_to?(meth)
+        sideloading.send(meth, *args, &blk)
+      else
+        super
+      end
+    end
+
     def self.inherited(klass)
       klass.config = self.config.deep_dup
     end
 
-    def self.includes(whitelist: nil, &blk)
-      whitelist = JSONAPI::IncludeDirective.new(whitelist) if whitelist
+    def self.sideloading
+      config[:sideloading] ||= Sideload.new(:base, resource: self)
+    end
 
-      config[:sideloads] = {
-        whitelist: whitelist,
-        custom_scope: blk
-      }
+    def self.sideload_whitelist(whitelist)
+      config[:sideload_whitelist] = JSONAPI::IncludeDirective.new(whitelist).to_hash
     end
 
     def self.allow_filter(name, *args, &blk)
@@ -89,6 +100,7 @@ module JsonapiCompliable
       @config ||= begin
         {
           sideloads: {},
+          sideload_whitelist: {},
           filters: {},
           default_filters: {},
           extra_fields: {},
@@ -136,8 +148,8 @@ module JsonapiCompliable
 
     def association_names
       @association_names ||= begin
-        if whitelist = sideloads[:whitelist]
-          Util::Hash.keys(whitelist.to_hash.values.reduce(&:merge))
+        if sideloading
+          Util::Hash.keys(sideloading.to_hash[:base])
         else
           []
         end
@@ -145,13 +157,13 @@ module JsonapiCompliable
     end
 
     def allowed_sideloads
-      return {} if sideloads.empty?
+      return {} unless sideloading
 
-      if namespace = context[:namespace]
-        sideloads[:whitelist][namespace].to_hash
-      else
-        sideloads[:whitelist].to_hash.values.reduce(&:merge)
+      sideloads = sideloading.to_hash[:base]
+      if !sideload_whitelist.empty? && context[:namespace]
+        sideloads = Util::IncludeParams.scrub(sideloads, sideload_whitelist[context[:namespace]])
       end
+      sideloads
     end
 
     def stat(attribute, calculation)

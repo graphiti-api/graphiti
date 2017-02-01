@@ -1,3 +1,5 @@
+require 'jsonapi_compliable/adapters/active_record_sideloading'
+
 module JsonapiCompliable
   module Adapters
     class ActiveRecord < Abstract
@@ -35,6 +37,10 @@ module JsonapiCompliable
 
       def minimum(scope, attr)
         scope.minimum(attr)
+      end
+
+      def sideloading_module
+        JsonapiCompliable::Adapters::ActiveRecordSideloading
       end
     end
   end

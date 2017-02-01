@@ -50,7 +50,7 @@ module JsonapiCompliable
       options = default_jsonapi_render_options
       options[:include] = forced_includes || Util::IncludeParams.scrub(query_hash[:include], resource.allowed_sideloads)
       options[:jsonapi] = resolved
-      options[:fields] = query.fieldsets
+      options[:fields] = query_hash[:fields]
       options[:meta] ||= {}
       options.merge!(opts)
 
@@ -107,7 +107,7 @@ module JsonapiCompliable
           self._jsonapi_compliable = resource
         else
           if !self._jsonapi_compliable
-            self._jsonapi_compliable = JsonapiCompliable::Resource
+            self._jsonapi_compliable = Class.new(JsonapiCompliable::Resource)
           end
         end
 

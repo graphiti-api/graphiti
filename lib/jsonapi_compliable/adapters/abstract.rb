@@ -16,6 +16,10 @@ module JsonapiCompliable
       def sideload(scope, includes)
         raise 'you must override #sideload in an adapter subclass'
       end
+
+      def sideloading_module
+        Module.new
+      end
     end
   end
 end
