@@ -41,8 +41,27 @@ ActiveRecord::Schema.define(:version => 1) do
   create_table :authors do |t|
     t.string :first_name
     t.string :last_name
+    t.string :dwelling_type
     t.integer :state_id
+    t.integer :dwelling_id
     t.timestamps
+  end
+
+  create_table :author_hobbies do |t|
+    t.integer :author_id
+    t.integer :hobby_id
+  end
+
+  create_table :hobbies do |t|
+    t.string :name
+  end
+
+  create_table :condos do |t|
+    t.string :name
+  end
+
+  create_table :houses do |t|
+    t.string :name
   end
 
   create_table :bios do |t|
@@ -84,11 +103,32 @@ class State < ApplicationRecord
 end
 
 class Author < ApplicationRecord
+  belongs_to :dwelling, polymorphic: true
   belongs_to :state
   has_many :books
+  has_many :author_hobbies
+  has_many :hobbies, through: :author_hobbies
   has_one :bio
   accepts_nested_attributes_for :books
   accepts_nested_attributes_for :state
+end
+
+class Condo < ApplicationRecord
+  has_many :authors, as: :dwelling
+end
+
+class House < ApplicationRecord
+  has_many :authors, as: :dwelling
+end
+
+class AuthorHobby < ApplicationRecord
+  belongs_to :author
+  belongs_to :hobby
+end
+
+class Hobby < ApplicationRecord
+  has_many :author_hobbies
+  has_many :authors, through: :author_hobbies
 end
 
 class Bio < ApplicationRecord
@@ -124,9 +164,53 @@ class SerializableAuthor < SerializableAbstract
   attribute :first_name
   attribute :last_name
 
+  belongs_to :dwelling
   belongs_to :state
   has_many :books
+  has_many :hobbies
   has_one :bio
+end
+
+class SerializableDwelling < SerializableAbstract
+  type 'dwellings'
+
+  attribute :name
+end
+
+class SerializableCondo < SerializableDwelling
+  type 'condos'
+
+  attribute :condo_description do
+    'condo desc'
+  end
+
+  extra_attribute :condo_price do
+    500_000
+  end
+end
+
+class SerializableHouse < SerializableDwelling
+  type 'houses'
+
+  attribute :house_description do
+    'house desc'
+  end
+
+  extra_attribute :house_price do
+    1_000_000
+  end
+end
+
+class SerializableHobby < SerializableAbstract
+  type 'hobbies'
+
+  attribute :name
+  attribute :description do
+    'hobby desc'
+  end
+  extra_attribute :reason do
+    'hobby reason'
+  end
 end
 
 class SerializableBio < SerializableAbstract

@@ -17,6 +17,11 @@ RSpec.describe 'sideloading', type: :controller do
         use_adapter JsonapiCompliable::Adapters::ActiveRecord
       end
 
+      class DwellingResource < JsonapiCompliable::Resource
+        type :dwellings
+        use_adapter JsonapiCompliable::Adapters::ActiveRecord
+      end
+
       allow_sideload :books, resource: BookResource do
         scope do |authors|
           Book.where(author_id: authors.map { |a| a[:id] })
@@ -55,13 +60,41 @@ RSpec.describe 'sideloading', type: :controller do
 
       allow_sideload :bio
 
-      sideload_whitelist({ index: [{ books: :genre }, :state] })
+      allow_sideload :dwelling, polymorphic: true do
+        group_by { |author| author[:dwelling_type] }
+
+        allow_sideload 'House', resource: DwellingResource do
+          scope do |authors|
+            House.where(id: authors.map { |a| a[:dwelling_id] })
+          end
+
+          assign do |authors, houses|
+            authors.each do |author|
+              author[:dwelling] = houses.find { |h| h.id == author[:dwelling_id] }
+            end
+          end
+        end
+
+        allow_sideload 'Condo', resource: DwellingResource do
+          scope do |authors|
+            Condo.where(id: authors.map { |a| a[:dwelling_id] })
+          end
+
+          assign do |authors, condos|
+            authors.each do |author|
+              author[:dwelling] = condos.find { |c| c.id == author[:dwelling_id] }
+            end
+          end
+        end
+      end
+
+      sideload_whitelist({ index: [{ books: :genre }, :state, :dwelling] })
     end
 
     # Scope via hashes, so we don't get any ActiveRecord false-positives
     # Then create actual authors from the results, for serialization
     def index
-      author_hashes = Author.all.map { |a| { id: a.id, state_id: a.state_id } }
+      author_hashes = Author.all.map(&:attributes).map(&:symbolize_keys)
       scope         = jsonapi_scope(author_hashes)
       authors       = scope.resolve.map do |attrs|
         author = Author.new(attrs.except(:books))
@@ -124,6 +157,52 @@ RSpec.describe 'sideloading', type: :controller do
     expect(state['name']).to_not be_nil
     expect(state).to_not have_key('abbreviation')
     expect(state).to_not have_key('population')
+  end
+
+  context 'when the sideload is polymorphic' do
+    let!(:condo)        { Condo.create!(name: 'My Condo') }
+    let!(:condo_author) { Author.create!(dwelling: condo) }
+    let!(:house)        { House.create!(name: 'Cozy House') }
+
+    before do
+      author.dwelling = house
+      author.save!
+    end
+
+    it 'groups by type' do
+      get :index, params: { include: 'dwelling' }
+      expect(json_included_types).to match_array(%w(condos houses))
+    end
+
+    it 'supports extra_fields for each type' do
+      get :index, params: {
+        include: 'dwelling',
+        extra_fields: { condos: 'condo_price', houses: 'house_price' }
+      }
+      house = json_includes('houses')[0]
+      expect(house['name']).to_not be_nil
+      expect(house['house_description']).to_not be_nil
+      expect(house['house_price']).to eq(1_000_000)
+      condo = json_includes('condos')[0]
+      expect(condo['name']).to_not be_nil
+      expect(condo['condo_description']).to_not be_nil
+      expect(condo['condo_price']).to eq(500_000)
+    end
+
+    it 'supports sparse fieldsets for each type' do
+      get :index, params: {
+        include: 'dwelling',
+        fields: { condos: 'name', houses: 'name' }
+      }
+      house = json_includes('houses')[0]
+      expect(house['name']).to_not be_nil
+      expect(house).to_not have_key('house_description')
+      expect(house).to_not have_key('price')
+      condo = json_includes('condos')[0]
+      expect(condo['name']).to_not be_nil
+      expect(condo).to_not have_key('condo_description')
+      expect(condo).to_not have_key('condo_price')
+    end
   end
 
   context 'when nested includes' do

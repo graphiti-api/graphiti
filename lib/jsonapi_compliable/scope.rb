@@ -39,11 +39,8 @@ module JsonapiCompliable
     def sideload(results, includes)
       includes.each_pair do |name, nested|
         if @resource.allowed_sideloads.has_key?(name)
-          sideload         = @resource.sideload(name)
-          sideload_scope   = sideload.scope_proc.call(results)
-          sideload_scope   = Scope.new(sideload_scope, sideload.resource, @query, namespace: sideload.name)
-          sideload_results = sideload_scope.resolve
-          sideload.assign_proc.call(results, sideload_results)
+          sideload = @resource.sideload(name)
+          sideload.resolve(results, @query)
         end
       end
     end

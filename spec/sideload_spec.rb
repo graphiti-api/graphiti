@@ -37,7 +37,6 @@ RSpec.describe JsonapiCompliable::Sideload do
   end
 
   describe '#allow_sideload' do
-
     it 'assigns a new sideload' do
       instance.allow_sideload :bar
       expect(instance.sideloads[:bar]).to be_a(JsonapiCompliable::Sideload)
@@ -49,6 +48,23 @@ RSpec.describe JsonapiCompliable::Sideload do
       end
       expect(instance.sideloads[:bar].instance_variable_get(:@foo))
         .to eq('foo')
+    end
+
+    context 'when polymorphic' do
+      before do
+        opts[:polymorphic] = true
+      end
+
+      it 'adds a new sideload to polymorphic groups' do
+        instance.allow_sideload :bar
+        groups = instance.instance_variable_get(:@polymorphic_groups)
+        expect(groups[:bar]).to be_a(JsonapiCompliable::Sideload)
+      end
+
+      it 'does not add to sideloads' do
+        instance.allow_sideload :bar
+        expect(instance.sideloads).to be_empty
+      end
     end
   end
 
