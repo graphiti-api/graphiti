@@ -58,7 +58,7 @@ module JsonapiCompliable
               parent.association(association_name).loaded!
               relevant_child = children.find { |c| c.send(foreign_key) == parent.send(primary_key) }
               next unless relevant_child
-              parent.send(:"#{association_name}=", relevant_child)
+              parent.association(association_name).replace(relevant_child, false)
             end
           end
 
@@ -105,7 +105,7 @@ module JsonapiCompliable
 
               assign do |parents, children|
                 parents.each do |parent|
-                  parent.send(:"#{association_name}=", children.find { |c| c.send(primary_key) == parent.dwelling_id })
+                  parent.send(:"#{association_name}=", children.find { |c| c.send(primary_key) == parent.send(foreign_key) })
                 end
               end
             end

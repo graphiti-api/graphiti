@@ -72,7 +72,9 @@ module JsonapiCompliable
     def resolve_polymorphic(parents, query)
       parents.group_by(&@grouper).each_pair do |group_type, group_members|
         sideload_for_group = @polymorphic_groups[group_type]
-        sideload_for_group.resolve(group_members, query, name)
+        if sideload_for_group
+          sideload_for_group.resolve(group_members, query, name)
+        end
       end
     end
 
