@@ -21,10 +21,23 @@ module JsonapiCompliable
       @params = params
     end
 
+    def include_directive
+      @include_directive ||= JSONAPI::IncludeDirective.new(params[:include])
+    end
+
+    def include_hash
+      @include_hash ||= include_directive.to_hash
+    end
+
+    def all_requested_association_names
+      @all_requested_association_names ||= Util::Hash.keys(include_hash)
+    end
+
     def to_hash
       hash = { resource.type => self.class.default_hash }
-      resource.association_names.each do |name|
-        hash[name] = self.class.default_hash.except(:include)
+
+      all_requested_association_names.each do |name|
+        hash[name] = self.class.default_hash
       end
 
       fields = parse_fields({}, :fields)
@@ -37,7 +50,7 @@ module JsonapiCompliable
       parse_filter(hash)
       parse_sort(hash)
       parse_pagination(hash)
-      parse_include(hash)
+      parse_include(hash, include_hash)
       parse_stats(hash)
 
       hash
@@ -55,8 +68,13 @@ module JsonapiCompliable
       resource.association_names.include?(name)
     end
 
-    def parse_include(hash)
-      hash[resource.type][:include] = JSONAPI::IncludeDirective.new(params[:include] || {}).to_hash
+    def parse_include(memo, incl_hash, namespace = nil)
+      namespace ||= resource.type
+
+      memo[namespace][:include] = incl_hash
+      incl_hash.each_pair do |key, sub_hash|
+        memo[key][:include] = parse_include(memo, sub_hash, key)
+      end
     end
 
     def parse_stats(hash)

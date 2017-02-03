@@ -12,8 +12,8 @@ RSpec.describe 'sorting', type: :controller do
   end
 
   before do
-    Author.create!(first_name: 'Stephen')
-    Author.create!(first_name: 'Philip')
+    Author.create!(first_name: 'Stephen', last_name: 'King')
+    Author.create!(first_name: 'Philip', last_name: 'Dick')
   end
 
   it 'defaults sort to resource default_sort' do
@@ -41,6 +41,26 @@ RSpec.describe 'sorting', type: :controller do
       let(:sort_param) { '-first_name' }
 
       it { is_expected.to eq(%w(Stephen Philip)) }
+    end
+
+    context 'when prefixed with type' do
+      let(:sort_param) { 'authors.first_name' }
+
+      it { is_expected.to eq(%w(Philip Stephen)) }
+    end
+
+    context 'when passed multisort' do
+      let(:sort_param) { 'first_name,last_name' }
+
+      before do
+        Author.create(first_name: 'Stephen', last_name: 'Adams')
+      end
+
+      it 'sorts correctly' do
+        get :index, params: { sort: sort_param }
+        last_names = json_items.map { |n| n['last_name'] }
+        expect(last_names).to eq(%w(Dick Adams King))
+      end
     end
 
     context 'when given a custom sort function' do

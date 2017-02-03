@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe JsonapiCompliable::Query do
   let(:resource) { double(type: :authors, association_names: [:books]).as_null_object }
-  let(:params)   { {} }
+  let(:params)   { { include: 'books' } }
   let(:instance) { described_class.new(resource, params) }
 
   describe '#to_hash' do
@@ -13,8 +13,18 @@ RSpec.describe JsonapiCompliable::Query do
         expect(subject[:authors][:filter]).to eq({})
       end
 
-      it 'defaults associations' do
+      it 'does not default associations' do
         expect(subject[:books][:filter]).to eq({})
+      end
+
+      context 'when association is not requested' do
+        before do
+          params.delete(:include)
+        end
+
+        it 'does not default the association query' do
+          expect(subject).to_not have_key(:books)
+        end
       end
 
       context 'when filter param present' do
@@ -156,24 +166,32 @@ RSpec.describe JsonapiCompliable::Query do
     end
 
     describe 'include' do
-      it 'defaults main entity' do
-        expect(subject[:authors][:include]).to eq({})
+      it 'sets main entity' do
+        expect(subject[:authors][:include]).to eq(books: {})
       end
 
-      it 'does NOT default associations' do
-        expect(subject[:books]).to_not have_key(:include)
+      it 'sets associations' do
+        expect(subject[:books][:include]).to eq({})
       end
 
       context 'when include param present' do
         before do
-          params[:include] = 'books.genre,state'
+          params[:include] = 'books.genre.owner,state'
         end
 
         it 'transforms to hash' do
           expect(subject[:authors][:include]).to eq({
-            books: { genre: {} },
+            books: { genre: { owner: {} } },
             state: {}
           })
+          expect(subject[:books][:include]).to eq({
+            genre: { owner: {} }
+          })
+          expect(subject[:genre][:include]).to eq({
+            owner: {}
+          })
+          expect(subject[:owner][:include]).to eq({})
+          expect(subject[:state][:include]).to eq({})
         end
       end
     end

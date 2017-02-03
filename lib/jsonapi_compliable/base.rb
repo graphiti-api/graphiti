@@ -48,7 +48,7 @@ module JsonapiCompliable
       resolved = scoped.respond_to?(:resolve) ? scoped.resolve : scoped
 
       options = default_jsonapi_render_options
-      options[:include] = forced_includes || Util::IncludeParams.scrub(query_hash[:include], resource.allowed_sideloads)
+      options[:include] = forced_includes || query_hash[:include]
       options[:jsonapi] = resolved
       options[:fields] = query_hash[:fields]
       options[:meta] ||= {}

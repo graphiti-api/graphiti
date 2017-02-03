@@ -2,10 +2,20 @@ require 'spec_helper'
 
 RSpec.describe 'integrated resources and adapters', type: :controller do
   module Integration
+    class GenreResource < JsonapiCompliable::Resource
+      type :genres
+      use_adapter JsonapiCompliable::Adapters::ActiveRecord
+    end
+
     class BookResource < JsonapiCompliable::Resource
       type :books
       use_adapter JsonapiCompliable::Adapters::ActiveRecord
       allow_filter :id
+
+      belongs_to :genre,
+        scope: -> { Genre.all },
+        foreign_key: :genre_id,
+        resource: GenreResource
     end
 
     class DwellingResource < JsonapiCompliable::Resource
@@ -82,14 +92,15 @@ RSpec.describe 'integrated resources and adapters', type: :controller do
 
   let!(:author1) { Author.create!(first_name: 'Stephen', dwelling: house, state: state) }
   let!(:author2) { Author.create!(first_name: 'George', dwelling: condo) }
-  let!(:book1)   { Book.create!(author: author1, title: 'The Shining') }
-  let!(:book2)   { Book.create!(author: author1, title: 'The Stand') }
+  let!(:book1)   { Book.create!(author: author1, genre: genre, title: 'The Shining') }
+  let!(:book2)   { Book.create!(author: author1, genre: genre, title: 'The Stand') }
   let!(:state)   { State.create!(name: 'Maine') }
   let!(:bio)     { Bio.create!(author: author1, picture: 'imgur', description: 'author bio') }
   let!(:hobby1)  { Hobby.create!(name: 'Fishing', authors: [author1]) }
   let!(:hobby2)  { Hobby.create!(name: 'Woodworking', authors: [author1]) }
   let(:house)    { House.new(name: 'Cozy') }
   let(:condo)    { Condo.new(name: 'Modern') }
+  let(:genre)    { Genre.create!(name: 'Horror') }
 
   def ids_for(type)
     json_includes(type).map { |b| b['id'].to_i }
@@ -113,6 +124,11 @@ RSpec.describe 'integrated resources and adapters', type: :controller do
   it 'allows basic sideloading' do
     get :index, params: { include: 'books' }
     expect(json_included_types).to match_array(%w(books))
+  end
+
+  it 'allows nested sideloading' do
+    get :index, params: { include: 'books.genre' }
+    expect(json_included_types).to match_array(%w(books genres))
   end
 
   context 'sideloading has_many' do

@@ -128,12 +128,18 @@ RSpec.describe JsonapiCompliable::Resource do
   end
 
   describe '#association_names' do
-    it 'collects all sideloads' do
+    it 'collects nested + resource sideloads' do
       klass.allow_sideload :books do
-        allow_sideload :genre
+        genre_resource = Class.new(JsonapiCompliable::Resource) do
+          allow_sideload :from_genre_resource do
+            allow_sideload :nested_from_genre_resource
+          end
+        end
+        allow_sideload :genre, resource: genre_resource
       end
-      klass.allow_sideload :state
-      expect(instance.association_names).to eq([:books, :genre, :state])
+      klass.allow_sideload :state, polymorphic: true
+      expect(instance.association_names)
+        .to match_array([:books, :genre, :state, :from_genre_resource, :nested_from_genre_resource])
     end
 
     context 'when no whitelist' do

@@ -59,10 +59,17 @@ module JsonapiCompliable
       @sideloads[name]
     end
 
+    # Grab from nested sideloads, AND resource, recursively
     def to_hash
       { name => {} }.tap do |hash|
         @sideloads.each_pair do |key, sideload|
           hash[name][key] = sideload.to_hash[key]
+
+          if sideloading = sideload.resource.sideloading
+            sideloading.sideloads.each_pair do |k, s|
+              hash[name][k] = s.to_hash[k]
+            end
+          end
         end
       end
     end

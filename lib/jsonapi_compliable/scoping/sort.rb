@@ -1,5 +1,3 @@
-# TODO: multisort
-
 module JsonapiCompliable
   class Scoping::Sort < Scoping::Base
     def custom_scope
@@ -7,21 +5,25 @@ module JsonapiCompliable
     end
 
     def apply_standard_scope
-      resource.adapter.order(@scope, attribute, direction)
+      each_sort do |attribute, direction|
+        @scope = resource.adapter.order(@scope, attribute, direction)
+      end
+      @scope
     end
 
     def apply_custom_scope
-      custom_scope.call(@scope, attribute, direction)
+      each_sort do |attribute, direction|
+        @scope = custom_scope.call(@scope, attribute, direction)
+      end
+      @scope
     end
 
     private
 
-    def attribute
-      sort_param[0].keys.first
-    end
-
-    def direction
-      sort_param[0].values.first
+    def each_sort
+      sort_param.each do |sort_hash|
+        yield sort_hash.keys.first, sort_hash.values.first
+      end
     end
 
     def sort_param
