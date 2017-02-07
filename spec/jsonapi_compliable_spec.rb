@@ -65,6 +65,38 @@ RSpec.describe JsonapiCompliable, type: :controller do
     end
   end
 
+  describe '#wrap_context' do
+    before do
+      allow(controller).to receive(:action_name) { 'index' }
+    end
+
+    it 'wraps in the resource context' do
+      controller.wrap_context do
+        expect(controller.resource.context).to eq({
+          object: controller,
+          namespace: :index
+        })
+      end
+    end
+
+    context 'when the class does not have a resource' do
+      let(:klass) do
+        Class.new(ApplicationController) do
+          include JsonapiCompliable::Base
+          self._jsonapi_compliable = nil
+        end
+      end
+
+      let(:instance) { klass.new }
+
+      it 'does nothing' do
+        instance.wrap_context do
+          expect(instance.resource).to be_nil
+        end
+      end
+    end
+  end
+
   describe '#render_jsonapi' do
     it 'is able to override options' do
       author = Author.create!(first_name: 'Stephen', last_name: 'King')

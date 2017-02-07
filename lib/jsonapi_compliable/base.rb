@@ -28,8 +28,10 @@ module JsonapiCompliable
 
     # TODO pass controller and action name here to guard
     def wrap_context
-      resource.with_context(self, action_name.to_sym) do
-        yield
+      if self.class._jsonapi_compliable
+        resource.with_context(self, action_name.to_sym) do
+          yield
+        end
       end
     end
 

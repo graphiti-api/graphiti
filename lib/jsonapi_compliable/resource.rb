@@ -156,12 +156,13 @@ module JsonapiCompliable
       end
     end
 
-    def allowed_sideloads
+    def allowed_sideloads(namespace = nil)
       return {} unless sideloading
 
+      namespace ||= context[:namespace]
       sideloads = sideloading.to_hash[:base]
-      if !sideload_whitelist.empty? && context[:namespace]
-        sideloads = Util::IncludeParams.scrub(sideloads, sideload_whitelist[context[:namespace]])
+      if !sideload_whitelist.empty? && namespace
+        sideloads = Util::IncludeParams.scrub(sideloads, sideload_whitelist[namespace])
       end
       sideloads
     end

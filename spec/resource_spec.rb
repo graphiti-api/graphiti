@@ -162,7 +162,6 @@ RSpec.describe JsonapiCompliable::Resource do
       it { is_expected.to eq({}) }
     end
 
-    # TODO only/as
     context 'when sideloads' do
       before do
         klass.allow_sideload :foo do
@@ -177,7 +176,21 @@ RSpec.describe JsonapiCompliable::Resource do
         instance.set_config(klass.config)
       end
 
-      context 'and a namespace is set' do
+      context 'and a namespace is passed as an argument' do
+        around do |e|
+          instance.with_context({}, :show) do
+            e.run
+          end
+        end
+
+        it 'uses that namespace' do
+          expect(instance.allowed_sideloads(:index)).to eq({
+            foo: { bar: {} }
+          })
+        end
+      end
+
+      context 'and a context namespace is set' do
         around do |e|
           instance.with_context({}, :show) do
             e.run
