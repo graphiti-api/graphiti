@@ -1,9 +1,15 @@
 require 'spec_helper'
 
-RSpec.describe 'deserialization', type: :controller do
-  controller(ApplicationController) do
-    jsonapi { }
+RSpec.describe 'deserialization' do
+  let(:klass) do
+    Class.new do
+      include JsonapiCompliable::Base
+      jsonapi { }
+      attr_accessor :params
+    end
   end
+
+  let(:instance) { klass.new }
 
   let(:payload) do
     {
@@ -27,24 +33,19 @@ RSpec.describe 'deserialization', type: :controller do
     }
   end
 
-
   describe '#deserialize_jsonapi!' do
     before do
-      controller.params = payload
+      instance.params = payload
     end
 
     it 'preserves raw params as raw_params' do
-      controller.deserialize_jsonapi!
+      instance.deserialize_jsonapi!
 
-      if Rails::VERSION::MAJOR == 4
-        expect(controller.raw_params).to eq(payload.deep_stringify_keys)
-      else
-        expect(controller.raw_params).to eq(payload)
-      end
+      expect(instance.raw_params).to eq(payload)
     end
 
     it 'sets params to a rails-friendly payload' do
-      controller.deserialize_jsonapi!
+      instance.deserialize_jsonapi!
       expected = {
         author: {
           first_name: 'Stephen',
@@ -57,8 +58,7 @@ RSpec.describe 'deserialization', type: :controller do
           ]
         }
       }
-      expected.deep_stringify_keys! if Rails::VERSION::MAJOR == 4
-      expect(controller.params).to eq(expected)
+      expect(instance.params).to eq(expected)
     end
   end
 end

@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 RSpec.describe JsonapiCompliable::Stats::DSL do
-  let(:config) { :myattr }
-  let(:instance) { described_class.new(config) }
+  let(:config)   { :myattr }
+  let(:adapter)  { JsonapiCompliable::Adapters::ActiveRecord.new }
+  let(:instance) { described_class.new(adapter, config) }
 
   describe '.new' do
     it 'sets name' do
@@ -17,7 +18,7 @@ RSpec.describe JsonapiCompliable::Stats::DSL do
       it 'applies defaults' do
         expect_any_instance_of(described_class)
           .to receive(:count!).and_call_original
-        instance = described_class.new(myattr: [:count])
+        instance = described_class.new(adapter, myattr: [:count])
         expect(instance.calculations).to have_key(:count)
       end
     end
@@ -38,13 +39,13 @@ RSpec.describe JsonapiCompliable::Stats::DSL do
 
     context 'when passed a symbol' do
       it 'returns the calculation' do
-        expect(instance.calculation(:count)).to be_a(Proc)
+        expect(instance.calculation(:count)).to respond_to(:call)
       end
     end
 
     context 'when passed a string' do
       it 'returns the calculation' do
-        expect(instance.calculation('count')).to be_a(Proc)
+        expect(instance.calculation('count')).to respond_to(:call)
       end
     end
 

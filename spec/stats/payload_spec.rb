@@ -1,16 +1,10 @@
 require 'spec_helper'
 
 RSpec.describe JsonapiCompliable::Stats::Payload do
-  let(:controller) { double.as_null_object }
-  let(:scope) { double.as_null_object }
-  let(:instance) { described_class.new(controller, scope) }
-  let(:params) { { stats: { attr1: 'count,average', attr2: 'maximum' } } }
-  let(:dsl) { double }
-
-  before do
-    allow(controller).to receive(:params) { params }
-    allow(controller).to receive(:_jsonapi_compliable) { dsl }
-  end
+  let(:dsl)      { double }
+  let(:query)    { { stats: { attr1: [:count, :average], attr2: [:maximum] } } }
+  let(:scope)    { double.as_null_object }
+  let(:instance) { described_class.new(dsl, query, scope) }
 
   describe '#generate' do
     subject { instance.generate }
@@ -30,34 +24,6 @@ RSpec.describe JsonapiCompliable::Stats::Payload do
         attr1: { count: 2, average: 1 },
         attr2: { maximum: 3 }
       })
-    end
-
-    # We may be auto-parsing comma-delimited values
-    context 'when the calculation string is already parsed' do
-      let(:params) { { stats: { attr1: ['count', 'average'] } } }
-
-      it 'generates correct payload' do
-        expect(subject).to eq(attr1: { count: 2, average: 1 })
-      end
-    end
-  end
-
-  describe '.new' do
-    it 'derives scope from controller' do
-      instance = described_class.new(controller, 'a')
-      expect(instance.instance_variable_get(:@scope))
-        .to eq(controller._jsonapi_scope)
-    end
-
-    context 'when scope not on controller' do
-      before do
-        allow(controller).to receive(:_jsonapi_scope) { nil }
-      end
-
-      it 'uses that scope' do
-        instance = described_class.new(controller, 'a')
-        expect(instance.instance_variable_get(:@scope)).to eq('a')
-      end
     end
   end
 end

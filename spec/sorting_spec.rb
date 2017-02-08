@@ -1,33 +1,35 @@
 require 'spec_helper'
 
-RSpec.describe 'sorting', type: :controller do
-  controller(ApplicationController) do
-    jsonapi {}
-
-    def index
-      render_jsonapi(Author.all)
-    end
-  end
+RSpec.describe 'sorting' do
+  include_context 'scoping'
 
   before do
-    Author.create!(first_name: 'Stephen')
-    Author.create!(first_name: 'Philip')
+    Author.create!(first_name: 'Stephen', last_name: 'King')
+    Author.create!(first_name: 'Philip', last_name: 'Dick')
   end
 
-  it 'defaults sort to controller default_sort' do
-    expect(controller).to receive(:default_sort) { 'id' }
-    get :index
-    expect(json_ids(true)).to eq(Author.pluck(:id))
-    expect(controller).to receive(:default_sort) { '-id' }
-    get :index
-    expect(json_ids(true)).to eq(Author.pluck(:id).reverse)
+  it 'defaults sort to resource default_sort' do
+    expect(scope.resolve.map(&:id)).to eq(Author.pluck(:id))
+  end
+
+  context 'when default_sort is overridden' do
+    before do
+      resource_class.class_eval do
+        default_sort([{ id: :desc }])
+      end
+    end
+
+    it 'respects the override' do
+      expect(scope.resolve.map(&:id)).to eq(Author.pluck(:id).reverse)
+    end
   end
 
   context 'when passing sort param' do
-    subject do
-      get :index, params: { sort: sort_param }
-      json_items.map { |n| n['first_name'] }
+    before do
+      params[:sort] = sort_param
     end
+
+    subject { scope.resolve.map(&:first_name) }
 
     context 'asc' do
       let(:sort_param) { 'first_name' }
@@ -41,25 +43,37 @@ RSpec.describe 'sorting', type: :controller do
       it { is_expected.to eq(%w(Stephen Philip)) }
     end
 
+    context 'when prefixed with type' do
+      let(:sort_param) { 'authors.first_name' }
+
+      it { is_expected.to eq(%w(Philip Stephen)) }
+    end
+
+    context 'when passed multisort' do
+      let(:sort_param) { 'first_name,last_name' }
+
+      before do
+        Author.create(first_name: 'Stephen', last_name: 'Adams')
+      end
+
+      it 'sorts correctly' do
+        expect(scope.resolve.map(&:last_name)).to eq(%w(Dick Adams King))
+      end
+    end
+
     context 'when given a custom sort function' do
       let(:sort_param) { 'first_name' }
 
       before do
-        controller.class_eval do
-          jsonapi do
-            sort do |scope, att, dir|
-              scope.special_sort(att, dir)
-            end
+        resource_class.class_eval do
+          sort do |scope, att, dir|
+            scope.order(id: :desc)
           end
         end
       end
 
       it 'uses the custom sort function' do
-        scope = double(is_a?: true).as_null_object
-        expect(Author).to receive(:all) { scope }
-        expect(scope).to receive(:special_sort)
-          .with(:first_name, :asc).and_return(scope)
-        get :index, params: { sort: sort_param }
+        expect(scope.resolve.map(&:id)).to eq(Author.pluck(:id).reverse)
       end
     end
   end

@@ -1,8 +1,10 @@
 require 'spec_helper'
 
-RSpec.describe 'stats', type: :controller do
-  controller(ApplicationController) do
-    jsonapi do
+RSpec.describe 'stats' do
+  include_context 'scoping'
+
+  before do
+    resource_class.class_eval do
       allow_stat total: :count
 
       allow_stat state_id: [:sum, :average, :maximum, :minimum] do
@@ -17,86 +19,94 @@ RSpec.describe 'stats', type: :controller do
         sum { |scope, attr| 101 }
       end
     end
-
-    def index
-      render_jsonapi(Author.all, meta: { other: 'things' })
-    end
   end
 
   let!(:author1) { Author.create!(first_name: 'Stephen', last_name: 'King', state_id: 1) }
   let!(:author2) { Author.create!(first_name: 'Stephen', last_name: 'King', state_id: 3) }
 
-  context 'when total count requested' do
-    it 'responds with count in meta stats' do
-      get :index, params: { stats: { total: 'count' } }
+  def json
+    render(scope, meta: { other: 'things' })
+  end
 
+  context 'when total count requested' do
+    before do
+      params[:stats] = { total: 'count' }
+    end
+
+    it 'responds with count in meta stats' do
       expect(json['meta']['stats']).to eq({ 'total' => { 'count' => 2 } })
     end
 
     it 'does not override other meta content' do
-      get :index, params: { stats: { total: 'count' } }
-
       expect(json['meta']['other']).to eq('things')
     end
   end
 
   context 'when specific attribute requested' do
-    context 'when sum' do
-      it 'responds with sum in meta stats' do
-        get :index, params: { stats: { state_id: 'sum' } }
+    before do
+      params[:stats] = { state_id: calculation }
+    end
 
+    context 'when sum' do
+      let(:calculation) { 'sum' }
+
+      it 'responds with sum in meta stats' do
         expect(json['meta']['stats']).to eq({ 'state_id' => { 'sum' => 4 } })
       end
     end
 
     context 'when average' do
-      it 'responds with average in meta stats' do
-        get :index, params: { stats: { state_id: 'average' } }
+      let(:calculation) { 'average' }
 
+      it 'responds with average in meta stats' do
         expect(json['meta']['stats']).to eq({ 'state_id' => { 'average' => 2.0 } })
       end
     end
 
     context 'when maximum' do
-      it 'responds with average in meta stats' do
-        get :index, params: { stats: { state_id: 'average' } }
+      let(:calculation) { 'maximum' }
 
-        expect(json['meta']['stats']).to eq({ 'state_id' => { 'average' => 2.0 } })
+      it 'responds with maximum in meta stats' do
+        expect(json['meta']['stats']).to eq({ 'state_id' => { 'maximum' => 3 } })
       end
     end
 
     context 'when minimum' do
-      it 'responds with minimum in meta stats' do
-        get :index, params: { stats: { state_id: 'minimum' } }
+      let(:calculation) { 'minimum' }
 
+      it 'responds with minimum in meta stats' do
         expect(json['meta']['stats']).to eq({ 'state_id' => { 'minimum' => 1 } })
       end
     end
 
     context 'when user-specified calculation' do
+      let(:calculation) { 'second' }
+
       it 'responds with user-specified calculation in meta stats' do
-        get :index, params: { stats: { state_id: 'maximum' } }
-
-        expect(json['meta']['stats']).to eq({ 'state_id' => { 'maximum' => 3 } })
-      end
-    end
-
-    context 'when multiple stats requested' do
-      it 'responds with both' do
-        get :index, params: { stats: { total: 'count', state_id: 'sum,average' } }
-
-        expect(json['meta']['stats']).to eq({
-          'total' => { 'count' => 2 },
-          'state_id' => { 'sum' => 4, 'average' => 2.0 }
-        })
+        expect(json['meta']['stats']).to eq({ 'state_id' => { 'second' => 3 } })
       end
     end
   end
 
-  context 'when passing symbol to allow_stat' do
-    it 'works correctly' do
-      get :index, params: { stats: { just_symbol: 'foo' } }
+  context 'when multiple stats requested' do
+    before do
+      params[:stats] = { total: 'count', state_id: 'sum,average' }
+    end
 
+    it 'responds with both' do
+      expect(json['meta']['stats']).to eq({
+        'total' => { 'count' => 2 },
+        'state_id' => { 'sum' => 4, 'average' => 2.0 }
+      })
+    end
+  end
+
+  context 'when passing symbol to allow_stat' do
+    before do
+      params[:stats] = { just_symbol: 'foo' }
+    end
+
+    it 'works correctly' do
       expect(json['meta']['stats']).to eq({
         'just_symbol' => { 'foo' => 'bar' }
       })
@@ -105,76 +115,72 @@ RSpec.describe 'stats', type: :controller do
 
   context 'when no stats requested' do
     it 'should not be in payload' do
-      get :index
-
       expect(json['meta']).to eq({ 'other' => 'things' })
     end
   end
 
   context 'when pagination requested' do
-    it 'should not affect the stats' do
-      get :index, params: { stats: { total: 'count' }, page: { size: 1, number: 1 } }
+    before do
+      params[:page]   = { size: 1, number: 1 }
+      params[:stats]  = { total: 'count' }
+    end
 
+    it 'should not affect the stats' do
       expect(json['meta']['stats']).to eq({ 'total' => { 'count' => 2 } })
     end
   end
 
   context 'overriding a default' do
-    it 'should return the override' do
-      get :index, params: { stats: { override: 'sum' } }
+    before do
+      params[:stats] = { override: 'sum' }
+    end
 
+    it 'should return the override' do
       expect(json['meta']['stats']).to eq({ 'override' => { 'sum' => 101 } })
     end
   end
 
   context 'requesting ONLY stats' do
-    def only_stats
-      get :index, params: { stats: { total: 'count' }, page: { size: 0 } }
+    before do
+      params[:page] = { size: 0 }
+      params[:stats] = { total: 'count' }
     end
 
     it 'returns empty data' do
-      only_stats
       expect(json['data']).to be_empty
     end
 
     it 'does not query DB' do
       expect(Author).to_not receive(:find_by_sql)
-      only_stats
+      json
     end
 
     it 'returns correct stats' do
-      only_stats
       expect(json['meta']['stats']).to eq({ 'total' => { 'count' => 2 } })
     end
   end
 
   context 'when not AR scope' do
     before do
-      controller.class_eval do
-        jsonapi do
-          allow_stat :total do
-            count { |scope| scope.length }
-          end
-        end
-
-        def index
-          render_jsonapi([Author.first])
+      resource_class.class_eval do
+        allow_stat :total do
+          count { |scope| scope.length + 100 }
         end
       end
     end
 
     it 'should stil allow custom stats' do
-      get :index, params: { stats: { total: 'count' } }
-
-      expect(json['meta']['stats']).to eq({ 'total' => { 'count' => 1 } })
+      params[:stats] = { total: 'count' }
+      expect(json['meta']['stats']).to eq({ 'total' => { 'count' => 102 } })
     end
   end
 
   context 'when requested stat not configured' do
     it 'raises error' do
+      params[:stats] = { asdf: 'count' }
       expect {
-        get :index, params: { stats: { asdf: :count} }
-      }.to raise_error(JsonapiCompliable::Errors::StatNotFound, "No stat configured for calculation :count on attribute 'asdf'")
+        json
+      }.to raise_error(JsonapiCompliable::Errors::StatNotFound, "No stat configured for calculation :count on attribute :asdf")
     end
   end
 end

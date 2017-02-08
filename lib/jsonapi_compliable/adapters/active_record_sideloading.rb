@@ -1,0 +1,119 @@
+module JsonapiCompliable
+  module Adapters
+    module ActiveRecordSideloading
+      def has_many(association_name, scope:, resource:, foreign_key:, primary_key: :id, &blk)
+        _scope = scope
+
+        allow_sideload association_name, resource: resource do
+          scope do |parents|
+            parent_ids = parents.map { |p| p.send(primary_key) }
+            _scope.call.where(foreign_key => parent_ids)
+          end
+
+          assign do |parents, children|
+            parents.each do |parent|
+              parent.association(association_name).loaded!
+              relevant_children = children.select { |c| c.send(foreign_key) == parent.send(primary_key) }
+              relevant_children.each do |c|
+                parent.association(association_name).add_to_target(c, :skip_callbacks)
+              end
+            end
+          end
+
+          instance_eval(&blk) if blk
+        end
+      end
+
+      def belongs_to(association_name, scope:, resource:, foreign_key:, primary_key: :id, &blk)
+        _scope = scope
+
+        allow_sideload association_name, resource: resource do
+          scope do |parents|
+            parent_ids = parents.map { |p| p.send(foreign_key) }
+            _scope.call.where(primary_key => parent_ids)
+          end
+
+          assign do |parents, children|
+            parents.each do |parent|
+              relevant_child = children.find { |c| parent.send(foreign_key) == c.send(primary_key) }
+              parent.send(:"#{association_name}=", relevant_child)
+            end
+          end
+        end
+
+        instance_eval(&blk) if blk
+      end
+
+      def has_one(association_name, scope:, resource:, foreign_key:, primary_key: :id, &blk)
+        _scope = scope
+
+        allow_sideload association_name, resource: resource do
+          scope do |parents|
+            parent_ids = parents.map { |p| p.send(primary_key) }
+            _scope.call.where(foreign_key => parent_ids)
+          end
+
+          assign do |parents, children|
+            parents.each do |parent|
+              parent.association(association_name).loaded!
+              relevant_child = children.find { |c| c.send(foreign_key) == parent.send(primary_key) }
+              next unless relevant_child
+              parent.association(association_name).replace(relevant_child, false)
+            end
+          end
+
+          instance_eval(&blk) if blk
+        end
+      end
+
+      def has_and_belongs_to_many(association_name, scope:, resource:, foreign_key:, primary_key: :id, as: nil, &blk)
+        through = foreign_key.keys.first
+        fk      = foreign_key.values.first
+        _scope  = scope
+
+        allow_sideload association_name, resource: resource do
+          scope do |parents|
+            _scope.call.joins(through).where(through => { fk => parents.map { |p| p.send(primary_key) } })
+          end
+
+          assign do |parents, children|
+            parents.each do |parent|
+              parent.association(association_name).loaded!
+              relevant_children = children.select { |c| c.send(through).any? { |ct| ct.send(fk) == parent.send(primary_key) } }
+              relevant_children.each do |c|
+                parent.association(association_name).add_to_target(c, :skip_callbacks)
+              end
+            end
+          end
+
+          instance_eval(&blk) if blk
+        end
+      end
+
+      def polymorphic_belongs_to(association_name, group_by:, groups:, &blk)
+        allow_sideload association_name, polymorphic: true do
+          group_by(&group_by)
+
+          groups.each_pair do |type, config|
+            primary_key = config[:primary_key] || :id
+            foreign_key = config[:foreign_key]
+
+            allow_sideload type, resource: config[:resource] do
+              scope do |parents|
+                config[:scope].call.where(primary_key => parents.map { |p| p.send(foreign_key) })
+              end
+
+              assign do |parents, children|
+                parents.each do |parent|
+                  parent.send(:"#{association_name}=", children.find { |c| c.send(primary_key) == parent.send(foreign_key) })
+                end
+              end
+            end
+          end
+        end
+
+        instance_eval(&blk) if blk
+      end
+    end
+  end
+end

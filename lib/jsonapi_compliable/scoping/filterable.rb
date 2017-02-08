@@ -1,5 +1,5 @@
 module JsonapiCompliable
-  module Scope::Filterable
+  module Scoping::Filterable
     def find_filter(name)
       find_filter!(name)
     rescue JsonapiCompliable::Errors::BadFilter
@@ -8,16 +8,16 @@ module JsonapiCompliable
 
     def find_filter!(name)
       filter_name, filter_value = \
-        dsl.filters.find { |_name, opts| opts[:aliases].include?(name.to_sym) }
+        resource.filters.find { |_name, opts| opts[:aliases].include?(name.to_sym) }
       raise JsonapiCompliable::Errors::BadFilter unless filter_name
       if guard = filter_value[:if]
-        raise JsonapiCompliable::Errors::BadFilter if controller.send(guard) == false
+        raise JsonapiCompliable::Errors::BadFilter if resource.context[:object].send(guard) == false
       end
       { filter_name => filter_value }
     end
 
     def filter_param
-      params[:filter] || {}
+      query_hash[:filter]
     end
   end
 end

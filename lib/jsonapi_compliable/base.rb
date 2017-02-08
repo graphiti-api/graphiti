@@ -6,65 +6,56 @@ module JsonapiCompliable
     MAX_PAGE_SIZE = 1_000
 
     included do
-      class_attribute :_jsonapi_compliable
-      attr_reader :_jsonapi_scope
+      class << self
+        attr_accessor :_jsonapi_compliable
+      end
 
-      before_action :parse_fieldsets!
-      after_action :reset_scope_flag
+      def self.inherited(klass)
+        super
+        klass._jsonapi_compliable = Class.new(_jsonapi_compliable)
+      end
     end
 
-    def default_page_number
-      1
+    def resource
+      @resource ||= self.class._jsonapi_compliable.new
     end
 
-    def default_page_size
-      20
+    def resource!
+      @resource = self.class._jsonapi_compliable.new
     end
 
-    def default_sort
-      'id'
+    def query
+      @query ||= Query.new(resource, params)
     end
 
-    def jsonapi_scope(scope,
-                      filter: true,
-                      includes: true,
-                      paginate: true,
-                      extra_fields: true,
-                      sort: true)
-      scope = JsonapiCompliable::Scope::DefaultFilter.new(self, scope).apply
-      scope = JsonapiCompliable::Scope::Filter.new(self, scope).apply if filter
-      scope = JsonapiCompliable::Scope::ExtraFields.new(self, scope).apply if extra_fields
-      scope = JsonapiCompliable::Scope::Sideload.new(self, scope).apply if includes
-      scope = JsonapiCompliable::Scope::Sort.new(self, scope).apply if sort
-      # This is set before pagination so it can be re-used for stats
-      @_jsonapi_scope = scope
-      scope = JsonapiCompliable::Scope::Paginate.new(self, scope).apply if paginate
-      scope
+    def query_hash
+      @query_hash ||= query.to_hash[resource.type]
     end
 
-    def reset_scope_flag
-      @_jsonapi_scope = nil
+    # TODO pass controller and action name here to guard
+    def wrap_context
+      if self.class._jsonapi_compliable
+        resource.with_context(self, action_name.to_sym) do
+          yield
+        end
+      end
     end
 
-    def parse_fieldsets!
-      Util::FieldParams.parse!(params, :fields)
-      Util::FieldParams.parse!(params, :extra_fields)
+    def jsonapi_scope(scope, opts = {})
+      resource.build_scope(scope, query, opts)
+    end
+
+    def perform_render_jsonapi(opts)
+      JSONAPI::Serializable::Renderer.render(opts.delete(:jsonapi), opts)
     end
 
     def render_jsonapi(scope, opts = {})
-      scoped = Util::Scoping.apply?(self, scope, opts.delete(:scope)) ? jsonapi_scope(scope) : scope
-      options = default_jsonapi_render_options
-      options[:include] = forced_includes || Util::IncludeParams.scrub(self)
-      options[:jsonapi] = JsonapiCompliable::Util::Pagination.zero?(params) ? [] : scoped
-      options[:fields] = Util::FieldParams.fieldset(params, :fields) if params[:fields]
-      options[:meta] ||= {}
-      options.merge!(opts)
-      options[:meta][:stats] = Stats::Payload.new(self, scoped).generate if params[:stats]
-      options[:expose] ||= {}
-      options[:expose][:context] = self
-      options[:expose][:extra_fields] = Util::FieldParams.fieldset(params, :extra_fields) if params[:extra_fields]
-
-      render(options)
+      scope = jsonapi_scope(scope) unless opts[:scope] == false || scope.is_a?(JsonapiCompliable::Scope)
+      opts  = default_jsonapi_render_options.merge(opts)
+      opts  = Util::RenderOptions.generate(scope, query_hash, opts)
+      opts[:expose][:context] = self
+      opts[:include] = forced_includes if force_includes?
+      perform_render_jsonapi(opts)
     end
 
     # render_jsonapi(foo) equivalent to
@@ -74,11 +65,11 @@ module JsonapiCompliable
       end
     end
 
+    # Legacy
     # TODO: This nastiness likely goes away once jsonapi standardizes
     # a spec for nested relationships.
     # See: https://github.com/json-api/json-api/issues/1089
     def forced_includes(data = nil)
-      return unless force_includes?
       data = raw_params[:data] unless data
 
       {}.tap do |forced|
@@ -95,21 +86,23 @@ module JsonapiCompliable
       end
     end
 
+    # Legacy
     def force_includes?
       %w(PUT PATCH POST).include?(request.method) and
         raw_params.try(:[], :data).try(:[], :relationships).present?
     end
 
     module ClassMethods
-      def jsonapi(&blk)
-        if !self._jsonapi_compliable
-          dsl = JsonapiCompliable::DSL.new
-          self._jsonapi_compliable = dsl
+      def jsonapi(resource: nil, &blk)
+        if resource
+          self._jsonapi_compliable = resource
         else
-          self._jsonapi_compliable = self._jsonapi_compliable.copy
+          if !self._jsonapi_compliable
+            self._jsonapi_compliable = Class.new(JsonapiCompliable::Resource)
+          end
         end
 
-        self._jsonapi_compliable.instance_eval(&blk)
+        self._jsonapi_compliable.class_eval(&blk) if blk
       end
     end
   end

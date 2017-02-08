@@ -1,31 +1,25 @@
 require 'spec_helper'
 
-RSpec.describe 'extra_fields', type: :controller do
+RSpec.describe 'extra_fields' do
+  include_context 'scoping'
+
   class SerializableTestExtraFields < JSONAPI::Serializable::Resource
     type 'authors'
     attributes :first_name, :last_name
-    extra_attribute :net_worth, if: proc { @context.allow_net_worth? } do
+    extra_attribute :net_worth, if: proc { !@context || @context.allow_net_worth? } do
       100_000_000
     end
   end
 
-  controller(ApplicationController) do
-    jsonapi do
-      extra_field(authors: :net_worth) do |scope|
+  before do
+    resource_class.class_eval do
+      extra_field :net_worth do |scope|
         scope.include_foo!
       end
     end
-
-    def allow_net_worth?
-      true
-    end
-
-    def index
-      render_jsonapi(Author.all, class: SerializableTestExtraFields)
-    end
   end
 
-  let(:scope) do
+  let!(:scope_object) do
     scope = Author.all
     scope.instance_eval do
       def include_foo!
@@ -38,33 +32,37 @@ RSpec.describe 'extra_fields', type: :controller do
   let!(:author) { Author.create!(first_name: 'Stephen', last_name: 'King') }
 
   before do
-    scope
-    allow(Author).to receive(:all) { scope }
+    allow(Author).to receive(:all) { scope_object }
+  end
+
+  let(:json) do
+    render(scope.resolve, class: SerializableTestExtraFields)
   end
 
   it 'does not include extra fields when not requested' do
-    get :index
-    expect(json_items(0).keys).to match_array(%w(id jsonapi_type first_name last_name))
+    expect(json['data'][0]['attributes'].keys).to match_array(%w(first_name last_name))
   end
 
   it 'includes the extra fields in the response when requested' do
-    get :index, params: { extra_fields: { authors: 'net_worth' } }
-    expect(json_items(0).keys).to match_array(%w(id jsonapi_type first_name last_name net_worth))
+    params[:extra_fields] = { authors: 'net_worth' }
+    expect(json['data'][0]['attributes'].keys).to match_array(%w(first_name last_name net_worth))
   end
 
   it 'alters the scope based on the supplied block' do
-    expect(scope).to receive(:include_foo!).and_return(scope)
-    get :index, params: { extra_fields: { authors: 'net_worth' } }
+    params[:extra_fields] = { authors: 'net_worth' }
+    expect(json['data'][0]['attributes'].keys).to match_array(%w(first_name last_name net_worth))
   end
 
   context 'when extra field is requested but guarded' do
     before do
-      allow(controller).to receive(:allow_net_worth?) { false }
+      params[:extra_fields] = { authors: 'net_worth' }
     end
 
     it 'does not include the extra field in the response' do
-      get :index, params: { extra_fields: { authors: 'net_worth' } }
-      expect(json_items(0).keys).to match_array(%w(id jsonapi_type first_name last_name))
+      ctx = double(allow_net_worth?: false)
+      resource.with_context ctx do
+        expect(json['data'][0]['attributes'].keys).to match_array(%w(first_name last_name))
+      end
     end
   end
 end

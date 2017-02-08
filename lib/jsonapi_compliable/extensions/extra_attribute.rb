@@ -14,11 +14,7 @@ module JsonapiCompliable
               next false unless instance_eval(&options[:if])
             end
 
-            if @extra_fields && @extra_fields[jsonapi_type]
-              @extra_fields[jsonapi_type].include?(name)
-            else
-              false
-            end
+            @extra_fields[@_type] && @extra_fields[@_type].include?(name)
           }
 
           attribute name, if: allow_field, &blk
