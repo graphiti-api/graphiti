@@ -11,6 +11,10 @@ RSpec.describe JsonapiCompliable::Scope do
       allow(query).to receive(:zero_results?) { false }
     end
 
+    xit 'TODO' do
+      # test sideload, etc
+    end
+
     it 'returns the object' do
       expect(instance.resolve).to eq(instance.instance_variable_get(:@object))
     end

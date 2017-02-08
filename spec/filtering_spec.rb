@@ -1,24 +1,18 @@
 require 'spec_helper'
 
-RSpec.describe 'filtering', type: :controller do
-  controller(ApplicationController) do
-    jsonapi do
-      type :authors
+RSpec.describe 'filtering' do
+  include_context 'scoping'
 
+  before do
+    resource_class.class_eval do
       allow_filter :id
-      allow_filter :first_name, aliases: [:name], if: :can_filter_first_name?
-
+      allow_filter :first_name, aliases: [:name]
+      allow_filter :first_name_guarded, if: :can_filter_first_name? do |scope, value|
+        scope.where(first_name: value)
+      end
       allow_filter :first_name_prefix do |scope, value|
         scope.where(['first_name like ?', "#{value}%"])
       end
-    end
-
-    def index
-      render_jsonapi(Author.all)
-    end
-
-    def can_filter_first_name?
-      true
     end
   end
 
@@ -28,74 +22,111 @@ RSpec.describe 'filtering', type: :controller do
   let!(:author4) { Author.create!(first_name: 'Harold',  last_name: 'Robbins') }
 
   it 'scopes correctly' do
-    get :index, params: { filter: { first_name: 'Stephen' } }
-    expect(json_ids).to eq([author1.id.to_s])
+    params[:filter] = { id: author1.id }
+    expect(scope.resolve.map(&:id)).to eq([author1.id])
+  end
+
+  context 'when filter is an integer' do
+    before do
+      params[:filter] = { id: author1.id }
+    end
+
+    it 'still works' do
+      expect(scope.resolve.map(&:id)).to eq([author1.id])
+    end
   end
 
   context 'when customized with a block' do
+    before do
+      params[:filter] = { first_name_prefix: 'Ag' }
+    end
+
     it 'scopes based on the given block' do
-      get :index, params: { filter: { first_name_prefix: 'Ag' } }
-      expect(json_ids).to eq([author2.id.to_s])
+      expect(scope.resolve.map(&:id)).to eq([author2.id])
     end
   end
 
   context 'when customized with alternate param name' do
+    before do
+      params[:filter] = { name: 'Stephen' }
+    end
+
     it 'filters based on the correct name' do
-      get :index, params: { filter: { name: 'Stephen' } }
-      expect(json_ids).to eq([author1.id.to_s])
+      expect(scope.resolve.map(&:id)).to eq([author1.id])
     end
   end
 
   context 'when the supplied value is comma-delimited' do
+    before do
+      params[:filter] = { id: [author1.id, author2.id].join(',') }
+    end
+
     it 'parses into a ruby array' do
-      get :index, params: { filter: { id: [author1.id, author2.id].join(',') } }
-      expect(json_ids(true)).to match_array([author1.id, author2.id])
+      expect(scope.resolve.map(&:id)).to eq([author1.id, author2.id])
     end
   end
 
   context 'when a default filter' do
     before do
-      controller.class.class_eval do
-        jsonapi do
-          default_filter :first_name do |scope|
-            scope.where(first_name: 'William')
-          end
+      resource_class.class_eval do
+        default_filter :first_name do |scope|
+          scope.where(first_name: 'William')
         end
       end
     end
 
     it 'applies by default' do
-      get :index
-      expect(json_ids(true)).to eq([author3.id])
+      expect(scope.resolve.map(&:id)).to eq([author3.id])
     end
 
     it 'is overrideable' do
-      get :index, params: { filter: { first_name: 'Stephen' } }
-      expect(json_ids(true)).to eq([author1.id])
+      params[:filter] = { first_name: 'Stephen' }
+      expect(scope.resolve.map(&:id)).to eq([author1.id])
     end
 
     it "is overrideable when overriding via an allowed filter's alias" do
-      get :index, params: { filter: { name: 'Stephen' } }
-      expect(json_ids(true)).to eq([author1.id])
+      params[:filter] = { name: 'Stephen' }
+      expect(scope.resolve.map(&:id)).to eq([author1.id])
     end
   end
 
   context 'when the filter is guarded' do
+    let(:can_filter) { true }
+    let(:ctx) { double(can_filter_first_name?: can_filter) }
+
     before do
-      allow(controller).to receive(:can_filter_first_name?) { false }
+      params[:filter] = { first_name_guarded: 'Stephen' }
     end
 
-    it 'raises an error' do
-      expect {
-        get :index, params: { filter: { first_name: 'Stephen' } }
-      }.to raise_error(JsonapiCompliable::Errors::BadFilter)
+    context 'and the guard passes' do
+      it 'filters normally' do
+        resource.with_context ctx do
+          expect(scope.resolve.map(&:id)).to eq([author1.id])
+        end
+      end
+    end
+
+    context 'and the guard does not pass' do
+      let(:can_filter) { false }
+
+      it 'raises an error' do
+        expect {
+          resource.with_context ctx do
+            scope.resolve
+          end
+        }.to raise_error(JsonapiCompliable::Errors::BadFilter)
+      end
     end
   end
 
   context 'when the filter is not whitelisted' do
+    before do
+      params[:filter] = { foo: 'bar' }
+    end
+
     it 'raises an error' do
       expect {
-        get :index, params: { filter: { foo: 'bar' } }
+        scope.resolve
       }.to raise_error(JsonapiCompliable::Errors::BadFilter)
     end
   end

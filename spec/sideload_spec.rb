@@ -36,6 +36,12 @@ RSpec.describe JsonapiCompliable::Sideload do
     end
   end
 
+  describe '#resolve' do
+    xit 'TODO' do
+      # test sideload etc
+    end
+  end
+
   describe '#allow_sideload' do
     it 'assigns a new sideload' do
       instance.allow_sideload :bar

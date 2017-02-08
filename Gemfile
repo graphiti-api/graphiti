@@ -9,6 +9,4 @@ group :test do
   gem 'appraisal'
   gem 'guard'
   gem 'guard-rspec'
-  gem 'pry'
-  gem 'pry-byebug'
 end

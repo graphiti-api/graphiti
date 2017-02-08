@@ -1,20 +1,26 @@
 require 'spec_helper'
 
-RSpec.describe JsonapiCompliable, type: :controller do
-  controller(ApplicationController) do
-    jsonapi do
-      type :authors
-    end
+RSpec.describe JsonapiCompliable do
+  let(:klass) do
+    Class.new do
+      attr_accessor :params
+      include JsonapiCompliable::Base
 
-    def index
-      scope = Author.all
-      render_jsonapi(scope)
+      jsonapi do
+        type :authors
+      end
+
+      def params
+        @params || {}
+      end
     end
   end
 
+  let(:instance) { klass.new }
+
   describe '.jsonapi' do
     let(:subclass1) do
-      Class.new(controller.class) do
+      Class.new(klass) do
         jsonapi do
           type :subclass_1
           allow_filter :id
@@ -35,9 +41,9 @@ RSpec.describe JsonapiCompliable, type: :controller do
     end
 
     it 'assigns a subclass of Resource by default' do
-      expect(controller.class._jsonapi_compliable.ancestors)
+      expect(klass._jsonapi_compliable.ancestors)
         .to include(JsonapiCompliable::Resource)
-      expect(controller.class._jsonapi_compliable.object_id)
+      expect(klass._jsonapi_compliable.object_id)
         .to_not eq(JsonapiCompliable::Resource.object_id)
     end
 
@@ -67,13 +73,13 @@ RSpec.describe JsonapiCompliable, type: :controller do
 
   describe '#wrap_context' do
     before do
-      allow(controller).to receive(:action_name) { 'index' }
+      allow(instance).to receive(:action_name) { 'index' }
     end
 
     it 'wraps in the resource context' do
-      controller.wrap_context do
-        expect(controller.resource.context).to eq({
-          object: controller,
+      instance.wrap_context do
+        expect(instance.resource.context).to eq({
+          object: instance,
           namespace: :index
         })
       end
@@ -81,13 +87,10 @@ RSpec.describe JsonapiCompliable, type: :controller do
 
     context 'when the class does not have a resource' do
       let(:klass) do
-        Class.new(ApplicationController) do
-          include JsonapiCompliable::Base
-          self._jsonapi_compliable = nil
+        Class.new do
+          include JsonapiCompliable
         end
       end
-
-      let(:instance) { klass.new }
 
       it 'does nothing' do
         instance.wrap_context do
@@ -98,39 +101,28 @@ RSpec.describe JsonapiCompliable, type: :controller do
   end
 
   describe '#render_jsonapi' do
+    before do
+      allow(instance).to receive(:force_includes?) { false }
+    end
+
     it 'is able to override options' do
       author = Author.create!(first_name: 'Stephen', last_name: 'King')
       author.books.create(title: "The Shining", genre: Genre.new(name: 'horror'))
 
-      controller.class_eval do
-        def index
-          scope = Author.all
-          render_jsonapi(scope, include: { books: :genre })
-        end
-      end
-
-      get :index
-      expect(json_included_types).to match_array(%w(books genres))
+      expect(instance).to receive(:perform_render_jsonapi).with(hash_including(meta: { foo: 'bar' }))
+      instance.render_jsonapi(Author.all, { scope: false, meta: { foo: 'bar' } })
     end
 
     context 'when passing scope: false' do
-      before do
-        controller.class_eval do
-          def index
-            people = Author.all
-            render_jsonapi(people.to_a, scope: false)
-          end
-        end
-      end
-
       it 'does not appy jsonapi_scope' do
+        instance.params = { include: 'books.genre,foo' }
         author = double
         allow(Author).to receive(:all).and_return([author])
         expect(Author).to_not receive(:find_by_sql)
         expect(author).to_not receive(:includes)
-        expect(controller).to_not receive(:jsonapi_scope)
+        expect(instance).to_not receive(:jsonapi_scope)
 
-        get :index, params: { include: 'books.genre,foo' }
+        instance.render_jsonapi(Author.all, scope: false)
       end
     end
   end

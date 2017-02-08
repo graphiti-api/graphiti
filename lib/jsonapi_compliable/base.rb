@@ -10,8 +10,6 @@ module JsonapiCompliable
         attr_accessor :_jsonapi_compliable
       end
 
-      around_action :wrap_context
-
       def self.inherited(klass)
         super
         klass._jsonapi_compliable = Class.new(_jsonapi_compliable)
@@ -26,6 +24,14 @@ module JsonapiCompliable
       @resource = self.class._jsonapi_compliable.new
     end
 
+    def query
+      @query ||= Query.new(resource, params)
+    end
+
+    def query_hash
+      @query_hash ||= query.to_hash[resource.type]
+    end
+
     # TODO pass controller and action name here to guard
     def wrap_context
       if self.class._jsonapi_compliable
@@ -36,36 +42,20 @@ module JsonapiCompliable
     end
 
     def jsonapi_scope(scope, opts = {})
-      query = Query.new(resource, params)
       resource.build_scope(scope, query, opts)
     end
 
-    # TODO: refactor
+    def perform_render_jsonapi(opts)
+      JSONAPI::Serializable::Renderer.render(opts.delete(:jsonapi), opts)
+    end
+
     def render_jsonapi(scope, opts = {})
-      query = Query.new(resource, params)
-      query_hash = query.to_hash[resource.type]
-
-      scoped = scope
-      scoped = jsonapi_scope(scoped) unless opts[:scope] == false || scoped.is_a?(JsonapiCompliable::Scope)
-      resolved = scoped.respond_to?(:resolve) ? scoped.resolve : scoped
-
-      options = default_jsonapi_render_options
-      options[:include] = forced_includes || query_hash[:include]
-      options[:jsonapi] = resolved
-      options[:fields] = query_hash[:fields]
-      options[:meta] ||= {}
-      options.merge!(opts)
-
-      if scoped.respond_to?(:resolve_stats)
-        stats = scoped.resolve_stats
-        options[:meta][:stats] = stats unless stats.empty?
-      end
-
-      options[:expose] ||= {}
-      options[:expose][:context] = self
-      options[:expose][:extra_fields] = query_hash[:extra_fields]
-
-      render(options)
+      scope = jsonapi_scope(scope) unless opts[:scope] == false || scope.is_a?(JsonapiCompliable::Scope)
+      opts  = default_jsonapi_render_options.merge(opts)
+      opts  = Util::RenderOptions.generate(scope, query_hash, opts)
+      opts[:expose][:context] = self
+      opts[:include] = forced_includes if force_includes?
+      perform_render_jsonapi(opts)
     end
 
     # render_jsonapi(foo) equivalent to
@@ -80,7 +70,6 @@ module JsonapiCompliable
     # a spec for nested relationships.
     # See: https://github.com/json-api/json-api/issues/1089
     def forced_includes(data = nil)
-      return unless force_includes?
       data = raw_params[:data] unless data
 
       {}.tap do |forced|

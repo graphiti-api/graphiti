@@ -99,7 +99,6 @@ module JsonapiCompliable
     def self.config
       @config ||= begin
         {
-          sideloads: {},
           sideload_whitelist: {},
           filters: {},
           default_filters: {},

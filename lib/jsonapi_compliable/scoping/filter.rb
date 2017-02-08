@@ -24,7 +24,7 @@ module JsonapiCompliable
       filter_param.each_pair do |param_name, param_value|
         filter = find_filter!(param_name.to_sym)
         value  = param_value
-        value  = value.split(',') if value.include?(',')
+        value  = value.split(',') if value.is_a?(String) && value.include?(',')
         yield filter, value
       end
     end

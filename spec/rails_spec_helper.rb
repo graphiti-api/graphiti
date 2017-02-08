@@ -1,33 +1,3 @@
-# https://github.com/rails/rails/blob/v5.0.0.beta1/railties/test/isolation/abstract_unit.rb
-
-# Usage Example:
-#
-# require 'support/isolated_unit'
-#
-# class RailtieTest < ActiveSupport::TestCase
-#   include ActiveSupport::Testing::Isolation
-#
-#   class WithRailsDefinedOnLoad < RailtieTest
-#     setup do
-#       require 'rails'
-#       require 'active_model_serializers'
-#       make_basic_app
-#     end
-#
-#     # some tests
-#   end
-#
-#   class WithoutRailsDefinedOnLoad < RailtieTest
-#     setup do
-#       require 'active_model_serializers'
-#       make_basic_app
-#     end
-#
-#     # some tests
-#   end
-# end
-#
-# Note:
 # It is important to keep this file as light as possible
 # the goal for tests that require this is to test booting up
 # rails from an empty state, so anything added here could
@@ -37,6 +7,8 @@
 # Rails booted up.
 require 'bundler/setup' unless defined?(Bundler)
 require 'rails'
+require 'action_controller'
+require 'jsonapi_compliable/rails'
 
 module BasicRailsApp
   module_function
@@ -61,3 +33,29 @@ module BasicRailsApp
     @app.initialize!
   end
 end
+
+::Rails.application = BasicRailsApp.generate
+
+class ApplicationController < ActionController::Base
+  include Rails.application.routes.url_helpers
+  include JsonapiCompliable::Rails
+
+  jsonapi do
+    use_adapter JsonapiCompliable::Adapters::ActiveRecord
+  end
+
+  prepend_before_action :fix_params!
+
+  private
+
+  # Honestly not sure why this is needed
+  # Otherwise params is { params: actual_params }
+  def fix_params!
+    if Rails::VERSION::MAJOR == 4
+      good_params = { action: action_name }.merge(params[:params] || {})
+      self.params = ActionController::Parameters.new(good_params.with_indifferent_access)
+    end
+  end
+end
+
+require 'rspec/rails'

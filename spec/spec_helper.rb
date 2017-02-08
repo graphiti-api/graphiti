@@ -1,14 +1,17 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
-require 'jsonapi_spec_helpers'
-require 'rails'
-
-require 'kaminari'
 require 'active_record'
-require 'action_controller'
 
-require File.expand_path(File.join(File.dirname(__FILE__), "./support/basic_rails_app"))
-require 'rspec/rails'
+# Easier require coming soon https://github.com/kaminari/kaminari/issues/518
+require 'kaminari/config'
+require 'kaminari/helpers/action_view_extension'
+require 'kaminari/helpers/paginator'
+require 'kaminari/models/page_scope_methods'
+require 'kaminari/models/configuration_methods'
+require 'kaminari/hooks'
+Kaminari::Hooks.init
+
+Dir[File.dirname(__FILE__) + "/support/**/*.rb"].each {|f| require f }
 require 'database_cleaner'
 
 require 'pry'
@@ -16,11 +19,7 @@ require 'jsonapi_compliable'
 require 'jsonapi_compliable/adapters/null'
 require 'jsonapi_compliable/adapters/active_record'
 
-::Rails.application = BasicRailsApp.generate
-
 RSpec.configure do |config|
-  config.include JsonapiSpecHelpers
-
   config.before(:suite) do
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with(:truncation)
@@ -35,7 +34,6 @@ end
 
 ActiveRecord::Migration.verbose = false
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
-ActiveRecord::Base.raise_in_transactional_callbacks = true
 
 ActiveRecord::Schema.define(:version => 1) do
   create_table :authors do |t|
@@ -273,33 +271,4 @@ class RSpec::Mocks::SerializableDouble < SerializableAbstract
   type 'doubles'
 
   id { rand(99999) }
-end
-
-JsonapiSpecHelpers::Payload.register(:book) do
-  key(:title)
-end
-
-JsonapiSpecHelpers::Payload.register(:genre) do
-  key(:name)
-end
-
-class ApplicationController < ActionController::Base
-  include JsonapiCompliable
-
-  jsonapi do
-    use_adapter JsonapiCompliable::Adapters::ActiveRecord
-  end
-
-  prepend_before_action :fix_params!
-
-  private
-
-  # Honestly not sure why this is needed
-  # Otherwise params is { params: actual_params }
-  def fix_params!
-    if Rails::VERSION::MAJOR == 4
-      good_params = { action: action_name }.merge(params[:params] || {})
-      self.params = ActionController::Parameters.new(good_params.with_indifferent_access)
-    end
-  end
 end
