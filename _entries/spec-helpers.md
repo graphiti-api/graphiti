@@ -2,7 +2,8 @@
 sectionid: spec-helpers
 sectionclass: h1
 title: Spec Helpers
-number: 13
+number: 21
+is-parent: true
 ---
 
 Validating verbose JSON API responses in tests can be a pain. We could

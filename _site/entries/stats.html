@@ -45,13 +45,23 @@
     </li>
     
     <li  class="parent">
+        <a href="#quickstart">Quickstart</a>
+        
+            <ul>
+                
+                
+            </ul>
+        
+    </li>
+    
+    <li  class="parent">
         <a href="#reads">Reads</a>
         
             <ul>
                 
                 
                     <li >
-                        <a href="#basics">The Basics</a>
+                        <a href="#resource-introduction">Resources</a>
                         
                     </li>
                 
@@ -61,7 +71,43 @@
                     </li>
                 
                     <li >
-                        <a href="#includes">Includes</a>
+                        <a href="#sorting">Sorting</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#pagination">Pagination</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#default-filters">Default Filters</a>
+                        
+                    </li>
+                
+                    <li class="parent">
+                        <a href="#sideloading">Sideloading</a>
+                        
+                            <ul>
+                                
+                                
+                                <li>
+                                    <a href="#sideloading-introduction">Introduction</a>
+                                </li>
+                                
+                                <li>
+                                    <a href="#sideloading-activerecord">ActiveRecord</a>
+                                </li>
+                                
+                                <li>
+                                    <a href="#advanced-activerecord">Advanced ActiveRecord</a>
+                                </li>
+                                
+                                <li>
+                                    <a href="#association-queries">Querying Associations</a>
+                                </li>
+                                
+                            </ul>
                         
                     </li>
                 
@@ -94,18 +140,23 @@
         
     </li>
     
-    <li >
+    <li  class="parent">
         <a href="#error-handling">Error Handling</a>
         
-    </li>
-    
-    <li >
-        <a href="#spec-helpers">Spec Helpers</a>
+            <ul>
+                
+                
+            </ul>
         
     </li>
     
-    <li >
-        <a href="#swagger">Swagger</a>
+    <li  class="parent">
+        <a href="#spec-helpers">Spec Helpers</a>
+        
+            <ul>
+                
+                
+            </ul>
         
     </li>
     
@@ -141,16 +192,26 @@
                 
                 
                     <li >
-                        <a href="#without-kaminari">Usage without Kaminari</a>
+                        <a href="#resource-dsl">Resource DSL</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#adapters">Adapters</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#elasticsearch">ElasticSearch</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#without-rails">Usage Without Rails</a>
                         
                     </li>
                 
             </ul>
-        
-    </li>
-    
-    <li >
-        <a href="#without-activerecord">Usage Without ActiveRecord</a>
         
     </li>
     
@@ -163,7 +224,10 @@
 
 <p>These calculations are supported via <code class="highlighter-rouge">allow_stat</code>:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+  <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
+
   <span class="n">allow_stat</span> <span class="ss">total: </span><span class="p">[</span><span class="ss">:count</span><span class="p">]</span>
 <span class="k">end</span>
 </code></pre>
@@ -188,20 +252,16 @@
 <code class="highlighter-rouge">maximum</code> and <code class="highlighter-rouge">minimum</code>. These will work out-of-the-box with ActiveRecord.
 Alternatively, override these calculation functions:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi</span> <span class="k">do</span>
-  <span class="n">allow_stat</span> <span class="ss">:salary</span> <span class="k">do</span>
-    <span class="n">average</span> <span class="p">{</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="kp">attr</span><span class="o">|</span> <span class="n">scope</span><span class="p">.</span><span class="nf">average</span><span class="p">(</span><span class="kp">attr</span><span class="p">)</span> <span class="p">}</span>
-  <span class="k">end</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">allow_stat</span> <span class="ss">:salary</span> <span class="k">do</span>
+  <span class="n">average</span> <span class="p">{</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="kp">attr</span><span class="o">|</span> <span class="n">scope</span><span class="p">.</span><span class="nf">average</span><span class="p">(</span><span class="kp">attr</span><span class="p">)</span> <span class="p">}</span>
 <span class="k">end</span>
 </code></pre>
 </div>
 
 <p>Or support your own custom calculations:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi</span> <span class="k">do</span>
-  <span class="n">allow_stat</span> <span class="ss">salary: </span><span class="p">[</span><span class="ss">:average</span><span class="p">]</span> <span class="k">do</span>
-    <span class="n">standard_deviation</span> <span class="p">{</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="kp">attr</span><span class="o">|</span> <span class="p">.</span><span class="nf">.</span><span class="o">.</span> <span class="p">}</span>
-  <span class="k">end</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">allow_stat</span> <span class="ss">salary: </span><span class="p">[</span><span class="ss">:average</span><span class="p">]</span> <span class="k">do</span>
+  <span class="n">standard_deviation</span> <span class="p">{</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="kp">attr</span><span class="o">|</span> <span class="p">.</span><span class="nf">.</span><span class="o">.</span> <span class="p">}</span>
 <span class="k">end</span>
 </code></pre>
 </div>

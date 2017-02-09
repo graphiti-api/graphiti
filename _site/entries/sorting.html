@@ -220,11 +220,34 @@
 
             <div class="content">
                 <span class="toggle">open</span>
-                <p>There are times when the JSON API specification doesn’t yet support
-something…but you have this use case <em>now</em> and need to get your work
-done. We support a few of these scenarios in a way that is compatible
-with the current specification, but not defined within it - we call this
-<strong>JSON API Plus</strong>.</p>
+                <p>Use <code class="highlighter-rouge">sort</code> in your resource to override the sorting behavior:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+
+  <span class="n">sort</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">direction</span><span class="o">|</span>
+    <span class="k">if</span> <span class="n">direction</span> <span class="o">=</span> <span class="ss">:seniority_level</span>
+      <span class="n">scope</span><span class="p">.</span><span class="nf">joins</span><span class="p">(</span><span class="ss">:positions</span><span class="p">).</span><span class="nf">order</span><span class="p">(</span><span class="s2">"positions.seniority_level </span><span class="si">#{</span><span class="n">direction</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">else</span>
+      <span class="n">scope</span><span class="p">.</span><span class="nf">order</span><span class="p">(</span><span class="n">attribute</span> <span class="o">=&gt;</span> <span class="n">direction</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>This will multisort as well, given a URL like
+<code class="highlighter-rouge">/employees?sort=first_name,last_name</code>.</p>
+
+<p>The default sort is <code class="highlighter-rouge">id ascending</code>. To change this:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="c1"># ... code ...</span>
+
+  <span class="n">default_sort</span><span class="p">([{</span> <span class="ss">title: :desc</span> <span class="p">}])</span>
+<span class="k">end</span>
+</code></pre>
+</div>
 
             </div>
         </div>

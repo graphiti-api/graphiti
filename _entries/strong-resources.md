@@ -3,7 +3,7 @@ sectionid: strong_resources
 sectionclass: h2
 title: Strong Resources
 parent-id: writes
-number: 11
+number: 19
 ---
 
 At this point we **could** use regular ol' [strong_parameters](https://github.com/rails/strong_parameters). That would work. However, two things eventually crop up making this a pain point:

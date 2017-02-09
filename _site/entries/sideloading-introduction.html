@@ -220,11 +220,71 @@
 
             <div class="content">
                 <span class="toggle">open</span>
-                <p>There are times when the JSON API specification doesn’t yet support
-something…but you have this use case <em>now</em> and need to get your work
-done. We support a few of these scenarios in a way that is compatible
-with the current specification, but not defined within it - we call this
-<strong>JSON API Plus</strong>.</p>
+                <p>JSONAPI has the <code class="highlighter-rouge">?include</code> query parameter (<a href="http://jsonapi.org/format/#fetching-includes">documentation</a>), which is used to ‘sideload’
+relationships. We use Resource objects for our main entities, and
+<strong>Sideload</strong> objects for the relationships.</p>
+
+<p>Similar to a Resource, a Sideload defines how we’re going to build up a
+scope. But instead of defining pagination, sorting, etc, we need to
+define:</p>
+
+<ul>
+  <li>How to build a base scope for this relationship from the main
+entities.</li>
+  <li>How to assign the results of this sideload to the main entities.</li>
+</ul>
+
+<p>In code, we do this through the <code class="highlighter-rouge">scope</code> and <code class="highlighter-rouge">assign</code> lambdas:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+  <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
+
+  <span class="n">allow_sideload</span> <span class="ss">:department</span><span class="p">,</span> <span class="ss">resource: </span><span class="no">DepartmentResource</span> <span class="k">do</span>
+    <span class="c1"># We've resolved the employee scope to an array of Employee objects</span>
+    <span class="c1"># Now we need to specify how to get departments for those employees.</span>
+    <span class="n">scope</span> <span class="k">do</span> <span class="o">|</span><span class="n">employees</span><span class="o">|</span>
+      <span class="no">Department</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">id: </span><span class="n">employees</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:department_id</span><span class="p">))</span>
+    <span class="k">end</span>
+
+    <span class="c1"># Now we've resolved BOTH the Employee and Department scopes</span>
+    <span class="c1"># Assign relevant department to each employee</span>
+    <span class="n">assign</span> <span class="k">do</span> <span class="o">|</span><span class="n">employees</span><span class="p">,</span> <span class="n">departments</span><span class="o">|</span>
+      <span class="n">employees</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span>
+        <span class="n">e</span><span class="p">.</span><span class="nf">department</span> <span class="o">=</span> <span class="n">departments</span><span class="p">.</span><span class="nf">find</span> <span class="p">{</span> <span class="o">|</span><span class="n">d</span><span class="o">|</span> <span class="n">d</span><span class="p">.</span><span class="nf">id</span> <span class="o">==</span> <span class="n">e</span><span class="p">.</span><span class="nf">department_id</span> <span class="p">}</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p><strong>Note:</strong> - <code class="highlighter-rouge">scope</code> must return a chainable scope object - it’s going to be passed
+to DepartmentResource so that we can sort/filter/etc our relationships
+as well.</p>
+
+<p>Finally, sideloads are nested. Let’s say each <code class="highlighter-rouge">Department</code> has many
+<code class="highlighter-rouge">Goal</code>s. We want to load employees, their departments, and the goals for
+those departments:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>/employees?include=department.goals
+</code></pre>
+</div>
+
+<p>As long as the <code class="highlighter-rouge">DepartmentResource</code> has a <code class="highlighter-rouge">goals</code> sideload, this query
+will work. However, we may want to ‘whitelist’ only a subset of possible
+sideloads, to accomodate load or security issues:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">jsonapi</span> <span class="ss">resource: </span><span class="no">EmployeeResource</span> <span class="k">do</span>
+    <span class="n">sideload_whitelist</span><span class="p">({</span>
+      <span class="ss">index: :department</span><span class="p">,</span>
+      <span class="ss">show: </span><span class="p">{</span> <span class="ss">department: :goals</span> <span class="p">}</span>
+    <span class="p">})</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
 
             </div>
         </div>

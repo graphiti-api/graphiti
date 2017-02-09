@@ -2,7 +2,7 @@
 sectionid: nested-relationships
 sectionclass: h2
 title: Nested Relationships
-number: 16
+number: 23
 parent-id: jsonapi-plus
 ---
 

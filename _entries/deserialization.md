@@ -3,7 +3,7 @@ sectionid: deserialization
 sectionclass: h2
 title: Deserialization
 parent-id: writes
-number: 9
+number: 17
 ---
 
 By default, Rails doesn't work too well with incoming JSON API payloads.

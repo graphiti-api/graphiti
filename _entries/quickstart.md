@@ -1,16 +1,21 @@
 ---
-sectionid: basics
-sectionclass: h2
-title: The Basics
-parent-id: reads
-number: 5
+sectionid: quickstart
+sectionclass: h1
+title: Quickstart
+is-parent: true
+number: 4
 ---
 
 Let's write a very simple controller:
 
 ```ruby
 class EmployeesController < ApplicationController
-  jsonapi { }
+  jsonapi do
+    type :employees
+    use_adapter JsonapiCompliable::Adapters::ActiveRecord
+
+    allow_filter :name
+  end
 
   def index
     employees = Employee.all
@@ -24,12 +29,15 @@ The above controller automatically supports:
 * [Pagination](http://jsonapi.org/format/#fetching-pagination)
 * [Sorting](http://jsonapi.org/format/#fetching-sorting)
 * [Sparse Fieldsets](http://jsonapi.org/format/#fetching-sparse-fieldsets)
+* [Filtering](http://jsonapi.org/format/#fetching-filtering) the 'name'
+attribute.
 * A [jsonapi.org compatible response](http://jsonapi.org/format/#document-structure)
 
 In other words, we now support these URLs:
 
 * `http://localhost:3000/api/employees?page[number]=2&page[size]=1`
 * `http://localhost:3000/api/employees?sort=-name`
+* `http://localhost:3000/api/employees?filter[name]=Homer`
 * `http://localhost:3000/api/employees?fields[employees]=name,age`
 
 Let's take a look at what this code does.
@@ -60,12 +68,15 @@ If you want to lower-level access to the scope we're building, use
 
 ```ruby
 def index
+  # returns a JsonapiCompliable::Scope object
   scope = jsonapi_scope(Employee.all)
-  scope = scope.where(active: true)
-
+  # We can get lower-level access to the underlying 'scope object'
+  scope.object = scope.object.where(active: true)
+  # Resolve the scope to fire SQL and get actual Employee objects:
+  results = scope.resolve
   # Here we'll pass the actual records instead of
-  # a scope, the scoping logic has already fired.
-  render_jsonapi(scope.to_a)
+  # a scope, as the scoping logic has already fired.
+  render_jsonapi(results, scope: false)
 end
 ```
 
@@ -74,7 +85,7 @@ end
 ###### Remember Your Serializers!
   <div class='note-content'>
   This documentation assumes you're roughly familiar with
-  [jsonapi-rb](http://jsonapi-rb.org). Note the above code would not output jsonapi unless a `SerializableEmployee` is defined. By convention, we would put this in `app/resources/serializable_employee.rb`.
+  [jsonapi-rb](http://jsonapi-rb.org). Note the above code would not output jsonapi unless a `SerializableEmployee` is defined. By convention, we would put this in `app/serializers/serializable_employee.rb`.
   </div>
 </div>
 <div style="height: 8rem;" />

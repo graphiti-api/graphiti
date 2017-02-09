@@ -220,62 +220,90 @@
 
             <div class="content">
                 <span class="toggle">open</span>
-                <p>Use <code class="highlighter-rouge">allow_filter</code> in your resource to whitelist filters:</p>
+                <p>In addition to <code class="highlighter-rouge">belongs_to</code> and <code class="highlighter-rouge">has_many</code>, we have
+<code class="highlighter-rouge">has_and_belongs_to_many</code>. Everything is the same, but the foreign key
+must be a composite key that includes the <code class="highlighter-rouge">through</code> table. Given these
+models:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Employee</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">has_many</span> <span class="ss">:taggings</span>
+  <span class="n">has_many</span> <span class="ss">:tags</span><span class="p">,</span> <span class="ss">through: :taggings</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Tagging</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">belongs_to</span> <span class="ss">:employee</span>
+  <span class="n">belongs_to</span> <span class="ss">:tag</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Tag</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">has_many</span> <span class="ss">:taggings</span>
+  <span class="n">has_many</span> <span class="ss">:employees</span><span class="p">,</span> <span class="ss">through: :taggings</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>We would have this macro in our resource:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
   <span class="n">type</span> <span class="ss">:employees</span>
   <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
 
-  <span class="n">allow_filter</span> <span class="ss">:name</span>
+  <span class="n">has_and_belongs_to_many</span> <span class="ss">:tags</span><span class="p">,</span>
+    <span class="ss">foreign_key: </span><span class="p">{</span> <span class="ss">taggings: :employee_id</span> <span class="p">},</span>
+    <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Tag</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+    <span class="ss">resource: </span><span class="no">TagResource</span>
 <span class="k">end</span>
 </code></pre>
 </div>
 
-<p>If a request
-comes in for a filter that is not whitelisted, a
-<code class="highlighter-rouge">JsonapiCompliable::Errors::BadFilter</code> error will be raised.</p>
+<p>Finally, we have <strong>polymorphic</strong> relationships. Let’s say an <code class="highlighter-rouge">Employee</code>
+has a <code class="highlighter-rouge">Workspace</code>, which can be either an <code class="highlighter-rouge">Office</code> or a <code class="highlighter-rouge">Cubicle</code>. Given
+these ActiveRecord models:</p>
 
-<p>Customize the filter by passing a block:</p>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Employee</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="c1"># we have workspace_type and workspace_id columns</span>
+  <span class="n">belongs_to</span> <span class="ss">:workspace</span><span class="p">,</span> <span class="ss">polymorphic: </span><span class="kp">true</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Office</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">has_many</span> <span class="ss">:employees</span><span class="p">,</span> <span class="ss">as: :workspace</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Cubicle</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">has_many</span> <span class="ss">:employees</span><span class="p">,</span> <span class="ss">as: :workspace</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>We’d have this macro in our resource:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
   <span class="n">type</span> <span class="ss">:employees</span>
   <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
 
-  <span class="n">allow_filter</span> <span class="ss">:name_prefix</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
-    <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">([</span><span class="s2">"name LIKE ?"</span><span class="p">,</span> <span class="s2">"</span><span class="si">#{</span><span class="n">value</span><span class="si">}</span><span class="s2">%"</span><span class="p">])</span>
-  <span class="k">end</span>
+  <span class="n">polymorphic_belongs_to</span> <span class="ss">:workspace</span><span class="p">,</span>
+    <span class="ss">group_by: </span><span class="nb">proc</span> <span class="p">{</span> <span class="o">|</span><span class="n">employee</span><span class="o">|</span> <span class="n">employee</span><span class="p">.</span><span class="nf">workspace_type</span> <span class="p">},</span>
+    <span class="ss">groups: </span><span class="p">{</span>
+      <span class="s1">'Cubicle'</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="ss">foreign_key: :workspace_id</span><span class="p">,</span>
+        <span class="ss">resource: </span><span class="no">WorkspaceResource</span><span class="p">,</span>
+        <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Cubicle</span><span class="p">.</span><span class="nf">all</span> <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="s1">'Office'</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="ss">foreign_key: :workspace_id</span><span class="p">,</span>
+        <span class="ss">resource: </span><span class="no">WorkspaceResource</span><span class="p">,</span>
+        <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Office</span><span class="p">.</span><span class="nf">all</span> <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
 <span class="k">end</span>
 </code></pre>
 </div>
 
-<p>Filters can be conditional/guarded as well:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/resources/employee_resource.rb</span>
-<span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
-  <span class="n">type</span> <span class="ss">:employees</span>
-  <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
-
-  <span class="n">allow_filter</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">if: :admin?</span>
-<span class="k">end</span>
-
-<span class="c1"># app/controllers/application_controller.rb</span>
-<span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
-  <span class="n">jsonapi</span> <span class="ss">resource: </span><span class="no">EmployeeResource</span>
-
-  <span class="k">def</span> <span class="nf">index</span>
-    <span class="n">render_jsonapi</span><span class="p">(</span><span class="no">Employee</span><span class="p">.</span><span class="nf">all</span><span class="p">)</span>
-  <span class="k">end</span>
-
-  <span class="k">def</span> <span class="nf">admin?</span>
-    <span class="n">current_user</span><span class="p">.</span><span class="nf">admin?</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre>
-</div>
-
-<p>In this example, the controller’s <code class="highlighter-rouge">#admin?</code> method would be called. If
-it returned false, we would allow filtering on this attribute, otherwise
-we would raise an error.</p>
+<p>In the above code, we group employees by <code class="highlighter-rouge">workspace_type</code>. When it’s a
+<code class="highlighter-rouge">Cubicle</code>, we use a different configuration than when it’s an <code class="highlighter-rouge">Office</code>.
+Note: both configurations use the same resource in this example - we’re
+starting with a different ‘base scope’, but after that everything is the
+same!</p>
 
             </div>
         </div>

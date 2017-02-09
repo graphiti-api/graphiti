@@ -2,7 +2,7 @@
 sectionid: jsonapi-plus
 sectionclass: h1
 title: JSON API Plus
-number: 15
+number: 22
 is-parent: true
 ---
 

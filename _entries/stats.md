@@ -2,7 +2,7 @@
 sectionid: stats
 sectionclass: h2
 title: Stats
-number: 18
+number: 25
 parent-id: jsonapi-plus
 ---
 
@@ -11,7 +11,10 @@ Imagine a grid listing records. The [Reads](https://jsonapi-suite.github.io/json
 These calculations are supported via `allow_stat`:
 
 ```ruby
-jsonapi do
+class EmployeeResource < JsonapiCompliable::Resource
+  type :employees
+  use_adapter JsonapiCompliable::Adapters::ActiveRecord
+
   allow_stat total: [:count]
 end
 ```
@@ -36,20 +39,16 @@ A few 'default calculations' are provided: `count`, `sum`, `average`,
 Alternatively, override these calculation functions:
 
 ```ruby
-jsonapi do
-  allow_stat :salary do
-    average { |scope, attr| scope.average(attr) }
-  end
+allow_stat :salary do
+  average { |scope, attr| scope.average(attr) }
 end
 ```
 
 Or support your own custom calculations:
 
 ```ruby
-jsonapi do
-  allow_stat salary: [:average] do
-    standard_deviation { |scope, attr| ... }
-  end
+allow_stat salary: [:average] do
+  standard_deviation { |scope, attr| ... }
 end
 ```
 

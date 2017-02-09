@@ -45,13 +45,23 @@
     </li>
     
     <li  class="parent">
+        <a href="#quickstart">Quickstart</a>
+        
+            <ul>
+                
+                
+            </ul>
+        
+    </li>
+    
+    <li  class="parent">
         <a href="#reads">Reads</a>
         
             <ul>
                 
                 
                     <li >
-                        <a href="#basics">The Basics</a>
+                        <a href="#resource-introduction">Resources</a>
                         
                     </li>
                 
@@ -61,7 +71,43 @@
                     </li>
                 
                     <li >
-                        <a href="#includes">Includes</a>
+                        <a href="#sorting">Sorting</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#pagination">Pagination</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#default-filters">Default Filters</a>
+                        
+                    </li>
+                
+                    <li class="parent">
+                        <a href="#sideloading">Sideloading</a>
+                        
+                            <ul>
+                                
+                                
+                                <li>
+                                    <a href="#sideloading-introduction">Introduction</a>
+                                </li>
+                                
+                                <li>
+                                    <a href="#sideloading-activerecord">ActiveRecord</a>
+                                </li>
+                                
+                                <li>
+                                    <a href="#advanced-activerecord">Advanced ActiveRecord</a>
+                                </li>
+                                
+                                <li>
+                                    <a href="#association-queries">Querying Associations</a>
+                                </li>
+                                
+                            </ul>
                         
                     </li>
                 
@@ -94,18 +140,23 @@
         
     </li>
     
-    <li >
+    <li  class="parent">
         <a href="#error-handling">Error Handling</a>
         
-    </li>
-    
-    <li >
-        <a href="#spec-helpers">Spec Helpers</a>
+            <ul>
+                
+                
+            </ul>
         
     </li>
     
-    <li >
-        <a href="#swagger">Swagger</a>
+    <li  class="parent">
+        <a href="#spec-helpers">Spec Helpers</a>
+        
+            <ul>
+                
+                
+            </ul>
         
     </li>
     
@@ -141,16 +192,26 @@
                 
                 
                     <li >
-                        <a href="#without-kaminari">Usage without Kaminari</a>
+                        <a href="#resource-dsl">Resource DSL</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#adapters">Adapters</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#elasticsearch">ElasticSearch</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#without-rails">Usage Without Rails</a>
                         
                     </li>
                 
             </ul>
-        
-    </li>
-    
-    <li >
-        <a href="#without-activerecord">Usage Without ActiveRecord</a>
         
     </li>
     
@@ -160,7 +221,7 @@
             <div class="content">
                 <span class="toggle">open</span>
                 <p>We touched on <a href="http://jsonapi.org/format/#errors">Error Objects</a> in the
-<a href="/entries#validations">validations section</a>. Let’s make this work for
+<a href="/#validations">validations section</a>. Let’s make this work for
 any random error our application might throw:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">API</span>

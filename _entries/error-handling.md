@@ -2,11 +2,12 @@
 sectionid: error-handling
 sectionclass: h1
 title: Error Handling
-number: 12
+is-parent: true
+number: 20
 ---
 
 We touched on [Error Objects](http://jsonapi.org/format/#errors) in the
-[validations section](/entries#validations). Let's make this work for
+[validations section](/#validations). Let's make this work for
 any random error our application might throw:
 
 ```ruby

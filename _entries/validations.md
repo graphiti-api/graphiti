@@ -3,7 +3,7 @@ sectionid: validations
 sectionclass: h2
 title: Validations
 parent-id: writes
-number: 10
+number: 18
 ---
 
 If our model has a validation error, we need to render a [JSON API Error

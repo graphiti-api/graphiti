@@ -45,13 +45,23 @@
     </li>
     
     <li  class="parent">
+        <a href="#quickstart">Quickstart</a>
+        
+            <ul>
+                
+                
+            </ul>
+        
+    </li>
+    
+    <li  class="parent">
         <a href="#reads">Reads</a>
         
             <ul>
                 
                 
                     <li >
-                        <a href="#basics">The Basics</a>
+                        <a href="#resource-introduction">Resources</a>
                         
                     </li>
                 
@@ -61,7 +71,43 @@
                     </li>
                 
                     <li >
-                        <a href="#includes">Includes</a>
+                        <a href="#sorting">Sorting</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#pagination">Pagination</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#default-filters">Default Filters</a>
+                        
+                    </li>
+                
+                    <li class="parent">
+                        <a href="#sideloading">Sideloading</a>
+                        
+                            <ul>
+                                
+                                
+                                <li>
+                                    <a href="#sideloading-introduction">Introduction</a>
+                                </li>
+                                
+                                <li>
+                                    <a href="#sideloading-activerecord">ActiveRecord</a>
+                                </li>
+                                
+                                <li>
+                                    <a href="#advanced-activerecord">Advanced ActiveRecord</a>
+                                </li>
+                                
+                                <li>
+                                    <a href="#association-queries">Querying Associations</a>
+                                </li>
+                                
+                            </ul>
                         
                     </li>
                 
@@ -94,18 +140,23 @@
         
     </li>
     
-    <li >
+    <li  class="parent">
         <a href="#error-handling">Error Handling</a>
         
-    </li>
-    
-    <li >
-        <a href="#spec-helpers">Spec Helpers</a>
+            <ul>
+                
+                
+            </ul>
         
     </li>
     
-    <li >
-        <a href="#swagger">Swagger</a>
+    <li  class="parent">
+        <a href="#spec-helpers">Spec Helpers</a>
+        
+            <ul>
+                
+                
+            </ul>
         
     </li>
     
@@ -141,16 +192,26 @@
                 
                 
                     <li >
-                        <a href="#without-kaminari">Usage without Kaminari</a>
+                        <a href="#resource-dsl">Resource DSL</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#adapters">Adapters</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#elasticsearch">ElasticSearch</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#without-rails">Usage Without Rails</a>
                         
                     </li>
                 
             </ul>
-        
-    </li>
-    
-    <li >
-        <a href="#without-activerecord">Usage Without ActiveRecord</a>
         
     </li>
     
@@ -162,7 +223,12 @@
                 <p>Let’s write a very simple controller:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
-  <span class="n">jsonapi</span> <span class="p">{</span> <span class="p">}</span>
+  <span class="n">jsonapi</span> <span class="k">do</span>
+    <span class="n">type</span> <span class="ss">:employees</span>
+    <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
+
+    <span class="n">allow_filter</span> <span class="ss">:name</span>
+  <span class="k">end</span>
 
   <span class="k">def</span> <span class="nf">index</span>
     <span class="n">employees</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">all</span>
@@ -178,6 +244,8 @@
   <li><a href="http://jsonapi.org/format/#fetching-pagination">Pagination</a></li>
   <li><a href="http://jsonapi.org/format/#fetching-sorting">Sorting</a></li>
   <li><a href="http://jsonapi.org/format/#fetching-sparse-fieldsets">Sparse Fieldsets</a></li>
+  <li><a href="http://jsonapi.org/format/#fetching-filtering">Filtering</a> the ‘name’
+attribute.</li>
   <li>A <a href="http://jsonapi.org/format/#document-structure">jsonapi.org compatible response</a></li>
 </ul>
 
@@ -186,6 +254,7 @@
 <ul>
   <li><code class="highlighter-rouge">http://localhost:3000/api/employees?page[number]=2&amp;page[size]=1</code></li>
   <li><code class="highlighter-rouge">http://localhost:3000/api/employees?sort=-name</code></li>
+  <li><code class="highlighter-rouge">http://localhost:3000/api/employees?filter[name]=Homer</code></li>
   <li><code class="highlighter-rouge">http://localhost:3000/api/employees?fields[employees]=name,age</code></li>
 </ul>
 
@@ -195,7 +264,7 @@
 later.</p>
 
 <p><code class="highlighter-rouge">render_jsonapi</code> is similar to <code class="highlighter-rouge">render :json</code> (actually <code class="highlighter-rouge">render :jsonapi</code> under-the-hood). However, it’s going to do
-some extra work for you. For starters, it will pass relavant arguments -
+some extra work for you. For starters, it will pass relevant arguments -
 like which sparse fieldsets were requested - to <code class="highlighter-rouge">render</code> for you.</p>
 
 <p><code class="highlighter-rouge">render_jsonapi</code> will also build the appropriate query scope. In this case
@@ -216,12 +285,15 @@ off of. In this case we’re automatically adding pagination, sorting, and
 <code class="highlighter-rouge">jsonapi_scope</code>. The following is equivalent:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">index</span>
+  <span class="c1"># returns a JsonapiCompliable::Scope object</span>
   <span class="n">scope</span> <span class="o">=</span> <span class="n">jsonapi_scope</span><span class="p">(</span><span class="no">Employee</span><span class="p">.</span><span class="nf">all</span><span class="p">)</span>
-  <span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
-
+  <span class="c1"># We can get lower-level access to the underlying 'scope object'</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">object</span> <span class="o">=</span> <span class="n">scope</span><span class="p">.</span><span class="nf">object</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
+  <span class="c1"># Resolve the scope to fire SQL and get actual Employee objects:</span>
+  <span class="n">results</span> <span class="o">=</span> <span class="n">scope</span><span class="p">.</span><span class="nf">resolve</span>
   <span class="c1"># Here we'll pass the actual records instead of</span>
-  <span class="c1"># a scope, the scoping logic has already fired.</span>
-  <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">scope</span><span class="p">.</span><span class="nf">to_a</span><span class="p">)</span>
+  <span class="c1"># a scope, as the scoping logic has already fired.</span>
+  <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="ss">scope: </span><span class="kp">false</span><span class="p">)</span>
 <span class="k">end</span>
 </code></pre>
 </div>
@@ -230,7 +302,7 @@ off of. In this case we’re automatically adding pagination, sorting, and
   <h6 id="remember-your-serializers">Remember Your Serializers!</h6>
   <div class="note-content">
     <p>This documentation assumes you’re roughly familiar with
-  <a href="http://jsonapi-rb.org">jsonapi-rb</a>. Note the above code would not output jsonapi unless a <code class="highlighter-rouge">SerializableEmployee</code> is defined. By convention, we would put this in <code class="highlighter-rouge">app/resources/serializable_employee.rb</code>.</p>
+  <a href="http://jsonapi-rb.org">jsonapi-rb</a>. Note the above code would not output jsonapi unless a <code class="highlighter-rouge">SerializableEmployee</code> is defined. By convention, we would put this in <code class="highlighter-rouge">app/serializers/serializable_employee.rb</code>.</p>
   </div>
 </div>
 <div style="height: 8rem;"></div>

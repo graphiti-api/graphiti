@@ -45,13 +45,23 @@
     </li>
     
     <li  class="parent">
+        <a href="#quickstart">Quickstart</a>
+        
+            <ul>
+                
+                
+            </ul>
+        
+    </li>
+    
+    <li  class="parent">
         <a href="#reads">Reads</a>
         
             <ul>
                 
                 
                     <li >
-                        <a href="#basics">The Basics</a>
+                        <a href="#resource-introduction">Resources</a>
                         
                     </li>
                 
@@ -61,7 +71,43 @@
                     </li>
                 
                     <li >
-                        <a href="#includes">Includes</a>
+                        <a href="#sorting">Sorting</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#pagination">Pagination</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#default-filters">Default Filters</a>
+                        
+                    </li>
+                
+                    <li class="parent">
+                        <a href="#sideloading">Sideloading</a>
+                        
+                            <ul>
+                                
+                                
+                                <li>
+                                    <a href="#sideloading-introduction">Introduction</a>
+                                </li>
+                                
+                                <li>
+                                    <a href="#sideloading-activerecord">ActiveRecord</a>
+                                </li>
+                                
+                                <li>
+                                    <a href="#advanced-activerecord">Advanced ActiveRecord</a>
+                                </li>
+                                
+                                <li>
+                                    <a href="#association-queries">Querying Associations</a>
+                                </li>
+                                
+                            </ul>
                         
                     </li>
                 
@@ -94,18 +140,23 @@
         
     </li>
     
-    <li >
+    <li  class="parent">
         <a href="#error-handling">Error Handling</a>
         
-    </li>
-    
-    <li >
-        <a href="#spec-helpers">Spec Helpers</a>
+            <ul>
+                
+                
+            </ul>
         
     </li>
     
-    <li >
-        <a href="#swagger">Swagger</a>
+    <li  class="parent">
+        <a href="#spec-helpers">Spec Helpers</a>
+        
+            <ul>
+                
+                
+            </ul>
         
     </li>
     
@@ -141,16 +192,26 @@
                 
                 
                     <li >
-                        <a href="#without-kaminari">Usage without Kaminari</a>
+                        <a href="#resource-dsl">Resource DSL</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#adapters">Adapters</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#elasticsearch">ElasticSearch</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#without-rails">Usage Without Rails</a>
                         
                     </li>
                 
             </ul>
-        
-    </li>
-    
-    <li >
-        <a href="#without-activerecord">Usage Without ActiveRecord</a>
         
     </li>
     
@@ -159,16 +220,42 @@
 
             <div class="content">
                 <span class="toggle">open</span>
-                <p>To get up and running, we need to install the gem and include a few
-modules. We’re making this a manual step so the code is more obvious
-to an outside developer:</p>
+                <p>If you’re using Rails:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># Gemfile</span>
-<span class="n">gem</span> <span class="s1">'jsonapi_suite'</span>
+<span class="n">gem</span> <span class="s1">'jsonapi_suite'</span><span class="p">,</span> <span class="s1">'~&gt; 0.5'</span>
+<span class="n">gem</span> <span class="s1">'jsonapi-rails'</span><span class="p">,</span> <span class="s1">'~&gt; 0.1'</span>
+
+<span class="c1"># config/initializers/jsonapi.rb</span>
+<span class="c1"># Require the ActiveRecord adapter if needed</span>
+<span class="nb">require</span> <span class="s1">'jsonapi_compliable/adapters/active_record'</span>
 
 <span class="c1"># app/controllers/application_controller.rb</span>
 <span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">API</span>
   <span class="kp">include</span> <span class="no">JsonapiSuite</span><span class="o">::</span><span class="no">ControllerMixin</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Without Rails:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># Gemfile</span>
+<span class="n">gem</span> <span class="s1">'jsonapi_suite'</span>
+
+<span class="c1"># Include the module where appropriate</span>
+<span class="c1"># For example, in Sinatra:</span>
+
+<span class="k">class</span> <span class="nc">TwitterApp</span> <span class="o">&lt;</span> <span class="no">Sinatra</span><span class="o">::</span><span class="no">Application</span>
+  <span class="c1"># Only Compliable is tested without Rails atm</span>
+  <span class="kp">include</span> <span class="no">JsonapiCompliable</span>
+
+  <span class="n">configure</span> <span class="k">do</span>
+    <span class="n">mime_type</span> <span class="ss">:jsonapi</span><span class="p">,</span> <span class="s1">'application/vnd.api+json'</span>
+  <span class="k">end</span>
+
+  <span class="n">before</span> <span class="k">do</span>
+    <span class="n">content_type</span> <span class="ss">:jsonapi</span>
+  <span class="k">end</span>
 <span class="k">end</span>
 </code></pre>
 </div>
@@ -180,7 +267,7 @@ to an outside developer:</p>
 <div style="height: 2rem;"></div>
 
 <div class="note info">
-  <h6 id="pagination">Pagination</h6>
+  <h6 id="pagination-libraries">Pagination Libraries</h6>
   <div class="note-content">
     <p>While not a requirement, you can get out-of-the-box pagination with any gem that adds <code class="highlighter-rouge">per</code> and <code class="highlighter-rouge">page</code> methods to your ActiveRecord scopes. We recommend <code class="highlighter-rouge">kaminari</code>:</p>
 

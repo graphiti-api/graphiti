@@ -220,11 +220,40 @@
 
             <div class="content">
                 <span class="toggle">open</span>
-                <p>There are times when the JSON API specification doesn’t yet support
-something…but you have this use case <em>now</em> and need to get your work
-done. We support a few of these scenarios in a way that is compatible
-with the current specification, but not defined within it - we call this
-<strong>JSON API Plus</strong>.</p>
+                <p>Similar to Resources, Sideloads can use the Adapter to DRY up this code. Using the <code class="highlighter-rouge">ActiveRecord</code> adapter, the following code is equivalent:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+  <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
+
+  <span class="n">belongs_to</span> <span class="ss">:department</span><span class="p">,</span>
+    <span class="ss">foreign_key: :department_id</span><span class="p">,</span>
+    <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Department</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+    <span class="ss">resource: </span><span class="no">DepartmentResource</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">DepartmentResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:departments</span>
+  <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
+
+  <span class="n">has_many</span> <span class="ss">:goals</span><span class="p">,</span>
+    <span class="ss">foreign_key: :department_id</span><span class="p">,</span>
+    <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Goal</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+    <span class="ss">resource: </span><span class="no">GoalResource</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>We passed:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">foreign_key</code> - Explicit, to avoid ActiveRecord reflection magic.</li>
+  <li><code class="highlighter-rouge">primary_key</code> (Optional) - Defaults to <code class="highlighter-rouge">id</code></li>
+  <li><code class="highlighter-rouge">scope</code> - The ‘base scope’ for DepartmentResource</li>
+  <li><code class="highlighter-rouge">resource</code> - Which will handle filtering/sorting/etc of this
+relationship. It will likely be re-used for the <code class="highlighter-rouge">/departments</code>
+endpoint.</li>
+</ul>
 
             </div>
         </div>

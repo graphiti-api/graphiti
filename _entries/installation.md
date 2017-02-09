@@ -5,17 +5,43 @@ title: Installation
 number: 3
 ---
 
-To get up and running, we need to install the gem and include a few
-modules. We're making this a manual step so the code is more obvious
-to an outside developer:
+If you're using Rails:
+
+```ruby
+# Gemfile
+gem 'jsonapi_suite', '~> 0.5'
+gem 'jsonapi-rails', '~> 0.1'
+
+# config/initializers/jsonapi.rb
+# Require the ActiveRecord adapter if needed
+require 'jsonapi_compliable/adapters/active_record'
+
+# app/controllers/application_controller.rb
+class ApplicationController < ActionController::API
+  include JsonapiSuite::ControllerMixin
+end
+```
+
+Without Rails:
 
 ```ruby
 # Gemfile
 gem 'jsonapi_suite'
 
-# app/controllers/application_controller.rb
-class ApplicationController < ActionController::API
-  include JsonapiSuite::ControllerMixin
+# Include the module where appropriate
+# For example, in Sinatra:
+
+class TwitterApp < Sinatra::Application
+  # Only Compliable is tested without Rails atm
+  include JsonapiCompliable
+
+  configure do
+    mime_type :jsonapi, 'application/vnd.api+json'
+  end
+
+  before do
+    content_type :jsonapi
+  end
 end
 ```
 
@@ -27,7 +53,7 @@ This suite is built on top of the mighty [jsonapi-rb](http://jsonapi-rb.org),
 
 {::options parse_block_html="true" /}
 <div class='note info'>
-###### Pagination
+###### Pagination Libraries
   <div class='note-content'>
   While not a requirement, you can get out-of-the-box pagination with any gem that adds `per` and `page` methods to your ActiveRecord scopes. We recommend `kaminari`:
 

@@ -220,11 +220,22 @@
 
             <div class="content">
                 <span class="toggle">open</span>
-                <p>There are times when the JSON API specification doesn’t yet support
-something…but you have this use case <em>now</em> and need to get your work
-done. We support a few of these scenarios in a way that is compatible
-with the current specification, but not defined within it - we call this
-<strong>JSON API Plus</strong>.</p>
+                <p>Sideloads can be thought of as nested Resources - in fact, a Sideload
+probably has an associated Resource object. Because of this, we can
+query our associations as well:</p>
+
+<ul>
+  <li>Filtering: <code class="highlighter-rouge">/employees?include=positions&amp;filter[positions][title]=Manager</code></li>
+  <li>Sorting: <code class="highlighter-rouge">/employees?include=positions&amp;sort=positions.title</code></li>
+  <li>Sparse fieldsets:
+<code class="highlighter-rouge">/employees?include=positions&amp;fields[positions]=title,salary</code></li>
+  <li>Pagination:
+<code class="highlighter-rouge">/employees/123?include=positions&amp;page[positions][size]=10</code></li>
+</ul>
+
+<p>Note - in our pagination example, we’re hitting the <code class="highlighter-rouge">show</code> action. Due
+to the nature of sideloading, paginating relationships of an array may
+have issues.</p>
 
             </div>
         </div>

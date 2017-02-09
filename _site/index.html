@@ -45,13 +45,23 @@
     </li>
     
     <li  class="parent">
+        <a href="#quickstart">Quickstart</a>
+        
+            <ul>
+                
+                
+            </ul>
+        
+    </li>
+    
+    <li  class="parent">
         <a href="#reads">Reads</a>
         
             <ul>
                 
                 
                     <li >
-                        <a href="#basics">The Basics</a>
+                        <a href="#resource-introduction">Resources</a>
                         
                     </li>
                 
@@ -61,7 +71,43 @@
                     </li>
                 
                     <li >
-                        <a href="#includes">Includes</a>
+                        <a href="#sorting">Sorting</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#pagination">Pagination</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#default-filters">Default Filters</a>
+                        
+                    </li>
+                
+                    <li class="parent">
+                        <a href="#sideloading">Sideloading</a>
+                        
+                            <ul>
+                                
+                                
+                                <li>
+                                    <a href="#sideloading-introduction">Introduction</a>
+                                </li>
+                                
+                                <li>
+                                    <a href="#sideloading-activerecord">ActiveRecord</a>
+                                </li>
+                                
+                                <li>
+                                    <a href="#advanced-activerecord">Advanced ActiveRecord</a>
+                                </li>
+                                
+                                <li>
+                                    <a href="#association-queries">Querying Associations</a>
+                                </li>
+                                
+                            </ul>
                         
                     </li>
                 
@@ -94,18 +140,23 @@
         
     </li>
     
-    <li >
+    <li  class="parent">
         <a href="#error-handling">Error Handling</a>
         
-    </li>
-    
-    <li >
-        <a href="#spec-helpers">Spec Helpers</a>
+            <ul>
+                
+                
+            </ul>
         
     </li>
     
-    <li >
-        <a href="#swagger">Swagger</a>
+    <li  class="parent">
+        <a href="#spec-helpers">Spec Helpers</a>
+        
+            <ul>
+                
+                
+            </ul>
         
     </li>
     
@@ -141,16 +192,26 @@
                 
                 
                     <li >
-                        <a href="#without-kaminari">Usage without Kaminari</a>
+                        <a href="#resource-dsl">Resource DSL</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#adapters">Adapters</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#elasticsearch">ElasticSearch</a>
+                        
+                    </li>
+                
+                    <li >
+                        <a href="#without-rails">Usage Without Rails</a>
                         
                     </li>
                 
             </ul>
-        
-    </li>
-    
-    <li >
-        <a href="#without-activerecord">Usage Without ActiveRecord</a>
         
     </li>
     
@@ -165,8 +226,6 @@
 
 
     
-
-    
         <section id="intro" class="h1">
             
                   <h1><a href="#intro" name="intro">Introduction</a></h1>
@@ -174,12 +233,11 @@
 
             <p>Welcome to JSONAPI Suite! This gem is a collection of libraries to
 enabled quick and easy <a href="http://jsonapi.org">jsonapi.org</a>-compatible APIs
-with <a href="http://rubyonrails.org">Ruby on Rails</a>.</p>
+with Ruby. <a href="http://rubyonrails.org">Rails</a> is recommended, but not
+required.</p>
 
 <p>If you only have 5 seconds to look at this, we recommend you take a
 glance at <a href="#basics">The Basics</a>.</p>
-
-<p>There is also a <a href="https://github.com/jsonapi-suite/jsonapi_suite_sample_app">sample Rails/Ember application</a> to see real-world usage.</p>
 
         </section>
     
@@ -214,16 +272,42 @@ glance at <a href="#basics">The Basics</a>.</p>
                   <h1><a href="#installation" name="installation">Installation</a></h1>
                 
 
-            <p>To get up and running, we need to install the gem and include a few
-modules. We’re making this a manual step so the code is more obvious
-to an outside developer:</p>
+            <p>If you’re using Rails:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># Gemfile</span>
-<span class="n">gem</span> <span class="s1">'jsonapi_suite'</span>
+<span class="n">gem</span> <span class="s1">'jsonapi_suite'</span><span class="p">,</span> <span class="s1">'~&gt; 0.5'</span>
+<span class="n">gem</span> <span class="s1">'jsonapi-rails'</span><span class="p">,</span> <span class="s1">'~&gt; 0.1'</span>
+
+<span class="c1"># config/initializers/jsonapi.rb</span>
+<span class="c1"># Require the ActiveRecord adapter if needed</span>
+<span class="nb">require</span> <span class="s1">'jsonapi_compliable/adapters/active_record'</span>
 
 <span class="c1"># app/controllers/application_controller.rb</span>
 <span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">API</span>
   <span class="kp">include</span> <span class="no">JsonapiSuite</span><span class="o">::</span><span class="no">ControllerMixin</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Without Rails:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># Gemfile</span>
+<span class="n">gem</span> <span class="s1">'jsonapi_suite'</span>
+
+<span class="c1"># Include the module where appropriate</span>
+<span class="c1"># For example, in Sinatra:</span>
+
+<span class="k">class</span> <span class="nc">TwitterApp</span> <span class="o">&lt;</span> <span class="no">Sinatra</span><span class="o">::</span><span class="no">Application</span>
+  <span class="c1"># Only Compliable is tested without Rails atm</span>
+  <span class="kp">include</span> <span class="no">JsonapiCompliable</span>
+
+  <span class="n">configure</span> <span class="k">do</span>
+    <span class="n">mime_type</span> <span class="ss">:jsonapi</span><span class="p">,</span> <span class="s1">'application/vnd.api+json'</span>
+  <span class="k">end</span>
+
+  <span class="n">before</span> <span class="k">do</span>
+    <span class="n">content_type</span> <span class="ss">:jsonapi</span>
+  <span class="k">end</span>
 <span class="k">end</span>
 </code></pre>
 </div>
@@ -235,7 +319,7 @@ to an outside developer:</p>
 <div style="height: 2rem;"></div>
 
 <div class="note info">
-  <h6 id="pagination">Pagination</h6>
+  <h6 id="pagination-libraries">Pagination Libraries</h6>
   <div class="note-content">
     <p>While not a requirement, you can get out-of-the-box pagination with any gem that adds <code class="highlighter-rouge">per</code> and <code class="highlighter-rouge">page</code> methods to your ActiveRecord scopes. We recommend <code class="highlighter-rouge">kaminari</code>:</p>
 
@@ -254,26 +338,20 @@ to an outside developer:</p>
     
 
     
-        <section id="reads" class="h1">
+        <section id="quickstart" class="h1">
             
-                  <h1><a href="#reads" name="reads">Reads</a></h1>
-                
-
-            
-
-        </section>
-    
-
-    
-        <section id="basics" class="h2">
-            
-                  <h2><a href="#basics" name="basics">The Basics</a></h2>
+                  <h1><a href="#quickstart" name="quickstart">Quickstart</a></h1>
                 
 
             <p>Let’s write a very simple controller:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
-  <span class="n">jsonapi</span> <span class="p">{</span> <span class="p">}</span>
+  <span class="n">jsonapi</span> <span class="k">do</span>
+    <span class="n">type</span> <span class="ss">:employees</span>
+    <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
+
+    <span class="n">allow_filter</span> <span class="ss">:name</span>
+  <span class="k">end</span>
 
   <span class="k">def</span> <span class="nf">index</span>
     <span class="n">employees</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">all</span>
@@ -289,6 +367,8 @@ to an outside developer:</p>
   <li><a href="http://jsonapi.org/format/#fetching-pagination">Pagination</a></li>
   <li><a href="http://jsonapi.org/format/#fetching-sorting">Sorting</a></li>
   <li><a href="http://jsonapi.org/format/#fetching-sparse-fieldsets">Sparse Fieldsets</a></li>
+  <li><a href="http://jsonapi.org/format/#fetching-filtering">Filtering</a> the ‘name’
+attribute.</li>
   <li>A <a href="http://jsonapi.org/format/#document-structure">jsonapi.org compatible response</a></li>
 </ul>
 
@@ -297,6 +377,7 @@ to an outside developer:</p>
 <ul>
   <li><code class="highlighter-rouge">http://localhost:3000/api/employees?page[number]=2&amp;page[size]=1</code></li>
   <li><code class="highlighter-rouge">http://localhost:3000/api/employees?sort=-name</code></li>
+  <li><code class="highlighter-rouge">http://localhost:3000/api/employees?filter[name]=Homer</code></li>
   <li><code class="highlighter-rouge">http://localhost:3000/api/employees?fields[employees]=name,age</code></li>
 </ul>
 
@@ -306,7 +387,7 @@ to an outside developer:</p>
 later.</p>
 
 <p><code class="highlighter-rouge">render_jsonapi</code> is similar to <code class="highlighter-rouge">render :json</code> (actually <code class="highlighter-rouge">render :jsonapi</code> under-the-hood). However, it’s going to do
-some extra work for you. For starters, it will pass relavant arguments -
+some extra work for you. For starters, it will pass relevant arguments -
 like which sparse fieldsets were requested - to <code class="highlighter-rouge">render</code> for you.</p>
 
 <p><code class="highlighter-rouge">render_jsonapi</code> will also build the appropriate query scope. In this case
@@ -327,12 +408,15 @@ off of. In this case we’re automatically adding pagination, sorting, and
 <code class="highlighter-rouge">jsonapi_scope</code>. The following is equivalent:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">index</span>
+  <span class="c1"># returns a JsonapiCompliable::Scope object</span>
   <span class="n">scope</span> <span class="o">=</span> <span class="n">jsonapi_scope</span><span class="p">(</span><span class="no">Employee</span><span class="p">.</span><span class="nf">all</span><span class="p">)</span>
-  <span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
-
+  <span class="c1"># We can get lower-level access to the underlying 'scope object'</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">object</span> <span class="o">=</span> <span class="n">scope</span><span class="p">.</span><span class="nf">object</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
+  <span class="c1"># Resolve the scope to fire SQL and get actual Employee objects:</span>
+  <span class="n">results</span> <span class="o">=</span> <span class="n">scope</span><span class="p">.</span><span class="nf">resolve</span>
   <span class="c1"># Here we'll pass the actual records instead of</span>
-  <span class="c1"># a scope, the scoping logic has already fired.</span>
-  <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">scope</span><span class="p">.</span><span class="nf">to_a</span><span class="p">)</span>
+  <span class="c1"># a scope, as the scoping logic has already fired.</span>
+  <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="ss">scope: </span><span class="kp">false</span><span class="p">)</span>
 <span class="k">end</span>
 </code></pre>
 </div>
@@ -341,10 +425,153 @@ off of. In this case we’re automatically adding pagination, sorting, and
   <h6 id="remember-your-serializers">Remember Your Serializers!</h6>
   <div class="note-content">
     <p>This documentation assumes you’re roughly familiar with
-  <a href="http://jsonapi-rb.org">jsonapi-rb</a>. Note the above code would not output jsonapi unless a <code class="highlighter-rouge">SerializableEmployee</code> is defined. By convention, we would put this in <code class="highlighter-rouge">app/resources/serializable_employee.rb</code>.</p>
+  <a href="http://jsonapi-rb.org">jsonapi-rb</a>. Note the above code would not output jsonapi unless a <code class="highlighter-rouge">SerializableEmployee</code> is defined. By convention, we would put this in <code class="highlighter-rouge">app/serializers/serializable_employee.rb</code>.</p>
   </div>
 </div>
 <div style="height: 8rem;"></div>
+
+        </section>
+    
+
+    
+        <section id="reads" class="h1">
+            
+                  <h1><a href="#reads" name="reads">Reads</a></h1>
+                
+
+            
+
+        </section>
+    
+
+    
+        <section id="resource-introduction" class="h2">
+            
+                  <h2><a href="#resource-introduction" name="resource-introduction">Resources</a></h2>
+                
+
+            <p>A <code class="highlighter-rouge">Resource</code> defines a ‘query chain’ for a given object. Think of this
+ActiveRecord code, querying for 20 active employees, sorted by name
+descending:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">scope</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">all</span> <span class="c1"># no query fired</span>
+<span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span><span class="p">.</span><span class="nf">order</span><span class="p">(</span><span class="ss">name: :desc</span><span class="p">)</span> <span class="k">if</span> <span class="n">order_by_name?</span>
+<span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">true</span><span class="p">)</span> <span class="k">if</span> <span class="n">only_active?</span>
+<span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span><span class="p">.</span><span class="nf">page</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="nf">per</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span> <span class="k">if</span> <span class="n">paginated?</span>
+<span class="n">scope</span><span class="p">.</span><span class="nf">to_a</span> <span class="c1"># query finally fires</span>
+</code></pre>
+</div>
+
+<p>In order to satisfy the dynamic nature of JSONAPI query parameters, we
+want to do something similar - parse and normalize the incoming payload,
+then gradually build up a scope. Let’s express the above code as a
+JSONAPI query:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>/employees?sort=-name&amp;filter[active]=true&amp;page[number]=1&amp;page[size]=20
+</code></pre>
+</div>
+
+<p>And satisfy that query with a resource that knows how to filter, sort,
+and paginate the relevant parameters:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+
+  <span class="n">allow_filter</span> <span class="ss">:active</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="n">value</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">sort</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">direction</span><span class="o">|</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">order</span><span class="p">(</span><span class="n">attribute</span> <span class="o">=&gt;</span> <span class="n">direction</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">page</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">current_page</span><span class="p">,</span> <span class="n">per_page</span><span class="o">|</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">per</span><span class="p">(</span><span class="n">per_page</span><span class="p">).</span><span class="nf">page</span><span class="p">(</span><span class="n">current_page</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># app/controllers/employees_controller.rb</span>
+<span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">jsonapi</span> <span class="ss">resource: </span><span class="no">EmployeeResource</span>
+
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="n">render_jsonapi</span><span class="p">(</span><span class="no">Employee</span><span class="p">.</span><span class="nf">all</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The above code starts with a base scope - <code class="highlighter-rouge">Employee.all</code> - then chains the
+‘active’ filter, then chains the sorting criteria, then chains
+pagination. Grunt work like
+translating <code class="highlighter-rouge">-books</code> to <code class="highlighter-rouge"><span class="p">{</span><span class="w"> </span><span class="err">books:</span><span class="w"> </span><span class="err">:desc</span><span class="w"> </span><span class="p">}</span></code> is taken care of
+behind-the-scenes.</p>
+
+<p>The above code isn’t very DRY, though - we’d repeat the same logic for
+all our queryable entities. Instead, let’s use an <strong>adapter</strong>, that will
+provide sensible defaults:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+  <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
+
+  <span class="n">allow_filter</span> <span class="ss">:active</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<ul>
+  <li>We applied the ‘ActiveRecord’ adapter</li>
+  <li>Sorting and pagination came for free</li>
+  <li>We no longer had to pass a block to <code class="highlighter-rouge">allow_filter</code></li>
+</ul>
+
+<p>Of course, we could always override the adapter’s default behavior as well.</p>
+
+<p>None of this is tied to ActiveRecord - instead, let’s build up a simple
+hash we can pass to something else down the line:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+
+  <span class="n">allow_filter</span> <span class="ss">:active</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">merge</span><span class="p">(</span><span class="ss">active: </span><span class="n">value</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">sort</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">direction</span><span class="o">|</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">merge</span><span class="p">(</span><span class="ss">order: </span><span class="p">{</span> <span class="n">attribute</span> <span class="o">=&gt;</span> <span class="n">direction</span> <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="n">page</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">current_page</span><span class="p">,</span> <span class="n">per_page</span><span class="o">|</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">merge</span><span class="p">(</span><span class="ss">page: </span><span class="n">current_page</span><span class="p">,</span> <span class="ss">per_page: </span><span class="n">per_page</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># app/controllers/employees_controller.rb</span>
+<span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">jsonapi</span> <span class="ss">resource: </span><span class="no">EmployeeResource</span>
+
+  <span class="c1"># The output of scope.resolve would be:</span>
+  <span class="c1">#</span>
+  <span class="c1"># {</span>
+  <span class="c1">#   active: true,</span>
+  <span class="c1">#   order: { name: :desc },</span>
+  <span class="c1">#   page: 1,</span>
+  <span class="c1">#   per_page: 20</span>
+  <span class="c1"># }</span>
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="n">scope</span> <span class="o">=</span> <span class="n">jsonapi_scope</span><span class="p">({})</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="no">MyService</span><span class="p">.</span><span class="nf">get_results</span><span class="p">(</span><span class="n">scope</span><span class="p">.</span><span class="nf">resolve</span><span class="p">.</span><span class="nf">first</span><span class="p">)</span>
+    <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="ss">scope: </span><span class="kp">false</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Resources are quite flexible - we’ll expand on their capabilities in the
+following sections.</p>
 
         </section>
     
@@ -355,134 +582,406 @@ off of. In this case we’re automatically adding pagination, sorting, and
                   <h2><a href="#filtering" name="filtering">Filtering</a></h2>
                 
 
-            <p>Let’s have some fun implementing <a href="http://jsonapi.org/format/#fetching-filtering">filtering</a>.</p>
+            <p>Use <code class="highlighter-rouge">allow_filter</code> in your resource to whitelist filters:</p>
 
-<p>Assume we’re using ActiveRecord and want to filter records based on name
-and email:</p>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+  <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
-  <span class="n">jsonapi</span> <span class="k">do</span>
-    <span class="n">allow_filter</span> <span class="ss">:name</span>
-    <span class="n">allow_filter</span> <span class="ss">:email</span>
+  <span class="n">allow_filter</span> <span class="ss">:name</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>If a request
+comes in for a filter that is not whitelisted, a
+<code class="highlighter-rouge">JsonapiCompliable::Errors::BadFilter</code> error will be raised.</p>
+
+<p>Customize the filter by passing a block:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+  <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
+
+  <span class="n">allow_filter</span> <span class="ss">:name_prefix</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">([</span><span class="s2">"name LIKE ?"</span><span class="p">,</span> <span class="s2">"</span><span class="si">#{</span><span class="n">value</span><span class="si">}</span><span class="s2">%"</span><span class="p">])</span>
   <span class="k">end</span>
-  <span class="c1"># ... code ...</span>
 <span class="k">end</span>
 </code></pre>
 </div>
 
-<p>Congratulations! You can now filter on name, email, or both. In other
-words, these URLs now work:</p>
+<p>Filters can be conditional/guarded as well:</p>
 
-<ul>
-  <li><code class="highlighter-rouge">/api/employees?filter[name]=Homer</code></li>
-  <li><code class="highlighter-rouge">/api/employees?filter[email]=chunkylover53@hotmail.com</code></li>
-  <li><code class="highlighter-rouge">/api/employees?filter[name]=Homer&amp;email=chunkylover53@hotmail.com</code></li>
-</ul>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+  <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
 
-<p>What if you want to filter on something that’s not an attribute, like
-all names starting with ‘hom’? Simply pass a block to <code class="highlighter-rouge">allow_filter</code> and
-chain onto your scope:</p>
+  <span class="n">allow_filter</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">if: :admin?</span>
+<span class="k">end</span>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">allow_filter</span> <span class="ss">:name_prefix</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
-  <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">([</span><span class="s2">"name LIKE ?"</span><span class="p">,</span> <span class="s2">"</span><span class="si">#{</span><span class="n">value</span><span class="si">}</span><span class="s2">%"</span><span class="p">])</span>
+<span class="c1"># app/controllers/application_controller.rb</span>
+<span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">jsonapi</span> <span class="ss">resource: </span><span class="no">EmployeeResource</span>
+
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="n">render_jsonapi</span><span class="p">(</span><span class="no">Employee</span><span class="p">.</span><span class="nf">all</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">admin?</span>
+    <span class="n">current_user</span><span class="p">.</span><span class="nf">admin?</span>
+  <span class="k">end</span>
 <span class="k">end</span>
 </code></pre>
 </div>
 
-<p>Or maybe we’re using <a href="https://github.com/mbleigh/acts-as-taggable-on">acts_as_taggable_on</a> and want to find all employees with a given tag:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">allow_filter</span> <span class="ss">:tag</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
-  <span class="n">scope</span><span class="p">.</span><span class="nf">tagged_with</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="ss">any: </span><span class="kp">true</span><span class="p">)</span>
-<span class="k">end</span>
-</code></pre>
-</div>
-
-<p>Filters can be conditional as well. Let’s say we want to allow filtering
-on <code class="highlighter-rouge">salary</code> if the user is an admin:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">allow_filter</span> <span class="ss">:salary</span><span class="p">,</span> <span class="ss">if: :admin?</span>
-
-<span class="c1"># ... code ...</span>
-
-<span class="k">def</span> <span class="nf">admin?</span>
-  <span class="n">current_user</span><span class="p">.</span><span class="nf">role</span> <span class="o">==</span> <span class="s1">'admin'</span>
-<span class="k">end</span>
-</code></pre>
-</div>
-
-<div class="note info">
-  <h6 id="customizing-filters">Customizing Filters</h6>
-  <div class="note-content">
-    <p>There are a number of ways to customize filters. To see full
-  documentation, check out <a href="https://github.com/jsonapi-suite/jsonapi_compliable">jsonapi_compliable</a>.</p>
-  </div>
-</div>
-<div style="height: 7rem"></div>
+<p>In this example, the controller’s <code class="highlighter-rouge">#admin?</code> method would be called. If
+it returned false, we would allow filtering on this attribute, otherwise
+we would raise an error.</p>
 
         </section>
     
 
     
-        <section id="includes" class="h2">
+        <section id="sorting" class="h2">
             
-                  <h2><a href="#includes" name="includes">Includes</a></h2>
+                  <h2><a href="#sorting" name="sorting">Sorting</a></h2>
                 
 
-            <p><a href="http://jsonapi.org/format/#fetching-includes">Inclusion of related resources</a> (<em>‘sideloading’</em>) is critical to JSON API. We need to do three things to support this feature:</p>
+            <p>Use <code class="highlighter-rouge">sort</code> in your resource to override the sorting behavior:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+
+  <span class="n">sort</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">direction</span><span class="o">|</span>
+    <span class="k">if</span> <span class="n">direction</span> <span class="o">=</span> <span class="ss">:seniority_level</span>
+      <span class="n">scope</span><span class="p">.</span><span class="nf">joins</span><span class="p">(</span><span class="ss">:positions</span><span class="p">).</span><span class="nf">order</span><span class="p">(</span><span class="s2">"positions.seniority_level </span><span class="si">#{</span><span class="n">direction</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">else</span>
+      <span class="n">scope</span><span class="p">.</span><span class="nf">order</span><span class="p">(</span><span class="n">attribute</span> <span class="o">=&gt;</span> <span class="n">direction</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>This will multisort as well, given a URL like
+<code class="highlighter-rouge">/employees?sort=first_name,last_name</code>.</p>
+
+<p>The default sort is <code class="highlighter-rouge">id ascending</code>. To change this:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="c1"># ... code ...</span>
+
+  <span class="n">default_sort</span><span class="p">([{</span> <span class="ss">title: :desc</span> <span class="p">}])</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+        </section>
+    
+
+    
+        <section id="pagination" class="h2">
+            
+                  <h2><a href="#pagination" name="pagination">Pagination</a></h2>
+                
+
+            <p>Use <code class="highlighter-rouge">paginate</code> in your resource to override the pagination behavior. The
+following example shows how to use <a href="https://github.com/mislav/will_paginate">will_paginate</a> instead of the default Kaminari:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+  <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
+
+  <span class="n">paginate</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">current_page</span><span class="p">,</span> <span class="n">per_page</span><span class="o">|</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">paginate</span><span class="p">(</span><span class="ss">page: </span><span class="n">current_page</span><span class="p">,</span> <span class="ss">per_page: </span><span class="n">per_page</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+        </section>
+    
+
+    
+        <section id="default-filters" class="h2">
+            
+                  <h2><a href="#default-filters" name="default-filters">Default Filters</a></h2>
+                
+
+            <p>Use <code class="highlighter-rouge">default_filter</code> in your resource when you want to apply a base
+scope without user parameters. Maybe we should only show ‘active’
+employees by default:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+  <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
+
+  <span class="n">default_filter</span> <span class="ss">:active</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="o">|</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Default filters can be overridden when the corresponding filter is sent
+in the query parameters:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>/employees?filter[active]=false
+</code></pre>
+</div>
+
+<p>Would override the default filter and show all inactive employees.</p>
+
+        </section>
+    
+
+    
+        <section id="sideloading" class="h2">
+            
+                  <h2><a href="#sideloading" name="sideloading">Sideloading</a></h2>
+                
+
+            
+
+        </section>
+    
+
+    
+        <section id="sideloading-introduction" class="h3">
+            
+                  <h3><a href="#sideloading-introduction" name="sideloading-introduction">Introduction</a></h3>
+                
+
+            <p>JSONAPI has the <code class="highlighter-rouge">?include</code> query parameter (<a href="http://jsonapi.org/format/#fetching-includes">documentation</a>), which is used to ‘sideload’
+relationships. We use Resource objects for our main entities, and
+<strong>Sideload</strong> objects for the relationships.</p>
+
+<p>Similar to a Resource, a Sideload defines how we’re going to build up a
+scope. But instead of defining pagination, sorting, etc, we need to
+define:</p>
 
 <ul>
-  <li>Render the requested resources in <code class="highlighter-rouge">included</code>.</li>
-  <li>Make sure our ORM eager loads all relationships to avoid N+1 issues.</li>
-  <li>Whitelist certain includes. You probably don’t want to expose your
-entire object graph, for both performance and security concerns.</li>
+  <li>How to build a base scope for this relationship from the main
+entities.</li>
+  <li>How to assign the results of this sideload to the main entities.</li>
 </ul>
 
-<p>The suite will handle this for you. Just add a whitelist:</p>
+<p>In code, we do this through the <code class="highlighter-rouge">scope</code> and <code class="highlighter-rouge">assign</code> lambdas:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi</span> <span class="k">do</span>
-  <span class="n">includes</span> <span class="ss">whitelist: </span><span class="p">{</span> <span class="ss">index: </span><span class="s1">'tags'</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+  <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
+
+  <span class="n">allow_sideload</span> <span class="ss">:department</span><span class="p">,</span> <span class="ss">resource: </span><span class="no">DepartmentResource</span> <span class="k">do</span>
+    <span class="c1"># We've resolved the employee scope to an array of Employee objects</span>
+    <span class="c1"># Now we need to specify how to get departments for those employees.</span>
+    <span class="n">scope</span> <span class="k">do</span> <span class="o">|</span><span class="n">employees</span><span class="o">|</span>
+      <span class="no">Department</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">id: </span><span class="n">employees</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:department_id</span><span class="p">))</span>
+    <span class="k">end</span>
+
+    <span class="c1"># Now we've resolved BOTH the Employee and Department scopes</span>
+    <span class="c1"># Assign relevant department to each employee</span>
+    <span class="n">assign</span> <span class="k">do</span> <span class="o">|</span><span class="n">employees</span><span class="p">,</span> <span class="n">departments</span><span class="o">|</span>
+      <span class="n">employees</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span>
+        <span class="n">e</span><span class="p">.</span><span class="nf">department</span> <span class="o">=</span> <span class="n">departments</span><span class="p">.</span><span class="nf">find</span> <span class="p">{</span> <span class="o">|</span><span class="n">d</span><span class="o">|</span> <span class="n">d</span><span class="p">.</span><span class="nf">id</span> <span class="o">==</span> <span class="n">e</span><span class="p">.</span><span class="nf">department_id</span> <span class="p">}</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
 <span class="k">end</span>
 </code></pre>
 </div>
 
-<p>No other code changes are required. Our endpoint now supports
-<code class="highlighter-rouge">/api/employees?include=tags</code>, putting all <code class="highlighter-rouge">Tag</code> resources in <code class="highlighter-rouge">included</code>. Any resources requested that have not been whitelisted will be silently dropped.</p>
+<p><strong>Note:</strong> - <code class="highlighter-rouge">scope</code> must return a chainable scope object - it’s going to be passed
+to DepartmentResource so that we can sort/filter/etc our relationships
+as well.</p>
 
-<p>Nesting includes is also supported:</p>
+<p>Finally, sideloads are nested. Let’s say each <code class="highlighter-rouge">Department</code> has many
+<code class="highlighter-rouge">Goal</code>s. We want to load employees, their departments, and the goals for
+those departments:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi</span> <span class="k">do</span>
-  <span class="n">includes</span> <span class="ss">whitelist: </span><span class="p">{</span> <span class="ss">index: </span><span class="p">[</span><span class="s1">'tags'</span><span class="p">,</span> <span class="p">{</span> <span class="ss">department: </span><span class="s1">'goals'</span> <span class="p">}]</span> <span class="p">}</span>
+<div class="highlighter-rouge"><pre class="highlight"><code>/employees?include=department.goals
+</code></pre>
+</div>
+
+<p>As long as the <code class="highlighter-rouge">DepartmentResource</code> has a <code class="highlighter-rouge">goals</code> sideload, this query
+will work. However, we may want to ‘whitelist’ only a subset of possible
+sideloads, to accomodate load or security issues:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">jsonapi</span> <span class="ss">resource: </span><span class="no">EmployeeResource</span> <span class="k">do</span>
+    <span class="n">sideload_whitelist</span><span class="p">({</span>
+      <span class="ss">index: :department</span><span class="p">,</span>
+      <span class="ss">show: </span><span class="p">{</span> <span class="ss">department: :goals</span> <span class="p">}</span>
+    <span class="p">})</span>
+  <span class="k">end</span>
 <span class="k">end</span>
 </code></pre>
 </div>
 
-<p>Would support the endpoint
-<code class="highlighter-rouge">/api/employees?include=tags,department.goals</code>. This is why the
-whitelist is a hash - you may want to limit the whitelist for <code class="highlighter-rouge">index</code>
-for performance reasons:</p>
+        </section>
+    
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi</span> <span class="k">do</span>
-  <span class="n">includes</span> <span class="ss">whitelist: </span><span class="p">{</span>
-    <span class="ss">index: :department</span><span class="p">,</span>
-    <span class="ss">show: </span><span class="p">[</span><span class="s1">'tags'</span><span class="p">,</span> <span class="p">{</span> <span class="ss">department: </span><span class="s1">'goals'</span> <span class="p">}]</span> <span class="p">}</span>
-  <span class="p">}</span>
+    
+        <section id="sideloading-activerecord" class="h4">
+            
+                  <h4><a href="#sideloading-activerecord" name="sideloading-activerecord">ActiveRecord</a></h4>
+            
+
+            <p>Similar to Resources, Sideloads can use the Adapter to DRY up this code. Using the <code class="highlighter-rouge">ActiveRecord</code> adapter, the following code is equivalent:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+  <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
+
+  <span class="n">belongs_to</span> <span class="ss">:department</span><span class="p">,</span>
+    <span class="ss">foreign_key: :department_id</span><span class="p">,</span>
+    <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Department</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+    <span class="ss">resource: </span><span class="no">DepartmentResource</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">DepartmentResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:departments</span>
+  <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
+
+  <span class="n">has_many</span> <span class="ss">:goals</span><span class="p">,</span>
+    <span class="ss">foreign_key: :department_id</span><span class="p">,</span>
+    <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Goal</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+    <span class="ss">resource: </span><span class="no">GoalResource</span>
 <span class="k">end</span>
 </code></pre>
 </div>
 
-<div class="note info">
-  <h6 id="ensure-your-serializer-specifies-relationships">Ensure your serializer specifies relationships</h6>
-  <div class="note-content">
-    <p>The above code assumes relationships are specified in your serializers
-  as well. Our <code class="highlighter-rouge">EmployeeSerializer</code> would need:</p>
+<p>We passed:</p>
 
-    <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">belongs_to</span> <span class="ss">:department</span>
-<span class="n">has_many</span> <span class="ss">:tags</span>
+<ul>
+  <li><code class="highlighter-rouge">foreign_key</code> - Explicit, to avoid ActiveRecord reflection magic.</li>
+  <li><code class="highlighter-rouge">primary_key</code> (Optional) - Defaults to <code class="highlighter-rouge">id</code></li>
+  <li><code class="highlighter-rouge">scope</code> - The ‘base scope’ for DepartmentResource</li>
+  <li><code class="highlighter-rouge">resource</code> - Which will handle filtering/sorting/etc of this
+relationship. It will likely be re-used for the <code class="highlighter-rouge">/departments</code>
+endpoint.</li>
+</ul>
+
+        </section>
+    
+
+    
+        <section id="advanced-activerecord" class="h4">
+            
+                  <h4><a href="#advanced-activerecord" name="advanced-activerecord">Advanced ActiveRecord</a></h4>
+            
+
+            <p>In addition to <code class="highlighter-rouge">belongs_to</code> and <code class="highlighter-rouge">has_many</code>, we have
+<code class="highlighter-rouge">has_and_belongs_to_many</code>. Everything is the same, but the foreign key
+must be a composite key that includes the <code class="highlighter-rouge">through</code> table. Given these
+models:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Employee</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">has_many</span> <span class="ss">:taggings</span>
+  <span class="n">has_many</span> <span class="ss">:tags</span><span class="p">,</span> <span class="ss">through: :taggings</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Tagging</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">belongs_to</span> <span class="ss">:employee</span>
+  <span class="n">belongs_to</span> <span class="ss">:tag</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Tag</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">has_many</span> <span class="ss">:taggings</span>
+  <span class="n">has_many</span> <span class="ss">:employees</span><span class="p">,</span> <span class="ss">through: :taggings</span>
+<span class="k">end</span>
 </code></pre>
-    </div>
-  </div>
 </div>
-<div style="height: 15rem"></div>
+
+<p>We would have this macro in our resource:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+  <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
+
+  <span class="n">has_and_belongs_to_many</span> <span class="ss">:tags</span><span class="p">,</span>
+    <span class="ss">foreign_key: </span><span class="p">{</span> <span class="ss">taggings: :employee_id</span> <span class="p">},</span>
+    <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Tag</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+    <span class="ss">resource: </span><span class="no">TagResource</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Finally, we have <strong>polymorphic</strong> relationships. Let’s say an <code class="highlighter-rouge">Employee</code>
+has a <code class="highlighter-rouge">Workspace</code>, which can be either an <code class="highlighter-rouge">Office</code> or a <code class="highlighter-rouge">Cubicle</code>. Given
+these ActiveRecord models:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Employee</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="c1"># we have workspace_type and workspace_id columns</span>
+  <span class="n">belongs_to</span> <span class="ss">:workspace</span><span class="p">,</span> <span class="ss">polymorphic: </span><span class="kp">true</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Office</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">has_many</span> <span class="ss">:employees</span><span class="p">,</span> <span class="ss">as: :workspace</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Cubicle</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">has_many</span> <span class="ss">:employees</span><span class="p">,</span> <span class="ss">as: :workspace</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>We’d have this macro in our resource:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+  <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
+
+  <span class="n">polymorphic_belongs_to</span> <span class="ss">:workspace</span><span class="p">,</span>
+    <span class="ss">group_by: </span><span class="nb">proc</span> <span class="p">{</span> <span class="o">|</span><span class="n">employee</span><span class="o">|</span> <span class="n">employee</span><span class="p">.</span><span class="nf">workspace_type</span> <span class="p">},</span>
+    <span class="ss">groups: </span><span class="p">{</span>
+      <span class="s1">'Cubicle'</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="ss">foreign_key: :workspace_id</span><span class="p">,</span>
+        <span class="ss">resource: </span><span class="no">WorkspaceResource</span><span class="p">,</span>
+        <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Cubicle</span><span class="p">.</span><span class="nf">all</span> <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="s1">'Office'</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="ss">foreign_key: :workspace_id</span><span class="p">,</span>
+        <span class="ss">resource: </span><span class="no">WorkspaceResource</span><span class="p">,</span>
+        <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Office</span><span class="p">.</span><span class="nf">all</span> <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>In the above code, we group employees by <code class="highlighter-rouge">workspace_type</code>. When it’s a
+<code class="highlighter-rouge">Cubicle</code>, we use a different configuration than when it’s an <code class="highlighter-rouge">Office</code>.
+Note: both configurations use the same resource in this example - we’re
+starting with a different ‘base scope’, but after that everything is the
+same!</p>
+
+        </section>
+    
+
+    
+        <section id="association-queries" class="h4">
+            
+                  <h4><a href="#association-queries" name="association-queries">Querying Associations</a></h4>
+            
+
+            <p>Sideloads can be thought of as nested Resources - in fact, a Sideload
+probably has an associated Resource object. Because of this, we can
+query our associations as well:</p>
+
+<ul>
+  <li>Filtering: <code class="highlighter-rouge">/employees?include=positions&amp;filter[positions][title]=Manager</code></li>
+  <li>Sorting: <code class="highlighter-rouge">/employees?include=positions&amp;sort=positions.title</code></li>
+  <li>Sparse fieldsets:
+<code class="highlighter-rouge">/employees?include=positions&amp;fields[positions]=title,salary</code></li>
+  <li>Pagination:
+<code class="highlighter-rouge">/employees/123?include=positions&amp;page[positions][size]=10</code></li>
+</ul>
+
+<p>Note - in our pagination example, we’re hitting the <code class="highlighter-rouge">show</code> action. Due
+to the nature of sideloading, paginating relationships of an array may
+have issues.</p>
 
         </section>
     
@@ -736,7 +1235,7 @@ department name that is not ‘Safety’, ‘Sales’, or ‘Accounting’.</p>
                 
 
             <p>We touched on <a href="http://jsonapi.org/format/#errors">Error Objects</a> in the
-<a href="/entries#validations">validations section</a>. Let’s make this work for
+<a href="/#validations">validations section</a>. Let’s make this work for
 any random error our application might throw:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">API</span>
@@ -934,77 +1433,6 @@ test could look something like:</p>
     
 
     
-        <section id="swagger" class="h1">
-            
-                  <h1><a href="#swagger" name="swagger">Swagger</a></h1>
-                
-
-            <p>OK, we now have DSLs for both reads (<code class="highlighter-rouge">jsonapi { }</code>) and writes
-(<code class="highlighter-rouge">strong_resources</code>). That means we can introspect those DSLs to
-auto-generate our documentation!</p>
-
-<p>Note: I’m going to assume you already have <a href="http://swagger.io/swagger-ui">swagger-ui</a> set up, pointing to <code class="highlighter-rouge">/api/swagger_docs.json</code>.</p>
-
-<p>We’re going to build on top of <a href="https://github.com/fotinakis/swagger-blocks">swagger-blocks</a>, so let’s go ahead and add our <code class="highlighter-rouge">DocsController</code>:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># config/routes</span>
-<span class="n">scope</span> <span class="s1">'/api'</span> <span class="k">do</span>
-  <span class="n">resources</span> <span class="ss">:docs</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:index</span><span class="p">],</span> <span class="ss">path: </span><span class="s1">'/swagger_docs'</span>
-<span class="k">end</span>
-
-<span class="c1"># app/controllers/docs_controller.rb</span>
-<span class="k">class</span> <span class="nc">DocsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
-  <span class="kp">include</span> <span class="no">JsonapiSwaggerHelpers</span><span class="o">::</span><span class="no">DocsControllerMixin</span>
-
-  <span class="n">swagger_root</span> <span class="k">do</span>
-    <span class="n">key</span> <span class="ss">:swagger</span><span class="p">,</span> <span class="s1">'2.0'</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre>
-</div>
-
-<p>Now add <code class="highlighter-rouge">jsonapi_resource</code> for any endpoint you want to document:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi_resource</span> <span class="s1">'/api/employees'</span><span class="p">,</span> <span class="ss">tags: </span><span class="p">[</span><span class="s1">'employees'</span><span class="p">]</span>
-</code></pre>
-</div>
-
-<p>That’s it. The suite will introspect the URL, figure out the correct
-controller, introspect our DSL metadata and generate all the correct
-swagger documentation. We’ll even add some extra information for you,
-like which relationships can be included:</p>
-
-<p><img src="img/endpoints.png" width="800px" />
-<img src="img/includes_filters.png" width="800px" />
-<img src="img/nested_relations.png" height="400px" /></p>
-
-<p>The default actions are <code class="highlighter-rouge">create</code>, <code class="highlighter-rouge">update</code>, <code class="highlighter-rouge">index</code>, <code class="highlighter-rouge">show</code>, and
-<code class="highlighter-rouge">destroy</code>. You can customize using <code class="highlighter-rouge">only</code> and <code class="highlighter-rouge">except</code>. You can also
-provide a custom description per action:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi_resource</span> <span class="s1">'/api/employees'</span><span class="p">,</span>
-  <span class="ss">tags: </span><span class="p">[</span><span class="s1">'employees'</span><span class="p">],</span>
-  <span class="ss">except: </span><span class="p">[</span><span class="ss">:destroy</span><span class="p">,</span> <span class="ss">:update</span><span class="p">],</span>
-  <span class="ss">descriptions: </span><span class="p">{</span>
-    <span class="ss">create: </span><span class="s2">"Presence of name is validated"</span>
-  <span class="p">}</span>
-</code></pre>
-</div>
-
-<div style="height: 3rem"></div>
-<div class="note info">
-  <h6 id="more-on-swagger-helper">More on Swagger Helper</h6>
-  <div class="note-content">
-    <p>For documentation on swagger helpers, check out
-<a href="https://github.com/jsonapi-suite/jsonapi_swagger_helpers">jsonapi_swagger_helpers</a>.</p>
-  </div>
-</div>
-<div style="height: 7rem"></div>
-
-        </section>
-    
-
-    
         <section id="jsonapi-plus" class="h1">
             
                   <h1><a href="#jsonapi-plus" name="jsonapi-plus">JSON API Plus</a></h1>
@@ -1159,7 +1587,10 @@ requested:</p>
 
 <p>These calculations are supported via <code class="highlighter-rouge">allow_stat</code>:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+  <span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
+
   <span class="n">allow_stat</span> <span class="ss">total: </span><span class="p">[</span><span class="ss">:count</span><span class="p">]</span>
 <span class="k">end</span>
 </code></pre>
@@ -1184,20 +1615,16 @@ requested:</p>
 <code class="highlighter-rouge">maximum</code> and <code class="highlighter-rouge">minimum</code>. These will work out-of-the-box with ActiveRecord.
 Alternatively, override these calculation functions:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi</span> <span class="k">do</span>
-  <span class="n">allow_stat</span> <span class="ss">:salary</span> <span class="k">do</span>
-    <span class="n">average</span> <span class="p">{</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="kp">attr</span><span class="o">|</span> <span class="n">scope</span><span class="p">.</span><span class="nf">average</span><span class="p">(</span><span class="kp">attr</span><span class="p">)</span> <span class="p">}</span>
-  <span class="k">end</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">allow_stat</span> <span class="ss">:salary</span> <span class="k">do</span>
+  <span class="n">average</span> <span class="p">{</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="kp">attr</span><span class="o">|</span> <span class="n">scope</span><span class="p">.</span><span class="nf">average</span><span class="p">(</span><span class="kp">attr</span><span class="p">)</span> <span class="p">}</span>
 <span class="k">end</span>
 </code></pre>
 </div>
 
 <p>Or support your own custom calculations:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi</span> <span class="k">do</span>
-  <span class="n">allow_stat</span> <span class="ss">salary: </span><span class="p">[</span><span class="ss">:average</span><span class="p">]</span> <span class="k">do</span>
-    <span class="n">standard_deviation</span> <span class="p">{</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="kp">attr</span><span class="o">|</span> <span class="p">.</span><span class="nf">.</span><span class="o">.</span> <span class="p">}</span>
-  <span class="k">end</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">allow_stat</span> <span class="ss">salary: </span><span class="p">[</span><span class="ss">:average</span><span class="p">]</span> <span class="k">do</span>
+  <span class="n">standard_deviation</span> <span class="p">{</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="kp">attr</span><span class="o">|</span> <span class="p">.</span><span class="nf">.</span><span class="o">.</span> <span class="p">}</span>
 <span class="k">end</span>
 </code></pre>
 </div>
@@ -1230,8 +1657,25 @@ Alternatively, override these calculation functions:</p>
                   <h1><a href="#customize" name="customize">Customize</a></h1>
                 
 
-            <p>So far our examples have assumed you are using <code class="highlighter-rouge">ActiveRecord</code>, and we do
-treat that as the default. But everything can be customized. The
+            <p>You can customize in three ways:</p>
+
+<ul>
+  <li>Define an in-line <code class="highlighter-rouge">Resource</code> in a controller, and subclass that
+controller.</li>
+  <li>Define a <code class="highlighter-rouge">Resource</code> and subclass it.</li>
+  <li>Define an adapter <code class="highlighter-rouge">Resource</code>s can use</li>
+</ul>
+
+        </section>
+    
+
+    
+        <section id="resource-dsl" class="h2">
+            
+                  <h2><a href="#resource-dsl" name="resource-dsl">Resource DSL</a></h2>
+                
+
+            <p>So far our examples have used <code class="highlighter-rouge">ActiveRecord</code>, but everything can be customized. The
 following shows the various ‘entry points’ to customize scoping rules.
 Note that each block must return a ‘scopeable’ that will be passed on:</p>
 
@@ -1251,43 +1695,23 @@ Note that each block must return a ‘scopeable’ that will be passed on:</p>
     <span class="c1"># Default: scope.per(per_page).page(current_page)</span>
   <span class="k">end</span>
 
-  <span class="n">includes</span> <span class="ss">whitelist: </span><span class="p">{</span> <span class="ss">index: :pets</span> <span class="p">}</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">includes</span><span class="o">|</span>
-    <span class="c1"># ... custom eager loads ...</span>
-    <span class="c1"># Default: scope.includes(includes)</span>
+  <span class="n">allow_sideload</span> <span class="ss">:things</span><span class="p">,</span> <span class="ss">resource: </span><span class="no">ThingResoure</span> <span class="k">do</span>
+    <span class="n">scope</span> <span class="k">do</span> <span class="o">|</span><span class="n">parents</span><span class="o">|</span>
+      <span class="c1"># ... custom sideload scope ...</span>
+      <span class="c1"># Default: N/A</span>
+    <span class="k">end</span>
+
+    <span class="n">assign</span> <span class="k">do</span> <span class="o">|</span><span class="n">parents</span><span class="p">,</span> <span class="n">children</span><span class="o">|</span>
+      <span class="c1"># ... custom sideload assignment ...</span>
+      <span class="c1"># Default: N/A</span>
+    <span class="k">end</span>
   <span class="k">end</span>
-<span class="k">end</span>
-</code></pre>
-</div>
 
-<p>Define <code class="highlighter-rouge">default_page_size</code> if you’d prefer something other than <code class="highlighter-rouge">20</code>:</p>
+  <span class="c1"># Default: 20</span>
+  <span class="n">default_page_size</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">PostsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
- <span class="n">jsonapi</span> <span class="k">do</span>
-   <span class="c1"># ... code ...</span>
- <span class="k">end</span>
-
- <span class="k">def</span> <span class="nf">default_page_size</span>
-   <span class="mi">100</span>
- <span class="k">end</span>
-<span class="k">end</span>
-</code></pre>
-</div>
-
-        </section>
-    
-
-    
-        <section id="without-kaminari" class="h3">
-            
-                  <h3><a href="#without-kaminari" name="without-kaminari">Usage without Kaminari</a></h3>
-                
-
-            <p>Any pagination scheme can be used. The following shows how to customize using <code class="highlighter-rouge">will_paginate</code> instead of the default Kaminari:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi</span> <span class="k">do</span>
-  <span class="n">paginate</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">current_page</span><span class="p">,</span> <span class="n">per_page</span><span class="o">|</span>
-    <span class="n">scope</span><span class="p">.</span><span class="nf">paginate</span><span class="p">(</span><span class="ss">page: </span><span class="n">params</span><span class="p">[</span><span class="ss">:page</span><span class="p">],</span> <span class="ss">per_page: </span><span class="mi">30</span><span class="p">)</span>
-  <span class="k">end</span>
+  <span class="c1"># Default: [{ id: :asc }]</span>
+  <span class="n">default_sort</span><span class="p">([{</span> <span class="ss">title: :asc</span> <span class="p">}])</span>
 <span class="k">end</span>
 </code></pre>
 </div>
@@ -1296,48 +1720,58 @@ Note that each block must return a ‘scopeable’ that will be passed on:</p>
     
 
     
-        <section id="without-activerecord" class="h1">
+        <section id="adapters" class="h2">
             
-                  <h1><a href="#without-activerecord" name="without-activerecord">Usage Without ActiveRecord</a></h1>
+                  <h2><a href="#adapters" name="adapters">Adapters</a></h2>
                 
 
-            <p>The following shows how to use the <code class="highlighter-rouge">jsonapi {  }</code> DSL to build up a hash that can be passed to an alternate ORM:</p>
+            <p>If you simply want to provide sensible defaults, define an adapter:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi</span> <span class="k">do</span>
-  <span class="n">allow_filter</span> <span class="ss">:name</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
-    <span class="n">scope</span><span class="p">[</span><span class="ss">:conditions</span><span class="p">]</span> <span class="o">||=</span> <span class="p">{}</span>
-    <span class="n">scope</span><span class="p">[</span><span class="ss">:conditions</span><span class="p">].</span><span class="nf">merge!</span><span class="p">(</span><span class="ss">name: </span><span class="n">value</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">SequelAdapter</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">Abstract</span>
+  <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="n">db</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="n">attribute</span> <span class="o">=&gt;</span> <span class="n">value</span><span class="p">)</span>
   <span class="k">end</span>
 
-  <span class="n">sort</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">att</span><span class="p">,</span> <span class="n">dir</span><span class="o">|</span>
-    <span class="n">scope</span><span class="p">.</span><span class="nf">merge!</span><span class="p">(</span><span class="ss">order: </span><span class="p">{</span> <span class="n">att</span> <span class="o">=&gt;</span> <span class="n">dir</span> <span class="p">})</span>
+  <span class="k">def</span> <span class="nf">order</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">direction</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="ss">:asc</span>
+      <span class="n">db</span><span class="p">.</span><span class="nf">order_append</span><span class="p">(</span><span class="n">attribute</span><span class="p">)</span>
+    <span class="k">else</span>
+      <span class="n">db</span><span class="p">.</span><span class="nf">order_append</span><span class="p">(</span><span class="no">Sequel</span><span class="p">.</span><span class="nf">desc</span><span class="p">(</span><span class="n">attribute</span><span class="p">)</span>
+    <span class="k">end</span>
   <span class="k">end</span>
 
-  <span class="n">paginate</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">current_page</span><span class="p">,</span> <span class="n">per_page</span><span class="o">|</span>
-    <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_page</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)</span> <span class="o">*</span> <span class="n">per_page</span>
-    <span class="n">scope</span><span class="p">.</span><span class="nf">merge!</span><span class="p">(</span><span class="ss">limit: </span><span class="n">per_page</span><span class="p">,</span> <span class="ss">offset: </span><span class="n">offset</span><span class="p">)</span>
+  <span class="k">def</span> <span class="nf">paginate</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">current_page</span><span class="p">,</span> <span class="n">per_page</span><span class="p">)</span>
+    <span class="n">db</span><span class="p">.</span><span class="nf">paginate</span><span class="p">(</span><span class="n">current_page</span><span class="p">,</span> <span class="n">per_page</span><span class="p">)</span>
   <span class="k">end</span>
 
-  <span class="n">includes</span> <span class="ss">whitelist: :department</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">includes</span><span class="o">|</span>
-    <span class="n">scope</span><span class="p">.</span><span class="nf">merge!</span><span class="p">(</span><span class="ss">include: </span><span class="n">includes</span><span class="p">)</span>
+  <span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="kp">attr</span><span class="p">)</span>
+    <span class="n">db</span><span class="p">.</span><span class="nf">count</span>
   <span class="k">end</span>
-<span class="k">end</span>
 
-<span class="k">def</span> <span class="nf">index</span>
-  <span class="nb">hash</span> <span class="o">=</span> <span class="n">jsonapi_scope</span><span class="p">({})</span>
-  <span class="nb">puts</span> <span class="nb">hash</span>
-  <span class="c1"># {</span>
-  <span class="c1">#   order: { id: :asc },</span>
-  <span class="c1">#   limit: 20,</span>
-  <span class="c1">#   offset: 0,</span>
-  <span class="c1">#   conditions: { name: 'foo' },</span>
-  <span class="c1">#   include: :department</span>
-  <span class="c1"># }</span>
+  <span class="c1"># etc.</span>
 <span class="k">end</span>
 </code></pre>
 </div>
 
-<p>And here’s an example using the elasticsearch gem <a href="https://github.com/richmolj/trample">trample</a>:</p>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+  <span class="n">use_adapter</span> <span class="no">SequelAdapter</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>We could now do something like <code class="highlighter-rouge">render_jsonapi(DB[:employees])</code></p>
+
+        </section>
+    
+
+    
+        <section id="elasticsearch" class="h2">
+            
+                  <h2><a href="#elasticsearch" name="elasticsearch">ElasticSearch</a></h2>
+                
+
+            <p>Here’s an example of customizing using the elasticsearch gem <a href="https://github.com/richmolj/trample">trample</a>:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
   <span class="n">jsonapi</span> <span class="k">do</span>
@@ -1359,22 +1793,28 @@ Note that each block must return a ‘scopeable’ that will be passed on:</p>
       <span class="n">scope</span><span class="p">.</span><span class="nf">metadata</span><span class="p">.</span><span class="nf">sort</span> <span class="o">=</span> <span class="p">[{</span><span class="ss">att: </span><span class="n">att</span><span class="p">,</span> <span class="ss">dir: </span><span class="n">dir</span><span class="p">}]</span>
       <span class="n">scope</span>
     <span class="k">end</span>
-
-    <span class="n">includes</span> <span class="ss">whitelist: </span><span class="p">{</span> <span class="ss">index: :pets</span> <span class="p">}</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">includes</span><span class="o">|</span>
-      <span class="n">scope</span><span class="p">.</span><span class="nf">metadata</span><span class="p">.</span><span class="nf">records</span><span class="p">[</span><span class="ss">:includes</span><span class="p">]</span> <span class="o">=</span> <span class="n">includes</span>
-      <span class="n">scope</span>
-    <span class="k">end</span>
   <span class="k">end</span>
 
   <span class="k">def</span> <span class="nf">index</span>
     <span class="n">search</span> <span class="o">=</span> <span class="n">jsonapi_scope</span><span class="p">(</span><span class="no">Search</span><span class="o">::</span><span class="no">Employee</span><span class="p">.</span><span class="nf">new</span><span class="p">)</span>
     <span class="n">search</span><span class="p">.</span><span class="nf">query!</span>
 
-    <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">search</span><span class="p">.</span><span class="nf">records</span><span class="p">.</span><span class="nf">to_a</span><span class="p">)</span>
+    <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">scope</span><span class="p">.</span><span class="nf">resolve</span><span class="p">,</span> <span class="ss">scope: </span><span class="kp">false</span><span class="p">)</span>
   <span class="k">end</span>
 <span class="k">end</span>
 </code></pre>
 </div>
+
+        </section>
+    
+
+    
+        <section id="without-rails" class="h2">
+            
+                  <h2><a href="#without-rails" name="without-rails">Usage Without Rails</a></h2>
+                
+
+            <p>Coming…</p>
 
         </section>
     
