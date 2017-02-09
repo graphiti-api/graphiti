@@ -88,6 +88,8 @@ module JsonapiCompliable
 
     # Legacy
     def force_includes?
+      return false unless defined?(Rails)
+
       %w(PUT PATCH POST).include?(request.method) and
         raw_params.try(:[], :data).try(:[], :relationships).present?
     end

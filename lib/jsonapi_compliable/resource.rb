@@ -31,7 +31,7 @@ module JsonapiCompliable
     end
 
     def self.inherited(klass)
-      klass.config = self.config.deep_dup
+      klass.config = Util::Hash.deep_dup(self.config)
     end
 
     def self.sideloading
@@ -112,11 +112,12 @@ module JsonapiCompliable
     end
 
     def copy
-      self.class.new(@config.deep_dup)
+      self.class.new(@config)
     end
 
     def initialize(config = nil)
-      config = config || self.class.config.deep_dup
+      config = config || self.class.config
+      config = Util::Hash.deep_dup(config)
       set_config(config)
     end
 

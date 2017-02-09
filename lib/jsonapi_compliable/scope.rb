@@ -24,7 +24,7 @@ module JsonapiCompliable
       else
         resolved = @object
         # TODO - configurable resolve function
-        resolved = @object.to_a if @object.is_a?(ActiveRecord::Relation)
+        resolved = @object.to_a if defined?(ActiveRecord) && @object.is_a?(ActiveRecord::Relation)
         sideload(resolved, query_hash[:include]) if query_hash[:include]
         resolved
       end

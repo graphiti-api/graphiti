@@ -9,6 +9,20 @@ module JsonapiCompliable
 
         collection
       end
+
+      def self.deep_dup(hash)
+        if hash.respond_to?(:deep_dup)
+          hash.deep_dup
+        else
+          {}.tap do |duped|
+            hash.each_pair do |key, value|
+              value = deep_dup(value) if value.is_a?(Hash)
+              value = value.dup if value && value.respond_to?(:dup) && ![Symbol, Fixnum].include?(value.class)
+              duped[key] = value
+            end
+          end
+        end
+      end
     end
   end
 end

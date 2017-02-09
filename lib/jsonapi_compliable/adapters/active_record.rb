@@ -15,10 +15,6 @@ module JsonapiCompliable
         scope.page(current_page).per(per_page)
       end
 
-      def sideload(scope, includes)
-        scope.includes(includes)
-      end
-
       def count(scope, attr)
         scope.count
       end

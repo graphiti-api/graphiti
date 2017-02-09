@@ -112,7 +112,7 @@ module JsonapiCompliable
     end
 
     def deserialize_jsonapi!
-      self.raw_params = self.params.deep_dup
+      self.raw_params = Util::Hash.deep_dup(self.params)
 
       if defined?(::Rails) && (is_a?(ActionController::Base) || (defined?(ActionController::API) && is_a?(ActionController::API)))
         hash = params.to_unsafe_h
