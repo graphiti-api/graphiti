@@ -17,25 +17,28 @@ module JsonapiCompliable
 
     class << self
       attr_accessor :config
+
+      delegate :allow_sideload, to: :sideloading
+      delegate :has_many, to: :sideloading
+      delegate :has_one, to: :sideloading
+      delegate :belongs_to, to: :sideloading
+      delegate :has_and_belongs_to_many, to: :sideloading
+      delegate :polymorphic_belongs_to, to: :sideloading
+      delegate :polymorphic_has_many, to: :sideloading
     end
 
     delegate :sideload, to: :sideloading
-
-    # Incorporate custom adapter methods
-    def self.method_missing(meth, *args, &blk)
-      if sideloading.respond_to?(meth)
-        sideloading.send(meth, *args, &blk)
-      else
-        super
-      end
-    end
 
     def self.inherited(klass)
       klass.config = Util::Hash.deep_dup(self.config)
     end
 
     def self.sideloading
-      config[:sideloading] ||= Sideload.new(:base, resource: self)
+      @sideloading ||= Sideload.new(:base, resource: self)
+    end
+
+    def sideloading
+      self.class.sideloading
     end
 
     def self.sideload_whitelist(whitelist)
@@ -165,6 +168,10 @@ module JsonapiCompliable
         sideloads = Util::IncludeParams.scrub(sideloads, sideload_whitelist[namespace])
       end
       sideloads
+    end
+
+    def sideloading
+      self.class.sideloading
     end
 
     def stat(attribute, calculation)

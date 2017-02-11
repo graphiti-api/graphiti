@@ -26,17 +26,24 @@ module JsonapiCompliable
     end
 
     def include_hash
-      @include_hash ||= include_directive.to_hash
+      @include_hash ||= begin
+        requested     = include_directive.to_hash
+        all_allowed   = resource.sideloading.to_hash[:base]
+        whitelist     = resource.sideload_whitelist.values.reduce(:merge)
+        allowed       = whitelist ? Util::IncludeParams.scrub(all_allowed, whitelist) : all_allowed
+
+        Util::IncludeParams.scrub(requested, allowed)
+      end
     end
 
-    def all_requested_association_names
-      @all_requested_association_names ||= Util::Hash.keys(include_hash)
+    def association_names
+      @association_names ||= Util::Hash.keys(include_hash)
     end
 
     def to_hash
       hash = { resource.type => self.class.default_hash }
 
-      all_requested_association_names.each do |name|
+      association_names.each do |name|
         hash[name] = self.class.default_hash
       end
 
@@ -50,7 +57,8 @@ module JsonapiCompliable
       parse_filter(hash)
       parse_sort(hash)
       parse_pagination(hash)
-      parse_include(hash, include_hash)
+
+      parse_include(hash, include_hash, resource.type)
       parse_stats(hash)
 
       hash
@@ -68,13 +76,14 @@ module JsonapiCompliable
       resource.association_names.include?(name)
     end
 
-    def parse_include(memo, incl_hash, namespace = nil)
-      namespace ||= resource.type
+    def parse_include(memo, incl_hash, namespace)
+      memo[namespace].merge!(include: incl_hash)
 
-      memo[namespace][:include] = incl_hash
       incl_hash.each_pair do |key, sub_hash|
-        memo[key][:include] = parse_include(memo, sub_hash, key)
+        memo.merge!(parse_include(memo, sub_hash, key))
       end
+
+      memo
     end
 
     def parse_stats(hash)

@@ -1,7 +1,7 @@
 PATH
   remote: ../
   specs:
-    jsonapi_compliable (0.4.0)
+    jsonapi_compliable (0.5.2)
       jsonapi-serializable (~> 0.1)
 
 GEM
@@ -196,7 +196,7 @@ DEPENDENCIES
   guard-rspec
   jsonapi-rails (~> 0.1)
   jsonapi_compliable!
-  kaminari
+  kaminari (~> 0.17)
   pry
   pry-byebug
   rails (~> 4.1)

@@ -69,6 +69,18 @@ RSpec.describe 'sideloading' do
       end
     end
 
+    resource_class.allow_sideload :state, resource: state_resource do
+      scope do |authors|
+        State.where(id: authors.map { |a| a[:state_id] })
+      end
+
+      assign do |authors, states|
+        authors.each do |author|
+          author[:state] = states.find { |s| s.id == author[:state_id] }
+        end
+      end
+    end
+
     _dwelling_resource = dwelling_resource
     resource_class.allow_sideload :dwelling, polymorphic: true do
       group_by { |author| binding.pry;author[:dwelling_type] }

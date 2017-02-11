@@ -5,9 +5,9 @@ RSpec.describe JsonapiCompliable::Sideload do
   let(:instance) { described_class.new(:foo, opts) }
 
   describe '.new' do
-    it 'assigns an instance of a subclass of resource' do
-      expect(instance.resource).to be_a(JsonapiCompliable::Resource)
-      expect(instance.resource.class.object_id).to_not eq(JsonapiCompliable::Resource)
+    it 'assigns a resource class' do
+      expect(instance.resource_class < JsonapiCompliable::Resource).to eq(true)
+      expect(instance.resource_class.object_id).to_not eq(JsonapiCompliable::Resource)
     end
 
     it "extends the resource with the adapter's sideloading module" do
@@ -16,22 +16,26 @@ RSpec.describe JsonapiCompliable::Sideload do
           'bar'
         end
       end
+
       adapter = JsonapiCompliable::Adapters::Abstract.new
       allow(adapter).to receive(:sideloading_module) { mod }
-      allow_any_instance_of(JsonapiCompliable::Resource).to receive(:adapter) { adapter }
+
+      resource = Class.new(JsonapiCompliable::Resource)
+      opts[:resource] = resource
+      allow(resource).to receive(:config) { { adapter: adapter } }
+
       expect(instance.foo).to eq('bar')
     end
 
     context 'when passed :resource' do
-      let(:resource_instance) { JsonapiCompliable::Resource.new }
+      let(:resource_class) { Class.new(JsonapiCompliable::Resource) }
 
       before do
-        resource = double(new: resource_instance)
-        opts[:resource] = resource
+        opts[:resource] = resource_class
       end
 
       it 'assigns an instance of that resource' do
-        expect(instance.resource).to eq(resource_instance)
+        expect(instance.resource_class).to eq(resource_class)
       end
     end
   end

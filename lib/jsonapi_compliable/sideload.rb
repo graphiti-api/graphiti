@@ -1,7 +1,7 @@
 module JsonapiCompliable
   class Sideload
     attr_reader :name,
-      :resource,
+      :resource_class,
       :polymorphic,
       :sideloads,
       :scope_proc,
@@ -10,12 +10,12 @@ module JsonapiCompliable
 
     def initialize(name, opts)
       @name               = name
-      @resource           = (opts[:resource] || Class.new(Resource)).new
+      @resource_class     = (opts[:resource] || Class.new(Resource))
       @sideloads          = {}
       @polymorphic        = !!opts[:polymorphic]
       @polymorphic_groups = {} if polymorphic?
 
-      extend @resource.adapter.sideloading_module
+      extend @resource_class.config[:adapter].sideloading_module
     end
 
     def polymorphic?
@@ -65,10 +65,8 @@ module JsonapiCompliable
         @sideloads.each_pair do |key, sideload|
           hash[name][key] = sideload.to_hash[key]
 
-          if sideloading = sideload.resource.sideloading
-            sideloading.sideloads.each_pair do |k, s|
-              hash[name][k] = s.to_hash[k]
-            end
+          if sideloading = sideload.resource_class.sideloading
+            hash[name][key].merge!(sideloading.to_hash[:base])
           end
         end
       end
@@ -87,7 +85,7 @@ module JsonapiCompliable
 
     def resolve_basic(parents, query, namespace)
       sideload_scope   = scope_proc.call(parents)
-      sideload_scope   = Scope.new(sideload_scope, resource, query, namespace: namespace)
+      sideload_scope   = Scope.new(sideload_scope, resource_class.new, query, namespace: namespace)
       sideload_results = sideload_scope.resolve
       assign_proc.call(parents, sideload_results)
     end
