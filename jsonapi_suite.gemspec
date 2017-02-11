@@ -24,7 +24,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'jsonapi_compliable', '~> 0.5'
   spec.add_dependency 'jsonapi_errorable', '~> 0.1'
   spec.add_dependency 'jsonapi_spec_helpers', '~> 0.3'
-  spec.add_dependency 'jsonapi_swagger_helpers', '~> 0.1'
   spec.add_dependency 'nested_attribute_reassignable', '~> 0.6'
 
   spec.add_development_dependency "bundler", "~> 1.12"
