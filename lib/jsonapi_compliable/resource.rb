@@ -1,19 +1,6 @@
 module JsonapiCompliable
   class Resource
-    attr_reader :filters,
-      :default_filters,
-      :default_sort,
-      :default_page_size,
-      :default_page_number,
-      :sorting,
-      :stats,
-      :sideload_whitelist,
-      :pagination,
-      :extra_fields,
-      :sideloading,
-      :adapter,
-      :type,
-      :context
+    attr_reader :context
 
     class << self
       attr_accessor :config
@@ -35,10 +22,6 @@ module JsonapiCompliable
 
     def self.sideloading
       @sideloading ||= Sideload.new(:base, resource: self)
-    end
-
-    def sideloading
-      self.class.sideloading
     end
 
     def self.sideload_whitelist(whitelist)
@@ -114,23 +97,6 @@ module JsonapiCompliable
       end
     end
 
-    def copy
-      self.class.new(@config)
-    end
-
-    def initialize(config = nil)
-      config = config || self.class.config
-      config = Util::Hash.deep_dup(config)
-      set_config(config)
-    end
-
-    def set_config(config)
-      @config = config
-      config.each_pair do |key, value|
-        instance_variable_set(:"@#{key}", value)
-      end
-    end
-
     def with_context(object, namespace = nil)
       begin
         prior = context
@@ -170,30 +136,62 @@ module JsonapiCompliable
       sideloads
     end
 
-    def sideloading
-      self.class.sideloading
-    end
-
     def stat(attribute, calculation)
       stats_dsl = stats[attribute] || stats[attribute.to_sym]
       raise Errors::StatNotFound.new(attribute, calculation) unless stats_dsl
       stats_dsl.calculation(calculation)
     end
 
+    def sideloading
+      self.class.sideloading
+    end
+
     def default_sort
-      @default_sort || [{ id: :asc }]
+      self.class.config[:default_sort] || [{ id: :asc }]
     end
 
     def default_page_number
-      @default_page_number || 1
+      self.class.config[:default_page_number] || 1
     end
 
     def default_page_size
-      @default_page_size || 20
+      self.class.config[:default_page_size] || 20
     end
 
     def type
-      @type || :undefined_jsonapi_type
+      self.class.config[:type] || :undefined_jsonapi_type
+    end
+
+    def filters
+      self.class.config[:filters]
+    end
+
+    def sorting
+      self.class.config[:sorting]
+    end
+
+    def stats
+      self.class.config[:stats]
+    end
+
+    def pagination
+      self.class.config[:pagination]
+    end
+
+    def extra_fields
+      self.class.config[:extra_fields]
+    end
+
+    def sideload_whitelist
+      self.class.config[:sideload_whitelist]
+    end
+
+    def default_filters
+      self.class.config[:default_filters]
+    end
+
+    def adapter
+      self.class.config[:adapter]
     end
   end
 end

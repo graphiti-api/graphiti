@@ -1,8 +1,8 @@
 module JsonapiCompliable
   module Stats
     class Payload
-      def initialize(dsl, query_hash, scope)
-        @dsl        = dsl
+      def initialize(resource, query_hash, scope)
+        @resource   = resource
         @query_hash = query_hash[:stats]
         @scope      = scope
       end
@@ -23,7 +23,7 @@ module JsonapiCompliable
 
       def each_calculation(name, calculations)
         calculations.each do |calc|
-          function = @dsl.stat(name, calc)
+          function = @resource.stat(name, calc)
           yield calc, function
         end
       end

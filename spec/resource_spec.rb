@@ -4,46 +4,26 @@ RSpec.describe JsonapiCompliable::Resource do
   let(:klass) { Class.new(described_class) }
   let(:instance) { klass.new }
 
-  describe '#copy' do
-    let(:copy) { instance.copy }
-
-    it 'returns a new instance' do
-      expect(copy).to be_a(described_class)
-      expect(copy.object_id).to_not eq(instance.object_id)
-    end
-
-    it 'copies the config' do
-      instance.set_config(foo: 'bar')
-      expect(copy.instance_variable_get(:@config)).to eq(foo: 'bar')
-      expect(copy.instance_variable_get(:@config).object_id)
-        .to_not eq(instance.instance_variable_get(:@config))
-    end
-
-    it 'assigns instance variables' do
-      instance.set_config(foo: 'bar')
-      expect(copy.instance_variable_get(:@foo)).to eq('bar')
-    end
-  end
-
   describe '#stat' do
     let(:avg_proc) { proc { |scope, attr| 1 } }
 
     before do
-      adapter = JsonapiCompliable::Adapters::ActiveRecord.new
-      dsl = JsonapiCompliable::Stats::DSL.new(adapter, :myattr)
-      dsl.average(&avg_proc)
-      instance.instance_variable_set(:@stats, { myattr: dsl })
+      klass.class_eval do
+        allow_stat :myattr do
+          average { |scope, attr| 1 }
+        end
+      end
     end
 
     context 'when passing strings' do
       it 'returns the corresponding proc' do
-        expect(instance.stat('myattr', 'average')).to eq(avg_proc)
+        expect(instance.stat('myattr', 'average').call(nil, nil)).to eq(1)
       end
     end
 
     context 'when passing symbols' do
       it 'returns the corresponding proc' do
-        expect(instance.stat(:myattr, :average)).to eq(avg_proc)
+        expect(instance.stat(:myattr, :average).call(nil, nil)).to eq(1)
       end
     end
 
@@ -172,8 +152,6 @@ RSpec.describe JsonapiCompliable::Resource do
         klass.sideload_whitelist \
           index: [{ foo: :bar }],
           show: :blah
-
-        instance.set_config(klass.config)
       end
 
       context 'and a namespace is passed as an argument' do
