@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/jsonapi-suite/jsonapi_compliable.svg?branch=master)](https://travis-ci.org/jsonapi-suite/jsonapi_compliable)
 
-[official documentation](https://jsonapi-suite.github.io/jsonapi_compliable)
+[official documentation](https://jsonapi-suite.github.io/jsonapi_suite)
 
 Supported Rails versions: >= 4.1
 
