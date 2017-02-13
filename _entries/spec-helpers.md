@@ -87,6 +87,13 @@ The comparison value can be customized. Let's say we serialize the
 key(:name) { |record| "#{record.first_name} #{record.last_name}" }
 ```
 
+Optionally, validate against a type as well. If both the expected and
+actual values match, but are the incorrect type, the test will fail:
+
+```ruby
+key(:salary, Integer)
+```
+
 You can also customize/override payloads at runtime in your test. Let's
 say we only serialize `salary` when the current user is an admin. Your
 test could look something like:
