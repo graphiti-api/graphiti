@@ -303,6 +303,13 @@ we’re doing something like <code class="highlighter-rouge">expect(json['email'
 </code></pre>
 </div>
 
+<p>Optionally, validate against a type as well. If both the expected and
+actual values match, but are the incorrect type, the test will fail:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">key</span><span class="p">(</span><span class="ss">:salary</span><span class="p">,</span> <span class="no">Integer</span><span class="p">)</span>
+</code></pre>
+</div>
+
 <p>You can also customize/override payloads at runtime in your test. Let’s
 say we only serialize <code class="highlighter-rouge">salary</code> when the current user is an admin. Your
 test could look something like:</p>

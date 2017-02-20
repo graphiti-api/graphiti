@@ -237,7 +237,7 @@ with Ruby. <a href="http://rubyonrails.org">Rails</a> is recommended, but not
 required.</p>
 
 <p>If you only have 5 seconds to look at this, we recommend you take a
-glance at <a href="#basics">The Basics</a>.</p>
+glance at the <a href="#quickstart">Quickstart</a>.</p>
 
         </section>
     
@@ -1403,6 +1403,13 @@ we’re doing something like <code class="highlighter-rouge">expect(json['email'
 <code class="highlighter-rouge">last_name</code>:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">key</span><span class="p">(</span><span class="ss">:name</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">record</span><span class="o">|</span> <span class="s2">"</span><span class="si">#{</span><span class="n">record</span><span class="p">.</span><span class="nf">first_name</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="n">record</span><span class="p">.</span><span class="nf">last_name</span><span class="si">}</span><span class="s2">"</span> <span class="p">}</span>
+</code></pre>
+</div>
+
+<p>Optionally, validate against a type as well. If both the expected and
+actual values match, but are the incorrect type, the test will fail:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">key</span><span class="p">(</span><span class="ss">:salary</span><span class="p">,</span> <span class="no">Integer</span><span class="p">)</span>
 </code></pre>
 </div>
 

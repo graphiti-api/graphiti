@@ -12,4 +12,4 @@ with Ruby. [Rails](http://rubyonrails.org) is recommended, but not
 required.
 
 If you only have 5 seconds to look at this, we recommend you take a
-glance at [The Basics](#basics).
+glance at the [Quickstart](#quickstart).
