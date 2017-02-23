@@ -4,7 +4,6 @@ require 'jsonapi/include_directive'
 require 'strong_resources'
 require 'jsonapi_compliable'
 require 'jsonapi_errorable'
-require 'jsonapi_swagger_helpers'
 require 'nested_attribute_reassignable'
 
 require "jsonapi_suite/version"
