@@ -79,13 +79,21 @@ RSpec.describe JsonapiCompliable::Sideload do
   end
 
   describe '#to_hash' do
+    # Set this up to catch any recursive trap
+    let(:resource) do
+      resource = JsonapiCompliable::Resource
+      resource.allow_sideload :bing, resource: JsonapiCompliable::Resource
+      resource
+    end
+
     before do
-      instance.allow_sideload :bar do
-        allow_sideload :baz do
-          allow_sideload :bazoo
+      resource = JsonapiCompliable::Resource
+      instance.allow_sideload :bar, resource: resource do
+        allow_sideload :baz, resource: resource do
+          allow_sideload :bazoo, resource: resource
         end
       end
-      instance.allow_sideload :blah
+      instance.allow_sideload :blah, resource: resource
     end
 
     it 'recursively builds a hash of sideloads' do
