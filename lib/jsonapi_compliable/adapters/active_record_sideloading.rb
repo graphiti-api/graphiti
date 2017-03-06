@@ -1,7 +1,7 @@
 module JsonapiCompliable
   module Adapters
     module ActiveRecordSideloading
-      def has_many(association_name, scope:, resource:, foreign_key:, primary_key: :id, &blk)
+      def has_many(association_name, scope: nil, resource:, foreign_key:, primary_key: :id, &blk)
         _scope = scope
 
         allow_sideload association_name, resource: resource do
@@ -24,7 +24,7 @@ module JsonapiCompliable
         end
       end
 
-      def belongs_to(association_name, scope:, resource:, foreign_key:, primary_key: :id, &blk)
+      def belongs_to(association_name, scope: nil, resource:, foreign_key:, primary_key: :id, &blk)
         _scope = scope
 
         allow_sideload association_name, resource: resource do
@@ -44,7 +44,7 @@ module JsonapiCompliable
         instance_eval(&blk) if blk
       end
 
-      def has_one(association_name, scope:, resource:, foreign_key:, primary_key: :id, &blk)
+      def has_one(association_name, scope: nil, resource:, foreign_key:, primary_key: :id, &blk)
         _scope = scope
 
         allow_sideload association_name, resource: resource do
@@ -66,7 +66,7 @@ module JsonapiCompliable
         end
       end
 
-      def has_and_belongs_to_many(association_name, scope:, resource:, foreign_key:, primary_key: :id, as: nil, &blk)
+      def has_and_belongs_to_many(association_name, scope: nil, resource:, foreign_key:, primary_key: :id, as: nil, &blk)
         through = foreign_key.keys.first
         fk      = foreign_key.values.first
         _scope  = scope
