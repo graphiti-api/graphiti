@@ -257,6 +257,16 @@ Note that each block must return a ‘scopeable’ that will be passed on:</p>
 
   <span class="c1"># Default: [{ id: :asc }]</span>
   <span class="n">default_sort</span><span class="p">([{</span> <span class="ss">title: :asc</span> <span class="p">}])</span>
+
+  <span class="c1"># Custom resolve function</span>
+  <span class="c1"># by default, delegates to adapter</span>
+  <span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+    <span class="c1"># This is the ActiveRecord default</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">to_a</span>
+    <span class="c1"># Or, let's say our scope is a built-up hash we want to pass to</span>
+    <span class="c1"># an HTTP client:</span>
+    <span class="no">MyExternalService</span><span class="p">.</span><span class="nf">call</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+  <span class="k">end</span>
 <span class="k">end</span>
 </code></pre>
 </div>

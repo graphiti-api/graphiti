@@ -44,5 +44,15 @@ jsonapi do
 
   # Default: [{ id: :asc }]
   default_sort([{ title: :asc }])
+
+  # Custom resolve function
+  # by default, delegates to adapter
+  def resolve(scope)
+    # This is the ActiveRecord default
+    scope.to_a
+    # Or, let's say our scope is a built-up hash we want to pass to
+    # an HTTP client:
+    MyExternalService.call(scope)
+  end
 end
 ```

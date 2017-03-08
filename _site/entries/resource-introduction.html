@@ -300,7 +300,7 @@ provide sensible defaults:</p>
 <p>Of course, we could always override the adapter’s default behavior as well.</p>
 
 <p>None of this is tied to ActiveRecord - instead, let’s build up a simple
-hash we can pass to something else down the line:</p>
+hash we can pass to an HTTP client down the line:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/resources/employee_resource.rb</span>
 <span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Resource</span>
@@ -317,13 +317,8 @@ hash we can pass to something else down the line:</p>
   <span class="n">page</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">current_page</span><span class="p">,</span> <span class="n">per_page</span><span class="o">|</span>
     <span class="n">scope</span><span class="p">.</span><span class="nf">merge</span><span class="p">(</span><span class="ss">page: </span><span class="n">current_page</span><span class="p">,</span> <span class="ss">per_page: </span><span class="n">per_page</span><span class="p">)</span>
   <span class="k">end</span>
-<span class="k">end</span>
 
-<span class="c1"># app/controllers/employees_controller.rb</span>
-<span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
-  <span class="n">jsonapi</span> <span class="ss">resource: </span><span class="no">EmployeeResource</span>
-
-  <span class="c1"># The output of scope.resolve would be:</span>
+  <span class="c1"># 'scope' here would be:</span>
   <span class="c1">#</span>
   <span class="c1"># {</span>
   <span class="c1">#   active: true,</span>
@@ -331,10 +326,17 @@ hash we can pass to something else down the line:</p>
   <span class="c1">#   page: 1,</span>
   <span class="c1">#   per_page: 20</span>
   <span class="c1"># }</span>
+  <span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+    <span class="no">MyExternalService</span><span class="p">.</span><span class="nf">call</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># app/controllers/employees_controller.rb</span>
+<span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">jsonapi</span> <span class="ss">resource: </span><span class="no">EmployeeResource</span>
+
   <span class="k">def</span> <span class="nf">index</span>
-    <span class="n">scope</span> <span class="o">=</span> <span class="n">jsonapi_scope</span><span class="p">({})</span>
-    <span class="n">results</span> <span class="o">=</span> <span class="no">MyService</span><span class="p">.</span><span class="nf">get_results</span><span class="p">(</span><span class="n">scope</span><span class="p">.</span><span class="nf">resolve</span><span class="p">.</span><span class="nf">first</span><span class="p">)</span>
-    <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="ss">scope: </span><span class="kp">false</span><span class="p">)</span>
+    <span class="n">render_jsonapi</span><span class="p">({})</span>
   <span class="k">end</span>
 <span class="k">end</span>
 </code></pre>

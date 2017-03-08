@@ -84,7 +84,7 @@ end
 Of course, we could always override the adapter's default behavior as well.
 
 None of this is tied to ActiveRecord - instead, let's build up a simple
-hash we can pass to something else down the line:
+hash we can pass to an HTTP client down the line:
 
 ```ruby
 # app/resources/employee_resource.rb
@@ -102,13 +102,8 @@ class EmployeeResource < JsonapiCompliable::Resource
   page do |scope, current_page, per_page|
     scope.merge(page: current_page, per_page: per_page)
   end
-end
 
-# app/controllers/employees_controller.rb
-class EmployeesController < ApplicationController
-  jsonapi resource: EmployeeResource
-
-  # The output of scope.resolve would be:
+  # 'scope' here would be:
   #
   # {
   #   active: true,
@@ -116,10 +111,17 @@ class EmployeesController < ApplicationController
   #   page: 1,
   #   per_page: 20
   # }
+  def resolve(scope)
+    MyExternalService.call(scope)
+  end
+end
+
+# app/controllers/employees_controller.rb
+class EmployeesController < ApplicationController
+  jsonapi resource: EmployeeResource
+
   def index
-    scope = jsonapi_scope({})
-    results = MyService.get_results(scope.resolve.first)
-    render_jsonapi(results, scope: false)
+    render_jsonapi({})
   end
 end
 ```
