@@ -34,15 +34,84 @@ RSpec.describe JsonapiCompliable::Sideload do
         opts[:resource] = resource_class
       end
 
-      it 'assigns an instance of that resource' do
+      it 'assigns an instance of that)resource' do
         expect(instance.resource_class).to eq(resource_class)
       end
     end
   end
 
   describe '#resolve' do
-    xit 'TODO' do
-      # test sideload etc
+    context 'when polymorphic' do
+      let(:opts)       { { polymorphic: true } }
+      let(:query_hash) { JsonapiCompliable::Query.default_hash }
+      let(:query)      { double(zero_results?: false, to_hash: { foo: query_hash }) }
+      let(:parents)    { [{ id: 1, type: 'foo' }, { id: 2, type: 'bar' }] }
+      let(:foo_resource) do
+        Class.new(JsonapiCompliable::Resource) do
+          use_adapter JsonapiCompliable::Adapters::Null
+        end
+      end
+
+      before do
+        instance.group_by { |parent| parent[:type] }
+
+        instance.allow_sideload 'foo', resource: foo_resource do
+          scope { |parents| [{ parent_id: 1 }] }
+          assign do |parents, children|
+            parents.each do |parent|
+              parent[:child] = children.find { |c| c[:parent_id] == parent[:id] }
+            end
+          end
+        end
+      end
+
+      it 'groups parents, then resolves that group' do
+        instance.resolve(parents, query)
+        expect(parents.first[:child]).to eq({ parent_id: 1 })
+      end
+    end
+
+    context 'when not polymorphic' do
+      let(:parents)    { [{ id: 1 }] }
+      let(:query)      { double }
+      let(:results)    { [{ parent_id: 1 }] }
+      let(:base_scope) { double }
+      let(:scope_proc) { ->(parents) { base_scope } }
+      let(:scope)      { double(resolve: results) }
+
+      before do
+        instance.scope  { |parents| base_scope }
+        instance.assign do |parents, children|
+          parents.each do |parent|
+            parent[:child] = children.find { |c| c[:parent_id] == parent[:id] }
+          end
+        end
+
+        allow(JsonapiCompliable::Scope).to receive(:new)
+          .and_return(scope)
+      end
+
+      it 'scopes via configured proc' do
+        expect(scope).to receive(:resolve) { results }
+        expect(JsonapiCompliable::Scope).to receive(:new)
+          .with(base_scope, anything, query, namespace: :foo)
+          .and_return(scope)
+        instance.resolve(parents, query)
+      end
+
+      it 'assigns results to parents' do
+        instance.resolve(parents, query)
+        expect(parents.first[:child]).to eq({ parent_id: 1 })
+      end
+
+      context 'when passed namespace' do
+        it 'passes namespace to scope builder' do
+          expect(JsonapiCompliable::Scope).to receive(:new)
+            .with(base_scope, anything, query, namespace: :bar)
+            .and_return(scope)
+          instance.resolve(parents, query, :bar)
+        end
+      end
     end
   end
 

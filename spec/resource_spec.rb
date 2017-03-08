@@ -129,6 +129,14 @@ RSpec.describe JsonapiCompliable::Resource do
     end
   end
 
+  describe '#resolve' do
+    it 'delegates to the adapter' do
+      scope = double
+      expect(instance.adapter).to receive(:resolve).with(scope)
+      instance.resolve(scope)
+    end
+  end
+
   describe '#allowed_sideloads' do
     subject do
       instance.allowed_sideloads

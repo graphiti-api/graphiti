@@ -35,6 +35,10 @@ module JsonapiCompliable
         scope.minimum(attr)
       end
 
+      def resolve(scope)
+        scope.to_a
+      end
+
       def sideloading_module
         JsonapiCompliable::Adapters::ActiveRecordSideloading
       end

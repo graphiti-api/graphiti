@@ -193,5 +193,9 @@ module JsonapiCompliable
     def adapter
       self.class.config[:adapter]
     end
+
+    def resolve(scope)
+      adapter.resolve(scope)
+    end
   end
 end
