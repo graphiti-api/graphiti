@@ -1,4 +1,3 @@
-require 'jsonapi'
 require 'jsonapi/include_directive'
 
 require 'strong_resources'
