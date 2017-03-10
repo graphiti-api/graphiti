@@ -61,7 +61,7 @@ module JsonapiCompliable
         hash = attributes
         hash = hash.merge(relationships)
         hash = @namespace ? { parsed_type => hash } : hash
-        hash.merge(@params.except(:data)).deep_symbolize_keys
+        hash.reverse_merge(@params.except(:data)).deep_symbolize_keys
       end
 
       private
