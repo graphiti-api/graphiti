@@ -60,5 +60,11 @@ RSpec.describe 'deserialization' do
       }
       expect(instance.params).to eq(expected)
     end
+
+    it 'does not overwrite deserialized param namespace with something from raw params' do
+      payload[:author] = 'Claudia y Inez Bachman'
+      instance.deserialize_jsonapi!
+      expect(instance.params[:author]).to be_a(Hash)
+    end
   end
 end
