@@ -35,6 +35,8 @@ module JsonapiCompliable
     private
 
     def sideload(results, includes)
+      return if results == []
+
       includes.each_pair do |name, nested|
         if @resource.allowed_sideloads.has_key?(name)
           sideload = @resource.sideload(name)
