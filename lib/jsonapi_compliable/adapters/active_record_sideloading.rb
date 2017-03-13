@@ -7,7 +7,7 @@ module JsonapiCompliable
         allow_sideload association_name, resource: resource do
           scope do |parents|
             parent_ids = parents.map { |p| p.send(primary_key) }
-            _scope.call.where(foreign_key => parent_ids)
+            _scope.call.where(foreign_key => parent_ids.uniq.compact)
           end
 
           assign do |parents, children|
@@ -30,7 +30,7 @@ module JsonapiCompliable
         allow_sideload association_name, resource: resource do
           scope do |parents|
             parent_ids = parents.map { |p| p.send(foreign_key) }
-            _scope.call.where(primary_key => parent_ids)
+            _scope.call.where(primary_key => parent_ids.uniq.compact)
           end
 
           assign do |parents, children|
@@ -50,7 +50,7 @@ module JsonapiCompliable
         allow_sideload association_name, resource: resource do
           scope do |parents|
             parent_ids = parents.map { |p| p.send(primary_key) }
-            _scope.call.where(foreign_key => parent_ids)
+            _scope.call.where(foreign_key => parent_ids.uniq.compact)
           end
 
           assign do |parents, children|
@@ -73,7 +73,10 @@ module JsonapiCompliable
 
         allow_sideload association_name, resource: resource do
           scope do |parents|
-            _scope.call.joins(through).where(through => { fk => parents.map { |p| p.send(primary_key) } })
+            parent_ids = parents.map { |p| p.send(primary_key) }
+            parent_ids.uniq!
+            parent_ids.compact!
+            _scope.call.joins(through).where(through => { fk => parent_ids })
           end
 
           assign do |parents, children|
@@ -100,7 +103,10 @@ module JsonapiCompliable
 
             allow_sideload type, resource: config[:resource] do
               scope do |parents|
-                config[:scope].call.where(primary_key => parents.map { |p| p.send(foreign_key) })
+                parent_ids = parents.map { |p| p.send(foreign_key) }
+                parent_ids.compact!
+                parent_ids.uniq!
+                config[:scope].call.where(primary_key => parent_ids)
               end
 
               assign do |parents, children|

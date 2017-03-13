@@ -3,14 +3,23 @@ module JsonapiCompliable
     class Base
       attr_reader :resource, :query_hash
 
-      def initialize(resource, query_hash, scope)
+      def initialize(resource, query_hash, scope, opts = {})
         @query_hash = query_hash
         @resource   = resource
         @scope      = scope
+        @opts       = opts
       end
 
       def apply
-        apply_standard_or_override
+        if apply?
+          apply_standard_or_override
+        else
+          @scope
+        end
+      end
+
+      def apply?
+        true
       end
 
       def apply_standard_or_override

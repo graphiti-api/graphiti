@@ -11,6 +11,14 @@ module JsonapiCompliable
       end
     end
 
+    def apply?
+      if @opts[:default] == false
+        not [page_param[:size], page_param[:number]].all?(&:nil?)
+      else
+        true
+      end
+    end
+
     def custom_scope
       resource.pagination
     end

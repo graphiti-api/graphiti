@@ -69,6 +69,18 @@ RSpec.describe 'sideloading' do
       end
     end
 
+    resource_class.allow_sideload :one_book, resource: book_resource do
+      scope do |authors|
+        Book.limit(1)
+      end
+
+      assign do |authors, books|
+        authors.each do |author|
+          author[:books] = books
+        end
+      end
+    end
+
     resource_class.allow_sideload :state, resource: state_resource do
       scope do |authors|
         State.where(id: authors.map { |a| a[:state_id] })
@@ -145,6 +157,11 @@ RSpec.describe 'sideloading' do
     params[:include] = 'books'
     params[:page]   = { books: { size: 1, number: 2 } }
     expect(scope.resolve.first[:books]).to eq([book2])
+  end
+
+  it 'does not apply default pagination for sideloads' do
+    params[:include] = 'one_book'
+    expect(scope.resolve.first[:books]).to eq([book1])
   end
 
   it 'supports sorting associations' do

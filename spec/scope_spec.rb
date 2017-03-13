@@ -43,6 +43,15 @@ RSpec.describe JsonapiCompliable::Scope do
           expect(sideload).to receive(:resolve).with(results, query)
           instance.resolve
         end
+
+        context 'but no parents were found' do
+          let(:results) { [] }
+
+          it 'does not resolve the sideload' do
+            expect(sideload).to_not receive(:resolve)
+            instance.resolve
+          end
+        end
       end
 
       context 'when the requested sideload is not allowed' do

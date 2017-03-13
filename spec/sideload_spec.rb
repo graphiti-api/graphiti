@@ -94,7 +94,7 @@ RSpec.describe JsonapiCompliable::Sideload do
       it 'scopes via configured proc' do
         expect(scope).to receive(:resolve) { results }
         expect(JsonapiCompliable::Scope).to receive(:new)
-          .with(base_scope, anything, query, namespace: :foo)
+          .with(base_scope, anything, query, default_paginate: false, namespace: :foo)
           .and_return(scope)
         instance.resolve(parents, query)
       end
@@ -107,7 +107,7 @@ RSpec.describe JsonapiCompliable::Sideload do
       context 'when passed namespace' do
         it 'passes namespace to scope builder' do
           expect(JsonapiCompliable::Scope).to receive(:new)
-            .with(base_scope, anything, query, namespace: :bar)
+            .with(base_scope, anything, query, default_paginate: false, namespace: :bar)
             .and_return(scope)
           instance.resolve(parents, query, :bar)
         end

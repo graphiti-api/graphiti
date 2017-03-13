@@ -35,6 +35,8 @@ module JsonapiCompliable
     private
 
     def sideload(results, includes)
+      return if results == []
+
       includes.each_pair do |name, nested|
         if @resource.allowed_sideloads.has_key?(name)
           sideload = @resource.sideload(name)
@@ -49,7 +51,7 @@ module JsonapiCompliable
       @object = JsonapiCompliable::Scoping::ExtraFields.new(@resource, query_hash, @object).apply unless opts[:extra_fields] == false
       @object = JsonapiCompliable::Scoping::Sort.new(@resource, query_hash, @object).apply unless opts[:sort] == false
       @unpaginated_object = @object
-      @object = JsonapiCompliable::Scoping::Paginate.new(@resource, query_hash, @object).apply unless opts[:paginate] == false
+      @object = JsonapiCompliable::Scoping::Paginate.new(@resource, query_hash, @object, default: opts[:default_paginate]).apply unless opts[:paginate] == false
     end
   end
 end
