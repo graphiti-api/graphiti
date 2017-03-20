@@ -10,6 +10,11 @@ module JsonapiCompliable
         collection
       end
 
+      def self.deep_merge!(hash, other)
+        merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
+        hash.merge!(other, &merger)
+      end
+
       def self.deep_dup(hash)
         if hash.respond_to?(:deep_dup)
           hash.deep_dup

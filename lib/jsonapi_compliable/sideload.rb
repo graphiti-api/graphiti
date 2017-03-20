@@ -6,16 +6,26 @@ module JsonapiCompliable
       :sideloads,
       :scope_proc,
       :assign_proc,
-      :grouper
+      :grouper,
+      :foreign_key,
+      :primary_key,
+      :type
 
-    def initialize(name, opts)
+    def initialize(name, type: nil, resource: nil, polymorphic: false, primary_key: :id, foreign_key: nil)
       @name               = name
-      @resource_class     = (opts[:resource] || Class.new(Resource))
+      @resource_class     = (resource || Class.new(Resource))
       @sideloads          = {}
-      @polymorphic        = !!opts[:polymorphic]
+      @polymorphic        = !!polymorphic
       @polymorphic_groups = {} if polymorphic?
+      @primary_key        = primary_key
+      @foreign_key        = foreign_key
+      @type               = type
 
       extend @resource_class.config[:adapter].sideloading_module
+    end
+
+    def resource
+      @resource ||= resource_class.new
     end
 
     def polymorphic?
@@ -28,6 +38,10 @@ module JsonapiCompliable
 
     def assign(&blk)
       @assign_proc = blk
+    end
+
+    def associate(parent, child)
+      resource_class.config[:adapter].associate(parent, child, name, type)
     end
 
     def group_by(&grouper)

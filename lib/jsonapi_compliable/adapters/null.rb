@@ -16,6 +16,10 @@ module JsonapiCompliable
       def sideload(scope, includes)
         scope
       end
+
+      def transaction
+        yield
+      end
     end
   end
 end

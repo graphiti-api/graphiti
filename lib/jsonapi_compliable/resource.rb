@@ -50,6 +50,10 @@ module JsonapiCompliable
       }
     end
 
+    def self.model(klass)
+      config[:model] = klass
+    end
+
     def self.sort(&blk)
       config[:sorting] = blk
     end
@@ -92,6 +96,7 @@ module JsonapiCompliable
           stats: {},
           sorting: nil,
           pagination: nil,
+          model: nil,
           adapter: Adapters::Abstract.new
         }
       end
@@ -113,6 +118,24 @@ module JsonapiCompliable
 
     def build_scope(base, query, opts = {})
       Scope.new(base, self, query, opts)
+    end
+
+    def create(create_params)
+      adapter.create(model, create_params)
+    end
+
+    def update(update_params)
+      adapter.update(model, update_params)
+    end
+
+    def destroy(id)
+      adapter.destroy(model, id)
+    end
+
+    def persist_with_relationships(meta, attributes, relationships)
+      persistence = JsonapiCompliable::Util::Persistence \
+        .new(self, meta, attributes, relationships)
+      persistence.run
     end
 
     def association_names
@@ -190,12 +213,22 @@ module JsonapiCompliable
       self.class.config[:default_filters]
     end
 
+    def model
+      self.class.config[:model]
+    end
+
     def adapter
       self.class.config[:adapter]
     end
 
     def resolve(scope)
       adapter.resolve(scope)
+    end
+
+    def transaction
+      adapter.transaction(model) do
+        yield
+      end
     end
   end
 end
