@@ -19,8 +19,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'rails', ['>= 4.1', '< 6']
-  spec.add_dependency 'strong_resources', '~> 0.1'
-  spec.add_dependency 'jsonapi_compliable', '~> 0.5'
+  spec.add_dependency 'strong_resources', '~> 0.6'
+  spec.add_dependency 'jsonapi_compliable', '~> 0.6'
   spec.add_dependency 'jsonapi_errorable', '~> 0.1'
   spec.add_dependency 'jsonapi_spec_helpers', '~> 0.3'
   spec.add_dependency 'nested_attribute_reassignable', '~> 0.6'
