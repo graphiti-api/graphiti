@@ -3,3 +3,7 @@ language: ruby
 rvm:
   - 2.3.0
 before_install: gem install bundler -v 1.12.5
+script: "bundle exec appraisal rspec"
+gemfile:
+  - gemfiles/rails_4.gemfile
+  - gemfiles/rails_5.gemfile
