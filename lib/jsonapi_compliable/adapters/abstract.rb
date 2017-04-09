@@ -17,6 +17,10 @@ module JsonapiCompliable
         raise 'you must override #sideload in an adapter subclass'
       end
 
+      def transaction
+        raise 'you must override #transaction in an adapter subclass, it must yield'
+      end
+
       def resolve(scope)
         scope
       end

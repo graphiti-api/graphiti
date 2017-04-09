@@ -4,6 +4,7 @@ require "jsonapi_compliable/resource"
 require "jsonapi_compliable/query"
 require "jsonapi_compliable/sideload"
 require "jsonapi_compliable/scope"
+require "jsonapi_compliable/deserializer"
 require "jsonapi_compliable/scoping/base"
 require "jsonapi_compliable/scoping/sort"
 require "jsonapi_compliable/scoping/paginate"
@@ -18,6 +19,9 @@ require "jsonapi_compliable/stats/payload"
 require "jsonapi_compliable/util/include_params"
 require "jsonapi_compliable/util/field_params"
 require "jsonapi_compliable/util/hash"
+require "jsonapi_compliable/util/relationship_payload"
+require "jsonapi_compliable/util/persistence"
+require "jsonapi_compliable/util/validation_response"
 
 # require correct jsonapi-rb before extensions
 if defined?(Rails)
@@ -30,8 +34,7 @@ require "jsonapi_compliable/extensions/extra_attribute"
 require "jsonapi_compliable/extensions/boolean_attribute"
 
 module JsonapiCompliable
-  autoload :Base,           'jsonapi_compliable/base'
-  autoload :Deserializable, 'jsonapi_compliable/deserializable'
+  autoload :Base, 'jsonapi_compliable/base'
 
   def self.included(klass)
     klass.instance_eval do

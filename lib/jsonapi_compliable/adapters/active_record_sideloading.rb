@@ -4,7 +4,7 @@ module JsonapiCompliable
       def has_many(association_name, scope: nil, resource:, foreign_key:, primary_key: :id, &blk)
         _scope = scope
 
-        allow_sideload association_name, resource: resource do
+        allow_sideload association_name, type: :has_many, resource: resource, foreign_key: foreign_key, primary_key: primary_key do
           scope do |parents|
             parent_ids = parents.map { |p| p.send(primary_key) }
             _scope.call.where(foreign_key => parent_ids.uniq.compact)
@@ -27,7 +27,7 @@ module JsonapiCompliable
       def belongs_to(association_name, scope: nil, resource:, foreign_key:, primary_key: :id, &blk)
         _scope = scope
 
-        allow_sideload association_name, resource: resource do
+        allow_sideload association_name, type: :belongs_to, resource: resource, foreign_key: foreign_key, primary_key: primary_key do
           scope do |parents|
             parent_ids = parents.map { |p| p.send(foreign_key) }
             _scope.call.where(primary_key => parent_ids.uniq.compact)

@@ -1,7 +1,6 @@
 module JsonapiCompliable
   module Base
     extend ActiveSupport::Concern
-    include Deserializable
 
     MAX_PAGE_SIZE = 1_000
 
@@ -32,7 +31,6 @@ module JsonapiCompliable
       @query_hash ||= query.to_hash[resource.type]
     end
 
-    # TODO pass controller and action name here to guard
     def wrap_context
       if self.class._jsonapi_compliable
         resource.with_context(self, action_name.to_sym) do
@@ -45,6 +43,30 @@ module JsonapiCompliable
       resource.build_scope(scope, query, opts)
     end
 
+    def deserialized_params
+      @deserialized_params ||= JsonapiCompliable::Deserializer.new(params, request.env)
+    end
+
+    def jsonapi_create
+      created = resource.transaction do
+        resource.persist_with_relationships \
+          deserialized_params.meta,
+          deserialized_params.attributes,
+          deserialized_params.relationships
+      end
+      Util::ValidationResponse.new(created, deserialized_params)
+    end
+
+    def jsonapi_update
+      updated = resource.transaction do
+        resource.persist_with_relationships \
+          deserialized_params.meta,
+          deserialized_params.attributes,
+          deserialized_params.relationships
+      end
+      Util::ValidationResponse.new(updated, deserialized_params)
+    end
+
     def perform_render_jsonapi(opts)
       JSONAPI::Serializable::Renderer.render(opts.delete(:jsonapi), opts)
     end
@@ -54,7 +76,7 @@ module JsonapiCompliable
       opts  = default_jsonapi_render_options.merge(opts)
       opts  = Util::RenderOptions.generate(scope, query_hash, opts)
       opts[:expose][:context] = self
-      opts[:include] = forced_includes if force_includes?
+      opts[:include] = deserialized_params.include_directive if force_includes?
       perform_render_jsonapi(opts)
     end
 
@@ -65,33 +87,8 @@ module JsonapiCompliable
       end
     end
 
-    # Legacy
-    # TODO: This nastiness likely goes away once jsonapi standardizes
-    # a spec for nested relationships.
-    # See: https://github.com/json-api/json-api/issues/1089
-    def forced_includes(data = nil)
-      data = raw_params[:data] unless data
-
-      {}.tap do |forced|
-        (data[:relationships] || {}).each_pair do |relation_name, relation|
-          if relation[:data].is_a?(Array)
-            forced[relation_name] = {}
-            relation[:data].each do |datum|
-              forced[relation_name].deep_merge!(forced_includes(datum))
-            end
-          else
-            forced[relation_name] = forced_includes(relation[:data])
-          end
-        end
-      end
-    end
-
-    # Legacy
     def force_includes?
-      return false unless defined?(Rails)
-
-      %w(PUT PATCH POST).include?(request.method) and
-        raw_params.try(:[], :data).try(:[], :relationships).present?
+      not params[:data].nil?
     end
 
     module ClassMethods
