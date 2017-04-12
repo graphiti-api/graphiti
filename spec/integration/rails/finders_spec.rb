@@ -19,14 +19,19 @@ if ENV["APPRAISAL_INITIALIZED"]
           resource: GenreResource
       end
 
-      class DwellingResource < JsonapiCompliable::Resource
-        type :dwellings
-        use_adapter JsonapiCompliable::Adapters::ActiveRecord
-      end
-
       class StateResource < JsonapiCompliable::Resource
         type :states
         use_adapter JsonapiCompliable::Adapters::ActiveRecord
+      end
+
+      class DwellingResource < JsonapiCompliable::Resource
+        type :dwellings
+        use_adapter JsonapiCompliable::Adapters::ActiveRecord
+
+        belongs_to :state,
+          foreign_key: :state_id,
+          scope: -> { State.all },
+          resource: StateResource
       end
 
       class BioResource < JsonapiCompliable::Resource
@@ -99,8 +104,8 @@ if ENV["APPRAISAL_INITIALIZED"]
     let!(:bio)     { Bio.create!(author: author1, picture: 'imgur', description: 'author bio') }
     let!(:hobby1)  { Hobby.create!(name: 'Fishing', authors: [author1]) }
     let!(:hobby2)  { Hobby.create!(name: 'Woodworking', authors: [author1]) }
-    let(:house)    { House.new(name: 'Cozy') }
-    let(:condo)    { Condo.new(name: 'Modern') }
+    let(:house)    { House.new(name: 'Cozy', state: state) }
+    let(:condo)    { Condo.new(name: 'Modern', state: state) }
     let(:genre)    { Genre.create!(name: 'Horror') }
 
     def ids_for(type)
@@ -276,6 +281,11 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(condo['condo_description']).to be_present
         expect(condo).to_not have_key('name')
         expect(condo).to_not have_key('condo_price')
+      end
+
+      it 'allows additional levels of nesting' do
+        get :index, params: { include: 'dwelling.state' }
+        expect(json_includes('states').length).to eq(1)
       end
     end
 

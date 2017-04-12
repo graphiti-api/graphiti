@@ -18,10 +18,12 @@ ActiveRecord::Schema.define(:version => 1) do
   end
 
   create_table :condos do |t|
+    t.integer :state_id
     t.string :name
   end
 
   create_table :houses do |t|
+    t.integer :state_id
     t.string :name
   end
 
@@ -76,10 +78,12 @@ end
 
 class Condo < LegacyApplicationRecord
   has_many :authors, as: :dwelling
+  belongs_to :state
 end
 
 class House < LegacyApplicationRecord
   has_many :authors, as: :dwelling
+  belongs_to :state
 end
 
 class AuthorHobby < LegacyApplicationRecord
@@ -148,6 +152,8 @@ class SerializableCondo < SerializableDwelling
   extra_attribute :condo_price do
     500_000
   end
+
+  belongs_to :state
 end
 
 class SerializableHouse < SerializableDwelling
@@ -160,6 +166,8 @@ class SerializableHouse < SerializableDwelling
   extra_attribute :house_price do
     1_000_000
   end
+
+  belongs_to :state
 end
 
 class SerializableHobby < LegacySerializableAbstract

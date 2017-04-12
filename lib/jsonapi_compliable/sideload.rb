@@ -3,6 +3,7 @@ module JsonapiCompliable
     attr_reader :name,
       :resource_class,
       :polymorphic,
+      :polymorphic_groups,
       :sideloads,
       :scope_proc,
       :assign_proc,
@@ -87,14 +88,26 @@ module JsonapiCompliable
         @sideloads.each_pair do |key, sideload|
           hash[name][key] = sideload.to_hash(levels_deep)[key] || {}
 
-          if sideloading = sideload.resource_class.sideloading
-            hash[name][key].merge!(sideloading.to_hash(levels_deep)[:base] || {})
+          if sideload.polymorphic?
+            sideload.polymorphic_groups.each_pair do |type, sl|
+              hash[name][key].merge!(nested_sideload_hash(sl, levels_deep))
+            end
+          else
+            hash[name][key].merge!(nested_sideload_hash(sideload, levels_deep))
           end
         end
       end
     end
 
     private
+
+    def nested_sideload_hash(sideload, levels_deep)
+      {}.tap do |hash|
+        if sideloading = sideload.resource_class.sideloading
+          hash.merge!(sideloading.to_hash(levels_deep)[:base])
+        end
+      end
+    end
 
     def resolve_polymorphic(parents, query)
       parents.group_by(&@grouper).each_pair do |group_type, group_members|
