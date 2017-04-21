@@ -122,7 +122,7 @@
                 
                 
                     <li >
-                        <a href="#deserialization">Deserialization</a>
+                        <a href="#custom-writes">Custom Writes</a>
                         
                     </li>
                 
@@ -224,8 +224,8 @@
 
 <ul>
   <li>You end up typing essentially the same stuff when writing your
-<a href="http://swagger.io">swagger</a> documentation, which violates the DRY
-principle and leads to code and documentation getting out of sync.</li>
+documentation, which violates the DRY principle and leads to code
+and documentation getting out of sync.</li>
   <li>If your API endpoints accept nested resources, you end up typing the
 same nested resource attributes across multiple controllers,
 inevitably adding an attribute it one place but forgetting it in others.</li>
@@ -264,11 +264,14 @@ this:</p>
   <span class="n">strong_resource</span> <span class="ss">:employee</span> <span class="k">do</span>
     <span class="n">belongs_to</span> <span class="ss">:department</span>
   <span class="k">end</span>
+
+  <span class="n">before_action</span> <span class="ss">:apply_strong_params</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:create</span><span class="p">,</span> <span class="ss">:update</span><span class="p">]</span>
 <span class="k">end</span>
 
 <span class="c1"># app/controllers/departments_controller.rb</span>
 <span class="k">class</span> <span class="nc">DepartmentsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
   <span class="n">strong_resource</span> <span class="ss">:department</span>
+  <span class="n">before_action</span> <span class="ss">:apply_strong_params</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:create</span><span class="p">,</span> <span class="ss">:update</span><span class="p">]</span>
 <span class="k">end</span>
 </code></pre>
 </div>

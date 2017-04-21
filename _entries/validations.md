@@ -8,7 +8,8 @@ number: 18
 
 If our model has a validation error, we need to render a [JSON API Error
 Object](http://jsonapi.org/format/#errors). You can just use
-`render_errors_for` and forget about it:
+`render_errors_for` and forget about it. This will handle validation
+errors on nested objects as well:
 
 ```ruby
 def create

@@ -122,7 +122,7 @@
                 
                 
                     <li >
-                        <a href="#deserialization">Deserialization</a>
+                        <a href="#custom-writes">Custom Writes</a>
                         
                     </li>
                 
@@ -222,7 +222,8 @@
                 <span class="toggle">open</span>
                 <p>If our model has a validation error, we need to render a <a href="http://jsonapi.org/format/#errors">JSON API Error
 Object</a>. You can just use
-<code class="highlighter-rouge">render_errors_for</code> and forget about it:</p>
+<code class="highlighter-rouge">render_errors_for</code> and forget about it. This will handle validation
+errors on nested objects as well:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">create</span>
   <span class="n">employee</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">employee_params</span><span class="p">)</span>

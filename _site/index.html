@@ -122,7 +122,7 @@
                 
                 
                     <li >
-                        <a href="#deserialization">Deserialization</a>
+                        <a href="#custom-writes">Custom Writes</a>
                         
                     </li>
                 
@@ -994,88 +994,85 @@ have issues.</p>
                   <h1><a href="#writes" name="writes">Writes</a></h1>
                 
 
-            
+            <p>Basic writes are very similar to vanilla Rails. Since we allow nested
+creation of non-ActiveRecord objects the syntax is slightly different:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">jsonapi</span> <span class="ss">resource: </span><span class="no">EmployeeResource</span>
+
+  <span class="k">def</span> <span class="nf">create</span>
+    <span class="n">employee</span><span class="p">,</span> <span class="n">success</span> <span class="o">=</span> <span class="n">jsonapi_create</span><span class="p">.</span><span class="nf">to_a</span>
+
+    <span class="k">if</span> <span class="n">success</span>
+      <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">employee</span><span class="p">,</span> <span class="ss">scope: </span><span class="kp">false</span><span class="p">)</span>
+    <span class="k">else</span>
+      <span class="n">render_errors_for</span><span class="p">(</span><span class="n">employee</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">update</span>
+    <span class="n">employee</span><span class="p">,</span> <span class="n">success</span> <span class="o">=</span> <span class="n">jsonapi_update</span><span class="p">.</span><span class="nf">to_a</span>
+
+    <span class="k">if</span> <span class="n">success</span>
+      <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">employee</span><span class="p">,</span> <span class="ss">scope: </span><span class="kp">false</span><span class="p">)</span>
+    <span class="k">else</span>
+      <span class="n">render_errors_for</span><span class="p">(</span><span class="n">employee</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>To enable writes, make sure your resources know about a corresponding
+<code class="highlighter-rouge">Model</code>:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+  <span class="n">model</span> <span class="no">Employee</span>
+<span class="k">end</span>
+</code></pre>
+</div>
 
         </section>
     
 
     
-        <section id="deserialization" class="h2">
+        <section id="custom-writes" class="h2">
             
-                  <h2><a href="#deserialization" name="deserialization">Deserialization</a></h2>
+                  <h2><a href="#custom-writes" name="custom-writes">Custom Writes</a></h2>
                 
 
-            <p>By default, Rails doesn’t work too well with incoming JSON API payloads.
-You can fix that with <code class="highlighter-rouge">deserialize_jsonapi!</code>:</p>
+            <p>Use your Resource to customize write logic. Here’s where you could use
+something other than ActiveRecord, send an email after a record is
+created, etc:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">before_action</span> <span class="ss">:deserialize_jsonapi!</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:create</span><span class="p">,</span> <span class="ss">:update</span><span class="p">]</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>  <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="n">employee</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="n">log</span><span class="p">(</span><span class="s1">'Created'</span><span class="p">,</span> <span class="n">employee</span><span class="p">)</span>
+    <span class="n">employee</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="n">employee</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">attributes</span><span class="p">[</span><span class="ss">:id</span><span class="p">])</span>
+    <span class="n">employee</span><span class="p">.</span><span class="nf">update_attributes</span><span class="p">(</span><span class="n">attributes</span><span class="p">.</span><span class="nf">except</span><span class="p">(</span><span class="ss">:id</span><span class="p">))</span>
+    <span class="n">log</span><span class="p">(</span><span class="s1">'Updated'</span><span class="p">,</span> <span class="n">employee</span><span class="p">)</span>
+    <span class="n">employee</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+    <span class="n">employee</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+    <span class="n">employee</span><span class="p">.</span><span class="nf">destroy</span>
+    <span class="n">log</span><span class="p">(</span><span class="s1">'Deleted'</span><span class="p">,</span> <span class="n">employee</span><span class="p">)</span>
+    <span class="n">employee</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">employee</span><span class="p">)</span>
+    <span class="no">Rails</span><span class="p">.</span><span class="nf">logger</span><span class="p">.</span><span class="nf">info</span> <span class="s2">"</span><span class="si">#{</span><span class="n">prefix</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="n">employee</span><span class="p">.</span><span class="nf">first_name</span><span class="si">}</span><span class="s2"> Employee via API"</span>
+    <span class="k">end</span>
 </code></pre>
 </div>
-
-<p>This will transform params from this:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># POST /employees</span>
-<span class="p">{</span>
-  <span class="ss">data: </span><span class="p">{</span>
-    <span class="ss">type: </span><span class="s1">'employees'</span><span class="p">,</span>
-    <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Homer Simpson'</span> <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre>
-</div>
-
-<p>To this:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
-  <span class="ss">employee: </span><span class="p">{</span>
-    <span class="ss">name: </span><span class="s1">'Homer Simpson'</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre>
-</div>
-
-<p>As if it were vanilla Rails. This will also transform any relationships
-into an <a href="http://api.rubyonrails.org/classes/ActiveRecord/NestedAttributes/ClassMethods.html">accepts_nested_attributes_for</a>-compatible payload:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># POST /employees</span>
-<span class="p">{</span>
-  <span class="ss">data: </span><span class="p">{</span>
-    <span class="ss">type: </span><span class="s1">'employees'</span><span class="p">,</span>
-    <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Homer Simpson'</span> <span class="p">},</span>
-    <span class="ss">relationships: </span><span class="p">{</span>
-      <span class="ss">department: </span><span class="p">{</span>
-        <span class="ss">data: </span><span class="p">{</span>
-          <span class="ss">type: </span><span class="s1">'departments'</span><span class="p">,</span>
-          <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Safety'</span> <span class="p">}</span>
-        <span class="p">}</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre>
-</div>
-
-<p>Becomes:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
-  <span class="ss">employee: </span><span class="p">{</span>
-    <span class="ss">name: </span><span class="s1">'Homer Simpson'</span><span class="p">,</span>
-    <span class="ss">department_attributes: </span><span class="p">{</span>
-      <span class="p">{</span> <span class="ss">name: </span><span class="s1">'Safety'</span> <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre>
-</div>
-
-<div class="note info">
-  <h6 id="rawparams">raw_params</h6>
-  <div class="note-content">
-    <p>If you ever need to reference the original parameters, use
-  <code class="highlighter-rouge">raw_params</code> instead of <code class="highlighter-rouge">params</code>.</p>
-  </div>
-</div>
-<div style="height: 7rem"></div>
 
         </section>
     
@@ -1088,7 +1085,8 @@ into an <a href="http://api.rubyonrails.org/classes/ActiveRecord/NestedAttribute
 
             <p>If our model has a validation error, we need to render a <a href="http://jsonapi.org/format/#errors">JSON API Error
 Object</a>. You can just use
-<code class="highlighter-rouge">render_errors_for</code> and forget about it:</p>
+<code class="highlighter-rouge">render_errors_for</code> and forget about it. This will handle validation
+errors on nested objects as well:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">create</span>
   <span class="n">employee</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">employee_params</span><span class="p">)</span>
@@ -1135,8 +1133,8 @@ Object</a>. You can just use
 
 <ul>
   <li>You end up typing essentially the same stuff when writing your
-<a href="http://swagger.io">swagger</a> documentation, which violates the DRY
-principle and leads to code and documentation getting out of sync.</li>
+documentation, which violates the DRY principle and leads to code
+and documentation getting out of sync.</li>
   <li>If your API endpoints accept nested resources, you end up typing the
 same nested resource attributes across multiple controllers,
 inevitably adding an attribute it one place but forgetting it in others.</li>
@@ -1175,11 +1173,14 @@ this:</p>
   <span class="n">strong_resource</span> <span class="ss">:employee</span> <span class="k">do</span>
     <span class="n">belongs_to</span> <span class="ss">:department</span>
   <span class="k">end</span>
+
+  <span class="n">before_action</span> <span class="ss">:apply_strong_params</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:create</span><span class="p">,</span> <span class="ss">:update</span><span class="p">]</span>
 <span class="k">end</span>
 
 <span class="c1"># app/controllers/departments_controller.rb</span>
 <span class="k">class</span> <span class="nc">DepartmentsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
   <span class="n">strong_resource</span> <span class="ss">:department</span>
+  <span class="n">before_action</span> <span class="ss">:apply_strong_params</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:create</span><span class="p">,</span> <span class="ss">:update</span><span class="p">]</span>
 <span class="k">end</span>
 </code></pre>
 </div>
@@ -1765,10 +1766,6 @@ Note that each block must return a ‘scopeable’ that will be passed on:</p>
 
   <span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="kp">attr</span><span class="p">)</span>
     <span class="n">db</span><span class="p">.</span><span class="nf">count</span>
-  <span class="k">end</span>
-
-  <span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
-    <span class="n">scope</span><span class="p">.</span><span class="nf">all</span>
   <span class="k">end</span>
 
   <span class="c1"># etc.</span>

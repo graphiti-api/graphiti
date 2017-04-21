@@ -9,11 +9,11 @@ number: 19
 At this point we **could** use regular ol' [strong_parameters](https://github.com/rails/strong_parameters). That would work. However, two things eventually crop up making this a pain point:
 
 * You end up typing essentially the same stuff when writing your
-  [swagger](http://swagger.io) documentation, which violates the DRY
-principle and leads to code and documentation getting out of sync.
+  documentation, which violates the DRY principle and leads to code
+  and documentation getting out of sync.
 * If your API endpoints accept nested resources, you end up typing the
   same nested resource attributes across multiple controllers,
-inevitably adding an attribute it one place but forgetting it in others.
+  inevitably adding an attribute it one place but forgetting it in others.
 
 Enter Strong Resources - DRY strong parameters! Instead of code like
 this:
@@ -49,11 +49,14 @@ class EmployeesController < ApplicationController
   strong_resource :employee do
     belongs_to :department
   end
+
+  before_action :apply_strong_params, only: [:create, :update]
 end
 
 # app/controllers/departments_controller.rb
 class DepartmentsController < ApplicationController
   strong_resource :department
+  before_action :apply_strong_params, only: [:create, :update]
 end
 ```
 
