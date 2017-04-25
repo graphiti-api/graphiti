@@ -32,6 +32,7 @@ end
 
 require "jsonapi_compliable/extensions/extra_attribute"
 require "jsonapi_compliable/extensions/boolean_attribute"
+require "jsonapi_compliable/extensions/temp_id"
 
 module JsonapiCompliable
   autoload :Base, 'jsonapi_compliable/base'
