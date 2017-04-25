@@ -259,6 +259,31 @@ creation of non-ActiveRecord objects the syntax is slightly different:</p>
 </code></pre>
 </div>
 
+<p>All writes run in an a transaction (by default, an ActiveRecord
+transaction) and will be rolled back upon error. This can be customized
+as well:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># Default Implementation</span>
+<span class="k">def</span> <span class="nf">transaction</span><span class="p">(</span><span class="n">model_class</span><span class="p">)</span>
+  <span class="n">model_class</span><span class="p">.</span><span class="nf">transaction</span> <span class="k">do</span>
+    <span class="k">yield</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Any object implementing ActiveModel::Validations <code class="highlighter-rouge">#errors</code> will be
+respected. So, if we had:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Employee</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">validates</span> <span class="ss">:first_name</span><span class="p">,</span> <span class="ss">presence: </span><span class="kp">true</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>And no <code class="highlighter-rouge">first_name</code> attribute is sent, the API will response with
+validation errors and the transaction will be rolled back.</p>
+
             </div>
         </div>
 

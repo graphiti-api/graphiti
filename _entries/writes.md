@@ -44,3 +44,28 @@ class EmployeeResource < ApplicationResource
   model Employee
 end
 ```
+
+All writes run in an a transaction (by default, an ActiveRecord
+transaction) and will be rolled back upon error. This can be customized
+as well:
+
+```ruby
+# Default Implementation
+def transaction(model_class)
+  model_class.transaction do
+    yield
+  end
+end
+```
+
+Any object implementing ActiveModel::Validations `#errors` will be
+respected. So, if we had:
+
+```ruby
+class Employee < ApplicationRecord
+  validates :first_name, presence: true
+end
+```
+
+And no `first_name` attribute is sent, the API will response with
+validation errors and the transaction will be rolled back.

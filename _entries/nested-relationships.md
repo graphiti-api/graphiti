@@ -8,46 +8,132 @@ parent-id: jsonapi-plus
 
 We've already mentioned nested relationships, but this is actually not
 currently part of the core JSON API spec. We accept PUT or POST
-payloads with nested attributes, including `_delete` (disassociate) and
-`_destroy` attributes:
+payloads with nested attributes. The payload is the same as a
+sideloaded response, with the addition of a `method` (called "sideposting"). Here we'll update
+an employee and position, while destroying the department for that
+position. If any of these error or fail validations, the transaction
+will be rolled back:
+
+```ruby
+{
+  id: '1',
+  type: 'employees',
+  attributes: { name: 'Homer Simpson' },
+  relationships: {
+    positions: {
+      data: [
+        {
+          type: 'positions',
+          id: '1',
+          method: 'update'
+        }
+      ]
+    }
+  },
+  included: [
+    {
+      id: '1',
+      type: 'positions',
+      attributes: { title: 'Software Engineer' },
+      relationships: {
+        department: {
+          data: {
+            id: '1',
+            type: 'departments',
+            method: 'destroy'
+          }
+        }
+        )    }
+    },
+    {
+      id: '1',
+      type: 'departments',
+      attributes: { name: 'Safety' }
+    }
+  ]
+}
+```
+
+When creating nested records, we accept a `temp-id` - this is so the
+client can match up the record they sent with the now-persisted record
+in the response. Here we'll create an employee, position, and
+department all in one go.
 
 ```ruby
 {
   type: 'employees',
   attributes: { name: 'Homer Simpson' },
   relationships: {
-    department: {
-      data: {
-        type: 'departments',
-        id: 1,
-        relationships: {
-          goals: {
-            data: {
-              type: 'goals',
-              id: 2,
-              attributes: { _delete: true }
-            }
+    positions: {
+      data: [
+        {
+          type: 'positions',
+          temp-id: 's0m3uu1d',
+          method: 'create'
+        }
+      ]
+    }
+  },
+  included: [
+    {
+      temp-id: 's0m3uu1d',
+      type: 'positions',
+      attributes: { title: 'Software Engineer' },
+      relationships: {
+        department: {
+          data: {
+            temp-id: 'an0th3ruu1d'
+            type: 'departments',
+            method: 'create'
           }
         }
       }
+    },
+    {
+      temp-id: 'an0th3ruu1d',
+      type: 'departments',
+      method: 'create'
     }
-  }
+  ]
 }
 ```
 
-To honor this API we need to customize `accepts_nested_attributes_for`.
-Since we're overring ActiveRecord, we require you to explicitly include
-this module:
+To accomodate this payload:
 
 ```ruby
-class Employee < ApplicationRecord
-  include NestedAttributeReassignable
+class EmployeesController
+  def create
+    employee, success = jsonapi_create.to_a
+
+    if success
+      render_jsonapi(employee, scope: false)
+    else
+      render_errors_for(employee)
+    end
+  end
+
+  def update
+    employee, success = jsonapi_update.to_a
+
+    if success
+      render_jsonapi(employee, scope: false)
+    else
+      render_errors_for(employee)
+    end
+  end
 end
 ```
 
-And instead of using `accepts_nested_attributes_for`, use
-`reassignable_nested_attributes_for`. Otherwise, everything is the same
-and will 'just work'.
+And add a `model` to your corresponding `Resource`:
+
+```ruby
+class EmployeeResource < ApplicationResource
+  # ... code ...
+  model Employee
+end
+```
+
+See the [tutorial on writes](https://gist.github.com/richmolj/c7f1adca75f614bb71b27f259ff3c37a#writes) for information on how to customize various write operations, whitelist parameters, nested validations, and more.
 
 {::options parse_block_html="true" /}
 <div style="height: 3rem" />

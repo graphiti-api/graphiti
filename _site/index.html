@@ -239,6 +239,9 @@ required.</p>
 <p>If you only have 5 seconds to look at this, we recommend you take a
 glance at the <a href="#quickstart">Quickstart</a>.</p>
 
+<p>If you prefer following a tutorial with a <a href="https://github.com/jsonapi-suite/employee_directory">sample application</a>, including <a href="https://github.com/jsonapi-suite/employee-directory">client-side
+usage</a>, please go <a href="https://gist.github.com/richmolj/c7f1adca75f614bb71b27f259ff3c37a">here</a>.</p>
+
         </section>
     
 
@@ -1033,6 +1036,31 @@ creation of non-ActiveRecord objects the syntax is slightly different:</p>
 </code></pre>
 </div>
 
+<p>All writes run in an a transaction (by default, an ActiveRecord
+transaction) and will be rolled back upon error. This can be customized
+as well:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># Default Implementation</span>
+<span class="k">def</span> <span class="nf">transaction</span><span class="p">(</span><span class="n">model_class</span><span class="p">)</span>
+  <span class="n">model_class</span><span class="p">.</span><span class="nf">transaction</span> <span class="k">do</span>
+    <span class="k">yield</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Any object implementing ActiveModel::Validations <code class="highlighter-rouge">#errors</code> will be
+respected. So, if we had:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Employee</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">validates</span> <span class="ss">:first_name</span><span class="p">,</span> <span class="ss">presence: </span><span class="kp">true</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>And no <code class="highlighter-rouge">first_name</code> attribute is sent, the API will response with
+validation errors and the transaction will be rolled back.</p>
+
         </section>
     
 
@@ -1046,7 +1074,11 @@ creation of non-ActiveRecord objects the syntax is slightly different:</p>
 something other than ActiveRecord, send an email after a record is
 created, etc:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>  <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+  <span class="n">model</span> <span class="no">Employee</span>
+
+  <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
     <span class="n">employee</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
     <span class="n">log</span><span class="p">(</span><span class="s1">'Created'</span><span class="p">,</span> <span class="n">employee</span><span class="p">)</span>
     <span class="n">employee</span>
@@ -1070,7 +1102,8 @@ created, etc:</p>
 
   <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">employee</span><span class="p">)</span>
     <span class="no">Rails</span><span class="p">.</span><span class="nf">logger</span><span class="p">.</span><span class="nf">info</span> <span class="s2">"</span><span class="si">#{</span><span class="n">prefix</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="n">employee</span><span class="p">.</span><span class="nf">first_name</span><span class="si">}</span><span class="s2"> Employee via API"</span>
-    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
 </code></pre>
 </div>
 
@@ -1465,46 +1498,132 @@ with the current specification, but not defined within it - we call this
 
             <p>We’ve already mentioned nested relationships, but this is actually not
 currently part of the core JSON API spec. We accept PUT or POST
-payloads with nested attributes, including <code class="highlighter-rouge">_delete</code> (disassociate) and
-<code class="highlighter-rouge">_destroy</code> attributes:</p>
+payloads with nested attributes. The payload is the same as a
+sideloaded response, with the addition of a <code class="highlighter-rouge">method</code> (called “sideposting”). Here we’ll update
+an employee and position, while destroying the department for that
+position. If any of these error or fail validations, the transaction
+will be rolled back:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="ss">id: </span><span class="s1">'1'</span><span class="p">,</span>
+  <span class="ss">type: </span><span class="s1">'employees'</span><span class="p">,</span>
+  <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Homer Simpson'</span> <span class="p">},</span>
+  <span class="ss">relationships: </span><span class="p">{</span>
+    <span class="ss">positions: </span><span class="p">{</span>
+      <span class="ss">data: </span><span class="p">[</span>
+        <span class="p">{</span>
+          <span class="ss">type: </span><span class="s1">'positions'</span><span class="p">,</span>
+          <span class="ss">id: </span><span class="s1">'1'</span><span class="p">,</span>
+          <span class="ss">method: </span><span class="s1">'update'</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="ss">included: </span><span class="p">[</span>
+    <span class="p">{</span>
+      <span class="ss">id: </span><span class="s1">'1'</span><span class="p">,</span>
+      <span class="ss">type: </span><span class="s1">'positions'</span><span class="p">,</span>
+      <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">title: </span><span class="s1">'Software Engineer'</span> <span class="p">},</span>
+      <span class="ss">relationships: </span><span class="p">{</span>
+        <span class="ss">department: </span><span class="p">{</span>
+          <span class="ss">data: </span><span class="p">{</span>
+            <span class="ss">id: </span><span class="s1">'1'</span><span class="p">,</span>
+            <span class="ss">type: </span><span class="s1">'departments'</span><span class="p">,</span>
+            <span class="ss">method: </span><span class="s1">'destroy'</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="p">)</span>    <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="ss">id: </span><span class="s1">'1'</span><span class="p">,</span>
+      <span class="ss">type: </span><span class="s1">'departments'</span><span class="p">,</span>
+      <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Safety'</span> <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>When creating nested records, we accept a <code class="highlighter-rouge">temp-id</code> - this is so the
+client can match up the record they sent with the now-persisted record
+in the response. Here we’ll create an employee, position, and
+department all in one go.</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
   <span class="ss">type: </span><span class="s1">'employees'</span><span class="p">,</span>
   <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Homer Simpson'</span> <span class="p">},</span>
   <span class="ss">relationships: </span><span class="p">{</span>
-    <span class="ss">department: </span><span class="p">{</span>
-      <span class="ss">data: </span><span class="p">{</span>
-        <span class="ss">type: </span><span class="s1">'departments'</span><span class="p">,</span>
-        <span class="ss">id: </span><span class="mi">1</span><span class="p">,</span>
-        <span class="ss">relationships: </span><span class="p">{</span>
-          <span class="ss">goals: </span><span class="p">{</span>
-            <span class="ss">data: </span><span class="p">{</span>
-              <span class="ss">type: </span><span class="s1">'goals'</span><span class="p">,</span>
-              <span class="ss">id: </span><span class="mi">2</span><span class="p">,</span>
-              <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">_delete: </span><span class="kp">true</span> <span class="p">}</span>
-            <span class="p">}</span>
+    <span class="ss">positions: </span><span class="p">{</span>
+      <span class="ss">data: </span><span class="p">[</span>
+        <span class="p">{</span>
+          <span class="ss">type: </span><span class="s1">'positions'</span><span class="p">,</span>
+          <span class="n">temp</span><span class="o">-</span><span class="ss">id: </span><span class="s1">'s0m3uu1d'</span><span class="p">,</span>
+          <span class="ss">method: </span><span class="s1">'create'</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="ss">included: </span><span class="p">[</span>
+    <span class="p">{</span>
+      <span class="n">temp</span><span class="o">-</span><span class="ss">id: </span><span class="s1">'s0m3uu1d'</span><span class="p">,</span>
+      <span class="ss">type: </span><span class="s1">'positions'</span><span class="p">,</span>
+      <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">title: </span><span class="s1">'Software Engineer'</span> <span class="p">},</span>
+      <span class="ss">relationships: </span><span class="p">{</span>
+        <span class="ss">department: </span><span class="p">{</span>
+          <span class="ss">data: </span><span class="p">{</span>
+            <span class="n">temp</span><span class="o">-</span><span class="ss">id: </span><span class="s1">'an0th3ruu1d'</span>
+            <span class="ss">type: </span><span class="s1">'departments'</span><span class="p">,</span>
+            <span class="ss">method: </span><span class="s1">'create'</span>
           <span class="p">}</span>
         <span class="p">}</span>
       <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="n">temp</span><span class="o">-</span><span class="ss">id: </span><span class="s1">'an0th3ruu1d'</span><span class="p">,</span>
+      <span class="ss">type: </span><span class="s1">'departments'</span><span class="p">,</span>
+      <span class="ss">method: </span><span class="s1">'create'</span>
     <span class="p">}</span>
-  <span class="p">}</span>
+  <span class="p">]</span>
 <span class="p">}</span>
 </code></pre>
 </div>
 
-<p>To honor this API we need to customize <code class="highlighter-rouge">accepts_nested_attributes_for</code>.
-Since we’re overring ActiveRecord, we require you to explicitly include
-this module:</p>
+<p>To accomodate this payload:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Employee</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
-  <span class="kp">include</span> <span class="no">NestedAttributeReassignable</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeesController</span>
+  <span class="k">def</span> <span class="nf">create</span>
+    <span class="n">employee</span><span class="p">,</span> <span class="n">success</span> <span class="o">=</span> <span class="n">jsonapi_create</span><span class="p">.</span><span class="nf">to_a</span>
+
+    <span class="k">if</span> <span class="n">success</span>
+      <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">employee</span><span class="p">,</span> <span class="ss">scope: </span><span class="kp">false</span><span class="p">)</span>
+    <span class="k">else</span>
+      <span class="n">render_errors_for</span><span class="p">(</span><span class="n">employee</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">update</span>
+    <span class="n">employee</span><span class="p">,</span> <span class="n">success</span> <span class="o">=</span> <span class="n">jsonapi_update</span><span class="p">.</span><span class="nf">to_a</span>
+
+    <span class="k">if</span> <span class="n">success</span>
+      <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">employee</span><span class="p">,</span> <span class="ss">scope: </span><span class="kp">false</span><span class="p">)</span>
+    <span class="k">else</span>
+      <span class="n">render_errors_for</span><span class="p">(</span><span class="n">employee</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
 <span class="k">end</span>
 </code></pre>
 </div>
 
-<p>And instead of using <code class="highlighter-rouge">accepts_nested_attributes_for</code>, use
-<code class="highlighter-rouge">reassignable_nested_attributes_for</code>. Otherwise, everything is the same
-and will ‘just work’.</p>
+<p>And add a <code class="highlighter-rouge">model</code> to your corresponding <code class="highlighter-rouge">Resource</code>:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="c1"># ... code ...</span>
+  <span class="n">model</span> <span class="no">Employee</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>See the <a href="https://gist.github.com/richmolj/c7f1adca75f614bb71b27f259ff3c37a#writes">tutorial on writes</a> for information on how to customize various write operations, whitelist parameters, nested validations, and more.</p>
 
 <div style="height: 3rem"></div>
 <div class="note info">

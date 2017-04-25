@@ -224,7 +224,11 @@
 something other than ActiveRecord, send an email after a record is
 created, etc:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>  <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+  <span class="n">model</span> <span class="no">Employee</span>
+
+  <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
     <span class="n">employee</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
     <span class="n">log</span><span class="p">(</span><span class="s1">'Created'</span><span class="p">,</span> <span class="n">employee</span><span class="p">)</span>
     <span class="n">employee</span>
@@ -248,7 +252,8 @@ created, etc:</p>
 
   <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">employee</span><span class="p">)</span>
     <span class="no">Rails</span><span class="p">.</span><span class="nf">logger</span><span class="p">.</span><span class="nf">info</span> <span class="s2">"</span><span class="si">#{</span><span class="n">prefix</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="n">employee</span><span class="p">.</span><span class="nf">first_name</span><span class="si">}</span><span class="s2"> Employee via API"</span>
-    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
 </code></pre>
 </div>
 

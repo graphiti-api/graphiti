@@ -11,6 +11,10 @@ something other than ActiveRecord, send an email after a record is
 created, etc:
 
 ```ruby
+class EmployeeResource < ApplicationResource
+  type :employees
+  model Employee
+
   def create(attributes)
     employee = Employee.create(attributes)
     log('Created', employee)
@@ -35,5 +39,6 @@ created, etc:
 
   def log(prefix, employee)
     Rails.logger.info "#{prefix} #{employee.first_name} Employee via API"
-    end
+  end
+end
 ````
