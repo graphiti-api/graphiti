@@ -48,23 +48,32 @@ module JsonapiCompliable
     end
 
     def jsonapi_create
-      created = resource.transaction do
+      _persist do
         resource.persist_with_relationships \
           deserialized_params.meta,
           deserialized_params.attributes,
           deserialized_params.relationships
       end
-      Util::ValidationResponse.new(created, deserialized_params)
     end
 
     def jsonapi_update
-      updated = resource.transaction do
+      _persist do
         resource.persist_with_relationships \
           deserialized_params.meta,
           deserialized_params.attributes,
           deserialized_params.relationships
       end
-      Util::ValidationResponse.new(updated, deserialized_params)
+    end
+
+    def _persist
+      validation_response = nil
+      resource.transaction do
+        object = yield
+        validation_response = Util::ValidationResponse.new \
+          object, deserialized_params
+        raise Errors::ValidationError unless validation_response.to_a[1]
+      end
+      validation_response
     end
 
     def perform_render_jsonapi(opts)

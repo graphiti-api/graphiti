@@ -1,6 +1,7 @@
 module JsonapiCompliable
   module Errors
     class BadFilter < StandardError; end
+    class ValidationError < StandardError; end
 
     class UnsupportedPageSize < StandardError
       def initialize(size, max)

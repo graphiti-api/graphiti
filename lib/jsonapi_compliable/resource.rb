@@ -226,9 +226,14 @@ module JsonapiCompliable
     end
 
     def transaction
-      adapter.transaction(model) do
-        yield
+      response = nil
+      begin
+        adapter.transaction(model) do
+          response = yield
+        end
+      rescue Errors::ValidationError
       end
+      response
     end
   end
 end
