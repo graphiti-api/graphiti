@@ -16,7 +16,7 @@ module JsonapiCompliable
       end
 
       def count(scope, attr)
-        scope.count
+        scope.uniq.count
       end
 
       def average(scope, attr)
