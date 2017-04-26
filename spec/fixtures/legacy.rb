@@ -5,7 +5,13 @@ ActiveRecord::Schema.define(:version => 1) do
     t.string :dwelling_type
     t.integer :state_id
     t.integer :dwelling_id
+    t.integer :organization_id
     t.timestamps
+  end
+
+  create_table :organizations do |t|
+    t.string :name
+    t.integer :parent_id
   end
 
   create_table :author_hobbies do |t|
@@ -68,12 +74,18 @@ end
 class Author < LegacyApplicationRecord
   belongs_to :dwelling, polymorphic: true
   belongs_to :state
+  belongs_to :organization
   has_many :books
   has_many :author_hobbies
   has_many :hobbies, through: :author_hobbies
   has_one :bio
   accepts_nested_attributes_for :books
   accepts_nested_attributes_for :state
+end
+
+class Organization < LegacyApplicationRecord
+  belongs_to :parent, class_name: 'Organization', foreign_key: :parent_id
+  has_many :children, class_name: 'Organization', foreign_key: :parent_id
 end
 
 class Condo < LegacyApplicationRecord
@@ -131,9 +143,19 @@ class SerializableAuthor < LegacySerializableAbstract
 
   belongs_to :dwelling
   belongs_to :state
+  belongs_to :organization
   has_many :books
   has_many :hobbies
   has_one :bio
+end
+
+class SerializableOrganization < LegacySerializableAbstract
+  type 'organizations'
+
+  attribute :name
+
+  has_many :children
+  belongs_to :parent
 end
 
 class SerializableDwelling < LegacySerializableAbstract

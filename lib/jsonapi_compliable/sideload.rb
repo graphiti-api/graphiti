@@ -75,36 +75,32 @@ module JsonapiCompliable
     end
 
     # Grab from nested sideloads, AND resource, recursively
-    # To prevent circular relationships (author resource sideloads
-    # books and books resource sideloads authors), this allows
-    # sideloading up to 10 levels deep into the nesting of relationships
-    # We may want to make this configurable (possible at runtime), or
-    # maybe there is a better pattern here
-    def to_hash(levels_deep = 0)
-      levels_deep += 1
-      return {} if levels_deep == 10
+    def to_hash(processed = [])
+      return { name => {} } if processed.include?(self)
+      processed << self
 
-      { name => {} }.tap do |hash|
+      result = { name => {} }.tap do |hash|
         @sideloads.each_pair do |key, sideload|
-          hash[name][key] = sideload.to_hash(levels_deep)[key] || {}
+          hash[name][key] = sideload.to_hash(processed)[key] || {}
 
           if sideload.polymorphic?
             sideload.polymorphic_groups.each_pair do |type, sl|
-              hash[name][key].merge!(nested_sideload_hash(sl, levels_deep))
+              hash[name][key].merge!(nested_sideload_hash(sl, processed))
             end
           else
-            hash[name][key].merge!(nested_sideload_hash(sideload, levels_deep))
+            hash[name][key].merge!(nested_sideload_hash(sideload, processed))
           end
         end
       end
+      result
     end
 
     private
 
-    def nested_sideload_hash(sideload, levels_deep)
+    def nested_sideload_hash(sideload, processed)
       {}.tap do |hash|
         if sideloading = sideload.resource_class.sideloading
-          hash.merge!(sideloading.to_hash(levels_deep)[:base])
+          hash.merge!(sideloading.to_hash(processed)[:base])
         end
       end
     end
