@@ -45,6 +45,20 @@ if ENV["APPRAISAL_INITIALIZED"]
         use_adapter JsonapiCompliable::Adapters::ActiveRecord
       end
 
+      class OrganizationResource < JsonapiCompliable::Resource
+        type :organizations
+        use_adapter JsonapiCompliable::Adapters::ActiveRecord
+
+        has_many :children,
+          foreign_key: :parent_id,
+          resource: OrganizationResource,
+          scope: -> { Organization.all }
+        belongs_to :parent,
+          foreign_key: :parent_id,
+          resource: OrganizationResource,
+          scope: -> { Organization.all }
+      end
+
       class AuthorResource < JsonapiCompliable::Resource
         type :authors
         use_adapter JsonapiCompliable::Adapters::ActiveRecord
@@ -85,6 +99,11 @@ if ENV["APPRAISAL_INITIALIZED"]
               scope: -> { Condo.all }
             }
           }
+
+        belongs_to :organization,
+          foreign_key: :organization_id,
+          resource: OrganizationResource,
+          scope: -> { Organization.all }
       end
     end
 
@@ -96,7 +115,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
-    let!(:author1) { Author.create!(first_name: 'Stephen', dwelling: house, state: state) }
+    let!(:author1) { Author.create!(first_name: 'Stephen', dwelling: house, state: state, organization: org1) }
     let!(:author2) { Author.create!(first_name: 'George', dwelling: condo) }
     let!(:book1)   { Book.create!(author: author1, genre: genre, title: 'The Shining') }
     let!(:book2)   { Book.create!(author: author1, genre: genre, title: 'The Stand') }
@@ -107,6 +126,8 @@ if ENV["APPRAISAL_INITIALIZED"]
     let(:house)    { House.new(name: 'Cozy', state: state) }
     let(:condo)    { Condo.new(name: 'Modern', state: state) }
     let(:genre)    { Genre.create!(name: 'Horror') }
+    let(:org1)     { Organization.create!(name: 'Org1', children: [org2]) }
+    let(:org2)     { Organization.create!(name: 'Org2') }
 
     def ids_for(type)
       json_includes(type).map { |i| i['id'].to_i }
@@ -249,6 +270,15 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(hobby['name']).to be_present
         expect(hobby).to_not have_key('description')
         expect(hobby).to_not have_key('reason')
+      end
+    end
+
+    context 'sideloading self-referential' do
+      it 'works' do
+        get :index, params: { include: 'organization.children' }
+        includes = json_includes('organizations')
+        expect(includes[0]['attributes']['name']).to eq('Org1')
+        expect(includes[1]['attributes']['name']).to eq('Org2')
       end
     end
 
