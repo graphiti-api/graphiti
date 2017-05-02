@@ -1,5 +1,10 @@
 ActiveRecord::Schema.define(:version => 1) do
+  create_table :classifications do |t|
+    t.string :description
+  end
+
   create_table :employees do |t|
+    t.integer :classification_id
     t.string :first_name
     t.string :last_name
     t.integer :age
@@ -20,7 +25,13 @@ class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
 end
 
+class Classification < ApplicationRecord
+  has_many :employees
+  validates :description, presence: true
+end
+
 class Employee < ApplicationRecord
+  belongs_to :classification
   has_many :positions
   validates :first_name, presence: true
 end
@@ -36,6 +47,11 @@ end
 
 class ApplicationResource < JsonapiCompliable::Resource
   use_adapter JsonapiCompliable::Adapters::ActiveRecord
+end
+
+class ClassificationResource < ApplicationResource
+  type 'classifications'
+  model Classification
 end
 
 class DepartmentResource < ApplicationResource
@@ -57,6 +73,10 @@ class EmployeeResource < ApplicationResource
   type 'employees'
   model Employee
 
+  belongs_to :classification,
+    scope: -> { Classification.all },
+    foreign_key: :classification_id,
+    resource: ClassificationResource
   has_many :positions,
     scope: -> { Position.all },
     foreign_key: :employee_id,
@@ -66,6 +86,12 @@ end
 class SerializableAbstract < JSONAPI::Serializable::Resource
 end
 
+class SerializableClassification < SerializableAbstract
+  type 'classifications'
+
+  attribute :description
+end
+
 class SerializableEmployee < SerializableAbstract
   type 'employees'
 
@@ -73,6 +99,7 @@ class SerializableEmployee < SerializableAbstract
   attribute :last_name
   attribute :age
 
+  belongs_to :classification
   has_many :positions
 end
 

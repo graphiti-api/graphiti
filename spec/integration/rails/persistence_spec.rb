@@ -204,6 +204,32 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(department.name).to eq('safety')
       end
 
+      context 'when associating to an existing record' do
+        let!(:classification) { Classification.create!(description: 'senior') }
+
+        let(:payload) do
+          {
+            data: {
+              type: 'employees',
+              attributes: { first_name: 'Joe' },
+              relationships: {
+                classification: {
+                  data: {
+                    type: 'classifications', id: classification.id.to_s
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        it 'associates to existing record' do
+          do_post
+          employee = Employee.first
+          expect(employee.classification).to eq(classification)
+        end
+      end
+
       context 'when no method specified' do
         let!(:position) { Position.create!(title: 'specialist') }
         let!(:department) { Department.create!(name: 'safety') }
