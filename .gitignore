@@ -5,6 +5,7 @@
 /coverage/
 /pkg/
 /spec/reports/
+/gemfiles/*.lock
 /tmp/
 .byebug_history
 spec/dummy/log/*
