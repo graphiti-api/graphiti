@@ -3,7 +3,7 @@ language: ruby
 rvm:
   - 2.3.3
 
-script: "bundle exec appraisal install && bundle exec appraisal rspec"
+script: "bundle exec rake"
 
 before_install:
   - gem update --system
