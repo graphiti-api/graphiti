@@ -1,5 +1,6 @@
 module JsonapiCompliable
   module Util
+    # @api private
     class FieldParams
       def self.parse(params)
         return {} if params.nil?

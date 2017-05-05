@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: JsonapiCompliable::Util::Persistence
+  
+    &mdash; Documentation by YARD 0.9.9
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "JsonapiCompliable::Util::Persistence";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (P)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../JsonapiCompliable.html" title="JsonapiCompliable (module)">JsonapiCompliable</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Util.html" title="JsonapiCompliable::Util (module)">Util</a></span></span>
+     &raquo; 
+    <span class="title">Persistence</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: JsonapiCompliable::Util::Persistence
+  
+  
+  <span class="private note title">Private</span>
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">JsonapiCompliable::Util::Persistence</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/jsonapi_compliable/util/persistence.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This class is part of a private API.</strong>
+  You should avoid using this class if possible, as it may be removed or be changed in the future.
+</p>
+
+<p>Save the given Resource#model, and all of its nested relationships.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(resource, meta, attributes, relationships)  &#x21d2; Persistence </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>A new instance of Persistence.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#run-instance_method" title="#run (instance method)">#<strong>run</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Perform the actual save logic.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(resource, meta, attributes, relationships)  &#x21d2; <tt><span class='object_link'><a href="" title="JsonapiCompliable::Util::Persistence (class)">Persistence</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+
+<p>Returns a new instance of Persistence</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>resource</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Resource.html" title="JsonapiCompliable::Resource (class)">Resource</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the resource instance</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>meta</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Hash.html" title="JsonapiCompliable::Util::Hash (class)">Hash</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>see (Deserializer#meta)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>attributes</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Hash.html" title="JsonapiCompliable::Util::Hash (class)">Hash</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>see (Deserializer#attributes)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>relationships</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Hash.html" title="JsonapiCompliable::Util::Hash (class)">Hash</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>see (Deserializer#relationships)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+8
+9
+10
+11
+12
+13</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/util/persistence.rb', line 8</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_resource'>resource</span><span class='comma'>,</span> <span class='id identifier rubyid_meta'>meta</span><span class='comma'>,</span> <span class='id identifier rubyid_attributes'>attributes</span><span class='comma'>,</span> <span class='id identifier rubyid_relationships'>relationships</span><span class='rparen'>)</span>
+  <span class='ivar'>@resource</span>      <span class='op'>=</span> <span class='id identifier rubyid_resource'>resource</span>
+  <span class='ivar'>@meta</span>          <span class='op'>=</span> <span class='id identifier rubyid_meta'>meta</span>
+  <span class='ivar'>@attributes</span>    <span class='op'>=</span> <span class='id identifier rubyid_attributes'>attributes</span>
+  <span class='ivar'>@relationships</span> <span class='op'>=</span> <span class='id identifier rubyid_relationships'>relationships</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="run-instance_method">
+  
+    #<strong>run</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+
+<p>Perform the actual save logic.</p>
+
+<p>belongs_to must be processed before/separately from has_many - we need to
+know the primary key value of the parent before persisting the child.</p>
+
+<p>Flow:</p>
+<ul><li>
+<p>process parents</p>
+</li><li>
+<p>update attributes to reflect parent primary keys</p>
+</li><li>
+<p>persist current object</p>
+</li><li>
+<p>associate temp id with current object</p>
+</li><li>
+<p>associate parent objects with current object</p>
+</li><li>
+<p>process children</p>
+</li><li>
+<p>associate children</p>
+</li><li>
+<p>return current object</p>
+</li></ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'>
+<p>the persisted model instance</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/util/persistence.rb', line 32</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span>
+  <span class='id identifier rubyid_parents'>parents</span> <span class='op'>=</span> <span class='id identifier rubyid_process_belongs_to'>process_belongs_to</span><span class='lparen'>(</span><span class='ivar'>@relationships</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_update_foreign_key_for_parents'>update_foreign_key_for_parents</span><span class='lparen'>(</span><span class='id identifier rubyid_parents'>parents</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_persisted'>persisted</span> <span class='op'>=</span> <span class='id identifier rubyid_persist_object'>persist_object</span><span class='lparen'>(</span><span class='ivar'>@meta</span><span class='lbracket'>[</span><span class='symbol'>:method</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='ivar'>@attributes</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_assign_temp_id'>assign_temp_id</span><span class='lparen'>(</span><span class='id identifier rubyid_persisted'>persisted</span><span class='comma'>,</span> <span class='ivar'>@meta</span><span class='lbracket'>[</span><span class='symbol'>:temp_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_associate_parents'>associate_parents</span><span class='lparen'>(</span><span class='id identifier rubyid_persisted'>persisted</span><span class='comma'>,</span> <span class='id identifier rubyid_parents'>parents</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_children'>children</span> <span class='op'>=</span> <span class='id identifier rubyid_process_has_many'>process_has_many</span><span class='lparen'>(</span><span class='ivar'>@relationships</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_x'>x</span><span class='op'>|</span>
+    <span class='id identifier rubyid_update_foreign_key'>update_foreign_key</span><span class='lparen'>(</span><span class='id identifier rubyid_persisted'>persisted</span><span class='comma'>,</span> <span class='id identifier rubyid_x'>x</span><span class='lbracket'>[</span><span class='symbol'>:attributes</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_x'>x</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_associate_children'>associate_children</span><span class='lparen'>(</span><span class='id identifier rubyid_persisted'>persisted</span><span class='comma'>,</span> <span class='id identifier rubyid_children'>children</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_persisted'>persisted</span> <span class='kw'>unless</span> <span class='ivar'>@meta</span><span class='lbracket'>[</span><span class='symbol'>:method</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:destroy</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Fri May  5 15:40:42 2017 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.9 (ruby-2.3.0).
+</div>
+
+    </div>
+  </body>
+</html>

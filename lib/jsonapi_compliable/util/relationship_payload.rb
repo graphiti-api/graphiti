@@ -1,5 +1,7 @@
 module JsonapiCompliable
   module Util
+    # Helper methods for traversing the 'relationships' JSONAPI payloads
+    # @api private
     class RelationshipPayload
       attr_reader :resource, :payload
 

@@ -1,6 +1,19 @@
 module JsonapiCompliable
   module Util
+    # @api private
     class Hash
+      # Grab all keys at any level of the hash.
+      #
+      #   { foo: { bar: { baz: {} } } }
+      #
+      # Becomes
+      #
+      # [:foo, :bar, :bar]
+      #
+      # @param hash the hash we want to process
+      # @param [Array<Symbol, String>] collection the memoized collection of keys
+      # @return [Array<Symbol, String>] the keys
+      # @api private
       def self.keys(hash, collection = [])
         hash.each_pair do |key, value|
           collection << key
@@ -10,11 +23,16 @@ module JsonapiCompliable
         collection
       end
 
+      # Like ActiveSupport's #deep_merge
+      # @return [Hash] the merged hash
+      # @api private
       def self.deep_merge!(hash, other)
         merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
         hash.merge!(other, &merger)
       end
 
+      # Like ActiveSupport's #deep_dup
+      # @api private
       def self.deep_dup(hash)
         if hash.respond_to?(:deep_dup)
           hash.deep_dup
