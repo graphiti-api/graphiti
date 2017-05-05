@@ -1,9 +1,14 @@
-# TODO: refactor - code could be better but it's a one-time thing.
-
 module JsonapiCompliable
+   # @attr_reader [Hash] params hash of query parameters with symbolized keys
+   # @attr_reader [Resource] resource the corresponding Resource object
   class Query
+    # TODO: This class could use some refactoring love!
     attr_reader :params, :resource
 
+    # This is the structure of +Query#to_hash+ used elsewhere in the library
+    # @see #to_hash
+    # @api private
+    # @return [Hash] the default hash
     def self.default_hash
       {
         filter: {},
@@ -21,10 +26,26 @@ module JsonapiCompliable
       @params = params
     end
 
+    # The relevant include directive
+    # @see http://jsonapi-rb.org
+    # @return [JSONAPI::IncludeDirective]
     def include_directive
       @include_directive ||= JSONAPI::IncludeDirective.new(params[:include])
     end
 
+    # The include, directive, as a hash. For instance
+    #
+    # { posts: { comments: {} } }
+    #
+    # This will only include relationships that are
+    #
+    # * Available on the Resource
+    # * Whitelisted (when specified)
+    #
+    # So that users can't simply request your entire object graph.
+    #
+    # @see Util::IncludeParams
+    # @return [Hash] the scrubbed include directive as a hash
     def include_hash
       @include_hash ||= begin
         requested     = include_directive.to_hash
@@ -36,10 +57,66 @@ module JsonapiCompliable
       end
     end
 
+    # All the keys of the #include_hash
+    #
+    # For example, let's say we had
+    #
+    #   { posts: { comments: {} }
+    #
+    # +#association_names+ would return
+    #
+    #   [:posts, :comments]
+    #
+    # @return [Array<Symbol>] all association names, recursive
     def association_names
       @association_names ||= Util::Hash.keys(include_hash)
     end
 
+    # A flat hash of sanitized query parameters.
+    # All relationship names are top-level:
+    #
+    #   {
+    #     posts: { filter, sort, ... }
+    #     comments: { filter, sort, ... }
+    #   }
+    #
+    # @example sorting
+    #   # GET /posts?sort=-title
+    #   { posts: { sort: { title: :desc } } }
+    #
+    # @example pagination
+    #   # GET /posts?page[number]=2&page[size]=10
+    #   { posts: { page: { number: 2, size: 10 } }
+    #
+    # @example filtering
+    #   # GET /posts?filter[title]=Foo
+    #   { posts: { filter: { title: 'Foo' } }
+    #
+    # @example include
+    #   # GET /posts?include=comments.author
+    #   { posts: { include: { comments: { author: {} } } } }
+    #
+    # @example stats
+    #   # GET /posts?stats[likes]=count,average
+    #   { posts: { stats: [:count, :average] } }
+    #
+    # @example fields
+    #   # GET /posts?fields=foo,bar
+    #   { posts: { fields: [:foo, :bar] } }
+    #
+    # @example extra fields
+    #   # GET /posts?fields=foo,bar
+    #   { posts: { extra_fields: [:foo, :bar] } }
+    #
+    # @example nested parameters
+    #   # GET /posts?include=comments&sort=comments.created_at&page[comments][size]=3
+    #   {
+    #     posts: { ... },
+    #     comments: { page: { size: 3 }, sort: { created_at: :asc } }
+    #
+    # @see #default_hash
+    # @see Base#query_hash
+    # @return [Hash] the normalized query hash
     def to_hash
       hash = { resource.type => self.class.default_hash }
 
@@ -64,6 +141,21 @@ module JsonapiCompliable
       hash
     end
 
+    # Check if the user has requested 0 actual results
+    # They may have done this to get, say, the total count
+    # without the overhead of fetching actual records.
+    #
+    # @example Total Count, 0 Results
+    #   # GET /posts?page[size]=0&stats[total]=count
+    #   # Response:
+    #   {
+    #     data: [],
+    #     meta: {
+    #       stats: { total: { count: 100 } }
+    #     }
+    #   }
+    #
+    # @return [Boolean] were 0 results requested?
     def zero_results?
       !@params[:page].nil? &&
         !@params[:page][:size].nil? &&

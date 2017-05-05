@@ -1,5 +1,7 @@
 module JsonapiCompliable
   module Util
+    # Generate the options we end up passing to {{http://jsonapi-rb.org jsonapi-rb}}
+    # @api private
     class RenderOptions
       def self.generate(object, query_hash, overrides = {})
         resolved = object.respond_to?(:resolve) ? object.resolve : object

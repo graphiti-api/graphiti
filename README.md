@@ -20,3 +20,10 @@ Or run tests for all versions:
 ```bash
 $ bin/appraisal bin/rspec
 ```
+
+### Generating the Documentation
+
+```bash
+$ yard doc
+$ yard server
+```

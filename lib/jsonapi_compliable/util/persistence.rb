@@ -1,4 +1,10 @@
+# Save the given Resource#model, and all of its nested relationships.
+# @api private
 class JsonapiCompliable::Util::Persistence
+  # @param [Resource] resource the resource instance
+  # @param [Hash] meta see (Deserializer#meta)
+  # @param [Hash] attributes see (Deserializer#attributes)
+  # @param [Hash] relationships see (Deserializer#relationships)
   def initialize(resource, meta, attributes, relationships)
     @resource      = resource
     @meta          = meta
@@ -6,9 +12,11 @@ class JsonapiCompliable::Util::Persistence
     @relationships = relationships
   end
 
+  # Perform the actual save logic.
+  #
   # belongs_to must be processed before/separately from has_many -
   # we need to know the primary key value of the parent before
-  # persisting the child
+  # persisting the child.
   #
   # Flow:
   # * process parents
@@ -19,6 +27,8 @@ class JsonapiCompliable::Util::Persistence
   # * process children
   # * associate children
   # * return current object
+  #
+  # @return the persisted model instance
   def run
     parents = process_belongs_to(@relationships)
     update_foreign_key_for_parents(parents)
@@ -34,6 +44,8 @@ class JsonapiCompliable::Util::Persistence
     associate_children(persisted, children)
     persisted unless @meta[:method] == :destroy
   end
+
+  private
 
   # The child's attributes should be modified to nil-out the
   # foreign_key when the parent is being destroyed or disassociated
@@ -98,8 +110,6 @@ class JsonapiCompliable::Util::Persistence
   def assign_temp_id(object, temp_id)
     object.instance_variable_set(:@_jsonapi_temp_id, temp_id)
   end
-
-  private
 
   def iterate(only: [], except: [])
     opts = {

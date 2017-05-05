@@ -1,15 +1,31 @@
+# We need to know two things in the response of a persistence call:
+#
+#   * The model we just tried to persist
+#   * Was the persistence successful?
+#
+# This object wraps those bits of data. The call is considered
+# unsuccessful when it adheres to the ActiveModel#errors interface,
+# and #errors is not blank. In other words, it is not successful if
+# there were validation errors.
+#
+# @attr_reader object the object we are saving
 class JsonapiCompliable::Util::ValidationResponse
   attr_reader :object
 
+  # @param object the model instance we tried to save
+  # @param deserialized_params see Base#deserialized_params
   def initialize(object, deserialized_params)
     @object = object
     @deserialized_params = deserialized_params
   end
 
+  # Check to ensure no validation errors.
+  # @return [Boolean] did the persistence call succeed?
   def success?
     all_valid?(object, @deserialized_params.relationships)
   end
 
+  # @return [Array] the object and success state
   def to_a
     [object, success?]
   end
