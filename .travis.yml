@@ -10,7 +10,7 @@ before_install:
   - rvm @global do gem uninstall bundler -a -x
   - rvm @global do gem install bundler -v 1.14.6
 
-install: bundle install --path=vendor/bundle --retry=3 --jobs=3
+install: bundle install --retry=3 --jobs=3
 
 gemfile:
   - gemfiles/rails_4.gemfile
