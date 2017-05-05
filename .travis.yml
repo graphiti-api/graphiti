@@ -3,7 +3,7 @@ language: ruby
 rvm:
   - 2.3.3
 
-script: "bundle exec rake cat_gemfile && bundle exec rake"
+script: "bundle exec rake"
 
 before_install:
   - gem update --system
