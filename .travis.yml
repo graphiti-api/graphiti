@@ -10,7 +10,7 @@ install: bundle install --path=vendor/bundle --retry=3 --jobs=3
 cache:
   directories:
     - vendor/bundle
-script: "bundle exec appraisal rspec"
+script: "bundle exec appraisal && bundle exec appraisal rspec"
 gemfile:
   - gemfiles/rails_4.gemfile
   - gemfiles/rails_5.gemfile
