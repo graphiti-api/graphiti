@@ -2,15 +2,16 @@ sudo: false
 language: ruby
 rvm:
   - 2.3.3
+
+script: "bundle exec appraisal install && bundle exec appraisal rspec"
+
 before_install:
   - gem update --system
   - rvm @global do gem uninstall bundler -a -x
   - rvm @global do gem install bundler -v 1.14.6
+
 install: bundle install --path=vendor/bundle --retry=3 --jobs=3
-cache:
-  directories:
-    - vendor/bundle
-script: "bundle exec appraisal && bundle exec appraisal rspec"
+
 gemfile:
   - gemfiles/rails_4.gemfile
   - gemfiles/rails_5.gemfile
