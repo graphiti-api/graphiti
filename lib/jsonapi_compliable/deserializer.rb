@@ -69,6 +69,12 @@ class JsonapiCompliable::Deserializer
     end
   end
 
+  # Override the attributes
+  # # @see #attributes
+  def attributes=(attrs)
+    @attributes = attrs
+  end
+
   # 'meta' information about this resource. Includes:
   #
   # +type+: the jsonapi type
