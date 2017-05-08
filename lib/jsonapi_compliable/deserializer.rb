@@ -65,7 +65,7 @@ class JsonapiCompliable::Deserializer
   # @return [Hash] the raw :attributes hash + +id+
   def attributes
     @attributes ||= raw_attributes.tap do |hash|
-      hash.merge!(id: id) if id
+      hash[:id] = id if id
     end
   end
 
@@ -191,13 +191,14 @@ class JsonapiCompliable::Deserializer
     attributes = included_object[:attributes] || {}
     attributes[:id] = datum[:id] if datum[:id]
     relationships = process_relationships(included_object[:relationships] || {})
-
+    method = datum[:method]
+    method = method.to_sym if method
 
     {
       meta: {
         jsonapi_type: datum[:type],
         temp_id: temp_id,
-        method: datum[:method].try(:to_sym)
+        method: method
       },
       attributes: attributes,
       relationships: relationships
