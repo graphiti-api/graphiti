@@ -10,4 +10,6 @@ Easily build jsonapi.org-compatible APIs in Rails.
 
 [View YARD documentation](https://jsonapi-suite.github.io/jsonapi_compliable)
 
+https://jsonapi-suite.slack.com
+
 Supports Rails >= 4.1
