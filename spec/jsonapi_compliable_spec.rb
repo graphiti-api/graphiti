@@ -78,7 +78,7 @@ RSpec.describe JsonapiCompliable do
 
     it 'wraps in the resource context' do
       instance.wrap_context do
-        expect(instance.resource.context).to eq({
+        expect(instance.jsonapi_resource.context).to eq({
           object: instance,
           namespace: :index
         })

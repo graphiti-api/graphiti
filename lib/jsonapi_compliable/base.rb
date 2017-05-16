@@ -63,8 +63,8 @@ module JsonapiCompliable
     # This returns MyResource.new
     #
     # @return [Resource] the configured Resource for this controller
-    def resource
-      @resource ||= self.class._jsonapi_compliable.new
+    def jsonapi_resource
+      @jsonapi_resource ||= self.class._jsonapi_compliable.new
     end
 
     # Instantiates the relevant Query object
@@ -72,13 +72,13 @@ module JsonapiCompliable
     # @see Query
     # @return [Query] the Query object for this resource/params
     def query
-      @query ||= Query.new(resource, params)
+      @query ||= Query.new(jsonapi_resource, params)
     end
 
     # @see Query#to_hash
     # @return [Hash] the normalized query hash for only the *current* resource
     def query_hash
-      @query_hash ||= query.to_hash[resource.type]
+      @query_hash ||= query.to_hash[jsonapi_resource.type]
     end
 
     # Tracks the current context so we can refer to it within any
@@ -89,7 +89,7 @@ module JsonapiCompliable
     # @yieldreturn Code to run within the current context
     def wrap_context
       if self.class._jsonapi_compliable
-        resource.with_context(self, action_name.to_sym) do
+        jsonapi_resource.with_context(self, action_name.to_sym) do
           yield
         end
       end
@@ -113,7 +113,7 @@ module JsonapiCompliable
     # @see Resource#build_scope
     # @return [Scope] the configured scope
     def jsonapi_scope(scope, opts = {})
-      resource.build_scope(scope, query, opts)
+      jsonapi_resource.build_scope(scope, query, opts)
     end
 
     # @see Deserializer#initialize
@@ -148,7 +148,7 @@ module JsonapiCompliable
     # @return [Util::ValidationResponse]
     def jsonapi_create
       _persist do
-        resource.persist_with_relationships \
+        jsonapi_resource.persist_with_relationships \
           deserialized_params.meta,
           deserialized_params.attributes,
           deserialized_params.relationships
@@ -179,7 +179,7 @@ module JsonapiCompliable
     # @return [Util::ValidationResponse]
     def jsonapi_update
       _persist do
-        resource.persist_with_relationships \
+        jsonapi_resource.persist_with_relationships \
           deserialized_params.meta,
           deserialized_params.attributes,
           deserialized_params.relationships
@@ -254,7 +254,7 @@ module JsonapiCompliable
 
     def _persist
       validation_response = nil
-      resource.transaction do
+      jsonapi_resource.transaction do
         object = yield
         validation_response = Util::ValidationResponse.new \
           object, deserialized_params
