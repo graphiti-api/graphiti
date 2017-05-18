@@ -446,12 +446,8 @@ module JsonapiCompliable
     # @param object The context (Rails controller or equivalent)
     # @param namespace One of index/show/etc
     def with_context(object, namespace = nil)
-      begin
-        prior = context
-        @context = { object: object, namespace: namespace }
+      JsonapiCompliable.with_context(object, namespace) do
         yield
-      ensure
-        @context = prior
       end
     end
 
@@ -462,7 +458,11 @@ module JsonapiCompliable
     # @see #with_context
     # @return [Hash] the context hash
     def context
-      @context || {}
+      JsonapiCompliable.context[:object]
+    end
+
+    def context_namespace
+      JsonapiCompliable.context[:namespace]
     end
 
     # Build a scope using this Resource configuration
@@ -592,7 +592,7 @@ module JsonapiCompliable
     def allowed_sideloads(namespace = nil)
       return {} unless sideloading
 
-      namespace ||= context[:namespace]
+      namespace ||= context_namespace
       sideloads = sideloading.to_hash[:base]
       if !sideload_whitelist.empty? && namespace
         sideloads = Util::IncludeParams.scrub(sideloads, sideload_whitelist[namespace])

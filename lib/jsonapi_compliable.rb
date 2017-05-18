@@ -42,4 +42,25 @@ module JsonapiCompliable
       include Base
     end
   end
+
+  # @api private
+  def self.context
+    Thread.current[:context] ||= {}
+  end
+
+  # @api private
+  def self.context=(val)
+    Thread.current[:context] = val
+  end
+
+  # @api private
+  def self.with_context(obj, namespace)
+    begin
+      prior = self.context
+      self.context = { object: obj, namespace: namespace }
+      yield
+    ensure
+      self.context = prior
+    end
+  end
 end

@@ -88,10 +88,8 @@ module JsonapiCompliable
     # @api private
     # @yieldreturn Code to run within the current context
     def wrap_context
-      if self.class._jsonapi_compliable
-        jsonapi_resource.with_context(self, action_name.to_sym) do
-          yield
-        end
+      jsonapi_resource.with_context(self, action_name.to_sym) do
+        yield
       end
     end
 
