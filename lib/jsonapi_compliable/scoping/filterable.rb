@@ -14,7 +14,7 @@ module JsonapiCompliable
         resource.filters.find { |_name, opts| opts[:aliases].include?(name.to_sym) }
       raise JsonapiCompliable::Errors::BadFilter unless filter_name
       if guard = filter_value[:if]
-        raise JsonapiCompliable::Errors::BadFilter if resource.context[:object].send(guard) == false
+        raise JsonapiCompliable::Errors::BadFilter if resource.context.send(guard) == false
       end
       { filter_name => filter_value }
     end

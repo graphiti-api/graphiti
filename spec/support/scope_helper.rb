@@ -14,7 +14,7 @@ RSpec.shared_context 'scoping' do
   let(:scope)        { resource.build_scope(scope_object, query) }
 
   def render(object, opts = {})
-    opts[:expose] = { context: resource.context[:object] }
+    opts[:expose] = { context: resource.context }
     opts = JsonapiCompliable::Util::RenderOptions.generate(object, query.to_hash[:authors], opts)
     resolved = opts.delete(:jsonapi)
     raw_json = JSONAPI::Serializable::Renderer.render(resolved, opts)

@@ -78,24 +78,8 @@ RSpec.describe JsonapiCompliable do
 
     it 'wraps in the resource context' do
       instance.wrap_context do
-        expect(instance.jsonapi_resource.context).to eq({
-          object: instance,
-          namespace: :index
-        })
-      end
-    end
-
-    context 'when the class does not have a resource' do
-      let(:klass) do
-        Class.new do
-          include JsonapiCompliable
-        end
-      end
-
-      it 'does nothing' do
-        instance.wrap_context do
-          expect(instance.resource).to be_nil
-        end
+        expect(instance.jsonapi_resource.context).to eq(instance)
+        expect(instance.jsonapi_resource.context_namespace).to eq(:index)
       end
     end
   end
