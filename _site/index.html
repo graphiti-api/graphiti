@@ -1505,19 +1505,21 @@ position. If any of these error or fail validations, the transaction
 will be rolled back:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
-  <span class="ss">id: </span><span class="s1">'1'</span><span class="p">,</span>
-  <span class="ss">type: </span><span class="s1">'employees'</span><span class="p">,</span>
-  <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Homer Simpson'</span> <span class="p">},</span>
-  <span class="ss">relationships: </span><span class="p">{</span>
-    <span class="ss">positions: </span><span class="p">{</span>
-      <span class="ss">data: </span><span class="p">[</span>
-        <span class="p">{</span>
-          <span class="ss">type: </span><span class="s1">'positions'</span><span class="p">,</span>
-          <span class="ss">id: </span><span class="s1">'1'</span><span class="p">,</span>
-          <span class="ss">method: </span><span class="s1">'update'</span>
-        <span class="p">}</span>
-      <span class="p">]</span>
-    <span class="p">}</span>
+  <span class="ss">data: </span><span class="p">{</span>
+    <span class="ss">id: </span><span class="s1">'1'</span><span class="p">,</span>
+    <span class="ss">type: </span><span class="s1">'employees'</span><span class="p">,</span>
+    <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Homer Simpson'</span> <span class="p">},</span>
+    <span class="ss">relationships: </span><span class="p">{</span>
+      <span class="ss">positions: </span><span class="p">{</span>
+        <span class="ss">data: </span><span class="p">[</span>
+          <span class="p">{</span>
+            <span class="ss">type: </span><span class="s1">'positions'</span><span class="p">,</span>
+            <span class="ss">id: </span><span class="s1">'1'</span><span class="p">,</span>
+            <span class="ss">method: </span><span class="s1">'update'</span>
+          <span class="p">}</span>
+        <span class="p">]</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
   <span class="p">},</span>
   <span class="ss">included: </span><span class="p">[</span>
     <span class="p">{</span>
@@ -1532,7 +1534,7 @@ will be rolled back:</p>
             <span class="ss">method: </span><span class="s1">'destroy'</span>
           <span class="p">}</span>
         <span class="p">}</span>
-        <span class="p">)</span>    <span class="p">}</span>
+      <span class="p">}</span>
     <span class="p">},</span>
     <span class="p">{</span>
       <span class="ss">id: </span><span class="s1">'1'</span><span class="p">,</span>
@@ -1550,18 +1552,20 @@ in the response. Here we’ll create an employee, position, and
 department all in one go.</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
-  <span class="ss">type: </span><span class="s1">'employees'</span><span class="p">,</span>
-  <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Homer Simpson'</span> <span class="p">},</span>
-  <span class="ss">relationships: </span><span class="p">{</span>
-    <span class="ss">positions: </span><span class="p">{</span>
-      <span class="ss">data: </span><span class="p">[</span>
-        <span class="p">{</span>
-          <span class="ss">type: </span><span class="s1">'positions'</span><span class="p">,</span>
-          <span class="n">temp</span><span class="o">-</span><span class="ss">id: </span><span class="s1">'s0m3uu1d'</span><span class="p">,</span>
-          <span class="ss">method: </span><span class="s1">'create'</span>
-        <span class="p">}</span>
-      <span class="p">]</span>
-    <span class="p">}</span>
+  <span class="ss">data: </span><span class="p">{</span>
+    <span class="ss">type: </span><span class="s1">'employees'</span><span class="p">,</span>
+    <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Homer Simpson'</span> <span class="p">},</span>
+    <span class="ss">relationships: </span><span class="p">{</span>
+      <span class="ss">positions: </span><span class="p">{</span>
+        <span class="ss">data: </span><span class="p">[</span>
+          <span class="p">{</span>
+            <span class="ss">type: </span><span class="s1">'positions'</span><span class="p">,</span>
+            <span class="n">temp</span><span class="o">-</span><span class="ss">id: </span><span class="s1">'s0m3uu1d'</span><span class="p">,</span>
+            <span class="ss">method: </span><span class="s1">'create'</span>
+          <span class="p">}</span>
+        <span class="p">]</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
   <span class="p">},</span>
   <span class="ss">included: </span><span class="p">[</span>
     <span class="p">{</span>
@@ -1642,7 +1646,6 @@ department all in one go.</p>
   </div>
 </div>
 <div style="height: 20rem"></div>
-
 
         </section>
     

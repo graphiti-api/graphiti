@@ -16,19 +16,21 @@ will be rolled back:
 
 ```ruby
 {
-  id: '1',
-  type: 'employees',
-  attributes: { name: 'Homer Simpson' },
-  relationships: {
-    positions: {
-      data: [
-        {
-          type: 'positions',
-          id: '1',
-          method: 'update'
-        }
-      ]
-    }
+  data: {
+    id: '1',
+    type: 'employees',
+    attributes: { name: 'Homer Simpson' },
+    relationships: {
+      positions: {
+        data: [
+          {
+            type: 'positions',
+            id: '1',
+            method: 'update'
+          }
+        ]
+      }
+    },
   },
   included: [
     {
@@ -43,7 +45,7 @@ will be rolled back:
             method: 'destroy'
           }
         }
-        )    }
+      }
     },
     {
       id: '1',
@@ -61,18 +63,20 @@ department all in one go.
 
 ```ruby
 {
-  type: 'employees',
-  attributes: { name: 'Homer Simpson' },
-  relationships: {
-    positions: {
-      data: [
-        {
-          type: 'positions',
-          temp-id: 's0m3uu1d',
-          method: 'create'
-        }
-      ]
-    }
+  data: {
+    type: 'employees',
+    attributes: { name: 'Homer Simpson' },
+    relationships: {
+      positions: {
+        data: [
+          {
+            type: 'positions',
+            temp-id: 's0m3uu1d',
+            method: 'create'
+          }
+        ]
+      }
+    },
   },
   included: [
     {
@@ -153,4 +157,3 @@ end
   </div>
 </div>
 <div style="height: 20rem" />
-
