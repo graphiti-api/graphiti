@@ -79,10 +79,6 @@ module Jsonapi
       template('resource.rb.erb', to)
     end
 
-    def do_thing
-      puts "DO THING"
-    end
-
     private
 
     def model_klass
