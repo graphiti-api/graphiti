@@ -24,6 +24,7 @@ module JsonapiCompliable
     def initialize(resource, params)
       @resource = resource
       @params = params
+      @params = @params.permit! if @params.respond_to?(:permit!)
     end
 
     # The relevant include directive
