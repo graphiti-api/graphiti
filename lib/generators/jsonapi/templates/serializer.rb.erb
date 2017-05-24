@@ -1,0 +1,5 @@
+<% module_namespacing do -%>
+class Serializable<%= class_name %> < JSONAPI::Serializable::Resource
+  type :<%= type %>
+end
+<% end -%>

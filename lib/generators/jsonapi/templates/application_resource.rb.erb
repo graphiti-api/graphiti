@@ -1,0 +1,5 @@
+require 'jsonapi_compliable/adapters/active_record'
+
+class ApplicationResource < JsonapiCompliable::Resource
+  use_adapter JsonapiCompliable::Adapters::ActiveRecord
+end
