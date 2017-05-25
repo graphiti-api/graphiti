@@ -21,8 +21,11 @@ module JsonapiCompliable
 
       # (see Adapters::Abstract#count)
       def count(scope, attr)
-        column = attr == :total ? :all : attr
-        scope.distinct.count(column)
+        if attr.to_sym == :total
+          scope.distinct.count
+        else
+          scope.distinct.count(attr)
+        end
       end
 
       # (see Adapters::Abstract#average)
