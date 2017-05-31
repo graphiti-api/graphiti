@@ -3,7 +3,17 @@ ActiveRecord::Schema.define(:version => 1) do
     t.string :description
   end
 
+  create_table :offices do |t|
+    t.string :address
+  end
+
+  create_table :home_offices do |t|
+    t.string :address
+  end
+
   create_table :employees do |t|
+    t.string :workspace_type
+    t.integer :workspace_id
     t.integer :classification_id
     t.string :first_name
     t.string :last_name
@@ -30,7 +40,16 @@ class Classification < ApplicationRecord
   validates :description, presence: true
 end
 
+class Office < ApplicationRecord
+  has_many :employees, as: :workspace
+end
+
+class HomeOffice < ApplicationRecord
+  has_many :employees, as: :workspace
+end
+
 class Employee < ApplicationRecord
+  belongs_to :workspace, polymorphic: true
   belongs_to :classification
   has_many :positions
   validates :first_name, presence: true
@@ -69,6 +88,16 @@ class PositionResource < ApplicationResource
     resource: DepartmentResource
 end
 
+class OfficeResource < ApplicationResource
+  type 'offices'
+  model Office
+end
+
+class HomeOfficeResource < ApplicationResource
+  type 'home_offices'
+  model HomeOffice
+end
+
 class EmployeeResource < ApplicationResource
   type 'employees'
   model Employee
@@ -81,6 +110,20 @@ class EmployeeResource < ApplicationResource
     scope: -> { Position.all },
     foreign_key: :employee_id,
     resource: PositionResource
+  polymorphic_belongs_to :workspace,
+    group_by: :workspace_type,
+    groups: {
+      'Office' => {
+        scope: -> { Office.all },
+        resource: OfficeResource,
+        foreign_key: :workspace_id
+      },
+      'HomeOffice' => {
+        scope: -> { HomeOffice.all },
+        resource: HomeOfficeResource,
+        foreign_key: :workspace_id
+      }
+    }
 end
 
 class SerializableAbstract < JSONAPI::Serializable::Resource

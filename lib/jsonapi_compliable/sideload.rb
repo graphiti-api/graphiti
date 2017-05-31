@@ -6,7 +6,7 @@ module JsonapiCompliable
   # @attr_reader [Hash] sideloads The associated sibling sideloads
   # @attr_reader [Proc] scope_proc The configured 'scope' block
   # @attr_reader [Proc] assign_proc The configured 'assign' block
-  # @attr_reader [Proc] grouper The configured 'group_by' proc
+  # @attr_reader [Symbol] grouping_field The configured 'group_by' symbol
   # @attr_reader [Symbol] foreign_key The attribute used to match objects - need not be a true database foreign key.
   # @attr_reader [Symbol] primary_key The attribute used to match objects - need not be a true database primary key.
   # @attr_reader [Symbol] type One of :has_many, :belongs_to, etc
@@ -15,10 +15,11 @@ module JsonapiCompliable
       :resource_class,
       :polymorphic,
       :polymorphic_groups,
+      :parent,
       :sideloads,
       :scope_proc,
       :assign_proc,
-      :grouper,
+      :grouping_field,
       :foreign_key,
       :primary_key,
       :type
@@ -28,12 +29,13 @@ module JsonapiCompliable
     # An anonymous Resource will be assigned when none provided.
     #
     # @see Adapters::Abstract#sideloading_module
-    def initialize(name, type: nil, resource: nil, polymorphic: false, primary_key: :id, foreign_key: nil)
+    def initialize(name, type: nil, resource: nil, polymorphic: false, primary_key: :id, foreign_key: nil, parent: nil)
       @name               = name
       @resource_class     = (resource || Class.new(Resource))
       @sideloads          = {}
       @polymorphic        = !!polymorphic
       @polymorphic_groups = {} if polymorphic?
+      @parent             = parent
       @primary_key        = primary_key
       @foreign_key        = foreign_key
       @type               = type
@@ -55,7 +57,7 @@ module JsonapiCompliable
     # +Business+ or +Government+:
     #
     #   allow_sideload :organization, :polymorphic: true do
-    #     group_by { |record| record.organization_type }
+    #     group_by :organization_type
     #
     #     allow_sideload 'Business', resource: BusinessResource do
     #       # ... code ...
@@ -70,7 +72,7 @@ module JsonapiCompliable
     # with ActiveRecord:
     #
     #   polymorphic_belongs_to :organization,
-    #     group_by: ->(office) { office.organization_type },
+    #     group_by: :organization_type,
     #     groups: {
     #       'Business' => {
     #         scope: -> { Business.all },
@@ -181,21 +183,25 @@ module JsonapiCompliable
     # @see #name
     # @see #type
     def associate(parent, child)
-      resource_class.config[:adapter].associate(parent, child, name, type)
+      association_name = @parent ? @parent.name : name
+      resource_class.config[:adapter].associate parent,
+        child,
+        association_name,
+        type
     end
 
-    # Define a proc that groups the parent records. For instance, with
+    # Define an attribute that groups the parent records. For instance, with
     # an ActiveRecord polymorphic belongs_to there will be a +parent_id+
     # and +parent_type+. We would want to group on +parent_type+:
     #
     #  allow_sideload :organization, polymorphic: true do
     #    # group parent_type, parent here is 'organization'
-    #    group_by ->(office) { office.organization_type }
+    #    group_by :organization_type
     #  end
     #
     # @see #polymorphic?
-    def group_by(&grouper)
-      @grouper = grouper
+    def group_by(grouping_field)
+      @grouping_field = grouping_field
     end
 
     # Resolve the sideload.
@@ -323,6 +329,13 @@ module JsonapiCompliable
       result
     end
 
+    # @api private
+    def polymorphic_child_for_type(type)
+      polymorphic_groups.values.find do |v|
+        v.resource_class.config[:type] == type
+      end
+    end
+
     private
 
     def nested_sideload_hash(sideload, processed)
@@ -333,8 +346,24 @@ module JsonapiCompliable
       end
     end
 
+    def polymorphic_grouper(grouping_field)
+      lambda do |record|
+        if record.is_a?(Hash)
+          if record.keys[0].is_a?(Symbol)
+            record[grouping_field]
+          else
+            record[grouping_field.to_s]
+          end
+        else
+          record.send(grouping_field)
+        end
+      end
+    end
+
     def resolve_polymorphic(parents, query)
-      parents.group_by(&@grouper).each_pair do |group_type, group_members|
+      grouper = polymorphic_grouper(@grouping_field)
+
+      parents.group_by(&grouper).each_pair do |group_type, group_members|
         sideload_for_group = @polymorphic_groups[group_type]
         if sideload_for_group
           sideload_for_group.resolve(group_members, query, name)

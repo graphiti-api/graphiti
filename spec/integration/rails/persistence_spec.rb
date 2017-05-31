@@ -149,6 +149,62 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
+    describe 'nested polymorphic relationship' do
+      let(:workspace_type) { 'offices' }
+
+      let(:payload) do
+        {
+          data: {
+            type: 'employees',
+            attributes: { first_name: 'Joe' },
+            relationships: {
+              workspace: {
+                data: {
+                  :'temp-id' => 'work1', type: workspace_type, method: 'create'
+                }
+              }
+            }
+          },
+          included: [
+            {
+              type: workspace_type,
+              :'temp-id' => 'work1',
+              attributes: {
+                address: 'Fake Workspace Address'
+              }
+            }
+          ]
+        }
+      end
+
+      context 'with jsonapi type "offices"' do
+        it 'associates workspace as office' do
+          do_post
+          employee = Employee.first
+          expect(employee.workspace).to be_a(Office)
+        end
+      end
+
+      context 'with jsonapi type "home_offices"' do
+        let(:workspace_type) { 'home_offices' }
+
+        it 'associates workspace as home office' do
+          do_post
+          employee = Employee.first
+          expect(employee.workspace).to be_a(HomeOffice)
+        end
+      end
+
+      it 'saves the relationship correctly' do
+        expect {
+          do_post
+        }.to change { Employee.count }.by(1)
+        employee = Employee.first
+        workspace = employee.workspace
+        expect(workspace.address).to eq('Fake Workspace Address')
+      end
+    end
+
     describe 'nested create' do
       let(:payload) do
         {

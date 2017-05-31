@@ -33,7 +33,8 @@ class JsonapiCompliable::Util::ValidationResponse
   private
 
   def valid_object?(object)
-    object.respond_to?(:errors) && object.errors.blank?
+    !object.respond_to?(:errors) ||
+      (object.respond_to?(:errors) && object.errors.blank?)
   end
 
   def all_valid?(model, deserialized_params)

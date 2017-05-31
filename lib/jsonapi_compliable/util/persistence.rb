@@ -52,9 +52,16 @@ class JsonapiCompliable::Util::Persistence
   def update_foreign_key(parent_object, attrs, x)
     if [:destroy, :disassociate].include?(x[:meta][:method])
       attrs[x[:foreign_key]] = nil
+      update_foreign_type(attrs, x, null: true) if x[:is_polymorphic]
     else
       attrs[x[:foreign_key]] = parent_object.send(x[:primary_key])
+      update_foreign_type(attrs, x) if x[:is_polymorphic]
     end
+  end
+
+  def update_foreign_type(attrs, x, null: false)
+    grouping_field = x[:sideload].parent.grouping_field
+    attrs[grouping_field] = null ? nil : x[:sideload].name
   end
 
   def update_foreign_key_for_parents(parents)
@@ -88,7 +95,7 @@ class JsonapiCompliable::Util::Persistence
 
   def process_has_many(relationships)
     [].tap do |processed|
-      iterate(except: [:belongs_to]) do |x|
+      iterate(except: [:polymorphic_belongs_to, :belongs_to]) do |x|
         yield x
         x[:object] = x[:sideload].resource
           .persist_with_relationships(x[:meta], x[:attributes], x[:relationships])
@@ -99,7 +106,7 @@ class JsonapiCompliable::Util::Persistence
 
   def process_belongs_to(relationships)
     [].tap do |processed|
-      iterate(only: [:belongs_to]) do |x|
+      iterate(only: [:polymorphic_belongs_to, :belongs_to]) do |x|
         x[:object] = x[:sideload].resource
           .persist_with_relationships(x[:meta], x[:attributes], x[:relationships])
         processed << x
