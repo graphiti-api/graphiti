@@ -47,7 +47,7 @@ module JsonapiCompliable
       def has_one(association_name, scope: nil, resource:, foreign_key:, primary_key: :id, &blk)
         _scope = scope
 
-        allow_sideload association_name, resource: resource do
+        allow_sideload association_name, type: :has_one, foreign_key: foreign_key, primary_key: primary_key, resource: resource do
           scope do |parents|
             parent_ids = parents.map { |p| p.send(primary_key) }
             _scope.call.where(foreign_key => parent_ids.uniq.compact)
@@ -71,7 +71,7 @@ module JsonapiCompliable
         fk      = foreign_key.values.first
         _scope  = scope
 
-        allow_sideload association_name, resource: resource do
+        allow_sideload association_name, type: :habtm, foreign_key: foreign_key, primary_key: primary_key, resource: resource do
           scope do |parents|
             parent_ids = parents.map { |p| p.send(primary_key) }
             parent_ids.uniq!
@@ -94,14 +94,14 @@ module JsonapiCompliable
       end
 
       def polymorphic_belongs_to(association_name, group_by:, groups:, &blk)
-        allow_sideload association_name, polymorphic: true do
-          group_by(&group_by)
+        allow_sideload association_name, type: :polymorphic_belongs_to, polymorphic: true do
+          group_by(group_by)
 
           groups.each_pair do |type, config|
             primary_key = config[:primary_key] || :id
             foreign_key = config[:foreign_key]
 
-            allow_sideload type, resource: config[:resource] do
+            allow_sideload type, parent: self, primary_key: primary_key, foreign_key: foreign_key, type: :belongs_to, resource: config[:resource] do
               scope do |parents|
                 parent_ids = parents.map { |p| p.send(foreign_key) }
                 parent_ids.compact!

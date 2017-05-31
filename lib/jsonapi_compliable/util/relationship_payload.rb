@@ -43,8 +43,14 @@ module JsonapiCompliable
       end
 
       def payload_for(sideload, relationship_payload)
+        if sideload.polymorphic?
+          type     = relationship_payload[:meta][:jsonapi_type]
+          sideload = sideload.polymorphic_child_for_type(type)
+        end
+
         {
           sideload: sideload,
+          is_polymorphic: !sideload.parent.nil?,
           primary_key: sideload.primary_key,
           foreign_key: sideload.foreign_key,
           attributes: relationship_payload[:attributes],

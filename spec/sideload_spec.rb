@@ -53,7 +53,7 @@ RSpec.describe JsonapiCompliable::Sideload do
       end
 
       before do
-        instance.group_by { |parent| parent[:type] }
+        instance.group_by :type
 
         instance.allow_sideload 'foo', resource: foo_resource do
           scope { |parents| [{ parent_id: 1 }] }
@@ -143,6 +143,30 @@ RSpec.describe JsonapiCompliable::Sideload do
       it 'does not add to sideloads' do
         instance.allow_sideload :bar
         expect(instance.sideloads).to be_empty
+      end
+    end
+  end
+
+  describe '#associate' do
+    before do
+      instance.instance_variable_set(:@type, :has_many)
+    end
+
+    it 'delegates to adapter' do
+      expect(instance.resource_class.config[:adapter])
+        .to receive(:associate).with('parent', 'child', :foo, :has_many)
+      instance.associate('parent', 'child')
+    end
+
+    context 'when a polymorphic child' do
+      before do
+        instance.instance_variable_set(:@parent, double(name: :parent_name))
+      end
+
+      it 'passes parent name as association name' do
+        expect(instance.resource_class.config[:adapter])
+          .to receive(:associate).with('parent', 'child', :parent_name, :has_many)
+        instance.associate('parent', 'child')
       end
     end
   end

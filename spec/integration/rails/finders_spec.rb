@@ -86,7 +86,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           foreign_key: { author_hobbies: :author_id }
 
         polymorphic_belongs_to :dwelling,
-          group_by: proc { |author| author.dwelling_type },
+          group_by: :dwelling_type,
           groups: {
             'House' => {
               foreign_key: :dwelling_id,

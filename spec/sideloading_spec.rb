@@ -95,7 +95,7 @@ RSpec.describe 'sideloading' do
 
     _dwelling_resource = dwelling_resource
     resource_class.allow_sideload :dwelling, polymorphic: true do
-      group_by { |author| binding.pry;author[:dwelling_type] }
+      group_by :dwelling_type
 
       allow_sideload 'House', resource: _dwelling_resource do
         scope do |authors|
@@ -201,7 +201,7 @@ RSpec.describe 'sideloading' do
 
       _dwelling_resource = dwelling_resource
       resource_class.allow_sideload :dwelling, polymorphic: true do
-        group_by { |author| author[:dwelling_type] }
+        group_by :dwelling_type
 
         allow_sideload 'House', resource: _dwelling_resource do
           scope do |authors|
