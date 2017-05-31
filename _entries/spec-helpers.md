@@ -110,6 +110,16 @@ end
 <div style="height: 3rem"></div>
 {::options parse_block_html="true" /}
 <div class='note info'>
+###### Installation
+  <div class='note-content'>
+Make sure to `require 'jsonapi_spec_helpers'` in your spec helper.
+  </div>
+</div>
+<div style="height: 7rem"></div>
+
+<div style="height: 3rem"></div>
+{::options parse_block_html="true" /}
+<div class='note info'>
 ###### More on spec helpers
   <div class='note-content'>
 For documentation on all the spec helpers we provide, check out the
