@@ -12,6 +12,10 @@ If you're using Rails:
 gem 'jsonapi_suite', '~> 0.5'
 gem 'jsonapi-rails', '~> 0.1'
 
+group :test do
+  gem 'jsonapi_spec_helpers', require: false
+end
+
 # config/initializers/jsonapi.rb
 # Require the ActiveRecord adapter if needed
 require 'jsonapi_compliable/adapters/active_record'
@@ -27,6 +31,10 @@ Without Rails:
 ```ruby
 # Gemfile
 gem 'jsonapi_suite'
+
+group :test do
+  gem 'jsonapi_spec_helpers', require: false
+end
 
 # Include the module where appropriate
 # For example, in Sinatra:
