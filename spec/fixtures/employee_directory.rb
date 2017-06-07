@@ -69,17 +69,17 @@ class ApplicationResource < JsonapiCompliable::Resource
 end
 
 class ClassificationResource < ApplicationResource
-  type 'classifications'
+  type :classifications
   model Classification
 end
 
 class DepartmentResource < ApplicationResource
-  type 'departments'
+  type :departments
   model Department
 end
 
 class PositionResource < ApplicationResource
-  type 'positions'
+  type :positions
   model Position
 
   belongs_to :department,
@@ -89,17 +89,17 @@ class PositionResource < ApplicationResource
 end
 
 class OfficeResource < ApplicationResource
-  type 'offices'
+  type :offices
   model Office
 end
 
 class HomeOfficeResource < ApplicationResource
-  type 'home_offices'
+  type :home_offices
   model HomeOffice
 end
 
 class EmployeeResource < ApplicationResource
-  type 'employees'
+  type :employees
   model Employee
 
   belongs_to :classification,
