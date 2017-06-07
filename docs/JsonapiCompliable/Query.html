@@ -392,7 +392,8 @@ get, say, the total count without the overhead of fetching actual records.</p>
 24
 25
 26
-27</pre>
+27
+28</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/query.rb', line 24</span>
@@ -400,6 +401,7 @@ get, say, the total count without the overhead of fetching actual records.</p>
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_resource'>resource</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='rparen'>)</span>
   <span class='ivar'>@resource</span> <span class='op'>=</span> <span class='id identifier rubyid_resource'>resource</span>
   <span class='ivar'>@params</span> <span class='op'>=</span> <span class='id identifier rubyid_params'>params</span>
+  <span class='ivar'>@params</span> <span class='op'>=</span> <span class='ivar'>@params</span><span class='period'>.</span><span class='id identifier rubyid_permit!'>permit!</span> <span class='kw'>if</span> <span class='ivar'>@params</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:permit!</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -649,12 +651,12 @@ get, say, the total count without the overhead of fetching actual records.</p>
       <pre class="lines">
 
 
-71
 72
-73</pre>
+73
+74</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/query.rb', line 71</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/query.rb', line 72</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_association_names'>association_names</span>
   <span class='ivar'>@association_names</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="Util.html" title="JsonapiCompliable::Util (module)">Util</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Util/Hash.html" title="JsonapiCompliable::Util::Hash (class)">Hash</a></span></span><span class='period'>.</span><span class='id identifier rubyid_keys'><span class='object_link'><a href="Util/Hash.html#keys-class_method" title="JsonapiCompliable::Util::Hash.keys (method)">keys</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_include_hash'>include_hash</span><span class='rparen'>)</span>
@@ -710,12 +712,12 @@ get, say, the total count without the overhead of fetching actual records.</p>
       <pre class="lines">
 
 
-32
 33
-34</pre>
+34
+35</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/query.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/query.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_include_directive'>include_directive</span>
   <span class='ivar'>@include_directive</span> <span class='op'>||=</span> <span class='const'>JSONAPI</span><span class='op'>::</span><span class='const'>IncludeDirective</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:include</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -787,7 +789,6 @@ get, say, the total count without the overhead of fetching actual records.</p>
       <pre class="lines">
 
 
-49
 50
 51
 52
@@ -796,10 +797,11 @@ get, say, the total count without the overhead of fetching actual records.</p>
 55
 56
 57
-58</pre>
+58
+59</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/query.rb', line 49</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/query.rb', line 50</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_include_hash'>include_hash</span>
   <span class='ivar'>@include_hash</span> <span class='op'>||=</span> <span class='kw'>begin</span>
@@ -946,7 +948,6 @@ top-level:</p>
       <pre class="lines">
 
 
-120
 121
 122
 123
@@ -968,10 +969,11 @@ top-level:</p>
 139
 140
 141
-142</pre>
+142
+143</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/query.rb', line 120</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/query.rb', line 121</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_hash'>to_hash</span>
   <span class='id identifier rubyid_hash'>hash</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_resource'>resource</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span> <span class='op'>=&gt;</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_default_hash'>default_hash</span> <span class='rbrace'>}</span>
@@ -1065,14 +1067,14 @@ get, say, the total count without the overhead of fetching actual records.</p>
       <pre class="lines">
 
 
-159
 160
 161
 162
-163</pre>
+163
+164</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/query.rb', line 159</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/query.rb', line 160</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_zero_results?'>zero_results?</span>
   <span class='op'>!</span><span class='ivar'>@params</span><span class='lbracket'>[</span><span class='symbol'>:page</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>&amp;&amp;</span>
@@ -1089,7 +1091,7 @@ get, say, the total count without the overhead of fetching actual records.</p>
 </div>
 
       <div id="footer">
-  Generated on Fri May  5 15:53:22 2017 by
+  Generated on Wed Jun  7 10:15:09 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>

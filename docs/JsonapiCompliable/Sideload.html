@@ -168,7 +168,7 @@ key.</p>
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#grouper-instance_method" title="#grouper (instance method)">#<strong>grouper</strong>  &#x21d2; Proc </a>
+      <a href="#grouping_field-instance_method" title="#grouping_field (instance method)">#<strong>grouping_field</strong>  &#x21d2; Symbol </a>
     
 
     
@@ -188,7 +188,7 @@ key.</p>
 
   
     <span class="summary_desc"><div class='inline'>
-<p>The configured &#39;group_by&#39; proc.</p>
+<p>The configured &#39;group_by&#39; symbol.</p>
 </div></span>
   
 </li>
@@ -218,6 +218,35 @@ key.</p>
   
     <span class="summary_desc"><div class='inline'>
 <p>The name of the sideload.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#parent-instance_method" title="#parent (instance method)">#<strong>parent</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute parent.</p>
 </div></span>
   
 </li>
@@ -515,7 +544,7 @@ key.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#group_by-instance_method" title="#group_by (instance method)">#<strong>group_by</strong>(&amp;grouper)  &#x21d2; Object </a>
+      <a href="#group_by-instance_method" title="#group_by (instance method)">#<strong>group_by</strong>(grouping_field)  &#x21d2; Object </a>
     
 
     
@@ -530,7 +559,7 @@ key.</p>
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Define a proc that groups the parent records.</p>
+<p>Define an attribute that groups the parent records.</p>
 </div></span>
   
 </li>
@@ -539,7 +568,7 @@ key.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(name, type: nil, resource: nil, polymorphic: false, primary_key: :id, foreign_key: nil)  &#x21d2; Sideload </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(name, type: nil, resource: nil, polymorphic: false, primary_key: :id, foreign_key: nil, parent: nil)  &#x21d2; Sideload </a>
     
 
     
@@ -583,6 +612,28 @@ instantiation.</p>
     <span class="summary_desc"><div class='inline'>
 <p>Is this sideload polymorphic?.</p>
 </div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#polymorphic_child_for_type-instance_method" title="#polymorphic_child_for_type (instance method)">#<strong>polymorphic_child_for_type</strong>(type)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -718,7 +769,7 @@ corresponding Resources, and returns an Include Directive hash.</p>
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(name, type: nil, resource: nil, polymorphic: false, primary_key: :id, foreign_key: nil)  &#x21d2; <tt><span class='object_link'><a href="" title="JsonapiCompliable::Sideload (class)">Sideload</a></span></tt> 
+    #<strong>initialize</strong>(name, type: nil, resource: nil, polymorphic: false, primary_key: :id, foreign_key: nil, parent: nil)  &#x21d2; <tt><span class='object_link'><a href="" title="JsonapiCompliable::Sideload (class)">Sideload</a></span></tt> 
   
 
   
@@ -751,7 +802,6 @@ instantiation</p>
       <pre class="lines">
 
 
-31
 32
 33
 34
@@ -762,17 +812,20 @@ instantiation</p>
 39
 40
 41
-42</pre>
+42
+43
+44</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 31</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 32</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>resource:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>polymorphic:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>primary_key:</span> <span class='symbol'>:id</span><span class='comma'>,</span> <span class='label'>foreign_key:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>resource:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>polymorphic:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>primary_key:</span> <span class='symbol'>:id</span><span class='comma'>,</span> <span class='label'>foreign_key:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>parent:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='ivar'>@name</span>               <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span>
   <span class='ivar'>@resource_class</span>     <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_resource'>resource</span> <span class='op'>||</span> <span class='const'>Class</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="Resource.html" title="JsonapiCompliable::Resource (class)">Resource</a></span></span><span class='rparen'>)</span><span class='rparen'>)</span>
   <span class='ivar'>@sideloads</span>          <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
   <span class='ivar'>@polymorphic</span>        <span class='op'>=</span> <span class='op'>!</span><span class='op'>!</span><span class='id identifier rubyid_polymorphic'>polymorphic</span>
   <span class='ivar'>@polymorphic_groups</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='kw'>if</span> <span class='id identifier rubyid_polymorphic?'>polymorphic?</span>
+  <span class='ivar'>@parent</span>             <span class='op'>=</span> <span class='id identifier rubyid_parent'>parent</span>
   <span class='ivar'>@primary_key</span>        <span class='op'>=</span> <span class='id identifier rubyid_primary_key'>primary_key</span>
   <span class='ivar'>@foreign_key</span>        <span class='op'>=</span> <span class='id identifier rubyid_foreign_key'>foreign_key</span>
   <span class='ivar'>@type</span>               <span class='op'>=</span> <span class='id identifier rubyid_type'>type</span>
@@ -915,9 +968,9 @@ key.</p>
       
       <span id=""></span>
       <div class="method_details ">
-  <h3 class="signature " id="grouper-instance_method">
+  <h3 class="signature " id="grouping_field-instance_method">
   
-    #<strong>grouper</strong>  &#x21d2; <tt>Proc</tt>  <span class="extras">(readonly)</span>
+    #<strong>grouping_field</strong>  &#x21d2; <tt>Symbol</tt>  <span class="extras">(readonly)</span>
   
 
   
@@ -926,7 +979,7 @@ key.</p>
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>The configured &#39;group_by&#39; proc</p>
+<p>The configured &#39;group_by&#39; symbol</p>
 
 
   </div>
@@ -939,13 +992,13 @@ key.</p>
     <li>
       
       
-        <span class='type'>(<tt>Proc</tt>)</span>
+        <span class='type'>(<tt>Symbol</tt>)</span>
       
       
       
         &mdash;
         <div class='inline'>
-<p>the current value of grouper</p>
+<p>the current value of grouping_field</p>
 </div>
       
     </li>
@@ -965,8 +1018,8 @@ key.</p>
     <td>
       <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 13</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_grouper'>grouper</span>
-  <span class='ivar'>@grouper</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_grouping_field'>grouping_field</span>
+  <span class='ivar'>@grouping_field</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1028,6 +1081,49 @@ key.</p>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_name'>name</span>
   <span class='ivar'>@name</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="parent-instance_method">
+  
+    #<strong>parent</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute parent</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+14
+15
+16</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 14</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_parent'>parent</span>
+  <span class='ivar'>@parent</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1565,19 +1661,19 @@ directly</p>
       <pre class="lines">
 
 
-264
-265
-266
-267
-268
-269
 270
 271
 272
-273</pre>
+273
+274
+275
+276
+277
+278
+279</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 264</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 270</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_allow_sideload'>allow_sideload</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_opts'>opts</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_blk'>blk</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_sideload'>sideload</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="" title="JsonapiCompliable::Sideload (class)">Sideload</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="JsonapiCompliable::Sideload#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
@@ -1708,12 +1804,12 @@ in your resource directly.</p>
       <pre class="lines">
 
 
-166
-167
-168</pre>
+168
+169
+170</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 166</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 168</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_assign'>assign</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_blk'>blk</span><span class='rparen'>)</span>
   <span class='ivar'>@assign_proc</span> <span class='op'>=</span> <span class='id identifier rubyid_blk'>blk</span>
@@ -1776,15 +1872,23 @@ in your resource directly.</p>
       <pre class="lines">
 
 
-183
-184
-185</pre>
+185
+186
+187
+188
+189
+190
+191</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 183</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 185</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_associate'>associate</span><span class='lparen'>(</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='id identifier rubyid_child'>child</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_resource_class'>resource_class</span><span class='period'>.</span><span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:adapter</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_associate'>associate</span><span class='lparen'>(</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='id identifier rubyid_child'>child</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_association_name'>association_name</span> <span class='op'>=</span> <span class='ivar'>@parent</span> <span class='op'>?</span> <span class='ivar'>@parent</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>:</span> <span class='id identifier rubyid_name'>name</span>
+  <span class='id identifier rubyid_resource_class'>resource_class</span><span class='period'>.</span><span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:adapter</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_associate'>associate</span> <span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_child'>child</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_association_name'>association_name</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_type'>type</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1794,7 +1898,7 @@ in your resource directly.</p>
       <div class="method_details ">
   <h3 class="signature " id="group_by-instance_method">
   
-    #<strong>group_by</strong>(&amp;grouper)  &#x21d2; <tt>Object</tt> 
+    #<strong>group_by</strong>(grouping_field)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -1803,14 +1907,14 @@ in your resource directly.</p>
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Define a proc that groups the parent records. For instance, with an
+<p>Define an attribute that groups the parent records. For instance, with an
 ActiveRecord polymorphic belongs_to there will be a <code>parent_id</code>
 and <code>parent_type</code>. We would want to group on
 <code>parent_type</code>:</p>
 
 <pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_allow_sideload'>allow_sideload</span> <span class='symbol'>:organization</span><span class='comma'>,</span> <span class='label'>polymorphic:</span> <span class='kw'>true</span> <span class='kw'>do</span>
   <span class='comment'># group parent_type, parent here is &#39;organization&#39;
-</span>  <span class='id identifier rubyid_group_by'>group_by</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_office'>office</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='id identifier rubyid_office'>office</span><span class='period'>.</span><span class='id identifier rubyid_organization_type'>organization_type</span> <span class='rbrace'>}</span>
+</span>  <span class='id identifier rubyid_group_by'>group_by</span> <span class='symbol'>:organization_type</span>
 <span class='kw'>end</span>
 </code></pre>
 
@@ -1833,15 +1937,15 @@ and <code>parent_type</code>. We would want to group on
       <pre class="lines">
 
 
-197
-198
-199</pre>
+203
+204
+205</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 197</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 203</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_group_by'>group_by</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_grouper'>grouper</span><span class='rparen'>)</span>
-  <span class='ivar'>@grouper</span> <span class='op'>=</span> <span class='id identifier rubyid_grouper'>grouper</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_group_by'>group_by</span><span class='lparen'>(</span><span class='id identifier rubyid_grouping_field'>grouping_field</span><span class='rparen'>)</span>
+  <span class='ivar'>@grouping_field</span> <span class='op'>=</span> <span class='id identifier rubyid_grouping_field'>grouping_field</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1868,7 +1972,7 @@ different &#39;types&#39; can be resolved differently. Let&#39;s say an
 be either a <code>Business</code> or <code>Government</code>:</p>
 
 <pre class="code ruby"><code class="ruby">allow_sideload :organization, :polymorphic: true do
-  group_by { |record| record.organization_type }
+  group_by :organization_type
 
   allow_sideload &#39;Business&#39;, resource: BusinessResource do
     # ... code ...
@@ -1883,7 +1987,7 @@ end</code></pre>
 ActiveRecord:</p>
 
 <pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_polymorphic_belongs_to'>polymorphic_belongs_to</span> <span class='symbol'>:organization</span><span class='comma'>,</span>
-  <span class='label'>group_by:</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_office'>office</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='id identifier rubyid_office'>office</span><span class='period'>.</span><span class='id identifier rubyid_organization_type'>organization_type</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>group_by:</span> <span class='symbol'>:organization_type</span><span class='comma'>,</span>
   <span class='label'>groups:</span> <span class='lbrace'>{</span>
     <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Business</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
       <span class='label'>scope:</span> <span class='tlambda'>-&gt;</span> <span class='tlambeg'>{</span> <span class='const'>Business</span><span class='period'>.</span><span class='id identifier rubyid_all'>all</span> <span class='rbrace'>}</span><span class='comma'>,</span>
@@ -1935,15 +2039,62 @@ ActiveRecord:</p>
       <pre class="lines">
 
 
-89
-90
-91</pre>
+91
+92
+93</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 89</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 91</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_polymorphic?'>polymorphic?</span>
   <span class='ivar'>@polymorphic</span> <span class='op'>==</span> <span class='kw'>true</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="polymorphic_child_for_type-instance_method">
+  
+    #<strong>polymorphic_child_for_type</strong>(type)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+333
+334
+335
+336
+337</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 333</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_polymorphic_child_for_type'>polymorphic_child_for_type</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_polymorphic_groups'>polymorphic_groups</span><span class='period'>.</span><span class='id identifier rubyid_values'>values</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_v'>v</span><span class='op'>|</span>
+    <span class='id identifier rubyid_v'>v</span><span class='period'>.</span><span class='id identifier rubyid_resource_class'>resource_class</span><span class='period'>.</span><span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='id identifier rubyid_type'>type</span>
+  <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2054,18 +2205,18 @@ ActiveRecord:</p>
       <pre class="lines">
 
 
-216
-217
-218
-219
-220
-221
 222
 223
-224</pre>
+224
+225
+226
+227
+228
+229
+230</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 216</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 222</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='lparen'>(</span><span class='id identifier rubyid_parents'>parents</span><span class='comma'>,</span> <span class='id identifier rubyid_query'>query</span><span class='comma'>,</span> <span class='id identifier rubyid_namespace'>namespace</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_namespace'>namespace</span> <span class='op'>||=</span> <span class='id identifier rubyid_name'>name</span>
@@ -2132,12 +2283,12 @@ ActiveRecord:</p>
       <pre class="lines">
 
 
-46
-47
-48</pre>
+48
+49
+50</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 46</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 48</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resource'>resource</span>
   <span class='ivar'>@resource</span> <span class='op'>||=</span> <span class='id identifier rubyid_resource_class'>resource_class</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
@@ -2252,12 +2403,12 @@ in your resource directly.</p>
       <pre class="lines">
 
 
-129
-130
-131</pre>
+131
+132
+133</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 129</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 131</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_scope'>scope</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_blk'>blk</span><span class='rparen'>)</span>
   <span class='ivar'>@scope_proc</span> <span class='op'>=</span> <span class='id identifier rubyid_blk'>blk</span>
@@ -2338,12 +2489,12 @@ in your resource directly.</p>
       <pre class="lines">
 
 
-279
-280
-281</pre>
+285
+286
+287</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 279</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 285</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sideload'>sideload</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='ivar'>@sideloads</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span>
@@ -2422,12 +2573,6 @@ corresponding Resources, and returns an Include Directive hash</p>
       <pre class="lines">
 
 
-306
-307
-308
-309
-310
-311
 312
 313
 314
@@ -2440,10 +2585,16 @@ corresponding Resources, and returns an Include Directive hash</p>
 321
 322
 323
-324</pre>
+324
+325
+326
+327
+328
+329
+330</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 306</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 312</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_hash'>to_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_processed'>processed</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='rbrace'>}</span> <span class='kw'>if</span> <span class='id identifier rubyid_processed'>processed</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span>
@@ -2474,7 +2625,7 @@ corresponding Resources, and returns an Include Directive hash</p>
 </div>
 
       <div id="footer">
-  Generated on Fri May  5 15:53:22 2017 by
+  Generated on Wed Jun  7 10:15:10 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>
