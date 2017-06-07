@@ -544,17 +544,17 @@ firing a query. Otherwise, simple assignment will do</p>
       <pre class="lines">
 
 
-71
-72
-73
 74
 75
 76
 77
-78</pre>
+78
+79
+80
+81</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 71</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 74</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_associate'>associate</span><span class='lparen'>(</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='id identifier rubyid_child'>child</span><span class='comma'>,</span> <span class='id identifier rubyid_association_name'>association_name</span><span class='comma'>,</span> <span class='id identifier rubyid_association_type'>association_type</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_association_type'>association_type</span> <span class='op'>==</span> <span class='symbol'>:has_many</span>
@@ -663,12 +663,12 @@ firing a query. Otherwise, simple assignment will do</p>
       <pre class="lines">
 
 
-29
-30
-31</pre>
+32
+33
+34</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 29</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 32</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_average'>average</span><span class='lparen'>(</span><span class='id identifier rubyid_scope'>scope</span><span class='comma'>,</span> <span class='id identifier rubyid_attr'>attr</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_scope'>scope</span><span class='period'>.</span><span class='id identifier rubyid_average'>average</span><span class='lparen'>(</span><span class='id identifier rubyid_attr'>attr</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span>
@@ -776,14 +776,20 @@ firing a query. Otherwise, simple assignment will do</p>
 23
 24
 25
-26</pre>
+26
+27
+28
+29</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 23</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_count'>count</span><span class='lparen'>(</span><span class='id identifier rubyid_scope'>scope</span><span class='comma'>,</span> <span class='id identifier rubyid_attr'>attr</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_column'>column</span> <span class='op'>=</span> <span class='id identifier rubyid_attr'>attr</span> <span class='op'>==</span> <span class='symbol'>:total</span> <span class='op'>?</span> <span class='symbol'>:all</span> <span class='op'>:</span> <span class='id identifier rubyid_attr'>attr</span>
-  <span class='id identifier rubyid_scope'>scope</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span><span class='lparen'>(</span><span class='id identifier rubyid_column'>column</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_attr'>attr</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span> <span class='op'>==</span> <span class='symbol'>:total</span>
+    <span class='id identifier rubyid_scope'>scope</span><span class='period'>.</span><span class='id identifier rubyid_distinct'>distinct</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_scope'>scope</span><span class='period'>.</span><span class='id identifier rubyid_distinct'>distinct</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span><span class='lparen'>(</span><span class='id identifier rubyid_attr'>attr</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -893,14 +899,14 @@ firing a query. Otherwise, simple assignment will do</p>
       <pre class="lines">
 
 
-81
-82
-83
 84
-85</pre>
+85
+86
+87
+88</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 81</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 84</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span><span class='lparen'>(</span><span class='id identifier rubyid_model_class'>model_class</span><span class='comma'>,</span> <span class='id identifier rubyid_create_params'>create_params</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_instance'>instance</span> <span class='op'>=</span> <span class='id identifier rubyid_model_class'>model_class</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_create_params'>create_params</span><span class='rparen'>)</span>
@@ -1015,14 +1021,14 @@ firing a query. Otherwise, simple assignment will do</p>
       <pre class="lines">
 
 
-95
-96
-97
 98
-99</pre>
+99
+100
+101
+102</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 95</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 98</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_destroy'>destroy</span><span class='lparen'>(</span><span class='id identifier rubyid_model_class'>model_class</span><span class='comma'>,</span> <span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_instance'>instance</span> <span class='op'>=</span> <span class='id identifier rubyid_model_class'>model_class</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
@@ -1253,12 +1259,12 @@ firing a query. Otherwise, simple assignment will do</p>
       <pre class="lines">
 
 
-39
-40
-41</pre>
+42
+43
+44</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 39</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 42</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_maximum'>maximum</span><span class='lparen'>(</span><span class='id identifier rubyid_scope'>scope</span><span class='comma'>,</span> <span class='id identifier rubyid_attr'>attr</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_scope'>scope</span><span class='period'>.</span><span class='id identifier rubyid_maximum'>maximum</span><span class='lparen'>(</span><span class='id identifier rubyid_attr'>attr</span><span class='rparen'>)</span>
@@ -1362,12 +1368,12 @@ firing a query. Otherwise, simple assignment will do</p>
       <pre class="lines">
 
 
-44
-45
-46</pre>
+47
+48
+49</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 44</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 47</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_minimum'>minimum</span><span class='lparen'>(</span><span class='id identifier rubyid_scope'>scope</span><span class='comma'>,</span> <span class='id identifier rubyid_attr'>attr</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_scope'>scope</span><span class='period'>.</span><span class='id identifier rubyid_minimum'>minimum</span><span class='lparen'>(</span><span class='id identifier rubyid_attr'>attr</span><span class='rparen'>)</span>
@@ -1726,12 +1732,12 @@ an HTTP call, etc.</p>
       <pre class="lines">
 
 
-49
-50
-51</pre>
+52
+53
+54</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 49</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 52</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='lparen'>(</span><span class='id identifier rubyid_scope'>scope</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_scope'>scope</span><span class='period'>.</span><span class='id identifier rubyid_to_a'>to_a</span>
@@ -1800,12 +1806,12 @@ Sideload#allow_sideload</p>
       <pre class="lines">
 
 
-64
-65
-66</pre>
+67
+68
+69</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 64</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 67</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sideloading_module'>sideloading_module</span>
   <span class='const'><span class='object_link'><a href="../../JsonapiCompliable.html" title="JsonapiCompliable (module)">JsonapiCompliable</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Adapters.html" title="JsonapiCompliable::Adapters (module)">Adapters</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="ActiveRecordSideloading.html" title="JsonapiCompliable::Adapters::ActiveRecordSideloading (module)">ActiveRecordSideloading</a></span></span>
@@ -1909,12 +1915,12 @@ Sideload#allow_sideload</p>
       <pre class="lines">
 
 
-34
-35
-36</pre>
+37
+38
+39</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 34</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 37</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sum'>sum</span><span class='lparen'>(</span><span class='id identifier rubyid_scope'>scope</span><span class='comma'>,</span> <span class='id identifier rubyid_attr'>attr</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_scope'>scope</span><span class='period'>.</span><span class='id identifier rubyid_sum'>sum</span><span class='lparen'>(</span><span class='id identifier rubyid_attr'>attr</span><span class='rparen'>)</span>
@@ -1995,14 +2001,14 @@ Sideload#allow_sideload</p>
       <pre class="lines">
 
 
-57
-58
-59
 60
-61</pre>
+61
+62
+63
+64</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 57</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 60</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_transaction'>transaction</span><span class='lparen'>(</span><span class='id identifier rubyid_model_class'>model_class</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_model_class'>model_class</span><span class='period'>.</span><span class='id identifier rubyid_transaction'>transaction</span> <span class='kw'>do</span>
@@ -2117,14 +2123,14 @@ Sideload#allow_sideload</p>
       <pre class="lines">
 
 
-88
-89
-90
 91
-92</pre>
+92
+93
+94
+95</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 88</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/active_record.rb', line 91</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update'>update</span><span class='lparen'>(</span><span class='id identifier rubyid_model_class'>model_class</span><span class='comma'>,</span> <span class='id identifier rubyid_update_params'>update_params</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_instance'>instance</span> <span class='op'>=</span> <span class='id identifier rubyid_model_class'>model_class</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_update_params'>update_params</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='symbol'>:id</span><span class='rparen'>)</span><span class='rparen'>)</span>
@@ -2141,7 +2147,7 @@ Sideload#allow_sideload</p>
 </div>
 
       <div id="footer">
-  Generated on Fri May  5 15:53:23 2017 by
+  Generated on Wed Jun  7 10:15:11 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>

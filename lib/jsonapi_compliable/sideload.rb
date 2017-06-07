@@ -332,7 +332,7 @@ module JsonapiCompliable
     # @api private
     def polymorphic_child_for_type(type)
       polymorphic_groups.values.find do |v|
-        v.resource_class.config[:type] == type
+        v.resource_class.config[:type] == type.to_sym
       end
     end
 

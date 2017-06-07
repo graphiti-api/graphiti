@@ -199,6 +199,30 @@ can track the object it just created. Expect this in <code>meta</code>:</p>
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#attributes=-instance_method" title="#attributes= (instance method)">#<strong>attributes=</strong>(attrs)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Override the attributes # @see #attributes.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#data-instance_method" title="#data (instance method)">#<strong>data</strong>  &#x21d2; Hash </a>
     
 
@@ -490,8 +514,49 @@ include directive like.</p>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_attributes'>attributes</span>
   <span class='ivar'>@attributes</span> <span class='op'>||=</span> <span class='id identifier rubyid_raw_attributes'>raw_attributes</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_hash'>hash</span><span class='op'>|</span>
-    <span class='id identifier rubyid_hash'>hash</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='label'>id:</span> <span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_id'>id</span>
+    <span class='id identifier rubyid_hash'>hash</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_id'>id</span> <span class='kw'>if</span> <span class='id identifier rubyid_id'>id</span>
   <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="attributes=-instance_method">
+  
+    #<strong>attributes=</strong>(attrs)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Override the attributes # @see #attributes</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+74
+75
+76</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 74</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_attributes='>attributes=</span><span class='lparen'>(</span><span class='id identifier rubyid_attrs'>attrs</span><span class='rparen'>)</span>
+  <span class='ivar'>@attributes</span> <span class='op'>=</span> <span class='id identifier rubyid_attrs'>attrs</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -667,18 +732,18 @@ include directive.</p>
       <pre class="lines">
 
 
-101
-102
-103
-104
-105
-106
 107
 108
-109</pre>
+109
+110
+111
+112
+113
+114
+115</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 101</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 107</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_include_directive'>include_directive</span><span class='lparen'>(</span><span class='id identifier rubyid_memo'>memo</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='id identifier rubyid_relationship_node'>relationship_node</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_relationship_node'>relationship_node</span> <span class='op'>||=</span> <span class='id identifier rubyid_relationships'>relationships</span>
@@ -738,16 +803,16 @@ create/update/destroy/disassociate. Based on the request env or the
       <pre class="lines">
 
 
-79
-80
-81
-82
-83
-84
-85</pre>
+85
+86
+87
+88
+89
+90
+91</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 79</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 85</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_meta'>meta</span>
   <span class='lbrace'>{</span>
@@ -805,12 +870,12 @@ create/update/destroy/disassociate. Based on the request env or the
       <pre class="lines">
 
 
-88
-89
-90</pre>
+94
+95
+96</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 88</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 94</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_relationships'>relationships</span>
   <span class='ivar'>@relationships</span> <span class='op'>||=</span> <span class='id identifier rubyid_process_relationships'>process_relationships</span><span class='lparen'>(</span><span class='id identifier rubyid_raw_relationships'>raw_relationships</span><span class='rparen'>)</span>
@@ -825,7 +890,7 @@ create/update/destroy/disassociate. Based on the request env or the
 </div>
 
       <div id="footer">
-  Generated on Fri May  5 15:53:22 2017 by
+  Generated on Wed Jun  7 10:15:10 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>

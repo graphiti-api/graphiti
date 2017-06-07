@@ -87,8 +87,6 @@ module JsonapiCompliable
   #     scope: -> { Comment.all },
   #     resource: CommentResource,
   #     foreign_key: :post_id
-  #
-  # @attr_reader [Hash] context A hash of +object+ and +namespace+ - Example object is a Rails controller, example namespace would be +:index+ or +:show+
   class Resource
     extend Forwardable
     attr_reader :context
@@ -451,16 +449,24 @@ module JsonapiCompliable
       end
     end
 
-    # The current context set by +#with_context+ in the form of
+    # The current context **object** set by +#with_context+. If you are
+    # using Rails, this is a controller instance.
     #
-    #   { object: context_obj, namespace: :index }
+    # This method is equivalent to +JsonapiCompliable.context[:object]+
     #
     # @see #with_context
-    # @return [Hash] the context hash
+    # @return the context object
     def context
       JsonapiCompliable.context[:object]
     end
 
+    # The current context **namespace** set by +#with_context+. If you
+    # are using Rails, this is the controller method name (e.g. +:index+)
+    #
+    # This method is equivalent to +JsonapiCompliable.context[:namespace]+
+    #
+    # @see #with_context
+    # @return [Symbol] the context namespace
     def context_namespace
       JsonapiCompliable.context[:namespace]
     end
