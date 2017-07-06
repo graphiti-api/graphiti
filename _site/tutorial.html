@@ -39,10 +39,10 @@
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
       <ul class="nav navbar-nav">
         <li>
-          <a class="nav-link" href="/quickstart">Quickstart</a>
+          <a class="nav-link" href="/jsonapi_suite/quickstart">Quickstart</a>
         </li>
         <li>
-          <a class="nav-link" href="/tutorial">Tutorial</a>
+          <a class="nav-link" href="/jsonapi_suite/tutorial">Tutorial</a>
         </li>
         <li>
           <a class="nav-link" href="mailto:richmolj@gmail.com">Contact</a>
@@ -67,7 +67,7 @@ If you’re looking for a brief overview, head to the
 <a href="/quickstart">Quickstart</a>
 instead.</p>
 
-<p><img src="/assets/img/employee_directory.gif" alt="employee_directory" /></p>
+<p><img src="/jsonapi_suite/assets/img/employee_directory.gif" alt="employee_directory" /></p>
 
 <p>If you get lost, you can view the code on Github:</p>
 
@@ -175,105 +175,105 @@ entities) and a show (single entity) endpoint for an Employee model.</p>
 
 <p>One line of code allows simple <code class="highlighter-rouge">WHERE</code> clauses. If the user tried to filter on something not whitelisted here, an error would be raised.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/master...step_1_add_filter">View the Diff on Github</a></p>
 
 <h2 id="custom-filtering"><a name="custom-filtering" href="#custom-filtering">Custom Filtering</a></h2>
 
 <p>Sometimes <code class="highlighter-rouge">WHERE</code> clauses are more complex, such as prefix queries. Here we’ll query all employees whose age is greater than or equal to a given number.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_1_add_filter...step_2_add_custom_filter">View the Diff on Github</a></p>
 
 <h2 id="sorting"><a name="sorting" href="#sorting">Sorting</a></h2>
 
 <p>Sorting comes for free, but here’s a test for it. Decide as a team if we <em>actually</em> need to write a spec here, or if it’s considered tested within the libraries.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_2_add_custom_filter...step_3_basic_sorting">View the Diff on Github</a></p>
 
 <h2 id="custom-sorting"><a name="custom-sorting" href="#custom-sorting">Custom Sorting</a></h2>
 
 <p>Sometimes we need more than a simple <code class="highlighter-rouge">ORDER BY</code> clause, for example maybe we need to join on another table. In this example, we switch from Postgres’s default case-sensitive query to a case in-sensitive one…but only for the <code class="highlighter-rouge">first_name</code> field.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_3_basic_sorting...step_4_custom_sorting">View the Diff on Github</a></p>
 
 <h2 id="pagination"><a name="pagination" href="#pagination">Pagination</a></h2>
 
 <p>Pagination also comes for free, so once again we’ll have to decide if writing a spec like this is worth the bother.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_4_custom_sorting...step_5_pagination">View the Diff on Github</a></p>
 
 <h2 id="custom-pagination"><a name="custom-pagination" href="#custom-pagination">Custom Pagination</a></h2>
 
 <p>By default we use the <a href="https://github.com/kaminari/kaminari">Kaminari</a> library for pagination. This shows how we could instead sub-out Kaminari and replace it with <a href="https://github.com/mislav/will_paginate">will_paginate</a></p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_5_pagination...step_6_custom_pagination">View the Diff on Github</a></p>
 
 <h2 id="statistics"><a name="statistics" href="#statistics">Statistics</a></h2>
 
 <p>For default statistics, (<code class="highlighter-rouge">count</code>, <code class="highlighter-rouge">sum</code>, <code class="highlighter-rouge">average</code>, <code class="highlighter-rouge">maximum</code> and <code class="highlighter-rouge">minimum</code>), simply specify the field and statistic.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_6_custom_pagination...step_7_stats">View the Diff on Github</a></p>
 
 <h2 id="custom-statistics"><a name="custom-statistics" href="#custom-statistics">Custom Statistics</a></h2>
 
 <p>Here we add a <code class="highlighter-rouge">median</code> statistic to show non-standard custom statistic usage.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_7_stats...step_8_custom_stats">View the Diff on Github</a></p>
 
 <h2 id="custom-serialization"><a name="custom-serialization" href="#custom-serialization">Custom Serialization</a></h2>
 
 <p>Let’s say we wanted the employee’s age to serialize <code class="highlighter-rouge">Thirty-Two</code> instead of <code class="highlighter-rouge">32</code> in JSON. Here we use a library to get the friendly-word doppleganger, and change the test to recognize this custom logic.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/master...custom-serialization">View the Diff on Github</a></p>
 
 <h2 id="has-many-association"><a name="has-many-association" href="#has-many-association">Has-Many Association</a></h2>
 
 <p>Get employees and their positions in one call.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/master...step_9_has_many">View the Diff on Github</a></p>
 
 <h2 id="belongs-to-association"><a name="belongs-to" href="#belongs-to">Belongs-To Association</a></h2>
 
 <p>Get employees, positions, and the department for those positions in one call:</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_9_has_many...step_10_belongs_to">View the Diff on Github</a></p>
 
 <h2 id="many-to-many"><a name="many-to-many" href="#many-to-many">Many-to-Many</a></h2>
 
 <p>In this example an <code class="highlighter-rouge">Employee</code> has many <code class="highlighter-rouge">Team</code>s and a <code class="highlighter-rouge">Team</code> has many <code class="highlighter-rouge">Employee</code>s.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_13_error_handling...many-to-many">View the Diff on Github</a></p>
 
 <h2 id="resource-re-use"><a name="resource-reuse" href="#resource-reuse">Resource Re-Use</a></h2>
 
 <p>In prior steps we created <code class="highlighter-rouge">PositionResource</code> and <code class="highlighter-rouge">DepartmentResource</code>. These objects may have custom sort logic, filter whitelists, etc - this configuration can be re-used if we need to add <code class="highlighter-rouge">/api/v1/positions</code> and <code class="highlighter-rouge">/api/v1/departments</code> endpoints.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_10_belongs_to...step_11_resource_reuse">View the Diff on Github</a></p>
 
 <h2 id="filtersortpaginate-associations"><a name="fsp-associations" href="#fsp-associations">Filter/Sort/Paginate Associations</a></h2>
 
 <p>This comes for free. As long as the associated <code class="highlighter-rouge">Resource</code> knows how to do something, we can re-use that logic.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_11_resource_reuse...step_12_fsp_associations">View the Diff on Github</a></p>
 
 <h2 id="error-handling"><a name="error-handling" href="#error-handling">Error Handling</a></h2>
 
 <p>In this example we add global error handling, so any random error will return a <a href="http://jsonapi.org/format/#errors">JSONAPI-compatible error response</a>. Then we customize that response for a specific scenario (the requested employee does not exist).</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_12_fsp_associations...step_13_error_handling">View the Diff on Github</a></p>
 
 <h1 id="writes"><a name="writes" href="#writes">Writes</a></h1>
@@ -282,14 +282,14 @@ entities) and a show (single entity) endpoint for an Employee model.</p>
 
 <p>Basic example without validations or strong parameters.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/bump_gemfile_for_writes...step_14_create">View the Diff on Github</a></p>
 
 <h2 id="validations"><a name="validations" href="#validations">Validations</a></h2>
 
 <p>Validations are basic, vanilla Rails code. When there is a validation error, we return a jsonapi-compatible error respone.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_14_create...step_15_validations">View the Diff on Github</a></p>
 
 <h2 id="strong-resources"><a name="strong-resources" href="#strong-resources">Strong Resources</a></h2>
@@ -300,21 +300,21 @@ entities) and a show (single entity) endpoint for an Employee model.</p>
 
 <p>Note: <code class="highlighter-rouge">strong_resources</code> requires Rails.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_15_validations...step_16_strong_resources">View the Diff on Github</a></p>
 
 <h2 id="basic-update"><a name="basic-update" href="#basic-update">Basic Update</a></h2>
 
 <p>Looks very similar to <code class="highlighter-rouge">create</code>.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_16_strong_resources...step_17_basic_update">View the Diff on Github</a></p>
 
 <h2 id="basic-destroy"><a name="basic-destroy" href="#basic-destroy">Basic Destroy</a></h2>
 
 <p>More or less basic Rails.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_17_basic_update...step_18_basic_destroy">View the Diff on Github</a></p>
 
 <h2 id="customizing-persistence"><a name="customizing-persistence" href="#customizing-persistence">Customizing Persistence</a></h2>
@@ -323,7 +323,7 @@ entities) and a show (single entity) endpoint for an Employee model.</p>
 
 <p>This code shows how to customize <code class="highlighter-rouge">create/update/destroy</code>. In this example we’re simply logging the action, but you could do whatever you want here as long as you return an instance of the object. Just like with reads, if any of this code becomes duplicative across <code class="highlighter-rouge">Resource</code> objects you could move it into a common <code class="highlighter-rouge">Adapter</code>.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_18_basic_destroy...step_19_custom_persistence">View the Diff on Github</a></p>
 
 <h2 id="association-writes"><a name="association-writes" href="#association-writes">Association Writes</a></h2>
@@ -334,14 +334,14 @@ entities) and a show (single entity) endpoint for an Employee model.</p>
 
 <p>Once again, note how our <code class="highlighter-rouge">strong_resources</code> can be shared across controllers.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_19_custom_persistence...step_20_association_create">View the Diff on Github</a></p>
 
 <h3 id="nested-updates"><a name="nested-updates" href="#nested-updates">Nested Updates</a></h3>
 
 <p>We got this for free, here’s a spec!</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_20_association_create...step_21_association_update">View the Diff on Github</a></p>
 
 <h3 id="nested-destroys"><a name="nested-destroys" href="#nested-destroys">Nested Destroys</a></h3>
@@ -350,14 +350,14 @@ entities) and a show (single entity) endpoint for an Employee model.</p>
 
 <p>Note destroy will do two things: delete the object, and make the foreign key on the corresponding child in the payload <code class="highlighter-rouge">null</code>.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_21_association_update...step_22_association_destroy">View the Diff on Github</a></p>
 
 <h3 id="disassociations"><a name="disassociations" href="#disassociations">Disassociations</a></h3>
 
 <p><code class="highlighter-rouge">destroy</code> actually deletes objects, what if we want to simply disassociate the objects by making the foreign key <code class="highlighter-rouge">null</code>? We get this for free, too.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_22_association_destroy...step_23_disassociation">View the Diff on Github</a></p>
 
 <h3 id="usage-without-activerecord"><a name="usage-without-activerecord" href="#usage-without-activerecord">Usage without ActiveRecord</a></h3>
@@ -513,7 +513,7 @@ end
 
 <h2 id="glimmer"><a name="glimmer" href="#glimmer">Glimmer</a></h2>
 
-<p><img src="/assets/img/glimmer_logo.png" alt="glimmer_logo" /></p>
+<p><img src="/jsonapi_suite/assets/img/glimmer_logo.png" alt="glimmer_logo" /></p>
 
 <p>JSORM can be used with the client-side framework of your choice. To give an example of real-world usage, we’ve created a demo application using <a href="https://glimmerjs.com/">Glimmer</a>. Glimmer is super-lightweight (you can learn it in 5 minutes) and provides the bare-bones we need to illustrate JSONAPI and JSORM in action.</p>
 
@@ -527,54 +527,54 @@ end
 
 <p>We’ll start by adding our models and populating a simple table:</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee-directory/compare/master...step_1_basic_search">View the Diff on Github</a></p>
 
 <h3 id="client-side-filtering"><a name="client-side-filtering" href="#client-side-filtering">Client-Side Filtering</a></h3>
 
 <p>Now add some first name/last name search filters to the grid:</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee-directory/compare/step_1_basic_search...step_2_add_filtering">View the Diff on Github</a></p>
 
 <h3 id="client-side-pagination"><a name="client-side-pagination" href="#client-side-pagination">Client-Side Pagination</a></h3>
 
 <p>Pretty straightforward: we add pagination to our scope, with some logic to calculate forward/back.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee-directory/compare/step_2_add_filtering...step_3_add_pagination">View the Diff on Github</a></p>
 
 <h3 id="client-side-statistics"><a name="client-side-stats" href="#client-side-stats">Client-Side Statistics</a></h3>
 
 <p>Here we’ll add a “Total Count” above our grid, and use this value to improve our pagination logic:</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee-directory/compare/step_3_add_pagination...step_4_stats">View the Diff on Github</a></p>
 
 <h3 id="client-side-sorting"><a name="client-side-sorting" href="#client-side-sorting">Client-Side Sorting</a></h3>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee-directory/compare/step_4_stats...step_5_sorting">View the Diff on Github</a></p>
 
 <h3 id="client-side-nested-create"><a name="client-side-nested-create" href="#client-side-nested-create">Client-Side Nested Create</a></h3>
 
 <p>Let’s add a form that will create an Employee, their Positions and associated Departments in one go:</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee-directory/compare/step_5_sorting...step_6_basic_create">View the Diff on Github</a></p>
 
 <h3 id="client-side-nested-update"><a name="client-side-nested-update" href="#client-side-nested-update">Client-Side Nested Update</a></h3>
 
 <p>Let’s add some glimmer-binding so that we can click an employee in the grid, and edit that employee in the form:</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee-directory/compare/step_6_basic_create...step_7_update">View the Diff on Github</a></p>
 
 <h3 id="client-side-nested-destroy"><a name="client-side-nested-destroy" href="#client-side-nested-destroy">Client-Side Nested Destroy</a></h3>
 
 <p>Remove employee positions. Since only one position is ‘current’, we’ll do some recalculating as the data changes.</p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee-directory/compare/step_7_update...step_8_destroy">View the Diff on Github</a></p>
 
 <h3 id="client-side-validations"><a name="client-side-validations" href="#client-side-validations">Client-Side Validations</a></h3>
@@ -583,7 +583,7 @@ end
 
 <p>The ‘age’ field is an exception. If the user submits a string instead of a number, the server will response with a 500. This is to show off our <a href="https://github.com/jsonapi-suite/employee_directory/blob/step_23_disassociation/config/initializers/strong_resources.rb#L5">stronger_parameters integration</a></p>
 
-<p><img src="/assets/img/GitHub-Mark-32px.png" alt="github" />
+<p><img src="/jsonapi_suite/assets/img/GitHub-Mark-32px.png" alt="github" />
 <a href="https://github.com/jsonapi-suite/employee-directory/compare/step_8_destroy...step_9_validations">View the Diff on Github</a></p>
 
 <p><br />
@@ -614,10 +614,10 @@ end
         <h3>Overview</h3>
         <ul>
           <li>
-            <a href="/quickstart">Quickstart</a>
+            <a href="/jsonapi_suite/quickstart">Quickstart</a>
           </li>
           <li>
-            <a href="/tutorial">Tutorial</a>
+            <a href="/jsonapi_suite/tutorial">Tutorial</a>
           </li>
         </ul>
       </div>

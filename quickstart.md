@@ -228,7 +228,7 @@ $ node index.js
 Now load `http://localhost:3000/api/v1/posts`. You should have 3 `Post`s in
 your database!
 
-![3_posts](/assets/img/3_posts_json.png)
+![3_posts](/jsonapi_suite/assets/img/3_posts_json.png)
 
 # <a name="querying" href='#querying'>Querying</a>
 
@@ -304,7 +304,7 @@ what query functionality we have. We've listed all `Post`s at
   * There are a number of built-in stats, you can also add your own.
   * This is rendered in the `meta` section of the response:
 
-    ![meta_total_count](/assets/img/meta_total_count.png)
+    ![meta_total_count](/jsonapi_suite/assets/img/meta_total_count.png)
 
 * **Error Handling**:
   * Your app will always render a JSONAPI-compliable error response.
@@ -319,7 +319,7 @@ what query functionality we have. We've listed all `Post`s at
 
   * View the default payload:
 
-    ![error_payload](/assets/img/error_payload.png)
+    ![error_payload](/jsonapi_suite/assets/img/error_payload.png)
 
   * Different errors can be customized with different response codes,
   JSON, and side-effects. View [jsonapi_errorable](https://jsonapi-suite.github.io/jsonapi_errorable/) for more.
