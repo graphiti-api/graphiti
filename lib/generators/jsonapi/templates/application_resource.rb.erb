@@ -1,5 +1,14 @@
-require 'jsonapi_compliable/adapters/active_record'
-
+<%- unless omit_comments? -%>
+# ApplicationResource is similar to ApplicationRecord - a base class that
+# holds configuration/methods for subclasses.
+# All Resources should inherit from ApplicationResource.
+# Resource documentation: https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Resource.html
+<%- end -%>
 class ApplicationResource < JsonapiCompliable::Resource
+  <%- unless omit_comments? -%>
+  # Use the ActiveRecord Adapter for all subclasses.
+  # Subclasses can still override this default.
+  # More on adapters: https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Adapters/Abstract.html
+  <%- end -%>
   use_adapter JsonapiCompliable::Adapters::ActiveRecord
 end

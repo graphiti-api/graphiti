@@ -1,21 +1,46 @@
 <% module_namespacing do -%>
 class <%= model_klass.name.pluralize %>Controller < ApplicationController
+  <%- unless omit_comments? -%>
+  # Mark this as a JSONAPI controller, associating with the given resource
+  <%- end -%>
   jsonapi resource: <%= model_klass %>Resource
 
+  <%- unless omit_comments? -%>
+  # Reference a strong resource payload defined in
+  # config/initializers/strong_resources.rb
+  <%- end -%>
   strong_resource :<%= file_name %>
 
+  <%- unless omit_comments? -%>
+  # Run strong parameter validation for these actions.
+  # Invalid keys will be dropped.
+  # Invalid value types will log or raise based on the configuration
+  # ActionController::Parameters.action_on_invalid_parameters
+  <%- end -%>
   before_action :apply_strong_params, only: [:create, :update]
 
+  <%- unless omit_comments? -%>
+  # Start with a base scope and pass to render_jsonapi
+  <%- end -%>
   def index
     <%= file_name.pluralize %> = <%= model_klass %>.all
     render_jsonapi(<%= file_name.pluralize %>)
   end
 
+  <%- unless omit_comments? -%>
+  # Call jsonapi_scope directly here so we can get behavior like
+  # sparse fieldsets and statistics.
+  <%- end -%>
   def show
     scope = jsonapi_scope(<%= model_klass %>.where(id: params[:id]))
     render_jsonapi(scope.resolve.first, scope: false)
   end
 
+  <%- unless omit_comments? -%>
+  # jsonapi_create will use the configured Resource (and adapter) to persist.
+  # This will handle nested relationships as well.
+  # On validation errors, render correct error JSON.
+  <%- end -%>
   def create
     <%= file_name %>, success = jsonapi_create.to_a
 
@@ -26,6 +51,11 @@ class <%= model_klass.name.pluralize %>Controller < ApplicationController
     end
   end
 
+  <%- unless omit_comments? -%>
+  # jsonapi_update will use the configured Resource (and adapter) to persist.
+  # This will handle nested relationships as well.
+  # On validation errors, render correct error JSON.
+  <%- end -%>
   def update
     <%= file_name %>, success = jsonapi_update.to_a
 
@@ -36,6 +66,10 @@ class <%= model_klass.name.pluralize %>Controller < ApplicationController
     end
   end
 
+  <%- unless omit_comments? -%>
+  # No need for any special logic here as no_content is jsonapi_compliant.
+  # Customize this if you have a more complex use case.
+  <%- end -%>
   def destroy
     <%= file_name %> = <%= model_klass %>.find(params[:id])
     <%= file_name %>.destroy
