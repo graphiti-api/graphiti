@@ -1,0 +1,325 @@
+.pricing-tabs-section {
+  margin-top: 60px;
+
+  .header {
+    text-align: center;
+
+    h3 {
+      font-size: 23px;
+      color: #444;
+      line-height: 25px;
+      font-weight: 500;
+    }
+
+    p {
+      font-size: 16px;
+      font-weight: 400;
+      color: #888;
+    }
+  }
+
+  .tabs {
+    background: #F8F8F8;
+    text-align: center;
+    border-radius: 3px;
+    margin-top: 40px;
+
+    .tab {
+      background-color: #F8F8F8;
+      font-weight: 500;
+      font-size: 15px;
+      color: #555;
+      display: inline-block;
+      padding: 18px 25px;
+      margin-top: 10px;
+      cursor: pointer;
+
+      @include transition(background-color 0.2s linear);
+
+      &.anually {
+        padding: 18px 18px 18px 23px;
+      }
+
+      &.active {
+        background-color: #fff;
+        border: 1px solid #E8E8E8;
+        border-radius: 5px 5px 0px 0px;
+        border-bottom: 0px;
+      }
+
+      span {
+        position: relative;
+        top: -2px;
+      }
+
+      small {
+        color: #32ACDA;
+        margin-left: 3px;
+      }
+    }     
+  }
+
+  .plans {
+    margin-top: 30px;
+    border: 1px solid #E3E3E3;
+    border-radius: 5px;
+
+    .plan {
+      border-right: 0px;
+      min-height: 220px;
+
+      &.middle {
+        border-right: 1px solid #E3E3E3;
+        border-left: 1px solid #E3E3E3;
+      }
+
+      .header {
+        text-align: left;
+        padding: 18px 25px;
+        border-bottom: 1px solid #E3E3E3;
+        margin: 0px -15px;
+        font-weight: 500;
+        font-size: 15px;
+
+        .icon {
+          color: #B7C5D8;
+          font-size: 18px;
+          position: relative;
+          top: 2px;
+          left: -4px;
+        }
+
+        .price {
+          float: right;
+          color: #3CA2E5;
+        }
+      }
+
+      .specs {
+        margin-top: 25px;
+        padding: 0px 10px 17px 10px;
+
+        .spec {
+          font-size: 15px;
+          color: #666;
+          margin-bottom: 13px;
+
+          .variable {
+            color: #1FBEE7;
+            font-weight: 400;
+          }
+        }
+      }
+    }
+  }
+
+  .signup {
+    margin-top: 50px;
+    text-align: center;
+
+    .button {
+      padding: 16px 38px;
+      font-size: 15px;
+
+      @include background-gradient(#4ABCF3, #1a80d9);
+    }
+
+    .message {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 12px;
+      color: #888;
+    }
+  } 
+}
+
+.pricing-comparison-section {
+  .divider {
+    height: 1px;
+    width: 100%;
+    background-color: #ddd;
+    position: relative;
+    margin: 120px 0 60px;
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-image: -webkit-gradient(linear, left top, right top, color-stop(0, rgba(255, 255, 255, 0.75)), color-stop(0.5, rgba(250,250,250,0)), color-stop(1, rgba(255, 255, 255, 0.75)));
+      background-image: -webkit-linear-gradient(left, rgba(255, 255, 255, 0.75) 0%, rgba(250,250,250,0) 50%, rgba(255, 255, 255, 0.75) 100%);
+      background-image: -moz-linear-gradient(left, rgba(255, 255, 255, 0.75) 0%, rgba(250,250,250,0) 50%, rgba(255, 255, 255, 0.75) 100%);
+      background-image: -o-linear-gradient(left, rgba(255, 255, 255, 0.75) 0%, rgba(250,250,250,0) 50%, rgba(255, 255, 255, 0.75) 100%);
+      background-image: -ms-linear-gradient(left, rgba(255, 255, 255, 0.75) 0%, rgba(250,250,250,0) 50%, rgba(255, 255, 255, 0.75) 100%);
+      background-image: linear-gradient(left, rgba(255, 255, 255, 0.75) 0%, rgba(250,250,250,0) 50%, rgba(255, 255, 255, 0.75) 100%);
+    }
+  }
+
+  .header {
+    text-align: center;
+
+    h3 {
+      font-size: 24px;
+      color: #444;
+      line-height: 25px;
+      font-weight: 500;
+    }
+
+    p {
+      font-size: 16px;
+      font-weight: 400;
+      color: #888;
+    }
+  }
+
+  .chart {
+    margin-top: 40px;
+    border: 1px solid #dfdfdf;
+    border-radius: 5px;
+    box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.1);
+
+    .header {
+      text-align: center;
+      background: #fbfbfb;
+      margin: 0px -15px;
+      padding: 20px 35px;
+      font-weight: 500;
+      font-size: 17px;
+      color: #444;
+      border-bottom: 1px solid #dfdfdf;
+      height: 73px;
+
+      @media(max-width: 991px) {
+        font-size: 15px;
+      }
+
+      @media(max-width: 767px) {
+        font-size: 13px;
+      }
+
+      .price {
+        color: #1a80d9;
+        position: relative;
+        top: 3px;
+        font-size: 14px;
+
+        @media(max-width: 767px) {
+          font-size: 13px;
+        }
+      }
+    }
+
+    .features-col {
+      .header {
+        text-align: left;
+        border-radius: 5px 0px 0px 0px;
+        margin-bottom: 30px;
+        padding: 23px 30px;
+        font-size: 18px;
+
+        @media(max-width: 991px) {
+          font-size: 16px;
+        }
+      }
+
+      .spec {
+        margin-bottom: 32px;
+        padding-left: 40px;
+        position: relative;
+
+        .icon {
+          position: absolute;
+          font-size: 27px;
+          color: #849FC4;
+          left: 0px;
+          top: -4px;
+        }
+      }
+    }
+
+    .plan-col {
+      border-left: 1px solid #dfdfdf;
+
+      &.last {
+        .header {
+          border-radius: 0px 5px 0px 0px;
+        }
+      }
+
+      .header {
+        padding: 13px 0px;
+      }
+
+      .spec {
+        margin-bottom: 34px;
+        margin-top: 25px;
+
+        .check {
+          margin: 0 auto;
+          display: block;
+          max-width: 20px;
+        }
+      }
+
+      .button {
+        margin-top: 20px;
+        margin-bottom: 15px;
+        font-size: 13px;
+        padding: 11px 24px;
+
+        @include background-gradient(#4ABCF3, #1a80d9);
+
+        @media(max-width: 991px) {
+          padding: 6px 10px;
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  .message {
+    p {
+      text-align: center;
+      font-size: 13px;
+      color: #656565;
+      margin-top: 30px;
+    }
+  }
+
+  .faq {
+    margin-top: 50px;
+
+    .header h3 {
+      font-size: 20px;
+      color: #454545;
+      text-align: left;
+    }
+
+    .questions {
+      margin-top: 25px;
+
+      .question {
+        margin-bottom: 40px;
+        
+        @media(min-width: 992px) {
+          width: 90%;
+        }
+
+        strong {
+          font-weight: 500;
+          font-size: 16px;
+          color: #454545;
+        }
+
+        p {
+          color: #555;
+          margin-top: 10px;
+          font-size: 13px;
+          line-height: 22px;
+        }
+      }
+    }
+  }
+}

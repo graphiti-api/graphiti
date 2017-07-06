@@ -1,0 +1,85 @@
+---
+layout: default
+---
+
+<div class="st-container st-container--right-side">
+  <div class="st-pusher">
+    <header class="navbar navbar-inverse hero" role="banner">
+      <div class="container">
+        <div class="navbar-header pull-left">
+          <a href="index.html" class="navbar-brand">JSONAPI Suite</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="index-sidebar-hero">
+      <div id="cover-image" class="animated fadeIn">
+        <div class="container">
+          <h1 class="hero-text animated fadeIn">Build full-featured, flexible APIs with ease.</h1>
+          <div class="cta animated fadeIn">
+            <a href="/quickstart" class="button">Quickstart</a>
+            <a href="/tutorial" class="demo">Step-by-Step Tutorial</a>
+          </div>
+          <div class="screenshot animated fadeInUp">
+            <img src="assets/img/ss2.png" class="img-responsive" alt="screenshot" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% include homepage/features-tabs-section.html %}
+
+    <div class="get-started">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <h2>Getting Started</h2>
+            <p>For a brief overview, head to the <a href="/quickstart">Quickstart</a>. For in-depth examples covering a variety of use-cases, including client-side development, head to the <a href="/tutorial">Tutorial</a>. For low-level documentation, see the <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Docs</a>. For specific questions, help, and advice, email <a href="mailto:richmolj@gmail.com">richmolj@gmail.com</a> for an invite to our <a target="_blank" href="https://jsonapi-suite.slack.com">Slack Chat</a>.
+            <p>And of course, you can always <a target="_blank" href="https://github.com/jsonapi-suite/jsonapi_suite">fork this project on Github</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% include homepage/features-grid-section.html %}
+
+    <br />
+    <br />
+
+    {% include footer.html %}
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(function () {
+    // Makes the demo video appear/disappear 
+    var $demo = $("#demo");
+    $('#demo').on('hidden.bs.modal', function () {
+      $demo.find("iframe").remove();
+    })
+    $('#demo').on('show.bs.modal', function () {
+      if (!$demo.find("iframe").length) {
+        $demo.find(".modal-body").append("<iframe src='https://player.vimeo.com/video/22439234' width='650' height='370' frameborder='0' webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>")
+      }
+    });
+
+    // triggers the off-canvas panel
+    $(".sidebar-toggle").click(function (e) {
+      e.stopPropagation();
+      $(".st-container").toggleClass("nav-effect");
+    });
+    $(".st-pusher").click(function () {
+      $(".st-container").removeClass("nav-effect");
+    });
+
+    // parallax header
+    $('#cover-image').css("background-position", "50% 50%");
+    $(window).scroll(function() {
+      var scroll = $(window).scrollTop(), 
+      slowScroll = scroll/4,
+      slowBg = 50 - slowScroll;
+
+      $('#cover-image').css("background-position", "50% " + slowBg + "%");
+    });
+   });
+</script>

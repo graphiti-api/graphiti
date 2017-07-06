@@ -1,0 +1,211 @@
+/* modules */
+@import "modules/mixins";
+@import "modules/elements";
+@import "modules/buttons";
+
+/* vendor */
+@import "bootstrap/bootstrap";
+@import "bootstrap/overrides";
+
+/* config variables */
+@import "partials/config";
+
+/* layout */
+@import "partials/layout";
+
+/* snippets */
+@import "partials/snippets/features";
+@import "partials/snippets/slider";
+
+/* pages */
+@import "partials/pages/index";
+@import "partials/pages/index2";
+@import "partials/pages/index3";
+@import "partials/pages/features";
+@import "partials/pages/services";
+@import "partials/pages/signup";
+@import "partials/pages/signup_rotate";
+@import "partials/pages/blog";
+@import "partials/pages/blog_cols";
+@import "partials/pages/blog_timeline";
+@import "partials/pages/blogpost";
+@import "partials/pages/pricing";
+@import "partials/pages/charts";
+@import "partials/pages/aboutus";
+@import "partials/pages/contactus";
+@import "partials/pages/status";
+@import "partials/pages/gallery";
+@import "partials/pages/portfolio";
+@import "partials/pages/portfolio_item";
+@import "partials/pages/support";
+@import "partials/pages/404";
+@import "partials/pages/coming_soon";
+@import "partials/pages/docs";
+@import "partials/pages/invoice";
+@import "partials/pages/timeline";
+
+#docs #guide {
+  margin-top: 70px;
+}
+
+#docs #api-docs {
+  margin-left: 10px;
+}
+
+body {
+  background: #414B5B;
+
+  .page-content {
+    background: white;
+  }
+}
+
+h1, h2 {
+  color: black;
+
+  a, a:hover {
+    color: black;
+    text-decoration: none;
+    position: relative;
+  }
+
+  a {
+    &:hover {
+      &:before {
+        content: '\00b6';
+        position: absolute;
+        left: -18px;
+        color: grey;
+        font-size: 18px;
+        font-family: sans-serif;
+        top: 4px;
+      }
+    }
+  }
+}
+
+h3, h4, h5 {
+  color: #727272;
+
+  a, a:hover {
+    color: #727272;
+    text-decoration: none;
+
+  }
+}
+
+.main-footer {
+  margin-top: 0;
+}
+
+.get-started {
+  margin-top: 40px;
+  padding: 40px 20px;
+  background: -webkit-linear-gradient(top, #355069 0, #5E7A9B 100%);
+  /*background: radial-gradient(#36414E, #253241);*/
+
+  font-size: 16px;
+  color: #f8f8f8;
+  font-weight: 400;
+  line-height: 25px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+
+  h2 {
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  a {
+    color: #90CAF9;
+  }
+}
+
+#docs #api-docs #methods .method .method-section {
+  padding-top: 0;
+}
+
+#cover-image {
+  background-image: url("/assets/img/sunrise.png") !important;
+}
+
+.solution {
+  img {
+    margin-left: 30px !important;
+    height: 300px;
+  }
+}
+
+pre {
+  background: #292E33;
+
+  code.hljs {
+    background: #292E33;
+    color: lighten(#DAE4F2, 5%);
+    line-height: 20px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+img[alt=github] {
+  margin-right: 5px;
+  width: 20px;
+  height: 20px;
+}
+
+pre {
+  code.hljs {
+    &.coffeescript, &.cs, &.javascript {
+      [class*=built_in] {
+        color: lighten(#9AB4DB, 5%);
+      }
+      [class*=string] {
+        color: lightgreen;
+      }
+      [class*=attribute] {
+        color: white;
+      }
+      [class*=literal] {
+        color: lighten(red, 30%);
+      }
+      [class*=c1] {
+        color: #B4B4B4;
+      }
+      [class*=constant] {
+        color: #FFDF9D;
+      }
+      [class*=nx] {
+        color: #9ECBEE;
+      }
+    }
+
+    &.ruby {
+      .class .title, .class .parent {
+        color: #FFDF9D;
+      }
+
+      [class*=keyword] {
+        color: lighten(red, 25%);
+      }
+      [class*=string] {
+        color: lightgreen;
+      }
+      [class*=comment] {
+        color: #B4B4B4;
+      }
+      [class*=constant] {
+        color: #FFDF9D;
+      }
+      [class*=symbol] {
+        color: #9ECBEE;
+      }
+    }
+  }
+}
+
+img[alt=glimmer_logo] {
+  margin: 0 auto;
+  width: 200px;
+  display: block;
+  margin-bottom: 4em;
+}

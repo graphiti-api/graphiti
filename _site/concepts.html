@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>JSONAPI Suite</title>
+  <meta name="description" content="Collection of Ruby libraries for powering JSONAPI-compliant APIs.">
+
+  <link rel="stylesheet" type="text/css" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
+  <link rel="stylesheet" href="/assets/main.css"
+  <link rel="canonical" href="http://localhost:4000/concepts.html">
+  <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  <script src="https://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="index.html" class="navbar-brand">JSONAPI Suite</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="mailto:richmolj@gmail.com">Contact</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div id="docs">
+  <div id="guide">
+    <h1 class="logo">
+      <a href="index.html">JSONAPI Suite</a>
+    </h1>
+    <ul class="menu nav">
+      
+        <li>
+          <a href="#resources">Resources</a>
+        </li>
+      
+        <li>
+          <a href="#serializers">Serializers</a>
+        </li>
+      
+    </ul>
+  </div>
+
+  <div id="api-docs">
+    <div id="methods">
+      
+        <div class="method" id="resources">
+          <div class="method-section clearfix">
+            <div class="method-description">
+              <h3>Resources</h3>
+              This is the description
+
+            </div>
+            <div class="method-example">
+              <pre>
+                <code class="ruby">
+class PostsController &lt; ApplicationController
+  jsonapi resource: PostResource
+
+  def index
+    render_jsonapi(Post.all)
+  end
+end
+
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      
+        <div class="method" id="serializers">
+          <div class="method-section clearfix">
+            <div class="method-description">
+              <h3>Serializers</h3>
+              Serializer desc
+
+            </div>
+            <div class="method-example">
+              <pre>
+                <code class="ruby">
+class FooSerializer &lt; ApplicationSerializer
+  type 'foos'
+end
+
+class FooSerializer &lt; ApplicationSerializer
+  type 'foos'
+end
+
+class FooSerializer &lt; ApplicationSerializer
+  type 'foos'
+end
+
+class FooSerializer &lt; ApplicationSerializer
+  type 'foos'
+end
+
+class FooSerializer &lt; ApplicationSerializer
+  type 'foos'
+end
+
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(function () {
+    hljs.configure({
+      tabReplace: '  ',
+      classPrefix: ''
+    });
+
+    $('.language-ruby code').addClass('ruby');
+    $('.language-javascript code').addClass('javascript');
+
+    hljs.initHighlightingOnLoad();
+  });
+</script>
+
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="/tutorial">Tutorial</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Resources</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://jsonapi-suite.slack.com/">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Contact us</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://glimmerjs.com">Glimmer</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </body>
+</html>

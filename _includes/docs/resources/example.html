@@ -1,0 +1,7 @@
+class PostsController < ApplicationController
+  jsonapi resource: PostResource
+
+  def index
+    render_jsonapi(Post.all)
+  end
+end

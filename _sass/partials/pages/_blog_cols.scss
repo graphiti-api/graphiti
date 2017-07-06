@@ -1,0 +1,134 @@
+.blog-cols-page {
+  background: #FCFCFC;
+}
+
+.blog-cols-header {
+  margin-top: 60px;
+  position: relative;
+
+  h1 {
+    font-size: 23px;
+    margin-top: 0;
+    color: #555;
+  }
+
+  p {
+    color: #757575;
+    font-size: 17px;
+    margin-top: 12px;
+  }
+}
+
+.blog-cols-wrapper {
+  margin-top: 40px;
+
+  @media(max-width: 767px) {
+    text-align: center;
+  }
+
+  .card {
+    display: inline-block;
+
+    @media(min-width: 992px) {
+      &:nth-child(3n+3) {
+        .card-wrapper {
+          margin: 20px 0;
+        }
+      }
+    }
+
+    @media(min-width: 768px) and (max-width: 991px) {
+      &:nth-child(2n+2) {
+        .card-wrapper {
+          margin: 20px 0;
+        }
+      }
+    }
+
+    .card-wrapper {
+      display: inline-block;
+      position: relative;
+      width: 295px;
+      background-color: #fff;
+      vertical-align: top;
+      text-align: left;
+      color: #4B4F56;
+      height: 480px;
+      margin: 20px 20px 20px 0;
+      box-shadow: 0 20px 20px rgba(0,0,0,.08);
+
+      @include transition(all 250ms cubic-bezier(.02, .01, .47, 1));
+
+      @media(max-width: 991px) {
+        width: 340px;
+      }
+
+      @media(max-width: 767px) {
+        margin: 20px 0;
+        width: 290px;
+      }
+
+      &:hover {
+        box-shadow: 0 40px 40px rgba(0,0,0,.16);
+        transform: translate(0,-20px);
+      }
+    }
+
+    .card-bg {
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      width: 100%;
+      height: 295px;
+
+      @media(max-width: 1199px) {
+        height: 260px;
+      }
+    }
+
+    .card-intro {
+      padding: 20px 20px 0;
+    }
+
+    .card-title {
+      font-size: 22px;
+      line-height: 32px;
+    }
+
+    .card-min-read {
+      margin-top: 5px;
+      font-size: 12px;
+      color: #777;
+    }
+
+    .card-description {
+      font-size: 15px;
+      margin-top: 13px;
+      line-height: 23px;
+      color: #90949C;
+    }
+  }
+}
+
+.blog-pager {
+  margin-top: 80px;
+
+  li>a {
+    padding: 9px 20px;
+    box-shadow: 0 1px 0px 0 rgba(0, 0, 0, 0.15);
+    border-radius: 30px;
+    margin: 0 10px;
+    font-weight: 500;
+    font-size: 15px;
+    color: #5F8AB0;
+    display: inline-block;
+
+    @include transition(all .2s linear);
+
+    &:hover {
+      background-color: #4a556b;
+      color: #fff;
+      box-shadow: none;
+    }
+  }
+}

@@ -1,0 +1,628 @@
+.pricing-3-options-section {
+  margin-top: 70px;
+
+  .header {
+    text-align: center;
+
+    h3 {
+      font-size: 24px;
+      color: #444;
+      line-height: 25px;
+      font-weight: 500;
+    }
+
+    p {
+      font-size: 16px;
+      font-weight: 400;
+      color: #888;
+    }
+  }
+
+  .charts {
+    margin-top: 45px;
+
+    .chart {
+      background-color: #fff;
+      border: 1px solid #D8D8D8;
+      border-radius: 5px;     
+      box-shadow: 0px 0px 2px 0px rgba(181, 181, 181, 0.3);
+      padding: 20px 40px;
+      position: relative;
+      text-align: center;
+      width: 97%;
+      min-height: 315px;
+      position: relative;
+      top: 20px;
+
+      @media(min-width: 992px) {
+        &.first {
+          float: right;
+          left: 45px;
+        }
+
+        &.last {
+          left: -45px;
+        }
+      }
+
+      @media (max-width: 991px) {
+        float: none !important;
+        left: 0px !important;
+        top: 0px !important;
+        margin: 0 auto;
+        width: 55%;
+        margin-bottom: 25px !important;
+
+        &.last {
+          margin-bottom: 0px !important;
+        }
+      }
+
+      @media (max-width: 600px) {
+        width: 90% !important;
+      }     
+
+      &.featured {          
+        z-index: 999;
+
+        @media(min-width: 992px) {
+          margin: 0 auto;
+          top: 0px;
+          min-height: 445px;
+
+          .btn-signup {
+            margin-top: 32px;
+          }
+        }
+
+        .popular {
+          position: absolute;
+          top: 0px;
+          left: 0px;
+        }
+
+        .quantity {
+          margin-top: 15px;
+          padding-bottom: 5px;
+        }
+      }
+
+      .plan-name {
+        text-align: center;
+        font-size: 20px;
+        font-weight: 400;
+        color: #444;
+        width: 90%;
+        margin: 0 auto;
+        margin-top: 5px;
+      }
+
+      .quantity {
+        text-align: center;
+        border-bottom: 1px solid #d5d5d5;
+        margin-top: 10px;
+
+        .dollar {
+          font-size: 19px;
+          position: relative;
+          top: -18px;
+        }
+
+        .price {
+          font-size: 49px;
+        }
+
+        .period {
+          font-size: 17px;
+          position: relative;
+          top: -8px;
+          margin-left: 4px;
+        }
+      }
+
+      .specs {
+        margin-top: 20px;
+
+        .spec {
+          font-size: 15px;
+          color: #474747;
+          text-align: center;
+          font-weight: 300;
+          margin-bottom: 13px;
+
+          .variable {
+            color: #1FBEE7;
+            font-weight: 500;
+          }
+        }
+      }
+
+      .btn-signup {
+        margin-top: 20px;
+        height: 38px;
+      }
+    }     
+  }
+
+  .message {
+    p {
+      text-align: center;
+      font-size: 13px;
+      color: #656565;
+      margin-top: 23px;
+    }
+  }
+
+  .faq {
+    margin-top: 40px;
+
+    .header h3 {
+      font-size: 20px;
+      color: #454545;
+      text-align: left;
+    }
+
+    .questions {
+      margin-top: 25px;
+
+      .question {
+        margin-bottom: 40px;
+        
+        @media(min-width: 992px) {
+          width: 90%;
+        }
+
+        strong {
+          font-weight: 500;
+          font-size: 16px;
+          color: #454545;
+        }
+
+        p {
+          color: #555;
+          margin-top: 10px;
+          font-size: 13px;
+          line-height: 22px;
+        }
+      }
+    }
+  }
+
+  .contact {
+    margin-top: 40px;
+
+    .wrapper {
+      background: #F7F8FB;
+      border: 1px solid #EAEDF7;
+      border-radius: 8px;
+      padding: 25px 60px;
+      box-shadow: inset rgba(100, 100, 100, 0.25) 0 1px 1px;      
+      margin: 0 auto;
+    }
+
+    h4 {
+      font-size: 15px;
+      position: relative;
+      color: #696E72;
+      text-align: center;
+      font-weight: 500;
+      text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8);
+      
+      @media (max-width: 991px) {
+        line-height: 26px;
+      }
+
+      span {
+        position: absolute;
+        font-size: 23px;
+        top: -5px;
+        left: 72px;
+        color: #626E7A;
+
+        @media (max-width: 991px) {
+          position: relative;
+          left: 0px;
+          top: 5px;
+        }
+      }
+    }
+  }
+}
+
+.pricing-dark-section {
+  border-top: 1px solid #EAEAEA;
+  border-bottom: 1px solid #EAEAEA;
+  background: #5E7A9B;
+  background: -webkit-linear-gradient(top, #355069 0, #5E7A9B 100%);
+  background: -moz-linear-gradient(top, #355069 0, #5E7A9B 100%);
+  background: -o-linear-gradient(top, #355069 0, #5E7A9B 100%);
+  background: linear-gradient(top, #355069 0, #5E7A9B 100%);
+  margin-top: 120px;
+  padding-top: 45px;
+  padding-bottom: 70px;
+  
+  .header {
+    text-align: center;
+
+    @media (max-width: 991px) {
+      margin-bottom: 25px;
+    }
+
+    h3 {
+      font-size: 27px;
+      color: #fff;
+      line-height: 25px;
+      font-weight: 400;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+
+      @media(max-width: 767px) {
+        font-size: 24px;
+        line-height: 29px;
+      }
+    }
+
+    p {
+      font-size: 16px;
+      margin-top: 15px;
+      color: #F0F0F0;
+      font-weight: 400;
+      line-height: 25px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+  }
+
+  .charts {
+    margin-top: 35px;
+    
+    @media (max-width: 991px) {
+      margin-top: 10px;
+    }
+
+    .chart {
+      background-color: #fff;
+      border: 1px solid #E6E6E6;
+      border-radius: 5px;     
+      box-shadow: 0px 0px 2px 0px rgba(181, 181, 181, 0.3);
+      padding: 20px 40px;
+      position: relative;
+      text-align: center;
+      width: 97%;
+
+      min-height: 315px;
+      position: relative;
+      top: 37px;
+
+      @media (max-width: 991px) {
+        float: none !important;
+        left: 0px !important;
+        top: 0px !important;
+        margin: 0 auto;
+        width: 55%;
+        margin-bottom: 25px !important;
+
+        &.last {
+          margin-bottom: 0px !important;
+        }
+      }
+
+      @media (max-width: 600px) {
+        width: 90% !important;
+      }
+
+      &.first {
+        float: right;
+        left: 12px;
+      }
+
+      &.last {
+        left: -12px;
+      }
+
+      &.featured {
+        min-height: 350px;
+        top: 0px;
+        margin: 0 auto;
+
+        .popular {
+          text-align: center;
+          text-transform: uppercase;
+          font-size: 16px;
+          letter-spacing: 1px;
+          color: #B1B1B1;
+          font-weight: 400;
+        }
+
+        .quantity {
+          margin-top: 15px;
+        }
+      }       
+
+      .quantity {
+        text-align: center;
+
+        .dollar {
+          font-size: 19px;
+          position: relative;
+          top: -18px;
+        }
+
+        .price {
+          font-size: 49px;
+        }
+
+        .period {
+          font-size: 17px;
+          position: relative;
+          top: -8px;
+          margin-left: 4px;
+        }
+      }
+
+      .plan-name {
+        text-align: center;
+        font-size: 20px;
+        font-weight: 400;
+        color: #777;
+        border-bottom: 1px solid #d5d5d5;
+        padding-bottom: 15px;
+        width: 90%;
+        margin: 0 auto;
+        margin-top: 8px;
+      }
+
+      .specs {
+        margin-top: 20px;
+
+        .spec {
+          font-size: 15px;
+          color: #353535;
+          text-align: center;
+          font-weight: 300;
+          margin-bottom: 13px;
+
+          .variable {
+            color: #1FBEE7;
+            font-weight: 400;
+          }
+        }
+      }
+
+      .btn-signup {
+        margin-top: 20px;
+        height: 38px;
+      }
+    }
+  }
+}
+
+.pricing-4-options-section {
+  margin-top: 55px;
+  margin-bottom: 150px;
+
+  .header {
+    text-align: center;
+
+    h3 {
+      font-size: 24px;
+      color: #444;
+      line-height: 25px;
+      font-weight: 500;
+    }
+
+    p {
+      font-size: 16px;
+      font-weight: 400;
+      color: #888;
+    }
+  }
+
+  @media(min-width: 992px) {
+    .container {
+      width: 1060px;
+    }
+  }
+
+  .charts {
+    margin-top: 50px;
+
+    .basic-plan {
+      background-color: #fff;
+      border: 1px solid #E6E6E6;
+      border-radius: 5px;
+      box-shadow: 0px 0px 2px 0px rgba(181, 181, 181, 0.3);
+      padding: 20px 30px 10px 30px;       
+      text-align: center;
+      width: 220px;
+      position: absolute;
+      right: 0px;
+      top: 20px;
+
+      @media (max-width: 991px) {
+        float: none !important;
+        left: 0px !important;
+        top: 0px !important;
+        margin: 0 auto;
+        width: 55%;
+        margin-bottom: 25px !important;
+        position: relative;
+        margin-top: 30px;
+
+        &.last {
+          margin-bottom: 0px !important;
+        }
+      }
+
+      @media (max-width: 600px) {
+        width: 90% !important;
+      }
+
+      .plan-name {
+        text-align: center;
+        font-size: 17px;
+        font-weight: 400;
+        color: #444;
+        width: 90%;
+        margin: 0 auto;
+        margin-top: 5px;
+      }
+
+      .quantity {
+        text-align: center;
+        border-bottom: 1px solid #d5d5d5;
+        margin-top: 5px;
+
+        .dollar {
+          font-size: 19px;
+          position: relative;
+          top: -18px;
+        }
+
+        .price {
+          font-size: 42px;
+        }
+
+        .period {
+          font-size: 17px;
+          position: relative;
+          top: -8px;
+          margin-left: 4px;
+        }
+      }
+
+      .description {
+        margin-top: 15px;
+        font-size: 13px;
+        color: #444;
+        line-height: 20px;
+
+        a {
+          display: block;
+          margin-top: 20px;
+          font-weight: 500;
+          font-size: 15px;
+        }
+      }
+    }
+
+    .chart {
+      background-color: #fff;
+      border: 1px solid #E6E6E6;
+      border-radius: 5px;
+      box-shadow: 0px 0px 2px 0px rgba(181, 181, 181, 0.3);
+      padding: 20px 40px;
+      position: relative;
+      text-align: center;
+      width: 280px;
+      float: left;
+      min-height: 315px;
+      position: relative;
+      top: 20px;
+
+      @media(min-width: 992px) {
+        &.featured {
+          left: -25px;
+        }
+
+        &.last {
+          left: -45px;
+        }
+      }
+
+      @media (max-width: 991px) {
+        float: none !important;
+        left: 0px !important;
+        top: 0px !important;
+        margin: 0 auto;
+        width: 55%;
+        margin-bottom: 25px !important;
+
+        &.last {
+          margin-bottom: 0px !important;
+        }
+      }
+
+      @media (max-width: 600px) {
+        width: 90% !important;
+      }     
+
+      &.featured {          
+        z-index: 999;
+
+        @media(min-width: 992px) {
+          margin: 0 auto;
+          top: 0px;
+          min-height: 445px;
+          .btn-signup {
+            margin-top: 32px;
+          }
+        }
+
+        .popular {
+          position: absolute;
+          top: 0px;
+          left: 0px;
+        }
+
+        .quantity {
+          margin-top: 15px;
+          padding-bottom: 5px;
+        }
+      }
+
+      .plan-name {
+        text-align: center;
+        font-size: 20px;
+        font-weight: 400;
+        color: #444;
+        width: 90%;
+        margin: 0 auto;
+        margin-top: 5px;
+      }
+
+      .quantity {
+        text-align: center;
+        border-bottom: 1px solid #d5d5d5;
+        margin-top: 10px;
+
+        .dollar {
+          font-size: 19px;
+          position: relative;
+          top: -18px;
+        }
+
+        .price {
+          font-size: 49px;
+        }
+
+        .period {
+          font-size: 17px;
+          position: relative;
+          top: -8px;
+          margin-left: 4px;
+        }
+      }
+
+      .specs {
+        margin-top: 20px;
+
+        .spec {
+          font-size: 15px;
+          color: #353535;
+          text-align: center;
+          font-weight: 300;
+          margin-bottom: 13px;
+
+          .variable {
+            color: #1FBEE7;
+            font-weight: 400;
+          }
+        }
+      }
+
+      .btn-signup {
+        margin-top: 20px;
+        height: 38px;
+      }
+    }     
+  }
+}

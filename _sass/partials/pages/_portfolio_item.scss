@@ -1,0 +1,115 @@
+.portfolio-item-showcase {
+  margin-top: 40px;
+  margin-bottom: -30px;
+  
+  .header {
+    text-align: left;
+    margin-bottom: 25px;
+
+    h3 {
+      display: inline-block;
+      font-size: 17px;
+      font-family: $myriad;
+      color: #53A6DA;
+      margin-top: 0px;
+      line-height: 25px;
+      font-weight: 500;
+      margin-bottom: 5px;
+      cursor: pointer;
+    }
+  }
+  
+  .project {
+    h1 {
+      text-align: center;
+      font-size: 25px;
+      color: #647583;
+      margin-top: 10px;
+      margin-bottom: 70px;
+    }
+
+    .screens {
+      img {
+        margin: 0 auto;
+        margin-bottom: 80px;
+        margin-top: 10px;
+
+        &.magnifier {
+          width: 490px;
+          margin-bottom: 100px;
+        }
+
+        &.mobile {
+          margin-bottom: 110px;
+        }
+      }
+
+      .text {
+        color: #7D8186;
+        font-size: 15px;
+        line-height: 22px;
+        margin-bottom: 80px;
+      }
+    }
+
+    .description {
+      .info {
+        margin-top: 25px;
+
+        &.stick {
+          @media(min-width: 992px) {
+            position: fixed;
+            top: 10px;
+          }
+        }
+
+        .icons {
+          margin-bottom: 20px;
+
+          .ion-icon:before {
+            color: #b2c3cb;
+            background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #b2c3cb), color-stop(100%,  #DBE3E7));
+            background: -webkit-linear-gradient(#b2c3cb, #DBE3E7);
+            font-size: 60px;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 9px;
+          }
+
+          .ion-social-windows:before {
+            font-size: 50px;
+          }
+        }
+
+        p {
+          color: #7D8186;
+          line-height: 22px;
+          margin-bottom: 22px;
+        }
+
+        .tweet-it {
+          color: #00A7DD;
+          margin-top: 3px;
+          display: inline-block;
+          position: relative;
+          padding-left: 29px;
+          text-decoration: none;
+
+          &:hover {
+            .ion-social-twitter:before {
+              content: "\f242";
+            }
+          }
+
+          .ion-social-twitter {
+            margin-right: 8px;
+            font-size: 21px;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+          }
+        }
+      }
+    }
+  }
+}

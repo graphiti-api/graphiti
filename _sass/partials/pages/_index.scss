@@ -1,0 +1,294 @@
+.index-hero {
+  overflow: hidden;
+  background: #4B4848;
+  background-size: cover;
+  background-image: url("../../images/8254861601_1fbf969a14_b.jpg");
+  /*background: -webkit-radial-gradient(closest-corner, rgba(16, 47, 70, 0) 60%, rgba(16, 47, 70, 0.26)), -webkit-linear-gradient(108deg, #5E8199, #153752 90%);*/
+
+  background-position: center 16%;
+  height: 580px;
+  position: relative;
+  padding-top: 150px;
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.4);
+
+  @media (max-width: 991px) {
+    padding-top: 100px;
+  }
+
+  @media (max-width: 767px) {
+    height: 550px;
+  }
+
+  &:before {
+    position: absolute;
+    content: '';
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: -webkit-linear-gradient(right, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0) 1%, rgba(0, 0, 0, 0.1) 26%, rgba(0, 0, 0, 0.35) 71%, rgba(0, 0, 0, 0.5) 100%);
+    background: -moz-linear-gradient(right, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0) 1%, rgba(0, 0, 0, 0.1) 26%, rgba(0, 0, 0, 0.35) 71%, rgba(0, 0, 0, 0.5) 100%);
+    background: -o-linear-gradient(right, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0) 1%, rgba(0, 0, 0, 0.1) 26%, rgba(0, 0, 0, 0.35) 71%, rgba(0, 0, 0, 0.5) 100%);
+    background: linear-gradient(right, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0) 1%, rgba(0, 0, 0, 0.1) 26%, rgba(0, 0, 0, 0.35) 71%, rgba(0, 0, 0, 0.5) 100%);
+  }
+
+  &:after {
+    position: absolute;
+    content: '';
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(32, 54, 114, 0.29);
+  }
+  
+  .container {
+    position: relative;
+    z-index: 33;
+  }
+
+  h1.hero-text {
+    line-height: 52px;
+    text-align: left;
+    font-size: 37px;
+    text-transform: uppercase;
+    font-weight: 300;
+    letter-spacing: .3px;
+    color: #FFF;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+
+    -webkit-animation-duration: 1s;
+
+    @media (max-width: 767px) {
+      font-size: 25px;
+      line-height: 38px;
+      margin-top: 0;
+      text-align: center;
+    }
+  }
+
+  .sub-text {
+    width: 50%;
+    margin-top: 25px;
+    color: #fff;
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 28px;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+
+    -webkit-animation-duration: 1s;
+
+    @media (max-width: 991px) {
+      width: 70%;
+    }
+
+    @media (max-width: 767px) {
+      font-size: 15px;
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  .cta {
+    @include animationDelay(0.6s);
+    margin-top: 60px;
+
+    @media (max-width: 767px) {
+      text-align: center;
+    }
+
+    a {
+      margin-right: 20px;
+      padding: 15px 31px;
+
+      @media (max-width: 767px) {
+        font-size: 14px;
+        padding: 12px 25px;
+        margin: 0px 15px 15px 0px;
+      }
+    }
+  }
+
+  .img {
+    position: absolute;
+    top: 15px;
+    left: 625px;
+    width: 570px;
+    height: 333px;
+    background-image: url("../../images/static-hero.png");
+    background-repeat: no-repeat;
+
+    @media(max-width: 991px) {
+      display: none;
+    }
+  }
+}
+
+.testimonials-section {
+  margin-top: 100px;
+
+  .header {
+    text-align: center;
+
+    h3 {
+      font-size: 23px;
+      color: #656565;
+      font-weight: 400;
+      line-height: 25px;
+      margin-bottom: 45px;
+    }
+  }
+
+  .testimonial {
+    width: 90%;
+
+    @media (max-width: 767px) {
+      float: none !important;
+      margin: 0 auto;
+      margin-bottom: 45px;
+    }
+
+    .quote {      
+      color: #53565f;
+      line-height: 26px;
+      border: 1px solid #E2E2E2;
+      padding: 16px 25px;
+      border-radius: 5px;
+      width: 95%;
+      position: relative;
+
+      @media (max-width: 767px) {
+        margin: 0 auto;
+      }
+
+      .arrow-down {
+        position: absolute;
+        bottom: 3px;
+        left: 30px;
+
+        .arrow, .arrow-border {
+          border-color: #fff transparent transparent;
+          border-style: solid;
+          border-width: 11px;
+          cursor: pointer;
+          position: absolute;
+          top: 3px;
+          z-index: 1002;
+        }
+
+        .arrow-border {
+          border-color: #E2E2E2 transparent transparent;
+          border-width: 12px;
+          top: 3px;
+          z-index: 1001;
+          left: -1px;
+        }
+      }
+    }
+
+    .author {
+      margin-top: 40px;
+      margin-left: 10px;
+
+      @media (max-width: 767px) {
+        margin-left: 6%;
+      }
+
+      .pic {
+        width: 71px;
+        height: 71px;
+        border-radius: 50px;
+        float: left;
+        position: relative;
+        top: -12px;
+        margin-right: 18px;
+        border: 1px solid #ccc;
+      }
+
+      .name {
+        color: #3C92C5;
+        line-height: 23px;
+        font-weight: 500;
+      }
+
+      .company {
+        font-size: 14px;
+        color: #909090;
+        line-height: 23px;
+        font-weight: 400;
+      }
+    }
+  }
+}
+
+.cta-section {
+  text-align: center;
+  margin-top: 120px;
+
+  p {
+    font-size: 18px;
+    color: #7A7D81;
+    letter-spacing: 0.1px;
+  }
+
+  a {
+    display: inline-block;
+    margin-top: 30px;
+    background: #6CAAE4;
+    color: #FFF;
+    padding: 23px 40px;
+    font-size: 16px;
+    letter-spacing: 1px;
+    font-weight: 500;
+    text-transform: uppercase;
+    border-radius: 5px;
+    box-shadow: rgba(23, 43, 99, 0.3) 0 7px 28px;
+
+    @include transition(all .2s linear);
+
+    &:hover {
+      text-decoration: none;
+      background: #3FD8DF;
+    }
+  }
+}
+
+.clients-section {
+  background: #5E7A9B;
+  background: radial-gradient(#36414E, #253241);
+  margin-top: 120px;
+  padding: 65px 0 80px;
+  text-align: center;
+
+  h3 {
+    color: #FFF;
+    margin-top: 0;
+    font-weight: 300;
+    font-size: 35px;
+    letter-spacing: .3px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  p {
+    font-size: 16px;
+    color: #f8f8f8;
+    margin-top: 17px;
+    font-weight: 300;
+    line-height: 25px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .logos {
+    margin-top: 35px;
+
+    img {
+      margin: 0 16px;
+
+      @media(max-width: 767px) {
+        margin: 0 auto;
+        display: block;
+        margin-bottom: 15px;
+      }
+    }
+  }
+}
