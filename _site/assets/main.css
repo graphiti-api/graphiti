@@ -1,5 +1,4 @@
 @charset "UTF-8";
-/* modules */
 /* this mixin makes possible to add transition to a specific vendor, example: */
 /* -webkit-transition: -webkit-transform 0.5s linear; */
 @import url(https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300italic,300,400italic,500,500italic,700,700italic,900,900italic);
@@ -12164,8 +12163,10 @@ h3, h4, h5 {
 #docs #api-docs #methods .method .method-section {
   padding-top: 0; }
 
-#cover-image {
+#cover-image.prod-bg {
   background-image: url("/jsonapi_suite/assets/img/sunrise.png") !important; }
+#cover-image.dev-bg {
+  background-image: url("/assets/img/sunrise.png") !important; }
 
 .solution img {
   margin-left: 30px !important;

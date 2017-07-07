@@ -1,4 +1,3 @@
-/* modules */
 @import "modules/mixins";
 @import "modules/elements";
 @import "modules/buttons";
@@ -124,8 +123,15 @@ h3, h4, h5 {
   padding-top: 0;
 }
 
+// hack bc I can't get jekyll variables in sass atm
 #cover-image {
-  background-image: url("/jsonapi_suite/assets/img/sunrise.png") !important;
+  &.prod-bg {
+    background-image: url("/jsonapi_suite/assets/img/sunrise.png") !important;
+  }
+
+  &.dev-bg {
+    background-image: url("/assets/img/sunrise.png") !important;
+  }
 }
 
 .solution {

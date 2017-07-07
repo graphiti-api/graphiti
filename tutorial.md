@@ -12,7 +12,7 @@ If you're looking for a brief overview, head to the
 [Quickstart](/quickstart)
 instead.
 
-![employee_directory](/jsonapi_suite/assets/img/employee_directory.gif)
+![employee_directory]({{site.github.url}}/assets/img/employee_directory.gif)
 
 If you get lost, you can view the code on Github:
 
@@ -116,105 +116,105 @@ You won't have to write *all* the tests you see here, some are simply for demons
 
 One line of code allows simple `WHERE` clauses. If the user tried to filter on something not whitelisted here, an error would be raised.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/master...step_1_add_filter)
 
 ## <a name="custom-filtering" href='#custom-filtering'>Custom Filtering</a>
 
 Sometimes `WHERE` clauses are more complex, such as prefix queries. Here we'll query all employees whose age is greater than or equal to a given number.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_1_add_filter...step_2_add_custom_filter)
 
 ## <a name="sorting" href='#sorting'>Sorting</a>
 
 Sorting comes for free, but here's a test for it. Decide as a team if we *actually* need to write a spec here, or if it's considered tested within the libraries.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_2_add_custom_filter...step_3_basic_sorting)
 
 ## <a name="custom-sorting" href='#custom-sorting'>Custom Sorting</a>
 
 Sometimes we need more than a simple `ORDER BY` clause, for example maybe we need to join on another table. In this example, we switch from Postgres's default case-sensitive query to a case in-sensitive one...but only for the `first_name` field.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_3_basic_sorting...step_4_custom_sorting)
 
 ## <a name="pagination" href='#pagination'>Pagination</a>
 
 Pagination also comes for free, so once again we'll have to decide if writing a spec like this is worth the bother.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_4_custom_sorting...step_5_pagination)
 
 ## <a name="custom-pagination" href='#custom-pagination'>Custom Pagination</a>
 
 By default we use the [Kaminari](https://github.com/kaminari/kaminari) library for pagination. This shows how we could instead sub-out Kaminari and replace it with [will_paginate](https://github.com/mislav/will_paginate)
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_5_pagination...step_6_custom_pagination)
 
 ## <a name="statistics" href='#statistics'>Statistics</a>
 
 For default statistics, (`count`, `sum`, `average`, `maximum` and `minimum`), simply specify the field and statistic.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_6_custom_pagination...step_7_stats)
 
 ## <a name="custom-statistics" href='#custom-statistics'>Custom Statistics</a>
 
 Here we add a `median` statistic to show non-standard custom statistic usage.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_7_stats...step_8_custom_stats)
 
 ## <a name="custom-serialization" href='#custom-serialization'>Custom Serialization</a>
 
 Let's say we wanted the employee's age to serialize `Thirty-Two` instead of `32` in JSON. Here we use a library to get the friendly-word doppleganger, and change the test to recognize this custom logic.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/master...custom-serialization)
 
 ## <a name="has-many-association" href='#has-many-association'>Has-Many Association</a>
 
 Get employees and their positions in one call. 
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}//assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/master...step_9_has_many)
 
 ## <a name="belongs-to" href='#belongs-to'>Belongs-To Association</a>
 
 Get employees, positions, and the department for those positions in one call:
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_9_has_many...step_10_belongs_to)
 
 ## <a name="many-to-many" href='#many-to-many'>Many-to-Many</a>
 
 In this example an `Employee` has many `Team`s and a `Team` has many `Employee`s.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_13_error_handling...many-to-many)
 
 ## <a name="resource-reuse" href='#resource-reuse'>Resource Re-Use</a>
 
 In prior steps we created `PositionResource` and `DepartmentResource`. These objects may have custom sort logic, filter whitelists, etc - this configuration can be re-used if we need to add `/api/v1/positions` and `/api/v1/departments` endpoints.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_10_belongs_to...step_11_resource_reuse)
 
 ## <a name="fsp-associations" href='#fsp-associations'>Filter/Sort/Paginate Associations</a>
 
 This comes for free. As long as the associated `Resource` knows how to do something, we can re-use that logic.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_11_resource_reuse...step_12_fsp_associations)
 
 ## <a name="error-handling" href='#error-handling'>Error Handling</a>
 
 In this example we add global error handling, so any random error will return a [JSONAPI-compatible error response](http://jsonapi.org/format/#errors). Then we customize that response for a specific scenario (the requested employee does not exist).
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_12_fsp_associations...step_13_error_handling)
 
 # <a name="writes" href='#writes'>Writes</a>
@@ -223,14 +223,14 @@ In this example we add global error handling, so any random error will return a 
 
 Basic example without validations or strong parameters.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/bump_gemfile_for_writes...step_14_create)
 
 ## <a name="validations" href='#validations'>Validations</a>
 
 Validations are basic, vanilla Rails code. When there is a validation error, we return a jsonapi-compatible error respone.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_14_create...step_15_validations)
 
 ## <a name="strong-resources" href='#strong-resources'>Strong Resources</a>
@@ -241,21 +241,21 @@ Instead we use `strong_resources` to define the parameter template *once*, and r
 
 Note: `strong_resources` requires Rails.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_15_validations...step_16_strong_resources)
 
 ## <a name="basic-update" href='#basic-update'>Basic Update</a>
 
 Looks very similar to `create`.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_16_strong_resources...step_17_basic_update)
 
 ## <a name="basic-destroy" href='#basic-destroy'>Basic Destroy</a>
 
 More or less basic Rails.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_17_basic_update...step_18_basic_destroy)
 
 ## <a name="customizing-persistence" href='#customizing-persistence'>Customizing Persistence</a>
@@ -264,7 +264,7 @@ So far we've shown `ActiveRecord`. What if we wanted to use a different ORM, or 
 
 This code shows how to customize `create/update/destroy`. In this example we're simply logging the action, but you could do whatever you want here as long as you return an instance of the object. Just like with reads, if any of this code becomes duplicative across `Resource` objects you could move it into a common `Adapter`.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_18_basic_destroy...step_19_custom_persistence)
 
 ## <a name="association-writes" href='#association-writes'>Association Writes</a>
@@ -275,14 +275,14 @@ Think Rails' `accepts_nested_attributes_for`, but not coupled to Rails or Active
 
 Once again, note how our `strong_resources` can be shared across controllers.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_19_custom_persistence...step_20_association_create)
 
 ### <a name="nested-updates" href='#nested-updates'>Nested Updates</a>
 
 We got this for free, here's a spec!
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_20_association_create...step_21_association_update)
 
 ### <a name="nested-destroys" href='#nested-destroys'>Nested Destroys</a>
@@ -291,14 +291,14 @@ We get this for free, though we have to explicitly tell `strong_resources` that 
 
 Note destroy will do two things: delete the object, and make the foreign key on the corresponding child in the payload `null`.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_21_association_update...step_22_association_destroy)
 
 ### <a name="disassociations" href='#disassociations'>Disassociations</a>
 
 `destroy` actually deletes objects, what if we want to simply disassociate the objects by making the foreign key `null`? We get this for free, too.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee_directory/compare/step_22_association_destroy...step_23_disassociation)
 
 ### <a name="usage-without-activerecord" href='#usage-without-activerecord'>Usage without ActiveRecord</a>
@@ -454,7 +454,7 @@ scope.find(123).then (response) => {
 
 ## <a name="glimmer" href='#glimmer'>Glimmer</a>
 
-![glimmer_logo](/jsonapi_suite/assets/img/glimmer_logo.png)
+![glimmer_logo]({{site.github.url}}/assets/img/glimmer_logo.png)
 
 JSORM can be used with the client-side framework of your choice. To give an example of real-world usage, we've created a demo application using [Glimmer](https://glimmerjs.com/). Glimmer is super-lightweight (you can learn it in 5 minutes) and provides the bare-bones we need to illustrate JSONAPI and JSORM in action.
 
@@ -468,54 +468,54 @@ Let's create our app.
 
 We'll start by adding our models and populating a simple table:
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee-directory/compare/master...step_1_basic_search)
 
 ### <a name="client-side-filtering" href='#client-side-filtering'>Client-Side Filtering</a>
 
 Now add some first name/last name search filters to the grid:
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee-directory/compare/step_1_basic_search...step_2_add_filtering)
 
 ### <a name="client-side-pagination" href='#client-side-pagination'>Client-Side Pagination</a>
 
 Pretty straightforward: we add pagination to our scope, with some logic to calculate forward/back.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee-directory/compare/step_2_add_filtering...step_3_add_pagination)
 
 ### <a name="client-side-stats" href='#client-side-stats'>Client-Side Statistics</a>
 
 Here we'll add a "Total Count" above our grid, and use this value to improve our pagination logic:
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee-directory/compare/step_3_add_pagination...step_4_stats)
 
 ### <a name="client-side-sorting" href='#client-side-sorting'>Client-Side Sorting</a>
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee-directory/compare/step_4_stats...step_5_sorting)
 
 ### <a name="client-side-nested-create" href='#client-side-nested-create'>Client-Side Nested Create</a>
 
 Let's add a form that will create an Employee, their Positions and associated Departments in one go:
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee-directory/compare/step_5_sorting...step_6_basic_create)
 
 ### <a name="client-side-nested-update" href='#client-side-nested-update'>Client-Side Nested Update</a>
 
 Let's add some glimmer-binding so that we can click an employee in the grid, and edit that employee in the form:
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee-directory/compare/step_6_basic_create...step_7_update)
 
 ### <a name="client-side-nested-destroy" href='#client-side-nested-destroy'>Client-Side Nested Destroy</a>
 
 Remove employee positions. Since only one position is 'current', we'll do some recalculating as the data changes.
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee-directory/compare/step_7_update...step_8_destroy)
 
 ### <a name="client-side-validations" href='#client-side-validations'>Client-Side Validations</a>
@@ -524,7 +524,7 @@ Of course, no form is complete without nested, server-backed validations. Here w
 
 The 'age' field is an exception. If the user submits a string instead of a number, the server will response with a 500. This is to show off our [stronger_parameters integration](https://github.com/jsonapi-suite/employee_directory/blob/step_23_disassociation/config/initializers/strong_resources.rb#L5)
 
-![github](/jsonapi_suite/assets/img/GitHub-Mark-32px.png)
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
 [View the Diff on Github](https://github.com/jsonapi-suite/employee-directory/compare/step_8_destroy...step_9_validations)
 
 <br />
