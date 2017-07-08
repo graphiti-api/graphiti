@@ -8344,7 +8344,7 @@ a:focus, button:focus {
     -o-animation-delay: 0.15s;
     -ms-animation-delay: 0.15s;
     animation-delay: 0.15s;
-    background-image: url("../../images/bg4.png"); }
+    background-image: url("../images/bg4.png"); }
     @media (max-width: 991px) {
       .index-sidebar-hero #cover-image {
         padding-top: 65px; } }
