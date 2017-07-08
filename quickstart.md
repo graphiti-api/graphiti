@@ -264,7 +264,7 @@ what query functionality we have. We've listed all `Post`s at
     # app/resources/post_resource.rb
     allow_filter :title
     ```
-  * URL: `/api/v1/posts?filter[title]=My title!
+  * URL: `/api/v1/posts?filter[title]=My title!`
   * SQL: `SELECT * FROM posts WHERE title = "My title!"`
   * Any filter not whitelisted will raise `JsonapiCompliable::BadFilter`
   error.

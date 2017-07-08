@@ -359,7 +359,7 @@ what query functionality we have. We’ve listed all <code class="highlighter-ro
 </code></pre>
         </div>
       </li>
-      <li>URL: `/api/v1/posts?filter[title]=My title!</li>
+      <li>URL: <code class="highlighter-rouge">/api/v1/posts?filter[title]=My title!</code></li>
       <li>SQL: <code class="highlighter-rouge">SELECT * FROM posts WHERE title = "My title!"</code></li>
       <li>Any filter not whitelisted will raise <code class="highlighter-rouge">JsonapiCompliable::BadFilter</code>
 error.</li>
