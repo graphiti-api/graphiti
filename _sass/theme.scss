@@ -193,6 +193,9 @@ pre {
       [class*=keyword] {
         color: lighten(red, 25%);
       }
+      [class*=kp] {
+        color: lighten(red, 25%);
+      }
       [class*=string] {
         color: lightgreen;
       }

@@ -12204,6 +12204,8 @@ pre code.hljs.ruby .class .title, pre code.hljs.ruby .class .parent {
   color: #FFDF9D; }
 pre code.hljs.ruby [class*=keyword] {
   color: #ff8080; }
+pre code.hljs.ruby [class*=kp] {
+  color: #ff8080; }
 pre code.hljs.ruby [class*=string] {
   color: lightgreen; }
 pre code.hljs.ruby [class*=comment] {
