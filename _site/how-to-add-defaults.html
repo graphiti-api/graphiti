@@ -11,7 +11,7 @@
 
   <link rel="stylesheet" type="text/css" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
   <link rel="stylesheet" href="http://localhost:4000/assets/main.css">
-  <link rel="canonical" href="http://localhost:4000/features.html">
+  <link rel="canonical" href="http://localhost:4000/how-to-add-defaults.html">
   <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
 
   <!-- javascript -->
@@ -88,77 +88,64 @@
 </header>
 
         <div class="container">
-          <div class="features-tabs-section">
-  <div class="container">
-    <div class="row header">
-      <h3>Formats to showcase features</h3>
-      <p>Choose your favorite formats for your own sites</p>
-    </div>
-    <div class="row">
-      <div class="col-md-12 tabs-wrapper">
-        <ul class="nav nav-tabs">
-          <li class="active"><a href="#home" data-toggle="tab">Upstart your development</a></li>
-          <li><a href="#profile" data-toggle="tab">Get ready in half the time</a></li>
-          <li><a href="#messages" data-toggle="tab">Collaborate with everyone</a></li>
-          <li><a href="#settings" data-toggle="tab">Get more done faster</a></li>
-        </ul>
+          <h1 id="how-to-add-defaults">How to Add Defaults</h1>
 
-        <div class="tab-content">
-          <div class="tab-pane fade in active" id="home">
-            <div class="col-md-6 info">
-              <h4>You don't need to have any advanced technical</h4>
-              <p>
-                Whether you want to fill this paragraph with some text like I'm doing right now, this place is perfect to describe some features or anything you want - React has a complete solution for you.
-              </p>
-              <p>
-                You have complete control over the look &amp; feel of your website, we offer the best quality so you take your site up and running in no time.
-              </p>
-            </div>
-            <div class="col-md-6 image">
-              <img src="http://localhost:4000/images/tabs/pic1.png" class="img-responsive" alt="picture1" />
-            </div>
-          </div>
-          <div class="tab-pane fade" id="profile">
-            <div class="col-md-6 image">
-              <img src="http://localhost:4000/images/portfolioitem1.png" class="img-responsive" alt="picture2" />
-            </div>
-            <div class="col-md-6 info">
-              <h4>You don't need to have any advanced technical</h4>
-              <p>
-                Whether you want to fill this paragraph with some text like I'm doing right now, this place is perfect to describe some features or anything you want - React has a complete solution for you.
-              </p>
-            </div>
-          </div>
-          <div class="tab-pane fade" id="messages">
-            <div class="col-md-6 info">
-              <h4>You don't need to have any advanced technical</h4>
-              <p>
-                Whether you want to fill this paragraph with some text like I'm doing right now, this place is perfect to describe some features or anything you want - React has a complete solution for you.
-              </p>
-              <p>
-                You have complete control over the look &amp; feel of your website, we offer the best quality so you take your site up and running in no time.
-              </p>
-            </div>
-            <div class="col-md-6 image">
-              <img src="http://localhost:4000/images/tabs/pic2.png" class="img-responsive" style="position: relative;top: 15px;" alt="picture3" />
-            </div>
-          </div>
-          <div class="tab-pane fade" id="settings">
-            <div class="col-md-6 image">
-              <img src="http://localhost:4000/images/tabs/pic1.png" class="img-responsive" alt="picture4" />
-            </div>
-            <div class="col-md-6 info">
-              <h4>You don't need to have any advanced technical</h4>
-              <p>
-                Whether you want to fill this paragraph with some text like I'm doing right now, this place is perfect to describe some features or anything you want - React has a complete solution for you.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<p>You may need to change the default behavior or your API - perhaps you
+want a default of 10 per page instead of 20. JSONAPI Suite provides
+facilities that enable <em>defaults</em> that can be <em>overridden</em> - 10 per
+page, unless elsewise specified by the user.</p>
+
+<p>You can see these defaults in the <a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Resource.html">Resource documentation</a>:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">default_filter</span> <span class="ss">:active</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">default_page_size</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">default_sort</span><span class="p">([{</span> <span class="ss">created_at: :desc</span> <span class="p">}])</span>
+</code></pre>
 </div>
+
+<p>These can all be overriden by the user. In other words, hitting
+<code class="highlighter-rouge">/posts</code> will only show active <code class="highlighter-rouge">Post</code>s, hitting
+<code class="highlighter-rouge">/posts?filter[active]=false</code> will show inactive <code class="highlighter-rouge">Post</code>s. The same applies
+for sorting and pagination.</p>
+
+<p>A common pattern is for default filters to apply for all users, but
+allow overrides for administrators. You can use the <code class="highlighter-rouge">:if</code> option to
+restrict the override:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/resources/post_resource.rb</span>
+<span class="n">allow_filter</span> <span class="ss">:active</span><span class="p">,</span> <span class="ss">if: :admin?</span>
+
+<span class="c1"># app/controllers/posts_controller.rb</span>
+<span class="k">def</span> <span class="nf">admin?</span>
+  <span class="n">current_user</span><span class="p">.</span><span class="nf">admin?</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Now the default behavior is to view only active <code class="highlighter-rouge">Post</code>s, but
+<em>administrators</em> can override this default.</p>
+
+<p><br />
+<br /></p>
+
+<script type="text/javascript">
+  $(function () {
+    hljs.configure({
+      tabReplace: '  ',
+      classPrefix: ''
+    });
+
+    $('.language-ruby code').addClass('ruby');
+    $('.language-javascript code').addClass('javascript');
+
+    hljs.initHighlightingOnLoad();
+  });
+</script>
+
 
         </div>
       </div>
