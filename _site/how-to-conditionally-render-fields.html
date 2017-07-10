@@ -130,6 +130,15 @@ requested. We can do that by customizing the <code class="highlighter-rouge">Res
 <p>We will now eager load assets only when the <code class="highlighter-rouge">net_worth</code> extra field is
 specified in the request.</p>
 
+<p>Finally, a special <code class="highlighter-rouge">#allow_x?</code> method is overrideable in your serializer. This is if additional conditionals must fire aside from the field being requested:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">allow_net_worth?</span>
+  <span class="k">return</span> <span class="kp">false</span> <span class="k">unless</span> <span class="n">current_user</span><span class="p">.</span><span class="nf">admin?</span>
+  <span class="k">super</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
 <p><br />
 <br /></p>
 

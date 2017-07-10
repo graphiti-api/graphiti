@@ -39,6 +39,15 @@ end
 We will now eager load assets only when the `net_worth` extra field is
 specified in the request.
 
+Finally, a special `#allow_x?` method is overrideable in your serializer. This is if additional conditionals must fire aside from the field being requested:
+
+```ruby
+def allow_net_worth?
+  return false unless current_user.admin?
+  super
+end
+```
+
 <br />
 <br />
 
