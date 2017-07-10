@@ -11,7 +11,7 @@
 
   <link rel="stylesheet" type="text/css" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
   <link rel="stylesheet" href="http://localhost:4000/assets/main.css">
-  <link rel="canonical" href="http://localhost:4000/concepts.html">
+  <link rel="canonical" href="http://localhost:4000/how-to-code-polymorphic-associations.html">
   <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
 
   <!-- javascript -->
@@ -85,90 +85,65 @@
 </header>
 
         <div class="container">
-          <div id="docs">
-  <div id="guide">
-    <h1 class="logo">
-      <a href="index.html">JSONAPI Suite</a>
-    </h1>
-    <ul class="menu nav">
-      
-        <li>
-          <a href="#resources">Resources</a>
-        </li>
-      
-        <li>
-          <a href="#serializers">Serializers</a>
-        </li>
-      
-    </ul>
-  </div>
+          <h1 id="polymorphic-associations">Polymorphic Associations</h1>
 
-  <div id="api-docs">
-    <div id="methods">
-      
-        <div class="method" id="resources">
-          <div class="method-section clearfix">
-            <div class="method-description">
-              <h3>Resources</h3>
-              This is the description
+<p>Let’s say an <code class="highlighter-rouge">Employee</code> belongs to a <code class="highlighter-rouge">Workspace</code>. <code class="highlighter-rouge">Workspace</code>s have
+different <code class="highlighter-rouge">type</code>s - <code class="highlighter-rouge">HomeOffice</code>, <code class="highlighter-rouge">Office</code>, <code class="highlighter-rouge">CoworkingSpace</code>, etc.</p>
 
-            </div>
-            <div class="method-example">
-              <pre>
-                <code class="ruby">
-class PostsController &lt; ApplicationController
-  jsonapi resource: PostResource
+<p>Assuming we’ve already set up our database, let’s add the associations
+to our <code class="highlighter-rouge">Model</code>s:</p>
 
-  def index
-    render_jsonapi(Post.all)
-  end
-end
-
-                </code>
-              </pre>
-            </div>
-          </div>
-        </div>
-      
-        <div class="method" id="serializers">
-          <div class="method-section clearfix">
-            <div class="method-description">
-              <h3>Serializers</h3>
-              Serializer desc
-
-            </div>
-            <div class="method-example">
-              <pre>
-                <code class="ruby">
-class FooSerializer &lt; ApplicationSerializer
-  type 'foos'
-end
-
-class FooSerializer &lt; ApplicationSerializer
-  type 'foos'
-end
-
-class FooSerializer &lt; ApplicationSerializer
-  type 'foos'
-end
-
-class FooSerializer &lt; ApplicationSerializer
-  type 'foos'
-end
-
-class FooSerializer &lt; ApplicationSerializer
-  type 'foos'
-end
-
-                </code>
-              </pre>
-            </div>
-          </div>
-        </div>
-      
-    </div>
-  </div>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/models/employee.rb</span>
+<span class="n">belongs_to</span> <span class="ss">:workspace</span><span class="p">,</span> <span class="ss">polymorphic: </span><span class="kp">true</span>
+</code></pre>
 </div>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/models/workspace.rb</span>
+<span class="n">has_many</span> <span class="ss">:employees</span><span class="p">,</span> <span class="ss">as: :workspace</span>
+</code></pre>
+</div>
+
+<p>Now we need to wire-up our resource. Usually you’d see something like
+<code class="highlighter-rouge">has_many</code> with a few options. But here, we may actually want to change
+our configuration based on <code class="highlighter-rouge">Workspace#type</code> - maybe each type of data is
+stored in a separate table, for instance.</p>
+
+<p>We want to pass the same configuration, but on a type-by-type basis. In
+other words, we need to group workspaces and define how to associate
+each group:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="n">polymorphic_belongs_to</span> <span class="ss">:workspace</span><span class="p">,</span>
+  <span class="ss">group_by: :workspace_type</span><span class="p">,</span>
+  <span class="ss">groups: </span><span class="p">{</span>
+    <span class="s1">'Office'</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Office</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+      <span class="ss">resource: </span><span class="no">OfficeResource</span><span class="p">,</span>
+      <span class="ss">foreign_key: :workspace_id</span>
+    <span class="p">},</span>
+    <span class="s1">'HomeOffice'</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">HomeOffice</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+      <span class="ss">resource: </span><span class="no">HomeOfficeResource</span><span class="p">,</span>
+      <span class="ss">foreign_key: :workspace_id</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+</code></pre>
+</div>
+
+<p>Let’s say our API was returning 10 <code class="highlighter-rouge">Employees</code>, sideloading their
+corresponding <code class="highlighter-rouge">Workspace</code>. The underlying code would:</p>
+
+<ul>
+  <li>Fetch the employees</li>
+  <li>Group the employees by the given key: <code class="highlighter-rouge">employees.group_by { |e|
+e.workspace_type }</code></li>
+  <li>Use the <code class="highlighter-rouge">Office</code> configuration for all <code class="highlighter-rouge">Employee</code>s where
+<code class="highlighter-rouge">workspace_type</code> is <code class="highlighter-rouge">Office</code>, and use the <code class="highlighter-rouge">HomeOffice</code> configuration
+for all <code class="highlighter-rouge">Employee</code>s where <code class="highlighter-rouge">workspace_type</code> is <code class="highlighter-rouge">HomeOffice</code>.</li>
+</ul>
+
+<p><br />
+<br /></p>
 
 <script type="text/javascript">
   $(function () {

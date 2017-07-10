@@ -11,7 +11,7 @@
 
   <link rel="stylesheet" type="text/css" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
   <link rel="stylesheet" href="http://localhost:4000/assets/main.css">
-  <link rel="canonical" href="http://localhost:4000/concepts.html">
+  <link rel="canonical" href="http://localhost:4000/how-to-code-many-to-many-associations.html">
   <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
 
   <!-- javascript -->
@@ -85,90 +85,40 @@
 </header>
 
         <div class="container">
-          <div id="docs">
-  <div id="guide">
-    <h1 class="logo">
-      <a href="index.html">JSONAPI Suite</a>
-    </h1>
-    <ul class="menu nav">
-      
-        <li>
-          <a href="#resources">Resources</a>
-        </li>
-      
-        <li>
-          <a href="#serializers">Serializers</a>
-        </li>
-      
-    </ul>
-  </div>
+          <h1 id="many-to-many-associations">Many-to-Many Associations</h1>
 
-  <div id="api-docs">
-    <div id="methods">
-      
-        <div class="method" id="resources">
-          <div class="method-section clearfix">
-            <div class="method-description">
-              <h3>Resources</h3>
-              This is the description
+<p><code class="highlighter-rouge">has_and_belongs_to_many</code> are <em>possible</em>, but maybe not desirable
+depending on your use case. Following the example from the <a href="/tutorial#many-to-many">tutorial</a>,
+let’s say an <code class="highlighter-rouge">Employee</code> has many <code class="highlighter-rouge">Team</code>s and a <code class="highlighter-rouge">Team</code> has many
+<code class="highlighter-rouge">Employee</code>s. We could wire-up our <code class="highlighter-rouge">EmployeeResource</code> like so:</p>
 
-            </div>
-            <div class="method-example">
-              <pre>
-                <code class="ruby">
-class PostsController &lt; ApplicationController
-  jsonapi resource: PostResource
-
-  def index
-    render_jsonapi(Post.all)
-  end
-end
-
-                </code>
-              </pre>
-            </div>
-          </div>
-        </div>
-      
-        <div class="method" id="serializers">
-          <div class="method-section clearfix">
-            <div class="method-description">
-              <h3>Serializers</h3>
-              Serializer desc
-
-            </div>
-            <div class="method-example">
-              <pre>
-                <code class="ruby">
-class FooSerializer &lt; ApplicationSerializer
-  type 'foos'
-end
-
-class FooSerializer &lt; ApplicationSerializer
-  type 'foos'
-end
-
-class FooSerializer &lt; ApplicationSerializer
-  type 'foos'
-end
-
-class FooSerializer &lt; ApplicationSerializer
-  type 'foos'
-end
-
-class FooSerializer &lt; ApplicationSerializer
-  type 'foos'
-end
-
-                </code>
-              </pre>
-            </div>
-          </div>
-        </div>
-      
-    </div>
-  </div>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">has_and_belongs_to_many</span> <span class="ss">:teams</span><span class="p">,</span>
+  <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Team</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+  <span class="ss">foreign_key: </span><span class="p">{</span> <span class="ss">employee_teams: :employee_id</span> <span class="p">},</span>
+  <span class="ss">resource: </span><span class="no">TeamResource</span>
+</code></pre>
 </div>
+
+<p>The only difference here is the <code class="highlighter-rouge">foreign_key</code> - we’re passing a hash
+instead of a symbol. <code class="highlighter-rouge">employee_teams</code> is our join table, and
+<code class="highlighter-rouge">employee_id</code> is the true foreign key.</p>
+
+<p>This will work, and for simple many-to-many relationships you can move
+on. But what if we want to add the property <code class="highlighter-rouge">primary</code>, a boolean, to the
+<code class="highlighter-rouge">employee_teams</code> table?</p>
+
+<p>As this is <em>metadata about the relationship</em> it should go on the <code class="highlighter-rouge">meta</code>
+section of the corresponding <a href="http://jsonapi.org/format/#document-resource-object-relationships">relationship object</a>.
+While supporting such an approach is on the JSONAPI Suite roadmap, many
+clients do not currently support this per-object level of functionality.</p>
+
+<p>For now, it might be best to simply expose the intermediate table to the
+API. Using a client like
+<a href="https://github.com/jsonapi-suite/jsorm">JSORM</a>, the overhead of this
+approach is minimal.</p>
+
+<p><br />
+<br /></p>
 
 <script type="text/javascript">
   $(function () {
