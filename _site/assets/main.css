@@ -11627,7 +11627,7 @@ html.portfolio-page {
       padding: 6px 15px 5px 35px; }
 #docs #api-docs {
   background: #FFF;
-  margin-left: 210px;
+  margin-left: 210px !important;
   min-width: 750px; }
   #docs #api-docs #methods {
     background: #292E33;
