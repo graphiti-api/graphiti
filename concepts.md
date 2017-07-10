@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: docs
 ---
 <div id="docs">
   <div id="guide">
@@ -37,5 +37,17 @@ layout: page
     </div>
   </div>
 </div>
+
+<script type="text/javascript">
+  $(function () {
+    window.addEventListener('scroll', function(e) {
+      if (window.scrollY > 70) {
+        $('#guide').css("margin-top", 0);
+      } else {
+        $('#guide').css("margin-top", 70+-1*window.scrollY);
+      }
+    });
+  });
+</script>
 
 {% include highlight.html %}

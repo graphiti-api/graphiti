@@ -11727,29 +11727,36 @@ html.portfolio-page {
               font-family: Monaco, Consolas, Menlo;
               font-size: 12px;
               display: none;
-              color: #DAE4F2; }
+              color: #DAE4F2;
+              /*> * {*/
+              /*color: #DAE4F2;*/
+              /*line-height: 20px;*/
+              /*}*/ }
               #docs #api-docs #methods .method .method-section .method-example pre code.always-visible {
                 display: block !important; }
               #docs #api-docs #methods .method .method-section .method-example pre code.ruby {
                 display: block; }
-              #docs #api-docs #methods .method .method-section .method-example pre code > * {
-                color: #DAE4F2;
-                line-height: 20px; }
             #docs #api-docs #methods .method .method-section .method-example pre .ruby {
-              color: #DAE4F2; }
-              #docs #api-docs #methods .method .method-section .method-example pre .ruby > * {
-                color: #DAE4F2;
-                line-height: 20px; }
-              #docs #api-docs #methods .method .method-section .method-example pre .ruby [class*=keyword] {
-                color: #9AB4DB; }
-              #docs #api-docs #methods .method .method-section .method-example pre .ruby [class*=string] {
-                color: #DAD0C6; }
-              #docs #api-docs #methods .method .method-section .method-example pre .ruby [class*=comment] {
-                color: #B4B4B4; }
-              #docs #api-docs #methods .method .method-section .method-example pre .ruby [class*=constant] {
-                color: #FFDF9D; }
-              #docs #api-docs #methods .method .method-section .method-example pre .ruby [class*=symbol] {
-                color: #9ECBEE; }
+              /*color: #DAE4F2;*/
+              /*> * {*/
+              /*color: #DAE4F2;*/
+              /*line-height: 20px;*/
+              /*}*/
+              /*[class*=keyword] {*/
+              /*color: #9AB4DB;*/
+              /*}*/
+              /*[class*=string] {*/
+              /*color: #DAD0C6;*/
+              /*}*/
+              /*[class*=comment] {*/
+              /*color: #B4B4B4;*/
+              /*}*/
+              /*[class*=constant] {*/
+              /*color: #FFDF9D;*/
+              /*}*/
+              /*[class*=symbol] {*/
+              /*color: #9ECBEE;*/
+              /*}*/ }
             #docs #api-docs #methods .method .method-section .method-example pre .python {
               color: #DAE4F2; }
               #docs #api-docs #methods .method .method-section .method-example pre .python > * {
@@ -12113,7 +12120,8 @@ html.portfolio-page {
   margin-top: 70px; }
 
 #docs #api-docs {
-  margin-left: 10px; }
+  margin-left: 200px;
+  margin-top: -20px; }
 
 body {
   background: #414B5B; }

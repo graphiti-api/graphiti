@@ -1,19 +1,27 @@
-class FooSerializer < ApplicationSerializer
+class PostSerializer < ApplicationSerializer
   type 'foos'
-end
 
-class FooSerializer < ApplicationSerializer
-  type 'foos'
-end
+  attribute :title
 
-class FooSerializer < ApplicationSerializer
-  type 'foos'
-end
+  attribute :description do
+    @object.active? ? 'Active Post' : 'Inactive Post'
+  end
 
-class FooSerializer < ApplicationSerializer
-  type 'foos'
-end
+  extra_attribute :net_worth do
+    @object.assets.sum(&:value)
+  end
 
-class FooSerializer < ApplicationSerializer
-  type 'foos'
+  has_many :comments do
+    data do
+      @object.published_comments
+    end
+
+    link :related do
+      @url_helpers.comments_url(filter: { post_id: @object.id })
+    end
+  end
+
+  meta do
+    { featured: true }
+  end
 end

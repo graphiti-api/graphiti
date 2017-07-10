@@ -44,6 +44,9 @@
         <li>
           <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
         </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/concepts">Concepts</a>
+        </li>
         <li class="dropdown">
           <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
             How-Tos
@@ -72,6 +75,9 @@
             <li>
               <a href="http://localhost:4000/how-to-add-defaults">Add Default Behavior</a>
             </li>
+            <li>
+              <a href="http://localhost:4000/how-to-conditionally-render-fields">Conditionally Render Fields</a>
+            </li>
           </ul>
         </li>
         <li>
@@ -87,8 +93,7 @@
   </div>
 </header>
 
-        <div class="container">
-          <div id="docs">
+        <div id="docs">
   <div id="guide">
     <h1 class="logo">
       <a href="index.html">JSONAPI Suite</a>
@@ -113,17 +118,71 @@
           <div class="method-section clearfix">
             <div class="method-description">
               <h3>Resources</h3>
-              This is the description
+              <p>
+  <a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Resource.html">Resources</a> are where you define how to query and persist a given <code class="highlighter-rouge">Model</code>.
+  We'll wire-up the JSONAPI contract for you, so you can customize hooks rather
+  than spend your time parsing query parameters.
+</p>
+
+<p>
+To the right, you'll see potential overrides of default behavior. Our defaults are based on <code class="highlighter-rouge">ActiveRecord</code>
+  and Rails conventions - so customizations like this are often not required.
+</p>
+
+<p>
+  If you find yourself writing the same customizations over and over again, DRY them up by writing an
+  <a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Adapters/Abstract.html">Adapter</a>.
+</p>
+
+<p>
+  See also:
+  <ul>
+    <li>
+      <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-use-without-activerecord">How to use alternate ORMs</a>
+    </li>
+    <li>
+      <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-build-an-adapter">How to build an Adapter</a>
+    </li>
+    <li>
+      <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-add-defaults">How to add default behavior</a>
+    </li>
+    <li>
+      <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-cause-side-effects">How to cause side-effects</a>
+    </li>
+  </ul>
+</p>
 
             </div>
             <div class="method-example">
               <pre>
                 <code class="ruby">
-class PostsController &lt; ApplicationController
-  jsonapi resource: PostResource
+class PostResource &lt; ApplicationResource
+  # Use default logic (specified in adapter)
+  # when no block passed
+  allow_filter :active
 
-  def index
-    render_jsonapi(Post.all)
+  allow_filter :title_prefix do |scope, value|
+    # Example:
+    # scope.where(["title LIKE ?", "#{value}%"])
+  end
+
+  sort do |scope, att, dir|
+    # Example:
+    # scope.order(att =&gt; dir)
+  end
+
+  paginate do |scope, current_page, per_page|
+    # Example:
+    # scope.per(per_page).page(current_page)
+  end
+
+  # Example: let's say we're hitting an HTTP
+  # service instead of ActiveRecord. Maybe our
+  # scope is a big hash we build up, and now
+  # we need to use a client to take that hash and
+  # execute the HTTP request.
+  def resolve(scope)
+    MyHTTPClient.request(scope)
   end
 end
 
@@ -137,30 +196,56 @@ end
           <div class="method-section clearfix">
             <div class="method-description">
               <h3>Serializers</h3>
-              Serializer desc
+              <p>
+  <strong>Serializers</strong> define the structure of the response.
+</p>
+
+<p>
+  We use <a href="http://jsonapi-rb.org">jsonapi-rb</a> for serialization. If you're familiar
+  with <a href="https://github.com/rails-api/active_model_serializers">active_model_serializers</a>,
+  the interface will seem very familiar. In fact, jsonapi-rb was created by one of the owners of that
+  project.
+</p>
+
+<p>
+  See also:
+  <ul>
+    <li>
+      <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-conditionally-render-fields">Conditionally Render Fields</a>
+    </li>
+  </ul>
+</p>
 
             </div>
             <div class="method-example">
               <pre>
                 <code class="ruby">
-class FooSerializer &lt; ApplicationSerializer
+class PostSerializer &lt; ApplicationSerializer
   type 'foos'
-end
 
-class FooSerializer &lt; ApplicationSerializer
-  type 'foos'
-end
+  attribute :title
 
-class FooSerializer &lt; ApplicationSerializer
-  type 'foos'
-end
+  attribute :description do
+    @object.active? ? 'Active Post' : 'Inactive Post'
+  end
 
-class FooSerializer &lt; ApplicationSerializer
-  type 'foos'
-end
+  extra_attribute :net_worth do
+    @object.assets.sum(&amp;:value)
+  end
 
-class FooSerializer &lt; ApplicationSerializer
-  type 'foos'
+  has_many :comments do
+    data do
+      @object.published_comments
+    end
+
+    link :related do
+      @url_helpers.comments_url(filter: { post_id: @object.id })
+    end
+  end
+
+  meta do
+    { featured: true }
+  end
 end
 
                 </code>
@@ -172,6 +257,18 @@ end
     </div>
   </div>
 </div>
+
+<script type="text/javascript">
+  $(function () {
+    window.addEventListener('scroll', function(e) {
+      if (window.scrollY > 70) {
+        $('#guide').css("margin-top", 0);
+      } else {
+        $('#guide').css("margin-top", 70+-1*window.scrollY);
+      }
+    });
+  });
+</script>
 
 <script type="text/javascript">
   $(function () {
@@ -188,7 +285,6 @@ end
 </script>
 
 
-        </div>
       </div>
     </main>
     <div class="main-footer main-footer--dark">
@@ -202,6 +298,9 @@ end
           </li>
           <li>
             <a href="http://localhost:4000/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/concepts">Concepts</a>
           </li>
         </ul>
       </div>
@@ -228,6 +327,9 @@ end
           </li>
           <li>
             <a href="http://localhost:4000/how-to-add-defaults">Add Default Behavior</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/how-to-conditionally-render-fields">Conditionally Render Fields</a>
           </li>
         </ul>
       </div>
