@@ -11,7 +11,7 @@
 
   <link rel="stylesheet" type="text/css" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
   <link rel="stylesheet" href="http://localhost:4000/assets/main.css">
-  <link rel="canonical" href="http://localhost:4000/how-to-cause-side-effects.html">
+  <link rel="canonical" href="http://localhost:4000/how-to-return-statistics.html">
   <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
 
   <!-- javascript -->
@@ -103,91 +103,63 @@
 </header>
 
         <div class="container">
-          <h1 id="side-effects">Side Effects</h1>
+          <h1 id="statistics">Statistics</h1>
 
-<p>Side effects scenarios come up often. What if we want to send an email
-notification every time a <code class="highlighter-rouge">Comment</code> is created?</p>
+<p>Imagine a grid listing records. What if we want “X total records”,
+above that grid, or “average cost” elsewhere in our UI?</p>
 
-<p>It’s important to note that there are three overall categories of side effects,
-and each requires a different solution:</p>
+<p>These calculations are supported via <code class="highlighter-rouge">allow_stat</code>:</p>
 
-<ul>
-  <li>Side effects internal to the <code class="highlighter-rouge">Model</code>: For example, setting a
-<code class="highlighter-rouge">published_at</code> attribute.</li>
-  <li>Side effects that should only occur on a specific request: For
-example, only send an email update if we’re creating a <code class="highlighter-rouge">Post</code> for the
-first time, at the <code class="highlighter-rouge">/posts</code> endpoint.</li>
-  <li>Side effects that should occur on every <em>type</em> of request: For
-example, send an email notification every time a <code class="highlighter-rouge">Comment</code> is created -
-but not updated - whether it was created at the <code class="highlighter-rouge">/comments</code> endpoint or sideposted at the
-<code class="highlighter-rouge">/posts</code> endpoint.</li>
-</ul>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="n">allow_stat</span> <span class="ss">total: </span><span class="p">[</span><span class="ss">:count</span><span class="p">]</span>
+</code></pre>
+</div>
 
-<h4 id="internal-side-effects">Internal Side-Effects</h4>
+<p>A GET to <code class="highlighter-rouge">/api/employees?stats[total]=count</code> would return:</p>
 
-<p>For the first scenario, it’s OK to use <code class="highlighter-rouge">ActiveRecord</code> callbacks (or the
-equivalent functionality in a different ORM):</p>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="ss">data: </span><span class="p">[.</span><span class="nf">.</span><span class="o">.</span><span class="p">],</span>
+  <span class="ss">meta: </span><span class="p">{</span>
+    <span class="ss">stats: </span><span class="p">{</span>
+      <span class="ss">total: </span><span class="p">{</span>
+        <span class="ss">count: </span><span class="mi">100</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/models/user.rb</span>
-<span class="k">class</span> <span class="nc">Post</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
-  <span class="n">before_save</span> <span class="ss">:set_published_at</span><span class="p">,</span>
-    <span class="ss">on: :update</span><span class="p">,</span>
-    <span class="ss">if: :publishing?</span>
+<p>A few ‘default calculations’ are provided: <code class="highlighter-rouge">count</code>, <code class="highlighter-rouge">sum</code>, <code class="highlighter-rouge">average</code>,
+<code class="highlighter-rouge">maximum</code> and <code class="highlighter-rouge">minimum</code>. These will work out-of-the-box with <code class="highlighter-rouge">ActiveRecord</code>.
+Alternatively, override these calculation functions:</p>
 
-  <span class="kp">private</span>
-
-  <span class="k">def</span> <span class="nf">set_published_at</span>
-    <span class="nb">self</span><span class="p">.</span><span class="nf">published_at</span> <span class="o">=</span> <span class="no">Time</span><span class="p">.</span><span class="nf">now</span>
-  <span class="k">end</span>
-
-  <span class="k">def</span> <span class="nf">publishing?</span>
-    <span class="n">status_changed?</span> <span class="o">&amp;&amp;</span> <span class="n">status</span> <span class="o">==</span> <span class="s1">'published'</span>
-  <span class="k">end</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">allow_stat</span> <span class="ss">:salary</span> <span class="k">do</span>
+  <span class="n">average</span> <span class="p">{</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="kp">attr</span><span class="o">|</span> <span class="n">scope</span><span class="p">.</span><span class="nf">average</span><span class="p">(</span><span class="kp">attr</span><span class="p">)</span> <span class="p">}</span>
 <span class="k">end</span>
 </code></pre>
 </div>
 
-<h4 id="side-effects-on-specific-action">Side-Effects on Specific Action</h4>
+<p>Or support your own custom calculations:</p>
 
-<p>Just like you would with vanilla Rails, use the controller. Here we’ll
-only send an email to our subscribers when the <code class="highlighter-rouge">Post</code> is first created.
-Keep in mind we could also “sidepost” <code class="highlighter-rouge">Post</code> objects at the <code class="highlighter-rouge">/blogs</code>
-endpoint, but this will only fire at the <code class="highlighter-rouge">/posts</code> endpoint.</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">PostsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
-  <span class="k">def</span> <span class="nf">create</span>
-    <span class="n">post</span><span class="p">,</span> <span class="n">success</span> <span class="o">=</span> <span class="n">jsonapi_create</span><span class="p">.</span><span class="nf">to_a</span>
-
-    <span class="k">if</span> <span class="n">success</span>
-      <span class="no">PostMailer</span><span class="p">.</span><span class="nf">published_email</span><span class="p">.</span><span class="nf">deliver_later</span>
-      <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">post</span><span class="p">,</span> <span class="ss">scope: </span><span class="kp">false</span><span class="p">)</span>
-    <span class="k">else</span>
-      <span class="n">render_errors_for</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
-    <span class="k">end</span>
-  <span class="k">end</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">allow_stat</span> <span class="ss">salary: </span><span class="p">[</span><span class="ss">:average</span><span class="p">]</span> <span class="k">do</span>
+  <span class="n">standard_deviation</span> <span class="p">{</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="kp">attr</span><span class="o">|</span> <span class="p">.</span><span class="nf">.</span><span class="o">.</span> <span class="p">}</span>
 <span class="k">end</span>
 </code></pre>
 </div>
 
-<h4 id="side-effects-on-every-request-of-a-given-type">Side-Effects on Every Request of a Given Type</h4>
+<p>Multiple stats are supported with one request:</p>
 
-<p>Let’s add some special logging every time we create a <code class="highlighter-rouge">Post</code>. Note this
-will fire <em>every</em> time we create a <code class="highlighter-rouge">Post</code> - whether we create it at the
-<code class="highlighter-rouge">/posts</code> endpoint or “sidepost” at the <code class="highlighter-rouge">/blogs</code> endpoint.</p>
-
-<p>We <strong>do not</strong> need to worry about this side-effect in our model specs,
-or rake tasks, as the functionality is only relevant to the API.</p>
-
-<p>Edit your <code class="highlighter-rouge">Resource</code>:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/resources/post_resource.rb</span>
-<span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
-  <span class="no">Rails</span><span class="p">.</span><span class="nf">logger</span><span class="p">.</span><span class="nf">info</span> <span class="s2">"Post begin created by </span><span class="si">#{</span><span class="n">context</span><span class="p">.</span><span class="nf">current_user</span><span class="p">.</span><span class="nf">email</span><span class="si">}</span><span class="s2">..."</span>
-  <span class="k">super</span>
-  <span class="no">Rails</span><span class="p">.</span><span class="nf">logger</span><span class="p">.</span><span class="nf">info</span> <span class="s2">"Success!"</span>
-<span class="k">end</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">GET</span> <span class="sr">/api/em</span><span class="n">ployees?stats</span><span class="p">[</span><span class="n">salary</span><span class="p">]</span><span class="o">=</span><span class="n">average</span><span class="p">,</span><span class="n">maximum</span><span class="o">&amp;</span><span class="n">stats</span><span class="p">[</span><span class="n">total</span><span class="p">]</span><span class="o">=</span><span class="n">count</span>
 </code></pre>
 </div>
+
+<p>If you want <strong>only</strong> stats, and no records (for performance), simple pass page size 0:</p>
+
+<p><code class="highlighter-rouge">GET /api/employees?stats[salary]=average&amp;page[size]=0</code></p>
+
+<p><br />
+<br /></p>
 
 <script type="text/javascript">
   $(function () {
