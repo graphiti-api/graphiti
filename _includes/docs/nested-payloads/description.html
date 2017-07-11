@@ -1,0 +1,38 @@
+<p>
+  We want to be able to *write* a nested relationship graph.
+  You can do this by mirroring the same
+  <a href="http://jsonapi.org/format/#fetching-includes">sideloading payload</a>
+  you see in read requests. To the right, you'll see we're updating a
+  <code class="highlighter-rouge">Post</code>, changing the name of its associated
+  <code class="highlighter-rouge">Blog</code>, creating two
+  <code class="highlighter-rouge">Tag</code>s, deleting one
+  <code class="highlighter-rouge">Comment</code>, and disassociating (`null` foreign key) a different
+  <code class="highlighter-rouge">Comment</code>, all in a single request.
+</p>
+
+<p>
+  When we send RESTful resources to the server, we typically send a corresponding HTTP verb.
+  That's the
+  <code class="highlighter-rouge">method</code> section of the payload.
+  <code class="highlighter-rouge">method</code> can be either
+  <code class="highlighter-rouge">create</code>,
+  <code class="highlighter-rouge">update</code>,
+  <code class="highlighter-rouge">destroy</code>, or
+  <code class="highlighter-rouge">disassociate</code>.
+</p>
+
+<p>
+  When creating, there is no
+  <code class="highlighter-rouge">id</code> to pass. Instead, pass
+  <code class="highlighter-rouge">temp-id</code>, a random uuid used to
+  link the relevant sections of the payload, and tells clients how to associate
+  their in-memory objects with the
+  <code class="highlighter-rouge">id</code>s returned from the server. Clients like
+  <a target="_blank" href="https://github.com/jsonapi-suite/jsorm">JSORM</a> will take care of this for you automatically.
+</p>
+
+<p>
+  When we actually perform these operations, everything will run within a transaction. The
+  transaction will be rolled back if an error is raised or the
+  <code class="highlighter-rouge">Model</code>s, do not pass validation.
+</p>

@@ -1,0 +1,25 @@
+{
+  data: {
+    type: 'posts',
+    id: 123,
+    attributes: { title: 'Updated!' },
+    relationships: {
+      blog: {
+        data: { type: 'blogs', id: 123, method: 'update' }
+      },
+      tags: {
+        data: [{ type: 'tags', temp-id: 's0m3uu1d', method: 'create' }]
+      },
+      comments: {
+        data: [
+          { type: 'comments', id: 123, method: 'destroy' }
+          { type: 'comments', id: 456, method: 'disassociate' }
+        ]
+      }
+    }
+  },
+  included: [
+    { type: 'tags', temp-id: 's0m3uu1d', attributes: { name: 'Important' } },
+    { type: 'blogs', id: 123, attributes: { name: 'Updated!' } }
+  ]
+}
