@@ -5,5 +5,8 @@
   title: 'Serializers'
   id: 'serializers'
 -
-  title: 'Nested Payloads'
-  id: 'nested-payloads'
+  title: 'Sideloading'
+  id: 'sideloading'
+-
+  title: 'Sideposting'
+  id: 'sideposting'

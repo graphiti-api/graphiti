@@ -6,7 +6,7 @@
   <code class="highlighter-rouge">Post</code>, changing the name of its associated
   <code class="highlighter-rouge">Blog</code>, creating two
   <code class="highlighter-rouge">Tag</code>s, deleting one
-  <code class="highlighter-rouge">Comment</code>, and disassociating (`null` foreign key) a different
+  <code class="highlighter-rouge">Comment</code>, and disassociating (<code class="highlighter-rouge">null</code> foreign key) a different
   <code class="highlighter-rouge">Comment</code>, all in a single request.
 </p>
 
@@ -25,7 +25,7 @@
   When creating, there is no
   <code class="highlighter-rouge">id</code> to pass. Instead, pass
   <code class="highlighter-rouge">temp-id</code>, a random uuid used to
-  link the relevant sections of the payload, and tells clients how to associate
+  link the relevant sections of the payload, and which tells clients how to associate
   their in-memory objects with the
   <code class="highlighter-rouge">id</code>s returned from the server. Clients like
   <a target="_blank" href="https://github.com/jsonapi-suite/jsorm">JSORM</a> will take care of this for you automatically.
@@ -35,4 +35,14 @@
   When we actually perform these operations, everything will run within a transaction. The
   transaction will be rolled back if an error is raised or the
   <code class="highlighter-rouge">Model</code>s, do not pass validation.
+</p>
+
+<p>
+  See also:
+
+  <ul>
+    <li>
+      <a href="{{site.github.url}}/tutorial#association-writes">Tutorial: Association Writes</a>
+    </li>
+  </ul>
 </p>

@@ -1,0 +1,22 @@
+# Adapter example
+has_many :comments,
+  foreign_key: :post_id,
+  resource: CommentResource,
+  scope: -> { Comment.all } # base scope, like you'd see in a controller
+
+
+
+# Lower-level customization example
+allow_sideload :blog, resource: BlogResource do
+  # Return a scope so further query parameters can be applied
+  # and the Resource logic can be re-used
+  data do |posts|
+    Blog.where(id: posts.map(&:blog_id))
+  end
+
+  assign do |posts, blogs|
+    posts.each do |p|
+      p.blog = blogs.find { |b| b.id == p.blog_id }
+    end
+  end
+end
