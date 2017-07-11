@@ -12122,6 +12122,14 @@ html.portfolio-page {
   margin-left: 200px !important;
   margin-top: -20px !important; }
 
+.nav-menu .main-menu h4 {
+  color: #e6e6e6;
+  margin-left: 5rem; }
+.nav-menu .main-menu ul {
+  margin-top: 2rem; }
+.nav-menu .main-menu ul li a {
+  padding-left: 3rem; }
+
 body {
   background: #414B5B; }
   body .page-content {

@@ -54,6 +54,21 @@
   }
 }
 
+.nav-menu .main-menu {
+  h4 {
+    color: darken(white, 10%);
+    margin-left: 5rem;
+  }
+
+  ul {
+    margin-top: 2rem;
+  }
+
+  ul li a {
+    padding-left: 3rem;
+  }
+}
+
 body {
   background: #414B5B;
 

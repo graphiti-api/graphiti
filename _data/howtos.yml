@@ -1,0 +1,33 @@
+-
+  path: '/how-to-scope-to-current-user'
+  title: 'Scope to Current User'
+-
+  path: '/how-to-cause-side-effects'
+  title: 'Cause Side-Effects'
+-
+  path: '/how-to-use-without-activerecord'
+  title: 'Use Alternate ORMs'
+-
+  path: '/how-to-build-an-adapter'
+  title: 'Build an Adapter'
+-
+  path: '/how-to-code-many-to-many-associations'
+  title: 'Many-to-Many Relationships'
+-
+  path: '/how-to-code-polymorphic-associations'
+  title: 'Polymorphic Relationships'
+-
+  path: '/how-to-add-default-behavior'
+  title: 'Add Default Behavior'
+-
+  path: '/how-to-conditionally-render-fields'
+  title: 'Conditionally Render Fields'
+-
+  path: '/how-to-customize-error-responses'
+  title: 'Customize Error Responses'
+-
+  path: '/how-to-write-specs'
+  title: 'Write Specs'
+-
+  path: '/how-to-return-statistics'
+  title: 'Statistics'

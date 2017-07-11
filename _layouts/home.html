@@ -1,6 +1,26 @@
 ---
 layout: default
 ---
+<div class="st-container st-container--right-side">
+  <nav class="nav-menu">
+    <div class="main-menu">
+      <h3>Menu</h3>
+      <a href="{{site.github.url}}/quickstart" class="item">Quickstart</a>
+      <a href="{{site.github.url}}/tutorial" class="item">Tutorial</a>
+      <a href="{{site.github.url}}/concepts" class="item">Concepts</a>
+      <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable" class="item">YARD Docs</a>
+      <a href="mailto:richmolj@gmail.com">Contact</a>
+      <h4>How-Tos:</h4>
+      <ul>
+        {% for howto in site.data.howtos %}
+          <li>
+            <a href="{{site.github.url}}{{howto.path}}" class="item">{{howto.title}}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </nav>
+</div>
 
 <div class="st-container st-container--right-side">
   <div class="st-pusher">
@@ -8,6 +28,11 @@ layout: default
       <div class="container">
         <div class="navbar-header pull-left">
           <a href="{{site.github.url}}/" class="navbar-brand">JSONAPI Suite</a>
+        </div>
+        <div class="sidebar-toggle">
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
         </div>
       </div>
     </header>

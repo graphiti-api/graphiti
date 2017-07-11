@@ -18,39 +18,11 @@
       <div class="col-sm-3 menu">
         <h3>How-Tos</h3>
         <ul>
-          <li>
-            <a href="{{site.github.url}}/how-to-cause-side-effects">Cause Side Effects</a>
-          </li>
-          <li>
-            <a href="{{site.github.url}}/how-to-scope-to-current-user">Scope to Current User</a>
-          </li>
-          <li>
-            <a href="{{site.github.url}}/how-to-use-without-activerecord">Use Alternate ORMs</a>
-          </li>
-          <li>
-            <a href="{{site.github.url}}/how-to-build-an-adapter">Build an Adapter</a>
-          </li>
-          <li>
-            <a href="{{site.github.url}}/how-to-code-many-to-many-associations">Many-to-Many Associations</a>
-          </li>
-          <li>
-            <a href="{{site.github.url}}/how-to-code-polymorphic-associations">Polymorphic Associations</a>
-          </li>
-          <li>
-            <a href="{{site.github.url}}/how-to-add-defaults">Add Default Behavior</a>
-          </li>
-          <li>
-            <a href="{{site.github.url}}/how-to-conditionally-render-fields">Conditionally Render Fields</a>
-          </li>
-          <li>
-            <a href="{{site.github.url}}/how-to-customize-error-responses">Customize Error Responses</a>
-          </li>
-          <li>
-            <a href="{{site.github.url}}/how-to-write-specs">Write Specs</a>
-          </li>
-          <li>
-            <a href="{{site.github.url}}/how-to-return-statistics">Statistics</a>
-          </li>
+          {% for howto in site.data.howtos %}
+            <li>
+              <a href="{{site.github.url}}/{{howto.path}}">{{howto.title}}</a>
+            </li>
+          {% endfor %}
         </ul>
       </div>
       <div class="col-sm-3 menu">

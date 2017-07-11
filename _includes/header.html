@@ -26,39 +26,11 @@
           </a>
 
           <ul class="dropdown-menu">
-            <li>
-              <a href="{{site.github.url}}/how-to-scope-to-current-user">Scope to Current User</a>
-            </li>
-            <li>
-              <a href="{{site.github.url}}/how-to-cause-side-effects">Cause Side Effects</a>
-            </li>
-            <li>
-              <a href="{{site.github.url}}/how-to-use-without-activerecord">Use Alternate ORMs</a>
-            </li>
-            <li>
-              <a href="{{site.github.url}}/how-to-build-an-adapter">Build an Adapter</a>
-            </li>
-            <li>
-              <a href="{{site.github.url}}/how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
-            </li>
-            <li>
-              <a href="{{site.github.url}}/how-to-code-polymorphic-associations">Polymorphic Relationships</a>
-            </li>
-            <li>
-              <a href="{{site.github.url}}/how-to-add-defaults">Add Default Behavior</a>
-            </li>
-            <li>
-              <a href="{{site.github.url}}/how-to-conditionally-render-fields">Conditionally Render Fields</a>
-            </li>
-            <li>
-              <a href="{{site.github.url}}/how-to-customize-error-responses">Customize Error Responses</a>
-            </li>
-            <li>
-              <a href="{{site.github.url}}/how-to-write-specs">Write Specs</a>
-            </li>
-            <li>
-              <a href="{{site.github.url}}/how-to-return-statistics">Statistics</a>
-            </li>
+            {% for howto in site.data.howtos %}
+              <li>
+                <a href="{{site.github.url}}{{howto.path}}">{{howto.title}}</a>
+              </li>
+            {% endfor %}
           </ul>
         </li>
         <li>
