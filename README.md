@@ -4,7 +4,7 @@
 
 Easily build jsonapi.org-compatible APIs in Rails.
 
-[View our website for documentation, examples and tutorial]((https://jsonapi-suite.github.io/jsonapi_suite)
+[View our website for documentation, examples and tutorial](https://jsonapi-suite.github.io/jsonapi_suite)
 
 [View YARD documentation](https://jsonapi-suite.github.io/jsonapi_compliable)
 
