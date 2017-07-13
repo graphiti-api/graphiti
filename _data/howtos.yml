@@ -17,7 +17,7 @@
   path: '/how-to-code-polymorphic-associations'
   title: 'Polymorphic Relationships'
 -
-  path: '/how-to-add-default-behavior'
+  path: '/how-to-add-defaults'
   title: 'Add Default Behavior'
 -
   path: '/how-to-conditionally-render-fields'
