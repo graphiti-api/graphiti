@@ -52,8 +52,8 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     before do
-      @request.headers['Accept'] = Mime::JSON
-      @request.headers['Content-Type'] = Mime::JSON.to_s
+      @request.headers['Accept'] = Mime[:json]
+      @request.headers['Content-Type'] = Mime[:json].to_s
 
       routes.draw {
         post "create" => "anonymous#create"
