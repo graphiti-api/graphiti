@@ -48,7 +48,7 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     def do_put(id)
-      put :update, id: id, params: payload
+      put :update, params: payload.merge(id: id)
     end
 
     before do
@@ -138,12 +138,12 @@ if ENV["APPRAISAL_INITIALIZED"]
       let(:employee) { Employee.create!(first_name: 'Joe') }
 
       it 'deletes the object' do
-        delete :destroy, id: employee.id
+        delete :destroy, params: { id: employee.id }
         expect { employee.reload }.to raise_error(ActiveRecord::RecordNotFound)
       end
 
       it 'responds with object' do
-        delete :destroy, id: employee.id
+        delete :destroy, params: { id: employee.id }
         expect(json_item['id']).to eq(employee.id.to_s)
         expect(json_item['first_name']).to eq('Joe')
       end
