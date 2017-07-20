@@ -23,7 +23,8 @@ Now add dependencies to your `Gemfile`:
 
 ```ruby
 gem 'jsonapi_suite'
-gem 'jsonapi-rails'
+gem 'jsonapi-serializable', '0.1.3'
+gem 'jsonapi-rails', '0.1.2'
 gem 'kaminari'
 ```
 
