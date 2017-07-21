@@ -122,7 +122,7 @@ if ENV["APPRAISAL_INITIALIZED"]
     let!(:state)   { State.create!(name: 'Maine') }
     let!(:bio)     { Bio.create!(author: author1, picture: 'imgur', description: 'author bio') }
     let!(:hobby1)  { Hobby.create!(name: 'Fishing', authors: [author1]) }
-    let!(:hobby2)  { Hobby.create!(name: 'Woodworking', authors: [author1]) }
+    let!(:hobby2)  { Hobby.create!(name: 'Woodworking', authors: [author1, author2]) }
     let(:house)    { House.new(name: 'Cozy', state: state) }
     let(:condo)    { Condo.new(name: 'Modern', state: state) }
     let(:genre)    { Genre.create!(name: 'Horror') }
@@ -270,6 +270,19 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(hobby['name']).to be_present
         expect(hobby).to_not have_key('description')
         expect(hobby).to_not have_key('reason')
+      end
+
+      it 'does not duplicate results' do
+        get :index, params: { include: 'hobbies' }
+        author1_relationships = json['data'][0]['relationships']
+        author2_relationships = json['data'][1]['relationships']
+
+        author1_hobbies = author1_relationships['hobbies']['data']
+        author2_hobbies = author2_relationships['hobbies']['data']
+
+        expect(json_includes('hobbies').size).to eq(2)
+        expect(author1_hobbies.size).to eq(2)
+        expect(author2_hobbies.size).to eq(1)
       end
     end
 

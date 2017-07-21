@@ -76,7 +76,7 @@ module JsonapiCompliable
             parent_ids = parents.map { |p| p.send(primary_key) }
             parent_ids.uniq!
             parent_ids.compact!
-            _scope.call.joins(through).where(through => { fk => parent_ids })
+            _scope.call.joins(through).where(through => { fk => parent_ids }).distinct
           end
 
           assign do |parents, children|
