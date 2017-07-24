@@ -5,6 +5,8 @@ layout: page
 How to Autodocument with Swagger
 ==========
 
+<i>You can follow the steps below, or [view the diff on github](https://github.com/jsonapi-suite/employee_directory/compare/step_23_disassociation...step_24_autodocumentation)</i>
+
 This suite uses DSLs to specify inputs (`strong_resources`, filters, etc), and outputs (`jsonapi-rb` serializers).
 We can introspect that DSL to provide automatic documentation. Not only
 does this save a lot of time, it ensures your code and documentation are
