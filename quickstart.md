@@ -701,8 +701,16 @@ patterns to get a feel for what's right for you.
 
 ### <a name="documentation" href='#documentation'>Bonus: Documentation</a>
 
-TODO! Automatic [swagger documentation](https://swagger.io) is coming
-shortly.
+We can autodocument our code using [swagger documentation](https://swagger.io). Once you follow the [installation instructions](/how-to-autodocument), documenting an endpoint is one line of code:
+
+```ruby
+jsonapi_resource '/v1/employees'
+```
+
+Our custom UI will show all possible query parameters (including nested
+relationships), as well as schemas for request/responses:
+
+<img style="width: 100%" src="https://user-images.githubusercontent.com/55264/28526490-af7ce5a8-7055-11e7-88bf-1ce5ead32dd7.png" />
 
 <br />
 <br />

@@ -11,7 +11,7 @@
 
   <link rel="stylesheet" type="text/css" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
   <link rel="stylesheet" href="http://localhost:4000/assets/main.css">
-  <link rel="canonical" href="http://localhost:4000/how-to-scope-to-current-user.html">
+  <link rel="canonical" href="http://localhost:4000/how-to-autodocument.html">
   <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
 
   <!-- javascript -->
@@ -119,100 +119,142 @@
 </header>
 
         <div class="container">
-          <h1 id="scoping-to-current-user">Scoping to Current User</h1>
+          <h1 id="how-to-autodocument-with-swagger">How to Autodocument with Swagger</h1>
 
-<h3 id="scenario-scoping-queries"><a name="scoping-queries" href="#scoping-queries">Scenario: Scoping Queries</a></h3>
+<p>This suite uses DSLs to specify inputs (<code class="highlighter-rouge">strong_resources</code>, filters, etc), and outputs (<code class="highlighter-rouge">jsonapi-rb</code> serializers).
+We can introspect that DSL to provide automatic documentation. Not only
+does this save a lot of time, it ensures your code and documentation are
+never out of sync.</p>
 
-<blockquote>
-  <p>Given a <code class="highlighter-rouge">Post</code> model with <code class="highlighter-rouge">hidden</code> attribute, only allow administrators
-to view hidden <code class="highlighter-rouge">Posts</code>.</p>
-</blockquote>
+<p>Here we’ll be using <a href="https://swagger.io">swagger</a>, a popular open-source
+documentation framework.
+<br />
+<br /></p>
 
-<p>Let’s start by adding a <code class="highlighter-rouge">visible</code> scope to <code class="highlighter-rouge">Post</code>, so we can easily
-retrive only <code class="highlighter-rouge">Post</code>s where <code class="highlighter-rouge">hidden</code> is <code class="highlighter-rouge">false</code>:</p>
+<p><img width="100%" src="https://user-images.githubusercontent.com/55264/28526490-af7ce5a8-7055-11e7-88bf-1ce5ead32dd7.png" /></p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/models/post.rb</span>
-<span class="n">scope</span> <span class="ss">:visible</span><span class="p">,</span> <span class="o">-&gt;</span> <span class="p">{</span> <span class="n">where</span><span class="p">(</span><span class="ss">hidden: </span><span class="kp">false</span><span class="p">)</span> <span class="p">}</span>
+<p><br />
+To get this UI, we need to install two things: a controller that
+generates a <b>schema</b> (<code class="highlighter-rouge">swagger.json</code>), and a static website
+in <code class="highlighter-rouge">public</code>. Let’s start by adding dependencies:
+<br />
+<br /></p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># Gemfile</span>
+<span class="c1"># Below 'jsonapi_suite'</span>
+<span class="n">gem</span> <span class="s1">'jsonapi_spec_helpers'</span>
+<span class="n">gem</span> <span class="s1">'jsonapi_swagger_helpers'</span>
 </code></pre>
 </div>
 
-<p>As you know, we would typically use the base scope <code class="highlighter-rouge">Post.all</code> like so:</p>
+<p><i>
+  Note: here we’re moving <code class="highlighter-rouge">jsonapi_spec_helpers</code> out of the
+  test-specific bundle group. Introspecting spec helpers is part of
+  autodocumenting, so we’ll <code class="highlighter-rouge">require</code> them manually when our documentation
+  controller is loaded.
+</i></p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">index</span>
-  <span class="n">render_jsonapi</span><span class="p">(</span><span class="no">Post</span><span class="p">.</span><span class="nf">all</span><span class="p">)</span>
+<p>Our web UI is a <a href="http://glimmerjs.com">Glimmer App</a>,
+but we’ll only deal with the already-compiled static files glimmer builds.
+Let’s copy those files and expose them to the web by putting them in
+<code class="highlighter-rouge">public</code>:</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>mkdir -p public/api/docs <span class="o">&amp;&amp;</span> <span class="nb">cd </span>public/api/docs
+<span class="gp">$ </span>git clone https://github.com/jsonapi-suite/swagger-ui.git <span class="o">&amp;&amp;</span> cp swagger-ui/prod-dist/<span class="k">*</span> . <span class="o">&amp;&amp;</span> rm -rf swagger-ui
+</code></pre>
+</div>
+
+<p>Our documentation will be accessible at <code class="highlighter-rouge">/api/docs</code>, so we put the files
+in <code class="highlighter-rouge">public/api/docs</code>. You may want a different directory depending on
+your own routing rules. In either case, our next step is to edit
+<code class="highlighter-rouge">index.html</code>: make sure any javascript and css has the correct URL.
+There are also a few configuration options, such as providing a link to
+Github.</p>
+
+<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="nb">window</span><span class="p">.</span><span class="nx">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">githubURL</span><span class="p">:</span> <span class="s1">'http://github.com/user/repo'</span><span class="p">,</span>
+  <span class="na">basePath</span><span class="p">:</span> <span class="s1">'/api'</span> <span class="c1">// basePath/swagger.json, basePath/v1/employees, etc</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>This static website will make a request to <code class="highlighter-rouge">/api/swagger.json</code>. Let’s
+build that endpoint now:</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>touch app/controllers/docs_controller.rb
+</code></pre>
+</div>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># config/routes.rb</span>
+<span class="n">scope</span> <span class="ss">path: </span><span class="s1">'/api'</span> <span class="k">do</span>
+  <span class="n">resources</span> <span class="ss">:docs</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:index</span><span class="p">],</span> <span class="ss">path: </span><span class="s1">'/swagger'</span>
+  <span class="c1"># ... code ...</span>
 <span class="k">end</span>
 </code></pre>
 </div>
 
-<p>Let’s instead use the base scope <code class="highlighter-rouge">Post.visible</code> when the user is not an
-administrator:</p>
+<p>Our <code class="highlighter-rouge">DocsController</code> uses <a href="https://github.com/fotinakis/swagger-blocks">swagger-blocks</a> to generate
+the swagger schema. Here’s the minimal setup needed to configure
+swagger:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">index</span>
-  <span class="n">scope</span> <span class="o">=</span> <span class="n">current_user</span><span class="p">.</span><span class="nf">admin?</span> <span class="p">?</span> <span class="no">Post</span><span class="p">.</span><span class="nf">all</span> <span class="p">:</span> <span class="no">Post</span><span class="p">.</span><span class="nf">visible</span>
-  <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
-<span class="k">end</span>
-</code></pre>
-</div>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'jsonapi_swagger_helpers'</span>
 
-<p>That’s it! Now only administrators can view hidden <code class="highlighter-rouge">Post</code>s.</p>
+<span class="k">class</span> <span class="nc">DocsController</span> <span class="o">&lt;</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">API</span>
+  <span class="kp">include</span> <span class="no">JsonapiSwaggerHelpers</span><span class="o">::</span><span class="no">DocsControllerMixin</span>
 
-<h3 id="privileged-writes"><a name="privileged-writes" href="#privileged-writes">Privileged Writes</a></h3>
-
-<blockquote>
-  <p>Given <code class="highlighter-rouge">Post</code>s that have an <code class="highlighter-rouge">internal</code> attribute, only allow
-internal users to publish internal posts.</p>
-</blockquote>
-
-<p>Our controller context is available in our resource. Let’s override
-<code class="highlighter-rouge">Resource#create</code> to ensure correct privileging:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
-  <span class="k">if</span> <span class="o">!</span><span class="n">internal_user?</span> <span class="o">&amp;&amp;</span> <span class="n">attributes</span><span class="p">[</span><span class="ss">:internal</span><span class="p">]</span> <span class="o">==</span> <span class="kp">true</span>
-    <span class="k">raise</span> <span class="s2">"Hey you! YOU can't publish internal posts!"</span>
-  <span class="k">else</span>
-    <span class="k">super</span>
+  <span class="n">swagger_root</span> <span class="k">do</span>
+    <span class="n">key</span> <span class="ss">:swagger</span><span class="p">,</span> <span class="s1">'2.0'</span>
+    <span class="n">info</span> <span class="k">do</span>
+      <span class="n">key</span> <span class="ss">:version</span><span class="p">,</span> <span class="s1">'1.0.0'</span>
+      <span class="n">key</span> <span class="ss">:title</span><span class="p">,</span> <span class="s1">'&lt;YOUR APP NAME&gt;'</span>
+      <span class="n">key</span> <span class="ss">:description</span><span class="p">,</span> <span class="s1">'&lt;YOUR APP DESCRIPTION&gt;'</span>
+      <span class="n">contact</span> <span class="k">do</span>
+      <span class="n">key</span> <span class="ss">:name</span><span class="p">,</span> <span class="s1">'&lt;YOU&gt;'</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+    <span class="n">key</span> <span class="ss">:basePath</span><span class="p">,</span> <span class="s1">'/api'</span>
+    <span class="n">key</span> <span class="ss">:consumes</span><span class="p">,</span> <span class="p">[</span><span class="s1">'application/json'</span><span class="p">]</span>
+    <span class="n">key</span> <span class="ss">:produces</span><span class="p">,</span> <span class="p">[</span><span class="s1">'application/json'</span><span class="p">]</span>
   <span class="k">end</span>
 <span class="k">end</span>
-
-<span class="kp">private</span>
-
-<span class="k">def</span> <span class="nf">internal_user?</span>
-  <span class="n">context</span><span class="p">.</span><span class="nf">current_user</span><span class="p">.</span><span class="nf">internal?</span>
-<span class="k">end</span>
 </code></pre>
 </div>
 
-<h3 id="guarding-filters"><a name="guarding-filters" href="#guarding-filters">Guarding Filters</a></h3>
+<p>That’s it. Now, every time we add an endpoint, we can autodocument with
+one line of code (below the <code class="highlighter-rouge">swagger_root</code> block):</p>
 
-<blockquote>
-  <p>Given <code class="highlighter-rouge">Employee</code>s with attribute <code class="highlighter-rouge">under_performance_review</code>, do not allow clients to find all employees under performance review.</p>
-</blockquote>
-
-<p>Occasionally you need to guard filters based on the current user. Use
-the <code class="highlighter-rouge">:if</code> option on <code class="highlighter-rouge">allow_filter</code>. This will execute in the context of
-your controller:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/resources/employee_resource.rb</span>
-<span class="n">allow_filter</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">if: :admin?</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi_resource</span> <span class="s1">'/v1/employees'</span>
 </code></pre>
 </div>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/controllers/employees_controller.rb</span>
-<span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
-  <span class="n">jsonapi</span> <span class="ss">resource: </span><span class="no">EmployeeResource</span>
+<p>This endpoint will be introspected for all RESTful actions, outputting
+the full configuration. There are a few customization options:</p>
 
-  <span class="k">def</span> <span class="nf">index</span>
-    <span class="n">render_jsonapi</span><span class="p">(</span><span class="no">Employee</span><span class="p">.</span><span class="nf">all</span><span class="p">)</span>
-  <span class="k">end</span>
-
-  <span class="kp">private</span>
-
-  <span class="k">def</span> <span class="nf">admin?</span>
-    <span class="n">current_user</span><span class="p">.</span><span class="nf">admin?</span>
-  <span class="k">end</span>
-<span class="k">end</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi_resource</span> <span class="s1">'/v1/employees'</span><span class="p">,</span>
+  <span class="ss">only: </span><span class="p">[</span><span class="ss">:create</span><span class="p">,</span> <span class="ss">:index</span><span class="p">],</span>
+  <span class="ss">except: </span><span class="p">[</span><span class="ss">:destroy</span><span class="p">],</span>
+  <span class="ss">descriptions: </span><span class="p">{</span>
+    <span class="ss">index: </span><span class="s2">"Some &lt;b&gt;additional&lt;/b&gt; documentation"</span>
+  <span class="p">}</span>
 </code></pre>
 </div>
+
+<p>If you want additional attribute-level documentation, you can add this
+to your spec payloads:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">key</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span> <span class="no">String</span><span class="p">,</span> <span class="ss">description: </span><span class="s1">'The full name, e.g. "John Doe"'</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><br />
+Will give you an output similar to:
+<br />
+<br /></p>
+
+<p><img width="430px" style="margin: 0 auto; display:block" src="https://user-images.githubusercontent.com/55264/28526856-c8938492-7056-11e7-8db2-2f25a3548e89.png" /></p>
+
+<p><br />
+<br /></p>
 
 <script type="text/javascript">
   $(function () {

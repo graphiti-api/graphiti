@@ -99,6 +99,10 @@
                 <a href="http://localhost:4000/how-to-return-statistics">Statistics</a>
               </li>
             
+              <li>
+                <a href="http://localhost:4000/how-to-autodocument">Autodocument with Swagger</a>
+              </li>
+            
           </ul>
         </li>
         <li>
@@ -861,8 +865,16 @@ patterns to get a feel for what’s right for you.</p>
 
 <h3 id="bonus-documentation"><a name="documentation" href="#documentation">Bonus: Documentation</a></h3>
 
-<p>TODO! Automatic <a href="https://swagger.io">swagger documentation</a> is coming
-shortly.</p>
+<p>We can autodocument our code using <a href="https://swagger.io">swagger documentation</a>. Once you follow the <a href="/how-to-autodocument">installation instructions</a>, documenting an endpoint is one line of code:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi_resource</span> <span class="s1">'/v1/employees'</span>
+</code></pre>
+</div>
+
+<p>Our custom UI will show all possible query parameters (including nested
+relationships), as well as schemas for request/responses:</p>
+
+<p><img style="width: 100%" src="https://user-images.githubusercontent.com/55264/28526490-af7ce5a8-7055-11e7-88bf-1ce5ead32dd7.png" /></p>
 
 <p><br />
 <br />
@@ -949,6 +961,10 @@ shortly.</p>
           
             <li>
               <a href="http://localhost:4000//how-to-return-statistics">Statistics</a>
+            </li>
+          
+            <li>
+              <a href="http://localhost:4000//how-to-autodocument">Autodocument with Swagger</a>
             </li>
           
         </ul>

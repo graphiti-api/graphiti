@@ -31,3 +31,6 @@
 -
   path: '/how-to-return-statistics'
   title: 'Statistics'
+-
+  path: '/how-to-autodocument'
+  title: 'Autodocument with Swagger'
