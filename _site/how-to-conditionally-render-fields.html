@@ -11,7 +11,7 @@
 
   <link rel="stylesheet" type="text/css" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
   <link rel="stylesheet" href="http://localhost:4000/assets/main.css">
-  <link rel="canonical" href="http://localhost:4000/how-to-conditionally-render-fields.html">
+  <link rel="canonical" href="/how-to-conditionally-render-fields.html">
   <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
 
   <!-- javascript -->
@@ -155,14 +155,14 @@ requested. We can do that by customizing the <code class="highlighter-rouge">Res
 <p>We will now eager load assets only when the <code class="highlighter-rouge">net_worth</code> extra field is
 specified in the request.</p>
 
-<p>Finally, a special <code class="highlighter-rouge">#allow_x?</code> method is overrideable in your serializer. This is if additional conditionals must fire aside from the field being requested:</p>
+<p>Finally, additional conditionals can still be applied:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">allow_net_worth?</span>
-  <span class="k">return</span> <span class="kp">false</span> <span class="k">unless</span> <span class="n">current_user</span><span class="p">.</span><span class="nf">admin?</span>
-  <span class="k">super</span>
-<span class="k">end</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/serializers/serializable_person.rb</span>
+<span class="n">extra_attribute</span> <span class="ss">:net_worth</span><span class="p">,</span> <span class="ss">if: </span><span class="nb">proc</span> <span class="p">{</span> <span class="vi">@context</span><span class="p">.</span><span class="nf">allow_net_worth?</span> <span class="p">}</span> <span class="k">do</span>
 </code></pre>
 </div>
+
+<p>If using Rails, <code class="highlighter-rouge">@context</code> is your controller.</p>
 
 <p><br />
 <br /></p>
