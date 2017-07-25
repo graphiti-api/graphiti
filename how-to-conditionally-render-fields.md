@@ -39,14 +39,14 @@ end
 We will now eager load assets only when the `net_worth` extra field is
 specified in the request.
 
-Finally, a special `#allow_x?` method is overrideable in your serializer. This is if additional conditionals must fire aside from the field being requested:
+Finally, additional conditionals can still be applied:
 
 ```ruby
-def allow_net_worth?
-  return false unless current_user.admin?
-  super
-end
+# app/serializers/serializable_person.rb
+extra_attribute :net_worth, if: proc { @context.allow_net_worth? } do
 ```
+
+If using Rails, `@context` is your controller.
 
 <br />
 <br />
