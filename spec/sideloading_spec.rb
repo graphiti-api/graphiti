@@ -123,17 +123,16 @@ RSpec.describe 'sideloading' do
     end
   end
 
-  let(:state)  { State.create!(name: 'maine') }
-  let(:genre)  { Genre.create!(name: 'horror') }
-  let(:book1)  { Book.create!(title: 'The Shining', genre: genre) }
-  let(:book2)  { Book.create!(title: 'The Stand', genre: genre) }
+  let!(:state)  { State.create!(name: 'maine') }
+  let!(:genre)  { Genre.create!(name: 'horror') }
+  let!(:book1)  { Book.create!(title: 'The Shining', author: author, genre: genre) }
+  let!(:book2)  { Book.create!(title: 'The Stand', author: author, genre: genre) }
 
   let!(:author) do
     Author.create! \
       first_name: 'Stephen',
       last_name: 'King',
-      state: state,
-      books: [book1, book2]
+      state: state
   end
 
   def json
