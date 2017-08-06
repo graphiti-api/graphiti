@@ -310,7 +310,10 @@ module JsonapiCompliable
     # @return [Hash] The nested include hash
     # @api private
     def to_hash(processed = [])
-      return { name => {} } if processed.include?(self)
+      # Cut off at 5 recursions
+      if processed.select { |p| p == self }.length == 5
+        return { name => {} }
+      end
       processed << self
 
       result = { name => {} }.tap do |hash|

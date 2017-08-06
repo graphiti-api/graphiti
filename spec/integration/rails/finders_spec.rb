@@ -295,6 +295,35 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
+    context 'sideloading the same "type", then adding another sideload' do
+      before do
+        Author.class_eval do
+          has_many :other_books, class_name: 'Book'
+        end
+
+        SerializableAuthor.class_eval do
+          has_many :other_books
+        end
+
+        Integration::AuthorResource.class_eval do
+          has_many :other_books,
+            scope: -> { Book.all },
+            foreign_key: :author_id,
+            resource: Integration::BookResource
+        end
+      end
+
+      it 'works' do
+        book2.genre = Genre.create! name: 'Comedy'
+        book2.save!
+        get :index, params: {
+          filter: { books: { id: book1.id }, other_books: { id: book2.id } },
+          include: 'books.genre,other_books.genre'
+        }
+        expect(json_includes('genres').length).to eq(2)
+      end
+    end
+
     context 'sideloading polymorphic belongs_to' do
       it 'allows extra fields for the sideloaded resource' do
         get :index, params: {
