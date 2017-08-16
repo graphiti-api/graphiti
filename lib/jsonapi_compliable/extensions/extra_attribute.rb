@@ -57,6 +57,12 @@ module JsonapiCompliable
 end
 
 JSONAPI::Serializable::Resource.class_eval do
-  prepend JSONAPI::Serializable::Resource::ConditionalFields
+  def self.inherited(klass)
+    super
+    klass.class_eval do
+      extend JSONAPI::Serializable::Resource::ConditionalFields
+    end
+  end
+
   include JsonapiCompliable::Extensions::ExtraAttribute
 end

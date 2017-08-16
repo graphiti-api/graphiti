@@ -190,7 +190,7 @@ module JsonapiCompliable
     # this, pass +scope: false+
     #
     # This builds relevant options and sends them to
-    # +JSONAPI::Serializable::Renderer.render+from
+    # +JSONAPI::Serializable::SuccessRenderer#render+from
     # {http://jsonapi-rb.org jsonapi-rb}
     #
     # @example Build Scope by Default
@@ -247,7 +247,9 @@ module JsonapiCompliable
     end
 
     def perform_render_jsonapi(opts)
-      JSONAPI::Serializable::Renderer.render(opts.delete(:jsonapi), opts)
+      # TODO(beauby): Reuse renderer.
+      JSONAPI::Serializable::SuccessRenderer.new
+        .render(opts.delete(:jsonapi), opts).to_json
     end
 
     def _persist
