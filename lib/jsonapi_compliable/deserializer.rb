@@ -49,6 +49,7 @@ class JsonapiCompliable::Deserializer
   # @param env [Hash] the Rack env (e.g. +request.env+).
   def initialize(payload, env)
     @payload = payload
+    @payload = @payload[:_jsonapi] if @payload.has_key?(:_jsonapi)
     @env = env
   end
 
