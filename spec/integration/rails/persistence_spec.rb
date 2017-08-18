@@ -149,6 +149,63 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
+    describe 'has_and_belongs_to_many nested relationship' do
+      let(:employee) { Employee.create!(first_name: 'Joe') }
+      let(:prior_team) { Team.new(name: 'prior') }
+      let(:disassociate_team) { Team.new(name: 'disassociate') }
+      let(:destroy_team) { Team.new(name: 'destroy') }
+
+      before do
+        employee.teams << prior_team
+        employee.teams << disassociate_team
+        employee.teams << destroy_team
+      end
+
+      let(:payload) do
+        {
+          data: {
+            id: employee.id,
+            type: 'employees',
+            relationships: {
+              teams: {
+                data: [
+                  { :'temp-id' => 'abc123', type: 'teams', method: 'create' },
+                  { id: prior_team.id.to_s, type: 'teams', method: 'update' },
+                  { id: disassociate_team.id.to_s, type: 'teams', method: 'disassociate' },
+                  { id: destroy_team.id.to_s, type: 'teams', method: 'destroy' }
+                ]
+              }
+            }
+          },
+          included: [
+            {
+              :'temp-id' => 'abc123',
+              type: 'teams',
+              attributes: { name: 'Team #1' }
+            },
+            {
+              id: prior_team.id.to_s,
+              type: 'teams',
+              attributes: { name: 'Updated!' }
+            }
+          ]
+        }
+      end
+
+      it 'can create/update/disassociate/destroy' do
+        expect(employee.teams).to include(destroy_team)
+        expect(employee.teams).to include(disassociate_team)
+        do_put(employee.id)
+        employee.reload
+        expect(employee.teams).to_not include(disassociate_team)
+        expect(employee.teams).to_not include(destroy_team)
+        expect { disassociate_team.reload }.to_not raise_error
+        expect { destroy_team.reload }.to raise_error(ActiveRecord::RecordNotFound)
+        expect(prior_team.reload.name).to include('Updated!')
+        expect((employee.teams - [prior_team]).first.name).to eq('Team #1')
+      end
+    end
+
     describe 'nested polymorphic relationship' do
       let(:workspace_type) { 'offices' }
 

@@ -237,6 +237,46 @@ module JsonapiCompliable
         raise 'you must override #associate in an adapter subclass'
       end
 
+      # Remove the association without destroying objects
+      #
+      # This is NOT needed in the standard use case. The standard use case would be:
+      #
+      #   def update(attrs)
+      #     # attrs[:the_foreign_key] is nil, so updating the record disassociates
+      #   end
+      #
+      # However, sometimes you need side-effect or elsewise non-standard behavior. Consider
+      # using {{https://github.com/mbleigh/acts-as-taggable-on acts_as_taggable_on}} gem:
+      #
+      #   # Not actually needed, just an example
+      #   def disassociate(parent, child, association_name, association_type)
+      #     parent.tag_list.remove(child.name)
+      #   end
+      #
+      # @example Basic accessor
+      #   def disassociate(parent, child, association_name, association_type)
+      #     if association_type == :has_many
+      #       parent.send(association_name).delete(child)
+      #     else
+      #       child.send(:"#{association_name}=", nil)
+      #     end
+      #   end
+      #
+      # +association_name+ and +association_type+ come from your sideload
+      # configuration:
+      #
+      #   allow_sideload :the_name, type: the_type do
+      #     # ... code.
+      #   end
+      #
+      # @param parent The parent object (via the JSONAPI 'relationships' graph)
+      # @param child The child object (via the JSONAPI 'relationships' graph)
+      # @param association_name The 'relationships' key we are processing
+      # @param association_type The Sideload type (see Sideload#type). Usually :has_many/:belongs_to/etc
+      def disassociate(parent, child, association_name, association_type)
+        raise 'you must override #disassociate in an adapter subclass'
+      end
+
       # This module gets mixed in to Sideload classes
       # This is where you define methods like has_many,
       # belongs_to etc that wrap the lower-level Sideload#allow_sideload

@@ -75,8 +75,21 @@ module JsonapiCompliable
         if association_type == :has_many
           parent.association(association_name).loaded!
           parent.association(association_name).add_to_target(child, :skip_callbacks)
+        elsif association_type == :habtm
+          parent.send(association_name) << child
         else
           child.send("#{association_name}=", parent)
+        end
+      end
+
+      # When a has_and_belongs_to_many relationship, we don't have a foreign
+      # key that can be null'd. Instead, go through the ActiveRecord API.
+      # @see Adapters::Abstract#disassociate
+      def disassociate(parent, child, association_name, association_type)
+        if association_type == :habtm
+          parent.send(association_name).delete(child)
+        else
+          # Nothing to do here, happened when we merged foreign key
         end
       end
 

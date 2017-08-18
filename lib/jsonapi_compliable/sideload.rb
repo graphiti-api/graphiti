@@ -170,24 +170,25 @@ module JsonapiCompliable
     end
 
     # Configure how to associate parent and child records.
-    #
-    # @example Basic attr_accessor
-    #   def associate(parent, child)
-    #     if type == :has_many
-    #       parent.send(:"#{name}").push(child)
-    #     else
-    #       child.send(:"#{name}=", parent)
-    #     end
-    #   end
+    # Delegates to #resource
     #
     # @see #name
     # @see #type
+    # @api private
     def associate(parent, child)
       association_name = @parent ? @parent.name : name
-      resource_class.config[:adapter].associate parent,
-        child,
-        association_name,
-        type
+      resource.associate(parent, child, association_name, type)
+    end
+
+    # Configure how to disassociate parent and child records.
+    # Delegates to #resource
+    #
+    # @see #name
+    # @see #type
+    # @api private
+    def disassociate(parent, child)
+      association_name = @parent ? @parent.name : name
+      resource.disassociate(parent, child, association_name, type)
     end
 
     # Define an attribute that groups the parent records. For instance, with
