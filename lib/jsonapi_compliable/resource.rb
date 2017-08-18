@@ -543,10 +543,28 @@ module JsonapiCompliable
       adapter.destroy(model, id)
     end
 
+    # Delegates #associate to adapter. Built for overriding.
+    #
+    # @see .use_adapter
+    # @see Adapters::Abstract#associate
+    # @see Adapters::ActiveRecord#associate
+    def associate(parent, child, association_name, type)
+      adapter.associate(parent, child, association_name, type)
+    end
+
+    # Delegates #disassociate to adapter. Built for overriding.
+    #
+    # @see .use_adapter
+    # @see Adapters::Abstract#disassociate
+    # @see Adapters::ActiveRecord#disassociate
+    def disassociate(parent, child, association_name, type)
+      adapter.disassociate(parent, child, association_name, type)
+    end
+
     # @api private
-    def persist_with_relationships(meta, attributes, relationships)
+    def persist_with_relationships(meta, attributes, relationships, caller_model = nil)
       persistence = JsonapiCompliable::Util::Persistence \
-        .new(self, meta, attributes, relationships)
+        .new(self, meta, attributes, relationships, caller_model)
       persistence.run
     end
 
