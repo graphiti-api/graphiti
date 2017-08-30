@@ -700,7 +700,7 @@ patterns to get a feel for what's right for you.
 
 ### <a name="documentation" href='#documentation'>Bonus: Documentation</a>
 
-We can autodocument our code using [swagger documentation](https://swagger.io). Once you follow the [installation instructions](/how-to-autodocument), documenting an endpoint is one line of code:
+We can autodocument our code using [swagger documentation](https://swagger.io). Once you follow the <a href="{{site.github.url}}/how-to-autodocument">installation instructions</a>, documenting an endpoint is one line of code:
 
 ```ruby
 jsonapi_resource '/v1/employees'
