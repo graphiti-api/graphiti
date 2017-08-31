@@ -596,6 +596,26 @@ config.around(:each) do |example|
 end
 ```
 
+By default we rescue exceptions and return a valid [error response](http://jsonapi.org/format/#errors).
+In tests, this can be confusing - we probably want to raise errors in
+tests. Enable errors by:
+
+```ruby
+config.before :each do
+  JsonapiErrorable.disable!
+end
+```
+
+And if you do need this functionality in a specific test:
+
+```ruby
+it "renders validation errors" do
+  JsonapiErrorable.enable!
+  post "/api/v1/employees", payload
+  expect(validation_errors[:name]).to eq("can't be blank")
+end
+```
+
 In following this guide, we generated `Post` and
 `Comment` resources. But - to avoid the overhead of testing during a
 quickstart - we didn't have `factory_girl` installed when we ran those

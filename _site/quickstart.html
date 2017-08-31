@@ -758,6 +758,26 @@ running these tests, we need to install and set up dependencies:</p>
 </code></pre>
 </div>
 
+<p>By default we rescue exceptions and return a valid <a href="http://jsonapi.org/format/#errors">error response</a>.
+In tests, this can be confusing - we probably want to raise errors in
+tests. Enable errors by:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">config</span><span class="p">.</span><span class="nf">before</span> <span class="ss">:each</span> <span class="k">do</span>
+  <span class="no">JsonapiErrorable</span><span class="p">.</span><span class="nf">disable!</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>And if you do need this functionality in a specific test:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"renders validation errors"</span> <span class="k">do</span>
+  <span class="no">JsonapiErrorable</span><span class="p">.</span><span class="nf">enable!</span>
+  <span class="n">post</span> <span class="s2">"/api/v1/employees"</span><span class="p">,</span> <span class="n">payload</span>
+  <span class="n">expect</span><span class="p">(</span><span class="n">validation_errors</span><span class="p">[</span><span class="ss">:name</span><span class="p">]).</span><span class="nf">to</span> <span class="n">eq</span><span class="p">(</span><span class="s2">"can't be blank"</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
 <p>In following this guide, we generated <code class="highlighter-rouge">Post</code> and
 <code class="highlighter-rouge">Comment</code> resources. But - to avoid the overhead of testing during a
 quickstart - we didn’t have <code class="highlighter-rouge">factory_girl</code> installed when we ran those
