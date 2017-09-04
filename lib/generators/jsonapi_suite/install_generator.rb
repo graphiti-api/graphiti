@@ -16,12 +16,12 @@ module JsonapiSuite
       to = File.join('config/initializers', "strong_resources.rb")
       template('strong_resources.rb.erb', to)
 
-      inject_into_file 'app/controllers/application_controller.rb', after: "class ApplicationController < ActionController::API\n" do
-        app_controller_code
-      end
-
-      inject_into_file 'app/controllers/application_controller.rb', after: "class ApplicationController < ActionController::Base\n" do
-        app_controller_code
+      # Inject code into ApplicationController, referring with explicit namespace for search hits
+      possible_base_classes = %w{ActionController::API ActionController::Base ActionController::Metal}
+      possible_base_classes.each do |base_class|
+        inject_into_file 'app/controllers/application_controller.rb', after: "class ApplicationController < #{base_class}\n" do
+          app_controller_code
+        end
       end
     end
 
