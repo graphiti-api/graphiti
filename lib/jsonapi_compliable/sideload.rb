@@ -191,6 +191,50 @@ module JsonapiCompliable
       resource.disassociate(parent, child, association_name, type)
     end
 
+    HOOK_ACTIONS = [:save, :create, :update, :destroy, :disassociate]
+
+    # Configure post-processing hooks
+    #
+    # In particular, helpful for bulk operations. "after_save" will fire
+    # for any persistence method - +:create+, +:update+, +:destroy+, +:disassociate+.
+    # Use "only" and "except" keyword arguments to fire only for a
+    # specific persistence method.
+    #
+    # @example Bulk Notify Users on Invite
+    #   class ProjectResource < ApplicationResource
+    #     # ... code ...
+    #     allow_sideload :users, resource: UserResource do
+    #       # scope {}
+    #       # assign {}
+    #       after_save only: [:create] do |project, users|
+    #         UserMailer.invite(project, users).deliver_later
+    #       end
+    #     end
+    #   end
+    #
+    # @see #hooks
+    # @see Util::Persistence
+    def after_save(only: [], except: [], &blk)
+      actions = HOOK_ACTIONS - except
+      actions = only & actions
+      actions = [:save] if only.empty? && except.empty?
+      actions.each do |a|
+        hooks[:"after_#{a}"] << blk
+      end
+    end
+
+    # Get the hooks the user has configured
+    # @see #after_save
+    # @return hash of hooks, ie +{ after_create: #<Proc>}+
+    def hooks
+      @hooks ||= {}.tap do |h|
+        HOOK_ACTIONS.each do |a|
+          h[:"after_#{a}"] = []
+          h[:"before_#{a}"] = []
+        end
+      end
+    end
+
     # Define an attribute that groups the parent records. For instance, with
     # an ActiveRecord polymorphic belongs_to there will be a +parent_id+
     # and +parent_type+. We would want to group on +parent_type+:
@@ -337,6 +381,15 @@ module JsonapiCompliable
     def polymorphic_child_for_type(type)
       polymorphic_groups.values.find do |v|
         v.resource_class.config[:type] == type.to_sym
+      end
+    end
+
+    def fire_hooks!(parent, objects, method)
+      return unless self.hooks
+
+      hooks = self.hooks[:"after_#{method}"] + self.hooks[:after_save]
+      hooks.compact.each do |hook|
+        resource.instance_exec(parent, objects, &hook)
       end
     end
 

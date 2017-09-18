@@ -39,9 +39,9 @@ module JsonapiCompliable
               parent.send(:"#{association_name}=", relevant_child)
             end
           end
-        end
 
-        instance_eval(&blk) if blk
+          instance_eval(&blk) if blk
+        end
       end
 
       def has_one(association_name, scope: nil, resource:, foreign_key:, primary_key: :id, &blk)

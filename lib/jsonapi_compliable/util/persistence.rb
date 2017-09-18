@@ -27,6 +27,7 @@ class JsonapiCompliable::Util::Persistence
   # * associate parent objects with current object
   # * process children
   # * associate children
+  # * run post-process sideload hooks
   # * return current object
   #
   # @return the persisted model instance
@@ -36,14 +37,17 @@ class JsonapiCompliable::Util::Persistence
 
     persisted = persist_object(@meta[:method], @attributes)
     assign_temp_id(persisted, @meta[:temp_id])
+
     associate_parents(persisted, parents)
 
     children = process_has_many(@relationships, persisted) do |x|
       update_foreign_key(persisted, x[:attributes], x)
     end
 
-    associate_children(persisted, children)
-    persisted unless @meta[:method] == :destroy
+    associate_children(persisted, children) unless @meta[:method] == :destroy
+    post_process(persisted, parents)
+    post_process(persisted, children)
+    persisted
   end
 
   private
@@ -76,6 +80,9 @@ class JsonapiCompliable::Util::Persistence
   end
 
   def associate_parents(object, parents)
+    # No need to associate to destroyed objects
+    parents = parents.select { |x| x[:meta][:method] != :destroy }
+
     parents.each do |x|
       if x[:object] && object
         if x[:meta][:method] == :disassociate
@@ -88,6 +95,9 @@ class JsonapiCompliable::Util::Persistence
   end
 
   def associate_children(object, children)
+    # No need to associate destroyed objects
+    return if @meta[:method] == :destroy
+
     children.each do |x|
       if x[:object] && object
         if x[:meta][:method] == :disassociate
@@ -127,6 +137,16 @@ class JsonapiCompliable::Util::Persistence
         x[:object] = x[:sideload].resource
           .persist_with_relationships(x[:meta], x[:attributes], x[:relationships])
         processed << x
+      end
+    end
+  end
+
+  def post_process(caller_model, processed)
+    groups = processed.group_by { |x| x[:meta][:method] }
+    groups.each_pair do |method, group|
+      group.group_by { |g| g[:sideload] }.each_pair do |sideload, members|
+        objects = members.map { |x| x[:object] }
+        sideload.fire_hooks!(caller_model, objects, method)
       end
     end
   end
