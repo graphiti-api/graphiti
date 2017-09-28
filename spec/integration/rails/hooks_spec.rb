@@ -113,7 +113,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     let(:book_data) { [] }
     let(:book_included) { [] }
-    let(:state_data) { {} }
+    let(:state_data) { nil }
     let(:state_included) { [] }
 
     let(:payload) do
@@ -225,8 +225,9 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     context 'belongs_to' do
+      let(:state_data) { { :'temp-id' => 'abc123', type: 'states', method: 'create' } }
+
       before do
-        state_data.merge!(:'temp-id' => 'abc123', type: 'states', method: 'create')
         state_included << { :'temp-id' => 'abc123', type: 'states', attributes: { name: 'New York' } }
       end
 
