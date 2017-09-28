@@ -43,6 +43,21 @@ module JsonapiCompliable
       extend @resource_class.config[:adapter].sideloading_module
     end
 
+    # @api private
+    def self.max_depth
+      @max_depth || 2
+    end
+
+    # Set maximum levels of sideload recursion
+    # /authors?comments.authors would be one level
+    # /authors?comments.authors.comments.authors would be two levels
+    # etc
+    #
+    # Default max depth is 2
+    def self.max_depth=(val)
+      @max_depth = val
+    end
+
     # @see #resource_class
     # @return [Resource] an instance of +#resource_class+
     def resource
@@ -331,6 +346,19 @@ module JsonapiCompliable
       @sideloads[name]
     end
 
+    # @api private
+    def all_sideloads
+      {}.tap do |all|
+        if polymorphic?
+          polymorphic_groups.each_pair do |type, sl|
+            all.merge!(sl.resource.sideloading.all_sideloads)
+          end
+        else
+          all.merge!(@sideloads.merge(resource.sideloading.sideloads))
+        end
+      end
+    end
+
     # Looks at all nested sideload, and all nested sideloads for the
     # corresponding Resources, and returns an Include Directive hash
     #
@@ -354,27 +382,20 @@ module JsonapiCompliable
     #
     # @return [Hash] The nested include hash
     # @api private
-    def to_hash(processed = [])
-      # Cut off at 5 recursions
-      if processed.select { |p| p == self }.length == 5
-        return { name => {} }
+    def to_hash(depth_chain = [], parent = nil)
+      depth = depth_chain.select { |arr| arr == [parent, self] }.length
+      return {} if depth >= self.class.max_depth
+
+      unless (parent && parent.name == :base) || name == :base
+        depth_chain += [[parent, self]]
       end
-      processed << self
 
-      result = { name => {} }.tap do |hash|
-        @sideloads.each_pair do |key, sideload|
-          hash[name][key] = sideload.to_hash(processed)[key] || {}
-
-          if sideload.polymorphic?
-            sideload.polymorphic_groups.each_pair do |type, sl|
-              hash[name][key].merge!(nested_sideload_hash(sl, processed))
-            end
-          else
-            hash[name][key].merge!(nested_sideload_hash(sideload, processed))
-          end
+      { name => {} }.tap do |hash|
+        all_sideloads.each_pair do |key, sl|
+          sideload_hash = sl.to_hash(depth_chain, self)
+          hash[name].merge!(sideload_hash)
         end
       end
-      result
     end
 
     # @api private
