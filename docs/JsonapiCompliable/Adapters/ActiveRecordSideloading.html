@@ -270,9 +270,9 @@
         <span class='id identifier rubyid_parent'>parent</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:#{</span><span class='id identifier rubyid_association_name'>association_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>=</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_relevant_child'>relevant_child</span><span class='rparen'>)</span>
       <span class='kw'>end</span>
     <span class='kw'>end</span>
-  <span class='kw'>end</span>
 
-  <span class='id identifier rubyid_instance_eval'>instance_eval</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_blk'>blk</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_blk'>blk</span>
+    <span class='id identifier rubyid_instance_eval'>instance_eval</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_blk'>blk</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_blk'>blk</span>
+  <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -334,7 +334,7 @@
       <span class='id identifier rubyid_parent_ids'>parent_ids</span> <span class='op'>=</span> <span class='id identifier rubyid_parents'>parents</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_p'>p</span><span class='op'>|</span> <span class='id identifier rubyid_p'>p</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='id identifier rubyid_primary_key'>primary_key</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
       <span class='id identifier rubyid_parent_ids'>parent_ids</span><span class='period'>.</span><span class='id identifier rubyid_uniq!'>uniq!</span>
       <span class='id identifier rubyid_parent_ids'>parent_ids</span><span class='period'>.</span><span class='id identifier rubyid_compact!'>compact!</span>
-      <span class='id identifier rubyid__scope'>_scope</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='period'>.</span><span class='id identifier rubyid_joins'>joins</span><span class='lparen'>(</span><span class='id identifier rubyid_through'>through</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='id identifier rubyid_through'>through</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_fk'>fk</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_parent_ids'>parent_ids</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid__scope'>_scope</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='period'>.</span><span class='id identifier rubyid_joins'>joins</span><span class='lparen'>(</span><span class='id identifier rubyid_through'>through</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='id identifier rubyid_through'>through</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_fk'>fk</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_parent_ids'>parent_ids</span> <span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_distinct'>distinct</span>
     <span class='kw'>end</span>
 
     <span class='id identifier rubyid_assign'>assign</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_parents'>parents</span><span class='comma'>,</span> <span class='id identifier rubyid_children'>children</span><span class='op'>|</span>
@@ -572,7 +572,7 @@
 </div>
 
       <div id="footer">
-  Generated on Wed Jun  7 10:15:09 2017 by
+  Generated on Thu Sep 28 17:28:10 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>

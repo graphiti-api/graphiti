@@ -163,36 +163,6 @@
       <pre class="lines">
 
 
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
 42
 43
 44
@@ -206,104 +176,24 @@
 52
 53
 54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70
-71
-72
-73
-74
-75
-76
-77
-78
-79
-80</pre>
+55</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/generators/jsonapi/resource_generator.rb', line 12</span>
+      <pre class="code"><span class="info file"># File 'lib/generators/jsonapi/resource_generator.rb', line 42</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_copy_resource_file'>copy_resource_file</span>
-  <span class='kw'>unless</span> <span class='ivar'>@options</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>no-controller</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
-    <span class='id identifier rubyid_to'>to</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>app/controllers</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_class_path'>class_path</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_file_name'>file_name</span><span class='period'>.</span><span class='id identifier rubyid_pluralize'>pluralize</span><span class='embexpr_end'>}</span><span class='tstring_content'>_controller.rb</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_template'>template</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>controller.rb.erb</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_to'>to</span><span class='rparen'>)</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_model_klass'>model_klass</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>You must define a </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_class_name'>class_name</span><span class='embexpr_end'>}</span><span class='tstring_content'> model before generating the corresponding resource.</span><span class='tstring_end'>&quot;</span></span>
   <span class='kw'>end</span>
 
-  <span class='kw'>unless</span> <span class='ivar'>@options</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>no-serializer</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
-    <span class='id identifier rubyid_to'>to</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>app/serializers</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_class_path'>class_path</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>serializable_</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_file_name'>file_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>.rb</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_template'>template</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>serializer.rb.erb</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_to'>to</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-
-  <span class='kw'>unless</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ApplicationResource</span><span class='tstring_end'>&#39;</span></span><span class='period'>.</span><span class='id identifier rubyid_safe_constantize'>safe_constantize</span>
-    <span class='id identifier rubyid_to'>to</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>app/resources</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_class_path'>class_path</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>application_resource.rb</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_template'>template</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>application_resource.rb.erb</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_to'>to</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-
-  <span class='kw'>unless</span> <span class='ivar'>@options</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>no-payload</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
-    <span class='id identifier rubyid_to'>to</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>spec/payloads</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_class_path'>class_path</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_file_name'>file_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>.rb</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_template'>template</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>payload.rb.erb</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_to'>to</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-
-  <span class='kw'>unless</span> <span class='ivar'>@options</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>no-strong-resources</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
-    <span class='id identifier rubyid_inject_into_file'>inject_into_file</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>config/initializers/strong_resources.rb</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>after:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>StrongResources.configure do\n</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='heredoc_beg'>&lt;&lt;-STR</span>
-<span class='tstring_content'>  strong_resource :</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_file_name'>file_name</span><span class='embexpr_end'>}</span><span class='tstring_content'> do
-# Your attributes go here, e.g.
-# attribute :name, :string
-  end
-
-</span><span class='heredoc_end'>    STR
-</span>    <span class='kw'>end</span>
-  <span class='kw'>end</span>
-
-  <span class='kw'>unless</span> <span class='ivar'>@options</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>no-route</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
-    <span class='id identifier rubyid_inject_into_file'>inject_into_file</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>config/routes.rb</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>after:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>scope &#39;/api&#39; do\n    scope &#39;/v1&#39; do\n</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='heredoc_beg'>&lt;&lt;-STR</span>
-<span class='tstring_content'>  resources :</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_type'>type</span><span class='embexpr_end'>}</span><span class='tstring_content'>
-</span><span class='heredoc_end'>    STR
-</span>    <span class='kw'>end</span>
-  <span class='kw'>end</span>
-
-  <span class='kw'>unless</span> <span class='ivar'>@options</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>no-test</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
-    <span class='id identifier rubyid_to'>to</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>spec/api/v1/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_file_name'>file_name</span><span class='period'>.</span><span class='id identifier rubyid_pluralize'>pluralize</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-      <span class='id identifier rubyid_class_path'>class_path</span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>index_spec.rb</span><span class='tstring_end'>&quot;</span></span>
-    <span class='id identifier rubyid_template'>template</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>index_request_spec.rb.erb</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_to'>to</span><span class='rparen'>)</span>
-
-    <span class='id identifier rubyid_to'>to</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>spec/api/v1/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_file_name'>file_name</span><span class='period'>.</span><span class='id identifier rubyid_pluralize'>pluralize</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-      <span class='id identifier rubyid_class_path'>class_path</span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>show_spec.rb</span><span class='tstring_end'>&quot;</span></span>
-    <span class='id identifier rubyid_template'>template</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>show_request_spec.rb.erb</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_to'>to</span><span class='rparen'>)</span>
-
-    <span class='id identifier rubyid_to'>to</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>spec/api/v1/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_file_name'>file_name</span><span class='period'>.</span><span class='id identifier rubyid_pluralize'>pluralize</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-      <span class='id identifier rubyid_class_path'>class_path</span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>create_spec.rb</span><span class='tstring_end'>&quot;</span></span>
-    <span class='id identifier rubyid_template'>template</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>create_request_spec.rb.erb</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_to'>to</span><span class='rparen'>)</span>
-
-    <span class='id identifier rubyid_to'>to</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>spec/api/v1/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_file_name'>file_name</span><span class='period'>.</span><span class='id identifier rubyid_pluralize'>pluralize</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-      <span class='id identifier rubyid_class_path'>class_path</span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>update_spec.rb</span><span class='tstring_end'>&quot;</span></span>
-    <span class='id identifier rubyid_template'>template</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>update_request_spec.rb.erb</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_to'>to</span><span class='rparen'>)</span>
-
-    <span class='id identifier rubyid_to'>to</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>spec/api/v1/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_file_name'>file_name</span><span class='period'>.</span><span class='id identifier rubyid_pluralize'>pluralize</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-      <span class='id identifier rubyid_class_path'>class_path</span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>destroy_spec.rb</span><span class='tstring_end'>&quot;</span></span>
-    <span class='id identifier rubyid_template'>template</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>destroy_request_spec.rb.erb</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_to'>to</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-
-  <span class='id identifier rubyid_to'>to</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>app/resources</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_class_path'>class_path</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_file_name'>file_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>_resource.rb</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_template'>template</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>resource.rb.erb</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_to'>to</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_generate_controller'>generate_controller</span> <span class='kw'>unless</span> <span class='id identifier rubyid_omit_controller?'>omit_controller?</span>
+  <span class='id identifier rubyid_generate_serializer'>generate_serializer</span> <span class='kw'>unless</span> <span class='id identifier rubyid_omit_serializer?'>omit_serializer?</span>
+  <span class='id identifier rubyid_generate_application_resource'>generate_application_resource</span> <span class='kw'>unless</span> <span class='id identifier rubyid_application_resource_defined?'>application_resource_defined?</span>
+  <span class='id identifier rubyid_generate_spec_payload'>generate_spec_payload</span> <span class='kw'>unless</span> <span class='id identifier rubyid_omit_spec_payload?'>omit_spec_payload?</span>
+  <span class='id identifier rubyid_generate_strong_resource'>generate_strong_resource</span> <span class='kw'>unless</span> <span class='id identifier rubyid_omit_strong_resource?'>omit_strong_resource?</span>
+  <span class='id identifier rubyid_generate_route'>generate_route</span> <span class='kw'>unless</span> <span class='id identifier rubyid_omit_route?'>omit_route?</span>
+  <span class='id identifier rubyid_generate_tests'>generate_tests</span> <span class='kw'>unless</span> <span class='id identifier rubyid_omit_tests?'>omit_tests?</span>
+  <span class='id identifier rubyid_generate_resource'>generate_resource</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -315,7 +205,7 @@
 </div>
 
       <div id="footer">
-  Generated on Wed Jun  7 10:15:10 2017 by
+  Generated on Thu Sep 28 17:28:11 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>

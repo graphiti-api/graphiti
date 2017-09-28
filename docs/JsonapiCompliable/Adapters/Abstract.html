@@ -339,6 +339,30 @@ API you are hitting does not support sorting, use
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#disassociate-instance_method" title="#disassociate (instance method)">#<strong>disassociate</strong>(parent, child, association_name, association_type)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Remove the association without destroying objects.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#filter-instance_method" title="#filter (instance method)">#<strong>filter</strong>(scope, attribute, value)  &#x21d2; Object </a>
     
 
@@ -1044,12 +1068,12 @@ your sideload configuration:</p>
       <pre class="lines">
 
 
-263
-264
-265</pre>
+303
+304
+305</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/abstract.rb', line 263</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/abstract.rb', line 303</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create'>create</span><span class='lparen'>(</span><span class='id identifier rubyid_model_class'>model_class</span><span class='comma'>,</span> <span class='id identifier rubyid_create_params'>create_params</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>you must override #create in an adapter subclass</span><span class='tstring_end'>&#39;</span></span>
@@ -1162,15 +1186,167 @@ your sideload configuration:</p>
       <pre class="lines">
 
 
-291
-292
-293</pre>
+331
+332
+333</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/abstract.rb', line 291</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/abstract.rb', line 331</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_destroy'>destroy</span><span class='lparen'>(</span><span class='id identifier rubyid_model_class'>model_class</span><span class='comma'>,</span> <span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>you must override #destroy in an adapter subclass</span><span class='tstring_end'>&#39;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="disassociate-instance_method">
+  
+    #<strong>disassociate</strong>(parent, child, association_name, association_type)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Remove the association without destroying objects</p>
+
+<p>This is NOT needed in the standard use case. The standard use case would
+be:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='kw'>def</span> <span class='id identifier rubyid_update'>update</span><span class='lparen'>(</span><span class='id identifier rubyid_attrs'>attrs</span><span class='rparen'>)</span>
+  <span class='comment'># attrs[:the_foreign_key] is nil, so updating the record disassociates
+</span><span class='kw'>end</span>
+</code></pre>
+
+<p>However, sometimes you need side-effect or elsewise non-standard behavior.
+Consider using <a href="{https://github.com/mbleigh/acts-as-taggable-on" target="_parent" title="acts_as_taggable_on">acts_as_taggable_on</a>} gem:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'># Not actually needed, just an example
+</span><span class='kw'>def</span> <span class='id identifier rubyid_disassociate'>disassociate</span><span class='lparen'>(</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='id identifier rubyid_child'>child</span><span class='comma'>,</span> <span class='id identifier rubyid_association_name'>association_name</span><span class='comma'>,</span> <span class='id identifier rubyid_association_type'>association_type</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_parent'>parent</span><span class='period'>.</span><span class='id identifier rubyid_tag_list'>tag_list</span><span class='period'>.</span><span class='id identifier rubyid_remove'>remove</span><span class='lparen'>(</span><span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<p><code>association_name</code> and <code>association_type</code> come from
+your sideload configuration:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_allow_sideload'>allow_sideload</span> <span class='symbol'>:the_name</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='id identifier rubyid_the_type'>the_type</span> <span class='kw'>do</span>
+  <span class='comment'># ... code.
+</span><span class='kw'>end</span>
+</code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+        <p class="example_title"><div class='inline'>
+<p>Basic accessor</p>
+</div></p>
+      
+      <pre class="example code"><code><span class='kw'>def</span> <span class='id identifier rubyid_disassociate'>disassociate</span><span class='lparen'>(</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='id identifier rubyid_child'>child</span><span class='comma'>,</span> <span class='id identifier rubyid_association_name'>association_name</span><span class='comma'>,</span> <span class='id identifier rubyid_association_type'>association_type</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_association_type'>association_type</span> <span class='op'>==</span> <span class='symbol'>:has_many</span>
+    <span class='id identifier rubyid_parent'>parent</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='id identifier rubyid_association_name'>association_name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='id identifier rubyid_child'>child</span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:#{</span><span class='id identifier rubyid_association_name'>association_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>=</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>parent</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The parent object (via the JSONAPI &#39;relationships&#39; graph)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>child</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The child object (via the JSONAPI &#39;relationships&#39; graph)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>association_name</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The &#39;relationships&#39; key we are processing</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>association_type</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The Sideload type (see Sideload#type). Usually :has_many/:belongs_to/etc</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+276
+277
+278</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/abstract.rb', line 276</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_disassociate'>disassociate</span><span class='lparen'>(</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='id identifier rubyid_child'>child</span><span class='comma'>,</span> <span class='id identifier rubyid_association_name'>association_name</span><span class='comma'>,</span> <span class='id identifier rubyid_association_type'>association_type</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>you must override #disassociate in an adapter subclass</span><span class='tstring_end'>&#39;</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1943,12 +2119,12 @@ Sideload#allow_sideload</p>
       <pre class="lines">
 
 
-249
-250
-251</pre>
+289
+290
+291</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/abstract.rb', line 249</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/abstract.rb', line 289</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sideloading_module'>sideloading_module</span>
   <span class='const'>Module</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
@@ -2255,12 +2431,12 @@ This method should roll back the transaction if an error is raised.</p>
       <pre class="lines">
 
 
-277
-278
-279</pre>
+317
+318
+319</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/abstract.rb', line 277</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/adapters/abstract.rb', line 317</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_update'>update</span><span class='lparen'>(</span><span class='id identifier rubyid_model_class'>model_class</span><span class='comma'>,</span> <span class='id identifier rubyid_update_params'>update_params</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>you must override #update in an adapter subclass</span><span class='tstring_end'>&#39;</span></span>
@@ -2275,7 +2451,7 @@ This method should roll back the transaction if an error is raised.</p>
 </div>
 
       <div id="footer">
-  Generated on Wed Jun  7 10:15:10 2017 by
+  Generated on Thu Sep 28 17:28:11 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>

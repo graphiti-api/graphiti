@@ -132,7 +132,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(resource, meta, attributes, relationships)  &#x21d2; Persistence </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(resource, meta, attributes, relationships, caller_model)  &#x21d2; Persistence </a>
     
 
     
@@ -188,7 +188,7 @@
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(resource, meta, attributes, relationships)  &#x21d2; <tt><span class='object_link'><a href="" title="JsonapiCompliable::Util::Persistence (class)">Persistence</a></span></tt> 
+    #<strong>initialize</strong>(resource, meta, attributes, relationships, caller_model)  &#x21d2; <tt><span class='object_link'><a href="" title="JsonapiCompliable::Util::Persistence (class)">Persistence</a></span></tt> 
   
 
   
@@ -288,16 +288,18 @@
 10
 11
 12
-13</pre>
+13
+14</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/util/persistence.rb', line 8</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_resource'>resource</span><span class='comma'>,</span> <span class='id identifier rubyid_meta'>meta</span><span class='comma'>,</span> <span class='id identifier rubyid_attributes'>attributes</span><span class='comma'>,</span> <span class='id identifier rubyid_relationships'>relationships</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_resource'>resource</span><span class='comma'>,</span> <span class='id identifier rubyid_meta'>meta</span><span class='comma'>,</span> <span class='id identifier rubyid_attributes'>attributes</span><span class='comma'>,</span> <span class='id identifier rubyid_relationships'>relationships</span><span class='comma'>,</span> <span class='id identifier rubyid_caller_model'>caller_model</span><span class='rparen'>)</span>
   <span class='ivar'>@resource</span>      <span class='op'>=</span> <span class='id identifier rubyid_resource'>resource</span>
   <span class='ivar'>@meta</span>          <span class='op'>=</span> <span class='id identifier rubyid_meta'>meta</span>
   <span class='ivar'>@attributes</span>    <span class='op'>=</span> <span class='id identifier rubyid_attributes'>attributes</span>
   <span class='ivar'>@relationships</span> <span class='op'>=</span> <span class='id identifier rubyid_relationships'>relationships</span>
+  <span class='ivar'>@caller_model</span>  <span class='op'>=</span> <span class='id identifier rubyid_caller_model'>caller_model</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -348,6 +350,8 @@ know the primary key value of the parent before persisting the child.</p>
 </li><li>
 <p>associate children</p>
 </li><li>
+<p>run post-process sideload hooks</p>
+</li><li>
 <p>return current object</p>
 </li></ul>
 
@@ -381,8 +385,6 @@ know the primary key value of the parent before persisting the child.</p>
       <pre class="lines">
 
 
-32
-33
 34
 35
 36
@@ -395,10 +397,15 @@ know the primary key value of the parent before persisting the child.</p>
 43
 44
 45
-46</pre>
+46
+47
+48
+49
+50
+51</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/util/persistence.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/util/persistence.rb', line 34</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span>
   <span class='id identifier rubyid_parents'>parents</span> <span class='op'>=</span> <span class='id identifier rubyid_process_belongs_to'>process_belongs_to</span><span class='lparen'>(</span><span class='ivar'>@relationships</span><span class='rparen'>)</span>
@@ -406,14 +413,17 @@ know the primary key value of the parent before persisting the child.</p>
 
   <span class='id identifier rubyid_persisted'>persisted</span> <span class='op'>=</span> <span class='id identifier rubyid_persist_object'>persist_object</span><span class='lparen'>(</span><span class='ivar'>@meta</span><span class='lbracket'>[</span><span class='symbol'>:method</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='ivar'>@attributes</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_assign_temp_id'>assign_temp_id</span><span class='lparen'>(</span><span class='id identifier rubyid_persisted'>persisted</span><span class='comma'>,</span> <span class='ivar'>@meta</span><span class='lbracket'>[</span><span class='symbol'>:temp_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+
   <span class='id identifier rubyid_associate_parents'>associate_parents</span><span class='lparen'>(</span><span class='id identifier rubyid_persisted'>persisted</span><span class='comma'>,</span> <span class='id identifier rubyid_parents'>parents</span><span class='rparen'>)</span>
 
-  <span class='id identifier rubyid_children'>children</span> <span class='op'>=</span> <span class='id identifier rubyid_process_has_many'>process_has_many</span><span class='lparen'>(</span><span class='ivar'>@relationships</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_x'>x</span><span class='op'>|</span>
+  <span class='id identifier rubyid_children'>children</span> <span class='op'>=</span> <span class='id identifier rubyid_process_has_many'>process_has_many</span><span class='lparen'>(</span><span class='ivar'>@relationships</span><span class='comma'>,</span> <span class='id identifier rubyid_persisted'>persisted</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_x'>x</span><span class='op'>|</span>
     <span class='id identifier rubyid_update_foreign_key'>update_foreign_key</span><span class='lparen'>(</span><span class='id identifier rubyid_persisted'>persisted</span><span class='comma'>,</span> <span class='id identifier rubyid_x'>x</span><span class='lbracket'>[</span><span class='symbol'>:attributes</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_x'>x</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
 
-  <span class='id identifier rubyid_associate_children'>associate_children</span><span class='lparen'>(</span><span class='id identifier rubyid_persisted'>persisted</span><span class='comma'>,</span> <span class='id identifier rubyid_children'>children</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_persisted'>persisted</span> <span class='kw'>unless</span> <span class='ivar'>@meta</span><span class='lbracket'>[</span><span class='symbol'>:method</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:destroy</span>
+  <span class='id identifier rubyid_associate_children'>associate_children</span><span class='lparen'>(</span><span class='id identifier rubyid_persisted'>persisted</span><span class='comma'>,</span> <span class='id identifier rubyid_children'>children</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='ivar'>@meta</span><span class='lbracket'>[</span><span class='symbol'>:method</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:destroy</span>
+  <span class='id identifier rubyid_post_process'>post_process</span><span class='lparen'>(</span><span class='id identifier rubyid_persisted'>persisted</span><span class='comma'>,</span> <span class='id identifier rubyid_parents'>parents</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_post_process'>post_process</span><span class='lparen'>(</span><span class='id identifier rubyid_persisted'>persisted</span><span class='comma'>,</span> <span class='id identifier rubyid_children'>children</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_persisted'>persisted</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -425,7 +435,7 @@ know the primary key value of the parent before persisting the child.</p>
 </div>
 
       <div id="footer">
-  Generated on Wed Jun  7 10:15:10 2017 by
+  Generated on Thu Sep 28 17:28:11 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>

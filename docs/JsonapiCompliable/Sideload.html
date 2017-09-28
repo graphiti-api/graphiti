@@ -100,6 +100,16 @@
 </div>
 
 
+  <h2>Constant Summary</h2>
+  <dl class="constants">
+    
+      <dt id="HOOK_ACTIONS-constant" class="">HOOK_ACTIONS =
+        
+      </dt>
+      <dd><pre class="code"><span class='lbracket'>[</span><span class='symbol'>:save</span><span class='comma'>,</span> <span class='symbol'>:create</span><span class='comma'>,</span> <span class='symbol'>:update</span><span class='comma'>,</span> <span class='symbol'>:destroy</span><span class='comma'>,</span> <span class='symbol'>:disassociate</span><span class='rbracket'>]</span></pre></dd>
+    
+  </dl>
+
 
 
 
@@ -463,11 +473,114 @@ key.</p>
 
   
     <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#max_depth-class_method" title="max_depth (class method)">.<strong>max_depth</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#max_depth=-class_method" title="max_depth= (class method)">.<strong>max_depth=</strong>(val)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Set maximum levels of sideload recursion /authors?comments.authors would be
+one level /authors?comments.authors.comments.authors would be two levels
+etc.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
       Instance Method Summary
       <small><a href="#" class="summary_toggle">collapse</a></small>
     </h2>
 
     <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#after_save-instance_method" title="#after_save (instance method)">#<strong>after_save</strong>(only: [], except: [], &amp;blk)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Configure post-processing hooks.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#all_sideloads-instance_method" title="#all_sideloads (instance method)">#<strong>all_sideloads</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
       
         <li class="public ">
   <span class="summary_signature">
@@ -531,12 +644,58 @@ key.</p>
   
   
   
-  
+  <span class="private note title">private</span>
 
   
     <span class="summary_desc"><div class='inline'>
 <p>Configure how to associate parent and child records.</p>
 </div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#disassociate-instance_method" title="#disassociate (instance method)">#<strong>disassociate</strong>(parent, child)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Configure how to disassociate parent and child records.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#fire_hooks!-instance_method" title="#fire_hooks! (instance method)">#<strong>fire_hooks!</strong>(parent, objects, method)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -560,6 +719,30 @@ key.</p>
   
     <span class="summary_desc"><div class='inline'>
 <p>Define an attribute that groups the parent records.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#hooks-instance_method" title="#hooks (instance method)">#<strong>hooks</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Get the hooks the user has configured.</p>
 </div></span>
   
 </li>
@@ -738,7 +921,7 @@ will be further chained with filtering/sorting/etc.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#to_hash-instance_method" title="#to_hash (instance method)">#<strong>to_hash</strong>(processed = [])  &#x21d2; Hash </a>
+      <a href="#to_hash-instance_method" title="#to_hash (instance method)">#<strong>to_hash</strong>(depth_chain = [], parent = nil)  &#x21d2; Hash </a>
     
 
     
@@ -1561,12 +1744,251 @@ key.</p>
   </div>
 
 
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="max_depth-class_method">
+  
+    .<strong>max_depth</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+47
+48
+49</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 47</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_max_depth'>max_depth</span>
+  <span class='ivar'>@max_depth</span> <span class='op'>||</span> <span class='int'>2</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="max_depth=-class_method">
+  
+    .<strong>max_depth=</strong>(val)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Set maximum levels of sideload recursion /authors?comments.authors would be
+one level /authors?comments.authors.comments.authors would be two levels
+etc</p>
+
+<p>Default max depth is 2</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+57
+58
+59</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 57</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_max_depth='>max_depth=</span><span class='lparen'>(</span><span class='id identifier rubyid_val'>val</span><span class='rparen'>)</span>
+  <span class='ivar'>@max_depth</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
   <div id="instance_method_details" class="method_details_list">
     <h2>Instance Method Details</h2>
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="allow_sideload-instance_method">
+  <h3 class="signature first" id="after_save-instance_method">
+  
+    #<strong>after_save</strong>(only: [], except: [], &amp;blk)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Configure post-processing hooks</p>
+
+<p>In particular, helpful for bulk operations. “after_save” will fire for any
+persistence method - <code>:create</code>, <code>:update</code>,
+<code>:destroy</code>, <code>:disassociate</code>. Use “only” and “except”
+keyword arguments to fire only for a specific persistence method.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+        <p class="example_title"><div class='inline'>
+<p>Bulk Notify Users on Invite</p>
+</div></p>
+      
+      <pre class="example code"><code><span class='kw'>class</span> <span class='const'>ProjectResource</span> <span class='op'>&lt;</span> <span class='const'>ApplicationResource</span>
+  <span class='comment'># ... code ...
+</span>  <span class='id identifier rubyid_allow_sideload'>allow_sideload</span> <span class='symbol'>:users</span><span class='comma'>,</span> <span class='label'>resource:</span> <span class='const'>UserResource</span> <span class='kw'>do</span>
+    <span class='comment'># scope {}
+</span>    <span class='comment'># assign {}
+</span>    <span class='id identifier rubyid_after_save'>after_save</span> <span class='label'>only:</span> <span class='lbracket'>[</span><span class='symbol'>:create</span><span class='rbracket'>]</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_project'>project</span><span class='comma'>,</span> <span class='id identifier rubyid_users'>users</span><span class='op'>|</span>
+      <span class='const'>UserMailer</span><span class='period'>.</span><span class='id identifier rubyid_invite'>invite</span><span class='lparen'>(</span><span class='id identifier rubyid_project'>project</span><span class='comma'>,</span> <span class='id identifier rubyid_users'>users</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_deliver_later'>deliver_later</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="#hooks-instance_method" title="JsonapiCompliable::Sideload#hooks (method)">#hooks</a></span></li>
+    
+      <li><span class='object_link'><a href="Util/Persistence.html" title="JsonapiCompliable::Util::Persistence (class)">Util::Persistence</a></span></li>
+    
+  </ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+232
+233
+234
+235
+236
+237
+238
+239</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 232</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_after_save'>after_save</span><span class='lparen'>(</span><span class='label'>only:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>except:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_blk'>blk</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_actions'>actions</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#HOOK_ACTIONS-constant" title="JsonapiCompliable::Sideload::HOOK_ACTIONS (constant)">HOOK_ACTIONS</a></span></span> <span class='op'>-</span> <span class='id identifier rubyid_except'>except</span>
+  <span class='id identifier rubyid_actions'>actions</span> <span class='op'>=</span> <span class='id identifier rubyid_only'>only</span> <span class='op'>&amp;</span> <span class='id identifier rubyid_actions'>actions</span>
+  <span class='id identifier rubyid_actions'>actions</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='symbol'>:save</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_only'>only</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_except'>except</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+  <span class='id identifier rubyid_actions'>actions</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_a'>a</span><span class='op'>|</span>
+    <span class='id identifier rubyid_hooks'>hooks</span><span class='lbracket'>[</span><span class='symbol'>:after_</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_a'>a</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_blk'>blk</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="all_sideloads-instance_method">
+  
+    #<strong>all_sideloads</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 350</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_all_sideloads'>all_sideloads</span>
+  <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_all'>all</span><span class='op'>|</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_polymorphic?'>polymorphic?</span>
+      <span class='id identifier rubyid_polymorphic_groups'>polymorphic_groups</span><span class='period'>.</span><span class='id identifier rubyid_each_pair'>each_pair</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='id identifier rubyid_sl'>sl</span><span class='op'>|</span>
+        <span class='id identifier rubyid_all'>all</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='id identifier rubyid_sl'>sl</span><span class='period'>.</span><span class='id identifier rubyid_resource'>resource</span><span class='period'>.</span><span class='id identifier rubyid_sideloading'>sideloading</span><span class='period'>.</span><span class='id identifier rubyid_all_sideloads'>all_sideloads</span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_all'>all</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='ivar'>@sideloads</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_resource'>resource</span><span class='period'>.</span><span class='id identifier rubyid_sideloading'>sideloading</span><span class='period'>.</span><span class='id identifier rubyid_sideloads'>sideloads</span><span class='rparen'>)</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="allow_sideload-instance_method">
   
     #<strong>allow_sideload</strong>(name, opts = {}, &amp;blk)  &#x21d2; <tt>Object</tt> 
   
@@ -1661,19 +2083,19 @@ directly</p>
       <pre class="lines">
 
 
-270
-271
-272
-273
-274
-275
-276
-277
-278
-279</pre>
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 270</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 330</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_allow_sideload'>allow_sideload</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_opts'>opts</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_blk'>blk</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_sideload'>sideload</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="" title="JsonapiCompliable::Sideload (class)">Sideload</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="JsonapiCompliable::Sideload#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
@@ -1804,12 +2226,12 @@ in your resource directly.</p>
       <pre class="lines">
 
 
-168
-169
-170</pre>
+183
+184
+185</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 168</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 183</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_assign'>assign</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_blk'>blk</span><span class='rparen'>)</span>
   <span class='ivar'>@assign_proc</span> <span class='op'>=</span> <span class='id identifier rubyid_blk'>blk</span>
@@ -1830,32 +2252,18 @@ in your resource directly.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Configure how to associate parent and child records.</p>
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+
+<p>Configure how to associate parent and child records. Delegates to #resource</p>
 
 
   </div>
 </div>
 <div class="tags">
   
-  <div class="examples">
-    <p class="tag_title">Examples:</p>
-    
-      
-        <p class="example_title"><div class='inline'>
-<p>Basic attr_accessor</p>
-</div></p>
-      
-      <pre class="example code"><code><span class='kw'>def</span> <span class='id identifier rubyid_associate'>associate</span><span class='lparen'>(</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='id identifier rubyid_child'>child</span><span class='rparen'>)</span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_type'>type</span> <span class='op'>==</span> <span class='symbol'>:has_many</span>
-    <span class='id identifier rubyid_parent'>parent</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_child'>child</span><span class='rparen'>)</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_child'>child</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>=</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_parent'>parent</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-<span class='kw'>end</span></code></pre>
-    
-  </div>
-
 
   <p class="tag_title">See Also:</p>
   <ul class="see">
@@ -1872,23 +2280,114 @@ in your resource directly.</p>
       <pre class="lines">
 
 
-185
-186
-187
-188
-189
-190
-191</pre>
+193
+194
+195
+196</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 185</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 193</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_associate'>associate</span><span class='lparen'>(</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='id identifier rubyid_child'>child</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_association_name'>association_name</span> <span class='op'>=</span> <span class='ivar'>@parent</span> <span class='op'>?</span> <span class='ivar'>@parent</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>:</span> <span class='id identifier rubyid_name'>name</span>
-  <span class='id identifier rubyid_resource_class'>resource_class</span><span class='period'>.</span><span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:adapter</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_associate'>associate</span> <span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span>
-    <span class='id identifier rubyid_child'>child</span><span class='comma'>,</span>
-    <span class='id identifier rubyid_association_name'>association_name</span><span class='comma'>,</span>
-    <span class='id identifier rubyid_type'>type</span>
+  <span class='id identifier rubyid_resource'>resource</span><span class='period'>.</span><span class='id identifier rubyid_associate'>associate</span><span class='lparen'>(</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='id identifier rubyid_child'>child</span><span class='comma'>,</span> <span class='id identifier rubyid_association_name'>association_name</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="disassociate-instance_method">
+  
+    #<strong>disassociate</strong>(parent, child)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+
+<p>Configure how to disassociate parent and child records. Delegates to
+#resource</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="#name-instance_method" title="JsonapiCompliable::Sideload#name (method)">#name</a></span></li>
+    
+      <li><span class='object_link'><a href="#type-instance_method" title="JsonapiCompliable::Sideload#type (method)">#type</a></span></li>
+    
+  </ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+204
+205
+206
+207</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 204</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_disassociate'>disassociate</span><span class='lparen'>(</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='id identifier rubyid_child'>child</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_association_name'>association_name</span> <span class='op'>=</span> <span class='ivar'>@parent</span> <span class='op'>?</span> <span class='ivar'>@parent</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>:</span> <span class='id identifier rubyid_name'>name</span>
+  <span class='id identifier rubyid_resource'>resource</span><span class='period'>.</span><span class='id identifier rubyid_disassociate'>disassociate</span><span class='lparen'>(</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='id identifier rubyid_child'>child</span><span class='comma'>,</span> <span class='id identifier rubyid_association_name'>association_name</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="fire_hooks!-instance_method">
+  
+    #<strong>fire_hooks!</strong>(parent, objects, method)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+408
+409
+410
+411
+412
+413
+414
+415</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 408</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_fire_hooks!'>fire_hooks!</span><span class='lparen'>(</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='id identifier rubyid_objects'>objects</span><span class='comma'>,</span> <span class='id identifier rubyid_method'>method</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_hooks'>hooks</span>
+
+  <span class='id identifier rubyid_hooks'>hooks</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_hooks'>hooks</span><span class='lbracket'>[</span><span class='symbol'>:after_</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_method'>method</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>+</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_hooks'>hooks</span><span class='lbracket'>[</span><span class='symbol'>:after_save</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_hooks'>hooks</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_hook'>hook</span><span class='op'>|</span>
+    <span class='id identifier rubyid_resource'>resource</span><span class='period'>.</span><span class='id identifier rubyid_instance_exec'>instance_exec</span><span class='lparen'>(</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='id identifier rubyid_objects'>objects</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_hook'>hook</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1937,15 +2436,91 @@ and <code>parent_type</code>. We would want to group on
       <pre class="lines">
 
 
-203
-204
-205</pre>
+263
+264
+265</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 203</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 263</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_group_by'>group_by</span><span class='lparen'>(</span><span class='id identifier rubyid_grouping_field'>grouping_field</span><span class='rparen'>)</span>
   <span class='ivar'>@grouping_field</span> <span class='op'>=</span> <span class='id identifier rubyid_grouping_field'>grouping_field</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="hooks-instance_method">
+  
+    #<strong>hooks</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Get the hooks the user has configured</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'>
+<p>hash of hooks, ie <tt>{ after_create: #&lt;Proc&gt;}</tt></p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="#after_save-instance_method" title="JsonapiCompliable::Sideload#after_save (method)">#after_save</a></span></li>
+    
+  </ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+244
+245
+246
+247
+248
+249
+250
+251</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 244</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_hooks'>hooks</span>
+  <span class='ivar'>@hooks</span> <span class='op'>||=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_h'>h</span><span class='op'>|</span>
+    <span class='const'><span class='object_link'><a href="#HOOK_ACTIONS-constant" title="JsonapiCompliable::Sideload::HOOK_ACTIONS (constant)">HOOK_ACTIONS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_a'>a</span><span class='op'>|</span>
+      <span class='id identifier rubyid_h'>h</span><span class='lbracket'>[</span><span class='symbol'>:after_</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_a'>a</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+      <span class='id identifier rubyid_h'>h</span><span class='lbracket'>[</span><span class='symbol'>:before_</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_a'>a</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2039,12 +2614,12 @@ ActiveRecord:</p>
       <pre class="lines">
 
 
-91
-92
-93</pre>
+106
+107
+108</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 91</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 106</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_polymorphic?'>polymorphic?</span>
   <span class='ivar'>@polymorphic</span> <span class='op'>==</span> <span class='kw'>true</span>
@@ -2082,18 +2657,18 @@ ActiveRecord:</p>
       <pre class="lines">
 
 
-333
-334
-335
-336
-337</pre>
+402
+403
+404
+405
+406</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 333</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 402</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_polymorphic_child_for_type'>polymorphic_child_for_type</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_polymorphic_groups'>polymorphic_groups</span><span class='period'>.</span><span class='id identifier rubyid_values'>values</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_v'>v</span><span class='op'>|</span>
-    <span class='id identifier rubyid_v'>v</span><span class='period'>.</span><span class='id identifier rubyid_resource_class'>resource_class</span><span class='period'>.</span><span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='id identifier rubyid_type'>type</span>
+    <span class='id identifier rubyid_v'>v</span><span class='period'>.</span><span class='id identifier rubyid_resource_class'>resource_class</span><span class='period'>.</span><span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2205,18 +2780,18 @@ ActiveRecord:</p>
       <pre class="lines">
 
 
-222
-223
-224
-225
-226
-227
-228
-229
-230</pre>
+282
+283
+284
+285
+286
+287
+288
+289
+290</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 222</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 282</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='lparen'>(</span><span class='id identifier rubyid_parents'>parents</span><span class='comma'>,</span> <span class='id identifier rubyid_query'>query</span><span class='comma'>,</span> <span class='id identifier rubyid_namespace'>namespace</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_namespace'>namespace</span> <span class='op'>||=</span> <span class='id identifier rubyid_name'>name</span>
@@ -2283,12 +2858,12 @@ ActiveRecord:</p>
       <pre class="lines">
 
 
-48
-49
-50</pre>
+63
+64
+65</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 48</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 63</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resource'>resource</span>
   <span class='ivar'>@resource</span> <span class='op'>||=</span> <span class='id identifier rubyid_resource_class'>resource_class</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
@@ -2403,12 +2978,12 @@ in your resource directly.</p>
       <pre class="lines">
 
 
-131
-132
-133</pre>
+146
+147
+148</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 131</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 146</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_scope'>scope</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_blk'>blk</span><span class='rparen'>)</span>
   <span class='ivar'>@scope_proc</span> <span class='op'>=</span> <span class='id identifier rubyid_blk'>blk</span>
@@ -2489,12 +3064,12 @@ in your resource directly.</p>
       <pre class="lines">
 
 
-285
-286
-287</pre>
+345
+346
+347</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 285</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 345</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sideload'>sideload</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='ivar'>@sideloads</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span>
@@ -2507,7 +3082,7 @@ in your resource directly.</p>
       <div class="method_details ">
   <h3 class="signature " id="to_hash-instance_method">
   
-    #<strong>to_hash</strong>(processed = [])  &#x21d2; <tt>Hash</tt> 
+    #<strong>to_hash</strong>(depth_chain = [], parent = nil)  &#x21d2; <tt>Hash</tt> 
   
 
   
@@ -2573,47 +3148,39 @@ corresponding Resources, and returns an Include Directive hash</p>
       <pre class="lines">
 
 
-312
-313
-314
-315
-316
-317
-318
-319
-320
-321
-322
-323
-324
-325
-326
-327
-328
-329
-330</pre>
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 312</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 385</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_to_hash'>to_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_processed'>processed</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='rbrace'>}</span> <span class='kw'>if</span> <span class='id identifier rubyid_processed'>processed</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_processed'>processed</span> <span class='op'>&lt;&lt;</span> <span class='kw'>self</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_to_hash'>to_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_depth_chain'>depth_chain</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_parent'>parent</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_depth'>depth</span> <span class='op'>=</span> <span class='id identifier rubyid_depth_chain'>depth_chain</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_arr'>arr</span><span class='op'>|</span> <span class='id identifier rubyid_arr'>arr</span> <span class='op'>==</span> <span class='lbracket'>[</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='kw'>self</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+  <span class='kw'>return</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='kw'>if</span> <span class='id identifier rubyid_depth'>depth</span> <span class='op'>&gt;=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_max_depth'>max_depth</span>
 
-  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_hash'>hash</span><span class='op'>|</span>
-    <span class='ivar'>@sideloads</span><span class='period'>.</span><span class='id identifier rubyid_each_pair'>each_pair</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_sideload'>sideload</span><span class='op'>|</span>
-      <span class='id identifier rubyid_hash'>hash</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_sideload'>sideload</span><span class='period'>.</span><span class='id identifier rubyid_to_hash'>to_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_processed'>processed</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='kw'>unless</span> <span class='lparen'>(</span><span class='id identifier rubyid_parent'>parent</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_parent'>parent</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>==</span> <span class='symbol'>:base</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>==</span> <span class='symbol'>:base</span>
+    <span class='id identifier rubyid_depth_chain'>depth_chain</span> <span class='op'>+=</span> <span class='lbracket'>[</span><span class='lbracket'>[</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='kw'>self</span><span class='rbracket'>]</span><span class='rbracket'>]</span>
+  <span class='kw'>end</span>
 
-      <span class='kw'>if</span> <span class='id identifier rubyid_sideload'>sideload</span><span class='period'>.</span><span class='id identifier rubyid_polymorphic?'>polymorphic?</span>
-        <span class='id identifier rubyid_sideload'>sideload</span><span class='period'>.</span><span class='id identifier rubyid_polymorphic_groups'>polymorphic_groups</span><span class='period'>.</span><span class='id identifier rubyid_each_pair'>each_pair</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='id identifier rubyid_sl'>sl</span><span class='op'>|</span>
-          <span class='id identifier rubyid_hash'>hash</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='id identifier rubyid_nested_sideload_hash'>nested_sideload_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_sl'>sl</span><span class='comma'>,</span> <span class='id identifier rubyid_processed'>processed</span><span class='rparen'>)</span><span class='rparen'>)</span>
-        <span class='kw'>end</span>
-      <span class='kw'>else</span>
-        <span class='id identifier rubyid_hash'>hash</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='id identifier rubyid_nested_sideload_hash'>nested_sideload_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_sideload'>sideload</span><span class='comma'>,</span> <span class='id identifier rubyid_processed'>processed</span><span class='rparen'>)</span><span class='rparen'>)</span>
-      <span class='kw'>end</span>
+  <span class='lbrace'>{</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_hash'>hash</span><span class='op'>|</span>
+    <span class='id identifier rubyid_all_sideloads'>all_sideloads</span><span class='period'>.</span><span class='id identifier rubyid_each_pair'>each_pair</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_sl'>sl</span><span class='op'>|</span>
+      <span class='id identifier rubyid_sideload_hash'>sideload_hash</span> <span class='op'>=</span> <span class='id identifier rubyid_sl'>sl</span><span class='period'>.</span><span class='id identifier rubyid_to_hash'>to_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_depth_chain'>depth_chain</span><span class='comma'>,</span> <span class='kw'>self</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_hash'>hash</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='id identifier rubyid_sideload_hash'>sideload_hash</span><span class='rparen'>)</span>
     <span class='kw'>end</span>
   <span class='kw'>end</span>
-  <span class='id identifier rubyid_result'>result</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2625,7 +3192,7 @@ corresponding Resources, and returns an Include Directive hash</p>
 </div>
 
       <div id="footer">
-  Generated on Wed Jun  7 10:15:10 2017 by
+  Generated on Thu Sep 28 17:28:11 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>

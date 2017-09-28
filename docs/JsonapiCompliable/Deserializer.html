@@ -438,13 +438,15 @@ include directive like.</p>
 50
 51
 52
-53</pre>
+53
+54</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 50</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_payload'>payload</span><span class='comma'>,</span> <span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span>
   <span class='ivar'>@payload</span> <span class='op'>=</span> <span class='id identifier rubyid_payload'>payload</span>
+  <span class='ivar'>@payload</span> <span class='op'>=</span> <span class='ivar'>@payload</span><span class='lbracket'>[</span><span class='symbol'>:_jsonapi</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='ivar'>@payload</span><span class='period'>.</span><span class='id identifier rubyid_has_key?'>has_key?</span><span class='lparen'>(</span><span class='symbol'>:_jsonapi</span><span class='rparen'>)</span>
   <span class='ivar'>@env</span> <span class='op'>=</span> <span class='id identifier rubyid_env'>env</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -503,14 +505,14 @@ include directive like.</p>
       <pre class="lines">
 
 
-66
 67
 68
 69
-70</pre>
+70
+71</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 66</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 67</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_attributes'>attributes</span>
   <span class='ivar'>@attributes</span> <span class='op'>||=</span> <span class='id identifier rubyid_raw_attributes'>raw_attributes</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_hash'>hash</span><span class='op'>|</span>
@@ -548,12 +550,12 @@ include directive like.</p>
       <pre class="lines">
 
 
-74
 75
-76</pre>
+76
+77</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 74</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 75</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_attributes='>attributes=</span><span class='lparen'>(</span><span class='id identifier rubyid_attrs'>attrs</span><span class='rparen'>)</span>
   <span class='ivar'>@attributes</span> <span class='op'>=</span> <span class='id identifier rubyid_attrs'>attrs</span>
@@ -607,12 +609,12 @@ include directive like.</p>
       <pre class="lines">
 
 
-56
 57
-58</pre>
+58
+59</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 56</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 57</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_data'>data</span>
   <span class='ivar'>@payload</span><span class='lbracket'>[</span><span class='symbol'>:data</span><span class='rbracket'>]</span>
@@ -666,12 +668,12 @@ include directive like.</p>
       <pre class="lines">
 
 
-61
 62
-63</pre>
+63
+64</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 61</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 62</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_id'>id</span>
   <span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span>
@@ -732,7 +734,6 @@ include directive.</p>
       <pre class="lines">
 
 
-107
 108
 109
 110
@@ -740,10 +741,11 @@ include directive.</p>
 112
 113
 114
-115</pre>
+115
+116</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 107</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 108</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_include_directive'>include_directive</span><span class='lparen'>(</span><span class='id identifier rubyid_memo'>memo</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='id identifier rubyid_relationship_node'>relationship_node</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_relationship_node'>relationship_node</span> <span class='op'>||=</span> <span class='id identifier rubyid_relationships'>relationships</span>
@@ -803,16 +805,16 @@ create/update/destroy/disassociate. Based on the request env or the
       <pre class="lines">
 
 
-85
 86
 87
 88
 89
 90
-91</pre>
+91
+92</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 85</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 86</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_meta'>meta</span>
   <span class='lbrace'>{</span>
@@ -870,12 +872,12 @@ create/update/destroy/disassociate. Based on the request env or the
       <pre class="lines">
 
 
-94
 95
-96</pre>
+96
+97</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 94</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/deserializer.rb', line 95</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_relationships'>relationships</span>
   <span class='ivar'>@relationships</span> <span class='op'>||=</span> <span class='id identifier rubyid_process_relationships'>process_relationships</span><span class='lparen'>(</span><span class='id identifier rubyid_raw_relationships'>raw_relationships</span><span class='rparen'>)</span>
@@ -890,7 +892,7 @@ create/update/destroy/disassociate. Based on the request env or the
 </div>
 
       <div id="footer">
-  Generated on Wed Jun  7 10:15:10 2017 by
+  Generated on Thu Sep 28 17:28:11 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>
