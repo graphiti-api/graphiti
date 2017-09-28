@@ -47,6 +47,7 @@ module JsonapiCompliable
           type     = relationship_payload[:meta][:jsonapi_type]
           sideload = sideload.polymorphic_child_for_type(type)
         end
+        relationship_payload[:meta][:method] ||= :update
 
         {
           sideload: sideload,

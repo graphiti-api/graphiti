@@ -172,34 +172,118 @@ RSpec.describe JsonapiCompliable::Sideload do
   end
 
   describe '#to_hash' do
-    # Set this up to catch any recursive trap
-    let(:resource) do
-      resource = JsonapiCompliable::Resource
-      resource.allow_sideload :bing, resource: JsonapiCompliable::Resource
-      resource
-    end
-
     before do
-      resource = JsonapiCompliable::Resource
-      instance.allow_sideload :bar, resource: resource do
-        allow_sideload :baz, resource: resource do
-          allow_sideload :bazoo, resource: resource
-        end
-      end
-      instance.allow_sideload :blah, resource: resource
+      stub_const('ResourceA', Class.new(JsonapiCompliable::Resource))
+      stub_const('ResourceB', Class.new(JsonapiCompliable::Resource))
+      stub_const('ResourceC', Class.new(JsonapiCompliable::Resource))
+      stub_const('ResourceD', Class.new(JsonapiCompliable::Resource))
+      stub_const('ResourceE', Class.new(JsonapiCompliable::Resource))
     end
 
-    it 'recursively builds a hash of sideloads' do
-      expect(instance.to_hash).to eq({
-        foo: {
-          bar: {
-            baz: {
-              bazoo: {}
+    around do |e|
+      original = JsonapiCompliable::Sideload.max_depth
+      JsonapiCompliable::Sideload.max_depth = 5
+      e.run
+      JsonapiCompliable::Sideload.max_depth = original
+    end
+
+    subject { ResourceA.new.sideloading.to_hash[:base] }
+
+    context 'when simple' do
+      before do
+        ResourceA.allow_sideload :b, resource: ResourceB
+        ResourceB.allow_sideload :c, resource: ResourceC
+        ResourceC.allow_sideload :d, resource: ResourceD
+      end
+
+      it 'returns all sideloads in a nested hash' do
+        expect(subject).to eq(b: { c: { d: {} } })
+      end
+    end
+
+    context 'when recursive' do
+      before do
+        ResourceA.allow_sideload :b, resource: ResourceB
+        ResourceB.allow_sideload :a, resource: ResourceA
+      end
+
+      it 'allows 5 levels of recursion' do
+        expect(subject).to eq({
+          b: {
+            a: { # one
+              b: {
+                a: { # two
+                  b: {
+                    a: { # three
+                      b: {
+                        a: { # four
+                          b: {
+                            a: { # five
+                              b: {}
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
-          },
-          blah: {}
-        }
-      })
+          }
+        })
+      end
+    end
+
+    context 'when polymorphic' do
+      before do
+        ResourceA.allow_sideload :polly, polymorphic: true do
+          allow_sideload 'WhenTypeB', resource: ResourceB
+          allow_sideload 'WhenTypeC', resource: ResourceC
+        end
+
+        ResourceB.allow_sideload :d, resource: ResourceD
+        ResourceC.allow_sideload :e, resource: ResourceE
+      end
+
+      it 'returns the correct nested hash' do
+        expect(subject[:polly]).to eq({
+          d: {},
+          e: {}
+        })
+      end
+    end
+
+    context 'when polymorphic AND recursive' do
+      before do
+        ResourceA.allow_sideload :polly, polymorphic: true do
+          allow_sideload 'WhenTypeB', resource: ResourceB
+        end
+        ResourceB.allow_sideload :a, resource: ResourceA
+      end
+
+      it 'allows 5 levels of recursion' do
+        expect(subject[:polly]).to eq({
+          a: { # one
+            polly: {
+              a: { # two
+                polly: {
+                  a: { # three
+                    polly: {
+                      a: { # four
+                        polly: {
+                          a: { # five
+                            polly: {}
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        })
+      end
     end
   end
 end
