@@ -15,3 +15,11 @@ install: bundle install --retry=3 --jobs=3
 gemfile:
   - gemfiles/rails_4.gemfile
   - gemfiles/rails_5.gemfile
+
+deploy:
+  provider: rubygems
+  api_key: $RUBYGEMS_API_KEY
+  gem: jsonapi_compliable
+  on:
+    tags: true
+    repo: jsonapi-suite/jsonapi_compliable
