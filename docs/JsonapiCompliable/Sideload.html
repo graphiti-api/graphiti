@@ -482,7 +482,7 @@ key.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#max_depth-class_method" title="max_depth (class method)">.<strong>max_depth</strong>  &#x21d2; Object </a>
+      <a href="#max_recursion-class_method" title="max_recursion (class method)">.<strong>max_recursion</strong>  &#x21d2; Object </a>
     
 
     
@@ -504,7 +504,7 @@ key.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#max_depth=-class_method" title="max_depth= (class method)">.<strong>max_depth=</strong>(val)  &#x21d2; Object </a>
+      <a href="#max_recursion=-class_method" title="max_recursion= (class method)">.<strong>max_recursion=</strong>(val)  &#x21d2; Object </a>
     
 
     
@@ -921,7 +921,7 @@ will be further chained with filtering/sorting/etc.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#to_hash-instance_method" title="#to_hash (instance method)">#<strong>to_hash</strong>(depth_chain = [], parent = nil)  &#x21d2; Hash </a>
+      <a href="#to_hash-instance_method" title="#to_hash (instance method)">#<strong>to_hash</strong>(recursion_chain = [], parent = nil)  &#x21d2; Hash </a>
     
 
     
@@ -1749,9 +1749,9 @@ key.</p>
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="max_depth-class_method">
+  <h3 class="signature first" id="max_recursion-class_method">
   
-    .<strong>max_depth</strong>  &#x21d2; <tt>Object</tt> 
+    .<strong>max_recursion</strong>  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -1783,8 +1783,8 @@ key.</p>
     <td>
       <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 47</span>
 
-<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_max_depth'>max_depth</span>
-  <span class='ivar'>@max_depth</span> <span class='op'>||</span> <span class='int'>2</span>
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_max_recursion'>max_recursion</span>
+  <span class='ivar'>@max_recursion</span> <span class='op'>||</span> <span class='int'>2</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1792,9 +1792,9 @@ key.</p>
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="max_depth=-class_method">
+  <h3 class="signature " id="max_recursion=-class_method">
   
-    .<strong>max_depth=</strong>(val)  &#x21d2; <tt>Object</tt> 
+    .<strong>max_recursion=</strong>(val)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -1807,7 +1807,7 @@ key.</p>
 one level /authors?comments.authors.comments.authors would be two levels
 etc</p>
 
-<p>Default max depth is 2</p>
+<p>Default max recursion is 2</p>
 
 
   </div>
@@ -1828,8 +1828,8 @@ etc</p>
     <td>
       <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 57</span>
 
-<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_max_depth='>max_depth=</span><span class='lparen'>(</span><span class='id identifier rubyid_val'>val</span><span class='rparen'>)</span>
-  <span class='ivar'>@max_depth</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span>
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_max_recursion='>max_recursion=</span><span class='lparen'>(</span><span class='id identifier rubyid_val'>val</span><span class='rparen'>)</span>
+  <span class='ivar'>@max_recursion</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2369,17 +2369,17 @@ in your resource directly.</p>
       <pre class="lines">
 
 
-408
 409
 410
 411
 412
 413
 414
-415</pre>
+415
+416</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 408</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 409</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_fire_hooks!'>fire_hooks!</span><span class='lparen'>(</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='id identifier rubyid_objects'>objects</span><span class='comma'>,</span> <span class='id identifier rubyid_method'>method</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_hooks'>hooks</span>
@@ -2657,14 +2657,14 @@ ActiveRecord:</p>
       <pre class="lines">
 
 
-402
 403
 404
 405
-406</pre>
+406
+407</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 402</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 403</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_polymorphic_child_for_type'>polymorphic_child_for_type</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_polymorphic_groups'>polymorphic_groups</span><span class='period'>.</span><span class='id identifier rubyid_values'>values</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_v'>v</span><span class='op'>|</span>
@@ -3082,7 +3082,7 @@ in your resource directly.</p>
       <div class="method_details ">
   <h3 class="signature " id="to_hash-instance_method">
   
-    #<strong>to_hash</strong>(depth_chain = [], parent = nil)  &#x21d2; <tt>Hash</tt> 
+    #<strong>to_hash</strong>(recursion_chain = [], parent = nil)  &#x21d2; <tt>Hash</tt> 
   
 
   
@@ -3162,22 +3162,24 @@ corresponding Resources, and returns an Include Directive hash</p>
 396
 397
 398
-399</pre>
+399
+400</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 385</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_to_hash'>to_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_depth_chain'>depth_chain</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_parent'>parent</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_depth'>depth</span> <span class='op'>=</span> <span class='id identifier rubyid_depth_chain'>depth_chain</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_arr'>arr</span><span class='op'>|</span> <span class='id identifier rubyid_arr'>arr</span> <span class='op'>==</span> <span class='lbracket'>[</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='kw'>self</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
-  <span class='kw'>return</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='kw'>if</span> <span class='id identifier rubyid_depth'>depth</span> <span class='op'>&gt;=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_max_depth'>max_depth</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_to_hash'>to_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_recursion_chain'>recursion_chain</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_parent'>parent</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_recursing'>recursing</span> <span class='op'>=</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_arr'>arr</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='id identifier rubyid_arr'>arr</span> <span class='op'>==</span> <span class='lbracket'>[</span><span class='id identifier rubyid_parent'>parent</span><span class='period'>.</span><span class='id identifier rubyid_object_id'>object_id</span><span class='comma'>,</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_object_id'>object_id</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_recursions'>recursions</span> <span class='op'>=</span> <span class='id identifier rubyid_recursion_chain'>recursion_chain</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_recursing'>recursing</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+  <span class='kw'>return</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='kw'>if</span> <span class='id identifier rubyid_recursions'>recursions</span> <span class='op'>&gt;=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_max_recursion'>max_recursion</span>
 
   <span class='kw'>unless</span> <span class='lparen'>(</span><span class='id identifier rubyid_parent'>parent</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_parent'>parent</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>==</span> <span class='symbol'>:base</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>==</span> <span class='symbol'>:base</span>
-    <span class='id identifier rubyid_depth_chain'>depth_chain</span> <span class='op'>+=</span> <span class='lbracket'>[</span><span class='lbracket'>[</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='kw'>self</span><span class='rbracket'>]</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_recursion_chain'>recursion_chain</span> <span class='op'>+=</span> <span class='lbracket'>[</span><span class='lbracket'>[</span><span class='id identifier rubyid_parent'>parent</span><span class='period'>.</span><span class='id identifier rubyid_object_id'>object_id</span><span class='comma'>,</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_object_id'>object_id</span><span class='rbracket'>]</span><span class='rbracket'>]</span>
   <span class='kw'>end</span>
 
   <span class='lbrace'>{</span> <span class='id identifier rubyid_name'>name</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_hash'>hash</span><span class='op'>|</span>
     <span class='id identifier rubyid_all_sideloads'>all_sideloads</span><span class='period'>.</span><span class='id identifier rubyid_each_pair'>each_pair</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_sl'>sl</span><span class='op'>|</span>
-      <span class='id identifier rubyid_sideload_hash'>sideload_hash</span> <span class='op'>=</span> <span class='id identifier rubyid_sl'>sl</span><span class='period'>.</span><span class='id identifier rubyid_to_hash'>to_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_depth_chain'>depth_chain</span><span class='comma'>,</span> <span class='kw'>self</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_sideload_hash'>sideload_hash</span> <span class='op'>=</span> <span class='id identifier rubyid_sl'>sl</span><span class='period'>.</span><span class='id identifier rubyid_to_hash'>to_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_recursion_chain'>recursion_chain</span><span class='comma'>,</span> <span class='kw'>self</span><span class='rparen'>)</span>
       <span class='id identifier rubyid_hash'>hash</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='id identifier rubyid_sideload_hash'>sideload_hash</span><span class='rparen'>)</span>
     <span class='kw'>end</span>
   <span class='kw'>end</span>
@@ -3192,7 +3194,7 @@ corresponding Resources, and returns an Include Directive hash</p>
 </div>
 
       <div id="footer">
-  Generated on Thu Sep 28 17:28:11 2017 by
+  Generated on Mon Oct  2 09:38:51 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>
