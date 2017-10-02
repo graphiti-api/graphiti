@@ -181,10 +181,10 @@ RSpec.describe JsonapiCompliable::Sideload do
     end
 
     around do |e|
-      original = JsonapiCompliable::Sideload.max_depth
-      JsonapiCompliable::Sideload.max_depth = 5
+      original = JsonapiCompliable::Sideload.max_recursion
+      JsonapiCompliable::Sideload.max_recursion = 5
       e.run
-      JsonapiCompliable::Sideload.max_depth = original
+      JsonapiCompliable::Sideload.max_recursion = original
     end
 
     subject { ResourceA.new.sideloading.to_hash[:base] }

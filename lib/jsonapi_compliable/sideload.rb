@@ -44,8 +44,8 @@ module JsonapiCompliable
     end
 
     # @api private
-    def self.max_depth
-      @max_depth || 2
+    def self.max_recursion
+      @max_recursion || 2
     end
 
     # Set maximum levels of sideload recursion
@@ -53,9 +53,9 @@ module JsonapiCompliable
     # /authors?comments.authors.comments.authors would be two levels
     # etc
     #
-    # Default max depth is 2
-    def self.max_depth=(val)
-      @max_depth = val
+    # Default max recursion is 2
+    def self.max_recursion=(val)
+      @max_recursion = val
     end
 
     # @see #resource_class
@@ -382,17 +382,18 @@ module JsonapiCompliable
     #
     # @return [Hash] The nested include hash
     # @api private
-    def to_hash(depth_chain = [], parent = nil)
-      depth = depth_chain.select { |arr| arr == [parent, self] }.length
-      return {} if depth >= self.class.max_depth
+    def to_hash(recursion_chain = [], parent = nil)
+      recursing = ->(arr) { arr == [parent.object_id, self.object_id] }
+      recursions = recursion_chain.select(&recursing).length
+      return {} if recursions >= self.class.max_recursion
 
       unless (parent && parent.name == :base) || name == :base
-        depth_chain += [[parent, self]]
+        recursion_chain += [[parent.object_id, self.object_id]]
       end
 
       { name => {} }.tap do |hash|
         all_sideloads.each_pair do |key, sl|
-          sideload_hash = sl.to_hash(depth_chain, self)
+          sideload_hash = sl.to_hash(recursion_chain, self)
           hash[name].merge!(sideload_hash)
         end
       end
