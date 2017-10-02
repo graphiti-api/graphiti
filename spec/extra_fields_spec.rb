@@ -59,7 +59,7 @@ RSpec.describe 'extra_fields' do
     end
 
     it 'does not include the extra field in the response' do
-      ctx = double(allow_net_worth?: false)
+      ctx = double(allow_net_worth?: false).as_null_object
       resource.with_context ctx do
         expect(json['data'][0]['attributes'].keys).to match_array(%w(first_name last_name))
       end

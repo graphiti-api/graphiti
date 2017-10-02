@@ -92,7 +92,7 @@ RSpec.describe 'filtering' do
 
   context 'when the filter is guarded' do
     let(:can_filter) { true }
-    let(:ctx) { double(can_filter_first_name?: can_filter) }
+    let(:ctx) { double(can_filter_first_name?: can_filter).as_null_object }
 
     before do
       params[:filter] = { first_name_guarded: 'Stephen' }

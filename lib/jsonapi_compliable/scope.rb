@@ -80,10 +80,8 @@ module JsonapiCompliable
       return if results == []
 
       includes.each_pair do |name, nested|
-        if @resource.allowed_sideloads.has_key?(name)
-          sideload = @resource.sideload(name)
-          sideload.resolve(results, @query)
-        end
+        sideload = @resource.sideload(name)
+        sideload.resolve(results, @query)
       end
     end
 
