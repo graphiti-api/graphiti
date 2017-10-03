@@ -8,6 +8,21 @@
 
 Supported Rails versions: >= 4.1
 
+### Upgrading to 0.10
+
+`sideload_whitelist` has been moved from the resource to the controller:
+
+```diff
+class PostsController < ApplicationController
+  jsonapi resource: PostResource do
+-    sideload_whitelist({ index: [:foo] })
+-  end
++  sideload_whitelist({ index: [:foo] })
+end
+
+# NEW
+```
+
 ### Running tests
 
 We support Rails >= 4.1. To do so, we use the [appraisal](https://github.com/thoughtbot/appraisal) gem. So, run:
