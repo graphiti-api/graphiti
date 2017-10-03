@@ -79,7 +79,7 @@
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/jsonapi_compliable.rb<span class="defines">,<br />
-  lib/jsonapi_compliable/base.rb,<br /> lib/jsonapi_compliable/query.rb,<br /> lib/jsonapi_compliable/rails.rb,<br /> lib/jsonapi_compliable/scope.rb,<br /> lib/jsonapi_compliable/errors.rb,<br /> lib/jsonapi_compliable/version.rb,<br /> lib/jsonapi_compliable/resource.rb,<br /> lib/jsonapi_compliable/sideload.rb,<br /> lib/jsonapi_compliable/stats/dsl.rb,<br /> lib/jsonapi_compliable/util/hash.rb,<br /> lib/jsonapi_compliable/scoping/base.rb,<br /> lib/jsonapi_compliable/scoping/sort.rb,<br /> lib/jsonapi_compliable/adapters/null.rb,<br /> lib/jsonapi_compliable/stats/payload.rb,<br /> lib/jsonapi_compliable/scoping/filter.rb,<br /> lib/jsonapi_compliable/scoping/paginate.rb,<br /> lib/jsonapi_compliable/adapters/abstract.rb,<br /> lib/jsonapi_compliable/util/field_params.rb,<br /> lib/jsonapi_compliable/extensions/temp_id.rb,<br /> lib/jsonapi_compliable/scoping/filterable.rb,<br /> lib/jsonapi_compliable/util/include_params.rb,<br /> lib/jsonapi_compliable/util/render_options.rb,<br /> lib/jsonapi_compliable/scoping/extra_fields.rb,<br /> lib/jsonapi_compliable/adapters/active_record.rb,<br /> lib/jsonapi_compliable/scoping/default_filter.rb,<br /> lib/jsonapi_compliable/util/relationship_payload.rb,<br /> lib/jsonapi_compliable/extensions/extra_attribute.rb,<br /> lib/jsonapi_compliable/extensions/boolean_attribute.rb,<br /> lib/jsonapi_compliable/adapters/active_record_sideloading.rb</span>
+  lib/jsonapi_compliable/base.rb,<br /> lib/jsonapi_compliable/query.rb,<br /> lib/jsonapi_compliable/rails.rb,<br /> lib/jsonapi_compliable/scope.rb,<br /> lib/jsonapi_compliable/errors.rb,<br /> lib/jsonapi_compliable/version.rb,<br /> lib/jsonapi_compliable/resource.rb,<br /> lib/jsonapi_compliable/sideload.rb,<br /> lib/jsonapi_compliable/stats/dsl.rb,<br /> lib/jsonapi_compliable/util/hash.rb,<br /> lib/jsonapi_compliable/scoping/base.rb,<br /> lib/jsonapi_compliable/scoping/sort.rb,<br /> lib/jsonapi_compliable/adapters/null.rb,<br /> lib/jsonapi_compliable/stats/payload.rb,<br /> lib/jsonapi_compliable/util/sideload.rb,<br /> lib/jsonapi_compliable/scoping/filter.rb,<br /> lib/jsonapi_compliable/scoping/paginate.rb,<br /> lib/jsonapi_compliable/adapters/abstract.rb,<br /> lib/jsonapi_compliable/util/field_params.rb,<br /> lib/jsonapi_compliable/extensions/temp_id.rb,<br /> lib/jsonapi_compliable/scoping/filterable.rb,<br /> lib/jsonapi_compliable/util/include_params.rb,<br /> lib/jsonapi_compliable/util/render_options.rb,<br /> lib/jsonapi_compliable/scoping/extra_fields.rb,<br /> lib/jsonapi_compliable/adapters/active_record.rb,<br /> lib/jsonapi_compliable/scoping/default_filter.rb,<br /> lib/jsonapi_compliable/util/relationship_payload.rb,<br /> lib/jsonapi_compliable/extensions/extra_attribute.rb,<br /> lib/jsonapi_compliable/extensions/boolean_attribute.rb,<br /> lib/jsonapi_compliable/adapters/active_record_sideloading.rb</span>
 </dd>
   </dl>
   
@@ -104,7 +104,7 @@
       <dt id="VERSION-constant" class="">VERSION =
         
       </dt>
-      <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.9.2</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+      <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.10.0</span><span class='tstring_end'>&quot;</span></span></pre></dd>
     
   </dl>
 
@@ -247,12 +247,12 @@
       <pre class="lines">
 
 
-47
 48
-49</pre>
+49
+50</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable.rb', line 47</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable.rb', line 48</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_context'>context</span>
   <span class='const'>Thread</span><span class='period'>.</span><span class='id identifier rubyid_current'>current</span><span class='lbracket'>[</span><span class='symbol'>:context</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -290,12 +290,12 @@
       <pre class="lines">
 
 
-52
 53
-54</pre>
+54
+55</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable.rb', line 52</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable.rb', line 53</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_context='>context=</span><span class='lparen'>(</span><span class='id identifier rubyid_val'>val</span><span class='rparen'>)</span>
   <span class='const'>Thread</span><span class='period'>.</span><span class='id identifier rubyid_current'>current</span><span class='lbracket'>[</span><span class='symbol'>:context</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span>
@@ -320,14 +320,14 @@
       <pre class="lines">
 
 
-40
 41
 42
 43
-44</pre>
+44
+45</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable.rb', line 40</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable.rb', line 41</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_included'>included</span><span class='lparen'>(</span><span class='id identifier rubyid_klass'>klass</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_klass'>klass</span><span class='period'>.</span><span class='id identifier rubyid_instance_eval'>instance_eval</span> <span class='kw'>do</span>
@@ -367,7 +367,6 @@
       <pre class="lines">
 
 
-57
 58
 59
 60
@@ -375,10 +374,11 @@
 62
 63
 64
-65</pre>
+65
+66</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable.rb', line 57</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable.rb', line 58</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_with_context'>with_context</span><span class='lparen'>(</span><span class='id identifier rubyid_obj'>obj</span><span class='comma'>,</span> <span class='id identifier rubyid_namespace'>namespace</span><span class='rparen'>)</span>
   <span class='kw'>begin</span>
@@ -399,7 +399,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Oct  3 09:22:25 2017 by
+  Generated on Tue Oct  3 14:55:06 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>
