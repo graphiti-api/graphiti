@@ -140,6 +140,30 @@
 </li>
 
       
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#sideload_whitelist-class_method" title="sideload_whitelist (class method)">.<strong>sideload_whitelist</strong>(hash)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Set the sideload whitelist.</p>
+</div></span>
+  
+</li>
+
+      
     </ul>
   
     <h2>
@@ -369,6 +393,28 @@ serialized parameters.</p>
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#sideload_whitelist-instance_method" title="#sideload_whitelist (instance method)">#<strong>sideload_whitelist</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#wrap_context-instance_method" title="#wrap_context (instance method)">#<strong>wrap_context</strong>  &#x21d2; Object </a>
     
 
@@ -484,7 +530,6 @@ serialized parameters.</p>
       <pre class="lines">
 
 
-44
 45
 46
 47
@@ -494,10 +539,11 @@ serialized parameters.</p>
 51
 52
 53
-54</pre>
+54
+55</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 44</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 45</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_jsonapi'>jsonapi</span><span class='lparen'>(</span><span class='id identifier rubyid_foo'>foo</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bar</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>resource:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_blk'>blk</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_resource'>resource</span>
@@ -509,6 +555,106 @@ serialized parameters.</p>
   <span class='kw'>end</span>
 
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid__jsonapi_compliable'>_jsonapi_compliable</span><span class='period'>.</span><span class='id identifier rubyid_class_eval'>class_eval</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_blk'>blk</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_blk'>blk</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="sideload_whitelist-class_method">
+  
+    .<strong>sideload_whitelist</strong>(hash)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Set the sideload whitelist. You may want to omit sideloads for security or
+performance reasons.</p>
+
+<p>Uses JSONAPI::IncludeDirective from <a href="{http://jsonapi-rb.org" target="_parent" title="jsonapi-rb">jsonapi-rb</a>}</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+        <p class="example_title"><div class='inline'>
+<p>Whitelisting Relationships</p>
+</div></p>
+      
+      <pre class="example code"><code><span class='comment'># Given the following whitelist
+</span><span class='kw'>class</span> <span class='const'>PostsController</span> <span class='op'>&lt;</span> <span class='const'>ApplicationResource</span>
+  <span class='id identifier rubyid_jsonapi'>jsonapi</span> <span class='label'>resource:</span> <span class='const'>MyResource</span>
+
+  <span class='id identifier rubyid_sideload_whitelist'>sideload_whitelist</span><span class='lparen'>(</span><span class='lbrace'>{</span>
+    <span class='label'>index:</span> <span class='lbracket'>[</span><span class='symbol'>:blog</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>show:</span> <span class='lbracket'>[</span><span class='symbol'>:blog</span><span class='comma'>,</span> <span class='lbrace'>{</span> <span class='label'>comments:</span> <span class='symbol'>:author</span> <span class='rbrace'>}</span><span class='rbracket'>]</span>
+  <span class='rbrace'>}</span><span class='rparen'>)</span>
+
+  <span class='comment'># ... code ...
+</span><span class='kw'>end</span>
+
+<span class='comment'># A request to sideload &#39;tags&#39;
+</span><span class='comment'>#
+</span><span class='comment'># GET /posts/1?include=tags
+</span><span class='comment'>#
+</span><span class='comment'># ...will silently fail.
+</span><span class='comment'>#
+</span><span class='comment'># A request for comments and tags:
+</span><span class='comment'>#
+</span><span class='comment'># GET /posts/1?include=tags,comments
+</span><span class='comment'>#
+</span><span class='comment'># ...will only sideload comments</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>whitelist</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>, <tt>Array</tt>, <tt>Symbol</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="Query.html#include_hash-instance_method" title="JsonapiCompliable::Query#include_hash (method)">Query#include_hash</a></span></li>
+    
+  </ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+89
+90
+91</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 89</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_sideload_whitelist'>sideload_whitelist</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid__sideload_whitelist'>_sideload_whitelist</span> <span class='op'>=</span> <span class='const'>JSONAPI</span><span class='op'>::</span><span class='const'>IncludeDirective</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_hash'>to_hash</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -584,13 +730,13 @@ render jsonapi: foo, default_jsonapi_render_options</code></pre>
       <pre class="lines">
 
 
-238
-239
-240
-241</pre>
+280
+281
+282
+283</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 238</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 280</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_default_jsonapi_render_options'>default_jsonapi_render_options</span>
   <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_options'>options</span><span class='op'>|</span>
@@ -645,12 +791,12 @@ render jsonapi: foo, default_jsonapi_render_options</code></pre>
       <pre class="lines">
 
 
-119
-120
-121</pre>
+161
+162
+163</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 119</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 161</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_deserialized_params'>deserialized_params</span>
   <span class='ivar'>@deserialized_params</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="../JsonapiCompliable.html" title="JsonapiCompliable (module)">JsonapiCompliable</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Deserializer.html" title="JsonapiCompliable::Deserializer (class)">Deserializer</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Deserializer.html#initialize-instance_method" title="JsonapiCompliable::Deserializer#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='comma'>,</span> <span class='id identifier rubyid_request'>request</span><span class='period'>.</span><span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span>
@@ -737,17 +883,17 @@ back the transaction.</p>
       <pre class="lines">
 
 
-147
-148
-149
-150
-151
-152
-153
-154</pre>
+189
+190
+191
+192
+193
+194
+195
+196</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 147</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 189</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_jsonapi_create'>jsonapi_create</span>
   <span class='id identifier rubyid__persist'>_persist</span> <span class='kw'>do</span>
@@ -813,12 +959,12 @@ back the transaction.</p>
       <pre class="lines">
 
 
-66
-67
-68</pre>
+108
+109
+110</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 66</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 108</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_jsonapi_resource'>jsonapi_resource</span>
   <span class='ivar'>@jsonapi_resource</span> <span class='op'>||=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid__jsonapi_compliable'>_jsonapi_compliable</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
@@ -905,12 +1051,12 @@ back the transaction.</p>
       <pre class="lines">
 
 
-113
-114
-115</pre>
+155
+156
+157</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 113</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 155</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_jsonapi_scope'>jsonapi_scope</span><span class='lparen'>(</span><span class='id identifier rubyid_scope'>scope</span><span class='comma'>,</span> <span class='id identifier rubyid_opts'>opts</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_jsonapi_resource'>jsonapi_resource</span><span class='period'>.</span><span class='id identifier rubyid_build_scope'>build_scope</span><span class='lparen'>(</span><span class='id identifier rubyid_scope'>scope</span><span class='comma'>,</span> <span class='id identifier rubyid_query'>query</span><span class='comma'>,</span> <span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
@@ -993,17 +1139,17 @@ back the transaction.</p>
       <pre class="lines">
 
 
-178
-179
-180
-181
-182
-183
-184
-185</pre>
+220
+221
+222
+223
+224
+225
+226
+227</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 178</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 220</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_jsonapi_update'>jsonapi_update</span>
   <span class='id identifier rubyid__persist'>_persist</span> <span class='kw'>do</span>
@@ -1069,12 +1215,12 @@ back the transaction.</p>
       <pre class="lines">
 
 
-74
-75
-76</pre>
+116
+117
+118</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 74</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 116</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_query'>query</span>
   <span class='ivar'>@query</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="Query.html" title="JsonapiCompliable::Query (class)">Query</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Query.html#initialize-instance_method" title="JsonapiCompliable::Query#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_jsonapi_resource'>jsonapi_resource</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='rparen'>)</span>
@@ -1136,12 +1282,12 @@ resource</p>
       <pre class="lines">
 
 
-80
-81
-82</pre>
+122
+123
+124</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 80</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 122</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_query_hash'>query_hash</span>
   <span class='ivar'>@query_hash</span> <span class='op'>||=</span> <span class='id identifier rubyid_query'>query</span><span class='period'>.</span><span class='id identifier rubyid_to_hash'>to_hash</span><span class='lbracket'>[</span><span class='id identifier rubyid_jsonapi_resource'>jsonapi_resource</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='rbracket'>]</span>
@@ -1283,17 +1429,17 @@ avoid this, pass <tt>scope: false</tt></p>
       <pre class="lines">
 
 
-218
-219
-220
-221
-222
-223
-224
-225</pre>
+260
+261
+262
+263
+264
+265
+266
+267</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 218</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 260</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_render_jsonapi'>render_jsonapi</span><span class='lparen'>(</span><span class='id identifier rubyid_scope'>scope</span><span class='comma'>,</span> <span class='id identifier rubyid_opts'>opts</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_scope'>scope</span> <span class='op'>=</span> <span class='id identifier rubyid_jsonapi_scope'>jsonapi_scope</span><span class='lparen'>(</span><span class='id identifier rubyid_scope'>scope</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:scope</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='kw'>false</span> <span class='op'>||</span> <span class='id identifier rubyid_scope'>scope</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../JsonapiCompliable.html" title="JsonapiCompliable (module)">JsonapiCompliable</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Scope.html" title="JsonapiCompliable::Scope (class)">Scope</a></span></span><span class='rparen'>)</span>
@@ -1302,6 +1448,187 @@ avoid this, pass <tt>scope: false</tt></p>
   <span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:expose</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:context</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>self</span>
   <span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:include</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_deserialized_params'>deserialized_params</span><span class='period'>.</span><span class='id identifier rubyid_include_directive'>include_directive</span> <span class='kw'>if</span> <span class='id identifier rubyid_force_includes?'>force_includes?</span>
   <span class='id identifier rubyid_perform_render_jsonapi'>perform_render_jsonapi</span><span class='lparen'>(</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="sideload_whitelist-instance_method">
+  
+    #<strong>sideload_whitelist</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 21</span>
+
+<span class='kw'>module</span> <span class='const'>ClassMethods</span>
+  <span class='comment'># Define your JSONAPI configuration
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @example Inline Resource
+</span>  <span class='comment'>#   # &#39;Quick and Dirty&#39; solution that does not require a separate
+</span>  <span class='comment'>#   # Resource object
+</span>  <span class='comment'>#   class PostsController &lt; ApplicationController
+</span>  <span class='comment'>#     jsonapi do
+</span>  <span class='comment'>#       type :posts
+</span>  <span class='comment'>#       use_adapter JsonapiCompliable::Adapters::ActiveRecord
+</span>  <span class='comment'>#
+</span>  <span class='comment'>#       allow_filter :title
+</span>  <span class='comment'>#     end
+</span>  <span class='comment'>#   end
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @example Resource Class (preferred)
+</span>  <span class='comment'>#   # Make code reusable by encapsulating it in a Resource class
+</span>  <span class='comment'>#   class PostsController &lt; ApplicationController
+</span>  <span class='comment'>#     jsonapi resource: PostResource
+</span>  <span class='comment'>#   end
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @see Resource
+</span>  <span class='comment'># @param resource [Resource] the Resource class associated to this endpoint
+</span>  <span class='comment'># @return [void]
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_jsonapi'>jsonapi</span><span class='lparen'>(</span><span class='id identifier rubyid_foo'>foo</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bar</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>resource:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_blk'>blk</span><span class='rparen'>)</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_resource'>resource</span>
+      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid__jsonapi_compliable'>_jsonapi_compliable</span> <span class='op'>=</span> <span class='id identifier rubyid_resource'>resource</span>
+    <span class='kw'>else</span>
+      <span class='kw'>if</span> <span class='op'>!</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid__jsonapi_compliable'>_jsonapi_compliable</span>
+        <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid__jsonapi_compliable'>_jsonapi_compliable</span> <span class='op'>=</span> <span class='const'>Class</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../JsonapiCompliable.html" title="JsonapiCompliable (module)">JsonapiCompliable</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Resource.html" title="JsonapiCompliable::Resource (class)">Resource</a></span></span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid__jsonapi_compliable'>_jsonapi_compliable</span><span class='period'>.</span><span class='id identifier rubyid_class_eval'>class_eval</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_blk'>blk</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_blk'>blk</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Set the sideload whitelist. You may want to omit sideloads for
+</span>  <span class='comment'># security or performance reasons.
+</span>  <span class='comment'>#
+</span>  <span class='comment'># Uses JSONAPI::IncludeDirective from {{http://jsonapi-rb.org jsonapi-rb}}
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @example Whitelisting Relationships
+</span>  <span class='comment'>#   # Given the following whitelist
+</span>  <span class='comment'>#   class PostsController &lt; ApplicationResource
+</span>  <span class='comment'>#     jsonapi resource: MyResource
+</span>  <span class='comment'>#
+</span>  <span class='comment'>#     sideload_whitelist({
+</span>  <span class='comment'>#       index: [:blog],
+</span>  <span class='comment'>#       show: [:blog, { comments: :author }]
+</span>  <span class='comment'>#     })
+</span>  <span class='comment'>#
+</span>  <span class='comment'>#     # ... code ...
+</span>  <span class='comment'>#   end
+</span>  <span class='comment'>#
+</span>  <span class='comment'>#   # A request to sideload &#39;tags&#39;
+</span>  <span class='comment'>#   #
+</span>  <span class='comment'>#   # GET /posts/1?include=tags
+</span>  <span class='comment'>#   #
+</span>  <span class='comment'>#   # ...will silently fail.
+</span>  <span class='comment'>#   #
+</span>  <span class='comment'>#   # A request for comments and tags:
+</span>  <span class='comment'>#   #
+</span>  <span class='comment'>#   # GET /posts/1?include=tags,comments
+</span>  <span class='comment'>#   #
+</span>  <span class='comment'>#   # ...will only sideload comments
+</span>  <span class='comment'>#
+</span>  <span class='comment'># @param [Hash, Array, Symbol] whitelist
+</span>  <span class='comment'># @see Query#include_hash
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_sideload_whitelist'>sideload_whitelist</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span>
+    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid__sideload_whitelist'>_sideload_whitelist</span> <span class='op'>=</span> <span class='const'>JSONAPI</span><span class='op'>::</span><span class='const'>IncludeDirective</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_hash'>to_hash</span>
+  <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1357,14 +1684,14 @@ Helpful for easy-access to things like the current user.</p>
       <pre class="lines">
 
 
-90
-91
-92
-93
-94</pre>
+132
+133
+134
+135
+136</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 90</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/base.rb', line 132</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_wrap_context'>wrap_context</span>
   <span class='id identifier rubyid_jsonapi_resource'>jsonapi_resource</span><span class='period'>.</span><span class='id identifier rubyid_with_context'>with_context</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='id identifier rubyid_action_name'>action_name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rparen'>)</span> <span class='kw'>do</span>
@@ -1381,7 +1708,7 @@ Helpful for easy-access to things like the current user.</p>
 </div>
 
       <div id="footer">
-  Generated on Mon Oct  2 09:38:50 2017 by
+  Generated on Tue Oct  3 09:18:22 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>
