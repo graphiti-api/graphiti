@@ -173,9 +173,11 @@ module JsonapiCompliable
     end
 
     def parse_include(memo, incl_hash, namespace)
+      memo[namespace] ||= self.class.default_hash
       memo[namespace].merge!(include: incl_hash)
 
       incl_hash.each_pair do |key, sub_hash|
+        key = Util::Sideload.namespace(namespace, key)
         memo.merge!(parse_include(memo, sub_hash, key))
       end
 

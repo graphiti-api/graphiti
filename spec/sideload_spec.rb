@@ -66,7 +66,7 @@ RSpec.describe JsonapiCompliable::Sideload do
       end
 
       it 'groups parents, then resolves that group' do
-        instance.resolve(parents, query)
+        instance.resolve(parents, query, instance.name)
         expect(parents.first[:child]).to eq({ parent_id: 1 })
       end
     end
@@ -96,11 +96,11 @@ RSpec.describe JsonapiCompliable::Sideload do
         expect(JsonapiCompliable::Scope).to receive(:new)
           .with(base_scope, anything, query, default_paginate: false, namespace: :foo)
           .and_return(scope)
-        instance.resolve(parents, query)
+        instance.resolve(parents, query, instance.name)
       end
 
       it 'assigns results to parents' do
-        instance.resolve(parents, query)
+        instance.resolve(parents, query, instance.name)
         expect(parents.first[:child]).to eq({ parent_id: 1 })
       end
 

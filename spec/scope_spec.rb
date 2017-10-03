@@ -24,7 +24,7 @@ RSpec.describe JsonapiCompliable::Scope do
     end
 
     context 'when sideloading' do
-      let(:sideload) { double }
+      let(:sideload) { double(name: :books) }
       let(:results)  { double }
 
       before do
@@ -40,8 +40,13 @@ RSpec.describe JsonapiCompliable::Scope do
         end
 
         it 'resolves the sideload' do
-          expect(sideload).to receive(:resolve).with(results, query)
+          expect(sideload).to receive(:resolve).with(results, query, sideload.name)
           instance.resolve
+        end
+
+        context 'and it is nested within the same namespace' do
+          xit 'resolves with the correct namespace' do
+          end
         end
 
         context 'but no parents were found' do

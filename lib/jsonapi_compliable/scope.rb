@@ -81,7 +81,8 @@ module JsonapiCompliable
 
       includes.each_pair do |name, nested|
         sideload = @resource.sideload(name)
-        sideload.resolve(results, @query)
+        namespace = Util::Sideload.namespace(@namespace, sideload.name)
+        sideload.resolve(results, @query, namespace)
       end
     end
 

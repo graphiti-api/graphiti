@@ -264,9 +264,7 @@ module JsonapiCompliable
     # @see Resource#with_context
     # @return [void]
     # @api private
-    def resolve(parents, query, namespace = nil)
-      namespace ||= name
-
+    def resolve(parents, query, namespace)
       if polymorphic?
         resolve_polymorphic(parents, query)
       else
