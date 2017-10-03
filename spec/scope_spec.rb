@@ -53,18 +53,6 @@ RSpec.describe JsonapiCompliable::Scope do
           end
         end
       end
-
-      context 'when the requested sideload is not allowed' do
-        before do
-          allow(resource).to receive(:allowed_sideloads) { {} }
-        end
-
-        it 'does not resolve the sideload' do
-          expect(resource).to_not receive(:sideload)
-          expect(sideload).to_not receive(:resolve)
-          instance.resolve
-        end
-      end
     end
 
     context 'when 0 results requested' do

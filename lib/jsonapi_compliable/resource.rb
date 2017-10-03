@@ -132,36 +132,6 @@ module JsonapiCompliable
       @sideloading ||= Sideload.new(:base, resource: self)
     end
 
-    # Set the sideload whitelist. You may want to omit sideloads for
-    # security or performance reasons.
-    #
-    # Uses JSONAPI::IncludeDirective from {{http://jsonapi-rb.org jsonapi-rb}}
-    #
-    # @example Whitelisting Relationships
-    #   # Given the following whitelist
-    #   class PostResource < ApplicationResource
-    #     # ... code ...
-    #     sideload_whitelist([:blog, { comments: :author }])
-    #   end
-    #
-    #   # A request to sideload 'tags'
-    #   #
-    #   # GET /posts?include=tags
-    #   #
-    #   # ...will silently fail.
-    #   #
-    #   # A request for comments and tags:
-    #   #
-    #   # GET /posts?include=tags,comments
-    #   #
-    #   # ...will only sideload comments
-    #
-    # @param [Hash, Array, Symbol] whitelist
-    # @see Query#include_hash
-    def self.sideload_whitelist(whitelist)
-      config[:sideload_whitelist] = JSONAPI::IncludeDirective.new(whitelist).to_hash
-    end
-
     # Whitelist a filter
     #
     # @example Basic Filtering
@@ -413,7 +383,6 @@ module JsonapiCompliable
     def self.config
       @config ||= begin
         {
-          sideload_whitelist: {},
           filters: {},
           default_filters: {},
           extra_fields: {},
@@ -568,60 +537,9 @@ module JsonapiCompliable
       persistence.run
     end
 
-    # All possible sideload names, including nested names
-    #
-    #   { comments: { author: {} } }
-    #
-    # Becomes
-    #
-    #   [:comments, :author]
-    #
-    # @see Sideload#to_hash
-    # @return [Array<Symbol>] the list of association names
+    # @see Sideload#association_names
     def association_names
-      @association_names ||= begin
-        if sideloading
-          Util::Hash.keys(sideloading.to_hash[:base])
-        else
-          []
-        end
-      end
-    end
-
-    # An Include Directive Hash of all possible sideloads for the current
-    # context namespace, taking into account the sideload whitelist.
-    #
-    # In other words, say we have this resource:
-    #
-    #   class PostResource < ApplicationResource
-    #     sideload_whitelist({
-    #       index: :comments,
-    #       show: { comments: :author }
-    #     })
-    #   end
-    #
-    # Expected behavior:
-    #
-    #   allowed_sideloads(:index) # => { comments: {} }
-    #   allowed_sideloads(:show) # => { comments: { author: {} }
-    #
-    #   instance.with_context({}, :index) do
-    #     instance.allowed_sideloads # => { comments: {} }
-    #   end
-    #
-    # @see Util::IncludeParams.scrub
-    # @see #with_context
-    # @param [Symbol] namespace Can be :index/:show/etc - The current context namespace will be used by default.
-    # @return [Hash] the scrubbed include directive
-    def allowed_sideloads(namespace = nil)
-      return {} unless sideloading
-
-      namespace ||= context_namespace
-      sideloads = sideloading.to_hash[:base]
-      if !sideload_whitelist.empty? && namespace
-        sideloads = Util::IncludeParams.scrub(sideloads, sideload_whitelist[namespace])
-      end
-      sideloads
+      sideloading.association_names
     end
 
     # The relevant proc for the given attribute and calculation.
@@ -708,12 +626,6 @@ module JsonapiCompliable
     # @api private
     def extra_fields
       self.class.config[:extra_fields]
-    end
-
-    # @see .sideload_whitelist
-    # @api private
-    def sideload_whitelist
-      self.class.config[:sideload_whitelist]
     end
 
     # @see .default_filter

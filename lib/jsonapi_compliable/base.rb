@@ -7,12 +7,13 @@ module JsonapiCompliable
 
     included do
       class << self
-        attr_accessor :_jsonapi_compliable
+        attr_accessor :_jsonapi_compliable, :_sideload_whitelist
       end
 
       def self.inherited(klass)
         super
         klass._jsonapi_compliable = Class.new(_jsonapi_compliable)
+        klass._sideload_whitelist = _sideload_whitelist.dup if _sideload_whitelist
       end
     end
 
@@ -52,6 +53,47 @@ module JsonapiCompliable
 
         self._jsonapi_compliable.class_eval(&blk) if blk
       end
+
+      # Set the sideload whitelist. You may want to omit sideloads for
+      # security or performance reasons.
+      #
+      # Uses JSONAPI::IncludeDirective from {{http://jsonapi-rb.org jsonapi-rb}}
+      #
+      # @example Whitelisting Relationships
+      #   # Given the following whitelist
+      #   class PostsController < ApplicationResource
+      #     jsonapi resource: MyResource
+      #
+      #     sideload_whitelist({
+      #       index: [:blog],
+      #       show: [:blog, { comments: :author }]
+      #     })
+      #
+      #     # ... code ...
+      #   end
+      #
+      #   # A request to sideload 'tags'
+      #   #
+      #   # GET /posts/1?include=tags
+      #   #
+      #   # ...will silently fail.
+      #   #
+      #   # A request for comments and tags:
+      #   #
+      #   # GET /posts/1?include=tags,comments
+      #   #
+      #   # ...will only sideload comments
+      #
+      # @param [Hash, Array, Symbol] whitelist
+      # @see Query#include_hash
+      def sideload_whitelist(hash)
+        self._sideload_whitelist = JSONAPI::IncludeDirective.new(hash).to_hash
+      end
+    end
+
+    # @api private
+    def sideload_whitelist
+      self.class._sideload_whitelist || {}
     end
 
     # Returns an instance of the associated Resource

@@ -359,44 +359,15 @@ module JsonapiCompliable
       end
     end
 
-    # Looks at all nested sideload, and all nested sideloads for the
-    # corresponding Resources, and returns an Include Directive hash
-    #
-    # For instance, this configuration:
-    #
-    #   class BarResource < ApplicationResource
-    #     allow_sideload :baz do
-    #     end
-    #   end
-    #
-    #   class PostResource < ApplicationResource
-    #     allow_sideload :foo do
-    #       allow_sideload :bar, resource: BarResource do
-    #       end
-    #     end
-    #   end
-    #
-    # +post_resource.sideloading.to_hash+ would return
-    #
-    #   { base: { foo: { bar: { baz: {} } } } }
-    #
-    # @return [Hash] The nested include hash
-    # @api private
-    def to_hash(recursion_chain = [], parent = nil)
-      recursing = ->(arr) { arr == [parent.object_id, self.object_id] }
-      recursions = recursion_chain.select(&recursing).length
-      return {} if recursions >= self.class.max_recursion
-
-      unless (parent && parent.name == :base) || name == :base
-        recursion_chain += [[parent.object_id, self.object_id]]
-      end
-
-      { name => {} }.tap do |hash|
-        all_sideloads.each_pair do |key, sl|
-          sideload_hash = sl.to_hash(recursion_chain, self)
-          hash[name].merge!(sideload_hash)
+    def association_names(memo = [])
+      all_sideloads.each_pair do |name, sl|
+        unless memo.include?(sl.name)
+          memo << sl.name
+          memo |= sl.association_names(memo)
         end
       end
+
+      memo
     end
 
     # @api private
@@ -416,14 +387,6 @@ module JsonapiCompliable
     end
 
     private
-
-    def nested_sideload_hash(sideload, processed)
-      {}.tap do |hash|
-        if sideloading = sideload.resource_class.sideloading
-          hash.merge!(sideloading.to_hash(processed)[:base])
-        end
-      end
-    end
 
     def polymorphic_grouper(grouping_field)
       lambda do |record|

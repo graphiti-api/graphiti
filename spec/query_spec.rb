@@ -195,20 +195,14 @@ RSpec.describe JsonapiCompliable::Query do
         expect(books_include).to eq(expected)
       end
 
-      # NB - if not excluded, we will still pass user-requested
-      # includes to 'render'. This means they will try to be
-      # serialized, causing accidental AR queries
       it 'excludes relations not in the whitelist' do
         params[:include] = 'books.genre,books.publisher'
-        resource_class.class_eval do
-          sideload_whitelist(index: { books: :genre })
+        ctx = double(sideload_whitelist: { index: { books: { genre: {} } } })
+
+        resource.with_context ctx, :index do
+          expect(subject[:authors][:include]).to eq(books: { genre: {} })
+          expect(subject[:books][:include]).to eq(genre: {})
         end
-
-        expect(subject[:authors][:include]).to eq(books: { genre: {} })
-        expect(subject[:books][:include]).to eq(genre: {})
-      end
-
-      it "excludes relations not in a RELATION's whitelist" do
       end
 
       context 'when include param present' do

@@ -651,12 +651,12 @@ get, say, the total count without the overhead of fetching actual records.</p>
       <pre class="lines">
 
 
-72
-73
-74</pre>
+75
+76
+77</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/query.rb', line 72</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/query.rb', line 75</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_association_names'>association_names</span>
   <span class='ivar'>@association_names</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="Util.html" title="JsonapiCompliable::Util (module)">Util</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Util/Hash.html" title="JsonapiCompliable::Util::Hash (class)">Hash</a></span></span><span class='period'>.</span><span class='id identifier rubyid_keys'><span class='object_link'><a href="Util/Hash.html#keys-class_method" title="JsonapiCompliable::Util::Hash.keys (method)">keys</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_include_hash'>include_hash</span><span class='rparen'>)</span>
@@ -798,19 +798,25 @@ get, say, the total count without the overhead of fetching actual records.</p>
 56
 57
 58
-59</pre>
+59
+60
+61
+62</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/query.rb', line 50</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_include_hash'>include_hash</span>
   <span class='ivar'>@include_hash</span> <span class='op'>||=</span> <span class='kw'>begin</span>
-    <span class='id identifier rubyid_requested'>requested</span>     <span class='op'>=</span> <span class='id identifier rubyid_include_directive'>include_directive</span><span class='period'>.</span><span class='id identifier rubyid_to_hash'>to_hash</span>
-    <span class='id identifier rubyid_all_allowed'>all_allowed</span>   <span class='op'>=</span> <span class='id identifier rubyid_resource'>resource</span><span class='period'>.</span><span class='id identifier rubyid_sideloading'>sideloading</span><span class='period'>.</span><span class='id identifier rubyid_to_hash'>to_hash</span><span class='lbracket'>[</span><span class='symbol'>:base</span><span class='rbracket'>]</span>
-    <span class='id identifier rubyid_whitelist'>whitelist</span>     <span class='op'>=</span> <span class='id identifier rubyid_resource'>resource</span><span class='period'>.</span><span class='id identifier rubyid_sideload_whitelist'>sideload_whitelist</span><span class='period'>.</span><span class='id identifier rubyid_values'>values</span><span class='period'>.</span><span class='id identifier rubyid_reduce'>reduce</span><span class='lparen'>(</span><span class='symbol'>:merge</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_allowed'>allowed</span>       <span class='op'>=</span> <span class='id identifier rubyid_whitelist'>whitelist</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="Util.html" title="JsonapiCompliable::Util (module)">Util</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Util/IncludeParams.html" title="JsonapiCompliable::Util::IncludeParams (class)">IncludeParams</a></span></span><span class='period'>.</span><span class='id identifier rubyid_scrub'><span class='object_link'><a href="Util/IncludeParams.html#scrub-class_method" title="JsonapiCompliable::Util::IncludeParams.scrub (method)">scrub</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_all_allowed'>all_allowed</span><span class='comma'>,</span> <span class='id identifier rubyid_whitelist'>whitelist</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='id identifier rubyid_all_allowed'>all_allowed</span>
+    <span class='id identifier rubyid_requested'>requested</span> <span class='op'>=</span> <span class='id identifier rubyid_include_directive'>include_directive</span><span class='period'>.</span><span class='id identifier rubyid_to_hash'>to_hash</span>
 
-    <span class='const'><span class='object_link'><a href="Util.html" title="JsonapiCompliable::Util (module)">Util</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Util/IncludeParams.html" title="JsonapiCompliable::Util::IncludeParams (class)">IncludeParams</a></span></span><span class='period'>.</span><span class='id identifier rubyid_scrub'><span class='object_link'><a href="Util/IncludeParams.html#scrub-class_method" title="JsonapiCompliable::Util::IncludeParams.scrub (method)">scrub</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_requested'>requested</span><span class='comma'>,</span> <span class='id identifier rubyid_allowed'>allowed</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_whitelist'>whitelist</span> <span class='op'>=</span> <span class='kw'>nil</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_resource'>resource</span><span class='period'>.</span><span class='id identifier rubyid_context'>context</span>
+      <span class='id identifier rubyid_whitelist'>whitelist</span> <span class='op'>=</span> <span class='id identifier rubyid_resource'>resource</span><span class='period'>.</span><span class='id identifier rubyid_context'>context</span><span class='period'>.</span><span class='id identifier rubyid_sideload_whitelist'>sideload_whitelist</span>
+      <span class='id identifier rubyid_whitelist'>whitelist</span> <span class='op'>=</span> <span class='id identifier rubyid_whitelist'>whitelist</span><span class='lbracket'>[</span><span class='id identifier rubyid_resource'>resource</span><span class='period'>.</span><span class='id identifier rubyid_context_namespace'>context_namespace</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_whitelist'>whitelist</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_whitelist'>whitelist</span> <span class='op'>?</span> <span class='const'><span class='object_link'><a href="Util.html" title="JsonapiCompliable::Util (module)">Util</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Util/IncludeParams.html" title="JsonapiCompliable::Util::IncludeParams (class)">IncludeParams</a></span></span><span class='period'>.</span><span class='id identifier rubyid_scrub'><span class='object_link'><a href="Util/IncludeParams.html#scrub-class_method" title="JsonapiCompliable::Util::IncludeParams.scrub (method)">scrub</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_requested'>requested</span><span class='comma'>,</span> <span class='id identifier rubyid_whitelist'>whitelist</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='id identifier rubyid_requested'>requested</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -948,9 +954,6 @@ top-level:</p>
       <pre class="lines">
 
 
-121
-122
-123
 124
 125
 126
@@ -970,10 +973,13 @@ top-level:</p>
 140
 141
 142
-143</pre>
+143
+144
+145
+146</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/query.rb', line 121</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/query.rb', line 124</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_hash'>to_hash</span>
   <span class='id identifier rubyid_hash'>hash</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_resource'>resource</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span> <span class='op'>=&gt;</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_default_hash'>default_hash</span> <span class='rbrace'>}</span>
@@ -1067,14 +1073,14 @@ get, say, the total count without the overhead of fetching actual records.</p>
       <pre class="lines">
 
 
-160
-161
-162
 163
-164</pre>
+164
+165
+166
+167</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/query.rb', line 160</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/query.rb', line 163</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_zero_results?'>zero_results?</span>
   <span class='op'>!</span><span class='ivar'>@params</span><span class='lbracket'>[</span><span class='symbol'>:page</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>&amp;&amp;</span>
@@ -1091,7 +1097,7 @@ get, say, the total count without the overhead of fetching actual records.</p>
 </div>
 
       <div id="footer">
-  Generated on Mon Oct  2 09:38:50 2017 by
+  Generated on Tue Oct  3 09:18:22 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>
