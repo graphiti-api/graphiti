@@ -473,63 +473,6 @@ key.</p>
 
   
     <h2>
-      Class Method Summary
-      <small><a href="#" class="summary_toggle">collapse</a></small>
-    </h2>
-
-    <ul class="summary">
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#max_recursion-class_method" title="max_recursion (class method)">.<strong>max_recursion</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  <span class="private note title">private</span>
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#max_recursion=-class_method" title="max_recursion= (class method)">.<strong>max_recursion=</strong>(val)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'>
-<p>Set maximum levels of sideload recursion /authors?comments.authors would be
-one level /authors?comments.authors.comments.authors would be two levels
-etc.</p>
-</div></span>
-  
-</li>
-
-      
-    </ul>
-  
-    <h2>
       Instance Method Summary
       <small><a href="#" class="summary_toggle">collapse</a></small>
     </h2>
@@ -1741,100 +1684,6 @@ key.</p>
   </div>
 
 
-  <div id="class_method_details" class="method_details_list">
-    <h2>Class Method Details</h2>
-
-    
-      <div class="method_details first">
-  <h3 class="signature first" id="max_recursion-class_method">
-  
-    .<strong>max_recursion</strong>  &#x21d2; <tt>Object</tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p class="note private">
-  <strong>This method is part of a private API.</strong>
-  You should avoid using this method if possible, as it may be removed or be changed in the future.
-</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-47
-48
-49</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 47</span>
-
-<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_max_recursion'>max_recursion</span>
-  <span class='ivar'>@max_recursion</span> <span class='op'>||</span> <span class='int'>2</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="max_recursion=-class_method">
-  
-    .<strong>max_recursion=</strong>(val)  &#x21d2; <tt>Object</tt> 
-  
-
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    
-<p>Set maximum levels of sideload recursion /authors?comments.authors would be
-one level /authors?comments.authors.comments.authors would be two levels
-etc</p>
-
-<p>Default max recursion is 2</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-57
-58
-59</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 57</span>
-
-<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_max_recursion='>max_recursion=</span><span class='lparen'>(</span><span class='id identifier rubyid_val'>val</span><span class='rparen'>)</span>
-  <span class='ivar'>@max_recursion</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-  </div>
-
   <div id="instance_method_details" class="method_details_list">
     <h2>Instance Method Details</h2>
 
@@ -1900,17 +1749,17 @@ keyword arguments to fire only for a specific persistence method.</p>
       <pre class="lines">
 
 
-232
-233
-234
-235
-236
-237
-238
-239</pre>
+217
+218
+219
+220
+221
+222
+223
+224</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 232</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 217</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_after_save'>after_save</span><span class='lparen'>(</span><span class='label'>only:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>except:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_blk'>blk</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_actions'>actions</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#HOOK_ACTIONS-constant" title="JsonapiCompliable::Sideload::HOOK_ACTIONS (constant)">HOOK_ACTIONS</a></span></span> <span class='op'>-</span> <span class='id identifier rubyid_except'>except</span>
@@ -1953,20 +1802,20 @@ keyword arguments to fire only for a specific persistence method.</p>
       <pre class="lines">
 
 
-350
-351
-352
-353
-354
-355
-356
-357
-358
-359
-360</pre>
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 350</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 335</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_all_sideloads'>all_sideloads</span>
   <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_all'>all</span><span class='op'>|</span>
@@ -2080,19 +1929,19 @@ directly</p>
       <pre class="lines">
 
 
-330
-331
-332
-333
-334
-335
-336
-337
-338
-339</pre>
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 330</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 315</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_allow_sideload'>allow_sideload</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_opts'>opts</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_blk'>blk</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_sideload'>sideload</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="" title="JsonapiCompliable::Sideload (class)">Sideload</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="JsonapiCompliable::Sideload#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
@@ -2223,12 +2072,12 @@ in your resource directly.</p>
       <pre class="lines">
 
 
-183
-184
-185</pre>
+168
+169
+170</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 183</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 168</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_assign'>assign</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_blk'>blk</span><span class='rparen'>)</span>
   <span class='ivar'>@assign_proc</span> <span class='op'>=</span> <span class='id identifier rubyid_blk'>blk</span>
@@ -2277,13 +2126,13 @@ in your resource directly.</p>
       <pre class="lines">
 
 
-193
-194
-195
-196</pre>
+178
+179
+180
+181</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 193</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 178</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_associate'>associate</span><span class='lparen'>(</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='id identifier rubyid_child'>child</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_association_name'>association_name</span> <span class='op'>=</span> <span class='ivar'>@parent</span> <span class='op'>?</span> <span class='ivar'>@parent</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>:</span> <span class='id identifier rubyid_name'>name</span>
@@ -2309,19 +2158,19 @@ in your resource directly.</p>
       <pre class="lines">
 
 
-362
-363
-364
-365
-366
-367
-368
-369
-370
-371</pre>
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 362</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 347</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_association_names'>association_names</span><span class='lparen'>(</span><span class='id identifier rubyid_memo'>memo</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_all_sideloads'>all_sideloads</span><span class='period'>.</span><span class='id identifier rubyid_each_pair'>each_pair</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_sl'>sl</span><span class='op'>|</span>
@@ -2378,13 +2227,13 @@ in your resource directly.</p>
       <pre class="lines">
 
 
-204
-205
-206
-207</pre>
+189
+190
+191
+192</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 204</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 189</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_disassociate'>disassociate</span><span class='lparen'>(</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='id identifier rubyid_child'>child</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_association_name'>association_name</span> <span class='op'>=</span> <span class='ivar'>@parent</span> <span class='op'>?</span> <span class='ivar'>@parent</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>:</span> <span class='id identifier rubyid_name'>name</span>
@@ -2410,17 +2259,17 @@ in your resource directly.</p>
       <pre class="lines">
 
 
-380
-381
-382
-383
-384
-385
-386
-387</pre>
+365
+366
+367
+368
+369
+370
+371
+372</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 380</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 365</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_fire_hooks!'>fire_hooks!</span><span class='lparen'>(</span><span class='id identifier rubyid_parent'>parent</span><span class='comma'>,</span> <span class='id identifier rubyid_objects'>objects</span><span class='comma'>,</span> <span class='id identifier rubyid_method'>method</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_hooks'>hooks</span>
@@ -2477,12 +2326,12 @@ and <code>parent_type</code>. We would want to group on
       <pre class="lines">
 
 
-263
-264
-265</pre>
+248
+249
+250</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 263</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 248</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_group_by'>group_by</span><span class='lparen'>(</span><span class='id identifier rubyid_grouping_field'>grouping_field</span><span class='rparen'>)</span>
   <span class='ivar'>@grouping_field</span> <span class='op'>=</span> <span class='id identifier rubyid_grouping_field'>grouping_field</span>
@@ -2543,17 +2392,17 @@ and <code>parent_type</code>. We would want to group on
       <pre class="lines">
 
 
-244
-245
-246
-247
-248
-249
-250
-251</pre>
+229
+230
+231
+232
+233
+234
+235
+236</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 244</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 229</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_hooks'>hooks</span>
   <span class='ivar'>@hooks</span> <span class='op'>||=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_h'>h</span><span class='op'>|</span>
@@ -2655,12 +2504,12 @@ ActiveRecord:</p>
       <pre class="lines">
 
 
-106
-107
-108</pre>
+91
+92
+93</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 106</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 91</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_polymorphic?'>polymorphic?</span>
   <span class='ivar'>@polymorphic</span> <span class='op'>==</span> <span class='kw'>true</span>
@@ -2698,14 +2547,14 @@ ActiveRecord:</p>
       <pre class="lines">
 
 
-374
-375
-376
-377
-378</pre>
+359
+360
+361
+362
+363</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 374</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 359</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_polymorphic_child_for_type'>polymorphic_child_for_type</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_polymorphic_groups'>polymorphic_groups</span><span class='period'>.</span><span class='id identifier rubyid_values'>values</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_v'>v</span><span class='op'>|</span>
@@ -2821,18 +2670,18 @@ ActiveRecord:</p>
       <pre class="lines">
 
 
-282
-283
-284
-285
-286
-287
-288
-289
-290</pre>
+267
+268
+269
+270
+271
+272
+273
+274
+275</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 282</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 267</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='lparen'>(</span><span class='id identifier rubyid_parents'>parents</span><span class='comma'>,</span> <span class='id identifier rubyid_query'>query</span><span class='comma'>,</span> <span class='id identifier rubyid_namespace'>namespace</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_namespace'>namespace</span> <span class='op'>||=</span> <span class='id identifier rubyid_name'>name</span>
@@ -2899,12 +2748,12 @@ ActiveRecord:</p>
       <pre class="lines">
 
 
-63
-64
-65</pre>
+48
+49
+50</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 63</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 48</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resource'>resource</span>
   <span class='ivar'>@resource</span> <span class='op'>||=</span> <span class='id identifier rubyid_resource_class'>resource_class</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
@@ -3019,12 +2868,12 @@ in your resource directly.</p>
       <pre class="lines">
 
 
-146
-147
-148</pre>
+131
+132
+133</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 146</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 131</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_scope'>scope</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_blk'>blk</span><span class='rparen'>)</span>
   <span class='ivar'>@scope_proc</span> <span class='op'>=</span> <span class='id identifier rubyid_blk'>blk</span>
@@ -3105,12 +2954,12 @@ in your resource directly.</p>
       <pre class="lines">
 
 
-345
-346
-347</pre>
+330
+331
+332</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 345</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/sideload.rb', line 330</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sideload'>sideload</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='ivar'>@sideloads</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span>
@@ -3125,7 +2974,7 @@ in your resource directly.</p>
 </div>
 
       <div id="footer">
-  Generated on Tue Oct  3 09:18:23 2017 by
+  Generated on Tue Oct  3 09:22:26 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>
