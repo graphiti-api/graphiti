@@ -43,21 +43,6 @@ module JsonapiCompliable
       extend @resource_class.config[:adapter].sideloading_module
     end
 
-    # @api private
-    def self.max_recursion
-      @max_recursion || 2
-    end
-
-    # Set maximum levels of sideload recursion
-    # /authors?comments.authors would be one level
-    # /authors?comments.authors.comments.authors would be two levels
-    # etc
-    #
-    # Default max recursion is 2
-    def self.max_recursion=(val)
-      @max_recursion = val
-    end
-
     # @see #resource_class
     # @return [Resource] an instance of +#resource_class+
     def resource
