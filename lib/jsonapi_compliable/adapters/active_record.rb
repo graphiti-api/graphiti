@@ -73,11 +73,14 @@ module JsonapiCompliable
       # @see Adapters::Abstract#associate
       def associate(parent, child, association_name, association_type)
         if association_type == :has_many
-          parent.association(association_name).loaded!
-          parent.association(association_name).add_to_target(child, :skip_callbacks)
+          associate_many(parent, child, association_name)
         elsif association_type == :habtm
-          parent.send(association_name) << child
-        else
+          if parent.send(association_name).exists?(child.id)
+            associate_many(parent, child, association_name)
+          else
+            parent.send(association_name) << child
+          end
+        elsif
           child.send("#{association_name}=", parent)
         end
       end
@@ -112,6 +115,13 @@ module JsonapiCompliable
         instance = model_class.find(id)
         instance.destroy
         instance
+      end
+
+      private
+
+      def associate_many(parent, child, association_name)
+        parent.association(association_name).loaded!
+        parent.association(association_name).add_to_target(child, :skip_callbacks)
       end
     end
   end

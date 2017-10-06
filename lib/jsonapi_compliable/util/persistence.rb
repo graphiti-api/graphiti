@@ -95,13 +95,14 @@ class JsonapiCompliable::Util::Persistence
   end
 
   def associate_children(object, children)
-    # No need to associate destroyed objects
-    return if @meta[:method] == :destroy
-
     children.each do |x|
       if x[:object] && object
         if x[:meta][:method] == :disassociate
           x[:sideload].disassociate(object, x[:object])
+        elsif x[:meta][:method] == :destroy
+          if x[:sideload].type == :habtm
+            x[:sideload].disassociate(object, x[:object])
+          end # otherwise, no need to disassociate destroyed objects
         else
           x[:sideload].associate(object, x[:object])
         end
