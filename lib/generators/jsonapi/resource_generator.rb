@@ -117,7 +117,7 @@ module Jsonapi
       code = <<-STR
       resources :#{type}
       STR
-      inject_into_file 'config/routes.rb', after: "scope path: '/api' do\n    scope path: '/v1' do\n" do
+      inject_into_file 'config/routes.rb', after: "scope path: '/v1' do\n" do
         code
       end
     end
