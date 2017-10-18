@@ -33,6 +33,7 @@ module Jsonapi
       generate_route
       generate_tests
       generate_resource
+      generate_swagger if docs_controller?
     end
 
     private
@@ -66,6 +67,19 @@ module Jsonapi
 
     def application_resource_defined?
       'ApplicationResource'.safe_constantize.present?
+    end
+
+    def docs_controller?
+      File.exists?('app/controllers/docs_controller.rb')
+    end
+
+    def generate_swagger
+      code = "  jsonapi_resource '/v1/#{type}'"
+      code << ", only: [#{actions.map { |a| ":#{a}" }.join(', ')}]" if actions.length < 5
+      code << "\n"
+      inject_into_file 'app/controllers/docs_controller.rb', before: /^end/ do
+        code
+      end
     end
 
     def generate_spec_payload
