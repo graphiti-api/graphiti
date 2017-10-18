@@ -15,7 +15,7 @@ RSpec.describe "<%= type %>#create", type: :request do
 
     it 'creates the resource' do
       expect {
-        jsonapi_post "/api/v1/<%= type %>", payload
+        jsonapi_post "/<%= api_namespace %>/v1/<%= type %>", payload
       }.to change { <%= model_klass %>.count }.by(1)
       <%= file_name %> = <%= model_klass %>.last
 

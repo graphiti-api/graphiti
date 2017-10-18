@@ -5,7 +5,7 @@ RSpec.describe "<%= file_name.pluralize %>#show", type: :request do
     let!(:<%= file_name %>) { create(:<%= file_name %>) }
 
     it 'serializes the resource correctly' do
-      get "/api/v1/<%= file_name.pluralize %>/#{<%= file_name %>.id}"
+      get "/<%= api_namespace %>/v1/<%= file_name.pluralize %>/#{<%= file_name %>.id}"
 
       assert_payload(:<%= file_name %>, <%= file_name %>, json_item)
     end

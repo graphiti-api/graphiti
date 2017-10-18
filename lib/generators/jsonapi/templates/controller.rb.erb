@@ -5,12 +5,14 @@ class <%= model_klass.name.pluralize %>Controller < ApplicationController
   <%- end -%>
   jsonapi resource: <%= model_klass %>Resource
 
+  <%- if actions?('create', 'update') -%>
   <%- unless omit_comments? -%>
   # Reference a strong resource payload defined in
   # config/initializers/strong_resources.rb
   <%- end -%>
   strong_resource :<%= file_name %>
-
+  <%- end -%>
+  <%- if actions?('create', 'update') -%>
   <%- unless omit_comments? -%>
   # Run strong parameter validation for these actions.
   # Invalid keys will be dropped.
@@ -19,6 +21,8 @@ class <%= model_klass.name.pluralize %>Controller < ApplicationController
   <%- end -%>
   before_action :apply_strong_params, only: [:create, :update]
 
+  <%- end -%>
+  <%- if actions?('index') -%>
   <%- unless omit_comments? -%>
   # Start with a base scope and pass to render_jsonapi
   <%- end -%>
@@ -27,6 +31,8 @@ class <%= model_klass.name.pluralize %>Controller < ApplicationController
     render_jsonapi(<%= file_name.pluralize %>)
   end
 
+  <%- end -%>
+  <%- if actions?('show') -%>
   <%- unless omit_comments? -%>
   # Call jsonapi_scope directly here so we can get behavior like
   # sparse fieldsets and statistics.
@@ -36,6 +42,8 @@ class <%= model_klass.name.pluralize %>Controller < ApplicationController
     render_jsonapi(scope.resolve.first, scope: false)
   end
 
+  <%- end -%>
+  <%- if actions?('create') -%>
   <%- unless omit_comments? -%>
   # jsonapi_create will use the configured Resource (and adapter) to persist.
   # This will handle nested relationships as well.
@@ -51,6 +59,8 @@ class <%= model_klass.name.pluralize %>Controller < ApplicationController
     end
   end
 
+  <%- end -%>
+  <%- if actions?('update') -%>
   <%- unless omit_comments? -%>
   # jsonapi_update will use the configured Resource (and adapter) to persist.
   # This will handle nested relationships as well.
@@ -66,6 +76,8 @@ class <%= model_klass.name.pluralize %>Controller < ApplicationController
     end
   end
 
+  <%- end -%>
+  <%- if actions?('destroy') -%>
   <%- unless omit_comments? -%>
   # No need for any special logic here as no_content is jsonapi_compliant.
   # Customize this if you have a more complex use case.
@@ -75,5 +87,6 @@ class <%= model_klass.name.pluralize %>Controller < ApplicationController
     <%= file_name %>.destroy
     return head(:no_content)
   end
+  <%- end -%>
 end
 <% end -%>

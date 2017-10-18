@@ -19,7 +19,7 @@ RSpec.describe "<%= type %>#update", type: :request do
     # Replace 'xit' with 'it' after adding attributes
     xit 'updates the resource' do
       expect {
-        jsonapi_put "/api/v1/<%= type %>/#{<%= file_name %>.id}", payload
+        jsonapi_put "/<%= api_namespace %>/v1/<%= type %>/#{<%= file_name %>.id}", payload
       }.to change { <%= file_name %>.reload.attributes }
       assert_payload(:<%= file_name %>, <%= file_name %>, json_item)
 
