@@ -6,7 +6,7 @@ RSpec.describe "<%= type %>#destroy", type: :request do
 
     it 'updates the resource' do
       expect {
-        delete "/api/v1/<%= type %>/#{<%= file_name %>.id}"
+        delete "/<%= api_namespace %>/v1/<%= type %>/#{<%= file_name %>.id}"
       }.to change { <%= model_klass %>.count }.by(-1)
 
       expect(response.status).to eq(204)

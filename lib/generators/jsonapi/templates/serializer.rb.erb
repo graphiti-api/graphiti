@@ -18,5 +18,8 @@ class Serializable<%= class_name %> < JSONAPI::Serializable::Resource
   #   @object.name.upcase
   # end
   <%- end -%>
+  <%- attributes.each do |a| -%>
+  attribute :<%= a.name %>
+  <%- end -%>
 end
 <% end -%>
