@@ -32,6 +32,7 @@
 JsonapiSpecHelpers::Payload.register(:<%= file_name %>) do
   <%- attributes.each do |a| -%>
   <%- type = a.type == :boolean ? [TrueClass, FalseClass] : a.type.to_s.classify -%>
+  <%- type = String if a.type == :text -%>
   key(:<%= a.name %>, <%= type %>)
   <%- end -%>
 end
