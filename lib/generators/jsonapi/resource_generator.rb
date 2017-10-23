@@ -91,7 +91,7 @@ module Jsonapi
       code = "  strong_resource :#{file_name} do\n"
       attributes.each do |a|
         type = a.type
-        type = 'string' if type == 'text'
+        type = :string if type == :text
         code << "    attribute :#{a.name}, :#{type}\n"
       end
       code << "  end\n"
