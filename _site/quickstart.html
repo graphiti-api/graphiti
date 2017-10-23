@@ -121,64 +121,31 @@
         <div class="container">
           <h1 id="quickstart">Quickstart</h1>
 
-<h5 id="zero-to-api-in-10-minutes">Zero to API in 10 minutes</h5>
+<h5 id="zero-to-api-in-5-minutes">Zero to API in 5 minutes</h5>
 
 <p>This quickstart will use Rails with ActiveRecord. Head to the guides
 section for usage with alternate ORMs or avoiding Rails
 completely.</p>
 
+<p>If the below seems too “magical”, don’t worry - we’re just applying some
+sensible defaults to get started quickly.</p>
+
 <h1 id="installation"><a name="installation" href="#installation">Installation</a></h1>
 
-<p>Let’s start with a classic Rails blog:</p>
+<p>Let’s start with a classic Rails blog. We’ll use a <a href="http://guides.rubyonrails.org/rails_application_templates.html">template</a> to handle some of the boilerplate. Just run this command and accept all the defaults for now:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>rails new blog --api
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>rails new blog --api -m https://raw.githubusercontent.com/jsonapi-suite/rails_template/master/all.rb
 </code></pre>
 </div>
 
-<p>Now add dependencies to your <code class="highlighter-rouge">Gemfile</code>:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">gem</span> <span class="s1">'jsonapi_suite'</span>
-<span class="n">gem</span> <span class="s1">'jsonapi-rails'</span><span class="p">,</span> <span class="s1">'~&gt; 0.2.1'</span>
-<span class="n">gem</span> <span class="s1">'kaminari'</span>
-</code></pre>
-</div>
-
-<p>The gem <code class="highlighter-rouge">kaminari</code> is optional (gems like <code class="highlighter-rouge">will_paginate</code> are also supported), but recommended if you’d like easy
-pagination out-of-the-box.</p>
-
-<p>Of course now we need to:</p>
-
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>bundle install
-</code></pre>
-</div>
-
-<p>Now that we’ve installed, let’s bootstrap the suite. This will add a
-few files and lines of code you don’t need to worry about right now
-(there are comments if you are curious):</p>
-
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>bundle <span class="nb">exec </span>rails g jsonapi_suite:install
-</code></pre>
-</div>
-
-<p>Finally, let’s set up our routes so that we have a simple versioning
-pattern baked-in:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># config/routes.rb</span>
-<span class="n">scope</span> <span class="ss">path: </span><span class="s1">'/api'</span> <span class="k">do</span>
-  <span class="n">scope</span> <span class="ss">path: </span><span class="s1">'/v1'</span> <span class="k">do</span>
-    <span class="c1"># your routes will go here</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre>
-</div>
-
-<p>This routing pattern is not required, but you will have to manually add
-your own routing if you opt-out.</p>
+<p>Feel free to run <code class="highlighter-rouge">git diff</code> if you’re interested in the
+particulars; this is mostly just installing gems and including modules.</p>
 
 <h1 id="defining-a-resource"><a name="defining-a-resource" href="#defining-a-resource">Defining a Resource</a></h1>
 
-<p>A <code class="highlighter-rouge">Resource</code> defines how to query and persist your <code class="highlighter-rouge">Model</code>. So first,
-let’s define our model:</p>
+<p>A <code class="highlighter-rouge">Resource</code> defines how to query and persist your <code class="highlighter-rouge">Model</code>. In other
+words: a <code class="highlighter-rouge">Model</code> is to the database as <code class="highlighter-rouge">Resource</code> is to the API. So
+first, let’s define our model:</p>
 
 <div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>bundle <span class="nb">exec </span>rails generate model Post title:string active:boolean
 <span class="gp">$ </span>bundle <span class="nb">exec </span>rake db:migrate
@@ -188,23 +155,20 @@ let’s define our model:</p>
 <p>Now we can use the built-in generator to define our <code class="highlighter-rouge">Resource</code>,
 controller, and specs:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>bundle <span class="nb">exec </span>rails g jsonapi:resource Post
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>bundle <span class="nb">exec </span>rails g jsonapi:resource Post title:string active:boolean
 </code></pre>
 </div>
 
 <p>You’ll see a number of files created. If you open each one, you’ll see
 comments explaining what’s going on. Head over to the
-<a href="/tutorial">tutorial</a> for a
-more in-depth understanding.</p>
+<a href="/tutorial">tutorial</a> for a more in-depth understanding. For now, let’s
+focus on two key concepts you’ll see over and over again: inputs (via
+<a href="https://jsonapi-suite.github.io/strong_resources/">strong_resources</a>),
+and outputs (via <a href="http://jsonapi-rb.org">jsonapi-rb</a>).</p>
 
-<p>There is a small bit of manual code: specifying the attributes of your
-resource. We have to do this in three places: our API inputs (using our
-version of <code class="highlighter-rouge">strong_parameters</code>), API outputs (using <a href="http://jsonapi-rb.org">jsonapi-rb</a>,
-a library similar to <code class="highlighter-rouge">active_model_serializers</code>), and tests.</p>
-
-<p>Start by specifying which attributes the user should be able to create
-and update. This is all configurable, but for now let’s let all <code class="highlighter-rouge">Post</code>
-attributes in:</p>
+<p>Our <strong>API Inputs</strong> are defined in
+<code class="highlighter-rouge">config/initializers/strong_resources.rb</code>. You can think of these as
+<a href="http://api.rubyonrails.org/v5.0/classes/ActionController/StrongParameters.html">strong parameter</a> templates.</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># config/initializers/strong_resources.rb</span>
 <span class="n">strong_resource</span> <span class="ss">:post</span> <span class="k">do</span>
@@ -214,8 +178,9 @@ attributes in:</p>
 </code></pre>
 </div>
 
-<p>Now specify what attributes you want to serialize as part of the
-response:</p>
+<p>Our <strong>API Outputs</strong> are defined in
+<code class="highlighter-rouge">app/serializers/serializable_post.rb</code>. The DSL is very similar to
+<a href="https://github.com/rails-api/active_model_serializers">active_model_serializers</a> and full documentation can be found at <a href="http://jsonapi-rb.org">jsonapi-rg.org</a>:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/serializers/serializable_post.rb</span>
 <span class="k">class</span> <span class="nc">SerializablePost</span> <span class="o">&lt;</span> <span class="no">JSONAPI</span><span class="o">::</span><span class="no">Serializable</span><span class="o">::</span><span class="no">Resource</span>
@@ -227,7 +192,7 @@ response:</p>
 </code></pre>
 </div>
 
-<p>And run your app!:</p>
+<p>Now run your app!:</p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>$ bundle exec rails s
 </code></pre>
@@ -505,7 +470,7 @@ persistence (“save this <code class="highlighter-rouge">Post</code> and 3 <cod
 
 <p>…and corresponding <code class="highlighter-rouge">Resource</code> object:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>bundle <span class="nb">exec </span>rails g jsonapi:resource Comment
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>bundle <span class="nb">exec </span>rails g jsonapi:resource Comment body:text active:boolean
 </code></pre>
 </div>
 
@@ -523,28 +488,12 @@ persistence (“save this <code class="highlighter-rouge">Post</code> and 3 <cod
 <ul>
   <li>Whitelists the relationship.</li>
   <li>Knows to link the objects via <code class="highlighter-rouge">post_id</code>.</li>
-  <li>Will use <code class="highlighter-rouge">CommentResource</code> for querying logic.</li>
-  <li>Uses an unfiltered base scope (<code class="highlighter-rouge">Comment.all</code>)</li>
+  <li>Will use <code class="highlighter-rouge">CommentResource</code> for querying logic (so we can say things
+like “only return the latest 3 active comments”)</li>
+  <li>Uses an unfiltered base scope (<code class="highlighter-rouge">Comment.all</code>). If we wanted, we could
+do things like <code class="highlighter-rouge">Comment.active</code> here to ensure only active comments are
+ever returned.</li>
 </ul>
-
-<p>Now specify the fields we want to output:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/serializers/serializable_comment.rb</span>
-<span class="n">attribute</span> <span class="ss">:body</span>
-<span class="n">attribute</span> <span class="ss">:active</span>
-<span class="n">attribute</span> <span class="ss">:created_at</span>
-</code></pre>
-</div>
-
-<p>And the fields we accept on input:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># config/initializers/strong_resources.rb</span>
-<span class="n">strong_resource</span> <span class="ss">:comment</span> <span class="k">do</span>
-  <span class="n">attribute</span> <span class="ss">:body</span><span class="p">,</span> <span class="ss">:string</span>
-  <span class="n">attribute</span> <span class="ss">:active</span><span class="p">,</span> <span class="ss">:boolean</span>
-<span class="k">end</span>
-</code></pre>
-</div>
 
 <p>You should now be able to hit <code class="highlighter-rouge">/api/v1/comments</code> with all the same
 functionality as before. We just need to seed data.</p>
@@ -619,6 +568,13 @@ functionality as before. We just need to seed data.</p>
 </code></pre>
 </div>
 
+<p>And tell our serializer it’s OK to render comments:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/serializers/post_serializer.rb</span>
+<span class="n">has_many</span> <span class="ss">:comments</span>
+</code></pre>
+</div>
+
 <p>Now run the script to persist the <code class="highlighter-rouge">Post</code> and its three <code class="highlighter-rouge">Comment</code>s in a
 single request:</p>
 
@@ -670,41 +626,29 @@ code.</p>
 
 <p>We have a full CRUD API with robust querying functionality, and the
 ability to combine relationships for both reads and writes. But what
-happens when you need to customize the sorting logic? What replacing
+happens when you need to customize the sorting logic? What about replacing
 <code class="highlighter-rouge">ActiveRecord</code> with an alternate persistence layer, or avoiding Rails
 altogether?</p>
 
 <p>These are important topics that JSONAPI Suite was built to address. To
 learn more about advanced usage and customization, we suggest following
-the <a href="/tutorial">tutorial</a>.</p>
+the <a href="/tutorial">tutorial</a>. There are also a number of how-tos on this
+site, a good one to start with is  <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-use-without-activerecord">How
+to Use without ActiveRecord</a></p>
 
-<p>For additional documentation, view the <a href="https://jsonapi-suite.github.io/jsonapi_compliable/">YARD Docs</a>.
-For help with specific use cases, join our Slack chat at https://jsonapi-suite.slack.com (email <a href="mailto:richmolj@gmail.com">richmolj@gmail.com</a> for an invite).</p>
+<p>For additional documentation, view the <a href="https://jsonapi-suite.github.io/jsonapi_compliable/">YARD Docs</a>.</p>
+
+<p>For help with specific use cases, join our Slack chat at https://jsonapi-suite.slack.com (email <a href="mailto:richmolj@gmail.com">richmolj@gmail.com</a> for an invite).</p>
 
 <h1 id="bonus-testing"><a name="testing" href="#testing">Bonus: Testing</a></h1>
 
 <h3 id="installation-1"><a name="testing-install" href="#testing-install">Installation</a></h3>
 
-<p>Sharp eyes may have noticed we generated a number of spec files. Before
-running these tests, we need to install and set up dependencies:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># Gemfile</span>
-<span class="n">group</span> <span class="ss">:development</span><span class="p">,</span> <span class="ss">:test</span> <span class="k">do</span>
-  <span class="n">gem</span> <span class="s1">'rspec-rails'</span>
-  <span class="n">gem</span> <span class="s1">'factory_girl_rails'</span>
-<span class="k">end</span>
-
-<span class="n">group</span> <span class="ss">:test</span> <span class="k">do</span>
-  <span class="n">gem</span> <span class="s1">'database_cleaner'</span>
-  <span class="n">gem</span> <span class="s1">'faker'</span>
-  <span class="n">gem</span> <span class="s1">'jsonapi_spec_helpers'</span><span class="p">,</span> <span class="ss">require: </span><span class="kp">false</span>
-<span class="k">end</span>
-</code></pre>
-</div>
-
-<p>Only RSpec and <code class="highlighter-rouge">jsonapi_spec_helpers</code> are required, the rest are sensible defaults:</p>
+<p>Our generator applied some sensible defaults:</p>
 
 <ul>
+  <li><a href="https://github.com/rspec/rspec-rails">Rspec</a> Test runner</li>
+  <li><a href="https://jsonapi-suite.github.io/jsonapi_spec_helpers">jsonapi_spec_helpers</a> Helpers to parse and assert on JSONAPI payloads.</li>
   <li><a href="https://github.com/thoughtbot/factory_girl">factory_girl</a> for
   seeding our test database with fake data.</li>
   <li><a href="https://github.com/stympy/faker">faker</a> for generating fake values,
@@ -713,62 +657,18 @@ running these tests, we need to install and set up dependencies:</p>
   to ensure our fake data gets cleaned up between test runs.</li>
 </ul>
 
-<p>Now let’s install everything and bootstrap RSpec:</p>
-
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>bundle install <span class="o">&amp;&amp;</span> bundle <span class="nb">exec </span>rails g rspec:install
-</code></pre>
-</div>
-
-<p>Edit <code class="highlighter-rouge">spec/rails_helper.rb</code> to add JSONAPI Suite <a href="https://jsonapi-suite.github.io/jsonapi_spec_helpers">spec helpers</a>:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'jsonapi_spec_helpers'</span>
-
-<span class="c1"># ... code ...</span>
-<span class="no">RSpec</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
-  <span class="c1"># ... code ...</span>
-  <span class="n">config</span><span class="p">.</span><span class="nf">include</span> <span class="no">JsonapiSpecHelpers</span>
-<span class="k">end</span>
-</code></pre>
-</div>
-
-<p>And the <code class="highlighter-rouge">factory_girl</code> helpers:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># ... code ...</span>
-<span class="n">config</span><span class="p">.</span><span class="nf">include</span> <span class="no">FactoryGirl</span><span class="o">::</span><span class="no">Syntax</span><span class="o">::</span><span class="no">Methods</span>
-</code></pre>
-</div>
-
-<p>And the <code class="highlighter-rouge">database_cleaner</code> glue code:</p>
-
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># ... code ...</span>
-<span class="n">config</span><span class="p">.</span><span class="nf">before</span><span class="p">(</span><span class="ss">:suite</span><span class="p">)</span> <span class="k">do</span>
-  <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">strategy</span> <span class="o">=</span> <span class="ss">:transaction</span>
-  <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">clean_with</span><span class="p">(</span><span class="ss">:truncation</span><span class="p">)</span>
-<span class="k">end</span>
-
-<span class="n">config</span><span class="p">.</span><span class="nf">around</span><span class="p">(</span><span class="ss">:each</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">example</span><span class="o">|</span>
-  <span class="k">begin</span>
-    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">cleaning</span> <span class="k">do</span>
-      <span class="n">example</span><span class="p">.</span><span class="nf">run</span>
-    <span class="k">end</span>
-  <span class="k">ensure</span>
-    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">clean</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre>
-</div>
-
 <p>By default we rescue exceptions and return a valid <a href="http://jsonapi.org/format/#errors">error response</a>.
 In tests, this can be confusing - we probably want to raise errors in
-tests. Enable errors by:</p>
+tests. So note our exception handling is disabled by default:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">config</span><span class="p">.</span><span class="nf">before</span> <span class="ss">:each</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># spec/rails_helper.rb</span>
+<span class="n">config</span><span class="p">.</span><span class="nf">before</span> <span class="ss">:each</span> <span class="k">do</span>
   <span class="no">JsonapiErrorable</span><span class="p">.</span><span class="nf">disable!</span>
 <span class="k">end</span>
 </code></pre>
 </div>
 
-<p>And if you do need this functionality in a specific test:</p>
+<p>But you can enable it on a per-test basis:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"renders validation errors"</span> <span class="k">do</span>
   <span class="no">JsonapiErrorable</span><span class="p">.</span><span class="nf">enable!</span>
@@ -779,9 +679,7 @@ tests. Enable errors by:</p>
 </div>
 
 <p>In following this guide, we generated <code class="highlighter-rouge">Post</code> and
-<code class="highlighter-rouge">Comment</code> resources. But - to avoid the overhead of testing during a
-quickstart - we didn’t have <code class="highlighter-rouge">factory_girl</code> installed when we ran those
-generators. Let’s go ahead and add those files now:</p>
+<code class="highlighter-rouge">Comment</code> resources. Let’s edit our <a href="https://github.com/thoughtbot/factory_bot">factories</a> to seed randomized data:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># spec/factories/post.rb</span>
 <span class="no">FactoryGirl</span><span class="p">.</span><span class="nf">define</span> <span class="k">do</span>
@@ -884,16 +782,20 @@ patterns to get a feel for what’s right for you.</p>
 
 <h3 id="bonus-documentation"><a name="documentation" href="#documentation">Bonus: Documentation</a></h3>
 
-<p>We can autodocument our code using <a href="https://swagger.io">swagger documentation</a>. Once you follow the <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-autodocument">installation instructions</a>, documenting an endpoint is one line of code:</p>
+<p>We can autodocument our code using <a href="https://swagger.io">swagger documentation</a>. Documenting an endpoint is one line of code:</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi_resource</span> <span class="s1">'/v1/employees'</span>
 </code></pre>
 </div>
 
-<p>Our custom UI will show all possible query parameters (including nested
+<p>Visit <code class="highlighter-rouge">http://localhost:3000/api/docs</code> to see the swagger documentation. Our custom UI will show all possible query parameters (including nested
 relationships), as well as schemas for request/responses:</p>
 
 <p><img style="width: 100%" src="https://user-images.githubusercontent.com/55264/28526490-af7ce5a8-7055-11e7-88bf-1ce5ead32dd7.png" /></p>
+
+<p>Our generator set up some boilerplate to enable this functionality, you
+can learn more at: <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-autodocument">How
+to Autodocument with Swagger</a></p>
 
 <p><br />
 <br />

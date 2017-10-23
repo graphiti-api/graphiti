@@ -5,64 +5,31 @@ layout: page
 Quickstart
 ==========
 
-##### Zero to API in 10 minutes
+##### Zero to API in 5 minutes
 
 This quickstart will use Rails with ActiveRecord. Head to the guides
 section for usage with alternate ORMs or avoiding Rails
 completely.
 
+If the below seems too "magical", don't worry - we're just applying some
+sensible defaults to get started quickly.
+
 # <a name="installation" href='#installation'>Installation</a>
 
-Let's start with a classic Rails blog:
+Let's start with a classic Rails blog. We'll use a [template](http://guides.rubyonrails.org/rails_application_templates.html) to handle some of the boilerplate. Just run this command and accept all the defaults for now:
 
 ```bash
-$ rails new blog --api
+$ rails new blog --api -m https://raw.githubusercontent.com/jsonapi-suite/rails_template/master/all.rb
 ```
 
-Now add dependencies to your `Gemfile`:
-
-```ruby
-gem 'jsonapi_suite'
-gem 'jsonapi-rails', '~> 0.2.1'
-gem 'kaminari'
-```
-
-The gem `kaminari` is optional (gems like `will_paginate` are also supported), but recommended if you'd like easy
-pagination out-of-the-box.
-
-Of course now we need to:
-
-```bash
-$ bundle install
-```
-
-Now that we've installed, let's bootstrap the suite. This will add a
-few files and lines of code you don't need to worry about right now
-(there are comments if you are curious):
-
-```bash
-$ bundle exec rails g jsonapi_suite:install
-```
-
-Finally, let's set up our routes so that we have a simple versioning
-pattern baked-in:
-
-```ruby
-# config/routes.rb
-scope path: '/api' do
-  scope path: '/v1' do
-    # your routes will go here
-  end
-end
-```
-
-This routing pattern is not required, but you will have to manually add
-your own routing if you opt-out.
+Feel free to run `git diff` if you're interested in the
+particulars; this is mostly just installing gems and including modules.
 
 # <a name="defining-a-resource" href='#defining-a-resource'>Defining a Resource</a>
 
-A `Resource` defines how to query and persist your `Model`. So first,
-let's define our model:
+A `Resource` defines how to query and persist your `Model`. In other
+words: a `Model` is to the database as `Resource` is to the API. So
+first, let's define our model:
 
 ```bash
 $ bundle exec rails generate model Post title:string active:boolean
@@ -73,22 +40,19 @@ Now we can use the built-in generator to define our `Resource`,
 controller, and specs:
 
 ```bash
-$ bundle exec rails g jsonapi:resource Post
+$ bundle exec rails g jsonapi:resource Post title:string active:boolean
 ```
 
 You'll see a number of files created. If you open each one, you'll see
 comments explaining what's going on. Head over to the
-[tutorial](/tutorial) for a
-more in-depth understanding.
+[tutorial](/tutorial) for a more in-depth understanding. For now, let's
+focus on two key concepts you'll see over and over again: inputs (via
+[strong_resources](https://jsonapi-suite.github.io/strong_resources/)),
+and outputs (via [jsonapi-rb](http://jsonapi-rb.org)).
 
-There is a small bit of manual code: specifying the attributes of your
-resource. We have to do this in three places: our API inputs (using our
-version of `strong_parameters`), API outputs (using [jsonapi-rb](http://jsonapi-rb.org),
-a library similar to `active_model_serializers`), and tests.
-
-Start by specifying which attributes the user should be able to create
-and update. This is all configurable, but for now let's let all `Post`
-attributes in:
+Our **API Inputs** are defined in
+`config/initializers/strong_resources.rb`. You can think of these as
+[strong parameter](http://api.rubyonrails.org/v5.0/classes/ActionController/StrongParameters.html) templates.
 
 ```ruby
 # config/initializers/strong_resources.rb
@@ -98,8 +62,9 @@ strong_resource :post do
 end
 ```
 
-Now specify what attributes you want to serialize as part of the
-response:
+Our **API Outputs** are defined in
+`app/serializers/serializable_post.rb`. The DSL is very similar to
+[active_model_serializers](https://github.com/rails-api/active_model_serializers) and full documentation can be found at [jsonapi-rg.org](http://jsonapi-rb.org):
 
 ```ruby
 # app/serializers/serializable_post.rb
@@ -111,7 +76,7 @@ class SerializablePost < JSONAPI::Serializable::Resource
 end
 ```
 
-And run your app!:
+Now run your app!:
 
 ```
 $ bundle exec rails s
@@ -350,7 +315,7 @@ belongs_to :post, optional: true
 ...and corresponding `Resource` object:
 
 ```bash
-$ bundle exec rails g jsonapi:resource Comment
+$ bundle exec rails g jsonapi:resource Comment body:text active:boolean
 ```
 
 Configure the relationship in `PostResource`:
@@ -366,27 +331,11 @@ This code:
 
 * Whitelists the relationship.
 * Knows to link the objects via `post_id`.
-* Will use `CommentResource` for querying logic.
-* Uses an unfiltered base scope (`Comment.all`)
-
-Now specify the fields we want to output:
-
-```ruby
-# app/serializers/serializable_comment.rb
-attribute :body
-attribute :active
-attribute :created_at
-```
-
-And the fields we accept on input:
-
-```ruby
-# config/initializers/strong_resources.rb
-strong_resource :comment do
-  attribute :body, :string
-  attribute :active, :boolean
-end
-```
+* Will use `CommentResource` for querying logic (so we can say things
+like "only return the latest 3 active comments")
+* Uses an unfiltered base scope (`Comment.all`). If we wanted, we could
+do things like `Comment.active` here to ensure only active comments are
+ever returned.
 
 You should now be able to hit `/api/v1/comments` with all the same
 functionality as before. We just need to seed data.
@@ -461,6 +410,13 @@ strong_resource :post do
 end
 ```
 
+And tell our serializer it's OK to render comments:
+
+```ruby
+# app/serializers/post_serializer.rb
+has_many :comments
+```
+
 Now run the script to persist the `Post` and its three `Comment`s in a
 single request:
 
@@ -510,40 +466,28 @@ code.
 
 We have a full CRUD API with robust querying functionality, and the
 ability to combine relationships for both reads and writes. But what
-happens when you need to customize the sorting logic? What replacing
+happens when you need to customize the sorting logic? What about replacing
 `ActiveRecord` with an alternate persistence layer, or avoiding Rails
 altogether?
 
 These are important topics that JSONAPI Suite was built to address. To
 learn more about advanced usage and customization, we suggest following
-the [tutorial](/tutorial).
+the [tutorial](/tutorial). There are also a number of how-tos on this
+site, a good one to start with is  <a href="{{site.github.url}}/how-to-use-without-activerecord">How
+to Use without ActiveRecord</a>
 
 For additional documentation, view the [YARD Docs](https://jsonapi-suite.github.io/jsonapi_compliable/).
+
 For help with specific use cases, join our Slack chat at https://jsonapi-suite.slack.com (email <richmolj@gmail.com> for an invite).
 
 # <a name="testing" href='#testing'>Bonus: Testing</a>
 
 ### <a name="testing-install" href='#testing-install'>Installation</a>
 
-Sharp eyes may have noticed we generated a number of spec files. Before
-running these tests, we need to install and set up dependencies:
+Our generator applied some sensible defaults:
 
-```ruby
-# Gemfile
-group :development, :test do
-  gem 'rspec-rails'
-  gem 'factory_girl_rails'
-end
-
-group :test do
-  gem 'database_cleaner'
-  gem 'faker'
-  gem 'jsonapi_spec_helpers', require: false
-end
-```
-
-Only RSpec and `jsonapi_spec_helpers` are required, the rest are sensible defaults:
-
+  * [Rspec](https://github.com/rspec/rspec-rails) Test runner
+  * [jsonapi_spec_helpers](https://jsonapi-suite.github.io/jsonapi_spec_helpers) Helpers to parse and assert on JSONAPI payloads.
   * [factory_girl](https://github.com/thoughtbot/factory_girl) for
   seeding our test database with fake data.
   * [faker](https://github.com/stympy/faker) for generating fake values,
@@ -551,62 +495,18 @@ Only RSpec and `jsonapi_spec_helpers` are required, the rest are sensible defaul
   * [database_cleaner](https://github.com/DatabaseCleaner/database_cleaner)
   to ensure our fake data gets cleaned up between test runs.
 
-Now let's install everything and bootstrap RSpec:
-
-```bash
-$ bundle install && bundle exec rails g rspec:install
-```
-
-Edit `spec/rails_helper.rb` to add JSONAPI Suite [spec helpers](https://jsonapi-suite.github.io/jsonapi_spec_helpers):
-
-```ruby
-require 'jsonapi_spec_helpers'
-
-# ... code ...
-RSpec.configure do |config|
-  # ... code ...
-  config.include JsonapiSpecHelpers
-end
-```
-
-And the `factory_girl` helpers:
-
-```ruby
-# ... code ...
-config.include FactoryGirl::Syntax::Methods
-```
-
-And the `database_cleaner` glue code:
-
-```ruby
-# ... code ...
-config.before(:suite) do
-  DatabaseCleaner.strategy = :transaction
-  DatabaseCleaner.clean_with(:truncation)
-end
-
-config.around(:each) do |example|
-  begin
-    DatabaseCleaner.cleaning do
-      example.run
-    end
-  ensure
-    DatabaseCleaner.clean
-  end
-end
-```
-
 By default we rescue exceptions and return a valid [error response](http://jsonapi.org/format/#errors).
 In tests, this can be confusing - we probably want to raise errors in
-tests. Enable errors by:
+tests. So note our exception handling is disabled by default:
 
 ```ruby
+# spec/rails_helper.rb
 config.before :each do
   JsonapiErrorable.disable!
 end
 ```
 
-And if you do need this functionality in a specific test:
+But you can enable it on a per-test basis:
 
 ```ruby
 it "renders validation errors" do
@@ -617,9 +517,7 @@ end
 ```
 
 In following this guide, we generated `Post` and
-`Comment` resources. But - to avoid the overhead of testing during a
-quickstart - we didn't have `factory_girl` installed when we ran those
-generators. Let's go ahead and add those files now:
+`Comment` resources. Let's edit our [factories](https://github.com/thoughtbot/factory_bot) to seed randomized data:
 
 ```ruby
 # spec/factories/post.rb
@@ -720,16 +618,20 @@ patterns to get a feel for what's right for you.
 
 ### <a name="documentation" href='#documentation'>Bonus: Documentation</a>
 
-We can autodocument our code using [swagger documentation](https://swagger.io). Once you follow the <a href="{{site.github.url}}/how-to-autodocument">installation instructions</a>, documenting an endpoint is one line of code:
+We can autodocument our code using [swagger documentation](https://swagger.io). Documenting an endpoint is one line of code:
 
 ```ruby
 jsonapi_resource '/v1/employees'
 ```
 
-Our custom UI will show all possible query parameters (including nested
+Visit `http://localhost:3000/api/docs` to see the swagger documentation. Our custom UI will show all possible query parameters (including nested
 relationships), as well as schemas for request/responses:
 
 <img style="width: 100%" src="https://user-images.githubusercontent.com/55264/28526490-af7ce5a8-7055-11e7-88bf-1ce5ead32dd7.png" />
+
+Our generator set up some boilerplate to enable this functionality, you
+can learn more at: <a href="{{site.github.url}}/how-to-autodocument">How
+to Autodocument with Swagger</a>
 
 <br />
 <br />
