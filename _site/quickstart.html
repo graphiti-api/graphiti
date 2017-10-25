@@ -11,7 +11,7 @@
 
   <link rel="stylesheet" type="text/css" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
   <link rel="stylesheet" href="https://jsonapi-suite.github.io/jsonapi_suite/assets/main.css">
-  <link rel="canonical" href="http://localhost:4000/quickstart.html">
+  <link rel="canonical" href="/quickstart.html">
   <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
 
   <!-- javascript -->
@@ -562,7 +562,8 @@ functionality as before. We just need to seed data.</p>
 
 <p>Tell our controller it’s OK to sidepost comments:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">strong_resource</span> <span class="ss">:post</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/controllers/posts_controller.rb</span>
+<span class="n">strong_resource</span> <span class="ss">:post</span> <span class="k">do</span>
   <span class="n">has_many</span> <span class="ss">:comments</span>
 <span class="k">end</span>
 </code></pre>
@@ -570,7 +571,7 @@ functionality as before. We just need to seed data.</p>
 
 <p>And tell our serializer it’s OK to render comments:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/serializers/post_serializer.rb</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/serializers/serializable_post.rb</span>
 <span class="n">has_many</span> <span class="ss">:comments</span>
 </code></pre>
 </div>

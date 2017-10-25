@@ -405,6 +405,7 @@ post.save({ with: ['comments'] });
 Tell our controller it's OK to sidepost comments:
 
 ```ruby
+# app/controllers/posts_controller.rb
 strong_resource :post do
   has_many :comments
 end
@@ -413,7 +414,7 @@ end
 And tell our serializer it's OK to render comments:
 
 ```ruby
-# app/serializers/post_serializer.rb
+# app/serializers/serializable_post.rb
 has_many :comments
 ```
 
