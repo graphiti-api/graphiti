@@ -13,6 +13,17 @@ module JsonapiCompliable
       end
     end
 
+    class InvalidInclude < StandardError
+      def initialize(relationship, parent_resource)
+        @relationship = relationship
+        @parent_resource = parent_resource
+      end
+
+      def message
+        "The requested included relationship \"#{@relationship}\" is not supported on resource \"#{@parent_resource}\""
+      end
+    end
+
     class StatNotFound < StandardError
       def initialize(attribute, calculation)
         @attribute = attribute

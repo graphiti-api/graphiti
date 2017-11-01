@@ -33,9 +33,8 @@ RSpec.describe JsonapiCompliable::Scope do
         allow(resource).to receive(:resolve).with(objekt) { results }
       end
 
-      context 'when the requested sideload is allowed' do
+      context 'when the requested sideload exists on the resource' do
         before do
-          allow(resource).to receive(:allowed_sideloads) { { books: {} } }
           allow(resource).to receive(:sideload).with(:books) { sideload }
         end
 
@@ -56,6 +55,18 @@ RSpec.describe JsonapiCompliable::Scope do
             expect(sideload).to_not receive(:resolve)
             instance.resolve
           end
+        end
+      end
+
+      context 'when the requested sideload does not exist' do
+        before do
+          allow(resource).to receive(:sideload).with(:books) { nil }
+        end
+
+        it 'raises a helpful error' do
+          expect do
+            instance.resolve
+          end.to raise_error(JsonapiCompliable::Errors::InvalidInclude, 'The requested included relationship "books" is not supported on resource "authors"')
         end
       end
     end
