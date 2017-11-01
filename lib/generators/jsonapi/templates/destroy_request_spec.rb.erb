@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "<%= type %>#destroy", type: :request do
   context 'basic destroy' do
-    let!(:<%= file_name %>) { FactoryBot.create(:<%= file_name %>) }
+    let!(:<%= file_name %>) { create(:<%= file_name %>) }
 
     it 'updates the resource' do
       expect {
