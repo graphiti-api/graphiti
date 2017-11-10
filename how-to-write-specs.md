@@ -13,7 +13,7 @@ use something like [json_matchers](https://github.com/thoughtbot/json_matchers) 
 
 Let's say we're testing the `show` action of our employees controller, sideloading the employee's department. Follow the [Quickstart](/quickstart) to make sure your `rails_helper.rb` is setup correctly first.
 
-Let's say we're testing the `show` action of our employees controller, sideloading the employee's department. Let's begin with vanilla RSpec of what the test might look like:
+Let's say we're testing the `show` action of our employees controller, sideloading the employee's department.
 
 
 Let's begin with vanilla RSpec of what the test might look like:
