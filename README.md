@@ -12,4 +12,6 @@ Easily build jsonapi.org-compatible APIs in Rails.
 
 [Join the Slack Channel](https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjcxNDYzMDYxODYzLWFjYmU1YzdkYWRlODlmYTQ0YWUzNGE3NzAxNjQ2Mzk2N2NlZmZkN2JjNDYxZmNlNDQzNDQwYzNkMmFhODMwYjA)
 
+Direct Contact: richmolj@gmail.com
+
 Supports Rails >= 4.1
