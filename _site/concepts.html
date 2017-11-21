@@ -366,7 +366,7 @@ has_many :comments,
 allow_sideload :blog, resource: BlogResource do
   # Return a scope so further query parameters can be applied
   # and the Resource logic can be re-used
-  data do |posts|
+  scope do |posts|
     Blog.where(id: posts.map(&amp;:blog_id))
   end
 
