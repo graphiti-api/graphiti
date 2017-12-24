@@ -479,7 +479,7 @@ to Use without ActiveRecord</a>
 
 For additional documentation, view the [YARD Docs](https://jsonapi-suite.github.io/jsonapi_compliable/).
 
-For help with specific use cases, [join our Slack chat](https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjcxNDYzMDYxODYzLWFjYmU1YzdkYWRlODlmYTQ0YWUzNGE3NzAxNjQ2Mzk2N2NlZmZkN2JjNDYxZmNlNDQzNDQwYzNkMmFhODMwYjA)!
+For help with specific use cases, [join our Slack chat](https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg)!
 
 # <a name="testing" href='#testing'>Bonus: Testing</a>
 
