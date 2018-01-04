@@ -48,7 +48,7 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     def do_put(id)
-      put :update, params: payload.merge(id: id)
+      put :update, params: payload
     end
 
     before do
@@ -146,6 +146,152 @@ if ENV["APPRAISAL_INITIALIZED"]
         delete :destroy, params: { id: employee.id }
         expect(json_item['id']).to eq(employee.id.to_s)
         expect(json_item['first_name']).to eq('Joe')
+      end
+    end
+
+    describe 'has_one nested relationship' do
+      context 'for new records' do
+        let(:payload) do
+          {
+            data: {
+              type: 'employees',
+              attributes: {
+                first_name: 'Joe',
+                last_name: 'Smith',
+                age: 30
+              },
+              relationships: {
+                salary: {
+                  data: {
+                    :'temp-id' => 'abc123',
+                    type: 'salaries',
+                    method: 'create'
+                  },
+                }
+              }
+            },
+            included: [
+              {
+                :'temp-id' => 'abc123',
+                type: 'salaries',
+                attributes: {
+                  base_rate: 15.00,
+                  overtime_rate: 30.00
+                }
+              }
+            ]
+          }
+        end
+
+        it 'can create' do
+          expect {
+            do_post
+          }.to change { Salary.count }.by(1)
+
+          salary = Employee.first.salary
+          expect(salary.base_rate).to eq(15.0)
+          expect(salary.overtime_rate).to eq(30.0)
+        end
+      end
+
+      context 'for existing records' do
+        let(:employee) { Employee.create!(first_name: 'Joe') }
+        let(:salary) { Salary.new(base_rate: 15.0, overtime_rate: 30.00) }
+
+        before do
+          employee.salary = salary
+          employee.save!
+        end
+
+        context 'on update' do
+          let(:payload) do
+            {
+              data: {
+                id: employee.id,
+                type: 'employees',
+                relationships: {
+                  salary: {
+                    data: {
+                      id: salary.id,
+                      type: 'salaries',
+                      method: 'update'
+                    },
+                  }
+                }
+              },
+              included: [
+                {
+                  id: salary.id,
+                  type: 'salaries',
+                  attributes: {
+                    base_rate: 15.75
+                  }
+                }
+              ]
+            }
+          end
+
+          it 'can update' do
+            expect {
+              do_put(employee.id)
+            }.to change { employee.reload.salary.base_rate }.from(15.0).to(15.75)
+          end
+        end
+
+        context 'on destroy' do
+          let(:payload) do
+            {
+              data: {
+                id: employee.id,
+                type: 'employees',
+                relationships: {
+                  salary: {
+                    data: {
+                      id: salary.id,
+                      type: 'salaries',
+                      method: 'destroy'
+                    }
+                  }
+                }
+              }
+            }
+          end
+
+          it 'can destroy' do
+            do_put(employee.id)
+            employee.reload
+
+            expect(employee.salary).to be_nil
+            expect { salary.reload }.to raise_error(ActiveRecord::RecordNotFound)
+          end
+        end
+
+        context 'on disassociate' do
+          let(:payload) do
+            {
+              data: {
+                id: employee.id,
+                type: 'employees',
+                relationships: {
+                  salary: {
+                    data: {
+                      id: salary.id,
+                      type: 'salaries',
+                      method: 'disassociate'
+                    }
+                  }
+                }
+              }
+            }
+          end
+
+          it 'can disassociate' do
+            do_put(employee.id)
+            salary.reload
+
+            expect(salary.employee_id).to be_nil
+          end
+        end
       end
     end
 

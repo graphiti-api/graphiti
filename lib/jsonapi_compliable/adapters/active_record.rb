@@ -80,6 +80,8 @@ module JsonapiCompliable
           else
             parent.send(association_name) << child
           end
+        elsif association_type == :has_one
+          parent.send("#{association_name}=", child)
         elsif
           child.send("#{association_name}=", parent)
         end

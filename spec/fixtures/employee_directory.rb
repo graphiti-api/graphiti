@@ -38,6 +38,12 @@ ActiveRecord::Schema.define(:version => 1) do
   create_table :departments do |t|
     t.string :name
   end
+
+  create_table :salaries do |t|
+    t.integer :employee_id
+    t.decimal :base_rate
+    t.decimal :overtime_rate
+  end
 end
 
 class ApplicationRecord < ActiveRecord::Base
@@ -75,6 +81,8 @@ class Employee < ApplicationRecord
 
   has_many :employee_teams
   has_many :teams, through: :employee_teams
+
+  has_one :salary
 end
 
 class Position < ApplicationRecord
@@ -84,6 +92,10 @@ end
 
 class Department < ApplicationRecord
   has_many :positions
+end
+
+class Salary < ApplicationRecord
+  belongs_to :employee
 end
 
 class ApplicationResource < JsonapiCompliable::Resource
@@ -125,6 +137,11 @@ class HomeOfficeResource < ApplicationResource
   model HomeOffice
 end
 
+class SalaryResource < ApplicationResource
+  type :salaries
+  model Salary
+end
+
 class EmployeeResource < ApplicationResource
   type :employees
   model Employee
@@ -141,6 +158,10 @@ class EmployeeResource < ApplicationResource
     resource: TeamResource,
     scope: -> { Team.all },
     foreign_key: { employee_teams: :employee_id }
+  has_one :salary,
+    resource: SalaryResource,
+    scope: -> { Salary.all },
+    foreign_key: :employee_id
 
   polymorphic_belongs_to :workspace,
     group_by: :workspace_type,
@@ -183,6 +204,8 @@ class SerializableEmployee < SerializableAbstract
   belongs_to :classification
   has_many :positions
   has_many :teams
+
+  has_one :salary
 end
 
 class SerializablePosition < SerializableAbstract
@@ -200,4 +223,11 @@ class SerializableDepartment < SerializableAbstract
   attribute :name
 
   has_many :positions
+end
+
+class SerializableSalary < SerializableAbstract
+  type 'salaries'
+
+  attribute :base_rate
+  attribute :overtime_rate
 end
