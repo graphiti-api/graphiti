@@ -8,7 +8,7 @@
 
 Supported Rails versions: >= 4.1
 
-### Upgrading from 0.10.x to 0.11.x
+### Upgrading to 0.11.x
 
 Due to a backwards-incompatibility introduced in the underlying
 [jsonapi-rb](http://jsonapi-rb.org) gem, specifying custom serializers
