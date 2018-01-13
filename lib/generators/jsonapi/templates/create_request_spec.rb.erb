@@ -1,7 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe "<%= type %>#create", type: :request do
-  context 'basic create' do
+  subject(:make_request) do
+    jsonapi_post "/<%= api_namespace %>/v1/<%= type %>", payload
+  end
+
+  describe 'basic create' do
     let(:payload) do
       {
         data: {
@@ -15,7 +19,7 @@ RSpec.describe "<%= type %>#create", type: :request do
 
     it 'creates the resource' do
       expect {
-        jsonapi_post "/<%= api_namespace %>/v1/<%= type %>", payload
+        make_request
       }.to change { <%= model_klass %>.count }.by(1)
       <%= file_name %> = <%= model_klass %>.last
 

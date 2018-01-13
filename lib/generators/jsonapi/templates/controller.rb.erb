@@ -39,7 +39,9 @@ class <%= model_klass.name.pluralize %>Controller < ApplicationController
   <%- end -%>
   def show
     scope = jsonapi_scope(<%= model_klass %>.where(id: params[:id]))
-    render_jsonapi(scope.resolve.first, scope: false)
+    instance = scope.resolve.first
+    raise JsonapiCompliable::Errors::RecordNotFound unless instance
+    render_jsonapi(instance, scope: false)
   end
 
   <%- end -%>
@@ -86,7 +88,7 @@ class <%= model_klass.name.pluralize %>Controller < ApplicationController
     <%= file_name %>, success = jsonapi_destroy.to_a
 
     if success
-      render_jsonapi(<%= file_name %>, scope: false)
+      render json: { meta: {} }
     else
       render_errors_for(<%= file_name %>)
     end
