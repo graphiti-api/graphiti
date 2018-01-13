@@ -15,3 +15,7 @@ Easily build jsonapi.org-compatible APIs in Rails.
 Direct Contact: richmolj@gmail.com
 
 Supports Rails >= 4.1
+
+### Upgrading
+
+When upgrading the [jsonapi_compliable](https://github.com/jsonapi-suite/jsonapi_compliable) dependency to 0.11.x, please see [this note](https://github.com/jsonapi-suite/jsonapi_compliable/blob/master/README.md#upgrading-to-011x)
