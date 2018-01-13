@@ -6,7 +6,14 @@ module JsonapiCompliable
       def self.generate(object, query_hash, overrides = {})
         resolved = object.respond_to?(:resolve) ? object.resolve : object
 
+        inferrer = ::Hash.new do |h, k|
+          names = k.to_s.split('::')
+          klass = names.pop
+          h[k] = [*names, "Serializable#{klass}"].join('::').safe_constantize
+        end
+
         options            = {}
+        options[:class]    = inferrer
         options[:include]  = query_hash[:include]
         options[:jsonapi]  = resolved
         options[:fields]   = query_hash[:fields]

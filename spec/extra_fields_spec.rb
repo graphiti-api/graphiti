@@ -36,7 +36,7 @@ RSpec.describe 'extra_fields' do
   end
 
   let(:json) do
-    render(scope.resolve, class: SerializableTestExtraFields)
+    render(scope.resolve, class: { Author: SerializableTestExtraFields })
   end
 
   it 'does not include extra fields when not requested' do

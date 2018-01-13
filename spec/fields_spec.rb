@@ -23,7 +23,7 @@ RSpec.describe 'fields' do
   let!(:author) { Author.create!(first_name: 'Stephen', last_name: 'King') }
 
   def json
-    render(scope.resolve, class: SerializableTestFields)
+    render(scope.resolve, class: { Author: SerializableTestFields })
   end
 
   it 'does not limit without fields param' do

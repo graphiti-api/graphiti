@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Pinning this version until backwards-incompatibility is addressed
-  spec.add_dependency 'jsonapi-serializable', '~> 0.2.0'
+  spec.add_dependency 'jsonapi-serializable', '~> 0.3.0'
 
   spec.add_development_dependency "activerecord", ['>= 4.1', '< 6']
   spec.add_development_dependency "kaminari", '~> 0.17'

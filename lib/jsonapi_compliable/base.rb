@@ -290,7 +290,7 @@ module JsonapiCompliable
 
     def perform_render_jsonapi(opts)
       # TODO(beauby): Reuse renderer.
-      JSONAPI::Serializable::SuccessRenderer.new
+      JSONAPI::Serializable::Renderer.new
         .render(opts.delete(:jsonapi), opts).to_json
     end
 
