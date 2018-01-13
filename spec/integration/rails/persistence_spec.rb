@@ -37,9 +37,13 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       def destroy
-        employee = Employee.find(params[:id])
-        employee.destroy
-        render_jsonapi(employee, scope: false)
+        employee, success = jsonapi_destroy.to_a
+
+        if success
+          render json: { meta: {} }
+        else
+          render json: { error: employee.errors }
+        end
       end
     end
 
@@ -135,17 +139,37 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     describe 'basic destroy' do
-      let(:employee) { Employee.create!(first_name: 'Joe') }
+      let!(:employee) { Employee.create!(first_name: 'Joe') }
+
+      before do
+        allow_any_instance_of(Employee)
+          .to receive(:force_validation_error) { force_validation_error }
+      end
+
+      let(:force_validation_error) { false }
 
       it 'deletes the object' do
-        delete :destroy, params: { id: employee.id }
+        expect {
+          delete :destroy, params: { id: employee.id }
+        }.to change { Employee.count }.by(-1)
         expect { employee.reload }.to raise_error(ActiveRecord::RecordNotFound)
       end
 
-      it 'responds with object' do
+      it 'responds with 200, empty meta' do
         delete :destroy, params: { id: employee.id }
-        expect(json_item['id']).to eq(employee.id.to_s)
-        expect(json_item['first_name']).to eq('Joe')
+        expect(response.status).to eq(200)
+        expect(json).to eq({ 'meta' => {} })
+      end
+
+      context 'when validation errors' do
+        let(:force_validation_error) { true }
+
+        it 'responds with correct error payload' do
+          expect {
+            delete :destroy, params: { id: employee.id }
+          }.to_not change { Employee.count }
+          expect(json['error']).to eq('base' => ['Forced validation error'])
+        end
       end
     end
 

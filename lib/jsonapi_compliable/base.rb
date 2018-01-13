@@ -226,6 +226,12 @@ module JsonapiCompliable
       end
     end
 
+    def jsonapi_destroy
+      _persist do
+        jsonapi_resource.destroy(params[:id])
+      end
+    end
+
     # Similar to +render :json+ or +render :jsonapi+
     #
     # By default, this will "build" the scope via +#jsonapi_scope+. To avoid

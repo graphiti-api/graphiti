@@ -207,10 +207,18 @@ class JsonapiCompliable::Deserializer
   end
 
   def raw_attributes
-    data[:attributes] || {}
+    if data
+      data[:attributes] || {}
+    else
+      {}
+    end
   end
 
   def raw_relationships
-    data[:relationships] || {}
+    if data
+      data[:relationships] || {}
+    else
+      {}
+    end
   end
 end

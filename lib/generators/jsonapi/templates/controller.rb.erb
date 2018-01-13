@@ -79,13 +79,17 @@ class <%= model_klass.name.pluralize %>Controller < ApplicationController
   <%- end -%>
   <%- if actions?('destroy') -%>
   <%- unless omit_comments? -%>
-  # No need for any special logic here as no_content is jsonapi_compliant.
-  # Customize this if you have a more complex use case.
+  # Renders 200 OK with empty meta
+  # http://jsonapi.org/format/#crud-deleting-responses-200
   <%- end -%>
   def destroy
-    <%= file_name %> = <%= model_klass %>.find(params[:id])
-    <%= file_name %>.destroy
-    return head(:no_content)
+    <%= file_name %>, success = jsonapi_destroy.to_a
+
+    if success
+      render_jsonapi(<%= file_name %>, scope: false)
+    else
+      render_errors_for(<%= file_name %>)
+    end
   end
   <%- end -%>
 end

@@ -74,15 +74,34 @@ class HomeOffice < ApplicationRecord
 end
 
 class Employee < ApplicationRecord
+  attr_accessor :force_validation_error
+
   belongs_to :workspace, polymorphic: true
   belongs_to :classification
   has_many :positions
   validates :first_name, presence: true
+  validates :delete_confirmation,
+    presence: true,
+    on: :destroy
 
   has_many :employee_teams
   has_many :teams, through: :employee_teams
 
   has_one :salary
+
+  before_destroy do
+    add_validation_error if force_validation_error
+
+    if Rails::VERSION::MAJOR >= 5
+      throw(:abort) if errors.present?
+    else
+      errors.blank?
+    end
+  end
+
+  def add_validation_error
+    errors.add(:base, 'Forced validation error')
+  end
 end
 
 class Position < ApplicationRecord
