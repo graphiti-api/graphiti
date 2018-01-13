@@ -32,14 +32,18 @@ module JsonapiSuite
       unless omit_comments?
         str << "  # Bootstrap jsonapi_suite with relevant modules\n"
       end
-      str << "  include JsonapiSuite::ControllerMixin\n\n"
+      str << "  include JsonapiSuite::ControllerMixin\n"
+      str << "\n"
+      str << "  register_exception JsonapiCompliable::Errors::RecordNotFound,\n"
+      str << "    status: 404\n"
+      str << "\n"
       unless omit_comments?
         str << "  # Catch all exceptions and render a JSONAPI-compliable error payload\n"
         str << "  # For additional documentation, see https://jsonapi-suite.github.io/jsonapi_errorable\n"
       end
       str << "  rescue_from Exception do |e|\n"
       str << "    handle_exception(e)\n"
-      str << "  end\n"
+      str << "  end\n\n"
       str
     end
 
