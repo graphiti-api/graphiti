@@ -375,7 +375,7 @@ what query functionality we have. We’ve listed all <code class="highlighter-ro
       <li>Any filter not whitelisted will raise <code class="highlighter-rouge">JsonapiCompliable::BadFilter</code>
 error.</li>
       <li>
-        <p>All filter logic can be customized as one-offs:</p>
+        <p>All filter logic can be customized:</p>
 
         <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># SELECT * from posts WHERE title LIKE 'My%'</span>
 <span class="n">allow_filter</span> <span class="ss">:title_prefix</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>

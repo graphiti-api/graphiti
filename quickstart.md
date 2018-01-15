@@ -233,7 +233,7 @@ what query functionality we have. We've listed all `Post`s at
   * SQL: `SELECT * FROM posts WHERE title = "My title!"`
   * Any filter not whitelisted will raise `JsonapiCompliable::BadFilter`
   error.
-  * All filter logic can be customized as one-offs:
+  * All filter logic can be customized:
 
     ```ruby
     # SELECT * from posts WHERE title LIKE 'My%'
