@@ -1316,7 +1316,7 @@ th {
 
 html {
   font-size: 10px;
-  -webkit-tap-highlight-color: transparent; }
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
 
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -6467,7 +6467,7 @@ button.close {
   color: #fff;
   text-align: center;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
-  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0);
   filter: alpha(opacity=50);
   opacity: .5; }
 
@@ -6549,7 +6549,7 @@ button.close {
   text-indent: -999px;
   cursor: pointer;
   background-color: #000 \9;
-  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0);
   border: 1px solid #fff;
   border-radius: 10px; }
 
@@ -7474,10 +7474,10 @@ a:focus, button:focus {
     bottom: 0;
     width: 100%;
     height: 100%;
-    background: -webkit-linear-gradient(right, rgba(255, 255, 255, 0) 0%, transparent 1%, rgba(0, 0, 0, 0.1) 26%, rgba(0, 0, 0, 0.35) 71%, rgba(0, 0, 0, 0.5) 100%);
-    background: -moz-linear-gradient(right, rgba(255, 255, 255, 0) 0%, transparent 1%, rgba(0, 0, 0, 0.1) 26%, rgba(0, 0, 0, 0.35) 71%, rgba(0, 0, 0, 0.5) 100%);
-    background: -o-linear-gradient(right, rgba(255, 255, 255, 0) 0%, transparent 1%, rgba(0, 0, 0, 0.1) 26%, rgba(0, 0, 0, 0.35) 71%, rgba(0, 0, 0, 0.5) 100%);
-    background: linear-gradient(right, rgba(255, 255, 255, 0) 0%, transparent 1%, rgba(0, 0, 0, 0.1) 26%, rgba(0, 0, 0, 0.35) 71%, rgba(0, 0, 0, 0.5) 100%); }
+    background: -webkit-linear-gradient(right, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0) 1%, rgba(0, 0, 0, 0.1) 26%, rgba(0, 0, 0, 0.35) 71%, rgba(0, 0, 0, 0.5) 100%);
+    background: -moz-linear-gradient(right, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0) 1%, rgba(0, 0, 0, 0.1) 26%, rgba(0, 0, 0, 0.35) 71%, rgba(0, 0, 0, 0.5) 100%);
+    background: -o-linear-gradient(right, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0) 1%, rgba(0, 0, 0, 0.1) 26%, rgba(0, 0, 0, 0.35) 71%, rgba(0, 0, 0, 0.5) 100%);
+    background: linear-gradient(right, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0) 1%, rgba(0, 0, 0, 0.1) 26%, rgba(0, 0, 0, 0.35) 71%, rgba(0, 0, 0, 0.5) 100%); }
   .index-hero:after {
     position: absolute;
     content: '';
@@ -7830,11 +7830,11 @@ a:focus, button:focus {
           left: 0;
           right: 0;
           content: '';
-          background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, transparent), color-stop(100%, rgba(0, 0, 0, 0.25)));
+          background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, rgba(0, 0, 0, 0)), color-stop(100%, rgba(0, 0, 0, 0.25)));
           background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.25) 100%);
-          background: -moz-linear-gradient(top, transparent, rgba(0, 0, 0, 0.25));
-          background: -o-linear-gradient(top, transparent, rgba(0, 0, 0, 0.25));
-          background: linear-gradient(top, transparent, rgba(0, 0, 0, 0.25)); }
+          background: -moz-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.25));
+          background: -o-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.25));
+          background: linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.25)); }
         .slider-hero .slides .slide .bg:after {
           content: '';
           position: absolute;
@@ -8363,11 +8363,11 @@ a:focus, button:focus {
       left: 0;
       right: 0;
       content: '';
-      background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, transparent), color-stop(100%, rgba(0, 0, 0, 0.25)));
+      background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, rgba(0, 0, 0, 0)), color-stop(100%, rgba(0, 0, 0, 0.25)));
       background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.25) 100%);
-      background: -moz-linear-gradient(top, transparent, rgba(0, 0, 0, 0.25));
-      background: -o-linear-gradient(top, transparent, rgba(0, 0, 0, 0.25));
-      background: linear-gradient(top, transparent, rgba(0, 0, 0, 0.25)); }
+      background: -moz-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.25));
+      background: -o-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.25));
+      background: linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.25)); }
   .index-sidebar-hero .container {
     position: relative;
     z-index: 3;
@@ -8692,11 +8692,11 @@ a:focus, button:focus {
         right: 0;
         border-radius: 0px 5px 5px 0px;
         background-repeat: repeat-x;
-        background-image: -webkit-linear-gradient(bottom, rgba(0, 0, 0, 0.12) 0, rgba(0, 0, 0, 0.3) 30%, transparent 100%);
-        background-image: -moz-linear-gradient(bottom, rgba(0, 0, 0, 0.12) 0, rgba(0, 0, 0, 0.3) 30%, transparent 100%);
-        background-image: -ms-linear-gradient(bottom, rgba(0, 0, 0, 0.12) 0, rgba(0, 0, 0, 0.3) 30%, transparent 100%);
-        background-image: -o-linear-gradient(bottom, rgba(0, 0, 0, 0.12) 0, rgba(0, 0, 0, 0.3) 30%, transparent 100%);
-        background-image: linear-gradient(to top, rgba(0, 0, 0, 0.12) 0, rgba(0, 0, 0, 0.3) 30%, transparent 100%); }
+        background-image: -webkit-linear-gradient(bottom, rgba(0, 0, 0, 0.12) 0, rgba(0, 0, 0, 0.3) 30%, rgba(0, 0, 0, 0) 100%);
+        background-image: -moz-linear-gradient(bottom, rgba(0, 0, 0, 0.12) 0, rgba(0, 0, 0, 0.3) 30%, rgba(0, 0, 0, 0) 100%);
+        background-image: -ms-linear-gradient(bottom, rgba(0, 0, 0, 0.12) 0, rgba(0, 0, 0, 0.3) 30%, rgba(0, 0, 0, 0) 100%);
+        background-image: -o-linear-gradient(bottom, rgba(0, 0, 0, 0.12) 0, rgba(0, 0, 0, 0.3) 30%, rgba(0, 0, 0, 0) 100%);
+        background-image: linear-gradient(to top, rgba(0, 0, 0, 0.12) 0, rgba(0, 0, 0, 0.3) 30%, rgba(0, 0, 0, 0) 100%); }
       .blog-showcase .pics .pic img {
         display: block;
         margin: 0 auto;
@@ -10927,7 +10927,7 @@ a:focus, button:focus {
     -o-transition: 0.5s cubic-bezier(0.25, 1.45, 0.51, 1.13);
     transition: 0.5s cubic-bezier(0.25, 1.45, 0.51, 1.13); }
     .gallery-showcase .pic.fluidbox-opened:hover .layer {
-      background: transparent; }
+      background: rgba(0, 0, 0, 0); }
       .gallery-showcase .pic.fluidbox-opened:hover .layer p {
         opacity: 0;
         filter: alpha(opacity=0); }
@@ -10946,7 +10946,7 @@ a:focus, button:focus {
       z-index: 9;
       top: 0px;
       left: 0px;
-      background: transparent;
+      background: rgba(0, 0, 0, 0);
       -webkit-transition: all 0.25s ease-out;
       -moz-transition: all 0.25s ease-out;
       -ms-transition: all 0.25s ease-out;

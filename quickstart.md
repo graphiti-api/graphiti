@@ -233,8 +233,15 @@ what query functionality we have. We've listed all `Post`s at
   * SQL: `SELECT * FROM posts WHERE title = "My title!"`
   * Any filter not whitelisted will raise `JsonapiCompliable::BadFilter`
   error.
-  * All filter logic can be customized as one-offs, or packaged into an
-  `Adapter`.
+  * All filter logic can be customized as one-offs:
+
+    ```ruby
+    # SELECT * from posts WHERE title LIKE 'My%'
+    allow_filter :title_prefix do |scope, value|
+      scope.where(["title LIKE ?", "#{value}%"])
+    end
+    ```
+  * Customizations can be DRYed up and packaged into `Adapter`s.
 
 * **Extra Fields**:
   * Sometimes you want to request additional fields not part of a normal

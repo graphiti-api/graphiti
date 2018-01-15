@@ -11,7 +11,7 @@
 
   <link rel="stylesheet" type="text/css" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
   <link rel="stylesheet" href="https://jsonapi-suite.github.io/jsonapi_suite/assets/main.css">
-  <link rel="canonical" href="/quickstart.html">
+  <link rel="canonical" href="http://localhost:4000/quickstart.html">
   <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
 
   <!-- javascript -->
@@ -374,8 +374,17 @@ what query functionality we have. We’ve listed all <code class="highlighter-ro
       <li>SQL: <code class="highlighter-rouge">SELECT * FROM posts WHERE title = "My title!"</code></li>
       <li>Any filter not whitelisted will raise <code class="highlighter-rouge">JsonapiCompliable::BadFilter</code>
 error.</li>
-      <li>All filter logic can be customized as one-offs, or packaged into an
-<code class="highlighter-rouge">Adapter</code>.</li>
+      <li>
+        <p>All filter logic can be customized as one-offs:</p>
+
+        <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># SELECT * from posts WHERE title LIKE 'My%'</span>
+<span class="n">allow_filter</span> <span class="ss">:title_prefix</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">([</span><span class="s2">"title LIKE ?"</span><span class="p">,</span> <span class="s2">"</span><span class="si">#{</span><span class="n">value</span><span class="si">}</span><span class="s2">%"</span><span class="p">])</span>
+<span class="k">end</span>
+</code></pre>
+        </div>
+      </li>
+      <li>Customizations can be DRYed up and packaged into <code class="highlighter-rouge">Adapter</code>s.</li>
     </ul>
   </li>
   <li><strong>Extra Fields</strong>:
@@ -639,7 +648,7 @@ to Use without ActiveRecord</a></p>
 
 <p>For additional documentation, view the <a href="https://jsonapi-suite.github.io/jsonapi_compliable/">YARD Docs</a>.</p>
 
-<p>For help with specific use cases, <a href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjcxNDYzMDYxODYzLWFjYmU1YzdkYWRlODlmYTQ0YWUzNGE3NzAxNjQ2Mzk2N2NlZmZkN2JjNDYxZmNlNDQzNDQwYzNkMmFhODMwYjA">join our Slack chat</a>!</p>
+<p>For help with specific use cases, <a href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">join our Slack chat</a>!</p>
 
 <h1 id="bonus-testing"><a name="testing" href="#testing">Bonus: Testing</a></h1>
 
@@ -898,7 +907,7 @@ to Autodocument with Swagger</a></p>
             <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
           </li>
           <li>
-            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjcxNDYzMDYxODYzLWFjYmU1YzdkYWRlODlmYTQ0YWUzNGE3NzAxNjQ2Mzk2N2NlZmZkN2JjNDYxZmNlNDQzNDQwYzNkMmFhODMwYjA">Slack Chat</a>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
           </li>
           <li>
             <a href="mailto:richmolj@gmail.com">Contact us</a>
