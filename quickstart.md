@@ -125,7 +125,7 @@ Accept the default for all prompts. Now add the `JSORM` dependency, as
 well as a polyfill for `fetch`:
 
 ```bash
-$ npm install --save jsorm isomorphic-fetch
+$ npm install --save jsorm@0.5.6 isomorphic-fetch
 ```
 
 Add this seed code to `index.js`:
