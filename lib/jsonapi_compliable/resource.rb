@@ -487,7 +487,7 @@ module JsonapiCompliable
     # @see .model
     # @see Adapters::ActiveRecord#update
     # @param [Hash] update_params The relevant attributes, including id and foreign keys
-    # @return [Object] an instance of the just-created model
+    # @return [Object] an instance of the just-updated model
     def update(update_params)
       adapter.update(model, update_params)
     end
@@ -507,7 +507,7 @@ module JsonapiCompliable
     # @see .model
     # @see Adapters::ActiveRecord#destroy
     # @param [String] id The +id+ of the relevant Model
-    # @return [Object] an instance of the just-created model
+    # @return [Object] an instance of the just-destroyed model
     def destroy(id)
       adapter.destroy(model, id)
     end
