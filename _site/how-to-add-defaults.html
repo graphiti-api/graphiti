@@ -9,15 +9,13 @@
   <title>JSONAPI Suite</title>
   <meta name="description" content="Collection of Ruby libraries for powering JSONAPI-compliant APIs.">
 
-  <link rel="stylesheet" type="text/css" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
-  <link rel="stylesheet" href="https://jsonapi-suite.github.io/jsonapi_suite/assets/main.css">
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css">
   <link rel="canonical" href="http://localhost:4000/how-to-add-defaults.html">
   <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
 
   <!-- javascript -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-  <script src="https://yandex.st/highlightjs/8.0/highlight.min.js"></script>
 
   
 </head>
@@ -39,13 +37,16 @@
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
       <ul class="nav navbar-nav">
         <li>
-          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart">Quickstart</a>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
         </li>
         <li>
-          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial">Tutorial</a>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
         </li>
         <li>
-          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/concepts">Concepts</a>
+          <a class="nav-link" href="http://localhost:4000/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/js/home">Javascript Client</a>
         </li>
         <li class="dropdown">
           <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
@@ -56,57 +57,54 @@
           <ul class="dropdown-menu">
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-scope-to-current-user">Scope to Current User</a>
+                <a href="http://localhost:4000/how-to-scope-to-current-user">Scope to Current User</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-cause-side-effects">Cause Side-Effects</a>
+                <a href="http://localhost:4000/how-to-cause-side-effects">Cause Side-Effects</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-use-without-activerecord">Use Alternate ORMs</a>
+                <a href="http://localhost:4000/how-to-use-without-activerecord">Use Alternate ORMs</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-build-an-adapter">Build an Adapter</a>
+                <a href="http://localhost:4000/how-to-build-an-adapter">Build an Adapter</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
+                <a href="http://localhost:4000/how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-code-polymorphic-associations">Polymorphic Relationships</a>
+                <a href="http://localhost:4000/how-to-code-polymorphic-associations">Polymorphic Relationships</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-add-defaults">Add Default Behavior</a>
+                <a href="http://localhost:4000/how-to-add-defaults">Add Default Behavior</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-conditionally-render-fields">Conditionally Render Fields</a>
+                <a href="http://localhost:4000/how-to-conditionally-render-fields">Conditionally Render Fields</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-customize-error-responses">Customize Error Responses</a>
+                <a href="http://localhost:4000/how-to-customize-error-responses">Customize Error Responses</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-write-specs">Write Specs</a>
+                <a href="http://localhost:4000/how-to-write-specs">Write Specs</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-return-statistics">Statistics</a>
+                <a href="http://localhost:4000/how-to-return-statistics">Statistics</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-autodocument">Autodocument with Swagger</a>
+                <a href="http://localhost:4000/how-to-autodocument">Autodocument with Swagger</a>
               </li>
             
           </ul>
-        </li>
-        <li>
-          <a class="nav-link" href="mailto:richmolj@gmail.com">Contact</a>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
@@ -128,15 +126,13 @@ page, unless elsewise specified by the user.</p>
 
 <p>You can see these defaults in the <a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Resource.html">Resource documentation</a>:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">default_filter</span> <span class="ss">:active</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="o">|</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">default_filter</span> <span class="ss">:active</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="o">|</span>
   <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
 <span class="k">end</span>
 
 <span class="n">default_page_size</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 
-<span class="n">default_sort</span><span class="p">([{</span> <span class="ss">created_at: :desc</span> <span class="p">}])</span>
-</code></pre>
-</div>
+<span class="n">default_sort</span><span class="p">([{</span> <span class="ss">created_at: :desc</span> <span class="p">}])</span></code></pre></figure>
 
 <p>These can all be overriden by the user. In other words, hitting
 <code class="highlighter-rouge">/posts</code> will only show active <code class="highlighter-rouge">Post</code>s, hitting
@@ -147,15 +143,13 @@ for sorting and pagination.</p>
 allow overrides for administrators. You can use the <code class="highlighter-rouge">:if</code> option to
 restrict the override:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/resources/post_resource.rb</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/post_resource.rb</span>
 <span class="n">allow_filter</span> <span class="ss">:active</span><span class="p">,</span> <span class="ss">if: :admin?</span>
 
 <span class="c1"># app/controllers/posts_controller.rb</span>
 <span class="k">def</span> <span class="nf">admin?</span>
   <span class="n">current_user</span><span class="p">.</span><span class="nf">admin?</span>
-<span class="k">end</span>
-</code></pre>
-</div>
+<span class="k">end</span></code></pre></figure>
 
 <p>Now the default behavior is to view only active <code class="highlighter-rouge">Post</code>s, but
 <em>administrators</em> can override this default.</p>
@@ -164,17 +158,48 @@ restrict the override:</p>
 <br /></p>
 
 <script type="text/javascript">
-  $(function () {
-    hljs.configure({
-      tabReplace: '  ',
-      classPrefix: ''
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
     });
 
-    $('.language-ruby code').addClass('ruby');
-    $('.language-javascript code').addClass('javascript');
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
 
-    hljs.initHighlightingOnLoad();
+  $('.tab').click(function() {
+    console.log('HEREERERE');
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
   });
+
+  flipTabs();
+})
 </script>
 
 
@@ -188,13 +213,13 @@ restrict the override:</p>
         <h3>Overview</h3>
         <ul>
           <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart">Quickstart</a>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
           </li>
           <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial">Tutorial</a>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
           </li>
           <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/concepts">Concepts</a>
+            <a href="http://localhost:4000/concepts">Concepts</a>
           </li>
         </ul>
       </div>
@@ -203,51 +228,51 @@ restrict the override:</p>
         <ul>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-scope-to-current-user">Scope to Current User</a>
+              <a href="http://localhost:4000//how-to-scope-to-current-user">Scope to Current User</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-cause-side-effects">Cause Side-Effects</a>
+              <a href="http://localhost:4000//how-to-cause-side-effects">Cause Side-Effects</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-use-without-activerecord">Use Alternate ORMs</a>
+              <a href="http://localhost:4000//how-to-use-without-activerecord">Use Alternate ORMs</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-build-an-adapter">Build an Adapter</a>
+              <a href="http://localhost:4000//how-to-build-an-adapter">Build an Adapter</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
+              <a href="http://localhost:4000//how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-code-polymorphic-associations">Polymorphic Relationships</a>
+              <a href="http://localhost:4000//how-to-code-polymorphic-associations">Polymorphic Relationships</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-add-defaults">Add Default Behavior</a>
+              <a href="http://localhost:4000//how-to-add-defaults">Add Default Behavior</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-conditionally-render-fields">Conditionally Render Fields</a>
+              <a href="http://localhost:4000//how-to-conditionally-render-fields">Conditionally Render Fields</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-customize-error-responses">Customize Error Responses</a>
+              <a href="http://localhost:4000//how-to-customize-error-responses">Customize Error Responses</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-write-specs">Write Specs</a>
+              <a href="http://localhost:4000//how-to-write-specs">Write Specs</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-return-statistics">Statistics</a>
+              <a href="http://localhost:4000//how-to-return-statistics">Statistics</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-autodocument">Autodocument with Swagger</a>
+              <a href="http://localhost:4000//how-to-autodocument">Autodocument with Swagger</a>
             </li>
           
         </ul>

@@ -1,13 +1,44 @@
 <script type="text/javascript">
-  $(function () {
-    hljs.configure({
-      tabReplace: '  ',
-      classPrefix: ''
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
     });
 
-    $('.language-ruby code').addClass('ruby');
-    $('.language-javascript code').addClass('javascript');
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
 
-    hljs.initHighlightingOnLoad();
+  $('.tab').click(function() {
+    console.log('HEREERERE');
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
   });
+
+  flipTabs();
+})
 </script>

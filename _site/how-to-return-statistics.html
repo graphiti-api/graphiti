@@ -9,15 +9,13 @@
   <title>JSONAPI Suite</title>
   <meta name="description" content="Collection of Ruby libraries for powering JSONAPI-compliant APIs.">
 
-  <link rel="stylesheet" type="text/css" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
-  <link rel="stylesheet" href="https://jsonapi-suite.github.io/jsonapi_suite/assets/main.css">
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css">
   <link rel="canonical" href="http://localhost:4000/how-to-return-statistics.html">
   <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
 
   <!-- javascript -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-  <script src="https://yandex.st/highlightjs/8.0/highlight.min.js"></script>
 
   
 </head>
@@ -39,13 +37,16 @@
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
       <ul class="nav navbar-nav">
         <li>
-          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart">Quickstart</a>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
         </li>
         <li>
-          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial">Tutorial</a>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
         </li>
         <li>
-          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/concepts">Concepts</a>
+          <a class="nav-link" href="http://localhost:4000/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/js/home">Javascript Client</a>
         </li>
         <li class="dropdown">
           <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
@@ -56,57 +57,54 @@
           <ul class="dropdown-menu">
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-scope-to-current-user">Scope to Current User</a>
+                <a href="http://localhost:4000/how-to-scope-to-current-user">Scope to Current User</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-cause-side-effects">Cause Side-Effects</a>
+                <a href="http://localhost:4000/how-to-cause-side-effects">Cause Side-Effects</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-use-without-activerecord">Use Alternate ORMs</a>
+                <a href="http://localhost:4000/how-to-use-without-activerecord">Use Alternate ORMs</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-build-an-adapter">Build an Adapter</a>
+                <a href="http://localhost:4000/how-to-build-an-adapter">Build an Adapter</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
+                <a href="http://localhost:4000/how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-code-polymorphic-associations">Polymorphic Relationships</a>
+                <a href="http://localhost:4000/how-to-code-polymorphic-associations">Polymorphic Relationships</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-add-defaults">Add Default Behavior</a>
+                <a href="http://localhost:4000/how-to-add-defaults">Add Default Behavior</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-conditionally-render-fields">Conditionally Render Fields</a>
+                <a href="http://localhost:4000/how-to-conditionally-render-fields">Conditionally Render Fields</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-customize-error-responses">Customize Error Responses</a>
+                <a href="http://localhost:4000/how-to-customize-error-responses">Customize Error Responses</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-write-specs">Write Specs</a>
+                <a href="http://localhost:4000/how-to-write-specs">Write Specs</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-return-statistics">Statistics</a>
+                <a href="http://localhost:4000/how-to-return-statistics">Statistics</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-autodocument">Autodocument with Swagger</a>
+                <a href="http://localhost:4000/how-to-autodocument">Autodocument with Swagger</a>
               </li>
             
           </ul>
-        </li>
-        <li>
-          <a class="nav-link" href="mailto:richmolj@gmail.com">Contact</a>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
@@ -126,14 +124,12 @@ above that grid, or “average cost” elsewhere in our UI?</p>
 
 <p>These calculations are supported via <code class="highlighter-rouge">allow_stat</code>:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/resources/employee_resource.rb</span>
-<span class="n">allow_stat</span> <span class="ss">total: </span><span class="p">[</span><span class="ss">:count</span><span class="p">]</span>
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="n">allow_stat</span> <span class="ss">total: </span><span class="p">[</span><span class="ss">:count</span><span class="p">]</span></code></pre></figure>
 
 <p>A GET to <code class="highlighter-rouge">/api/employees?stats[total]=count</code> would return:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="p">{</span>
   <span class="ss">data: </span><span class="p">[.</span><span class="nf">.</span><span class="o">.</span><span class="p">],</span>
   <span class="ss">meta: </span><span class="p">{</span>
     <span class="ss">stats: </span><span class="p">{</span>
@@ -142,53 +138,80 @@ above that grid, or “average cost” elsewhere in our UI?</p>
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre>
-</div>
+<span class="p">}</span></code></pre></figure>
 
 <p>A few ‘default calculations’ are provided: <code class="highlighter-rouge">count</code>, <code class="highlighter-rouge">sum</code>, <code class="highlighter-rouge">average</code>,
 <code class="highlighter-rouge">maximum</code> and <code class="highlighter-rouge">minimum</code>. These will work out-of-the-box with <code class="highlighter-rouge">ActiveRecord</code>.
 Alternatively, override these calculation functions:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">allow_stat</span> <span class="ss">:salary</span> <span class="k">do</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">allow_stat</span> <span class="ss">:salary</span> <span class="k">do</span>
   <span class="n">average</span> <span class="p">{</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="kp">attr</span><span class="o">|</span> <span class="n">scope</span><span class="p">.</span><span class="nf">average</span><span class="p">(</span><span class="kp">attr</span><span class="p">)</span> <span class="p">}</span>
-<span class="k">end</span>
-</code></pre>
-</div>
+<span class="k">end</span></code></pre></figure>
 
 <p>Or support your own custom calculations:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">allow_stat</span> <span class="ss">salary: </span><span class="p">[</span><span class="ss">:average</span><span class="p">]</span> <span class="k">do</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">allow_stat</span> <span class="ss">salary: </span><span class="p">[</span><span class="ss">:average</span><span class="p">]</span> <span class="k">do</span>
   <span class="n">standard_deviation</span> <span class="p">{</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="kp">attr</span><span class="o">|</span> <span class="p">.</span><span class="nf">.</span><span class="o">.</span> <span class="p">}</span>
-<span class="k">end</span>
-</code></pre>
-</div>
+<span class="k">end</span></code></pre></figure>
 
 <p>Multiple stats are supported with one request:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">GET</span> <span class="sr">/api/em</span><span class="n">ployees?stats</span><span class="p">[</span><span class="n">salary</span><span class="p">]</span><span class="o">=</span><span class="n">average</span><span class="p">,</span><span class="n">maximum</span><span class="o">&amp;</span><span class="n">stats</span><span class="p">[</span><span class="n">total</span><span class="p">]</span><span class="o">=</span><span class="n">count</span>
-</code></pre>
-</div>
+<blockquote>
+  <p>GET /api/employees?stats[salary]=average,maximum&amp;stats[total]=count</p>
+</blockquote>
 
 <p>If you want <strong>only</strong> stats, and no records (for performance), simple pass page size 0:</p>
 
-<p><code class="highlighter-rouge">GET /api/employees?stats[salary]=average&amp;page[size]=0</code></p>
+<blockquote>
+  <p>GET /api/employees?stats[salary]=average&amp;page[size]=0</p>
+</blockquote>
 
 <p><br />
 <br /></p>
 
 <script type="text/javascript">
-  $(function () {
-    hljs.configure({
-      tabReplace: '  ',
-      classPrefix: ''
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
     });
 
-    $('.language-ruby code').addClass('ruby');
-    $('.language-javascript code').addClass('javascript');
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
 
-    hljs.initHighlightingOnLoad();
+  $('.tab').click(function() {
+    console.log('HEREERERE');
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
   });
+
+  flipTabs();
+})
 </script>
 
 
@@ -202,13 +225,13 @@ Alternatively, override these calculation functions:</p>
         <h3>Overview</h3>
         <ul>
           <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart">Quickstart</a>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
           </li>
           <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial">Tutorial</a>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
           </li>
           <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/concepts">Concepts</a>
+            <a href="http://localhost:4000/concepts">Concepts</a>
           </li>
         </ul>
       </div>
@@ -217,51 +240,51 @@ Alternatively, override these calculation functions:</p>
         <ul>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-scope-to-current-user">Scope to Current User</a>
+              <a href="http://localhost:4000//how-to-scope-to-current-user">Scope to Current User</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-cause-side-effects">Cause Side-Effects</a>
+              <a href="http://localhost:4000//how-to-cause-side-effects">Cause Side-Effects</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-use-without-activerecord">Use Alternate ORMs</a>
+              <a href="http://localhost:4000//how-to-use-without-activerecord">Use Alternate ORMs</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-build-an-adapter">Build an Adapter</a>
+              <a href="http://localhost:4000//how-to-build-an-adapter">Build an Adapter</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
+              <a href="http://localhost:4000//how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-code-polymorphic-associations">Polymorphic Relationships</a>
+              <a href="http://localhost:4000//how-to-code-polymorphic-associations">Polymorphic Relationships</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-add-defaults">Add Default Behavior</a>
+              <a href="http://localhost:4000//how-to-add-defaults">Add Default Behavior</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-conditionally-render-fields">Conditionally Render Fields</a>
+              <a href="http://localhost:4000//how-to-conditionally-render-fields">Conditionally Render Fields</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-customize-error-responses">Customize Error Responses</a>
+              <a href="http://localhost:4000//how-to-customize-error-responses">Customize Error Responses</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-write-specs">Write Specs</a>
+              <a href="http://localhost:4000//how-to-write-specs">Write Specs</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-return-statistics">Statistics</a>
+              <a href="http://localhost:4000//how-to-return-statistics">Statistics</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-autodocument">Autodocument with Swagger</a>
+              <a href="http://localhost:4000//how-to-autodocument">Autodocument with Swagger</a>
             </li>
           
         </ul>

@@ -10,12 +10,12 @@ depending on your use case. Following the example from the [tutorial](/tutorial#
 let's say an `Employee` has many `Team`s and a `Team` has many
 `Employee`s. We could wire-up our `EmployeeResource` like so:
 
-```ruby
+{% highlight ruby %}
 has_and_belongs_to_many :teams,
   scope: -> { Team.all },
   foreign_key: { employee_teams: :employee_id },
   resource: TeamResource
-```
+{% endhighlight %}
 
 The only difference here is the `foreign_key` - we're passing a hash
 instead of a symbol. `employee_teams` is our join table, and

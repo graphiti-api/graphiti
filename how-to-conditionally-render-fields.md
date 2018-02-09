@@ -15,12 +15,12 @@ computationally expensive and not often requested.
 
 Let's add a simple *extra attribute*:
 
-```ruby
+{% highlight ruby %}
 # app/serializers/serializable_person.rb
 extra_attribute :net_worth do
   1_000_000
 end
-```
+{% endhighlight %}
 
 This field will not be rendered when we hit `/people`. It will only be
 rendered when we hit `/people?extra_fields[people]=net_worth`. The URL
@@ -29,22 +29,22 @@ signature is the same as [sparse fieldsets](http://jsonapi.org/format/#fetching-
 We may want to eager load some data, only when a specific extra field is
 requested. We can do that by customizing the `Resource`:
 
-```ruby
+{% highlight ruby %}
 # app/resources/person_resource.rb
 extra_field :net_worth do |scope|
   scope.includes(:assets)
 end
-```
+{% endhighlight %}
 
 We will now eager load assets only when the `net_worth` extra field is
 specified in the request.
 
 Finally, additional conditionals can still be applied:
 
-```ruby
+{% highlight ruby %}
 # app/serializers/serializable_person.rb
 extra_attribute :net_worth, if: proc { @context.allow_net_worth? } do
-```
+{% endhighlight %}
 
 If using Rails, `@context` is your controller.
 
@@ -52,4 +52,3 @@ If using Rails, `@context` is your controller.
 <br />
 
 {% include highlight.html %}
-

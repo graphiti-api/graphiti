@@ -18,9 +18,9 @@ sensible defaults to get started quickly.
 
 Let's start with a classic Rails blog. We'll use a [template](http://guides.rubyonrails.org/rails_application_templates.html) to handle some of the boilerplate. Just run this command and accept all the defaults for now:
 
-```bash
+{% highlight bash %}
 $ rails new blog --api -m https://raw.githubusercontent.com/jsonapi-suite/rails_template/master/all.rb
-```
+{% endhighlight %}
 
 Feel free to run `git diff` if you're interested in the
 particulars; this is mostly just installing gems and including modules.
@@ -31,17 +31,17 @@ A `Resource` defines how to query and persist your `Model`. In other
 words: a `Model` is to the database as `Resource` is to the API. So
 first, let's define our model:
 
-```bash
+{% highlight bash %}
 $ bundle exec rails generate model Post title:string active:boolean
 $ bundle exec rake db:migrate
-```
+{% endhighlight %}
 
 Now we can use the built-in generator to define our `Resource`,
 controller, and specs:
 
-```bash
+{% highlight bash %}
 $ bundle exec rails g jsonapi:resource Post title:string active:boolean
-```
+{% endhighlight %}
 
 You'll see a number of files created. If you open each one, you'll see
 comments explaining what's going on. Head over to the
@@ -54,19 +54,19 @@ Our **API Inputs** are defined in
 `config/initializers/strong_resources.rb`. You can think of these as
 [strong parameter](http://api.rubyonrails.org/v5.0/classes/ActionController/StrongParameters.html) templates.
 
-```ruby
+{% highlight ruby %}
 # config/initializers/strong_resources.rb
 strong_resource :post do
   attribute :title, :string
   attribute :active, :boolean
 end
-```
+{% endhighlight %}
 
 Our **API Outputs** are defined in
 `app/serializers/serializable_post.rb`. The DSL is very similar to
-[active_model_serializers](https://github.com/rails-api/active_model_serializers) and full documentation can be found at [jsonapi-rg.org](http://jsonapi-rb.org):
+[active_model_serializers](https://github.com/rails-api/active_model_serializers) and full documentation can be found at [jsonapi-rb.org](http://jsonapi-rb.org):
 
-```ruby
+{% highlight ruby %}
 # app/serializers/serializable_post.rb
 class SerializablePost < JSONAPI::Serializable::Resource
   type :posts
@@ -74,13 +74,13 @@ class SerializablePost < JSONAPI::Serializable::Resource
   attribute :title
   attribute :active
 end
-```
+{% endhighlight %}
 
 Now run your app!:
 
-```
+{% highlight bash %}
 $ bundle exec rails s
-```
+{% endhighlight %}
 
 Verify `http://localhost:3000/api/v1/posts` renders JSON correctly.
 Now we just need data.
@@ -95,79 +95,79 @@ development, or you can avoid the detour and plow right ahead.
 
 Edit `db/seeds.rb` to create a few `Post`s:
 
-```ruby
+{% highlight ruby %}
 Post.create!(title: 'My title!', active: true)
 Post.create!(title: 'Another title!', active: false)
 Post.create!(title: 'OMG! A title!', active: true)
-```
+{% endhighlight %}
 
 And run the script:
 
-```bash
+{% highlight bash %}
 $ bundle exec rake db:seed
-```
+{% endhighlight %}
 
 ### <a name="seeding-with-node" href='#seeding-with-node'>Seeding With JS Client</a>
 
 There are a variety of [JSONAPI Clients](http://jsonapi.org/implementations/#client-libraries)
-out there. We'll be using [JSORM](https://github.com/jsonapi-suite/jsorm),
+out there. We'll be using [JSORM](/js/home)
 which is built to work with Suite-specific functionality like nested
 payloads. It can be used from the browser, but for now we'll call
 it using a simple Node script.
 
 Create the project:
 
-```bash
+{% highlight bash %}
 $ mkdir node-seed && cd node-seed && touch index.js && npm init
-```
+{% endhighlight %}
 
 Accept the default for all prompts. Now add the `JSORM` dependency, as
 well as a polyfill for `fetch`:
 
-```bash
-$ npm install --save jsorm@0.5.6 isomorphic-fetch
-```
+{% highlight bash %}
+$ npm install --save jsorm isomorphic-fetch
+{% endhighlight %}
 
 Add this seed code to `index.js`:
 
-```javascript
-require('isomorphic-fetch');
-var jsorm = require('jsorm');
+{% highlight javascript %}
+require("isomorphic-fetch");
+var jsorm = require("jsorm");
 
 // setup code
 
 var ApplicationRecord = jsorm.Model.extend({
   static: {
-    baseUrl: 'http://localhost:3000',
-    apiNamespace: '/api/v1'
+    baseUrl: "http://localhost:3000",
+    apiNamespace: "/api/v1"
   }
 });
 
 var Post = ApplicationRecord.extend({
   static: {
-    jsonapiType: 'posts'
+    jsonapiType: "posts"
   },
 
-  title: jsorm.attr(),
-  active: jsorm.attr()
+  attrs: {
+    title: jsorm.attr(),
+    active: jsorm.attr()
+  }
 });
-
-jsorm.Config.setup();
 
 // seed code
 
 var post1 = new Post({
-  title: 'My title!',
+  title: "My title!",
   active: true
 });
 
 var post2 = new Post({
-  title: 'Another title!',
+  title: "Another title!",
   active: false
 });
 
 var post3 = new Post({
-  title: 'OMG! A title!',
+  title: "OMG! A title!",
   active: true
 });
 
@@ -177,7 +177,7 @@ post1.save().then(() => {
     post3.save();
   });
 });
-```
+{% endhighlight %}
 
 This should be pretty straightforward if you're familiar with
 `ActiveRecord`. We define `Model` objects, putting configuration on
@@ -186,9 +186,9 @@ class attributes. We instatiating instances of those Models, and call
 
 Run the script:
 
-```bash
+{% highlight bash %}
 $ node index.js
-```
+{% endhighlight %}
 
 Now load `http://localhost:3000/api/v1/posts`. You should have 3 `Post`s in
 your database!
@@ -225,22 +225,22 @@ what query functionality we have. We've listed all `Post`s at
 * **Filter**:
   * Add one line of code:
 
-    ```ruby
-    # app/resources/post_resource.rb
-    allow_filter :title
-    ```
+{% highlight ruby %}
+# app/resources/post_resource.rb
+allow_filter :title
+{% endhighlight %}
   * URL: `/api/v1/posts?filter[title]=My title!`
   * SQL: `SELECT * FROM posts WHERE title = "My title!"`
   * Any filter not whitelisted will raise `JsonapiCompliable::BadFilter`
   error.
   * All filter logic can be customized:
 
-    ```ruby
-    # SELECT * from posts WHERE title LIKE 'My%'
-    allow_filter :title_prefix do |scope, value|
-      scope.where(["title LIKE ?", "#{value}%"])
-    end
-    ```
+{% highlight ruby %}
+# SELECT * from posts WHERE title LIKE 'My%'
+allow_filter :title_prefix do |scope, value|
+  scope.where(["title LIKE ?", "#{value}%"])
+end
+{% endhighlight %}
   * Customizations can be DRYed up and packaged into `Adapter`s.
 
 * **Extra Fields**:
@@ -248,12 +248,12 @@ what query functionality we have. We've listed all `Post`s at
   response (perhaps they are computationally expensive).
   * This can be done like so:
 
-    ```ruby
-    # app/serializers/serializable_post.rb
-    extra_attribute :description do
-      @object.active? ? 'Active Post' : 'Inactive Post'
-    end
-    ```
+{% highlight ruby %}
+# app/serializers/serializable_post.rb
+extra_attribute :description do
+  @object.active? ? 'Active Post' : 'Inactive Post'
+end
+{% endhighlight %}
 
   * URL: `/api/v1/posts?extra_fields[posts]=description`
   * SQL: `SELECT * FROM posts`
@@ -265,10 +265,10 @@ what query functionality we have. We've listed all `Post`s at
   the total count of all posts".
   * One line of code to whitelist the stat:
 
-    ```ruby
-    # app/resources/post_resource.rb
-    allow_stat total: [:count]
-    ```
+{% highlight ruby %}
+# app/resources/post_resource.rb
+allow_stat total: [:count]
+{% endhighlight %}
 
   * URL: `/api/v1/posts?stats[total]=count`
   * SQL: `SELECT count(*) from posts`
@@ -282,12 +282,12 @@ what query functionality we have. We've listed all `Post`s at
   * Your app will always render a JSONAPI-compliable error response.
   * Cause an error:
 
-    ```ruby
-    # app/controllers/posts_controller.rb
-    def index
-      raise 'foo'
-    end
-    ```
+{% highlight ruby %}
+# app/controllers/posts_controller.rb
+def index
+  raise 'foo'
+end
+{% endhighlight %}
 
   * View the default payload:
 
@@ -306,33 +306,33 @@ persistence ("save this `Post` and 3 `Comment`s in a single request").
 
 Let's start by defining our model:
 
-```bash
+{% highlight bash %}
 $ bundle exec rails g model Comment post_id:integer body:text active:boolean
 $ bundle exec rake db:migrate
-```
+{% endhighlight %}
 
-```ruby
+{% highlight ruby %}
 # app/models/post.rb
 has_many :comments
 
 # app/models/comment.rb
 belongs_to :post, optional: true
-```
+{% endhighlight %}
 
 ...and corresponding `Resource` object:
 
-```bash
+{% highlight bash %}
 $ bundle exec rails g jsonapi:resource Comment body:text active:boolean
-```
+{% endhighlight %}
 
 Configure the relationship in `PostResource`:
 
-```ruby
+{% highlight ruby %}
 has_many :comments,
   foreign_key: :post_id,
   resource: CommentResource,
   scope: -> { Comment.all }
-```
+{% endhighlight %}
 
 This code:
 
@@ -349,9 +349,9 @@ functionality as before. We just need to seed data.
 
 Start by clearing out your database:
 
-```bash
+{% highlight bash %}
 $ bundle exec rake db:migrate:reset
-```
+{% endhighlight %}
 
 Again, you can seed your data using a NodeJS client or the traditional
 `db/seeds.rb`.
@@ -360,84 +360,86 @@ Again, you can seed your data using a NodeJS client or the traditional
 
 Let's edit our `node-seed/index.js`. First add a `Comment` model:
 
-```javascript
+{% highlight javascript %}
 var Comment = ApplicationRecord.extend({
   static: {
     jsonapiType: 'comments'
   },
 
-  body: jsorm.attr(),
-  active: jsorm.attr(),
-  createdAt: jsorm.attr()
+  attrs: {
+    body: jsorm.attr(),
+    active: jsorm.attr(),
+    createdAt: jsorm.attr()
+  }
 });
-```
+{% endhighlight %}
 
 ...and add the relationship to `Post`:
 
-```javascript
+{% highlight javascript %}
 // within class body
 // ... code ...
-comments: jsorm.hasMany(),
+comments: jsorm.hasMany()
 // ... code...
-```
+{% endhighlight %}
 
 Replace the existing `Post` instances with one `Post` and three
 `Comment`s:
 
-```javascript
+{% highlight javascript %}
 var comment1 = new Comment({
-  body: 'comment one',
+  body: "comment one",
   active: true
 });
 
 var comment2 = new Comment({
-  body: 'comment two',
+  body: "comment two",
   active: false
 });
 
 var comment3 = new Comment({
-  body: 'comment three',
+  body: "comment three",
   active: true
 });
 
 var post = new Post({
-  title: 'My title!',
+  title: "My title!",
   active: true,
   comments: [comment1, comment2, comment3]
 });
 
-post.save({ with: ['comments'] });
-```
+post.save({ with: ["comments"] });
+{% endhighlight %}
 
 Tell our controller it's OK to sidepost comments:
 
-```ruby
+{% highlight ruby %}
 # app/controllers/posts_controller.rb
 strong_resource :post do
   has_many :comments
 end
-```
+{% endhighlight %}
 
 And tell our serializer it's OK to render comments:
 
-```ruby
+{% highlight ruby %}
 # app/serializers/serializable_post.rb
 has_many :comments
-```
+{% endhighlight %}
 
 Now run the script to persist the `Post` and its three `Comment`s in a
 single request:
 
-```bash
+{% highlight bash %}
 $ node node-seed/index.js
-```
+{% endhighlight %}
 
 #### <a name="relationship-seeding-ruby" href='#relationship-seeding-ruby'>Seeding with Ruby</a>
 
 Replace your `db/seeds.rb` with this code to persist one `Post` and
 three `Comment`s:
 
-```ruby
+{% highlight ruby %}
 comment1 = Comment.new(body: 'comment one', active: true)
 comment2 = Comment.new(body: 'comment two', active: false)
 comment3 = Comment.new(body: 'comment three', active: true)
@@ -446,7 +448,7 @@ Post.create! \
   title: 'My title!',
   active: true,
   comments: [comment1, comment2, comment3]
-```
+{% endhighlight %}
 
 ## <a name="relationship-usage" href='#relationship-usage'>Usage</a>
 
@@ -457,9 +459,9 @@ comments by `created_at` descending: `/api/v1/posts?include=comments&sort=-comme
 
 Now add a filter to `CommentResource`:
 
-```ruby
+{% highlight ruby %}
 allow_filter :active
-```
+{% endhighlight %}
 
 That filter now works in two places:
 
@@ -507,27 +509,27 @@ By default we rescue exceptions and return a valid [error response](http://jsona
 In tests, this can be confusing - we probably want to raise errors in
 tests. So note our exception handling is disabled by default:
 
-```ruby
+{% highlight ruby %}
 # spec/rails_helper.rb
 config.before :each do
   JsonapiErrorable.disable!
 end
-```
+{% endhighlight %}
 
 But you can enable it on a per-test basis:
 
-```ruby
+{% highlight ruby %}
 it "renders validation errors" do
   JsonapiErrorable.enable!
   post "/api/v1/employees", payload
   expect(validation_errors[:name]).to eq("can't be blank")
 end
-```
+{% endhighlight %}
 
 In following this guide, we generated `Post` and
 `Comment` resources. Let's edit our [factories](https://github.com/thoughtbot/factory_bot) to seed randomized data:
 
-```ruby
+{% highlight ruby %}
 # spec/factories/post.rb
 FactoryGirl.define do
   factory :post do
@@ -543,7 +545,7 @@ FactoryGirl.define do
     active { [true, false].sample }
   end
 end
-```
+{% endhighlight %}
 
 Finally, we need to define a `Payload`. `Payload`s use a
 `factory_girl`-style DSL to define expected JSON. A `Payload` compares a
@@ -558,7 +560,7 @@ Finally, we need to define a `Payload`. `Payload`s use a
 
 Let's define our payloads now:
 
-```ruby
+{% highlight ruby %}
 # spec/payloads/post.rb
 JsonapiSpecHelpers::Payload.register(:post) do
   key(:title, String)
@@ -571,15 +573,15 @@ JsonapiSpecHelpers::Payload.register(:comment) do
   key(:active, [TrueClass, FalseClass])
   key(:created_at, Time)
 end
-```
+{% endhighlight %}
 
 ### <a name="testing-run" href='#testing-rub'>Run</a>
 
 We can now run specs. Let's start with the `Post` specs:
 
-```bash
+{% highlight bash %}
 $ bundle exec rspec spec/api/v1/posts
-```
+{% endhighlight %}
 
 You should see five specs, with one failing (`spec/api/v1/posts/create_spec.rb`),
 and one pending (`spec/api/v1/posts/update_spec.rb`).
@@ -592,7 +594,7 @@ values will fail `assert_payload` unless elsewise configured.
 
 So, let's update our spec to POST attributes, not just an empty object:
 
-```ruby
+{% highlight ruby %}
 let(:payload) do
   {
     data: {
@@ -604,7 +606,7 @@ let(:payload) do
     }
   }
 end
-```
+{% endhighlight %}
 
 Your specs should now pass. The only pending spec is due to a similar
 issue - we need to specify attributes in `spec/api/v1/posts/update_spec.rb` as
@@ -628,9 +630,9 @@ patterns to get a feel for what's right for you.
 
 We can autodocument our code using [swagger documentation](https://swagger.io). Documenting an endpoint is one line of code:
 
-```ruby
+{% highlight ruby %}
 jsonapi_resource '/v1/employees'
-```
+{% endhighlight %}
 
 Visit `http://localhost:3000/api/docs` to see the swagger documentation. Our custom UI will show all possible query parameters (including nested
 relationships), as well as schemas for request/responses:

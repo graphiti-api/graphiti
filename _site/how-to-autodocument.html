@@ -9,15 +9,13 @@
   <title>JSONAPI Suite</title>
   <meta name="description" content="Collection of Ruby libraries for powering JSONAPI-compliant APIs.">
 
-  <link rel="stylesheet" type="text/css" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
-  <link rel="stylesheet" href="https://jsonapi-suite.github.io/jsonapi_suite/assets/main.css">
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css">
   <link rel="canonical" href="http://localhost:4000/how-to-autodocument.html">
   <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
 
   <!-- javascript -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-  <script src="https://yandex.st/highlightjs/8.0/highlight.min.js"></script>
 
   
 </head>
@@ -39,13 +37,16 @@
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
       <ul class="nav navbar-nav">
         <li>
-          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart">Quickstart</a>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
         </li>
         <li>
-          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial">Tutorial</a>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
         </li>
         <li>
-          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/concepts">Concepts</a>
+          <a class="nav-link" href="http://localhost:4000/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/js/home">Javascript Client</a>
         </li>
         <li class="dropdown">
           <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
@@ -56,57 +57,54 @@
           <ul class="dropdown-menu">
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-scope-to-current-user">Scope to Current User</a>
+                <a href="http://localhost:4000/how-to-scope-to-current-user">Scope to Current User</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-cause-side-effects">Cause Side-Effects</a>
+                <a href="http://localhost:4000/how-to-cause-side-effects">Cause Side-Effects</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-use-without-activerecord">Use Alternate ORMs</a>
+                <a href="http://localhost:4000/how-to-use-without-activerecord">Use Alternate ORMs</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-build-an-adapter">Build an Adapter</a>
+                <a href="http://localhost:4000/how-to-build-an-adapter">Build an Adapter</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
+                <a href="http://localhost:4000/how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-code-polymorphic-associations">Polymorphic Relationships</a>
+                <a href="http://localhost:4000/how-to-code-polymorphic-associations">Polymorphic Relationships</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-add-defaults">Add Default Behavior</a>
+                <a href="http://localhost:4000/how-to-add-defaults">Add Default Behavior</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-conditionally-render-fields">Conditionally Render Fields</a>
+                <a href="http://localhost:4000/how-to-conditionally-render-fields">Conditionally Render Fields</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-customize-error-responses">Customize Error Responses</a>
+                <a href="http://localhost:4000/how-to-customize-error-responses">Customize Error Responses</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-write-specs">Write Specs</a>
+                <a href="http://localhost:4000/how-to-write-specs">Write Specs</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-return-statistics">Statistics</a>
+                <a href="http://localhost:4000/how-to-return-statistics">Statistics</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-autodocument">Autodocument with Swagger</a>
+                <a href="http://localhost:4000/how-to-autodocument">Autodocument with Swagger</a>
               </li>
             
           </ul>
-        </li>
-        <li>
-          <a class="nav-link" href="mailto:richmolj@gmail.com">Contact</a>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
@@ -142,12 +140,10 @@ in <code class="highlighter-rouge">public</code>. Let’s start by adding depend
 <br />
 <br /></p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># Gemfile</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Gemfile</span>
 <span class="c1"># Below 'jsonapi_suite'</span>
 <span class="n">gem</span> <span class="s1">'jsonapi_spec_helpers'</span>
-<span class="n">gem</span> <span class="s1">'jsonapi_swagger_helpers'</span>
-</code></pre>
-</div>
+<span class="n">gem</span> <span class="s1">'jsonapi_swagger_helpers'</span></code></pre></figure>
 
 <p><i>
   Note: here we’re moving <code class="highlighter-rouge">jsonapi_spec_helpers</code> out of the
@@ -161,10 +157,8 @@ but we’ll only deal with the already-compiled static files glimmer builds.
 Let’s copy those files and expose them to the web by putting them in
 <code class="highlighter-rouge">public</code>:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>mkdir -p public/api/docs <span class="o">&amp;&amp;</span> <span class="nb">cd </span>public/api/docs
-<span class="gp">$ </span>git clone https://github.com/jsonapi-suite/swagger-ui.git <span class="o">&amp;&amp;</span> cp swagger-ui/prod-dist/<span class="k">*</span> . <span class="o">&amp;&amp;</span> rm -rf swagger-ui
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>mkdir -p public/api/docs <span class="o">&amp;&amp;</span> <span class="nb">cd </span>public/api/docs
+<span class="gp">$ </span>git clone https://github.com/jsonapi-suite/swagger-ui.git <span class="o">&amp;&amp;</span> cp swagger-ui/prod-dist/<span class="k">*</span> . <span class="o">&amp;&amp;</span> rm -rf swagger-ui</code></pre></figure>
 
 <p>Our documentation will be accessible at <code class="highlighter-rouge">/api/docs</code>, so we put the files
 in <code class="highlighter-rouge">public/api/docs</code>. You may want a different directory depending on
@@ -173,33 +167,27 @@ your own routing rules. In either case, our next step is to edit
 There are also a few configuration options, such as providing a link to
 Github.</p>
 
-<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="nb">window</span><span class="p">.</span><span class="nx">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">githubURL</span><span class="p">:</span> <span class="s1">'http://github.com/user/repo'</span><span class="p">,</span>
-  <span class="na">basePath</span><span class="p">:</span> <span class="s1">'/api'</span> <span class="c1">// basePath/swagger.json, basePath/v1/employees, etc</span>
-<span class="p">}</span>
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nb">window</span><span class="p">.</span><span class="nx">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">githubURL</span><span class="p">:</span> <span class="s2">"http://github.com/user/repo"</span><span class="p">,</span>
+  <span class="na">basePath</span><span class="p">:</span> <span class="s2">"/api"</span> <span class="c1">// basePath/swagger.json, basePath/v1/employees, etc</span>
+<span class="p">}</span></code></pre></figure>
 
 <p>This static website will make a request to <code class="highlighter-rouge">/api/swagger.json</code>. Let’s
 build that endpoint now:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>touch app/controllers/docs_controller.rb
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>touch app/controllers/docs_controller.rb</code></pre></figure>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># config/routes.rb</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># config/routes.rb</span>
 <span class="n">scope</span> <span class="ss">path: </span><span class="s1">'/api'</span> <span class="k">do</span>
   <span class="n">resources</span> <span class="ss">:docs</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:index</span><span class="p">],</span> <span class="ss">path: </span><span class="s1">'/swagger'</span>
   <span class="c1"># ... code ...</span>
-<span class="k">end</span>
-</code></pre>
-</div>
+<span class="k">end</span></code></pre></figure>
 
 <p>Our <code class="highlighter-rouge">DocsController</code> uses <a href="https://github.com/fotinakis/swagger-blocks">swagger-blocks</a> to generate
 the swagger schema. Here’s the minimal setup needed to configure
 swagger:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'jsonapi_swagger_helpers'</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="nb">require</span> <span class="s1">'jsonapi_swagger_helpers'</span>
 
 <span class="k">class</span> <span class="nc">DocsController</span> <span class="o">&lt;</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">API</span>
   <span class="kp">include</span> <span class="no">JsonapiSwaggerHelpers</span><span class="o">::</span><span class="no">DocsControllerMixin</span>
@@ -218,35 +206,27 @@ swagger:</p>
     <span class="n">key</span> <span class="ss">:consumes</span><span class="p">,</span> <span class="p">[</span><span class="s1">'application/json'</span><span class="p">]</span>
     <span class="n">key</span> <span class="ss">:produces</span><span class="p">,</span> <span class="p">[</span><span class="s1">'application/json'</span><span class="p">]</span>
   <span class="k">end</span>
-<span class="k">end</span>
-</code></pre>
-</div>
+<span class="k">end</span></code></pre></figure>
 
 <p>That’s it. Now, every time we add an endpoint, we can autodocument with
 one line of code (below the <code class="highlighter-rouge">swagger_root</code> block):</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi_resource</span> <span class="s1">'/v1/employees'</span>
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">jsonapi_resource</span> <span class="s1">'/v1/employees'</span></code></pre></figure>
 
 <p>This endpoint will be introspected for all RESTful actions, outputting
 the full configuration. There are a few customization options:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi_resource</span> <span class="s1">'/v1/employees'</span><span class="p">,</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">jsonapi_resource</span> <span class="s1">'/v1/employees'</span><span class="p">,</span>
   <span class="ss">only: </span><span class="p">[</span><span class="ss">:create</span><span class="p">,</span> <span class="ss">:index</span><span class="p">],</span>
   <span class="ss">except: </span><span class="p">[</span><span class="ss">:destroy</span><span class="p">],</span>
   <span class="ss">descriptions: </span><span class="p">{</span>
     <span class="ss">index: </span><span class="s2">"Some &lt;b&gt;additional&lt;/b&gt; documentation"</span>
-  <span class="p">}</span>
-</code></pre>
-</div>
+  <span class="p">}</span></code></pre></figure>
 
 <p>If you want additional attribute-level documentation, you can add this
 to your spec payloads:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">key</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span> <span class="no">String</span><span class="p">,</span> <span class="ss">description: </span><span class="s1">'The full name, e.g. "John Doe"'</span><span class="p">)</span>
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">key</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span> <span class="no">String</span><span class="p">,</span> <span class="ss">description: </span><span class="s1">'The full name, e.g. "John Doe"'</span><span class="p">)</span></code></pre></figure>
 
 <p><br />
 Will give you an output similar to:
@@ -259,17 +239,48 @@ Will give you an output similar to:
 <br /></p>
 
 <script type="text/javascript">
-  $(function () {
-    hljs.configure({
-      tabReplace: '  ',
-      classPrefix: ''
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
     });
 
-    $('.language-ruby code').addClass('ruby');
-    $('.language-javascript code').addClass('javascript');
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
 
-    hljs.initHighlightingOnLoad();
+  $('.tab').click(function() {
+    console.log('HEREERERE');
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
   });
+
+  flipTabs();
+})
 </script>
 
 
@@ -283,13 +294,13 @@ Will give you an output similar to:
         <h3>Overview</h3>
         <ul>
           <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart">Quickstart</a>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
           </li>
           <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial">Tutorial</a>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
           </li>
           <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/concepts">Concepts</a>
+            <a href="http://localhost:4000/concepts">Concepts</a>
           </li>
         </ul>
       </div>
@@ -298,51 +309,51 @@ Will give you an output similar to:
         <ul>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-scope-to-current-user">Scope to Current User</a>
+              <a href="http://localhost:4000//how-to-scope-to-current-user">Scope to Current User</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-cause-side-effects">Cause Side-Effects</a>
+              <a href="http://localhost:4000//how-to-cause-side-effects">Cause Side-Effects</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-use-without-activerecord">Use Alternate ORMs</a>
+              <a href="http://localhost:4000//how-to-use-without-activerecord">Use Alternate ORMs</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-build-an-adapter">Build an Adapter</a>
+              <a href="http://localhost:4000//how-to-build-an-adapter">Build an Adapter</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
+              <a href="http://localhost:4000//how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-code-polymorphic-associations">Polymorphic Relationships</a>
+              <a href="http://localhost:4000//how-to-code-polymorphic-associations">Polymorphic Relationships</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-add-defaults">Add Default Behavior</a>
+              <a href="http://localhost:4000//how-to-add-defaults">Add Default Behavior</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-conditionally-render-fields">Conditionally Render Fields</a>
+              <a href="http://localhost:4000//how-to-conditionally-render-fields">Conditionally Render Fields</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-customize-error-responses">Customize Error Responses</a>
+              <a href="http://localhost:4000//how-to-customize-error-responses">Customize Error Responses</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-write-specs">Write Specs</a>
+              <a href="http://localhost:4000//how-to-write-specs">Write Specs</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-return-statistics">Statistics</a>
+              <a href="http://localhost:4000//how-to-return-statistics">Statistics</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-autodocument">Autodocument with Swagger</a>
+              <a href="http://localhost:4000//how-to-autodocument">Autodocument with Swagger</a>
             </li>
           
         </ul>

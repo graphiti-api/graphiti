@@ -15,10 +15,9 @@ Let's say we're testing the `show` action of our employees controller, sideloadi
 
 Let's say we're testing the `show` action of our employees controller, sideloading the employee's department.
 
-
 Let's begin with vanilla RSpec of what the test might look like:
 
-```ruby
+{% highlight ruby %}
 require 'rails_helper'
 
 RSpec.describe 'employees#show', type: :request do
@@ -32,25 +31,25 @@ RSpec.describe 'employees#show', type: :request do
     # ... code asserting json response ...
   end
 end
-```
+{% endhighlight %}
 
 To avoid painful json assertions, let's use [jsonapi_spec_helpers](https://github.com/jsonapi-suite/jsonapi_spec_helpers). Start by adding some setup code:
 
-```ruby
+{% highlight ruby %}
 # spec/rails_helper.rb
 require 'jsonapi_spec_helpers'
 
 RSpec.configure do |config|
   config.include JsonapiSpecHelpers
 end
-```
+{% endhighlight %}
 
 And now to validate the response, we'll call `assert_payload`:
 
-```ruby
+{% highlight ruby %}
 assert_payload(:employee, homer, json_item)
 assert_payload(:department, safety, json_include('departments'))
-```
+{% endhighlight %}
 
 `assert_payload` takes three arguments:
 * The name of a payload we've defined (we haven't done this yet).
@@ -63,7 +62,7 @@ OK, so we want to take a record, response JSON, and compare them against
 something pre-defined. Let's write those definitions; they look very similar to
 something you'd write for [factory_girl](https://github.com/thoughtbot/factory_girl):
 
-```ruby
+{% highlight ruby %}
 # spec/payloads/employee.rb
 JsonapiSpecHelpers::Payload.register(:employee) do
   key(:name)
@@ -76,7 +75,7 @@ end
 JsonapiSpecHelpers::Payload.register(:department) do
   key(:name)
 end
-```
+{% endhighlight %}
 
 `assert_payload` will do four things:
 
@@ -90,29 +89,30 @@ The comparison value can be customized. Let's say we serialize the
 `name` attribute as a combination of the employee's `first_name` and
 `last_name`:
 
-```ruby
+{% highlight ruby %}
 key(:name) { |record| "#{record.first_name} #{record.last_name}" }
-```
+{% endhighlight %}
 
 Optionally, validate against a type as well. If both the expected and
 actual values match, but are the incorrect type, the test will fail:
 
-```ruby
+{% highlight ruby %}
 key(:salary, Integer)
-```
+{% endhighlight %}
 
 You can also customize/override payloads at runtime in your test. Let's
 say we only serialize `salary` when the current user is an admin. Your
 test could look something like:
 
-```ruby
+{% highlight ruby %}
 sign_in(:user)
 assert_payload(:employee, homer, json_item)
 sign_in(:admin)
 assert_payload(:employee, homer, json_item) do
   key(:salary)
 end
-```
+{% endhighlight %}
+
 For documentation on all the spec helpers we provide, check out the
 [jsonapi_spec_helpers](https://github.com/jsonapi-suite/jsonapi_spec_helpers) gem.
 

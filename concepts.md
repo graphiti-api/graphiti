@@ -25,11 +25,7 @@ layout: docs
               {% include docs/{{doc.id}}/description.html %}
             </div>
             <div class="method-example">
-              <pre>
-                <code class="ruby">
 {% include docs/{{doc.id}}/example.html %}
-                </code>
-              </pre>
             </div>
           </div>
         </div>

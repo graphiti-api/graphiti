@@ -26,7 +26,7 @@ but not updated - whether it was created at the `/comments` endpoint or sidepost
 For the first scenario, it's OK to use `ActiveRecord` callbacks (or the
 equivalent functionality in a different ORM):
 
-```ruby
+{% highlight ruby %}
 # app/models/user.rb
 class Post < ApplicationRecord
   before_save :set_published_at,
@@ -43,7 +43,7 @@ class Post < ApplicationRecord
     status_changed? && status == 'published'
   end
 end
-```
+{% endhighlight %}
 
 #### Side-Effects on Specific Action
 
@@ -52,7 +52,7 @@ only send an email to our subscribers when the `Post` is first created.
 Keep in mind we could also "sidepost" `Post` objects at the `/blogs`
 endpoint, but this will only fire at the `/posts` endpoint.
 
-```ruby
+{% highlight ruby %}
 class PostsController < ApplicationController
   def create
     post, success = jsonapi_create.to_a
@@ -65,7 +65,7 @@ class PostsController < ApplicationController
     end
   end
 end
-```
+{% endhighlight %}
 
 #### Side-Effects on Every Request of a Given Type
 
@@ -78,13 +78,13 @@ or rake tasks, as the functionality is only relevant to the API.
 
 Edit your `Resource`:
 
-```ruby
+{% highlight ruby %}
 # app/resources/post_resource.rb
 def create(attributes)
   Rails.logger.info "Post begin created by #{context.current_user.email}..."
   super
   Rails.logger.info "Success!"
 end
-```
+{% endhighlight %}
 
 {% include highlight.html %}

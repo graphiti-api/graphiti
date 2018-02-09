@@ -12,7 +12,7 @@ page, unless elsewise specified by the user.
 
 You can see these defaults in the [Resource documentation](https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Resource.html):
 
-```ruby
+{% highlight ruby %}
 default_filter :active do |scope|
   scope.where(active: true)
 end
@@ -20,7 +20,7 @@ end
 default_page_size(10)
 
 default_sort([{ created_at: :desc }])
-```
+{% endhighlight %}
 
 These can all be overriden by the user. In other words, hitting
 `/posts` will only show active `Post`s, hitting
@@ -31,7 +31,7 @@ A common pattern is for default filters to apply for all users, but
 allow overrides for administrators. You can use the `:if` option to
 restrict the override:
 
-```ruby
+{% highlight ruby %}
 # app/resources/post_resource.rb
 allow_filter :active, if: :admin?
 
@@ -39,7 +39,7 @@ allow_filter :active, if: :admin?
 def admin?
   current_user.admin?
 end
-```
+{% endhighlight %}
 
 Now the default behavior is to view only active `Post`s, but
 *administrators* can override this default.

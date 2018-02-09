@@ -13,28 +13,28 @@ to view hidden `Posts`.
 Let's start by adding a `visible` scope to `Post`, so we can easily
 retrive only `Post`s where `hidden` is `false`:
 
-```ruby
+{% highlight ruby %}
 # app/models/post.rb
 scope :visible, -> { where(hidden: false) }
-```
+{% endhighlight %}
 
 As you know, we would typically use the base scope `Post.all` like so:
 
-```ruby
+{% highlight ruby %}
 def index
   render_jsonapi(Post.all)
 end
-```
+{% endhighlight %}
 
 Let's instead use the base scope `Post.visible` when the user is not an
 administrator:
 
-```ruby
+{% highlight ruby %}
 def index
   scope = current_user.admin? ? Post.all : Post.visible
   render_jsonapi(scope)
 end
-```
+{% endhighlight %}
 
 That's it! Now only administrators can view hidden `Post`s.
 
@@ -46,7 +46,7 @@ internal users to publish internal posts.
 Our controller context is available in our resource. Let's override
 `Resource#create` to ensure correct privileging:
 
-```ruby
+{% highlight ruby %}
 def create(attributes)
   if !internal_user? && attributes[:internal] == true
     raise "Hey you! YOU can't publish internal posts!"
@@ -60,7 +60,7 @@ private
 def internal_user?
   context.current_user.internal?
 end
-```
+{% endhighlight %}
 
 ### <a name="guarding-filters" href='#guarding-filters'>Guarding Filters</a>
 
@@ -70,12 +70,12 @@ Occasionally you need to guard filters based on the current user. Use
 the `:if` option on `allow_filter`. This will execute in the context of
 your controller:
 
-```ruby
+{% highlight ruby %}
 # app/resources/employee_resource.rb
 allow_filter :name, if: :admin?
-```
+{% endhighlight %}
 
-```ruby
+{% highlight ruby %}
 # app/controllers/employees_controller.rb
 class EmployeesController < ApplicationController
   jsonapi resource: EmployeeResource
@@ -90,6 +90,6 @@ class EmployeesController < ApplicationController
     current_user.admin?
   end
 end
-```
+{% endhighlight %}
 
 {% include highlight.html %}

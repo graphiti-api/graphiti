@@ -46,7 +46,7 @@ entities) and a show (single entity) endpoint for an Employee model.
 
 Code:
 
-```ruby
+{% highlight ruby %}
 # app/controllers/employees_controller.rb
 class EmployeesController < ApplicationController
   jsonapi resource: EmployeeResource
@@ -60,16 +60,16 @@ class EmployeesController < ApplicationController
     render_jsonapi(scope.resolve.first, scope: false)
   end
 end
-```
+{% endhighlight %}
 
-```ruby
+{% highlight ruby %}
 # app/resources/employee_resource.rb
 class EmployeeResource < ApplicationResource
   type :employees
 end
-```
+{% endhighlight %}
 
-```ruby
+{% highlight ruby %}
 # app/serializers/serializable_employee.rb
 class SerializableEmployee < JSONAPI::Serializable::Resource
   type :employees
@@ -78,11 +78,11 @@ class SerializableEmployee < JSONAPI::Serializable::Resource
   attribute :last_name
   attribute :age
 end
-```
+{% endhighlight %}
 
 Tests:
 
-```ruby
+{% highlight ruby %}
 # spec/api/v1/employees/index_spec.rb
 RSpec.describe 'v1/employees#index', type: :request do
   let!(:employee1) { create(:employee) }
@@ -94,9 +94,9 @@ RSpec.describe 'v1/employees#index', type: :request do
     assert_payload(:employee, employee1, json_items[0])
   end
 end
-```
+{% endhighlight %}
 
-```ruby
+{% highlight ruby %}
 # spec/api/v1/employees/show_spec.rb
 RSpec.describe 'v1/employees#show', type: :request do
   let!(:employee) { create(:employee) }
@@ -106,7 +106,7 @@ RSpec.describe 'v1/employees#show', type: :request do
     assert_payload(:employee, employee, json_item)
   end
 end
-```
+{% endhighlight %}
 
 A note on testing: these are full-stack [request specs](https://github.com/rspec/rspec-rails#request-specs). We seed the database using [factory_girl](https://github.com/thoughtbot/factory_girl), randomizing data with [faker](https://github.com/stympy/faker), then assert on the resulting JSON using [spec helpers](https://jsonapi-suite.github.io/jsonapi_spec_helpers).
 
@@ -308,39 +308,39 @@ the `/departments` endpoint.
 
 Make the model a PORO:
 
-```ruby
+{% highlight ruby %}
 # app/models/position.rb
 
 # belongs_to :department, optional: true
 attr_accessor :department
-```
+{% endhighlight %}
 
 Use `{}` as our base scope instead of `ActiveRecord::Relation`:
 
-```ruby
+{% highlight ruby %}
 # app/controllers/departments_controller.rb
 def index
   # render_jsonapi(Department.all)
   render_jsonapi({})
 end
-```
+{% endhighlight %}
 
 Customize `resolve` for the new hash-based scope:
 
-```ruby
+{% highlight ruby %}
 # app/resources/department_resource.rb
 use_adapter JsonapiCompliable::Adapters::Null
 
 def resolve(scope)
   Department.where(scope)
 end
-```
+{% endhighlight %}
 
 `Department.where` is our contract for resolving the scope. The underlying `Department` code could use an HTTP client, alternate datastore, what-have-you.
 
 Let's also change our code for sideloading departments at `/api/v1/employees?include=departments`:
 
-```ruby
+{% highlight ruby %}
 # app/resources/position_resource.rb
 
 # belongs_to :department,
@@ -359,7 +359,7 @@ allow_sideload :department, resource: DepartmentResource do
     end
   end
 end
-```
+{% endhighlight %}
 
 As you can see, we're delving into a lower-level DSL to customize. You
 probably want to package up these changes into an [Adapter](https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Adapters/Abstract.html). The `ActiveRecord` adapter is simple packaging up similar low-level defaults. Your app may require an `HTTPAdapter` or `ServiceAdapter`, or you can make one-off customizations as shown above.
@@ -370,18 +370,18 @@ Similar to a service call, here's how we might incorporate the elasticsearch [tr
 
 Make our base scope an instance of our Trample client:
 
-```diff
+{% highlight ruby %}
 # app/controllers/employees_controller.rb
   def index
     # render_jsonapi(Employee.all)
     render_jsonapi(Search::Employee.new)
   end
 end
-```
+{% endhighlight %}
 
 Customize the resource using the Trample Client API:
 
-```diff
+{% highlight ruby %}
 # app/resources/employee_resource.rb
 use_adapter JsonapiCompliable::Adapters::Null
 
@@ -397,7 +397,7 @@ def resolve(scope)
   scope.query!
   scope.results
 end
-```
+{% endhighlight %}
 
 Once again, you probably want to package these changes into an [Adapter](https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Adapters/Abstract.html).
 
@@ -411,121 +411,61 @@ This will fetch an employee with id 123. their last 3 positions where the title 
 
 We'll use typescript for this example, though we could use vanilla JS just as well. First define our models (additional client-side business logic can go in these classes):
 
-```javascript
-class Employee extends Model {
-  static jsonapiType: 'people';
+{% highlight typescript %}
+import { JSORMBase, Attr, HasMany, BelongsTo } from "jsorm"
 
-  firstName: attr();
-  lastName: attr();
-  age: attr();
-
-  positions: hasMany();
+class ApplicationRecord extends JSORMBase {
+  static baseUrl = "http://localhost:3000"
+  static apiNamespace = "/api/v1"
 }
 
-class Position extends Model {
-  static jsonapiType: 'positions';
+class Employee extends ApplicationRecord {
+  static jsonapiType = "people"
 
-  title: attr();
+  @Attr() firstName: string
+  @Attr() lastName: string
+  @Attr() age: number
 
-  department: belongsTo();
+  @HasMany() positions: Position[]
 }
 
-class Department extends Model {
-  static jsonapiType: 'departments';
+class Position extends ApplicationRecord {
+  static jsonapiType = "positions"
 
-  name: attr();
+  @Attr() title: string
+
+  @BelongsTo() department: Department[]
 }
-```
+
+class Department extends ApplicationRecord {
+  static jsonapiType = "departments"
+
+  @Attr() name: string
+}
+{% endhighlight %}
 
 Now fetch the data in one call:
 
-```javascript
-let positionScope = Position.where({ title_prefix: 'dev' }).order({ created_at: 'dsc' });
+{% highlight javascript %}
+let positionScope = Position
+  .where({ title_prefix: "dev" })
+  .order({ created_at: "desc" });
 
-let scope = Employee.includes({ positions: 'department' }).merge({ positions: positionScope});
-scope.find(123).then (response) => {
-  let employee = response.data;
-  // access data like so in HTML:
-  // employee.positions[0].department.name
+let scope = Employee
+  .includes({ positions: "department" })
+  .merge({ positions: positionScope})
+
+let employee = (await scope.find(123)).data
+// access data like so in HTML:
+// employee.positions[0].department.name
 }
-```
+{% endhighlight %}
 
-[Read the JSORM documentation here](https://jsonapi-suite.github.io/jsorm/)
+[Read the JSORM documentation here](/js/home)
 
 ## <a name="glimmer" href='#glimmer'>Glimmer</a>
 
-![glimmer_logo]({{site.github.url}}/assets/img/glimmer_logo.png)
-
-JSORM can be used with the client-side framework of your choice. To give an example of real-world usage, we've created a demo application using [Glimmer](https://glimmerjs.com/). Glimmer is super-lightweight (you can learn it in 5 minutes) and provides the bare-bones we need to illustrate JSONAPI and JSORM in action.
-
-Still, we want to demo JSONAPI, not Glimmer. To that end, we've created a [base glimmer application](https://github.com/jsonapi-suite/employee-directory) that will take care of styling and glimmer-specific helpers.
-
-Finally, [this will point to a slightly tweaked branch](https://github.com/jsonapi-suite/employee_directory/tree/prepare_clientside) of the server-side API above.
-
-Let's create our app.
-
-### <a name="client-side-datagrid" href='#client-side-datagrid'>Client-Side Datagrid</a>
-
-We'll start by adding our models and populating a simple table:
-
-![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
-[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory/compare/master...step_1_basic_search)
-
-### <a name="client-side-filtering" href='#client-side-filtering'>Client-Side Filtering</a>
-
-Now add some first name/last name search filters to the grid:
-
-![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
-[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory/compare/step_1_basic_search...step_2_add_filtering)
-
-### <a name="client-side-pagination" href='#client-side-pagination'>Client-Side Pagination</a>
-
-Pretty straightforward: we add pagination to our scope, with some logic to calculate forward/back.
-
-![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
-[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory/compare/step_2_add_filtering...step_3_add_pagination)
-
-### <a name="client-side-stats" href='#client-side-stats'>Client-Side Statistics</a>
-
-Here we'll add a "Total Count" above our grid, and use this value to improve our pagination logic:
-
-![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
-[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory/compare/step_3_add_pagination...step_4_stats)
-
-### <a name="client-side-sorting" href='#client-side-sorting'>Client-Side Sorting</a>
-
-![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
-[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory/compare/step_4_stats...step_5_sorting)
-
-### <a name="client-side-nested-create" href='#client-side-nested-create'>Client-Side Nested Create</a>
-
-Let's add a form that will create an Employee, their Positions and associated Departments in one go:
-
-![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
-[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory/compare/step_5_sorting...step_6_basic_create)
-
-### <a name="client-side-nested-update" href='#client-side-nested-update'>Client-Side Nested Update</a>
-
-Let's add some glimmer-binding so that we can click an employee in the grid, and edit that employee in the form:
-
-![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
-[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory/compare/step_6_basic_create...step_7_update)
-
-### <a name="client-side-nested-destroy" href='#client-side-nested-destroy'>Client-Side Nested Destroy</a>
-
-Remove employee positions. Since only one position is 'current', we'll do some recalculating as the data changes.
-
-![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
-[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory/compare/step_7_update...step_8_destroy)
-
-### <a name="client-side-validations" href='#client-side-validations'>Client-Side Validations</a>
-
-Of course, no form is complete without nested, server-backed validations. Here we'll highlight the main fields in red, and also give an example of adding a note explaining the error to the user.
-
-The 'age' field is an exception. If the user submits a string instead of a number, the server will response with a 500. This is to show off our [stronger_parameters integration](https://github.com/jsonapi-suite/employee_directory/blob/step_23_disassociation/config/initializers/strong_resources.rb#L5)
-
-![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
-[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory/compare/step_8_destroy...step_9_validations)
+TODO REPLACE WITH VUEJS
 
 <br />
 <br />

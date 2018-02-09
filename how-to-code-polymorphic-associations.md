@@ -11,15 +11,15 @@ different `type`s - `HomeOffice`, `Office`, `CoworkingSpace`, etc.
 Assuming we've already set up our database, let's add the associations
 to our `Model`s:
 
-```ruby
+{% highlight ruby %}
 # app/models/employee.rb
 belongs_to :workspace, polymorphic: true
-```
+{% endhighlight %}
 
-```ruby
+{% highlight ruby %}
 # app/models/workspace.rb
 has_many :employees, as: :workspace
-```
+{% endhighlight %}
 
 Now we need to wire-up our resource. Usually you'd see something like
 `has_many` with a few options. But here, we may actually want to change
@@ -30,7 +30,7 @@ We want to pass the same configuration, but on a type-by-type basis. In
 other words, we need to group workspaces and define how to associate
 each group:
 
-```ruby
+{% highlight ruby %}
 # app/resources/employee_resource.rb
 polymorphic_belongs_to :workspace,
   group_by: :workspace_type,
@@ -46,7 +46,7 @@ polymorphic_belongs_to :workspace,
       foreign_key: :workspace_id
     }
   }
-```
+{% endhighlight %}
 
 Let's say our API was returning 10 `Employees`, sideloading their
 corresponding `Workspace`. The underlying code would:

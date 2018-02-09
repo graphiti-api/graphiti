@@ -71,10 +71,17 @@
 
 body {
   background: #414B5B;
+  font-size: 15px;
+  line-height: 1.5;
 
   .page-content {
     background: white;
   }
+}
+
+#next {
+  float: right;
+  margin: 40px 0 40px 0;
 }
 
 h1, h2 {
@@ -177,9 +184,29 @@ img[alt=github] {
   height: 20px;
 }
 
-pre {
-  code.hljs {
-    &.coffeescript, &.cs, &.javascript {
+.js-toc, blockquote {
+  background: #f7f8fb;
+  border: 1px solid #eaedf7;
+  border-radius: 5px;
+  padding: 10px;
+  line-height: 1.8;
+}
+
+blockquote {
+  &.url {
+    font-size: 14px;
+    color: grey;
+    margin-top: -12px;
+  }
+}
+
+ul ul { // toc
+  padding-left: 20px;
+}
+
+pre.highlight, pre.hljs {
+  code {
+    &.coffeescript, &.cs, &.javascript, &.js, &.ts, &.php {
       [class*=built_in] {
         color: lighten(#9AB4DB, 5%);
       }
@@ -188,6 +215,10 @@ pre {
       }
       [class*=attribute] {
         color: white;
+      }
+      [class*=keyword] {
+        color: lighten(brown, 30%);
+        font-weight: 600;
       }
       [class*=literal] {
         color: lighten(red, 30%);
@@ -199,7 +230,14 @@ pre {
         color: #FFDF9D;
       }
       [class*=nx] {
-        color: #9ECBEE;
+        color: saturate(#9ECBEE, 20%);
+        font-weight: 600;
+      }
+    }
+
+    &.typescript {
+      [class*=kr] {
+        color: desaturate(yellow, 30%);
       }
     }
 
@@ -235,4 +273,155 @@ img[alt=glimmer_logo] {
   width: 200px;
   display: block;
   margin-bottom: 4em;
+}
+
+.tabs {
+  background: #f8f8f8;
+  border-radius: 3px;
+
+  .tab {
+    background-color: #f8f8f8;
+    font-weight: 500;
+    color: #555;
+    display: inline-block;
+    padding: 18px 25px;
+    margin-top: 10px;
+    cursor: pointer;
+    -webkit-transition: background-color .2s linear;
+    -moz-transition: background-color .2s linear;
+    -ms-transition: background-color .2s linear;
+    -o-transition: background-color .2s linear;
+    transition: background-color .2s linear;
+
+    &.active {
+      background-color: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 5px 5px 0 0;
+      border-bottom: 0;
+    }
+  }
+}
+
+.highlight {
+  $generic: #edf2f9;
+  $comment: #9c9c9c;
+  $yellow: #e6eb9d;
+  $blue: #a2dcff;
+
+  pre {
+    code {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  }
+
+  .language-ruby {
+    .n {
+      color: white;
+    }
+
+    .c1 {
+      color: $comment;
+    }
+
+    .ss {
+      color: $blue;
+      font-weight: 600;
+    }
+
+    .k, .kp {
+      color: #ff8080;
+    }
+
+    .p {
+      color: white;
+    }
+
+    .nc, .no {
+      color: $yellow;
+      font-weight: 600;
+    }
+
+    .o, .si, .nf {
+      color: white;
+    }
+
+    .s1, .s2 {
+      color: lightgreen;
+      font-weight: 600;
+    }
+
+    .vi, .mi, .nb {
+      color: lighten(#ff66d9, 10%);
+      font-weight: 600;
+    }
+  }
+
+  .language-typescript, .language-javascript {
+    .kd {
+      color: $generic;
+      font-weight: 600;
+    }
+
+    .o {
+      color: $generic;
+    }
+
+    .p {
+      color: $generic;
+    }
+
+    .nx {
+      color: $blue;
+      font-weight: 600;
+    }
+
+    .nb {
+      color: white;
+    }
+
+    .kc {
+      color: $yellow;
+    }
+
+    .kr {
+      color: lighten(#008080, 20%);
+    }
+
+    .c1 {
+      color: #9c9c9c;
+    }
+
+    .k {
+      color: #ff66d9;
+    }
+
+    .err {
+      font-weight: 600;
+      color: $yellow;
+    }
+
+    .na, .nl {
+      color: #ff66d9;
+    }
+
+    .s1, .s2 {
+      color: lightgreen;
+      font-weight: 600;
+    }
+
+    .mi {
+      color: $yellow;
+    }
+  }
+
+  .language-bash {
+    color: white;
+  }
+
+  .language-javascript {
+    .k {
+      color: $yellow !important;
+    }
+  }
 }

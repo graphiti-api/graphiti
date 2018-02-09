@@ -10,14 +10,14 @@ above that grid, or "average cost" elsewhere in our UI?
 
 These calculations are supported via `allow_stat`:
 
-```ruby
+{% highlight ruby %}
 # app/resources/employee_resource.rb
 allow_stat total: [:count]
-```
+{% endhighlight %}
 
 A GET to `/api/employees?stats[total]=count` would return:
 
-```ruby
+{% highlight ruby %}
 {
   data: [...],
   meta: {
@@ -28,35 +28,33 @@ A GET to `/api/employees?stats[total]=count` would return:
     }
   }
 }
-```
+{% endhighlight %}
 
 A few 'default calculations' are provided: `count`, `sum`, `average`,
 `maximum` and `minimum`. These will work out-of-the-box with `ActiveRecord`.
 Alternatively, override these calculation functions:
 
-```ruby
+{% highlight ruby %}
 allow_stat :salary do
   average { |scope, attr| scope.average(attr) }
 end
-```
+{% endhighlight %}
 
 Or support your own custom calculations:
 
-```ruby
+{% highlight ruby %}
 allow_stat salary: [:average] do
   standard_deviation { |scope, attr| ... }
 end
-```
+{% endhighlight %}
 
 Multiple stats are supported with one request:
 
-```ruby
-GET /api/employees?stats[salary]=average,maximum&stats[total]=count
-```
+> GET /api/employees?stats[salary]=average,maximum&stats[total]=count
 
 If you want **only** stats, and no records (for performance), simple pass page size 0:
 
-`GET /api/employees?stats[salary]=average&page[size]=0`
+> GET /api/employees?stats[salary]=average&page[size]=0
 
 <br />
 <br />

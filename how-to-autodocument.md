@@ -26,12 +26,12 @@ in `public`. Let's start by adding dependencies:
 <br />
 <br />
 
-```ruby
+{% highlight ruby %}
 # Gemfile
 # Below 'jsonapi_suite'
 gem 'jsonapi_spec_helpers'
 gem 'jsonapi_swagger_helpers'
-```
+{% endhighlight %}
 
 <i>
   Note: here we're moving `jsonapi_spec_helpers` out of the
@@ -45,10 +45,10 @@ but we'll only deal with the already-compiled static files glimmer builds.
 Let's copy those files and expose them to the web by putting them in
 `public`:
 
-```bash
+{% highlight bash %}
 $ mkdir -p public/api/docs && cd public/api/docs
 $ git clone https://github.com/jsonapi-suite/swagger-ui.git && cp swagger-ui/prod-dist/* . && rm -rf swagger-ui
-```
+{% endhighlight %}
 
 Our documentation will be accessible at `/api/docs`, so we put the files
 in `public/api/docs`. You may want a different directory depending on
@@ -57,33 +57,33 @@ your own routing rules. In either case, our next step is to edit
 There are also a few configuration options, such as providing a link to
 Github.
 
-```javascript
+{% highlight javascript %}
 window.CONFIG = {
-  githubURL: 'http://github.com/user/repo',
-  basePath: '/api' // basePath/swagger.json, basePath/v1/employees, etc
+  githubURL: "http://github.com/user/repo",
+  basePath: "/api" // basePath/swagger.json, basePath/v1/employees, etc
 }
-```
+{% endhighlight %}
 
 This static website will make a request to `/api/swagger.json`. Let's
 build that endpoint now:
 
-```bash
+{% highlight bash %}
 $ touch app/controllers/docs_controller.rb
-```
+{% endhighlight %}
 
-```ruby
+{% highlight ruby %}
 # config/routes.rb
 scope path: '/api' do
   resources :docs, only: [:index], path: '/swagger'
   # ... code ...
 end
-```
+{% endhighlight %}
 
 Our `DocsController` uses [swagger-blocks](https://github.com/fotinakis/swagger-blocks) to generate
 the swagger schema. Here's the minimal setup needed to configure
 swagger:
 
-```ruby
+{% highlight ruby %}
 require 'jsonapi_swagger_helpers'
 
 class DocsController < ActionController::API
@@ -104,33 +104,33 @@ class DocsController < ActionController::API
     key :produces, ['application/json']
   end
 end
-```
+{% endhighlight %}
 
 That's it. Now, every time we add an endpoint, we can autodocument with
 one line of code (below the `swagger_root` block):
 
-```ruby
+{% highlight ruby %}
 jsonapi_resource '/v1/employees'
-```
+{% endhighlight %}
 
 This endpoint will be introspected for all RESTful actions, outputting
 the full configuration. There are a few customization options:
 
-```ruby
+{% highlight ruby %}
 jsonapi_resource '/v1/employees',
   only: [:create, :index],
   except: [:destroy],
   descriptions: {
     index: "Some <b>additional</b> documentation"
   }
-```
+{% endhighlight %}
 
 If you want additional attribute-level documentation, you can add this
 to your spec payloads:
 
-```ruby
+{% highlight ruby %}
 key(:name, String, description: 'The full name, e.g. "John Doe"')
-```
+{% endhighlight %}
 
 <br />
 Will give you an output similar to:

@@ -9,15 +9,13 @@
   <title>JSONAPI Suite</title>
   <meta name="description" content="Collection of Ruby libraries for powering JSONAPI-compliant APIs.">
 
-  <link rel="stylesheet" type="text/css" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
-  <link rel="stylesheet" href="https://jsonapi-suite.github.io/jsonapi_suite/assets/main.css">
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css">
   <link rel="canonical" href="http://localhost:4000/quickstart.html">
   <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
 
   <!-- javascript -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-  <script src="https://yandex.st/highlightjs/8.0/highlight.min.js"></script>
 
   
 </head>
@@ -39,13 +37,16 @@
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
       <ul class="nav navbar-nav">
         <li>
-          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart">Quickstart</a>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
         </li>
         <li>
-          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial">Tutorial</a>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
         </li>
         <li>
-          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/concepts">Concepts</a>
+          <a class="nav-link" href="http://localhost:4000/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/js/home">Javascript Client</a>
         </li>
         <li class="dropdown">
           <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
@@ -56,57 +57,54 @@
           <ul class="dropdown-menu">
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-scope-to-current-user">Scope to Current User</a>
+                <a href="http://localhost:4000/how-to-scope-to-current-user">Scope to Current User</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-cause-side-effects">Cause Side-Effects</a>
+                <a href="http://localhost:4000/how-to-cause-side-effects">Cause Side-Effects</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-use-without-activerecord">Use Alternate ORMs</a>
+                <a href="http://localhost:4000/how-to-use-without-activerecord">Use Alternate ORMs</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-build-an-adapter">Build an Adapter</a>
+                <a href="http://localhost:4000/how-to-build-an-adapter">Build an Adapter</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
+                <a href="http://localhost:4000/how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-code-polymorphic-associations">Polymorphic Relationships</a>
+                <a href="http://localhost:4000/how-to-code-polymorphic-associations">Polymorphic Relationships</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-add-defaults">Add Default Behavior</a>
+                <a href="http://localhost:4000/how-to-add-defaults">Add Default Behavior</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-conditionally-render-fields">Conditionally Render Fields</a>
+                <a href="http://localhost:4000/how-to-conditionally-render-fields">Conditionally Render Fields</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-customize-error-responses">Customize Error Responses</a>
+                <a href="http://localhost:4000/how-to-customize-error-responses">Customize Error Responses</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-write-specs">Write Specs</a>
+                <a href="http://localhost:4000/how-to-write-specs">Write Specs</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-return-statistics">Statistics</a>
+                <a href="http://localhost:4000/how-to-return-statistics">Statistics</a>
               </li>
             
               <li>
-                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-autodocument">Autodocument with Swagger</a>
+                <a href="http://localhost:4000/how-to-autodocument">Autodocument with Swagger</a>
               </li>
             
           </ul>
-        </li>
-        <li>
-          <a class="nav-link" href="mailto:richmolj@gmail.com">Contact</a>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
@@ -134,9 +132,7 @@ sensible defaults to get started quickly.</p>
 
 <p>Let’s start with a classic Rails blog. We’ll use a <a href="http://guides.rubyonrails.org/rails_application_templates.html">template</a> to handle some of the boilerplate. Just run this command and accept all the defaults for now:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>rails new blog --api -m https://raw.githubusercontent.com/jsonapi-suite/rails_template/master/all.rb
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>rails new blog --api -m https://raw.githubusercontent.com/jsonapi-suite/rails_template/master/all.rb</code></pre></figure>
 
 <p>Feel free to run <code class="highlighter-rouge">git diff</code> if you’re interested in the
 particulars; this is mostly just installing gems and including modules.</p>
@@ -147,17 +143,13 @@ particulars; this is mostly just installing gems and including modules.</p>
 words: a <code class="highlighter-rouge">Model</code> is to the database as <code class="highlighter-rouge">Resource</code> is to the API. So
 first, let’s define our model:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>bundle <span class="nb">exec </span>rails generate model Post title:string active:boolean
-<span class="gp">$ </span>bundle <span class="nb">exec </span>rake db:migrate
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>bundle <span class="nb">exec </span>rails generate model Post title:string active:boolean
+<span class="gp">$ </span>bundle <span class="nb">exec </span>rake db:migrate</code></pre></figure>
 
 <p>Now we can use the built-in generator to define our <code class="highlighter-rouge">Resource</code>,
 controller, and specs:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>bundle <span class="nb">exec </span>rails g jsonapi:resource Post title:string active:boolean
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>bundle <span class="nb">exec </span>rails g jsonapi:resource Post title:string active:boolean</code></pre></figure>
 
 <p>You’ll see a number of files created. If you open each one, you’ll see
 comments explaining what’s going on. Head over to the
@@ -170,33 +162,27 @@ and outputs (via <a href="http://jsonapi-rb.org">jsonapi-rb</a>).</p>
 <code class="highlighter-rouge">config/initializers/strong_resources.rb</code>. You can think of these as
 <a href="http://api.rubyonrails.org/v5.0/classes/ActionController/StrongParameters.html">strong parameter</a> templates.</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># config/initializers/strong_resources.rb</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># config/initializers/strong_resources.rb</span>
 <span class="n">strong_resource</span> <span class="ss">:post</span> <span class="k">do</span>
   <span class="n">attribute</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:string</span>
   <span class="n">attribute</span> <span class="ss">:active</span><span class="p">,</span> <span class="ss">:boolean</span>
-<span class="k">end</span>
-</code></pre>
-</div>
+<span class="k">end</span></code></pre></figure>
 
 <p>Our <strong>API Outputs</strong> are defined in
 <code class="highlighter-rouge">app/serializers/serializable_post.rb</code>. The DSL is very similar to
-<a href="https://github.com/rails-api/active_model_serializers">active_model_serializers</a> and full documentation can be found at <a href="http://jsonapi-rb.org">jsonapi-rg.org</a>:</p>
+<a href="https://github.com/rails-api/active_model_serializers">active_model_serializers</a> and full documentation can be found at <a href="http://jsonapi-rb.org">jsonapi-rb.org</a>:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/serializers/serializable_post.rb</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/serializers/serializable_post.rb</span>
 <span class="k">class</span> <span class="nc">SerializablePost</span> <span class="o">&lt;</span> <span class="no">JSONAPI</span><span class="o">::</span><span class="no">Serializable</span><span class="o">::</span><span class="no">Resource</span>
   <span class="n">type</span> <span class="ss">:posts</span>
 
   <span class="n">attribute</span> <span class="ss">:title</span>
   <span class="n">attribute</span> <span class="ss">:active</span>
-<span class="k">end</span>
-</code></pre>
-</div>
+<span class="k">end</span></code></pre></figure>
 
 <p>Now run your app!:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>$ bundle exec rails s
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>bundle <span class="nb">exec </span>rails s</code></pre></figure>
 
 <p>Verify <code class="highlighter-rouge">http://localhost:3000/api/v1/posts</code> renders JSON correctly.
 Now we just need data.</p>
@@ -211,78 +197,70 @@ development, or you can avoid the detour and plow right ahead.</p>
 
 <p>Edit <code class="highlighter-rouge">db/seeds.rb</code> to create a few <code class="highlighter-rouge">Post</code>s:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Post</span><span class="p">.</span><span class="nf">create!</span><span class="p">(</span><span class="ss">title: </span><span class="s1">'My title!'</span><span class="p">,</span> <span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">Post</span><span class="p">.</span><span class="nf">create!</span><span class="p">(</span><span class="ss">title: </span><span class="s1">'My title!'</span><span class="p">,</span> <span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
 <span class="no">Post</span><span class="p">.</span><span class="nf">create!</span><span class="p">(</span><span class="ss">title: </span><span class="s1">'Another title!'</span><span class="p">,</span> <span class="ss">active: </span><span class="kp">false</span><span class="p">)</span>
-<span class="no">Post</span><span class="p">.</span><span class="nf">create!</span><span class="p">(</span><span class="ss">title: </span><span class="s1">'OMG! A title!'</span><span class="p">,</span> <span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
-</code></pre>
-</div>
+<span class="no">Post</span><span class="p">.</span><span class="nf">create!</span><span class="p">(</span><span class="ss">title: </span><span class="s1">'OMG! A title!'</span><span class="p">,</span> <span class="ss">active: </span><span class="kp">true</span><span class="p">)</span></code></pre></figure>
 
 <p>And run the script:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>bundle <span class="nb">exec </span>rake db:seed
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>bundle <span class="nb">exec </span>rake db:seed</code></pre></figure>
 
 <h3 id="seeding-with-js-client"><a name="seeding-with-node" href="#seeding-with-node">Seeding With JS Client</a></h3>
 
 <p>There are a variety of <a href="http://jsonapi.org/implementations/#client-libraries">JSONAPI Clients</a>
-out there. We’ll be using <a href="https://github.com/jsonapi-suite/jsorm">JSORM</a>,
+out there. We’ll be using <a href="/js/home">JSORM</a>
 which is built to work with Suite-specific functionality like nested
 payloads. It can be used from the browser, but for now we’ll call
 it using a simple Node script.</p>
 
 <p>Create the project:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>mkdir node-seed <span class="o">&amp;&amp;</span> <span class="nb">cd </span>node-seed <span class="o">&amp;&amp;</span> touch index.js <span class="o">&amp;&amp;</span> npm init
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>mkdir node-seed <span class="o">&amp;&amp;</span> <span class="nb">cd </span>node-seed <span class="o">&amp;&amp;</span> touch index.js <span class="o">&amp;&amp;</span> npm init</code></pre></figure>
 
 <p>Accept the default for all prompts. Now add the <code class="highlighter-rouge">JSORM</code> dependency, as
 well as a polyfill for <code class="highlighter-rouge">fetch</code>:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>npm install --save jsorm isomorphic-fetch
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>npm install --save jsorm isomorphic-fetch</code></pre></figure>
 
 <p>Add this seed code to <code class="highlighter-rouge">index.js</code>:</p>
 
-<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="nx">require</span><span class="p">(</span><span class="s1">'isomorphic-fetch'</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">jsorm</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'jsorm'</span><span class="p">);</span>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">require</span><span class="p">(</span><span class="s2">"isomorphic-fetch"</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">jsorm</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"jsorm"</span><span class="p">);</span>
 
 <span class="c1">// setup code</span>
 
 <span class="kd">var</span> <span class="nx">ApplicationRecord</span> <span class="o">=</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
   <span class="na">static</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">baseUrl</span><span class="p">:</span> <span class="s1">'http://localhost:3000'</span><span class="p">,</span>
-    <span class="na">apiNamespace</span><span class="p">:</span> <span class="s1">'/api/v1'</span>
+    <span class="na">baseUrl</span><span class="p">:</span> <span class="s2">"http://localhost:3000"</span><span class="p">,</span>
+    <span class="na">apiNamespace</span><span class="p">:</span> <span class="s2">"/api/v1"</span>
   <span class="p">}</span>
 <span class="p">});</span>
 
 <span class="kd">var</span> <span class="nx">Post</span> <span class="o">=</span> <span class="nx">ApplicationRecord</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
   <span class="na">static</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">jsonapiType</span><span class="p">:</span> <span class="s1">'posts'</span>
+    <span class="na">jsonapiType</span><span class="p">:</span> <span class="s2">"posts"</span>
   <span class="p">},</span>
 
-  <span class="na">title</span><span class="p">:</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">attr</span><span class="p">(),</span>
-  <span class="na">active</span><span class="p">:</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">attr</span><span class="p">()</span>
+  <span class="na">attrs</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">title</span><span class="p">:</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">attr</span><span class="p">(),</span>
+    <span class="na">active</span><span class="p">:</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">attr</span><span class="p">()</span>
+  <span class="p">}</span>
 <span class="p">});</span>
-
-<span class="nx">jsorm</span><span class="p">.</span><span class="nx">Config</span><span class="p">.</span><span class="nx">setup</span><span class="p">();</span>
 
 <span class="c1">// seed code</span>
 
 <span class="kd">var</span> <span class="nx">post1</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Post</span><span class="p">({</span>
-  <span class="na">title</span><span class="p">:</span> <span class="s1">'My title!'</span><span class="p">,</span>
+  <span class="na">title</span><span class="p">:</span> <span class="s2">"My title!"</span><span class="p">,</span>
   <span class="na">active</span><span class="p">:</span> <span class="kc">true</span>
 <span class="p">});</span>
 
 <span class="kd">var</span> <span class="nx">post2</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Post</span><span class="p">({</span>
-  <span class="na">title</span><span class="p">:</span> <span class="s1">'Another title!'</span><span class="p">,</span>
+  <span class="na">title</span><span class="p">:</span> <span class="s2">"Another title!"</span><span class="p">,</span>
   <span class="na">active</span><span class="p">:</span> <span class="kc">false</span>
 <span class="p">});</span>
 
 <span class="kd">var</span> <span class="nx">post3</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Post</span><span class="p">({</span>
-  <span class="na">title</span><span class="p">:</span> <span class="s1">'OMG! A title!'</span><span class="p">,</span>
+  <span class="na">title</span><span class="p">:</span> <span class="s2">"OMG! A title!"</span><span class="p">,</span>
   <span class="na">active</span><span class="p">:</span> <span class="kc">true</span>
 <span class="p">});</span>
 
@@ -291,9 +269,7 @@ well as a polyfill for <code class="highlighter-rouge">fetch</code>:</p>
   <span class="nx">post2</span><span class="p">.</span><span class="nx">save</span><span class="p">().</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">post3</span><span class="p">.</span><span class="nx">save</span><span class="p">();</span>
   <span class="p">});</span>
-<span class="p">});</span>
-</code></pre>
-</div>
+<span class="p">});</span></code></pre></figure>
 
 <p>This should be pretty straightforward if you’re familiar with
 <code class="highlighter-rouge">ActiveRecord</code>. We define <code class="highlighter-rouge">Model</code> objects, putting configuration on
@@ -302,14 +278,12 @@ class attributes. We instatiating instances of those Models, and call
 
 <p>Run the script:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>node index.js
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>node index.js</code></pre></figure>
 
 <p>Now load <code class="highlighter-rouge">http://localhost:3000/api/v1/posts</code>. You should have 3 <code class="highlighter-rouge">Post</code>s in
 your database!</p>
 
-<p><img src="https://jsonapi-suite.github.io/jsonapi_suite/assets/img/3_posts_json.png" alt="3_posts" /></p>
+<p><img src="http://localhost:4000/assets/img/3_posts_json.png" alt="3_posts" /></p>
 
 <h1 id="querying"><a name="querying" href="#querying">Querying</a></h1>
 
@@ -362,95 +336,97 @@ what query functionality we have. We’ve listed all <code class="highlighter-ro
   </li>
   <li><strong>Filter</strong>:
     <ul>
-      <li>
-        <p>Add one line of code:</p>
-
-        <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/resources/post_resource.rb</span>
-<span class="n">allow_filter</span> <span class="ss">:title</span>
-</code></pre>
-        </div>
-      </li>
-      <li>URL: <code class="highlighter-rouge">/api/v1/posts?filter[title]=My title!</code></li>
-      <li>SQL: <code class="highlighter-rouge">SELECT * FROM posts WHERE title = "My title!"</code></li>
-      <li>Any filter not whitelisted will raise <code class="highlighter-rouge">JsonapiCompliable::BadFilter</code>
-error.</li>
-      <li>
-        <p>All filter logic can be customized:</p>
-
-        <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># SELECT * from posts WHERE title LIKE 'My%'</span>
-<span class="n">allow_filter</span> <span class="ss">:title_prefix</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
-  <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">([</span><span class="s2">"title LIKE ?"</span><span class="p">,</span> <span class="s2">"</span><span class="si">#{</span><span class="n">value</span><span class="si">}</span><span class="s2">%"</span><span class="p">])</span>
-<span class="k">end</span>
-</code></pre>
-        </div>
-      </li>
-      <li>Customizations can be DRYed up and packaged into <code class="highlighter-rouge">Adapter</code>s.</li>
+      <li>Add one line of code:</li>
     </ul>
   </li>
-  <li><strong>Extra Fields</strong>:
+</ul>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/post_resource.rb</span>
+<span class="n">allow_filter</span> <span class="ss">:title</span></code></pre></figure>
+
+<ul>
+  <li>URL: <code class="highlighter-rouge">/api/v1/posts?filter[title]=My title!</code></li>
+  <li>SQL: <code class="highlighter-rouge">SELECT * FROM posts WHERE title = "My title!"</code></li>
+  <li>Any filter not whitelisted will raise <code class="highlighter-rouge">JsonapiCompliable::BadFilter</code>
+  error.</li>
+  <li>All filter logic can be customized:</li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># SELECT * from posts WHERE title LIKE 'My%'</span>
+<span class="n">allow_filter</span> <span class="ss">:title_prefix</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">([</span><span class="s2">"title LIKE ?"</span><span class="p">,</span> <span class="s2">"</span><span class="si">#{</span><span class="n">value</span><span class="si">}</span><span class="s2">%"</span><span class="p">])</span>
+<span class="k">end</span></code></pre></figure>
+
+<ul>
+  <li>
+    <p>Customizations can be DRYed up and packaged into <code class="highlighter-rouge">Adapter</code>s.</p>
+  </li>
+  <li>
+    <p><strong>Extra Fields</strong>:</p>
     <ul>
       <li>Sometimes you want to request additional fields not part of a normal
 response (perhaps they are computationally expensive).</li>
-      <li>
-        <p>This can be done like so:</p>
+      <li>This can be done like so:</li>
+    </ul>
+  </li>
+</ul>
 
-        <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/serializers/serializable_post.rb</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/serializers/serializable_post.rb</span>
 <span class="n">extra_attribute</span> <span class="ss">:description</span> <span class="k">do</span>
   <span class="vi">@object</span><span class="p">.</span><span class="nf">active?</span> <span class="p">?</span> <span class="s1">'Active Post'</span> <span class="p">:</span> <span class="s1">'Inactive Post'</span>
-<span class="k">end</span>
-</code></pre>
-        </div>
-      </li>
-      <li>URL: <code class="highlighter-rouge">/api/v1/posts?extra_fields[posts]=description</code></li>
-      <li>SQL: <code class="highlighter-rouge">SELECT * FROM posts</code></li>
-      <li>You can conditionally eager load data or further customize this
-logic. See the tutorial for more.</li>
-    </ul>
+<span class="k">end</span></code></pre></figure>
+
+<ul>
+  <li>URL: <code class="highlighter-rouge">/api/v1/posts?extra_fields[posts]=description</code></li>
+  <li>SQL: <code class="highlighter-rouge">SELECT * FROM posts</code></li>
+  <li>
+    <p>You can conditionally eager load data or further customize this
+  logic. See the tutorial for more.</p>
   </li>
   <li><strong>Statistics</strong>:
     <ul>
       <li>Useful for search grids - “Find me the first 10 active posts, and
 the total count of all posts”.</li>
-      <li>
-        <p>One line of code to whitelist the stat:</p>
-
-        <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/resources/post_resource.rb</span>
-<span class="n">allow_stat</span> <span class="ss">total: </span><span class="p">[</span><span class="ss">:count</span><span class="p">]</span>
-</code></pre>
-        </div>
-      </li>
-      <li>URL: <code class="highlighter-rouge">/api/v1/posts?stats[total]=count</code></li>
-      <li>SQL: <code class="highlighter-rouge">SELECT count(*) from posts</code></li>
-      <li>Combine with filters and the count will adjust accordingly.</li>
-      <li>There are a number of built-in stats, you can also add your own.</li>
-      <li>
-        <p>This is rendered in the <code class="highlighter-rouge">meta</code> section of the response:</p>
-
-        <p><img src="https://jsonapi-suite.github.io/jsonapi_suite/assets/img/meta_total_count.png" alt="meta_total_count" /></p>
-      </li>
+      <li>One line of code to whitelist the stat:</li>
     </ul>
+  </li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/post_resource.rb</span>
+<span class="n">allow_stat</span> <span class="ss">total: </span><span class="p">[</span><span class="ss">:count</span><span class="p">]</span></code></pre></figure>
+
+<ul>
+  <li>URL: <code class="highlighter-rouge">/api/v1/posts?stats[total]=count</code></li>
+  <li>SQL: <code class="highlighter-rouge">SELECT count(*) from posts</code></li>
+  <li>Combine with filters and the count will adjust accordingly.</li>
+  <li>There are a number of built-in stats, you can also add your own.</li>
+  <li>
+    <p>This is rendered in the <code class="highlighter-rouge">meta</code> section of the response:</p>
+
+    <p><img src="http://localhost:4000/assets/img/meta_total_count.png" alt="meta_total_count" /></p>
   </li>
   <li><strong>Error Handling</strong>:
     <ul>
       <li>Your app will always render a JSONAPI-compliable error response.</li>
-      <li>
-        <p>Cause an error:</p>
+      <li>Cause an error:</li>
+    </ul>
+  </li>
+</ul>
 
-        <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/controllers/posts_controller.rb</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/posts_controller.rb</span>
 <span class="k">def</span> <span class="nf">index</span>
   <span class="k">raise</span> <span class="s1">'foo'</span>
-<span class="k">end</span>
-</code></pre>
-        </div>
-      </li>
-      <li>
-        <p>View the default payload:</p>
+<span class="k">end</span></code></pre></figure>
 
-        <p><img src="https://jsonapi-suite.github.io/jsonapi_suite/assets/img/error_payload.png" alt="error_payload" /></p>
-      </li>
-      <li>Different errors can be customized with different response codes,
-JSON, and side-effects. View <a href="https://jsonapi-suite.github.io/jsonapi_errorable/">jsonapi_errorable</a> for more.</li>
-    </ul>
+<ul>
+  <li>
+    <p>View the default payload:</p>
+
+    <p><img src="http://localhost:4000/assets/img/error_payload.png" alt="error_payload" /></p>
+  </li>
+  <li>
+    <p>Different errors can be customized with different response codes,
+  JSON, and side-effects. View <a href="https://jsonapi-suite.github.io/jsonapi_errorable/">jsonapi_errorable</a> for more.</p>
   </li>
 </ul>
 
@@ -464,33 +440,25 @@ persistence (“save this <code class="highlighter-rouge">Post</code> and 3 <cod
 
 <p>Let’s start by defining our model:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>bundle <span class="nb">exec </span>rails g model Comment post_id:integer body:text active:boolean
-<span class="gp">$ </span>bundle <span class="nb">exec </span>rake db:migrate
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>bundle <span class="nb">exec </span>rails g model Comment post_id:integer body:text active:boolean
+<span class="gp">$ </span>bundle <span class="nb">exec </span>rake db:migrate</code></pre></figure>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/models/post.rb</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/models/post.rb</span>
 <span class="n">has_many</span> <span class="ss">:comments</span>
 
 <span class="c1"># app/models/comment.rb</span>
-<span class="n">belongs_to</span> <span class="ss">:post</span><span class="p">,</span> <span class="ss">optional: </span><span class="kp">true</span>
-</code></pre>
-</div>
+<span class="n">belongs_to</span> <span class="ss">:post</span><span class="p">,</span> <span class="ss">optional: </span><span class="kp">true</span></code></pre></figure>
 
 <p>…and corresponding <code class="highlighter-rouge">Resource</code> object:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>bundle <span class="nb">exec </span>rails g jsonapi:resource Comment body:text active:boolean
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>bundle <span class="nb">exec </span>rails g jsonapi:resource Comment body:text active:boolean</code></pre></figure>
 
 <p>Configure the relationship in <code class="highlighter-rouge">PostResource</code>:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">has_many</span> <span class="ss">:comments</span><span class="p">,</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">has_many</span> <span class="ss">:comments</span><span class="p">,</span>
   <span class="ss">foreign_key: :post_id</span><span class="p">,</span>
   <span class="ss">resource: </span><span class="no">CommentResource</span><span class="p">,</span>
-  <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Comment</span><span class="p">.</span><span class="nf">all</span> <span class="p">}</span>
-</code></pre>
-</div>
+  <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Comment</span><span class="p">.</span><span class="nf">all</span> <span class="p">}</span></code></pre></figure>
 
 <p>This code:</p>
 
@@ -509,9 +477,7 @@ functionality as before. We just need to seed data.</p>
 
 <p>Start by clearing out your database:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>bundle <span class="nb">exec </span>rake db:migrate:reset
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>bundle <span class="nb">exec </span>rake db:migrate:reset</code></pre></figure>
 
 <p>Again, you can seed your data using a NodeJS client or the traditional
 <code class="highlighter-rouge">db/seeds.rb</code>.</p>
@@ -520,93 +486,81 @@ functionality as before. We just need to seed data.</p>
 
 <p>Let’s edit our <code class="highlighter-rouge">node-seed/index.js</code>. First add a <code class="highlighter-rouge">Comment</code> model:</p>
 
-<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">Comment</span> <span class="o">=</span> <span class="nx">ApplicationRecord</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">Comment</span> <span class="o">=</span> <span class="nx">ApplicationRecord</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
   <span class="na">static</span><span class="p">:</span> <span class="p">{</span>
     <span class="na">jsonapiType</span><span class="p">:</span> <span class="s1">'comments'</span>
   <span class="p">},</span>
 
-  <span class="na">body</span><span class="p">:</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">attr</span><span class="p">(),</span>
-  <span class="na">active</span><span class="p">:</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">attr</span><span class="p">(),</span>
-  <span class="na">createdAt</span><span class="p">:</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">attr</span><span class="p">()</span>
-<span class="p">});</span>
-</code></pre>
-</div>
+  <span class="na">attrs</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">body</span><span class="p">:</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">attr</span><span class="p">(),</span>
+    <span class="na">active</span><span class="p">:</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">attr</span><span class="p">(),</span>
+    <span class="na">createdAt</span><span class="p">:</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">attr</span><span class="p">()</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></figure>
 
 <p>…and add the relationship to <code class="highlighter-rouge">Post</code>:</p>
 
-<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="c1">// within class body</span>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// within class body</span>
 <span class="c1">// ... code ...</span>
-<span class="nl">comments</span><span class="p">:</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">hasMany</span><span class="p">(),</span>
-<span class="c1">// ... code...</span>
-</code></pre>
-</div>
+<span class="nl">comments</span><span class="p">:</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">hasMany</span><span class="p">()</span>
+<span class="c1">// ... code...</span></code></pre></figure>
 
 <p>Replace the existing <code class="highlighter-rouge">Post</code> instances with one <code class="highlighter-rouge">Post</code> and three
 <code class="highlighter-rouge">Comment</code>s:</p>
 
-<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">comment1</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Comment</span><span class="p">({</span>
-  <span class="na">body</span><span class="p">:</span> <span class="s1">'comment one'</span><span class="p">,</span>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">comment1</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Comment</span><span class="p">({</span>
+  <span class="na">body</span><span class="p">:</span> <span class="s2">"comment one"</span><span class="p">,</span>
   <span class="na">active</span><span class="p">:</span> <span class="kc">true</span>
 <span class="p">});</span>
 
 <span class="kd">var</span> <span class="nx">comment2</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Comment</span><span class="p">({</span>
-  <span class="na">body</span><span class="p">:</span> <span class="s1">'comment two'</span><span class="p">,</span>
+  <span class="na">body</span><span class="p">:</span> <span class="s2">"comment two"</span><span class="p">,</span>
   <span class="na">active</span><span class="p">:</span> <span class="kc">false</span>
 <span class="p">});</span>
 
 <span class="kd">var</span> <span class="nx">comment3</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Comment</span><span class="p">({</span>
-  <span class="na">body</span><span class="p">:</span> <span class="s1">'comment three'</span><span class="p">,</span>
+  <span class="na">body</span><span class="p">:</span> <span class="s2">"comment three"</span><span class="p">,</span>
   <span class="na">active</span><span class="p">:</span> <span class="kc">true</span>
 <span class="p">});</span>
 
 <span class="kd">var</span> <span class="nx">post</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Post</span><span class="p">({</span>
-  <span class="na">title</span><span class="p">:</span> <span class="s1">'My title!'</span><span class="p">,</span>
+  <span class="na">title</span><span class="p">:</span> <span class="s2">"My title!"</span><span class="p">,</span>
   <span class="na">active</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
   <span class="na">comments</span><span class="p">:</span> <span class="p">[</span><span class="nx">comment1</span><span class="p">,</span> <span class="nx">comment2</span><span class="p">,</span> <span class="nx">comment3</span><span class="p">]</span>
 <span class="p">});</span>
 
-<span class="nx">post</span><span class="p">.</span><span class="nx">save</span><span class="p">({</span> <span class="na">with</span><span class="p">:</span> <span class="p">[</span><span class="s1">'comments'</span><span class="p">]</span> <span class="p">});</span>
-</code></pre>
-</div>
+<span class="nx">post</span><span class="p">.</span><span class="nx">save</span><span class="p">({</span> <span class="na">with</span><span class="p">:</span> <span class="p">[</span><span class="s2">"comments"</span><span class="p">]</span> <span class="p">});</span></code></pre></figure>
 
 <p>Tell our controller it’s OK to sidepost comments:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/controllers/posts_controller.rb</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/posts_controller.rb</span>
 <span class="n">strong_resource</span> <span class="ss">:post</span> <span class="k">do</span>
   <span class="n">has_many</span> <span class="ss">:comments</span>
-<span class="k">end</span>
-</code></pre>
-</div>
+<span class="k">end</span></code></pre></figure>
 
 <p>And tell our serializer it’s OK to render comments:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># app/serializers/serializable_post.rb</span>
-<span class="n">has_many</span> <span class="ss">:comments</span>
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/serializers/serializable_post.rb</span>
+<span class="n">has_many</span> <span class="ss">:comments</span></code></pre></figure>
 
 <p>Now run the script to persist the <code class="highlighter-rouge">Post</code> and its three <code class="highlighter-rouge">Comment</code>s in a
 single request:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>node node-seed/index.js
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>node node-seed/index.js</code></pre></figure>
 
 <h4 id="seeding-with-ruby-1"><a name="relationship-seeding-ruby" href="#relationship-seeding-ruby">Seeding with Ruby</a></h4>
 
 <p>Replace your <code class="highlighter-rouge">db/seeds.rb</code> with this code to persist one <code class="highlighter-rouge">Post</code> and
 three <code class="highlighter-rouge">Comment</code>s:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">comment1</span> <span class="o">=</span> <span class="no">Comment</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">body: </span><span class="s1">'comment one'</span><span class="p">,</span> <span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">comment1</span> <span class="o">=</span> <span class="no">Comment</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">body: </span><span class="s1">'comment one'</span><span class="p">,</span> <span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
 <span class="n">comment2</span> <span class="o">=</span> <span class="no">Comment</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">body: </span><span class="s1">'comment two'</span><span class="p">,</span> <span class="ss">active: </span><span class="kp">false</span><span class="p">)</span>
 <span class="n">comment3</span> <span class="o">=</span> <span class="no">Comment</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">body: </span><span class="s1">'comment three'</span><span class="p">,</span> <span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
 
 <span class="no">Post</span><span class="p">.</span><span class="nf">create!</span> <span class="p">\</span>
   <span class="ss">title: </span><span class="s1">'My title!'</span><span class="p">,</span>
   <span class="ss">active: </span><span class="kp">true</span><span class="p">,</span>
-  <span class="ss">comments: </span><span class="p">[</span><span class="n">comment1</span><span class="p">,</span> <span class="n">comment2</span><span class="p">,</span> <span class="n">comment3</span><span class="p">]</span>
-</code></pre>
-</div>
+  <span class="ss">comments: </span><span class="p">[</span><span class="n">comment1</span><span class="p">,</span> <span class="n">comment2</span><span class="p">,</span> <span class="n">comment3</span><span class="p">]</span></code></pre></figure>
 
 <h2 id="usage"><a name="relationship-usage" href="#relationship-usage">Usage</a></h2>
 
@@ -617,9 +571,7 @@ comments by <code class="highlighter-rouge">created_at</code> descending: <code 
 
 <p>Now add a filter to <code class="highlighter-rouge">CommentResource</code>:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">allow_filter</span> <span class="ss">:active</span>
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">allow_filter</span> <span class="ss">:active</span></code></pre></figure>
 
 <p>That filter now works in two places:</p>
 
@@ -643,7 +595,7 @@ altogether?</p>
 <p>These are important topics that JSONAPI Suite was built to address. To
 learn more about advanced usage and customization, we suggest following
 the <a href="/tutorial">tutorial</a>. There are also a number of how-tos on this
-site, a good one to start with is  <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-use-without-activerecord">How
+site, a good one to start with is  <a href="http://localhost:4000/how-to-use-without-activerecord">How
 to Use without ActiveRecord</a></p>
 
 <p>For additional documentation, view the <a href="https://jsonapi-suite.github.io/jsonapi_compliable/">YARD Docs</a>.</p>
@@ -671,27 +623,23 @@ to Use without ActiveRecord</a></p>
 In tests, this can be confusing - we probably want to raise errors in
 tests. So note our exception handling is disabled by default:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># spec/rails_helper.rb</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># spec/rails_helper.rb</span>
 <span class="n">config</span><span class="p">.</span><span class="nf">before</span> <span class="ss">:each</span> <span class="k">do</span>
   <span class="no">JsonapiErrorable</span><span class="p">.</span><span class="nf">disable!</span>
-<span class="k">end</span>
-</code></pre>
-</div>
+<span class="k">end</span></code></pre></figure>
 
 <p>But you can enable it on a per-test basis:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"renders validation errors"</span> <span class="k">do</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">it</span> <span class="s2">"renders validation errors"</span> <span class="k">do</span>
   <span class="no">JsonapiErrorable</span><span class="p">.</span><span class="nf">enable!</span>
   <span class="n">post</span> <span class="s2">"/api/v1/employees"</span><span class="p">,</span> <span class="n">payload</span>
   <span class="n">expect</span><span class="p">(</span><span class="n">validation_errors</span><span class="p">[</span><span class="ss">:name</span><span class="p">]).</span><span class="nf">to</span> <span class="n">eq</span><span class="p">(</span><span class="s2">"can't be blank"</span><span class="p">)</span>
-<span class="k">end</span>
-</code></pre>
-</div>
+<span class="k">end</span></code></pre></figure>
 
 <p>In following this guide, we generated <code class="highlighter-rouge">Post</code> and
 <code class="highlighter-rouge">Comment</code> resources. Let’s edit our <a href="https://github.com/thoughtbot/factory_bot">factories</a> to seed randomized data:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># spec/factories/post.rb</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># spec/factories/post.rb</span>
 <span class="no">FactoryGirl</span><span class="p">.</span><span class="nf">define</span> <span class="k">do</span>
   <span class="n">factory</span> <span class="ss">:post</span> <span class="k">do</span>
     <span class="n">title</span> <span class="p">{</span> <span class="no">Faker</span><span class="o">::</span><span class="no">Lorem</span><span class="p">.</span><span class="nf">sentence</span> <span class="p">}</span>
@@ -705,9 +653,7 @@ tests. So note our exception handling is disabled by default:</p>
     <span class="n">body</span> <span class="p">{</span> <span class="no">Faker</span><span class="o">::</span><span class="no">Lorem</span><span class="p">.</span><span class="nf">paragraph</span> <span class="p">}</span>
     <span class="n">active</span> <span class="p">{</span> <span class="p">[</span><span class="kp">true</span><span class="p">,</span> <span class="kp">false</span><span class="p">].</span><span class="nf">sample</span> <span class="p">}</span>
   <span class="k">end</span>
-<span class="k">end</span>
-</code></pre>
-</div>
+<span class="k">end</span></code></pre></figure>
 
 <p>Finally, we need to define a <code class="highlighter-rouge">Payload</code>. <code class="highlighter-rouge">Payload</code>s use a
 <code class="highlighter-rouge">factory_girl</code>-style DSL to define expected JSON. A <code class="highlighter-rouge">Payload</code> compares a
@@ -724,7 +670,7 @@ tests. So note our exception handling is disabled by default:</p>
 
 <p>Let’s define our payloads now:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># spec/payloads/post.rb</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># spec/payloads/post.rb</span>
 <span class="no">JsonapiSpecHelpers</span><span class="o">::</span><span class="no">Payload</span><span class="p">.</span><span class="nf">register</span><span class="p">(</span><span class="ss">:post</span><span class="p">)</span> <span class="k">do</span>
   <span class="n">key</span><span class="p">(</span><span class="ss">:title</span><span class="p">,</span> <span class="no">String</span><span class="p">)</span>
   <span class="n">key</span><span class="p">(</span><span class="ss">:active</span><span class="p">,</span> <span class="p">[</span><span class="no">TrueClass</span><span class="p">,</span> <span class="no">FalseClass</span><span class="p">])</span>
@@ -735,17 +681,13 @@ tests. So note our exception handling is disabled by default:</p>
   <span class="n">key</span><span class="p">(</span><span class="ss">:body</span><span class="p">,</span> <span class="no">String</span><span class="p">)</span>
   <span class="n">key</span><span class="p">(</span><span class="ss">:active</span><span class="p">,</span> <span class="p">[</span><span class="no">TrueClass</span><span class="p">,</span> <span class="no">FalseClass</span><span class="p">])</span>
   <span class="n">key</span><span class="p">(</span><span class="ss">:created_at</span><span class="p">,</span> <span class="no">Time</span><span class="p">)</span>
-<span class="k">end</span>
-</code></pre>
-</div>
+<span class="k">end</span></code></pre></figure>
 
 <h3 id="run"><a name="testing-run" href="#testing-rub">Run</a></h3>
 
 <p>We can now run specs. Let’s start with the <code class="highlighter-rouge">Post</code> specs:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>bundle <span class="nb">exec </span>rspec spec/api/v1/posts
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>bundle <span class="nb">exec </span>rspec spec/api/v1/posts</code></pre></figure>
 
 <p>You should see five specs, with one failing (<code class="highlighter-rouge">spec/api/v1/posts/create_spec.rb</code>),
 and one pending (<code class="highlighter-rouge">spec/api/v1/posts/update_spec.rb</code>).</p>
@@ -758,7 +700,7 @@ values will fail <code class="highlighter-rouge">assert_payload</code> unless el
 
 <p>So, let’s update our spec to POST attributes, not just an empty object:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">let</span><span class="p">(</span><span class="ss">:payload</span><span class="p">)</span> <span class="k">do</span>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">let</span><span class="p">(</span><span class="ss">:payload</span><span class="p">)</span> <span class="k">do</span>
   <span class="p">{</span>
     <span class="ss">data: </span><span class="p">{</span>
       <span class="ss">type: </span><span class="s1">'posts'</span><span class="p">,</span>
@@ -768,9 +710,7 @@ values will fail <code class="highlighter-rouge">assert_payload</code> unless el
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">}</span>
-<span class="k">end</span>
-</code></pre>
-</div>
+<span class="k">end</span></code></pre></figure>
 
 <p>Your specs should now pass. The only pending spec is due to a similar
 issue - we need to specify attributes in <code class="highlighter-rouge">spec/api/v1/posts/update_spec.rb</code> as
@@ -794,9 +734,7 @@ patterns to get a feel for what’s right for you.</p>
 
 <p>We can autodocument our code using <a href="https://swagger.io">swagger documentation</a>. Documenting an endpoint is one line of code:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">jsonapi_resource</span> <span class="s1">'/v1/employees'</span>
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">jsonapi_resource</span> <span class="s1">'/v1/employees'</span></code></pre></figure>
 
 <p>Visit <code class="highlighter-rouge">http://localhost:3000/api/docs</code> to see the swagger documentation. Our custom UI will show all possible query parameters (including nested
 relationships), as well as schemas for request/responses:</p>
@@ -804,7 +742,7 @@ relationships), as well as schemas for request/responses:</p>
 <p><img style="width: 100%" src="https://user-images.githubusercontent.com/55264/28526490-af7ce5a8-7055-11e7-88bf-1ce5ead32dd7.png" /></p>
 
 <p>Our generator set up some boilerplate to enable this functionality, you
-can learn more at: <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-autodocument">How
+can learn more at: <a href="http://localhost:4000/how-to-autodocument">How
 to Autodocument with Swagger</a></p>
 
 <p><br />
@@ -812,17 +750,48 @@ to Autodocument with Swagger</a></p>
 <br /></p>
 
 <script type="text/javascript">
-  $(function () {
-    hljs.configure({
-      tabReplace: '  ',
-      classPrefix: ''
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
     });
 
-    $('.language-ruby code').addClass('ruby');
-    $('.language-javascript code').addClass('javascript');
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
 
-    hljs.initHighlightingOnLoad();
+  $('.tab').click(function() {
+    console.log('HEREERERE');
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
   });
+
+  flipTabs();
+})
 </script>
 
 
@@ -836,13 +805,13 @@ to Autodocument with Swagger</a></p>
         <h3>Overview</h3>
         <ul>
           <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart">Quickstart</a>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
           </li>
           <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial">Tutorial</a>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
           </li>
           <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/concepts">Concepts</a>
+            <a href="http://localhost:4000/concepts">Concepts</a>
           </li>
         </ul>
       </div>
@@ -851,51 +820,51 @@ to Autodocument with Swagger</a></p>
         <ul>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-scope-to-current-user">Scope to Current User</a>
+              <a href="http://localhost:4000//how-to-scope-to-current-user">Scope to Current User</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-cause-side-effects">Cause Side-Effects</a>
+              <a href="http://localhost:4000//how-to-cause-side-effects">Cause Side-Effects</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-use-without-activerecord">Use Alternate ORMs</a>
+              <a href="http://localhost:4000//how-to-use-without-activerecord">Use Alternate ORMs</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-build-an-adapter">Build an Adapter</a>
+              <a href="http://localhost:4000//how-to-build-an-adapter">Build an Adapter</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
+              <a href="http://localhost:4000//how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-code-polymorphic-associations">Polymorphic Relationships</a>
+              <a href="http://localhost:4000//how-to-code-polymorphic-associations">Polymorphic Relationships</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-add-defaults">Add Default Behavior</a>
+              <a href="http://localhost:4000//how-to-add-defaults">Add Default Behavior</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-conditionally-render-fields">Conditionally Render Fields</a>
+              <a href="http://localhost:4000//how-to-conditionally-render-fields">Conditionally Render Fields</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-customize-error-responses">Customize Error Responses</a>
+              <a href="http://localhost:4000//how-to-customize-error-responses">Customize Error Responses</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-write-specs">Write Specs</a>
+              <a href="http://localhost:4000//how-to-write-specs">Write Specs</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-return-statistics">Statistics</a>
+              <a href="http://localhost:4000//how-to-return-statistics">Statistics</a>
             </li>
           
             <li>
-              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-autodocument">Autodocument with Swagger</a>
+              <a href="http://localhost:4000//how-to-autodocument">Autodocument with Swagger</a>
             </li>
           
         </ul>

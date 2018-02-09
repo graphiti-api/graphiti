@@ -1,3 +1,4 @@
+{% highlight ruby %}
 # Adapter example
 has_many :comments,
   foreign_key: :post_id,
@@ -20,3 +21,4 @@ allow_sideload :blog, resource: BlogResource do
     end
   end
 end
+{% endhighlight %}

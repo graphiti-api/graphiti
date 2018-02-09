@@ -20,7 +20,7 @@ Start by creating `lib/elasticsearch_adapter.rb`. Cut/past the sorting,
 pagination, and `#resolve` overrides from `EmployeeResource` into the adapter,
 turning into `def` methods along the way:
 
-```ruby
+{% highlight ruby %}
 # lib/elasticsearch_adapter.rb
 class ElasticsearchAdapter
   def paginate(scope, current_page, per_page)
@@ -39,20 +39,20 @@ class ElasticsearchAdapter
     scope.results
   end
 end
-```
+{% endhighlight %}
 
 Ensure our adapter gets loaded:
 
-```ruby
+{% highlight ruby %}
 # config/initializers/jsonapi.rb
 require 'elasticsearch_adapter'
-```
+{% endhighlight %}
 
 And switch to that adapter in `EmployeeResource`:
 
-```ruby
+{% highlight ruby %}
 use_adapter ElasticsearchAdapter
-```
+{% endhighlight %}
 
 Bounce your server. You can still hit the `/api/v1/employees` endpoint
 with the same sort and paginate functionality, but the code has been
@@ -60,11 +60,11 @@ moved to an adapter.
 
 Let's ensure our users can filter as well:
 
-```ruby
+{% highlight ruby %}
 def filter(scope, att, val)
   scope.condition(att).eq(val)
 end
-```
+{% endhighlight %}
 
 For all the methods and functionality an adapter supports, see the
 [Adapter documenation](https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Adapters/Abstract.html).
@@ -73,7 +73,7 @@ We probably also want `has_many`-style macros to avoid writing similar
 `allow_sideload` code time after time. Start by specifying where this
 functionality is defined, and add a `has_many` macro:
 
-```ruby
+{% highlight ruby %}
 module Sideloading
   def has_many(association_name,
                scope:,
@@ -89,7 +89,7 @@ end
 def sideloading_module
   Sideloading
 end
-```
+{% endhighlight %}
 
 The `instance_eval` is there so we can always drop down to a lower-level
 customization in our `Resource`.
@@ -97,7 +97,7 @@ customization in our `Resource`.
 We can basically cut/paste our existing sideload code and rewrite it as
 variables:
 
-```ruby
+{% highlight ruby %}
 scope do |parents|
   parent_ids = parents.map { |p| p.send(primary_key) }
   scope.call.condition(foreign_key).or(parent_ids.uniq.compact)
@@ -111,7 +111,7 @@ assign do |parents, children|
     p.send(:"#{association_name}=", relevant_children)
   end
 end
-```
+{% endhighlight %}
 
 You can now remove any customizations from your `Resource` classes. You
 can continue to build the adapter, adding `belongs_to`, statistics, and
