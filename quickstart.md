@@ -136,7 +136,7 @@ Add this seed code to `index.js`:
 
 {% highlight javascript %}
 require("isomorphic-fetch");
-var jsorm = require("jsorm");
+var jsorm = require("jsorm/dist/jsorm");
 
 // setup code
 
