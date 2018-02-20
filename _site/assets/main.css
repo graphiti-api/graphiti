@@ -12323,7 +12323,7 @@ img[alt=glimmer_logo] {
   color: white; }
 .highlight .language-typescript .kc, .highlight .language-javascript .kc {
   color: #e6eb9d; }
-.highlight .language-typescript .kr, .highlight .language-typescript .kd, .highlight .language-javascript .kr, .highlight .language-javascript .kd {
+.highlight .language-typescript .kr, .highlight .language-javascript .kr {
   color: #00e6e6; }
 .highlight .language-typescript .c1, .highlight .language-javascript .c1 {
   color: #9c9c9c; }
