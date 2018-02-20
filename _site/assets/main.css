@@ -12316,7 +12316,7 @@ img[alt=glimmer_logo] {
   color: #edf2f9; }
 .highlight .language-typescript .p, .highlight .language-javascript .p {
   color: #edf2f9; }
-.highlight .language-typescript .nx, .highlight .language-javascript .nx {
+.highlight .language-typescript .nx, .highlight .language-typescript .nd, .highlight .language-javascript .nx, .highlight .language-javascript .nd {
   color: #a2dcff;
   font-weight: 600; }
 .highlight .language-typescript .nb, .highlight .language-javascript .nb {
