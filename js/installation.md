@@ -45,7 +45,7 @@ const {
   belongsTo,
   hasMany
   // etc
-} = require("jsorm")
+} = require("jsorm/dist/jsorm")
 {% endhighlight %}
 </div>
 
