@@ -10,7 +10,7 @@ layout: page
 {% include js-toc.html %}
 
 <div markdown="1" class="col-md-8 col-md-offset-1">
-  > **Start here**: [Why JSORM?](/js/introduction)
+  > **Start here**: [Why JSORM?]({{ site.github.url }}/js/introduction)
 
   <div class="tabs">
     <div class="tab typescript">
