@@ -14,8 +14,23 @@ Use `#select()` to limit the fields returned by the server:
 Post.select(['title', 'status']).all()
 {% endhighlight %}
 <blockquote class="url">
-  <p>/posts?fields=title,status</p>
+  <p>/posts?fields[posts]=title,status</p>
 </blockquote>
+
+When dealing with relationships, it may be easier to pass an object,
+where the key is the corresponding JSONAPI type. This will be exactly
+what's sent to the server in `?fields`:
+
+{% highlight typescript %}
+Post.select({
+  posts: ['title', 'status'],
+  comments: ['created_at']
+}).all()
+{% endhighlight %}
+<blockquote class="url">
+  <p>/posts?fields[posts]=title,status&fields[comments]=created_at</p>
+</blockquote>
+
 
 ### Extra Fieldsets
 
@@ -26,8 +41,11 @@ come back (often computationally expensive):
 Post.selectExtra(['highlights', 'cumulative_ranking']).all()
 {% endhighlight %}
 <blockquote class="url">
-  <p>/posts?extra_fields=highlights,cumulative_ranking</p>
+  <p>/posts?extra_fields[posts]=highlights,cumulative_ranking</p>
 </blockquote>
+
+Just like the `select` example above, feel free to pass an object
+specifying the fields for each relationship.
 
 <div class="clearfix">
   <h2 id="next">

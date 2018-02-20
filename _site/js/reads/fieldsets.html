@@ -165,7 +165,20 @@
   <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="nx">Post</span><span class="p">.</span><span class="nx">select</span><span class="p">([</span><span class="s1">'title'</span><span class="p">,</span> <span class="s1">'status'</span><span class="p">]).</span><span class="nx">all</span><span class="p">()</span></code></pre></figure>
 
   <blockquote class="url">
-  <p>/posts?fields=title,status</p>
+  <p>/posts?fields[posts]=title,status</p>
+</blockquote>
+
+  <p>When dealing with relationships, it may be easier to pass an object,
+where the key is the corresponding JSONAPI type. This will be exactly
+what’s sent to the server in <code class="highlighter-rouge">?fields</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="nx">Post</span><span class="p">.</span><span class="nx">select</span><span class="p">({</span>
+  <span class="na">posts</span><span class="p">:</span> <span class="p">[</span><span class="s1">'title'</span><span class="p">,</span> <span class="s1">'status'</span><span class="p">],</span>
+  <span class="na">comments</span><span class="p">:</span> <span class="p">[</span><span class="s1">'created_at'</span><span class="p">]</span>
+<span class="p">}).</span><span class="nx">all</span><span class="p">()</span></code></pre></figure>
+
+  <blockquote class="url">
+  <p>/posts?fields[posts]=title,status&amp;fields[comments]=created_at</p>
 </blockquote>
 
   <h3 id="extra-fieldsets">Extra Fieldsets</h3>
@@ -176,7 +189,7 @@ come back (often computationally expensive):</p>
   <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="nx">Post</span><span class="p">.</span><span class="nx">selectExtra</span><span class="p">([</span><span class="s1">'highlights'</span><span class="p">,</span> <span class="s1">'cumulative_ranking'</span><span class="p">]).</span><span class="nx">all</span><span class="p">()</span></code></pre></figure>
 
   <blockquote class="url">
-  <p>/posts?extra_fields=highlights,cumulative_ranking</p>
+  <p>/posts?extra_fields[posts]=highlights,cumulative_ranking</p>
 </blockquote>
 
   <div class="clearfix">
