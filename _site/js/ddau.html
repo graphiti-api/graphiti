@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>JSONAPI Suite</title>
+  <meta name="description" content="Collection of Ruby libraries for powering JSONAPI-compliant APIs.">
+
+  <link rel="stylesheet" href="https://jsonapi-suite.github.io/jsonapi_suite/assets/main.css?ref=wh4t3v43">
+  <link rel="canonical" href="http://localhost:4000/js/ddau.html">
+  <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="https://jsonapi-suite.github.io/jsonapi_suite" class="navbar-brand">JSONAPI Suite</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/js/home">Javascript Client</a>
+        </li>
+        <li class="dropdown">
+          <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
+            How-Tos
+            <b class="caret"></b>
+          </a>
+
+          <ul class="dropdown-menu">
+            
+              <li>
+                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-scope-to-current-user">Scope to Current User</a>
+              </li>
+            
+              <li>
+                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-cause-side-effects">Cause Side-Effects</a>
+              </li>
+            
+              <li>
+                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-use-without-activerecord">Use Alternate ORMs</a>
+              </li>
+            
+              <li>
+                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-build-an-adapter">Build an Adapter</a>
+              </li>
+            
+              <li>
+                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
+              </li>
+            
+              <li>
+                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-code-polymorphic-associations">Polymorphic Relationships</a>
+              </li>
+            
+              <li>
+                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-add-defaults">Add Default Behavior</a>
+              </li>
+            
+              <li>
+                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-conditionally-render-fields">Conditionally Render Fields</a>
+              </li>
+            
+              <li>
+                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-customize-error-responses">Customize Error Responses</a>
+              </li>
+            
+              <li>
+                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-write-specs">Write Specs</a>
+              </li>
+            
+              <li>
+                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-return-statistics">Statistics</a>
+              </li>
+            
+              <li>
+                <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-autodocument">Autodocument with Swagger</a>
+              </li>
+            
+          </ul>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <h1>
+  JSORM
+  <small>the isomorphic, framework-agnostic Javascript ORM</small>
+</h1>
+
+<div class="js-toc col-md-3">
+  <ul>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/home">Home</a></li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/introduction">Introduction</a></li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/installation">Installation</a>
+      <ul>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/installation#defining-models">Defining Models</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/installation#connecting-to-the-api">Connecting to the API</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/installation#defining-attributes">Defining Attributes</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/installation#defining-relationships">Defining Relationships</a></li>
+      </ul>
+    </li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/reads">Reads</a>
+      <ul>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/reads/sorting">Sorting</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/reads/pagination">Pagination</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/reads/filtering">Filtering</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/reads/fieldsets">Fieldsets</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/reads/statistics">Statistics</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/reads/nested-queries">Nested Queries</a></li>
+      </ul>
+    </li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/writes">Writes</a>
+      <ul>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/writes/validations">Validations</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/writes/dirty-tracking">Dirty Tracking</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/writes/nested">Nested Writes</a></li>
+      </ul>
+    </li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/middleware">Middleware</a></li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/authentication">Authentication</a></li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/js/state-syncing">State Syncing</a></li>
+  </ul>
+</div>
+
+<div class="col-md-8 col-md-offset-1">
+  <h3 id="data-down-actions-up">Data Down, Actions Up</h3>
+
+  <p>It’s a <a href="http://www.samselikoff.com/blog/data-down-actions-up">popular pattern</a> to pass data <strong>down</strong> to components, avoid modifying state within the component, and instead pass <strong>actions up</strong> to modify state. This can make complex applications easier to track and reason about, and you’ll see it in client-side frameworks from React to Ember.</p>
+
+  <p>To follow this pattern, use <code class="highlighter-rouge">#dup()</code> when passing down to your component:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash">&lt;my-component <span class="nv">something</span><span class="o">=</span><span class="s2">"model.dup()"</span> /&gt;</code></pre></figure>
+
+  <p>This will create a new instance of the model with all the same state.
+Avoid modifying this instance in your component and instead pass
+<strong>actions up</strong>.</p>
+
+  <p>When opting-in to <a href="/js/state-syncing">state-syncing</a> these instances will sync-up whenever one of these is instances is persisted. You won’t have to worry about updating the child component when the parent instance is saved.</p>
+
+  <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    console.log('HEREERERE');
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-3 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="https://jsonapi-suite.github.io/jsonapi_suite/concepts">Concepts</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-3 menu">
+        <h3>How-Tos</h3>
+        <ul>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-scope-to-current-user">Scope to Current User</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-cause-side-effects">Cause Side-Effects</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-use-without-activerecord">Use Alternate ORMs</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-build-an-adapter">Build an Adapter</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-code-polymorphic-associations">Polymorphic Relationships</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-add-defaults">Add Default Behavior</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-conditionally-render-fields">Conditionally Render Fields</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-customize-error-responses">Customize Error Responses</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-write-specs">Write Specs</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-return-statistics">Statistics</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-autodocument">Autodocument with Swagger</a>
+            </li>
+          
+        </ul>
+      </div>
+      <div class="col-sm-3 menu">
+        <h3>Resources</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Contact us</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-3 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </body>
+</html>
