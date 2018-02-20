@@ -16,7 +16,7 @@ JSONAPI Suite is already set up to return validation errors with a
   {% highlight typescript %}
   let success = await post.save()
   console.log(success) // false
-  post.errors // { title: "Can't be blank" }
+  post.errors.title // { message: "Can't be blank", ... }
   post.title = "no longer blank"
   success = await post.save()
   console.log(success) // true
@@ -26,7 +26,7 @@ JSONAPI Suite is already set up to return validation errors with a
   {% highlight javascript %}
   post.save().then(function(success) {
     console.log(success) // false
-    post.errors // { title: "Can't be blank" }
+    post.errors.title // { message: "Can't be blank", ... }
     post.title = "no longer blank"
     post.save().then(function(success) {
       console.log(success); // true

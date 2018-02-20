@@ -405,20 +405,22 @@ Once again, you probably want to package these changes into an [Adapter](https:/
 
 ## <a name="jsorm" href='#jsorm'>JSORM</a>
 
-There are number of [jsonapi clients](http://jsonapi.org/implementations/) in a variety of languages. Here we'll be using [JSORM](https://github.com/jsonapi-suite/jsorm) - an ActiveRecord-style ORM that can be used from Node or the browser. It's been custom-built to work with JSONAPI Suite enhancements.
+There are number of [jsonapi clients](http://jsonapi.org/implementations/) in a variety of languages. Here we'll be using [JSORM](/js/home) - an ActiveRecord-style ORM that can be used from Node or the browser. It's been custom-built to work with JSONAPI Suite enhancements.
 
-This will fetch an employee with id 123. their last 3 positions where the title starts with 'dev', and the departments for those positions.
+This will fetch an employee with id 123, their last 3 positions where the title starts with 'dev', and the departments for those positions.
 
 We'll use typescript for this example, though we could use vanilla JS just as well. First define our models (additional client-side business logic can go in these classes):
 
 {% highlight typescript %}
-import { JSORMBase, Attr, HasMany, BelongsTo } from "jsorm"
+import { JSORMBase, Model, Attr, HasMany, BelongsTo } from "jsorm"
 
+@Model()
 class ApplicationRecord extends JSORMBase {
   static baseUrl = "http://localhost:3000"
   static apiNamespace = "/api/v1"
 }
 
+@Model()
 class Employee extends ApplicationRecord {
   static jsonapiType = "people"
 
@@ -429,6 +431,7 @@ class Employee extends ApplicationRecord {
   @HasMany() positions: Position[]
 }
 
+@Model()
 class Position extends ApplicationRecord {
   static jsonapiType = "positions"
 
@@ -437,6 +440,7 @@ class Position extends ApplicationRecord {
   @BelongsTo() department: Department[]
 }
 
+@Model()
 class Department extends ApplicationRecord {
   static jsonapiType = "departments"
 
@@ -449,11 +453,11 @@ Now fetch the data in one call:
 {% highlight javascript %}
 let positionScope = Position
   .where({ title_prefix: "dev" })
-  .order({ created_at: "desc" });
+  .order({ created_at: "desc" })
 
 let scope = Employee
   .includes({ positions: "department" })
-  .merge({ positions: positionScope})
+  .merge({ positions: positionScope })
 
 let employee = (await scope.find(123)).data
 // access data like so in HTML:
@@ -463,9 +467,164 @@ let employee = (await scope.find(123)).data
 
 [Read the JSORM documentation here](/js/home)
 
-## <a name="glimmer" href='#glimmer'>Glimmer</a>
+## <a name="vue" href='#vue'>VueJS Sample Application</a>
 
-TODO REPLACE WITH VUEJS
+<img style="width: 100%" src="{{site.github.url}}/assets/img/vue_logo.png" alt="vue" />
+
+**JSORM can be used with the client-side framework of your choice**. To give an example of real-world usage, we've created a demo application using
+[VueJS](https://vuejs.org/). Vue is lightweight and provides the
+bare-bones we need to illustrate JSONAPI and JSORM in action.
+
+This will point to a [slightly-tweaked branch](https://github.com/jsonapi-suite/employee_directory/tree/prepare_clientside) of the server-side API
+above.
+
+Let's create our app.
+
+### Step 0: Setup
+
+We've started with a basic Vue app configured with Webpack. None of this
+is JSONAPI-specific, just boilerplate to get started quickly.
+
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
+[View the Branch on Github](https://github.com/jsonapi-suite/employee-directory-vue/tree/step_0_setup)
+
+### Step 1: Models
+
+We'll start by defining our models, which should look very familiar if
+you've worked with `ActiveRecord`. Again, see the [JSORM
+documentation](/js/home) if any of this looks confusing to you.
+
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
+[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory-vue/compare/step_0_setup...step_1_models)
+
+### Step 2: Data Grid
+
+We'll add a simple data grid to our page listing all `Employee`s. This
+will turn into a search grid, but for now we're simply loading employees
+via `Employee.all()`
+
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
+[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory-vue/compare/step_1_models...step_2_data_grid)
+
+### Step 3: Adding Relationships
+
+Here we've added a `currentPosition` relationship to avoid fetching
+excess data from the server. When the page loads we fetch the
+employees, current positions for those employees, and the departments for those positions.
+
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
+[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory-vue/compare/step_2_data_grid...step_3_includes)
+
+### Step 4: Filtering
+
+Here we've added a bit of state to the page, `query`, which will be
+bound to the form inputs. We pass `query` to `Employee.where` to
+successfully query employees by first and last name.
+
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
+[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory-vue/compare/step_3_includes...step_4_filtering)
+
+### Step 5: Sorting
+
+Just like with filters, we add a bit of state to our page to track
+sorting parameters. When the user clicks a table header, we'll update
+that state and pass it to our query.
+
+
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
+[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory-vue/compare/step_4_filtering...step_5_sorting)
+
+### Step 6: Stats
+
+A JSORM promise returns a `response` object with a `data` key - the
+model instance(s) we've been referencing so far. It also returns a
+`meta` key that reflects the [meta](http://jsonapi.org/format/#document-meta) section of the JSONAPI response.
+
+Here we'll request the total count of employees in our query to the
+server, grab that total count from `meta`, and bind it to the page as
+`totalCount`
+
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
+[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory-vue/compare/step_5_sorting...step_6_stats)
+
+### Step 7: Pagination
+
+Building on what we've already done, we can apply a similar pattern for
+pagination. We add the `currentPage` state and alter it when the user
+clicks pagination links. We use `currentPage` and `totalCount` to figure
+out if we should display previous/next page links.
+
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
+[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory-vue/compare/step_6_stats...step_7_pagination)
+
+### Step 8: Basic Form Setup
+
+We'll be adding a form to create and update employees. This step just
+adds the relevant HTML and Vue code to get set up, before involving
+JSORM.
+
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
+[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory-vue/compare/step_7_pagination...step_8_basic_form_setup)
+
+### Step 9: Dropdowns
+
+Our form will submit employees, positions and departments in a single
+request. We associate a position to an existing department through a
+`select` dropdown. To populate that dropdown, we fetch all departments
+from the server and bind it to the `select`.
+
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
+[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory-vue/compare/step_8_basic_form_setup...step_9_dropdown)
+
+### Step 10: Nested Create/Update
+
+This step simply binds our instantiated models to the form. When the
+form is submitted, we save everything in a single one-line request.
+
+After the form submission, we could edit the form and submit again -
+JSORM will know to `PATCH` an update to the appropriate URL
+automatically.
+
+Note we could also edit our search to immediately reflect the new
+data...but this is more Vue-specific than anything to do with JSORM, so
+we'll hold off until the last step.
+
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
+[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory-vue/compare/step_9_dropdown...step_10_nested_create)
+
+### Step 11: Validations
+
+Our server-side code will automatically handle validation errors and
+give us a well-formatted response. JSORM will read that response and
+automatically apply `error` objects to our model instances. Here we
+display simple error messages without involving any JS code.
+
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
+[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory-vue/compare/step_10_nested_create...step_11_validations)
+
+### Step 12: Nested Destroy
+
+This step adds buttons to our form that will add and remove positions
+for a given employee. To add, we simply `push` a new `Employee` onto the
+relationship array. To remove, we set `isMarkedForDestruction = true`,
+which allows for "unsaved deleted records". This follows a similar
+pattern to one introduced in Ember Data, [explained here](https://www.emberjs.com/blog/2015/09/02/ember-data-2-0-released.html#toc_unsaved-deleted-records).
+
+Note that if we wanted to **disassociate** the position rather than
+**destroying** the underlying record, we could use
+`position.isMarkedForDisassociation = true`.
+
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
+[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory-vue/compare/step_10_nested_create...step_11_validations)
+
+### Step 13: VueJS Wrap-up
+
+Our final step adds some Vue-specific functionality - we add an
+`EventBus` to allow selecting an employee from the grid and binding it
+to the form, and refresh the search grid after each form submission.
+
+![github]({{site.github.url}}/assets/img/GitHub-Mark-32px.png)
+[View the Diff on Github](https://github.com/jsonapi-suite/employee-directory-vue/compare/step_12_nested_destroy...step_13_vue)
 
 <br />
 <br />

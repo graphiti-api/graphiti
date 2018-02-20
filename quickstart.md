@@ -25,6 +25,10 @@ $ rails new blog --api -m https://raw.githubusercontent.com/jsonapi-suite/rails_
 Feel free to run `git diff` if you're interested in the
 particulars; this is mostly just installing gems and including modules.
 
+> Note: if a network issue prevents you from pointing to this URL
+> directly, you can download the file and and run this command as `-m
+> /path/to/all.rb`
+
 # <a name="defining-a-resource" href='#defining-a-resource'>Defining a Resource</a>
 
 A `Resource` defines how to query and persist your `Model`. In other
@@ -136,7 +140,7 @@ var jsorm = require("jsorm");
 
 // setup code
 
-var ApplicationRecord = jsorm.Model.extend({
+var ApplicationRecord = jsorm.JSORMBase.extend({
   static: {
     baseUrl: "http://localhost:3000",
     apiNamespace: "/api/v1"
@@ -377,7 +381,7 @@ var Comment = ApplicationRecord.extend({
 ...and add the relationship to `Post`:
 
 {% highlight javascript %}
-// within class body
+// within attrs
 // ... code ...
 comments: jsorm.hasMany()
 // ... code...

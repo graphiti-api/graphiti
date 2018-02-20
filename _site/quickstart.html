@@ -137,6 +137,12 @@ sensible defaults to get started quickly.</p>
 <p>Feel free to run <code class="highlighter-rouge">git diff</code> if you’re interested in the
 particulars; this is mostly just installing gems and including modules.</p>
 
+<blockquote>
+  <p>Note: if a network issue prevents you from pointing to this URL
+directly, you can download the file and and run this command as <code class="highlighter-rouge">-m
+/path/to/all.rb</code></p>
+</blockquote>
+
 <h1 id="defining-a-resource"><a name="defining-a-resource" href="#defining-a-resource">Defining a Resource</a></h1>
 
 <p>A <code class="highlighter-rouge">Resource</code> defines how to query and persist your <code class="highlighter-rouge">Model</code>. In other
@@ -229,7 +235,7 @@ well as a polyfill for <code class="highlighter-rouge">fetch</code>:</p>
 
 <span class="c1">// setup code</span>
 
-<span class="kd">var</span> <span class="nx">ApplicationRecord</span> <span class="o">=</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+<span class="kd">var</span> <span class="nx">ApplicationRecord</span> <span class="o">=</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">JSORMBase</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
   <span class="na">static</span><span class="p">:</span> <span class="p">{</span>
     <span class="na">baseUrl</span><span class="p">:</span> <span class="s2">"http://localhost:3000"</span><span class="p">,</span>
     <span class="na">apiNamespace</span><span class="p">:</span> <span class="s2">"/api/v1"</span>
@@ -500,7 +506,7 @@ functionality as before. We just need to seed data.</p>
 
 <p>…and add the relationship to <code class="highlighter-rouge">Post</code>:</p>
 
-<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// within class body</span>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// within attrs</span>
 <span class="c1">// ... code ...</span>
 <span class="nl">comments</span><span class="p">:</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">hasMany</span><span class="p">()</span>
 <span class="c1">// ... code...</span></code></pre></figure>

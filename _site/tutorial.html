@@ -501,19 +501,21 @@ probably want to package up these changes into an <a href="https://jsonapi-suite
 
 <h2 id="jsorm"><a name="jsorm" href="#jsorm">JSORM</a></h2>
 
-<p>There are number of <a href="http://jsonapi.org/implementations/">jsonapi clients</a> in a variety of languages. Here we’ll be using <a href="https://github.com/jsonapi-suite/jsorm">JSORM</a> - an ActiveRecord-style ORM that can be used from Node or the browser. It’s been custom-built to work with JSONAPI Suite enhancements.</p>
+<p>There are number of <a href="http://jsonapi.org/implementations/">jsonapi clients</a> in a variety of languages. Here we’ll be using <a href="/js/home">JSORM</a> - an ActiveRecord-style ORM that can be used from Node or the browser. It’s been custom-built to work with JSONAPI Suite enhancements.</p>
 
-<p>This will fetch an employee with id 123. their last 3 positions where the title starts with ‘dev’, and the departments for those positions.</p>
+<p>This will fetch an employee with id 123, their last 3 positions where the title starts with ‘dev’, and the departments for those positions.</p>
 
 <p>We’ll use typescript for this example, though we could use vanilla JS just as well. First define our models (additional client-side business logic can go in these classes):</p>
 
-<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="k">import</span> <span class="p">{</span> <span class="nx">JSORMBase</span><span class="p">,</span> <span class="nx">Attr</span><span class="p">,</span> <span class="nx">HasMany</span><span class="p">,</span> <span class="nx">BelongsTo</span> <span class="p">}</span> <span class="k">from</span> <span class="s2">"jsorm"</span>
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="k">import</span> <span class="p">{</span> <span class="nx">JSORMBase</span><span class="p">,</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">Attr</span><span class="p">,</span> <span class="nx">HasMany</span><span class="p">,</span> <span class="nx">BelongsTo</span> <span class="p">}</span> <span class="k">from</span> <span class="s2">"jsorm"</span>
 
+<span class="err">@</span><span class="nx">Model</span><span class="p">()</span>
 <span class="kr">class</span> <span class="nx">ApplicationRecord</span> <span class="k">extends</span> <span class="nx">JSORMBase</span> <span class="p">{</span>
   <span class="k">static</span> <span class="nx">baseUrl</span> <span class="o">=</span> <span class="s2">"http://localhost:3000"</span>
   <span class="k">static</span> <span class="nx">apiNamespace</span> <span class="o">=</span> <span class="s2">"/api/v1"</span>
 <span class="p">}</span>
 
+<span class="err">@</span><span class="nx">Model</span><span class="p">()</span>
 <span class="kr">class</span> <span class="nx">Employee</span> <span class="k">extends</span> <span class="nx">ApplicationRecord</span> <span class="p">{</span>
   <span class="k">static</span> <span class="nx">jsonapiType</span> <span class="o">=</span> <span class="s2">"people"</span>
 
@@ -524,6 +526,7 @@ probably want to package up these changes into an <a href="https://jsonapi-suite
   <span class="err">@</span><span class="nx">HasMany</span><span class="p">()</span> <span class="nx">positions</span><span class="err">:</span> <span class="nx">Position</span><span class="p">[]</span>
 <span class="p">}</span>
 
+<span class="err">@</span><span class="nx">Model</span><span class="p">()</span>
 <span class="kr">class</span> <span class="nx">Position</span> <span class="k">extends</span> <span class="nx">ApplicationRecord</span> <span class="p">{</span>
   <span class="k">static</span> <span class="nx">jsonapiType</span> <span class="o">=</span> <span class="s2">"positions"</span>
 
@@ -532,6 +535,7 @@ probably want to package up these changes into an <a href="https://jsonapi-suite
   <span class="err">@</span><span class="nx">BelongsTo</span><span class="p">()</span> <span class="nx">department</span><span class="err">:</span> <span class="nx">Department</span><span class="p">[]</span>
 <span class="p">}</span>
 
+<span class="err">@</span><span class="nx">Model</span><span class="p">()</span>
 <span class="kr">class</span> <span class="nx">Department</span> <span class="k">extends</span> <span class="nx">ApplicationRecord</span> <span class="p">{</span>
   <span class="k">static</span> <span class="nx">jsonapiType</span> <span class="o">=</span> <span class="s2">"departments"</span>
 
@@ -542,11 +546,11 @@ probably want to package up these changes into an <a href="https://jsonapi-suite
 
 <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">positionScope</span> <span class="o">=</span> <span class="nx">Position</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">({</span> <span class="na">title_prefix</span><span class="p">:</span> <span class="s2">"dev"</span> <span class="p">})</span>
-  <span class="p">.</span><span class="nx">order</span><span class="p">({</span> <span class="na">created_at</span><span class="p">:</span> <span class="s2">"desc"</span> <span class="p">});</span>
+  <span class="p">.</span><span class="nx">order</span><span class="p">({</span> <span class="na">created_at</span><span class="p">:</span> <span class="s2">"desc"</span> <span class="p">})</span>
 
 <span class="kd">let</span> <span class="nx">scope</span> <span class="o">=</span> <span class="nx">Employee</span>
   <span class="p">.</span><span class="nx">includes</span><span class="p">({</span> <span class="na">positions</span><span class="p">:</span> <span class="s2">"department"</span> <span class="p">})</span>
-  <span class="p">.</span><span class="nx">merge</span><span class="p">({</span> <span class="na">positions</span><span class="p">:</span> <span class="nx">positionScope</span><span class="p">})</span>
+  <span class="p">.</span><span class="nx">merge</span><span class="p">({</span> <span class="na">positions</span><span class="p">:</span> <span class="nx">positionScope</span> <span class="p">})</span>
 
 <span class="kd">let</span> <span class="nx">employee</span> <span class="o">=</span> <span class="p">(</span><span class="nx">await</span> <span class="nx">scope</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="mi">123</span><span class="p">)).</span><span class="nx">data</span>
 <span class="c1">// access data like so in HTML:</span>
@@ -555,9 +559,163 @@ probably want to package up these changes into an <a href="https://jsonapi-suite
 
 <p><a href="/js/home">Read the JSORM documentation here</a></p>
 
-<h2 id="glimmer"><a name="glimmer" href="#glimmer">Glimmer</a></h2>
+<h2 id="vuejs-sample-application"><a name="vue" href="#vue">VueJS Sample Application</a></h2>
 
-<p>TODO REPLACE WITH VUEJS</p>
+<p><img style="width: 100%" src="http://localhost:4000/assets/img/vue_logo.png" alt="vue" /></p>
+
+<p><strong>JSORM can be used with the client-side framework of your choice</strong>. To give an example of real-world usage, we’ve created a demo application using
+<a href="https://vuejs.org/">VueJS</a>. Vue is lightweight and provides the
+bare-bones we need to illustrate JSONAPI and JSORM in action.</p>
+
+<p>This will point to a <a href="https://github.com/jsonapi-suite/employee_directory/tree/prepare_clientside">slightly-tweaked branch</a> of the server-side API
+above.</p>
+
+<p>Let’s create our app.</p>
+
+<h3 id="step-0-setup">Step 0: Setup</h3>
+
+<p>We’ve started with a basic Vue app configured with Webpack. None of this
+is JSONAPI-specific, just boilerplate to get started quickly.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/tree/step_0_setup">View the Branch on Github</a></p>
+
+<h3 id="step-1-models">Step 1: Models</h3>
+
+<p>We’ll start by defining our models, which should look very familiar if
+you’ve worked with <code class="highlighter-rouge">ActiveRecord</code>. Again, see the <a href="/js/home">JSORM
+documentation</a> if any of this looks confusing to you.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_0_setup...step_1_models">View the Diff on Github</a></p>
+
+<h3 id="step-2-data-grid">Step 2: Data Grid</h3>
+
+<p>We’ll add a simple data grid to our page listing all <code class="highlighter-rouge">Employee</code>s. This
+will turn into a search grid, but for now we’re simply loading employees
+via <code class="highlighter-rouge">Employee.all()</code></p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_1_models...step_2_data_grid">View the Diff on Github</a></p>
+
+<h3 id="step-3-adding-relationships">Step 3: Adding Relationships</h3>
+
+<p>Here we’ve added a <code class="highlighter-rouge">currentPosition</code> relationship to avoid fetching
+excess data from the server. When the page loads we fetch the
+employees, current positions for those employees, and the departments for those positions.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_2_data_grid...step_3_includes">View the Diff on Github</a></p>
+
+<h3 id="step-4-filtering">Step 4: Filtering</h3>
+
+<p>Here we’ve added a bit of state to the page, <code class="highlighter-rouge">query</code>, which will be
+bound to the form inputs. We pass <code class="highlighter-rouge">query</code> to <code class="highlighter-rouge">Employee.where</code> to
+successfully query employees by first and last name.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_3_includes...step_4_filtering">View the Diff on Github</a></p>
+
+<h3 id="step-5-sorting">Step 5: Sorting</h3>
+
+<p>Just like with filters, we add a bit of state to our page to track
+sorting parameters. When the user clicks a table header, we’ll update
+that state and pass it to our query.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_4_filtering...step_5_sorting">View the Diff on Github</a></p>
+
+<h3 id="step-6-stats">Step 6: Stats</h3>
+
+<p>A JSORM promise returns a <code class="highlighter-rouge">response</code> object with a <code class="highlighter-rouge">data</code> key - the
+model instance(s) we’ve been referencing so far. It also returns a
+<code class="highlighter-rouge">meta</code> key that reflects the <a href="http://jsonapi.org/format/#document-meta">meta</a> section of the JSONAPI response.</p>
+
+<p>Here we’ll request the total count of employees in our query to the
+server, grab that total count from <code class="highlighter-rouge">meta</code>, and bind it to the page as
+<code class="highlighter-rouge">totalCount</code></p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_5_sorting...step_6_stats">View the Diff on Github</a></p>
+
+<h3 id="step-7-pagination">Step 7: Pagination</h3>
+
+<p>Building on what we’ve already done, we can apply a similar pattern for
+pagination. We add the <code class="highlighter-rouge">currentPage</code> state and alter it when the user
+clicks pagination links. We use <code class="highlighter-rouge">currentPage</code> and <code class="highlighter-rouge">totalCount</code> to figure
+out if we should display previous/next page links.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_6_stats...step_7_pagination">View the Diff on Github</a></p>
+
+<h3 id="step-8-basic-form-setup">Step 8: Basic Form Setup</h3>
+
+<p>We’ll be adding a form to create and update employees. This step just
+adds the relevant HTML and Vue code to get set up, before involving
+JSORM.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_7_pagination...step_8_basic_form_setup">View the Diff on Github</a></p>
+
+<h3 id="step-9-dropdowns">Step 9: Dropdowns</h3>
+
+<p>Our form will submit employees, positions and departments in a single
+request. We associate a position to an existing department through a
+<code class="highlighter-rouge">select</code> dropdown. To populate that dropdown, we fetch all departments
+from the server and bind it to the <code class="highlighter-rouge">select</code>.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_8_basic_form_setup...step_9_dropdown">View the Diff on Github</a></p>
+
+<h3 id="step-10-nested-createupdate">Step 10: Nested Create/Update</h3>
+
+<p>This step simply binds our instantiated models to the form. When the
+form is submitted, we save everything in a single one-line request.</p>
+
+<p>After the form submission, we could edit the form and submit again -
+JSORM will know to <code class="highlighter-rouge">PATCH</code> an update to the appropriate URL
+automatically.</p>
+
+<p>Note we could also edit our search to immediately reflect the new
+data…but this is more Vue-specific than anything to do with JSORM, so
+we’ll hold off until the last step.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_9_dropdown...step_10_nested_create">View the Diff on Github</a></p>
+
+<h3 id="step-11-validations">Step 11: Validations</h3>
+
+<p>Our server-side code will automatically handle validation errors and
+give us a well-formatted response. JSORM will read that response and
+automatically apply <code class="highlighter-rouge">error</code> objects to our model instances. Here we
+display simple error messages without involving any JS code.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_10_nested_create...step_11_validations">View the Diff on Github</a></p>
+
+<h3 id="step-12-nested-destroy">Step 12: Nested Destroy</h3>
+
+<p>This step adds buttons to our form that will add and remove positions
+for a given employee. To add, we simply <code class="highlighter-rouge">push</code> a new <code class="highlighter-rouge">Employee</code> onto the
+relationship array. To remove, we set <code class="highlighter-rouge">isMarkedForDestruction = true</code>,
+which allows for “unsaved deleted records”. This follows a similar
+pattern to one introduced in Ember Data, <a href="https://www.emberjs.com/blog/2015/09/02/ember-data-2-0-released.html#toc_unsaved-deleted-records">explained here</a>.</p>
+
+<p>Note that if we wanted to <strong>disassociate</strong> the position rather than
+<strong>destroying</strong> the underlying record, we could use
+<code class="highlighter-rouge">position.isMarkedForDisassociation = true</code>.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_10_nested_create...step_11_validations">View the Diff on Github</a></p>
+
+<h3 id="step-13-vuejs-wrap-up">Step 13: VueJS Wrap-up</h3>
+
+<p>Our final step adds some Vue-specific functionality - we add an
+<code class="highlighter-rouge">EventBus</code> to allow selecting an employee from the grid and binding it
+to the form, and refresh the search grid after each form submission.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_12_nested_destroy...step_13_vue">View the Diff on Github</a></p>
 
 <p><br />
 <br /></p>
