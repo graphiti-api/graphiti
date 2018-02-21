@@ -58,5 +58,3 @@ If you want **only** stats, and no records (for performance), simple pass page s
 
 <br />
 <br />
-
-{% include highlight.html %}

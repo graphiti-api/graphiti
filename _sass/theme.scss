@@ -54,6 +54,10 @@
   }
 }
 
+.index-sidebar-hero .cta a.button {
+  padding: 12px 30px;
+}
+
 .nav-menu .main-menu {
   h4 {
     color: darken(white, 10%);
@@ -116,6 +120,11 @@ h3, h4, h5 {
     text-decoration: none;
 
   }
+}
+
+h4 {
+  margin-top: 40px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .main-footer {
@@ -184,12 +193,23 @@ img[alt=github] {
   height: 20px;
 }
 
-.js-toc, blockquote {
+.js-toc, .ruby-toc, blockquote {
   background: #f7f8fb;
   border: 1px solid #eaedf7;
   border-radius: 5px;
   padding: 10px;
   line-height: 1.8;
+}
+
+.ruby-toc {
+  ul {
+    padding-left: 25px;
+  }
+}
+
+.ruby-toc + div {
+  margin-bottom: 20px;
+  font-size: 16px;
 }
 
 blockquote {

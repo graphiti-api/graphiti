@@ -83,5 +83,3 @@ Example: adding a custom header before the request is sent:
     </a>
   </h2>
 </div>
-
-{% include highlight.html %}

@@ -37,5 +37,3 @@ approach is minimal.
 
 <br />
 <br />
-
-{% include highlight.html %}

@@ -60,5 +60,3 @@ for all `Employee`s where `workspace_type` is `HomeOffice`.
 
 <br />
 <br />
-
-{% include highlight.html %}

@@ -103,5 +103,3 @@ person.save()
     {% endhighlight %}
   </div>
 </div>
-
-{% include highlight.html %}

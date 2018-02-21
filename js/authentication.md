@@ -71,6 +71,3 @@ will be updated automatically if you're using it).
     </a>
   </h2>
 </div>
-
-{% include highlight.html %}
-

@@ -149,5 +149,3 @@ posts // array of Post instances
     </a>
   </h2>
 </div>
-
-{% include highlight.html %}

@@ -45,5 +45,3 @@ JSONAPI Suite is already set up to return validation errors with a
     </a>
   </h2>
 </div>
-
-{% include highlight.html %}

@@ -44,5 +44,3 @@ Post.page(5).per(10).all()
     </a>
   </h2>
 </div>
-
-{% include highlight.html %}

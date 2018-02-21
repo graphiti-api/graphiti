@@ -293,5 +293,3 @@ Person.includes('dogs').then((response) => {
     </a>
   </h2>
 </div>
-
-{% include highlight.html %}

@@ -141,5 +141,3 @@ Will give you an output similar to:
 
 <br />
 <br />
-
-{% include highlight.html %}

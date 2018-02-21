@@ -628,5 +628,3 @@ to the form, and refresh the search grid after each form submission.
 
 <br />
 <br />
-
-{% include highlight.html %}

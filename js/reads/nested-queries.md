@@ -19,7 +19,10 @@ are `active`, sorted by `created_at` descending. We can create a
 let commentScope = Comment
   .where({ active: true })
   .order({ created_at: "desc" })
-Post.merge({ comments: commentScope }).all()
+Post
+  .includes("comments")
+  .merge({ comments: commentScope })
+  .all()
 {% endhighlight %}
 
 {% highlight javascript %}
@@ -27,7 +30,7 @@ var commentScope = Comment
   .where({ active: true })
   .order({ created_at: "desc" })
 Post
-  .includes('comments')
+  .includes("comments")
   .merge({ comments: commentScope })
   .all()
 {% endhighlight %}
@@ -66,7 +69,10 @@ const Comment = ApplicationRecord.extend({
   }
 })
 
-Post.merge({ comments: Comment.recent() }).all()
+Post
+  .includes("comments")
+  .merge({ comments: Comment.recent() })
+  .all()
 {% endhighlight %}
 </div>
 
@@ -110,6 +116,3 @@ Dog.includes("owner").merge({ owner: Person.limitedFields() })
     </a>
   </h2>
 </div>
-
-{% include highlight.html %}
-

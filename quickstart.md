@@ -650,5 +650,3 @@ to Autodocument with Swagger</a>
 <br />
 <br />
 <br />
-
-{% include highlight.html %}

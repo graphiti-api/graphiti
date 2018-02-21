@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>JSONAPI Suite</title>
+  <meta name="description" content="Collection of Ruby libraries for powering JSONAPI-compliant APIs.">
+
+  <link rel="stylesheet" href="https://jsonapi-suite.github.io/jsonapi_suite/assets/main.css?ref=wh4t3v45">
+  <link rel="canonical" href="/ruby/alternate-datastores/elasticsearch.html">
+  <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="https://jsonapi-suite.github.io/jsonapi_suite" class="navbar-brand">JSONAPI Suite</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/ruby">Docs</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/js/home">Javascript Client</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="ruby-toc col-md-3">
+  <ul>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/installation">Installation</a></li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/resources">Understanding Resources</a></li>
+    <li>Reads
+      <ul>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/reads/basic-reads">Basic Reads</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/reads/sorting">Sorting</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/reads/pagination">Pagination</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/reads/filtering">Filtering</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/reads/fieldsets">Fieldsets</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/reads/statistics">Statistics</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/reads/activerecord-associations">ActiveRecord Associations</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/reads/nested">Querying Relationships</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/reads/serializers">Serializers</a></li>
+      </ul>
+    </li>
+    <li>Writes
+      <ul>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/writes/basic-writes">Basic Writes</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/writes/validations">Validations</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/writes/strong-resources">Strong Resources</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/writes/nested-writes">Nested Writes</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/writes/side-effects">Side Effects</a></li>
+      </ul>
+    </li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/alternate-datastores">Alternate Datastores</a>
+      <ul>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/alternate-datastores/elasticsearch">ElasticSearch</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/alternate-datastores/http">HTTP Services</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/alternate-datastores/adapters">Adapters</a></li>
+      </ul>
+    </li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/scoping-to-current-user">Scoping to Current User</a></li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/backwards-compatibility">Backwards Compatibility</a></li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/swagger">Swagger</a></li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/testing">Integration Testing</a></li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/error-handling">Error Handling</a></li>
+  </ul>
+</div>
+
+<div class="col-md-8 col-md-offset-1">
+  <h3 id="usage-without-activerecord-elasticsearch">Usage Without ActiveRecord: ElasticSearch</h3>
+
+  <blockquote>
+    <p><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/resources">Read First: Resources Overview</a></p>
+  </blockquote>
+
+  <blockquote>
+    <p><a href="https://github.com/jsonapi-suite/employee_directory/compare/step_23_disassociation...elasticsearch">View the Sample App</a></p>
+  </blockquote>
+
+  <blockquote>
+    <p><a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Resource.html">View the YARD Documentation</a></p>
+  </blockquote>
+
+  <p>Though we’ll be hitting <a href="https://www.elastic.co">elasticsearch</a> in this
+example, remember that this is just an HTTP API underneath the hood. The
+same pattern applies to a variety of use cases.</p>
+
+  <p>First we need a <strong>Client</strong> for <code class="highlighter-rouge">elasticsearch</code>. Though you can feel free
+to use a variety of clients, this example will use <a href="http://richmolj.github.io/trample">trample</a>.</p>
+
+  <p>Also keep in mind, we’ll be showing a one-off customization here. You
+probably want to extract this code into an
+<a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/alternate-datastores/adapters">Adapter</a> if this is going to
+become a core component of your application.</p>
+
+  <h4 id="pre-jsonapi-setup">Pre-JSONAPI Setup</h4>
+
+  <p>Start by installing trample:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Gemfile</span>
+<span class="n">gem</span> <span class="s1">'trample_search'</span><span class="p">,</span> <span class="ss">require: </span><span class="s1">'trample'</span></code></pre></figure>
+
+  <p>Tell <a href="https://github.com/ankane/searchkick">searchkick</a> that we want to
+index <code class="highlighter-rouge">Employee</code>s and <code class="highlighter-rouge">Position</code>s:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/models/employee.rb</span>
+<span class="n">searchkick</span> <span class="ss">text_start: </span><span class="p">[</span><span class="ss">:first_name</span><span class="p">]</span>
+
+<span class="c1"># app/models/position.rb</span>
+<span class="n">searchkick</span> <span class="ss">text_start: </span><span class="p">[</span><span class="ss">:title</span><span class="p">]</span></code></pre></figure>
+
+  <p>Define our search classes. These tell trample the configuration of the
+search:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/models/employee_search.rb</span>
+<span class="k">class</span> <span class="nc">EmployeeSearch</span> <span class="o">&lt;</span> <span class="no">Trample</span><span class="o">::</span><span class="no">Search</span>
+  <span class="n">model</span> <span class="no">Employee</span>
+
+  <span class="n">condition</span> <span class="ss">:first_name</span><span class="p">,</span> <span class="ss">single: </span><span class="kp">true</span>
+  <span class="n">condition</span> <span class="ss">:last_name</span><span class="p">,</span> <span class="ss">single: </span><span class="kp">true</span>
+<span class="k">end</span>
+
+<span class="c1"># app/models/position_search.rb</span>
+<span class="k">class</span> <span class="nc">PositionSearch</span> <span class="o">&lt;</span> <span class="no">Trample</span><span class="o">::</span><span class="no">Search</span>
+  <span class="n">model</span> <span class="no">Position</span>
+
+  <span class="n">condition</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">single: </span><span class="kp">true</span>
+  <span class="n">condition</span> <span class="ss">:employee_id</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Finally, seed some data:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># db/seeds.rb</span>
+<span class="p">[</span><span class="no">Employee</span><span class="p">,</span> <span class="no">Position</span><span class="p">].</span><span class="nf">each</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:delete_all</span><span class="p">)</span>
+<span class="n">bart</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">create!</span><span class="p">(</span><span class="ss">first_name: </span><span class="s1">'Bart'</span><span class="p">,</span> <span class="ss">last_name: </span><span class="s1">'Simpson'</span><span class="p">)</span>
+<span class="n">homer</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">create!</span><span class="p">(</span><span class="ss">first_name: </span><span class="s1">'Homer'</span><span class="p">,</span> <span class="ss">last_name: </span><span class="s1">'Simpson'</span><span class="p">)</span>
+<span class="n">monty</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">create!</span><span class="p">(</span><span class="ss">first_name: </span><span class="s1">'Monty'</span><span class="p">,</span> <span class="ss">last_name: </span><span class="s1">'Burns'</span><span class="p">)</span>
+
+<span class="n">bart</span><span class="p">.</span><span class="nf">positions</span><span class="p">.</span><span class="nf">create!</span><span class="p">(</span><span class="ss">title: </span><span class="s1">'Junior Engineer'</span><span class="p">)</span>
+<span class="n">homer</span><span class="p">.</span><span class="nf">positions</span><span class="p">.</span><span class="nf">create!</span><span class="p">(</span><span class="ss">title: </span><span class="s1">'Senior Engineer'</span><span class="p">)</span>
+<span class="n">monty</span><span class="p">.</span><span class="nf">positions</span><span class="p">.</span><span class="nf">create!</span><span class="p">(</span><span class="ss">title: </span><span class="s1">'Manager'</span><span class="p">)</span></code></pre></figure>
+
+  <h4 id="jsonapi-integration">JSONAPI Integration</h4>
+
+  <p>In our controller, we need to pass a base scope. In <code class="highlighter-rouge">ActiveRecord</code> examples, we’d pass an <code class="highlighter-rouge">ActiveRecord::Relation</code> (e.g. <code class="highlighter-rouge">Post.all</code>). Let’s pass an instance
+of <code class="highlighter-rouge">Trample::Search</code> instead.</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/employees_controller.rb</span>
+<span class="k">def</span> <span class="nf">index</span>
+  <span class="n">render_jsonapi</span><span class="p">(</span><span class="no">EmployeeSearch</span><span class="p">.</span><span class="nf">new</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/serializers/serializable_employee.rb</span>
+<span class="k">class</span> <span class="nc">SerializableEmployee</span> <span class="o">&lt;</span> <span class="no">JSONAPI</span><span class="o">::</span><span class="no">Serializable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+
+  <span class="n">attribute</span> <span class="ss">:first_name</span>
+  <span class="n">attribute</span> <span class="ss">:last_name</span>
+  <span class="n">attribute</span> <span class="ss">:created_at</span>
+  <span class="n">attribute</span> <span class="ss">:updated_at</span>
+
+  <span class="n">has_many</span> <span class="ss">:positions</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Since we are now passing a non-default base scope, we need to tell our
+<code class="highlighter-rouge">Resource</code> how to query and resolve this new scope. Start by switching to
+the pass-through adapter, and resolve using <code class="highlighter-rouge">trample</code>’s query API:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">Null</span>
+<span class="c1"># ... code ...</span>
+<span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">query!</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">records</span><span class="p">.</span><span class="nf">compact</span>
+<span class="k">end</span>
+
+<span class="c1"># no belongs_to for now</span></code></pre></figure>
+
+  <p>You can now hit <code class="highlighter-rouge">http://localhost:3000/api/v1/employees</code> - the exact
+same payload is coming back, but is now sourced from <code class="highlighter-rouge">elasticsearch</code>!</p>
+
+  <p>Let’s add a prefix filter:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="n">allow_filter</span> <span class="ss">:first_name_prefix</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">condition</span><span class="p">(</span><span class="ss">:first_name</span><span class="p">).</span><span class="nf">starts_with</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Hit <code class="highlighter-rouge">http://localhost:3000/api/v1/employees?filter[first_name]=hom</code>.
+You’re now successfully querying the <code class="highlighter-rouge">elasticsearch</code> index.</p>
+
+  <p>If we want sorting and pagination, we need to tell the <code class="highlighter-rouge">Resource</code>
+ how to deal with that, too:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="n">paginate</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">current_page</span><span class="p">,</span> <span class="n">per_page</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">metadata</span><span class="p">.</span><span class="nf">pagination</span><span class="p">.</span><span class="nf">current_page</span> <span class="o">=</span> <span class="n">current_page</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">metadata</span><span class="p">.</span><span class="nf">pagination</span><span class="p">.</span><span class="nf">per_page</span> <span class="o">=</span> <span class="n">per_page</span>
+  <span class="n">scope</span>
+<span class="k">end</span>
+
+<span class="n">sort</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">att</span><span class="p">,</span> <span class="n">dir</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">metadata</span><span class="p">.</span><span class="nf">sort</span> <span class="o">=</span> <span class="p">[{</span><span class="ss">att: </span><span class="n">att</span><span class="p">,</span> <span class="ss">dir: </span><span class="n">dir</span><span class="p">}]</span>
+  <span class="n">scope</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>View the <a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Resource.html">Resource</a> and <a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Adapters/Abstract.html">Adapter</a> documentation for additional overrides, like statistics.</p>
+
+  <p>The last step is adding the <code class="highlighter-rouge">positions</code> association. If we want
+<code class="highlighter-rouge">has_many</code>-style macros we need to create an
+<a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/alternate-datastores/adapters">Adapter</a>, but for now
+let’s simply use the lower-level <a href="https://jsonapi-suite.github.io/jsonapi_suite/">allow_sideload</a> DSL. We need to define
+two functions: how to build a scope for the association, and how to
+associate the resulting objects:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="n">allow_sideload</span> <span class="ss">:positions</span><span class="p">,</span> <span class="ss">resource: </span><span class="no">PositionResource</span> <span class="k">do</span>
+  <span class="n">scope</span> <span class="k">do</span> <span class="o">|</span><span class="n">employees</span><span class="o">|</span>
+    <span class="n">scope</span> <span class="o">=</span> <span class="no">PositionSearch</span><span class="p">.</span><span class="nf">new</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">condition</span><span class="p">(</span><span class="ss">:employee_id</span><span class="p">).</span><span class="nf">or</span><span class="p">(</span><span class="n">employees</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:id</span><span class="p">))</span>
+  <span class="k">end</span>
+
+  <span class="n">assign</span> <span class="k">do</span> <span class="o">|</span><span class="n">employees</span><span class="p">,</span> <span class="n">positions</span><span class="o">|</span>
+    <span class="n">employees</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span>
+      <span class="n">e</span><span class="p">.</span><span class="nf">positions</span> <span class="o">=</span> <span class="n">positions</span><span class="p">.</span><span class="nf">select</span> <span class="p">{</span> <span class="o">|</span><span class="nb">p</span><span class="o">|</span> <span class="nb">p</span><span class="p">.</span><span class="nf">employee_id</span> <span class="o">=</span> <span class="n">e</span><span class="p">.</span><span class="nf">id</span> <span class="p">}</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Convert the <code class="highlighter-rouge">PositionResource</code> to use <code class="highlighter-rouge">elasticsearch</code>, just like we did
+for <code class="highlighter-rouge">Employee</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/position_resource.rb</span>
+<span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">Null</span>
+
+<span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">query!</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">results</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Create the <code class="highlighter-rouge">SerializablePosition</code> class:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">SerializablePosition</span> <span class="o">&lt;</span> <span class="no">JSONAPI</span><span class="o">::</span><span class="no">Serializable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:positions</span>
+
+  <span class="n">attribute</span> <span class="ss">:title</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>We can now sideload <code class="highlighter-rouge">positions</code> - check out the results at
+<code class="highlighter-rouge">http://localhost:3000/api/v1/employees?include=positions</code>. We’re
+fetching employees and their corresponding <code class="highlighter-rouge">positions</code> in a single
+request, via <code class="highlighter-rouge">elasticsearch</code>. Any filters/changes/default sort/etc that
+apply to <code class="highlighter-rouge">PositionResource</code> can be re-used at this endpoint.</p>
+
+  <p>If this was a one-off section of our application, we can call this good
+enough and move on. But as we continue to use this pattern, it’s going
+to get monotonous writing the same filter overrides, <code class="highlighter-rouge">allow_sideload</code>
+wiring code, etc. To DRY up this code, we can package our changes into
+an <a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/alternate-datastores/adapters">Adapter</a>.</p>
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-3 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="https://jsonapi-suite.github.io/jsonapi_suite/concepts">Concepts</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-3 menu">
+        <h3>How-Tos</h3>
+        <ul>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-scope-to-current-user">Scope to Current User</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-cause-side-effects">Cause Side-Effects</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-use-without-activerecord">Use Alternate ORMs</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-build-an-adapter">Build an Adapter</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-code-polymorphic-associations">Polymorphic Relationships</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-add-defaults">Add Default Behavior</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-conditionally-render-fields">Conditionally Render Fields</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-customize-error-responses">Customize Error Responses</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-write-specs">Write Specs</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-return-statistics">Statistics</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-autodocument">Autodocument with Swagger</a>
+            </li>
+          
+        </ul>
+      </div>
+      <div class="col-sm-3 menu">
+        <h3>Resources</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Contact us</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-3 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    console.log('HEREERERE');
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

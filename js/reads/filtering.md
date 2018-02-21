@@ -67,5 +67,3 @@ Post.where({ status: ['draft', 'review'] })
     </a>
   </h2>
 </div>
-
-{% include highlight.html %}

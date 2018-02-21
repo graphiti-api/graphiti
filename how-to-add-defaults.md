@@ -46,5 +46,3 @@ Now the default behavior is to view only active `Post`s, but
 
 <br />
 <br />
-
-{% include highlight.html %}

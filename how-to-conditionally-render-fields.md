@@ -50,5 +50,3 @@ If using Rails, `@context` is your controller.
 
 <br />
 <br />
-
-{% include highlight.html %}

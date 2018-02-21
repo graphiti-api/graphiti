@@ -21,5 +21,3 @@ Avoid modifying this instance in your component and instead pass
 **actions up**.
 
 When opting-in to [state-syncing]({{ site.github.url }}/js/state-syncing) these instances will sync-up whenever one of these is instances is persisted. You won't have to worry about updating the child component when the parent instance is saved.
-
-{% include highlight.html %}

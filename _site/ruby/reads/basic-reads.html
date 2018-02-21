@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>JSONAPI Suite</title>
+  <meta name="description" content="Collection of Ruby libraries for powering JSONAPI-compliant APIs.">
+
+  <link rel="stylesheet" href="https://jsonapi-suite.github.io/jsonapi_suite/assets/main.css?ref=wh4t3v45">
+  <link rel="canonical" href="/ruby/reads/basic-reads.html">
+  <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="https://jsonapi-suite.github.io/jsonapi_suite" class="navbar-brand">JSONAPI Suite</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/ruby">Docs</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/js/home">Javascript Client</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="ruby-toc col-md-3">
+  <ul>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/installation">Installation</a></li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/resources">Understanding Resources</a></li>
+    <li>Reads
+      <ul>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/reads/basic-reads">Basic Reads</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/reads/sorting">Sorting</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/reads/pagination">Pagination</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/reads/filtering">Filtering</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/reads/fieldsets">Fieldsets</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/reads/statistics">Statistics</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/reads/activerecord-associations">ActiveRecord Associations</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/reads/nested">Querying Relationships</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/reads/serializers">Serializers</a></li>
+      </ul>
+    </li>
+    <li>Writes
+      <ul>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/writes/basic-writes">Basic Writes</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/writes/validations">Validations</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/writes/strong-resources">Strong Resources</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/writes/nested-writes">Nested Writes</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/writes/side-effects">Side Effects</a></li>
+      </ul>
+    </li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/alternate-datastores">Alternate Datastores</a>
+      <ul>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/alternate-datastores/elasticsearch">ElasticSearch</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/alternate-datastores/http">HTTP Services</a></li>
+        <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/alternate-datastores/adapters">Adapters</a></li>
+      </ul>
+    </li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/scoping-to-current-user">Scoping to Current User</a></li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/backwards-compatibility">Backwards Compatibility</a></li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/swagger">Swagger</a></li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/testing">Integration Testing</a></li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/error-handling">Error Handling</a></li>
+  </ul>
+</div>
+
+<div class="col-md-8 col-md-offset-1">
+  <h3 id="basic-reads">Basic Reads</h3>
+
+  <p>Here’s the full code for a JSONAPI endpoint that supports sorting,
+pagination, sparse fieldsets and a <a href="http://jsonapi.org/format/#document-structure">JSONAPI-compliant</a> response:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/models/post.rb</span>
+<span class="k">class</span> <span class="nc">Post</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+<span class="k">end</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># config/routes.rb</span>
+<span class="n">scope</span> <span class="ss">path: </span><span class="s1">'/api'</span> <span class="k">do</span>
+  <span class="n">scope</span> <span class="ss">path: </span><span class="s1">'/v1'</span> <span class="k">do</span>
+    <span class="n">resources</span> <span class="ss">:posts</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:index</span><span class="p">]</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/serializers/serializable_post.rb</span>
+<span class="k">class</span> <span class="nc">SerializablePost</span> <span class="o">&lt;</span> <span class="no">JSONAPI</span><span class="o">::</span><span class="no">Serializable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:posts</span>
+
+  <span class="n">attribute</span> <span class="ss">:title</span>
+  <span class="n">attribute</span> <span class="ss">:description</span>
+  <span class="n">attribute</span> <span class="ss">:body</span>
+<span class="k">end</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/post_resource.rb</span>
+<span class="k">class</span> <span class="nc">PostResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="n">type</span> <span class="ss">:posts</span>
+  <span class="n">model</span> <span class="no">Post</span>
+<span class="k">end</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/posts_controller.rb</span>
+<span class="k">class</span> <span class="nc">PostsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">jsonapi</span> <span class="ss">resource: </span><span class="no">PostResource</span>
+
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="n">posts</span> <span class="o">=</span> <span class="no">Post</span><span class="p">.</span><span class="nf">all</span>
+    <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">posts</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Let’s walk through each of these files:</p>
+
+  <ul>
+    <li><strong>app/models/post.rb</strong>
+      <ul>
+        <li>Our <a href="https://martinfowler.com/eaaCatalog/domainModel.html">Model</a>. As Martin Fowler puts it, “<em>An object model of the domain that incorporates both behavior and data.</em>”. In this case we’re using <a href="http://guides.rubyonrails.org/active_record_basics.html">ActiveRecord</a>, though other model patterns can be used. This is the <strong>M</strong> of <a href="https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller">MVC</a>.</li>
+      </ul>
+    </li>
+    <li><strong>config/routes.rb</strong>
+      <ul>
+        <li>Sets up the endpoint <code class="highlighter-rouge">/api/v1/posts</code>, per <a href="http://guides.rubyonrails.org/routing.html">Rails Routing</a>.</li>
+      </ul>
+    </li>
+    <li><strong>app/serializers/serializable_post.rb</strong>
+      <ul>
+        <li>Given a <code class="highlighter-rouge">Model</code>, how do we want to represent that model as JSON? We
+might want to avoid exposing certain attributes, normalize values,
+or compute something specific to the view. This is the <strong>V</strong> of <a href="https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller">MVC</a>.</li>
+        <li>We use the excellent <a href="http://jsonapi-rb.org">jsonapi-rb</a> library for
+serialization. If you’re familiar with <a href="https://github.com/rails-api/active_model_serializers">active_model_serializers</a>, this code will look very familiar.</li>
+      </ul>
+    </li>
+    <li><strong>app/resources/post_resource.rb</strong>
+      <ul>
+        <li>A <code class="highlighter-rouge">Resource</code> holds the logic for querying and persisting our
+<code class="highlighter-rouge">Model</code>s based on the JSONAPI request. <a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/reads/resources">Learn about Resources
+here</a>.</li>
+      </ul>
+    </li>
+    <li><strong>app/controllers/posts_controller.rb</strong>
+      <ul>
+        <li>This is a typical <a href="http://guides.rubyonrails.org/action_controller_overview.html">Rails Controller</a>, the <strong>C</strong> of <a href="https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller">MVC</a>.</li>
+        <li>We’ve added <code class="highlighter-rouge">jsonapi resource: PostResource</code> to tell our controller
+to use query and persistence logic defined in our <a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/resources">Resource</a>.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <p>All of this leads up to the all-important <code class="highlighter-rouge">render_jsonapi</code> method.</p>
+
+  <h4 id="renderjsonapi">render_jsonapi</h4>
+
+  <blockquote>
+    <p><a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Base.html#render_jsonapi-instance_method">View the YARD documentation</a></p>
+  </blockquote>
+
+  <p>This method does two things: builds and resolves the “base scope”, and passes relevant options to the serialization layer.</p>
+
+  <p>In other words, this lower-level code would be the equivalent:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">scope</span> <span class="o">=</span> <span class="n">jsonapi_scope</span><span class="p">(</span><span class="no">Post</span><span class="p">.</span><span class="nf">all</span><span class="p">)</span> <span class="c1"># build up the scope</span>
+<span class="n">posts</span> <span class="o">=</span> <span class="n">scope</span><span class="p">.</span><span class="nf">resolve</span> <span class="c1"># fire the query</span>
+<span class="n">render</span> <span class="ss">json: </span><span class="n">posts</span><span class="p">,</span>
+  <span class="ss">fields: </span><span class="n">params</span><span class="p">[</span><span class="ss">:fields</span><span class="p">].</span><span class="nf">split</span><span class="p">(</span><span class="s1">','</span><span class="p">),</span>
+  <span class="ss">bunch: </span><span class="s1">'of'</span><span class="p">,</span>
+  <span class="ss">other: </span><span class="s1">'options'</span></code></pre></figure>
+
+  <ul>
+    <li>We’ve started with a base scope - <code class="highlighter-rouge">Post.all</code> - and passed it into our
+<a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/resources">Resource</a>, which will
+modify the scope based on incoming parameters.</li>
+    <li>We’ve passed a number of boilerplate options to the underlying
+<a href="http://jsonapi-rb.org">jsonapi-rb</a> serialization library.</li>
+  </ul>
+
+  <p>There are times we want to manually build and resolve the scope prior to
+calling <code class="highlighter-rouge">render_jsonapi</code>. The <code class="highlighter-rouge">show</code> action is one example.</p>
+
+  <h4 id="the-show-action">The <code class="highlighter-rouge">#show</code> action</h4>
+
+  <p>Our <a href="http://guides.rubyonrails.org/routing.html#crud-verbs-and-actions">#show action</a> fetches one specific post by ID, rather than a list of posts. To accomodate this, we manually build and resolve the scope instead of applying the default logic in <code class="highlighter-rouge">#render_jsonapi</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">scope</span> <span class="o">=</span> <span class="n">jsonapi_scope</span><span class="p">(</span><span class="no">Post</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">id: </span><span class="n">params</span><span class="p">[</span><span class="ss">:id</span><span class="p">]))</span>
+<span class="n">post</span> <span class="o">=</span> <span class="n">scope</span><span class="p">.</span><span class="nf">resolve</span><span class="p">.</span><span class="nf">first</span>
+<span class="n">render_jsonapi</span><span class="p">(</span><span class="n">post</span><span class="p">,</span> <span class="ss">scope: </span><span class="kp">false</span><span class="p">)</span></code></pre></figure>
+
+  <p>Note the <code class="highlighter-rouge">scope: false</code> option - we’ve already resolved our models, so
+we tell <code class="highlighter-rouge">render_jsonapi</code> not to run the scoping logic again.</p>
+
+  <blockquote>
+    <p><a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Base.html#jsonapi_scope-instance_method">View the YARD documentation for #jsonapi_scope</a></p>
+  </blockquote>
+
+  <p>It’s a common convention in Rails to return a <code class="highlighter-rouge">404</code> response code from
+the <code class="highlighter-rouge">show</code> action when a record is not found. Typically you’d raise and
+rescue <code class="highlighter-rouge">ActiveRecord::RecordNotFound</code>…but we want to be agnostic to
+the database. Instead:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">raise</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Errors</span><span class="o">::</span><span class="no">RecordNotFound</span> <span class="k">unless</span> <span class="n">post</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/application_controller.rb</span>
+<span class="n">rescue_exception</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Errors</span><span class="o">::</span><span class="no">RecordNotFound</span><span class="p">,</span>
+  <span class="ss">status: </span><span class="mi">404</span></code></pre></figure>
+
+  <p>We’re throwing an exception, and using our <a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/error-handling">error handling
+library</a> to
+customize the status code when that particular error is thrown.</p>
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-3 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="https://jsonapi-suite.github.io/jsonapi_suite/concepts">Concepts</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-3 menu">
+        <h3>How-Tos</h3>
+        <ul>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-scope-to-current-user">Scope to Current User</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-cause-side-effects">Cause Side-Effects</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-use-without-activerecord">Use Alternate ORMs</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-build-an-adapter">Build an Adapter</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-code-many-to-many-associations">Many-to-Many Relationships</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-code-polymorphic-associations">Polymorphic Relationships</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-add-defaults">Add Default Behavior</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-conditionally-render-fields">Conditionally Render Fields</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-customize-error-responses">Customize Error Responses</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-write-specs">Write Specs</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-return-statistics">Statistics</a>
+            </li>
+          
+            <li>
+              <a href="https://jsonapi-suite.github.io/jsonapi_suite//how-to-autodocument">Autodocument with Swagger</a>
+            </li>
+          
+        </ul>
+      </div>
+      <div class="col-sm-3 menu">
+        <h3>Resources</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Contact us</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-3 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    console.log('HEREERERE');
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

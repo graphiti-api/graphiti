@@ -118,5 +118,3 @@ For documentation on all the spec helpers we provide, check out the
 
 <br />
 <br />
-
-{% include highlight.html %}

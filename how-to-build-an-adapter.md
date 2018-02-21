@@ -116,5 +116,3 @@ end
 You can now remove any customizations from your `Resource` classes. You
 can continue to build the adapter, adding `belongs_to`, statistics, and
 more. [View the adapter documentation for the full API](https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Adapters/Abstract.html).
-
-{% include highlight.html %}

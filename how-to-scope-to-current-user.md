@@ -91,5 +91,3 @@ class EmployeesController < ApplicationController
   end
 end
 {% endhighlight %}
-
-{% include highlight.html %}

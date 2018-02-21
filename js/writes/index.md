@@ -140,5 +140,3 @@ Notably, **only dirty (changed) attributes will be sent to the server**. This pr
     </a>
   </h2>
 </div>
-
-{% include highlight.html %}

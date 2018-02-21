@@ -79,5 +79,3 @@ end
 
 <br />
 <br />
-
-{% include highlight.html %}

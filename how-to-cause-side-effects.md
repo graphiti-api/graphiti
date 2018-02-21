@@ -86,5 +86,3 @@ def create(attributes)
   Rails.logger.info "Success!"
 end
 {% endhighlight %}
-
-{% include highlight.html %}

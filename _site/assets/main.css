@@ -12121,6 +12121,9 @@ html.portfolio-page {
   margin-left: 200px !important;
   margin-top: -20px !important; }
 
+.index-sidebar-hero .cta a.button {
+  padding: 12px 30px; }
+
 .nav-menu .main-menu h4 {
   color: #e6e6e6;
   margin-left: 5rem; }
@@ -12160,6 +12163,10 @@ h3, h4, h5 {
   h3 a, h3 a:hover, h4 a, h4 a:hover, h5 a, h5 a:hover {
     color: #727272;
     text-decoration: none; }
+
+h4 {
+  margin-top: 40px;
+  border-bottom: 1px solid #f0f0f0; }
 
 .main-footer {
   margin-top: 0; }
@@ -12206,12 +12213,19 @@ img[alt=github] {
   width: 20px;
   height: 20px; }
 
-.js-toc, blockquote {
+.js-toc, .ruby-toc, blockquote {
   background: #f7f8fb;
   border: 1px solid #eaedf7;
   border-radius: 5px;
   padding: 10px;
   line-height: 1.8; }
+
+.ruby-toc ul {
+  padding-left: 25px; }
+
+.ruby-toc + div {
+  margin-bottom: 20px;
+  font-size: 16px; }
 
 blockquote.url {
   font-size: 14px;

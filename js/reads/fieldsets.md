@@ -56,5 +56,3 @@ specifying the fields for each relationship.
     </a>
   </h2>
 </div>
-
-{% include highlight.html %}

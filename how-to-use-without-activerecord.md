@@ -102,19 +102,7 @@ end
 # remove the belongs_to for now
 {% endhighlight %}
 
-Seed some data:
 
-{% highlight ruby %}
-# db/seeds.rb
-[Employee, Position].each(&:delete_all)
-bart = Employee.create!(first_name: 'Bart', last_name: 'Simpson')
-homer = Employee.create!(first_name: 'Homer', last_name: 'Simpson')
-monty = Employee.create!(first_name: 'Monty', last_name: 'Burns')
-
-bart.positions.create!(title: 'Junior Engineer')
-homer.positions.create!(title: 'Senior Engineer')
-monty.positions.create!(title: 'Manager')
-{% endhighlight %}
 
 You can now hit `http://localhost:3000/api/v1/employees` - the exact
 same payload is coming back, but is now sourced from `elasticsearch`!
@@ -207,5 +195,3 @@ enough and move on. But as we continue to use this pattern, it's going
 to get monotonous writing the same filter overrides, `allow_sideload`
 wiring code, etc. To DRY up this code, we can package our changes into
 an [Adapter](https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Adapters/Abstract.html).
-
-{% include highlight.html %}

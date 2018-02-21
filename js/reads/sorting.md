@@ -50,5 +50,3 @@ Post
     </a>
   </h2>
 </div>
-
-{% include highlight.html %}
