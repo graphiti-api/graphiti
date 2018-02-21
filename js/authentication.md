@@ -64,7 +64,7 @@ will be updated automatically if you're using it).
 
 <div class="clearfix">
   <h2 id="next">
-    <a href="/js/state-syncing">
+    <a href="{{site.github.url}}/js/state-syncing">
       NEXT:
       <small>State Syncing</small>
       &raquo;

@@ -76,7 +76,7 @@ Example: adding a custom header before the request is sent:
 
 <div class="clearfix">
   <h2 id="next">
-    <a href="/js/authentication">
+    <a href="{{site.github.url}}/js/authentication">
       NEXT:
       <small>Authentication</small>
       &raquo;

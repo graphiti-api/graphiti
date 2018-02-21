@@ -51,7 +51,7 @@ Post
 
 <div class="clearfix">
   <h2 id="next">
-    <a href="/js/writes">
+    <a href="{{site.github.url}}/js/writes">
       NEXT:
       <small>Writes</small>
       &raquo;

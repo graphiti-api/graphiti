@@ -60,7 +60,7 @@ Post.where({ status: ['draft', 'review'] })
 
 <div class="clearfix">
   <h2 id="next">
-    <a href="/js/reads/fieldsets">
+    <a href="{{site.github.url}}/js/reads/fieldsets">
       NEXT:
       <small>Fieldsets</small>
       &raquo;

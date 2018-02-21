@@ -38,7 +38,7 @@ JSONAPI Suite is already set up to return validation errors with a
 
 <div class="clearfix">
   <h2 id="next">
-    <a href="/js/writes/dirty-tracking">
+    <a href="{{site.github.url}}/js/writes/dirty-tracking">
       NEXT:
       <small>Dirty Tracking</small>
       &raquo;

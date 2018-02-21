@@ -142,7 +142,7 @@ posts // array of Post instances
 
 <div class="clearfix">
   <h2 id="next">
-    <a href="/js/reads/sorting">
+    <a href="{{site.github.url}}/js/reads/sorting">
       NEXT:
       <small>Sorting</small>
       &raquo;

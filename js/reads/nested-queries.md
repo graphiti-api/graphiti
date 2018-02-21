@@ -103,7 +103,7 @@ Dog.includes("owner").merge({ owner: Person.limitedFields() })
 
 <div class="clearfix">
   <h2 id="next">
-    <a href="/js/reads/nested-queries">
+    <a href="{{site.github.url}}/js/reads/nested-queries">
       NEXT:
       <small>Nested Queries</small>
       &raquo;

@@ -49,7 +49,7 @@ specifying the fields for each relationship.
 
 <div class="clearfix">
   <h2 id="next">
-    <a href="/js/reads/statistics">
+    <a href="{{site.github.url}}/js/reads/statistics">
       NEXT:
       <small>Statistics</small>
       &raquo;

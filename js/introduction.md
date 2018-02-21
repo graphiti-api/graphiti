@@ -31,7 +31,7 @@ order to avoid common `ActiveRecord` pitfalls.
 
 <div class="clearfix">
   <h2 id="next">
-    <a href="/js/installation">
+    <a href="{{site.github.url}}/js/installation">
       NEXT:
       <small>Installation</small>
       &raquo;

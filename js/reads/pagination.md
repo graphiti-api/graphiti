@@ -37,7 +37,7 @@ Post.page(5).per(10).all()
 
 <div class="clearfix">
   <h2 id="next">
-    <a href="/js/reads/filtering">
+    <a href="{{site.github.url}}/js/reads/filtering">
       NEXT:
       <small>Filtering</small>
       &raquo;

@@ -133,7 +133,7 @@ Notably, **only dirty (changed) attributes will be sent to the server**. This pr
 
 <div class="clearfix">
   <h2 id="next">
-    <a href="/js/writes/validations">
+    <a href="{{site.github.url}}/js/writes/validations">
       NEXT:
       <small>Validations</small>
       &raquo;

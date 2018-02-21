@@ -81,7 +81,7 @@ accident. Just add `.id` to the relationship name:
 
 <div class="clearfix">
   <h2 id="next">
-    <a href="/js/middleware">
+    <a href="{{site.github.url}}/js/middleware">
       NEXT:
       <small>Middleware</small>
       &raquo;

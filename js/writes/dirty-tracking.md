@@ -121,7 +121,7 @@ object.
 
 <div class="clearfix">
   <h2 id="next">
-    <a href="/js/writes/nested">
+    <a href="{{site.github.url}}/js/writes/nested">
       NEXT:
       <small>Nested Writes</small>
       &raquo;

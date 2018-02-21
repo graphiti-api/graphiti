@@ -286,7 +286,7 @@ Person.includes('dogs').then((response) => {
 
 <div class="clearfix">
   <h2 id="next">
-    <a href="/js/reads">
+    <a href="{{site.github.url}}/js/reads">
       NEXT:
       <small>Reads</small>
       &raquo;

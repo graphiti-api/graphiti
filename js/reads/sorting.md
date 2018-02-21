@@ -43,7 +43,7 @@ Post
 
 <div class="clearfix">
   <h2 id="next">
-    <a href="/js/reads/pagination">
+    <a href="{{site.github.url}}/js/reads/pagination">
       NEXT:
       <small>Pagination</small>
       &raquo;
