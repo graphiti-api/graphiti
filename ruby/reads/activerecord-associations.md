@@ -80,3 +80,73 @@ This will work, and for simple many-to-many relationships you can move on. But w
 As this is metadata about the relationship it should go on the meta section of the corresponding relationship object. While supporting such an approach is on the JSONAPI Suite roadmap, we haven't done so yet.
 
 For now, it might be best to simply expose the intermediate table to the API. Using a client like [JSORM]({{site.github.url}}/js/home), the overhead of this approach is minimal.
+
+#### polymorphic_belongs_to
+
+{% highlight ruby %}
+# app/models/employee.rb
+belongs_to :workspace, polymorphic: true
+{% endhighlight %}
+
+{% highlight ruby %}
+# app/models/workspace.rb
+has_many :employees, as: :workspace
+{% endhighlight %}
+
+{% highlight ruby %}
+# app/resources/employee_resource.rb
+polymorphic_belongs_to :workspace,
+  group_by: :workspace_type,
+  groups: {
+    'Office' => {
+      scope: -> { Office.all },
+      resource: OfficeResource,
+      foreign_key: :workspace_id
+    },
+    'HomeOffice' => {
+      scope: -> { HomeOffice.all },
+      resource: HomeOfficeResource,
+      foreign_key: :workspace_id
+    }
+  }
+{% endhighlight %}
+
+{% highlight bash %}
+/employees?include=workspace
+{% endhighlight %}
+
+Here an `Employee` belongs to a `Workspace`. `Workspace`s have
+different `type`s - `HomeOffice`, `Office`, `CoworkingSpace`, etc. The
+`employees` table has `workspace_id` and `workspace_type` columns
+to support this relationship.
+
+We may need to query each `workspace_type` differently - perhaps
+they live in separate tables (`home_offices`, `coworking_spaces`, etc). So, when fetching the relationship, we'll need to group our `Employees` by `workspace_type` and query differently for each group:
+
+{% highlight ruby %}
+# app/resources/employee_resource.rb
+polymorphic_belongs_to :workspace,
+  group_by: :workspace_type,
+  groups: {
+    'Office' => {
+      scope: -> { Office.all },
+      resource: OfficeResource,
+      foreign_key: :workspace_id
+    },
+    'HomeOffice' => {
+      scope: -> { HomeOffice.all },
+      resource: HomeOfficeResource,
+      foreign_key: :workspace_id
+    }
+  }
+{% endhighlight %}
+
+Let's say our API was returning 10 `Employees`, sideloading their corresponding `Workspace`. The underlying code would:
+
+* Fetch the employees
+* Group the employees by the given key: `employees.group_by { |e|
+  e.workspace_type }`
+* Use the `Office` configuration for all `Employee`s where
+  `workspace_type` is `Office`, and use the `HomeOffice` configuration
+for all `Employee`s where `workspace_type` is `HomeOffice`, and so
+forth.

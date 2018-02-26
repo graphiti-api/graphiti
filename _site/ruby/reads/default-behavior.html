@@ -10,7 +10,7 @@
   <meta name="description" content="Collection of Ruby libraries for powering JSONAPI-compliant APIs.">
 
   <link rel="stylesheet" href="https://jsonapi-suite.github.io/jsonapi_suite/assets/main.css?ref=wh4t3v45">
-  <link rel="canonical" href="http://localhost:4000/ruby/writes/nested-writes.html">
+  <link rel="canonical" href="http://localhost:4000/ruby/reads/default-behavior.html">
   <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
 
   <!-- javascript -->
@@ -105,97 +105,42 @@
 </div>
 
 <div class="col-md-8 col-md-offset-1">
-  <h3 id="nested-writes">Nested Writes</h3>
+  <h3 id="default-behavior">Default Behavior</h3>
 
-  <blockquote>
-    <p>View the Sample App: <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_19_custom_persistence...step_23_disassociation">Server</a>  |  <a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_9_dropdown...step_10_nested_create">Client</a></p>
-  </blockquote>
+  <p>You may need to change the default behavior or your API - perhaps you
+want a default of 10 per page instead of 20. JSONAPI Suite provides
+facilities that enable <strong><em>defaults</em></strong> that can be <strong><em>overridden</em></strong> - 10 per
+page, unless elsewise specified by the user.</p>
 
-  <p>Nested writes occur via “sideposting”. Using the same example from the
-<a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/writes/strong-resources">strong resources section</a>, let’s “sidepost” a <code class="highlighter-rouge">Person</code> at the <code class="highlighter-rouge">/accounts</code> endpoint:</p>
+  <p>You can see these defaults in the <a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Resource.html">Resource documentation</a>:</p>
 
-  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># PUT /accounts/123</span>
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">default_filter</span> <span class="ss">:active</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
+<span class="k">end</span>
 
-<span class="p">{</span>
-  <span class="ss">data: </span><span class="p">{</span>
-    <span class="ss">type: </span><span class="s2">"accounts"</span><span class="p">,</span>
-    <span class="ss">id: </span><span class="s2">"123"</span><span class="p">,</span>
-    <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s2">"updated"</span> <span class="p">}</span>
-    <span class="ss">relationships: </span><span class="p">{</span>
-      <span class="ss">people: </span><span class="p">{</span>
-        <span class="ss">data: </span><span class="p">[</span>
-          <span class="p">{</span> <span class="ss">id: </span><span class="s2">"1"</span><span class="p">,</span> <span class="ss">type: </span><span class="s2">"people"</span><span class="p">,</span> <span class="ss">method: </span><span class="s2">"update"</span> <span class="p">}</span>
-        <span class="p">]</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">},</span>
-  <span class="ss">included: </span><span class="p">[</span>
-    <span class="p">{</span>
-      <span class="ss">type: </span><span class="s2">"people"</span><span class="p">,</span>
-      <span class="ss">id: </span><span class="s2">"1"</span><span class="p">,</span>
-      <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s2">"updated"</span> <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">]</span>
-<span class="p">}</span></code></pre></figure>
+<span class="n">default_page_size</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 
-  <p>Here we’ve update the <code class="highlighter-rouge">Account</code> and associated <code class="highlighter-rouge">Person</code> in a single
-request. You’ll see this is nothing more than a mirror of a
-<a href="http://jsonapi.org/format/#document-compound-documents">“sideloading” payload</a>, with one key addition - because HTTP verbs only apply to the top-level resource, we add a <code class="highlighter-rouge">method</code> key for all associated resources. Because we’re sticking to the convention of pairing a Resource with a verb, we call this “REST with Relationships”. Verbs can be one of <code class="highlighter-rouge">create</code>, <code class="highlighter-rouge">update</code>, <code class="highlighter-rouge">destroy</code> or <code class="highlighter-rouge">disassociate</code>.</p>
+<span class="n">default_sort</span><span class="p">([{</span> <span class="ss">created_at: :desc</span> <span class="p">}])</span></code></pre></figure>
 
-  <blockquote>
-    <p>Read more about the <a href="https://jsonapi-suite.github.io/jsonapi_suite/concepts#sideposting">Sideposting Concept</a></p>
-  </blockquote>
+  <p>These can all be overriden by the user. In other words, hitting
+<code class="highlighter-rouge">/posts</code> will only show active <code class="highlighter-rouge">Post</code>s, hitting
+<code class="highlighter-rouge">/posts?filter[active]=false</code> will show inactive <code class="highlighter-rouge">Post</code>s. The same applies
+for sorting and pagination.</p>
 
-  <p>There’s not much code to satisfy this document. Make sure the
-relationship is defined in your <code class="highlighter-rouge">Resource</code>:</p>
+  <p>A common pattern is for default filters to apply for all users, but
+allow overrides for administrators. You can use the <code class="highlighter-rouge">:if</code> option to
+restrict the override:</p>
 
-  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/account_resource.rb</span>
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/post_resource.rb</span>
+<span class="n">allow_filter</span> <span class="ss">:active</span><span class="p">,</span> <span class="ss">if: :admin?</span>
 
-<span class="n">has_many</span> <span class="ss">:people</span><span class="p">,</span>
-  <span class="ss">resource: </span><span class="no">PersonResource</span><span class="p">,</span>
-  <span class="ss">foreign_key: :account_id</span><span class="p">,</span>
-  <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Person</span><span class="p">.</span><span class="nf">all</span> <span class="p">}</span></code></pre></figure>
-
-  <p>And whitelisted in your controller:</p>
-
-  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/accounts_controller.rb</span>
-
-<span class="n">strong_resource</span> <span class="ss">:account</span> <span class="k">do</span>
-  <span class="n">has_many</span> <span class="ss">:people</span>
+<span class="c1"># app/controllers/posts_controller.rb</span>
+<span class="k">def</span> <span class="nf">admin?</span>
+  <span class="n">current_user</span><span class="p">.</span><span class="nf">admin?</span>
 <span class="k">end</span></code></pre></figure>
 
-  <p>That’s it!</p>
-
-  <h4 id="temp-id">temp-id</h4>
-
-  <p>There’s one final concept in sideposting, specific to <code class="highlighter-rouge">create</code>. We need
-to tell our clients how to update an in-memory object with the
-newly-minted <code class="highlighter-rouge">id</code> from the server. To do this, we pass <code class="highlighter-rouge">temp-id</code> (a random uuid) in the
-request instead of <code class="highlighter-rouge">id</code>:</p>
-
-  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># create an Account with a Person in a single request</span>
-<span class="p">{</span>
-  <span class="ss">data: </span><span class="p">{</span>
-    <span class="n">type</span> <span class="s2">"accounts"</span><span class="p">,</span>
-    <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s2">"new account"</span> <span class="p">},</span>
-    <span class="ss">relationships: </span><span class="p">{</span>
-    <span class="ss">people: </span><span class="p">{</span>
-      <span class="ss">data: </span><span class="p">[</span>
-        <span class="p">{</span> <span class="ss">:'temp-id'</span> <span class="o">=&gt;</span> <span class="s2">"abc123"</span><span class="p">,</span> <span class="ss">type: </span><span class="s2">"people"</span> <span class="p">}</span>
-      <span class="p">]</span>
-    <span class="p">}</span>
-  <span class="p">},</span>
-  <span class="ss">included: </span><span class="p">[</span>
-    <span class="p">{</span>
-      <span class="ss">type: </span><span class="s2">"people"</span><span class="p">,</span>
-      <span class="ss">:"temp-id"</span> <span class="o">=&gt;</span> <span class="s2">"abc123"</span><span class="p">,</span>
-      <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s2">"John Doe"</span> <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">]</span>
-<span class="p">}</span></code></pre></figure>
-
-  <p>Clients like <a href="https://jsonapi-suite.github.io/jsonapi_suite/js/home">JSORM</a> will handle this for you
-automatically.</p>
+  <p>Now the default behavior is to view only active <code class="highlighter-rouge">Post</code>s, but
+<em>administrators</em> can override this default.</p>
 </div>
 
         </div>

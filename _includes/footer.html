@@ -1,7 +1,7 @@
 <div class="main-footer main-footer--dark">
   <div class="container">
     <div class="row">
-      <div class="col-sm-3 menu">
+      <div class="col-sm-4 menu">
         <h3>Overview</h3>
         <ul>
           <li>
@@ -15,17 +15,7 @@
           </li>
         </ul>
       </div>
-      <div class="col-sm-3 menu">
-        <h3>How-Tos</h3>
-        <ul>
-          {% for howto in site.data.howtos %}
-            <li>
-              <a href="{{site.github.url}}/{{howto.path}}">{{howto.title}}</a>
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-      <div class="col-sm-3 menu">
+      <div class="col-sm-4 menu">
         <h3>Resources</h3>
         <ul>
           <li>
@@ -39,7 +29,7 @@
           </li>
         </ul>
       </div>
-      <div class="col-sm-3 menu">
+      <div class="col-sm-4 menu">
         <h3>Related</h3>
         <ul>
           <li>

@@ -2,8 +2,10 @@
 layout: page
 ---
 
-How to Add Defaults
-==========
+{% include ruby-toc.html %}
+
+<div markdown="1" class="col-md-8 col-md-offset-1">
+### Default Behavior
 
 You may need to change the default behavior or your API - perhaps you
 want a default of 10 per page instead of 20. JSONAPI Suite provides
@@ -43,6 +45,3 @@ end
 
 Now the default behavior is to view only active `Post`s, but
 *administrators* can override this default.
-
-<br />
-<br />
