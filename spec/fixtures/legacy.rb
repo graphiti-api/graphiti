@@ -1,5 +1,6 @@
 ActiveRecord::Schema.define(:version => 1) do
   create_table :authors do |t|
+    t.boolean :active, default: true
     t.string :first_name
     t.string :last_name
     t.string :dwelling_type

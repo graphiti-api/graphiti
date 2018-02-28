@@ -13,6 +13,7 @@ RSpec.describe 'filtering' do
       allow_filter :first_name_prefix do |scope, value|
         scope.where(['first_name like ?', "#{value}%"])
       end
+      allow_filter :active
     end
   end
 
@@ -24,6 +25,54 @@ RSpec.describe 'filtering' do
   it 'scopes correctly' do
     params[:filter] = { id: author1.id }
     expect(scope.resolve.map(&:id)).to eq([author1.id])
+  end
+
+  context 'when filter is a "string nil"' do
+    before do
+      params[:filter] = { first_name: 'nil' }
+      author2.update_attribute(:first_name, nil)
+    end
+
+    it 'converts to a real nil' do
+      ids = scope.resolve.map(&:id)
+      expect(ids).to eq([author2.id])
+    end
+  end
+
+  context 'when filter is a "string null"' do
+    before do
+      params[:filter] = { first_name: 'null' }
+      author2.update_attribute(:first_name, nil)
+    end
+
+    it 'converts to a real nil' do
+      ids = scope.resolve.map(&:id)
+      expect(ids).to eq([author2.id])
+    end
+  end
+
+  context 'when filter is a "string boolean"' do
+    before do
+      params[:filter] = { active: 'true' }
+      author2.update_attribute(:active, false)
+    end
+
+    it 'automatically casts to a real boolean' do
+      ids = scope.resolve.map(&:id)
+      expect(ids.length).to eq(3)
+      expect(ids).to_not include(author2.id)
+    end
+
+    context 'and multiple are passed' do
+      before do
+        params[:filter] = { active: 'true,false' }
+      end
+
+      it 'still works' do
+        ids = scope.resolve.map(&:id)
+        expect(ids.length).to eq(4)
+      end
+    end
   end
 
   context 'when filter is an integer' do
