@@ -38,7 +38,7 @@ module JsonapiCompliable
     def apply
       resource.default_filters.each_pair do |name, opts|
         next if overridden?(name)
-        @scope = opts[:filter].call(@scope)
+        @scope = opts[:filter].call(@scope, resource.context)
       end
 
       @scope

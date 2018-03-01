@@ -41,7 +41,7 @@ module JsonapiCompliable
     # specified in the adapter.
     def filter_scope(filter, value)
       if custom_scope = filter.values.first[:filter]
-        custom_scope.call(@scope, value)
+        custom_scope.call(@scope, value, resource.context)
       else
         resource.adapter.filter(@scope, filter.keys.first, value)
       end

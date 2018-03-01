@@ -35,7 +35,7 @@ module JsonapiCompliable
     # @return the scope object we are chaining/modofying
     def apply
       each_extra_field do |callable|
-        @scope = callable.call(@scope)
+        @scope = callable.call(@scope, resource.context)
       end
 
       @scope

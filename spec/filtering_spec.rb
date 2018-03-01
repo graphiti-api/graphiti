@@ -14,6 +14,9 @@ RSpec.describe 'filtering' do
         scope.where(['first_name like ?', "#{value}%"])
       end
       allow_filter :active
+      allow_filter :temp do |scope, value, ctx|
+        scope.where(id: ctx.runtime_id)
+      end
     end
   end
 
@@ -25,6 +28,15 @@ RSpec.describe 'filtering' do
   it 'scopes correctly' do
     params[:filter] = { id: author1.id }
     expect(scope.resolve.map(&:id)).to eq([author1.id])
+  end
+
+  # For example, getting current user from controller
+  it 'has access to calling context' do
+    ctx = double(runtime_id: author3.id).as_null_object
+    JsonapiCompliable.with_context(ctx, {}) do
+      params[:filter] = { temp: true }
+      expect(scope.resolve.map(&:id)).to eq([author3.id])
+    end
   end
 
   context 'when filter is a "string nil"' do
@@ -136,6 +148,23 @@ RSpec.describe 'filtering' do
     it "is overrideable when overriding via an allowed filter's alias" do
       params[:filter] = { name: 'Stephen' }
       expect(scope.resolve.map(&:id)).to eq([author1.id])
+    end
+
+    context 'when accessing calling context' do
+      before do
+        resource_class.class_eval do
+          default_filter :first_name do |scope, ctx|
+            scope.where(id: ctx.runtime_id)
+          end
+        end
+      end
+
+      it 'works' do
+        ctx = double(runtime_id: author3.id).as_null_object
+        JsonapiCompliable.with_context(ctx, {}) do
+          expect(scope.resolve.map(&:id)).to eq([author3.id])
+        end
+      end
     end
   end
 

@@ -61,7 +61,7 @@ module JsonapiCompliable
 
     # Apply the custom pagination proc
     def apply_custom_scope
-      custom_scope.call(@scope, number, size)
+      custom_scope.call(@scope, number, size, resource.context)
     end
 
     private

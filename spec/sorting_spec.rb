@@ -75,6 +75,30 @@ RSpec.describe 'sorting' do
       it 'uses the custom sort function' do
         expect(scope.resolve.map(&:id)).to eq(Author.pluck(:id).reverse)
       end
+
+      context 'and it accesses runtime context' do
+        before do
+          resource_class.class_eval do
+            sort do |scope, att, dir, ctx|
+              scope.order(id: ctx.runtime_direction)
+            end
+          end
+        end
+
+        it 'works (desc)' do
+          ctx = double(runtime_direction: :desc).as_null_object
+          JsonapiCompliable.with_context(ctx, {}) do
+            expect(scope.resolve.map(&:id)).to eq(Author.pluck(:id).reverse)
+          end
+        end
+
+        it 'works (asc)' do
+          ctx = double(runtime_direction: :asc).as_null_object
+          JsonapiCompliable.with_context(ctx, {}) do
+            expect(scope.resolve.map(&:id)).to eq(Author.pluck(:id))
+          end
+        end
+      end
     end
   end
 end

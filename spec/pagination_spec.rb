@@ -52,5 +52,22 @@ RSpec.describe 'pagination' do
     it 'uses the custom pagination function' do
       expect(scope.resolve).to eq([])
     end
+
+    context 'and it accesses runtime context' do
+      before do
+        resource_class.class_eval do
+          paginate do |scope, page, per_page, ctx|
+            scope.limit(ctx.runtime_limit)
+          end
+        end
+      end
+
+      it 'works' do
+        ctx = double(runtime_limit: 2).as_null_object
+        JsonapiCompliable.with_context(ctx, {}) do
+          expect(scope.resolve.length).to eq(2)
+        end
+      end
+    end
   end
 end
