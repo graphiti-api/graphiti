@@ -52,7 +52,30 @@ module JsonapiCompliable
         filter = find_filter!(param_name.to_sym)
         value  = param_value
         value  = value.split(',') if value.is_a?(String) && value.include?(',')
+        value  = normalize_string_values(value)
         yield filter, value
+      end
+    end
+
+    # Convert a string of "true" to true, etc
+    #
+    # NB - avoid Array(value) here since we might want to
+    # return a single element instead of array
+    def normalize_string_values(value)
+      if value.is_a?(Array)
+        value.map { |v| normalize_string_value(v) }
+      else
+        normalize_string_value(value)
+      end
+    end
+
+    def normalize_string_value(value)
+      case value
+      when 'true' then true
+      when 'false' then false
+      when 'nil', 'null' then nil
+      else
+        value
       end
     end
   end
