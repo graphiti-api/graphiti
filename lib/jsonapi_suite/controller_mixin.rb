@@ -8,7 +8,7 @@ module JsonapiSuite
           include JsonapiCompliable::Base
         end
         include JsonapiErrorable
-        include StrongResources::Controller::Mixin
+        include JsonapiSuite::StrongResources::ControllerMixin
       end
     end
   end
