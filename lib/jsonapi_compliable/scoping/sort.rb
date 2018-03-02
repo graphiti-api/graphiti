@@ -31,7 +31,8 @@ module JsonapiCompliable
     # @return the scope we are chaining/modifying
     def apply_custom_scope
       each_sort do |attribute, direction|
-        @scope = custom_scope.call(@scope, attribute, direction)
+        @scope = custom_scope
+          .call(@scope, attribute, direction, resource.context)
       end
       @scope
     end

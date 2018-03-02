@@ -2,10 +2,16 @@ require 'spec_helper'
 
 RSpec.describe JsonapiCompliable::Scope do
   let(:object)     { double.as_null_object }
-  let(:resource)   { double(type: :authors, default_page_size: 1).as_null_object }
   let(:query_hash) { JsonapiCompliable::Query.default_hash }
   let(:query)      { double(to_hash: { authors: query_hash }) }
   let(:instance)   { described_class.new(object, resource, query) }
+
+  let(:resource) do
+    dbl = double type: :authors,
+      default_page_size: 1,
+      pagination: nil
+    dbl.as_null_object
+  end
 
   describe '#resolve' do
     before do
