@@ -84,3 +84,11 @@ There are a variety of ways to customize strong resource templates -
 like allowing certain parameters only on `update` but not `create`. Head
 over to the [strong_resources documentation](https://jsonapi-suite.github.io/strong_resources/) for a more in-depth
 overview.
+
+<blockquote>
+  Note: a common issue is allowing an input to be `null`. You can define your own types, or
+  {% highlight ruby %}
+# config/initializers/strong_resources.rb
+ActionController::Parameters.allow_nil_for_everything = true
+  {% endhighlight %}
+</blockquote>

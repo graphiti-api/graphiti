@@ -10,7 +10,7 @@
   <meta name="description" content="Collection of Ruby libraries for powering JSONAPI-compliant APIs.">
 
   <link rel="stylesheet" href="https://jsonapi-suite.github.io/jsonapi_suite/assets/main.css?ref=wh4t3v45">
-  <link rel="canonical" href="https://jsonapi-suite.github.io/ruby/writes/strong-resources.html">
+  <link rel="canonical" href="/ruby/writes/strong-resources.html">
   <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
 
   <!-- javascript -->
@@ -178,6 +178,15 @@ can opt-in to <code class="highlighter-rouge">destroy</code> and <code class="hi
 like allowing certain parameters only on <code class="highlighter-rouge">update</code> but not <code class="highlighter-rouge">create</code>. Head
 over to the <a href="https://jsonapi-suite.github.io/strong_resources/">strong_resources documentation</a> for a more in-depth
 overview.</p>
+
+  <blockquote>
+  Note: a common issue is allowing an input to be `null`. You can define your own types, or
+  
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># config/initializers/strong_resources.rb</span>
+<span class="no">ActionController</span><span class="o">::</span><span class="no">Parameters</span><span class="p">.</span><span class="nf">allow_nil_for_everything</span> <span class="o">=</span> <span class="kp">true</span>
+  </code></pre></figure>
+
+</blockquote>
 </div>
 
         </div>
