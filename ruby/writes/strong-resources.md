@@ -86,7 +86,7 @@ over to the [strong_resources documentation](https://jsonapi-suite.github.io/str
 overview.
 
 <blockquote>
-  Note: a common issue is allowing an input to be `null`. You can define your own types, or
+Note: a common issue is allowing an input to be <code class="highlighter-rouge">null</code>. You can define your own types, or
   {% highlight ruby %}
 # config/initializers/strong_resources.rb
 ActionController::Parameters.allow_nil_for_everything = true
