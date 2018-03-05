@@ -38,6 +38,16 @@ end
 
 That's it! Now only administrators can view hidden `Post`s.
 
+Of course, this logic would only apply to the `/posts` endpoint and
+would not apply when we are sideloading from `/blogs?include=posts`. To
+ensure this logic runs *all the time*, add a default filter:
+
+{% highlight ruby %}
+default_filter :visible do |scope, context|
+  context.current_user.admin? ? scope : scope.visible
+end
+{% endhighlight %}
+
 ### <a name="privileged-writes" href='#privileged-writes'>Privileged Writes</a>
 
 > Given `Post`s that have an `internal` attribute, only allow
@@ -72,7 +82,7 @@ your controller:
 
 {% highlight ruby %}
 # app/resources/employee_resource.rb
-allow_filter :name, if: :admin?
+allow_filter :under_performance_review, if: :admin?
 {% endhighlight %}
 
 {% highlight ruby %}

@@ -10,7 +10,6 @@
   <meta name="description" content="Collection of Ruby libraries for powering JSONAPI-compliant APIs.">
 
   <link rel="stylesheet" href="https://jsonapi-suite.github.io/jsonapi_suite/assets/main.css?ref=wh4t3v45">
-  <link rel="canonical" href="https://jsonapi-suite.github.io/ruby/reads/filtering.html">
   <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
 
   <!-- javascript -->
@@ -226,6 +225,19 @@ keep a one-liner with the correct naming, while still responding correctly
 to <code class="highlighter-rouge">fname</code>:</p>
 
   <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">allow_filter</span> <span class="ss">:first_name</span><span class="p">,</span> <span class="ss">aliases: </span><span class="p">[</span><span class="ss">:fname</span><span class="p">]</span></code></pre></figure>
+
+  <h4 id="accessing-runtime-context">Accessing Runtime Context</h4>
+
+  <p><code class="highlighter-rouge">allow_filter</code> can access runtime context (in Rails, the controller) as
+the last argument:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">allow_filter</span> <span class="ss">:my_siblings</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">context</span><span class="o">|</span>
+  <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="kp">true</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">family_id: </span><span class="n">context</span><span class="p">.</span><span class="nf">current_user</span><span class="p">.</span><span class="nf">family_id</span><span class="p">)</span>
+  <span class="k">else</span>
+    <span class="n">scope</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
 
 </div>
 

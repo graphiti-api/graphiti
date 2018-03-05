@@ -10,7 +10,6 @@
   <meta name="description" content="Collection of Ruby libraries for powering JSONAPI-compliant APIs.">
 
   <link rel="stylesheet" href="https://jsonapi-suite.github.io/jsonapi_suite/assets/main.css?ref=wh4t3v45">
-  <link rel="canonical" href="https://jsonapi-suite.github.io/ruby/scoping-to-current-user.html">
   <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
 
   <!-- javascript -->
@@ -134,6 +133,14 @@ administrator:</p>
 
   <p>That’s it! Now only administrators can view hidden <code class="highlighter-rouge">Post</code>s.</p>
 
+  <p>Of course, this logic would only apply to the <code class="highlighter-rouge">/posts</code> endpoint and
+would not apply when we are sideloading from <code class="highlighter-rouge">/blogs?include=posts</code>. To
+ensure this logic runs <em>all the time</em>, add a default filter:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">default_filter</span> <span class="ss">:visible</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">context</span><span class="o">|</span>
+  <span class="n">context</span><span class="p">.</span><span class="nf">current_user</span><span class="p">.</span><span class="nf">admin?</span> <span class="p">?</span> <span class="n">scope</span> <span class="p">:</span> <span class="n">scope</span><span class="p">.</span><span class="nf">visible</span>
+<span class="k">end</span></code></pre></figure>
+
   <h3 id="privileged-writes"><a name="privileged-writes" href="#privileged-writes">Privileged Writes</a></h3>
 
   <blockquote>
@@ -169,7 +176,7 @@ the <code class="highlighter-rouge">:if</code> option on <code class="highlighte
 your controller:</p>
 
   <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
-<span class="n">allow_filter</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">if: :admin?</span></code></pre></figure>
+<span class="n">allow_filter</span> <span class="ss">:under_performance_review</span><span class="p">,</span> <span class="ss">if: :admin?</span></code></pre></figure>
 
   <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/employees_controller.rb</span>
 <span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>

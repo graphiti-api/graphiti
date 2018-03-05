@@ -10,7 +10,6 @@
   <meta name="description" content="Collection of Ruby libraries for powering JSONAPI-compliant APIs.">
 
   <link rel="stylesheet" href="https://jsonapi-suite.github.io/jsonapi_suite/assets/main.css?ref=wh4t3v45">
-  <link rel="canonical" href="https://jsonapi-suite.github.io/ruby/reads/default-behavior.html">
   <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
 
   <!-- javascript -->
@@ -141,6 +140,14 @@ restrict the override:</p>
 
   <p>Now the default behavior is to view only active <code class="highlighter-rouge">Post</code>s, but
 <em>administrators</em> can override this default.</p>
+
+  <p>You also have access to the context (in Rails, the controller) as the
+last argument to <code class="highlighter-rouge">default_filter</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">default_filter</span> <span class="ss">:by_user</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">context</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">user_id: </span><span class="n">context</span><span class="p">.</span><span class="nf">current_user</span><span class="p">.</span><span class="nf">id</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
 </div>
 
         </div>

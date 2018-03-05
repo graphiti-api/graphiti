@@ -134,3 +134,18 @@ to `fname`:
 {% highlight ruby %}
 allow_filter :first_name, aliases: [:fname]
 {% endhighlight %}
+
+#### Accessing Runtime Context
+
+`allow_filter` can access runtime context (in Rails, the controller) as
+the last argument:
+
+{% highlight ruby %}
+allow_filter :my_siblings do |scope, value, context|
+  if value == true
+    scope.where(family_id: context.current_user.family_id)
+  else
+    scope
+  end
+end
+{% endhighlight %}

@@ -45,3 +45,12 @@ end
 
 Now the default behavior is to view only active `Post`s, but
 *administrators* can override this default.
+
+You also have access to the context (in Rails, the controller) as the
+last argument to `default_filter`:
+
+{% highlight ruby %}
+default_filter :by_user do |scope, context|
+  scope.where(user_id: context.current_user.id)
+end
+{% endhighlight %}
