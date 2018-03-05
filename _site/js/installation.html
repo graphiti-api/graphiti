@@ -275,9 +275,9 @@ to track which applications are using which attributes of the API.</p>
     <span class="na">firstName</span><span class="p">:</span> <span class="nx">attr</span><span class="p">(),</span>
     <span class="na">lastName</span><span class="p">:</span> <span class="nx">attr</span><span class="p">(),</span>
     <span class="na">age</span><span class="p">:</span> <span class="nx">attr</span><span class="p">()</span>
-  <span class="p">},</span>
-  <span class="na">methods</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">fullName</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="p">},}</span>
+  <span class="nl">methods</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">fullName</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
       <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">firstName</span> <span class="o">+</span> <span class="s2">" "</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">lastName</span><span class="p">;</span>
     <span class="p">}</span>
   <span class="p">}</span>
@@ -288,6 +288,30 @@ to track which applications are using which attributes of the API.</p>
 <span class="nx">person</span><span class="p">.</span><span class="nx">lastName</span> <span class="o">=</span> <span class="s2">"Doe"</span>
 <span class="nx">person</span><span class="p">.</span><span class="nx">attributes</span> <span class="c1">// { firstName: "John", lastName: "Doe" }</span>
 <span class="nx">person</span><span class="p">.</span><span class="nx">fullName</span><span class="p">()</span> <span class="c1">// "John Doe"</span></code></pre></figure>
+
+    </div>
+
+    <p>Attributes can be marked read-only, so they are never sent to the server
+on a write request:</p>
+
+    <div class="tabs">
+  <div class="tab typescript active">
+    <span>Typescript</span>
+  </div>
+  <div class="tab javascript">
+    <span>Javascript</span>
+  </div>
+</div>
+
+    <div class="code-tabs">
+
+      <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="err">@</span><span class="nx">Attr</span><span class="p">({</span> <span class="na">persist</span><span class="p">:</span> <span class="kc">false</span> <span class="p">})</span> <span class="nx">createdAt</span><span class="err">:</span> <span class="kr">string</span>
+<span class="err">@</span><span class="nx">Attr</span><span class="p">({</span> <span class="na">persist</span><span class="p">:</span> <span class="kc">false</span> <span class="p">})</span> <span class="nx">updatedAt</span><span class="err">:</span> <span class="kr">string</span></code></pre></figure>
+
+      <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">attrs</span><span class="err">:</span> <span class="p">{</span>
+  <span class="nl">createdAt</span><span class="p">:</span> <span class="nx">attr</span><span class="p">({</span> <span class="na">persist</span><span class="p">:</span> <span class="kc">false</span> <span class="p">}),</span>
+  <span class="nx">updatedAt</span><span class="err">:</span> <span class="nx">attr</span><span class="p">({</span> <span class="na">persist</span><span class="p">:</span> <span class="kc">false</span> <span class="p">})</span>
+<span class="p">}</span></code></pre></figure>
 
     </div>
 

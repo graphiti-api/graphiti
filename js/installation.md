@@ -152,7 +152,7 @@ const Person = ApplicationRecord.extend({
     firstName: attr(),
     lastName: attr(),
     age: attr()
-  },
+    },}
   methods: {
     fullName: function() {
       return this.firstName + " " + this.lastName;
@@ -165,6 +165,24 @@ person.firstName // "John"
 person.lastName = "Doe"
 person.attributes // { firstName: "John", lastName: "Doe" }
 person.fullName() // "John Doe"
+{% endhighlight %}
+</div>
+
+Attributes can be marked read-only, so they are never sent to the server
+on a write request:
+
+{% include js-code-tabs.html %}
+<div markdown="1" class="code-tabs">
+{% highlight typescript %}
+@Attr({ persist: false }) createdAt: string
+@Attr({ persist: false }) updatedAt: string
+{% endhighlight %}
+
+{% highlight javascript %}
+attrs: {
+  createdAt: attr({ persist: false }),
+  updatedAt: attr({ persist: false })
+}
 {% endhighlight %}
 </div>
 
