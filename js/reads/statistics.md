@@ -51,9 +51,9 @@ Post
 
 <div class="clearfix">
   <h2 id="next">
-    <a href="{{site.github.url}}/js/writes">
+    <a href="{{site.github.url}}/js/reads/includes">
       NEXT:
-      <small>Writes</small>
+      <small>Includes</small>
       &raquo;
     </a>
   </h2>
