@@ -140,5 +140,9 @@ Will give you an output similar to:
 <img width="430px" style="margin: 0 auto; display:block" src="https://user-images.githubusercontent.com/55264/28526856-c8938492-7056-11e7-8db2-2f25a3548e89.png" />
 
 <br />
-<br />
 
+### Authentication
+
+Your site may require authentication - for instance, sending a
+`Authorization` header in every request. We suggest using something like
+[Request.ly](https://chrome.google.com/webstore/detail/requestly-redirect-url-mo/mdnleldcmiljblolnjhpnblkcekpdkpa?hl=en) to modify headers for every request to a given URL.
