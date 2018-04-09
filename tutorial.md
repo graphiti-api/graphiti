@@ -9,7 +9,7 @@ Tutorial
 
 In this section, we'll build an employee directory application.
 If you're looking for a brief overview, head to the
-[Quickstart](/quickstart)
+[Quickstart]({{site.github.url}}/quickstart)
 instead.
 
 ![employee_directory]({{site.github.url}}/assets/img/employee_directory.gif)
@@ -33,7 +33,7 @@ The intent is to illustrate a variety of real-world use cases:
 * Nested CRUD of relationships, including validation errors.
 
 *Note: to better understand the underlying code, we'll be avoiding use
-of generators. Head to the [Quickstart](/quickstart) for a guide on how
+of generators. Head to the [Quickstart]({{site.github.url}}/quickstart) for a guide on how
 to automate much of the legwork here.*
 
 # <a name="reads" href='#reads'>Reads</a>
