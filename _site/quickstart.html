@@ -9,8 +9,8 @@
   <title>JSONAPI Suite</title>
   <meta name="description" content="Collection of Ruby libraries for powering JSONAPI-compliant APIs.">
 
-  <link rel="stylesheet" href="https://jsonapi-suite.github.io/jsonapi_suite/assets/main.css?ref=wh4t3v45">
-  <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
+  <link rel="stylesheet" href="/jsonapi_suite/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/jsonapi_suite/feed.xml">
 
   <!-- javascript -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
@@ -31,24 +31,24 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a href="https://jsonapi-suite.github.io/jsonapi_suite" class="navbar-brand">JSONAPI Suite</a>
+      <a href="/jsonapi_suite/" class="navbar-brand">JSONAPI Suite</a>
     </div>
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
       <ul class="nav navbar-nav">
         <li>
-          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart">Quickstart</a>
+          <a class="nav-link" href="/jsonapi_suite/quickstart">Quickstart</a>
         </li>
         <li>
-          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial">Tutorial</a>
+          <a class="nav-link" href="/jsonapi_suite/tutorial">Tutorial</a>
         </li>
         <li>
-          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/concepts">Concepts</a>
+          <a class="nav-link" href="/jsonapi_suite/concepts">Concepts</a>
         </li>
         <li>
-          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/ruby">Docs</a>
+          <a class="nav-link" href="/jsonapi_suite/ruby">Docs</a>
         </li>
         <li>
-          <a class="nav-link" href="https://jsonapi-suite.github.io/jsonapi_suite/js/home">Javascript Client</a>
+          <a class="nav-link" href="/jsonapi_suite/js/home">Javascript Client</a>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
@@ -72,7 +72,7 @@ completely.</p>
 <p>If the below seems too “magical”, don’t worry - we’re just applying some
 sensible defaults to get started quickly.</p>
 
-<h1 id="installation"><a name="installation" href="#installation">Installation</a></h1>
+<h1 id="installation"><a href="#installation">Installation</a></h1>
 
 <p>Let’s start with a classic Rails blog. We’ll use a <a href="http://guides.rubyonrails.org/rails_application_templates.html">template</a> to handle some of the boilerplate. Just run this command and accept all the defaults for now:</p>
 
@@ -87,7 +87,7 @@ directly, you can download the file and and run this command as <code class="hig
 /path/to/all.rb</code></p>
 </blockquote>
 
-<h1 id="defining-a-resource"><a name="defining-a-resource" href="#defining-a-resource">Defining a Resource</a></h1>
+<h1 id="defining-a-resource"><a href="#defining-a-resource">Defining a Resource</a></h1>
 
 <p>A <code class="highlighter-rouge">Resource</code> defines how to query and persist your <code class="highlighter-rouge">Model</code>. In other
 words: a <code class="highlighter-rouge">Model</code> is to the database as <code class="highlighter-rouge">Resource</code> is to the API. So
@@ -103,7 +103,7 @@ controller, and specs:</p>
 
 <p>You’ll see a number of files created. If you open each one, you’ll see
 comments explaining what’s going on. Head over to the
-<a href="/tutorial">tutorial</a> for a more in-depth understanding. For now, let’s
+<a href="tutorial">tutorial</a> for a more in-depth understanding. For now, let’s
 focus on two key concepts you’ll see over and over again: inputs (via
 <a href="https://jsonapi-suite.github.io/strong_resources/">strong_resources</a>),
 and outputs (via <a href="http://jsonapi-rb.org">jsonapi-rb</a>).</p>
@@ -137,13 +137,13 @@ and outputs (via <a href="http://jsonapi-rb.org">jsonapi-rb</a>).</p>
 <p>Verify <code class="highlighter-rouge">http://localhost:3000/api/v1/posts</code> renders JSON correctly.
 Now we just need data.</p>
 
-<h1 id="seeding-data"><a name="seeding-data" href="#seeding-data">Seeding Data</a></h1>
+<h1 id="seeding-data"><a href="#seeding-data">Seeding Data</a></h1>
 
 <p>We can seed data in two ways: the usual <code class="highlighter-rouge">db/seeds.rb</code>, or using an HTTP
 client. Using the client helps get your feet wet with client-side
 development, or you can avoid the detour and plow right ahead.</p>
 
-<h3 id="seeding-with-ruby"><a name="seeding-with-ruby" href="#seeding-with-ruby">Seeding With Ruby</a></h3>
+<h3 id="seeding-with-ruby"><a href="#seeding-with-ruby">Seeding With Ruby</a></h3>
 
 <p>Edit <code class="highlighter-rouge">db/seeds.rb</code> to create a few <code class="highlighter-rouge">Post</code>s:</p>
 
@@ -155,10 +155,10 @@ development, or you can avoid the detour and plow right ahead.</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>bundle <span class="nb">exec </span>rake db:seed</code></pre></figure>
 
-<h3 id="seeding-with-js-client"><a name="seeding-with-node" href="#seeding-with-node">Seeding With JS Client</a></h3>
+<h3 id="seeding-with-js-client"><a href="#seeding-with-node">Seeding With JS Client</a></h3>
 
 <p>There are a variety of <a href="http://jsonapi.org/implementations/#client-libraries">JSONAPI Clients</a>
-out there. We’ll be using <a href="/js/home">JSORM</a>
+out there. We’ll be using <a href="https://jsonapi-suite.github.io/jsorm">JSORM</a>
 which is built to work with Suite-specific functionality like nested
 payloads. It can be used from the browser, but for now we’ll call
 it using a simple Node script.</p>
@@ -233,9 +233,9 @@ class attributes. We instatiating instances of those Models, and call
 <p>Now load <code class="highlighter-rouge">http://localhost:3000/api/v1/posts</code>. You should have 3 <code class="highlighter-rouge">Post</code>s in
 your database!</p>
 
-<p><img src="https://jsonapi-suite.github.io/jsonapi_suite/assets/img/3_posts_json.png" alt="3_posts" /></p>
+<p><img src="assets/img/3_posts_json.png" alt="3_posts" /></p>
 
-<h1 id="querying"><a name="querying" href="#querying">Querying</a></h1>
+<h1 id="querying"><a href="#querying">Querying</a></h1>
 
 <p>Now that we’ve defined our <code class="highlighter-rouge">Resource</code> and seeded some data, let’s see
 what query functionality we have. We’ve listed all <code class="highlighter-rouge">Post</code>s at
@@ -353,7 +353,7 @@ the total count of all posts”.</li>
   <li>
     <p>This is rendered in the <code class="highlighter-rouge">meta</code> section of the response:</p>
 
-    <p><img src="https://jsonapi-suite.github.io/jsonapi_suite/assets/img/meta_total_count.png" alt="meta_total_count" /></p>
+    <p><img src="assets/img/meta_total_count.png" alt="meta_total_count" /></p>
   </li>
   <li><strong>Error Handling</strong>:
     <ul>
@@ -372,7 +372,7 @@ the total count of all posts”.</li>
   <li>
     <p>View the default payload:</p>
 
-    <p><img src="https://jsonapi-suite.github.io/jsonapi_suite/assets/img/error_payload.png" alt="error_payload" /></p>
+    <p><img src="assets/img/error_payload.png" alt="error_payload" /></p>
   </li>
   <li>
     <p>Different errors can be customized with different response codes,
@@ -380,13 +380,13 @@ the total count of all posts”.</li>
   </li>
 </ul>
 
-<h1 id="adding-relationships"><a name="adding-relationships" href="#adding-relationships">Adding Relationships</a></h1>
+<h1 id="adding-relationships"><a href="#adding-relationships">Adding Relationships</a></h1>
 
 <p>JSONAPI Suite supports full querying of relationships (“fetch me this
 <code class="highlighter-rouge">Post</code> and 3 active <code class="highlighter-rouge">Comment</code>s sorted by creation date”), as well as
 persistence (“save this <code class="highlighter-rouge">Post</code> and 3 <code class="highlighter-rouge">Comment</code>s in a single request”).</p>
 
-<h3 id="adding-relationships-1"><a name="relationship-setup" href="#relationship-setup">Adding Relationships</a></h3>
+<h3 id="adding-relationships-1"><a href="#relationship-setup">Adding Relationships</a></h3>
 
 <p>Let’s start by defining our model:</p>
 
@@ -432,7 +432,7 @@ functionality as before. We just need to seed data.</p>
 <p>Again, you can seed your data using a NodeJS client or the traditional
 <code class="highlighter-rouge">db/seeds.rb</code>.</p>
 
-<h4 id="seeding-with-nodejs"><a name="relationship-seeding-node" href="#relationship-seeding-node">Seeding with NodeJS</a></h4>
+<h4 id="seeding-with-nodejs"><a href="#relationship-seeding-node">Seeding with NodeJS</a></h4>
 
 <p>Let’s edit our <code class="highlighter-rouge">node-seed/index.js</code>. First add a <code class="highlighter-rouge">Comment</code> model:</p>
 
@@ -498,7 +498,7 @@ single request:</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>node node-seed/index.js</code></pre></figure>
 
-<h4 id="seeding-with-ruby-1"><a name="relationship-seeding-ruby" href="#relationship-seeding-ruby">Seeding with Ruby</a></h4>
+<h4 id="seeding-with-ruby-1"><a href="#relationship-seeding-ruby">Seeding With Ruby</a></h4>
 
 <p>Replace your <code class="highlighter-rouge">db/seeds.rb</code> with this code to persist one <code class="highlighter-rouge">Post</code> and
 three <code class="highlighter-rouge">Comment</code>s:</p>
@@ -512,7 +512,7 @@ three <code class="highlighter-rouge">Comment</code>s:</p>
   <span class="ss">active: </span><span class="kp">true</span><span class="p">,</span>
   <span class="ss">comments: </span><span class="p">[</span><span class="n">comment1</span><span class="p">,</span> <span class="n">comment2</span><span class="p">,</span> <span class="n">comment3</span><span class="p">]</span></code></pre></figure>
 
-<h2 id="usage"><a name="relationship-usage" href="#relationship-usage">Usage</a></h2>
+<h2 id="usage"><a href="#relationship-usage">Usage</a></h2>
 
 <p>Now let’s fetch a <code class="highlighter-rouge">Post</code> and filtered <code class="highlighter-rouge">Comment</code>s in a single request: <code class="highlighter-rouge">/api/v1/posts?include=comments</code>.</p>
 
@@ -534,7 +534,7 @@ comments by <code class="highlighter-rouge">created_at</code> descending: <code 
 functionality shared across many different endpoints, with no extra
 code.</p>
 
-<h1 id="whats-next"><a name="whats-next" href="#whats-next">What’s Next</a></h1>
+<h1 id="whats-next"><a href="#whats-next">What’s Next</a></h1>
 
 <p>We have a full CRUD API with robust querying functionality, and the
 ability to combine relationships for both reads and writes. But what
@@ -544,17 +544,16 @@ altogether?</p>
 
 <p>These are important topics that JSONAPI Suite was built to address. To
 learn more about advanced usage and customization, we suggest following
-the <a href="/tutorial">tutorial</a>. There are also a number of how-tos on this
-site, a good one to start with is  <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-use-without-activerecord">How
-to Use without ActiveRecord</a></p>
+the <a href="tutorial">tutorial</a>. There are also a number of how-tos on this
+site, a good one to start with is <a href="how-to-use-without-activerecord">How to Use without ActiveRecord</a></p>
 
 <p>For additional documentation, view the <a href="https://jsonapi-suite.github.io/jsonapi_compliable/">YARD Docs</a>.</p>
 
 <p>For help with specific use cases, <a href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">join our Slack chat</a>!</p>
 
-<h1 id="bonus-testing"><a name="testing" href="#testing">Bonus: Testing</a></h1>
+<h1 id="bonus-testing"><a href="#testing">Bonus: Testing</a></h1>
 
-<h3 id="installation-1"><a name="testing-install" href="#testing-install">Installation</a></h3>
+<h3 id="installation-1"><a href="#testing-install">Installation</a></h3>
 
 <p>Our generator applied some sensible defaults:</p>
 
@@ -633,7 +632,7 @@ tests. So note our exception handling is disabled by default:</p>
   <span class="n">key</span><span class="p">(</span><span class="ss">:created_at</span><span class="p">,</span> <span class="no">Time</span><span class="p">)</span>
 <span class="k">end</span></code></pre></figure>
 
-<h3 id="run"><a name="testing-run" href="#testing-rub">Run</a></h3>
+<h3 id="run"><a href="#testing-rub">Run</a></h3>
 
 <p>We can now run specs. Let’s start with the <code class="highlighter-rouge">Post</code> specs:</p>
 
@@ -680,7 +679,7 @@ filter with <code class="highlighter-rouge">allow_filter</code>? This boils down
 tolerance of failures. Try adding a few specs following the generated
 patterns to get a feel for what’s right for you.</p>
 
-<h3 id="bonus-documentation"><a name="documentation" href="#documentation">Bonus: Documentation</a></h3>
+<h3 id="bonus-documentation"><a href="#documentation">Bonus: Documentation</a></h3>
 
 <p>We can autodocument our code using <a href="https://swagger.io">swagger documentation</a>. Documenting an endpoint is one line of code:</p>
 
@@ -692,8 +691,7 @@ relationships), as well as schemas for request/responses:</p>
 <p><img style="width: 100%" src="https://user-images.githubusercontent.com/55264/28526490-af7ce5a8-7055-11e7-88bf-1ce5ead32dd7.png" /></p>
 
 <p>Our generator set up some boilerplate to enable this functionality, you
-can learn more at: <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-autodocument">How
-to Autodocument with Swagger</a></p>
+can learn more at: <a href="how-to-autodocument">How to Autodocument with Swagger</a></p>
 
 <p><br />
 <br />
@@ -709,13 +707,13 @@ to Autodocument with Swagger</a></p>
         <h3>Overview</h3>
         <ul>
           <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart">Quickstart</a>
+            <a href="/jsonapi_suite/quickstart">Quickstart</a>
           </li>
           <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial">Tutorial</a>
+            <a href="/jsonapi_suite/tutorial">Tutorial</a>
           </li>
           <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/concepts">Concepts</a>
+            <a href="/jsonapi_suite/concepts">Concepts</a>
           </li>
         </ul>
       </div>
