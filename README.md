@@ -14,7 +14,7 @@ Easily build jsonapi.org-compatible APIs in Rails.
 
 Direct Contact: richmolj@gmail.com
 
-Supports Rails >= 4.1
+Supports Rails >= 4.1 <= 5.1.5. Rails 5.2 support coming soon!
 
 ### Upgrading
 
