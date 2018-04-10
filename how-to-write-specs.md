@@ -6,12 +6,12 @@ Writing Specs
 ==========
 
 > NB: before writing specs, make sure you are set up correctly by
-> following the [Quickstart]({{site.github.url}}/quickstart)
+> following the [Quickstart](quickstart)
 
 Validating verbose JSON API responses in tests can be a pain. We could
 use something like [json_matchers](https://github.com/thoughtbot/json_matchers) to validate a schema, but we hope to do one better - let's validate full payloads with a few simple helpers, using full-stack [rspec request specs](https://github.com/rspec/rspec-rails#request-specs).
 
-Let's say we're testing the `show` action of our employees controller, sideloading the employee's department. Follow the [Quickstart]({{site.github.url}}/quickstart) to make sure your `rails_helper.rb` is setup correctly first.
+Let's say we're testing the `show` action of our employees controller, sideloading the employee's department. Follow the [Quickstart](quickstart) to make sure your `rails_helper.rb` is setup correctly first.
 
 Let's say we're testing the `show` action of our employees controller, sideloading the employee's department.
 

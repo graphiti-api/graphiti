@@ -29,12 +29,12 @@ layout: page
               </p>
             </div>
             <div class="col-md-6 image">
-              <img src="{{site.github.url}}/images/tabs/pic1.png" class="img-responsive" alt="picture1" />
+              <img src="assets/images/tabs/pic1.png" class="img-responsive" alt="picture1" />
             </div>
           </div>
           <div class="tab-pane fade" id="profile">
             <div class="col-md-6 image">
-              <img src="{{site.github.url}}/images/portfolioitem1.png" class="img-responsive" alt="picture2" />
+              <img src="assets/images/portfolioitem1.png" class="img-responsive" alt="picture2" />
             </div>
             <div class="col-md-6 info">
               <h4>You don't need to have any advanced technical</h4>
@@ -54,12 +54,12 @@ layout: page
               </p>
             </div>
             <div class="col-md-6 image">
-              <img src="{{site.github.url}}/images/tabs/pic2.png" class="img-responsive" style="position: relative;top: 15px;" alt="picture3" />
+              <img src="assets/images/tabs/pic2.png" class="img-responsive" style="position: relative;top: 15px;" alt="picture3" />
             </div>
           </div>
           <div class="tab-pane fade" id="settings">
             <div class="col-md-6 image">
-              <img src="{{site.github.url}}/images/tabs/pic1.png" class="img-responsive" alt="picture4" />
+              <img src="assets/images/tabs/pic1.png" class="img-responsive" alt="picture4" />
             </div>
             <div class="col-md-6 info">
               <h4>You don't need to have any advanced technical</h4>

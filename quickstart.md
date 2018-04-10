@@ -14,7 +14,7 @@ completely.
 If the below seems too "magical", don't worry - we're just applying some
 sensible defaults to get started quickly.
 
-# <a name="installation" href='#installation'>Installation</a>
+# [Installation](#installation)
 
 Let's start with a classic Rails blog. We'll use a [template](http://guides.rubyonrails.org/rails_application_templates.html) to handle some of the boilerplate. Just run this command and accept all the defaults for now:
 
@@ -29,7 +29,7 @@ particulars; this is mostly just installing gems and including modules.
 > directly, you can download the file and and run this command as `-m
 > /path/to/all.rb`
 
-# <a name="defining-a-resource" href='#defining-a-resource'>Defining a Resource</a>
+# [Defining a Resource](#defining-a-resource)
 
 A `Resource` defines how to query and persist your `Model`. In other
 words: a `Model` is to the database as `Resource` is to the API. So
@@ -49,7 +49,7 @@ $ bundle exec rails g jsonapi:resource Post title:string active:boolean
 
 You'll see a number of files created. If you open each one, you'll see
 comments explaining what's going on. Head over to the
-[tutorial](/tutorial) for a more in-depth understanding. For now, let's
+[tutorial](tutorial) for a more in-depth understanding. For now, let's
 focus on two key concepts you'll see over and over again: inputs (via
 [strong_resources](https://jsonapi-suite.github.io/strong_resources/)),
 and outputs (via [jsonapi-rb](http://jsonapi-rb.org)).
@@ -89,13 +89,13 @@ $ bundle exec rails s
 Verify `http://localhost:3000/api/v1/posts` renders JSON correctly.
 Now we just need data.
 
-# <a name="seeding-data" href='#seeding-data'>Seeding Data</a>
+# [Seeding Data](#seeding-data)
 
 We can seed data in two ways: the usual `db/seeds.rb`, or using an HTTP
 client. Using the client helps get your feet wet with client-side
 development, or you can avoid the detour and plow right ahead.
 
-### <a name="seeding-with-ruby" href='#seeding-with-ruby'>Seeding With Ruby</a>
+### [Seeding With Ruby](#seeding-with-ruby)
 
 Edit `db/seeds.rb` to create a few `Post`s:
 
@@ -111,10 +111,10 @@ And run the script:
 $ bundle exec rake db:seed
 {% endhighlight %}
 
-### <a name="seeding-with-node" href='#seeding-with-node'>Seeding With JS Client</a>
+### [Seeding With JS Client](#seeding-with-node)
 
 There are a variety of [JSONAPI Clients](http://jsonapi.org/implementations/#client-libraries)
-out there. We'll be using [JSORM](/js/home)
+out there. We'll be using [JSORM](https://jsonapi-suite.github.io/jsorm)
 which is built to work with Suite-specific functionality like nested
 payloads. It can be used from the browser, but for now we'll call
 it using a simple Node script.
@@ -197,9 +197,9 @@ $ node index.js
 Now load `http://localhost:3000/api/v1/posts`. You should have 3 `Post`s in
 your database!
 
-![3_posts]({{site.github.url}}/assets/img/3_posts_json.png)
+![3_posts](assets/img/3_posts_json.png)
 
-# <a name="querying" href='#querying'>Querying</a>
+# [Querying](#querying)
 
 Now that we've defined our `Resource` and seeded some data, let's see
 what query functionality we have. We've listed all `Post`s at
@@ -280,7 +280,7 @@ allow_stat total: [:count]
   * There are a number of built-in stats, you can also add your own.
   * This is rendered in the `meta` section of the response:
 
-    ![meta_total_count]({{site.github.url}}/assets/img/meta_total_count.png)
+    ![meta_total_count](assets/img/meta_total_count.png)
 
 * **Error Handling**:
   * Your app will always render a JSONAPI-compliable error response.
@@ -295,18 +295,18 @@ end
 
   * View the default payload:
 
-    ![error_payload]({{site.github.url}}/assets/img/error_payload.png)
+    ![error_payload](assets/img/error_payload.png)
 
   * Different errors can be customized with different response codes,
   JSON, and side-effects. View [jsonapi_errorable](https://jsonapi-suite.github.io/jsonapi_errorable/) for more.
 
-# <a name="adding-relationships" href='#adding-relationships'>Adding Relationships</a>
+# [Adding Relationships](#adding-relationships)
 
 JSONAPI Suite supports full querying of relationships ("fetch me this
 `Post` and 3 active `Comment`s sorted by creation date"), as well as
 persistence ("save this `Post` and 3 `Comment`s in a single request").
 
-### <a name="relationship-setup" href='#relationship-setup'>Adding Relationships</a>
+### [Adding Relationships](#relationship-setup)
 
 Let's start by defining our model:
 
@@ -360,7 +360,7 @@ $ bundle exec rake db:migrate:reset
 Again, you can seed your data using a NodeJS client or the traditional
 `db/seeds.rb`.
 
-#### <a name="relationship-seeding-node" href='#relationship-seeding-node'>Seeding with NodeJS</a>
+#### [Seeding with NodeJS](#relationship-seeding-node)
 
 Let's edit our `node-seed/index.js`. First add a `Comment` model:
 
@@ -438,7 +438,7 @@ single request:
 $ node node-seed/index.js
 {% endhighlight %}
 
-#### <a name="relationship-seeding-ruby" href='#relationship-seeding-ruby'>Seeding with Ruby</a>
+#### [Seeding With Ruby](#relationship-seeding-ruby)
 
 Replace your `db/seeds.rb` with this code to persist one `Post` and
 three `Comment`s:
@@ -454,7 +454,7 @@ Post.create! \
   comments: [comment1, comment2, comment3]
 {% endhighlight %}
 
-## <a name="relationship-usage" href='#relationship-usage'>Usage</a>
+## [Usage](#relationship-usage)
 
 Now let's fetch a `Post` and filtered `Comment`s in a single request: `/api/v1/posts?include=comments`.
 
@@ -476,7 +476,7 @@ This is why `Resource` objects exist: they provide an interface to
 functionality shared across many different endpoints, with no extra
 code.
 
-# <a name="whats-next" href='#whats-next'>What's Next</a>
+# [What's Next](#whats-next)
 
 We have a full CRUD API with robust querying functionality, and the
 ability to combine relationships for both reads and writes. But what
@@ -486,17 +486,16 @@ altogether?
 
 These are important topics that JSONAPI Suite was built to address. To
 learn more about advanced usage and customization, we suggest following
-the [tutorial](/tutorial). There are also a number of how-tos on this
-site, a good one to start with is  <a href="{{site.github.url}}/how-to-use-without-activerecord">How
-to Use without ActiveRecord</a>
+the [tutorial](tutorial). There are also a number of how-tos on this
+site, a good one to start with is [How to Use without ActiveRecord](how-to-use-without-activerecord)
 
 For additional documentation, view the [YARD Docs](https://jsonapi-suite.github.io/jsonapi_compliable/).
 
 For help with specific use cases, [join our Slack chat](https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg)!
 
-# <a name="testing" href='#testing'>Bonus: Testing</a>
+# [Bonus: Testing](#testing)
 
-### <a name="testing-install" href='#testing-install'>Installation</a>
+### [Installation](#testing-install)
 
 Our generator applied some sensible defaults:
 
@@ -579,7 +578,7 @@ JsonapiSpecHelpers::Payload.register(:comment) do
 end
 {% endhighlight %}
 
-### <a name="testing-run" href='#testing-rub'>Run</a>
+### [Run](#testing-rub)
 
 We can now run specs. Let's start with the `Post` specs:
 
@@ -630,7 +629,7 @@ filter with `allow_filter`? This boils down to personal preference and
 tolerance of failures. Try adding a few specs following the generated
 patterns to get a feel for what's right for you.
 
-### <a name="documentation" href='#documentation'>Bonus: Documentation</a>
+### [Bonus: Documentation](#documentation)
 
 We can autodocument our code using [swagger documentation](https://swagger.io). Documenting an endpoint is one line of code:
 
@@ -644,8 +643,7 @@ relationships), as well as schemas for request/responses:
 <img style="width: 100%" src="https://user-images.githubusercontent.com/55264/28526490-af7ce5a8-7055-11e7-88bf-1ce5ead32dd7.png" />
 
 Our generator set up some boilerplate to enable this functionality, you
-can learn more at: <a href="{{site.github.url}}/how-to-autodocument">How
-to Autodocument with Swagger</a>
+can learn more at: [How to Autodocument with Swagger](how-to-autodocument)
 
 <br />
 <br />

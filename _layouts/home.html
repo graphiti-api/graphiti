@@ -5,16 +5,16 @@ layout: default
   <nav class="nav-menu">
     <div class="main-menu">
       <h3>Menu</h3>
-      <a href="{{site.github.url}}/quickstart" class="item">Quickstart</a>
-      <a href="{{site.github.url}}/tutorial" class="item">Tutorial</a>
-      <a href="{{site.github.url}}/concepts" class="item">Concepts</a>
+      <a href="{{site.baseurl}}/quickstart" class="item">Quickstart</a>
+      <a href="{{site.baseurl}}/tutorial" class="item">Tutorial</a>
+      <a href="{{site.baseurl}}/concepts" class="item">Concepts</a>
       <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable" class="item">YARD Docs</a>
       <a href="mailto:richmolj@gmail.com">Contact</a>
       <h4>How-Tos:</h4>
       <ul>
         {% for howto in site.data.howtos %}
           <li>
-            <a href="{{site.github.url}}{{howto.path}}" class="item">{{howto.title}}</a>
+            <a href="{{site.baseurl}}{{howto.path}}" class="item">{{howto.title}}</a>
           </li>
         {% endfor %}
       </ul>
@@ -27,7 +27,7 @@ layout: default
     <header class="navbar navbar-inverse hero" role="banner">
       <div class="container">
         <div class="navbar-header pull-left">
-          <a href="{{site.github.url}}/" class="navbar-brand">JSONAPI Suite</a>
+          <a href="{{site.baseurl}}/" class="navbar-brand">JSONAPI Suite</a>
         </div>
         <div class="sidebar-toggle">
           <div class="line"></div>
@@ -42,13 +42,13 @@ layout: default
         <div class="container">
           <h1 class="hero-text animated fadeIn">Build full-featured, flexible APIs with ease.</h1>
           <div class="cta animated fadeIn">
-            <a href="{{site.github.url}}/quickstart" class="button">Quickstart</a>
-            <a href="{{site.github.url}}/ruby" class="button">Server-Side Docs</a>
-            <a href="{{site.github.url}}/js/home" class="button">Client-Side Docs</a>
-            <a href="{{site.github.url}}/tutorial" class="button">Step-by-Step Tutorial</a>
+            <a href="{{site.baseurl}}/quickstart" class="button">Quickstart</a>
+            <a href="{{site.baseurl}}/ruby" class="button">Server-Side Docs</a>
+            <a href="{{site.baseurl}}/js/home" class="button">Client-Side Docs</a>
+            <a href="{{site.baseurl}}/tutorial" class="button">Step-by-Step Tutorial</a>
           </div>
           <div class="screenshot animated fadeInUp">
-            <img src="{{site.github.url}}/assets/img/ss2.png" class="img-responsive" alt="screenshot" />
+            <img src="{{site.baseurl}}/assets/img/ss2.png" class="img-responsive" alt="screenshot" />
           </div>
         </div>
       </div>
@@ -61,7 +61,7 @@ layout: default
         <div class="row">
           <div class="col-md-12">
             <h2>Getting Started</h2>
-            <p>For a brief overview, head to the <a href="{{site.github.url}}/quickstart">Quickstart</a>. For in-depth examples covering a variety of use-cases, including client-side development, head to the <a href="{{site.github.url}}/tutorial">Tutorial</a>. For low-level documentation, see the <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Docs</a>. For specific questions, help, and advice, join our <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>.
+            <p>For a brief overview, head to the <a href="{{site.baseurl}}/quickstart">Quickstart</a>. For in-depth examples covering a variety of use-cases, including client-side development, head to the <a href="{{site.baseurl}}/tutorial">Tutorial</a>. For low-level documentation, see the <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Docs</a>. For specific questions, help, and advice, join our <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>.
             <p>And of course, you can always <a target="_blank" href="https://github.com/jsonapi-suite/jsonapi_suite">fork this project on Github</a></p>
           </div>
         </div>

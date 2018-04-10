@@ -17,7 +17,7 @@ title: JSONAPI Suite
 email: richmolj@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
   Collection of Ruby libraries for powering JSONAPI-compliant APIs.
-baseurl: "" # the subpath of your site, e.g. /blog
+baseurl: "/jsonapi_suite" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: jekyllrb
 github_username:  jekyll
