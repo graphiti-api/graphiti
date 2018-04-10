@@ -49,7 +49,7 @@ $ bundle exec rails g jsonapi:resource Post title:string active:boolean
 
 You'll see a number of files created. If you open each one, you'll see
 comments explaining what's going on. Head over to the
-[tutorial](/tutorial) for a more in-depth understanding. For now, let's
+[tutorial]({{site.github.url}}/tutorial) for a more in-depth understanding. For now, let's
 focus on two key concepts you'll see over and over again: inputs (via
 [strong_resources](https://jsonapi-suite.github.io/strong_resources/)),
 and outputs (via [jsonapi-rb](http://jsonapi-rb.org)).
