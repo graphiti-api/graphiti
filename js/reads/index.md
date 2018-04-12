@@ -12,6 +12,58 @@ The interface for read operations is a simpler version of the
 [ActiveRecord Query Interface](http://guides.rubyonrails.org/active_record_querying.html).
 Instead of generating SQL, we'll be generating JSONAPI requests.
 
+### Basic Finders
+
+Execute queries with `.all()`, `find()`, or `.first()`:
+
+{% include js-code-tabs.html %}
+<div markdown="1" class="code-tabs">
+  {% highlight typescript %}
+let response = await Post.all()
+response.data // array of Post instances
+  {% endhighlight %}
+  {% highlight javascript %}
+Post.all().then(function(response) {
+  response.data // array of Post instances
+});
+  {% endhighlight %}
+</div>
+<blockquote class="url">
+  <p>GET /posts</p>
+</blockquote>
+
+{% include js-code-tabs.html %}
+<div markdown="1" class="code-tabs">
+  {% highlight typescript %}
+let response = await Post.find(123)
+response.data // Post instance
+  {% endhighlight %}
+  {% highlight javascript %}
+Post.find(123).then(function(response) {
+  response.data // Post instance
+});
+  {% endhighlight %}
+</div>
+<blockquote class="url">
+  <p>GET /posts/123</p>
+</blockquote>
+
+{% include js-code-tabs.html %}
+<div markdown="1" class="code-tabs">
+  {% highlight typescript %}
+let response = await Post.first()
+response.data // Post instance
+  {% endhighlight %}
+  {% highlight javascript %}
+Post.first().then(function(response) {
+  response.data // Post instance
+});
+  {% endhighlight %}
+</div>
+<blockquote class="url">
+  <p>GET /posts?page[size]=1</p>
+</blockquote>
+
 ### Composable Queries with Scopes
 
 The beauty of ORMs is their ability to compose queries. We'll be doing
@@ -93,6 +145,24 @@ scope.all() // fire query
 <blockquote class="url">
 <p>/posts?sort=-ranking&stats[total]=count&page[size]=10&filter[ranking_gt]=8</p>
 </blockquote>
+
+### Metadata
+
+The [meta information](http://jsonapi.org/format/#document-meta) of the
+JSONAPI response is available as a POJO on the response:
+
+{% include js-code-tabs.html %}
+<div markdown="1" class="code-tabs">
+  {% highlight typescript %}
+let response = await Post.all()
+response.meta // { stats: { total: { count: 100 } } }
+  {% endhighlight %}
+  {% highlight javascript %}
+await Post.all().then(function(response) {
+  response.meta // { stats: { total: { count: 100 } } }
+})
+  {% endhighlight %}
+</div>
 
 ### Promises and Async/Await
 
