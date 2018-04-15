@@ -452,7 +452,7 @@ body {
 }
 
 .home {
-  $base: 18px;
+  $base: 17px;
 
   width: 80%;
   margin: 0 auto;
@@ -485,12 +485,12 @@ body {
 
   .sample {
     .highlight pre code {
-      font-size: 20px !important;
+      font-size: 18px !important;
     }
 
     &.s {
       .highlight pre code {
-        font-size: 18px !important;
+        font-size: 16px !important;
       }
     }
 
@@ -538,7 +538,7 @@ body {
   }
 
   .xl {
-    font-size: $base*2.5;
+    font-size: $base*2.2;
   }
 
   .quote {
