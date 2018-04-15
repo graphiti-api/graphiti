@@ -1,118 +1,263 @@
 ---
 layout: default
 ---
-<div class="st-container st-container--right-side">
-  <nav class="nav-menu">
-    <div class="main-menu">
-      <h3>Menu</h3>
-      <a href="{{site.github.url}}/quickstart" class="item">Quickstart</a>
-      <a href="{{site.github.url}}/tutorial" class="item">Tutorial</a>
-      <a href="{{site.github.url}}/concepts" class="item">Concepts</a>
-      <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable" class="item">YARD Docs</a>
-      <a href="mailto:richmolj@gmail.com">Contact</a>
-      <h4>How-Tos:</h4>
-      <ul>
-        {% for howto in site.data.howtos %}
-          <li>
-            <a href="{{site.github.url}}{{howto.path}}" class="item">{{howto.title}}</a>
-          </li>
-        {% endfor %}
-      </ul>
+
+<div class="home">
+  <a class="btn btn-primary skip-intro" href="{{site.github.url}}/quickstart">Skip Intro &raquo;</a>
+
+  <div class="start p">
+    <a class="xl bold mag" href="{{site.github.url}}/ruby">JSONAPI SUITE</a>
+    is a collection of
+    <span class="s bold">ruby libraries</span>
+    that facilitate the
+    <a href="jsonapi.org" class="s">jsonapi.org</a>
+    specification.
+  </div>
+
+  <div class="p">
+    If you're
+    <span class="s">unfamiliar</span>
+    with
+    <span class="bold">JSONAPI</span>,
+    think
+
+    <div class="quote">"RESTful GraphQL created by Yehuda Katz"</div>
+  </div>
+
+  <div class="p">
+    Here's a simple Suite app:
+  </div>
+
+<span class="sample">
+  {% highlight ruby %}
+# app/controllers/posts_controller.rb
+class PostsController
+  jsonapi resource: PostResource
+
+  def index
+    posts = Post.all
+    render_jsonapi(posts)
+  end
+end
+  {% endhighlight %}
+
+  {% highlight ruby %}
+# app/resources/post_resource.rb
+class PostResource
+  type :posts
+  model Post
+
+  allow_filter :title
+  allow_stat total: [:count]
+end
+  {% endhighlight %}
+
+  {% highlight ruby %}
+# app/controllers/posts_controller.rb
+class SerializablePosts
+  type :posts
+
+  attribute :title
+  attribute :created_at
+  attribute :updated_at
+end
+  {% endhighlight %}
+  </span>
+
+  <div class="p">
+    This API now supports
+    <a class="s bold" href="http://jsonapi.org/format/#fetching-sparse-fieldsets">Sparse Fieldsets</a>,
+    <a class="s bold" href="http://jsonapi.org/format/#fetching-sorting">Sorting</a>,
+    <a class="s bold" href="http://jsonapi.org/format/#fetching-pagination">Pagination</a>,
+    <span class="s bold">statistics</span>, and
+    <a class="s bold" href="http://jsonapi.org/format/#fetching-filtering">Filtering</a>.
+
+    Though we're using
+    <code class="highlighter-rouge">ActiveRecord</code>,
+    in these examples, the same patterns
+    apply to
+    <span class="m bold underline">ANY ORM or DATASTORE</span>
+    including
+    <span class="s bold">HTTP calls</span>.
+    Blend SQL and NoSQL in a
+    <span class="s bold">single</span>
+    request.
+  </div>
+
+  <div class="p">
+    Let's access the API using our
+    <a class="s bold" href="https://jsonapi-suite.github.io/jsonapi_suite/js/home">Javascript Client</a>,
+    which you can think of as
+    <div class="quote">
+      "<code class="highlighter-rouge">ActiveRecord</code> in the browser"
     </div>
-  </nav>
-</div>
+  </div>
 
-<div class="st-container st-container--right-side">
-  <div class="st-pusher">
-    <header class="navbar navbar-inverse hero" role="banner">
-      <div class="container">
-        <div class="navbar-header pull-left">
-          <a href="{{site.github.url}}/" class="navbar-brand">JSONAPI Suite</a>
-        </div>
-        <div class="sidebar-toggle">
-          <div class="line"></div>
-          <div class="line"></div>
-          <div class="line"></div>
-        </div>
-      </div>
-    </header>
+  <span class="sample">
+  {% highlight typescript %}
+await Post
+  .where({ title: "JSONAPI Rocks!" })
+  .order({ created_at: "desc" })
+  .per(10).page(2)
+  .stats({ total: "count" })
+  .fields(["title", "byline"])
+  {% endhighlight %}
+  </span>
 
-    <div class="index-sidebar-hero">
-      <div id="cover-image" class="animated fadeIn">
-        <div class="container">
-          <h1 class="hero-text animated fadeIn">Build full-featured, flexible APIs with ease.</h1>
-          <div class="cta animated fadeIn">
-            <a href="{{site.github.url}}/quickstart" class="button">Quickstart</a>
-            <a href="{{site.github.url}}/ruby" class="button">Server-Side Docs</a>
-            <a href="{{site.github.url}}/js/home" class="button">Client-Side Docs</a>
-            <a href="{{site.github.url}}/tutorial" class="button">Step-by-Step Tutorial</a>
-          </div>
-          <div class="screenshot animated fadeInUp">
-            <img src="{{site.github.url}}/assets/img/ss2.png" class="img-responsive" alt="screenshot" />
-          </div>
-        </div>
-      </div>
+  {% comment %}customize filter, no magic, complete control{% endcomment %}
+  {% comment %}maybe invert with the any data store bit{% endcomment %}
+  {% comment %}then associations, swagger, backwards-compat{% endcomment %}
+  {% comment %}microservices{% endcomment %}
+  {% comment %}testingß{% endcomment %}
+
+  <div class="p">
+    <span class="m bold">Associations</span> are simple and customizable:
+
+    <span class="sample">
+  {% highlight ruby %}
+# app/resources/post_resource.rb
+has_many :comments,
+  scope: -> { Comment.all },
+  resource: CommentResource,
+  foreign_key: :post_id
+  {% endhighlight %}
+
+  {% highlight typescript %}
+// In your JS app
+Post.includes("comments")
+  {% endhighlight %}
+    </span>
+  </div>
+
+  <div class="p">
+    Associations are
+    <span class="bold">deep queryable</span>. In other words,
+    you could fetch the Post and only its
+    <code class="highlighter-rouge">active</code> comments,
+    sorted by
+    <code class="highlighter-rouge">created_at</code> descending.
+    This applies to your
+    <span class="s mag bold">entire graph of data.</span>
+    The server-side code would be nothing more than:
+  </div>
+
+  <span class="sample">
+  {% highlight ruby %}
+# app/resources/comment_resource.rb
+allow_filter :active
+  {% endhighlight %}
+  </span>
+
+  <div class="p">
+    At this point, You may be thinking:
+
+    <div>
+      <span class="lg italic quote">
+        "Is this just a bunch of incomprehensible ruby magic
+      </span>
+      <span class="quote">😬
+      <span class="lg italic quote">
+      ?"
+      </span>
     </div>
 
-    {% include homepage/features-tabs-section.html %}
-
-    <div class="get-started">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-12">
-            <h2>Getting Started</h2>
-            <p>For a brief overview, head to the <a href="{{site.github.url}}/quickstart">Quickstart</a>. For in-depth examples covering a variety of use-cases, including client-side development, head to the <a href="{{site.github.url}}/tutorial">Tutorial</a>. For low-level documentation, see the <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Docs</a>. For specific questions, help, and advice, join our <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>.
-            <p>And of course, you can always <a target="_blank" href="https://github.com/jsonapi-suite/jsonapi_suite">fork this project on Github</a></p>
-          </div>
-        </div>
-      </div>
+    <div>
+      <span class="m bold underline">No.</span>
     </div>
 
-    {% include homepage/features-grid-section.html %}
+    We're simply parsing the request, removing boilerplate, and supplying
+    <span class="s bold mag">sensible defaults</span> because we believe in
+    <span class="s bold">convention over configuration</span>.
+  </div>
 
-    <br />
-    <br />
+  <div class="p">
+    Let's make our filter a prefix query:
+  </div>
 
-    {% include footer.html %}
+  <span class="sample s">
+  {% highlight ruby %}
+allow_filter :title_prefix do |scope, value|
+  scope.where(["title LIKE ?", "#{value}%"])
+end
+  {% endhighlight %}
+  </span>
+
+  <div class="p">
+    From filtering to pagination, these are all just
+    <span class="s mag">customizable lambdas</span>.
+    You have
+    <span class="m bold">complete control</span>
+    of the query.
+  </div>
+
+  <div class="p">
+    Just as you can
+    <span class="m bold mag">Query</span>
+    the full graph of data, you can also
+    <span class="m bold mag">Persist</span>
+    the full graph of data in a
+    <span class="underline">single request</span>:
+  </div>
+
+  <span class="sample s">
+  {% highlight typescript %}
+post = new Post({ title: "JSONAPI Rocks!" })
+comment = new Comment({ body: "I agree!" })
+post.comments.push(comment)
+post.save({ with: "comments" })
+  {% endhighlight %}
+  </span>
+
+  <div class="p">
+    All of this is easily validated with
+    <span class="m bold">end-to-end</span>
+    <span class="m bold">integration test patterns</span>
+    that ensure
+    <span class="s mag">backwards-compatibility</span>:
+  </div>
+
+  <span class="sample s">
+  {% highlight ruby %}
+let(:post1) { create(:post, title: "Hello") }
+let(:post2) { create(:post, title: "Hiya") }
+
+it "filters correctly" do
+  jsonapi_get '/api/v1/posts', params: {
+    filter: { title_prefix: 'He' }
+  }
+  expect(json_ids(true)).to eq([post1.id])
+  assert_payload(:post, post1, json_items[0])
+end
+  {% endhighlight %}
+  </span>
+
+  <div class="p">
+    ...and
+    <span class="mag s bold">automatically documented</span>
+    in <span class="bold">Swagger</span>:
+  </div>
+
+  <div class="p">
+    <img width="100%" src="https://user-images.githubusercontent.com/55264/28526490-af7ce5a8-7055-11e7-88bf-1ce5ead32dd7.png">
+  </div>
+
+  <div class="p">
+    There's
+    <span class="m bold">so much more</span>
+    to talk about. To get your feet wet, check out
+    our
+    <a class="m bold" href="{{site.github.url}}/quickstart">Quickstart</a>,
+    or step-by-step
+    <a class="m bold" href="{{site.github.url}}/tutorial">Tutorial</a>.
+    We also have
+    <span class="m bold">comprehensive documentation</span>
+    on the
+    <a class="m bold" href="{{site.github.url}}/ruby">Server</a>
+    and on the
+    <a class="m bold" href="{{site.github.url}}/js/home">Client</a>.
+    Join our
+    <a target="_blank" class="m bold" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+    to ask questions or say hi - we'd
+    love to meet you and hear what you think ❤️
   </div>
 </div>
-
-<script type="text/javascript">
-  $(function () {
-    // Makes the demo video appear/disappear 
-    var $demo = $("#demo");
-    $('#demo').on('hidden.bs.modal', function () {
-      $demo.find("iframe").remove();
-    })
-    $('#demo').on('show.bs.modal', function () {
-      if (!$demo.find("iframe").length) {
-        $demo.find(".modal-body").append("<iframe src='https://player.vimeo.com/video/22439234' width='650' height='370' frameborder='0' webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>")
-      }
-    });
-
-    // triggers the off-canvas panel
-    $(".sidebar-toggle").click(function (e) {
-      e.stopPropagation();
-      $(".st-container").toggleClass("nav-effect");
-    });
-    $(".st-pusher").click(function () {
-      $(".st-container").removeClass("nav-effect");
-    });
-
-    {% if site.github.url == "http://localhost:4000" %}
-      $('#cover-image').addClass('dev-bg');
-    {% else %}
-      $('#cover-image').addClass('prod-bg');
-    {% endif %}
-
-    // parallax header
-    $('#cover-image').css("background-position", "50% 50%");
-    $(window).scroll(function() {
-      var scroll = $(window).scrollTop(), 
-      slowScroll = scroll/4,
-      slowBg = 50 - slowScroll;
-
-      $('#cover-image').css("background-position", "50% " + slowBg + "%");
-    });
-   });
-</script>

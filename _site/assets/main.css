@@ -12357,3 +12357,62 @@ img[alt=glimmer_logo] {
   color: white; }
 .highlight .language-javascript .k {
   color: #e6eb9d !important; }
+
+body {
+  background-color: white; }
+
+.home {
+  width: 80%;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 18px;
+  line-height: 1.4;
+  padding-top: 10px;
+  z-index: 20; }
+  .home .skip-intro {
+    position: absolute;
+    right: 50px;
+    font-size: 102%; }
+  .home .start {
+    margin-top: 50px; }
+  .home .img {
+    position: absolute;
+    background-repeat: no-repeat;
+    opacity: 0.1;
+    width: 100%;
+    height: 100%;
+    background-position: 70% 10%;
+    background-size: 40%; }
+  .home .sample .highlight pre code {
+    font-size: 20px !important; }
+  .home .sample.s .highlight pre code {
+    font-size: 18px !important; }
+  .home .sample figure:last-child {
+    margin-bottom: 18px; }
+  .home .mag {
+    color: #e600e6; }
+  .home .lg {
+    color: grey; }
+  .home .p {
+    margin-bottom: 2.5rem; }
+  .home .bold {
+    font-weight: bold; }
+  .home .italic {
+    font-style: italic; }
+  .home .underline {
+    text-decoration: underline; }
+  .home .s {
+    font-size: 21.6px; }
+  .home .m {
+    font-size: 28.8px; }
+  .home .l {
+    font-size: 36px; }
+  .home .xl {
+    font-size: 45px; }
+  .home .quote {
+    margin-top: 5px;
+    font-size: 27px; }
+  .home .highlight {
+    text-align: left; }
+    .home .highlight pre {
+      padding-bottom: 0; }

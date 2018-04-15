@@ -9,7 +9,7 @@
   <title>JSONAPI Suite</title>
   <meta name="description" content="Collection of Ruby libraries for powering JSONAPI-compliant APIs.">
 
-  <link rel="stylesheet" href="https://jsonapi-suite.github.io/jsonapi_suite/assets/main.css?ref=wh4t3v45">
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
   <link rel="alternate" type="application/rss+xml" title="JSONAPI Suite" href="/feed.xml">
 
   <!-- javascript -->
@@ -23,328 +23,275 @@
   <body>
     <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <div class="st-container st-container--right-side">
-  <nav class="nav-menu">
-    <div class="main-menu">
-      <h3>Menu</h3>
-      <a href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart" class="item">Quickstart</a>
-      <a href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial" class="item">Tutorial</a>
-      <a href="https://jsonapi-suite.github.io/jsonapi_suite/concepts" class="item">Concepts</a>
-      <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable" class="item">YARD Docs</a>
-      <a href="mailto:richmolj@gmail.com">Contact</a>
-      <h4>How-Tos:</h4>
-      <ul>
-        
-          <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-scope-to-current-user" class="item">Scope to Current User</a>
-          </li>
-        
-          <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-cause-side-effects" class="item">Cause Side-Effects</a>
-          </li>
-        
-          <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-use-without-activerecord" class="item">Use Alternate ORMs</a>
-          </li>
-        
-          <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-build-an-adapter" class="item">Build an Adapter</a>
-          </li>
-        
-          <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-code-many-to-many-associations" class="item">Many-to-Many Relationships</a>
-          </li>
-        
-          <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-code-polymorphic-associations" class="item">Polymorphic Relationships</a>
-          </li>
-        
-          <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-add-defaults" class="item">Add Default Behavior</a>
-          </li>
-        
-          <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-conditionally-render-fields" class="item">Conditionally Render Fields</a>
-          </li>
-        
-          <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-customize-error-responses" class="item">Customize Error Responses</a>
-          </li>
-        
-          <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-write-specs" class="item">Write Specs</a>
-          </li>
-        
-          <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-return-statistics" class="item">Statistics</a>
-          </li>
-        
-          <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/how-to-autodocument" class="item">Autodocument with Swagger</a>
-          </li>
-        
-      </ul>
-    </div>
-  </nav>
-</div>
+        <div class="home">
+  <a class="btn btn-primary skip-intro" href="http://localhost:4000/quickstart">Skip Intro &raquo;</a>
 
-<div class="st-container st-container--right-side">
-  <div class="st-pusher">
-    <header class="navbar navbar-inverse hero" role="banner">
-      <div class="container">
-        <div class="navbar-header pull-left">
-          <a href="https://jsonapi-suite.github.io/jsonapi_suite/" class="navbar-brand">JSONAPI Suite</a>
-        </div>
-        <div class="sidebar-toggle">
-          <div class="line"></div>
-          <div class="line"></div>
-          <div class="line"></div>
-        </div>
-      </div>
-    </header>
+  <div class="start p">
+    <a class="xl bold mag" href="http://localhost:4000/ruby">JSONAPI SUITE</a>
+    is a collection of
+    <span class="s bold">ruby libraries</span>
+    that facilitate the
+    <a href="jsonapi.org" class="s">jsonapi.org</a>
+    specification.
+  </div>
 
-    <div class="index-sidebar-hero">
-      <div id="cover-image" class="animated fadeIn">
-        <div class="container">
-          <h1 class="hero-text animated fadeIn">Build full-featured, flexible APIs with ease.</h1>
-          <div class="cta animated fadeIn">
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart" class="button">Quickstart</a>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby" class="button">Server-Side Docs</a>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/js/home" class="button">Client-Side Docs</a>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial" class="button">Step-by-Step Tutorial</a>
-          </div>
-          <div class="screenshot animated fadeInUp">
-            <img src="https://jsonapi-suite.github.io/jsonapi_suite/assets/img/ss2.png" class="img-responsive" alt="screenshot" />
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="p">
+    If you're
+    <span class="s">unfamiliar</span>
+    with
+    <span class="bold">JSONAPI</span>,
+    think
 
-    <div class="features-tabs-section">
-  <div class="container">
-    <div class="row header">
-      <div class="col-md-12">
-        <h3>Batteries Included</h3>
-        <p>From server to client, we've got you covered.</p>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-12 tabs-wrapper">
-        <ul class="nav nav-tabs">
-          <li class="active"><a href="#home" data-toggle="tab">Develop with Ease</a></li>
-          <li><a href="#profile" data-toggle="tab">Customize Thoroughly</a></li>
-          <li><a href="#messages" data-toggle="tab">Test Real-World Usage</a></li>
-          <li><a href="#settings" data-toggle="tab">REST across Relationships</a></li>
-        </ul>
+    <div class="quote">"RESTful GraphQL created by Yehuda Katz"</div>
+  </div>
 
-        <div class="tab-content">
-          <div class="tab-pane fade in active" id="home">
-            <div class="col-md-6 info">
-              <h4>Up and Running in Minutes</h4>
-              <p>
-                Everything you want from an API - filtering, sorting, pagination, statistics and more - comes "out of the box". Common problems are solved in a common way, leaving you more time to tend to your domain and focus on client needs.
-              </p>
-              <p>
-                Don't worry - this isn't a straightjacket, just a grouping of sensible defaults.
-              </p>
-            </div>
-            <div class="col-md-6 image">
-              <img src="https://jsonapi-suite.github.io/jsonapi_suite/assets/img/easy.jpg" class="img-responsive" alt="pic1" />
-            </div>
-          </div>
-          <div class="tab-pane fade" id="profile">
-            <div class="col-md-6 image">
-              <img src="https://jsonapi-suite.github.io/jsonapi_suite/assets/img/customize2.png" class="img-responsive" alt="pic2" />
-            </div>
-            <div class="col-md-6 info">
-              <h4>Custom sorting logic? MongoDB? No problem.</h4>
-              <p>
-                JSONAPI Suite was built for customization. We provide out-of-the-box defaults, but everything can be overridden. You can even package your overrides into an <strong>adapter</strong> to DRY up code.
-              </p>
-              <p>
-                We take care of wiring up the API contract. You take care of your domain.
-              </p>
-            </div>
-          </div>
-          <div class="tab-pane fade" id="messages">
-            <div class="col-md-6 info">
-              <h4>Full-Stack RSpec Integration Tests</h4>
-              <p>
-                Whether you're a hardcore TDD engineer or throwing up a quick prototype, we'll provide patterns for easy-to-write integration tests than ensure backwards-compatibility.
-              </p>
-              <p>
-                We're not just validating schemas or stubbing critical integration points. Test your API fully - a real server, a real database, and robust assertions on full JSON payloads.
-              </p>
-            </div>
-            <div class="col-md-6 image">
-              <img src="https://jsonapi-suite.github.io/jsonapi_suite/assets/img/rspec2.png" class="img-responsive" style="position: relative;top: 15px;" alt="pic3" />
-            </div>
-          </div>
-          <div class="tab-pane fade" id="settings">
-            <div class="col-md-6 image solution">
-              <img src="https://jsonapi-suite.github.io/jsonapi_suite/assets/img/solutions.jpeg" class="img-responsive" alt="pic4" />
-            </div>
-            <div class="col-md-6 info">
-              <h4>Problem Solved.</h4>
-              <p>
-                One of the problems with REST has always been compound documents. What if you need to save your Post and its Tags within the same transaction? What if you need a single request to fetch the Post and its last three active Tags?
-              </p>
-              <p>
-                JSONAPI Suite standardizes patterns for cross-relationship reads and writes, providing out-of-the-box functionality and one more thing you no longer have to worry about.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+  <div class="p">
+    Here's a simple Suite app:
+  </div>
+
+<span class="sample">
+  
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/posts_controller.rb</span>
+<span class="k">class</span> <span class="nc">PostsController</span>
+  <span class="n">jsonapi</span> <span class="ss">resource: </span><span class="no">PostResource</span>
+
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="n">posts</span> <span class="o">=</span> <span class="no">Post</span><span class="p">.</span><span class="nf">all</span>
+    <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">posts</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+  </code></pre></figure>
+
+
+  
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/post_resource.rb</span>
+<span class="k">class</span> <span class="nc">PostResource</span>
+  <span class="n">type</span> <span class="ss">:posts</span>
+  <span class="n">model</span> <span class="no">Post</span>
+
+  <span class="n">allow_filter</span> <span class="ss">:title</span>
+  <span class="n">allow_stat</span> <span class="ss">total: </span><span class="p">[</span><span class="ss">:count</span><span class="p">]</span>
+<span class="k">end</span>
+  </code></pre></figure>
+
+
+  
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/posts_controller.rb</span>
+<span class="k">class</span> <span class="nc">SerializablePosts</span>
+  <span class="n">type</span> <span class="ss">:posts</span>
+
+  <span class="n">attribute</span> <span class="ss">:title</span>
+  <span class="n">attribute</span> <span class="ss">:created_at</span>
+  <span class="n">attribute</span> <span class="ss">:updated_at</span>
+<span class="k">end</span>
+  </code></pre></figure>
+
+  </span>
+
+  <div class="p">
+    This API now supports
+    <a class="s bold" href="http://jsonapi.org/format/#fetching-sparse-fieldsets">Sparse Fieldsets</a>,
+    <a class="s bold" href="http://jsonapi.org/format/#fetching-sorting">Sorting</a>,
+    <a class="s bold" href="http://jsonapi.org/format/#fetching-pagination">Pagination</a>,
+    <span class="s bold">statistics</span>, and
+    <a class="s bold" href="http://jsonapi.org/format/#fetching-filtering">Filtering</a>.
+
+    Though we're using
+    <code class="highlighter-rouge">ActiveRecord</code>,
+    in these examples, the same patterns
+    apply to
+    <span class="m bold underline">ANY ORM or DATASTORE</span>
+    including
+    <span class="s bold">HTTP calls</span>.
+    Blend SQL and NoSQL in a
+    <span class="s bold">single</span>
+    request.
+  </div>
+
+  <div class="p">
+    Let's access the API using our
+    <a class="s bold" href="https://jsonapi-suite.github.io/jsonapi_suite/js/home">Javascript Client</a>,
+    which you can think of as
+    <div class="quote">
+      "<code class="highlighter-rouge">ActiveRecord</code> in the browser"
     </div>
   </div>
-</div>
+
+  <span class="sample">
+  
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="k">await</span> <span class="nx">Post</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">({</span> <span class="na">title</span><span class="p">:</span> <span class="s2">"JSONAPI Rocks!"</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">order</span><span class="p">({</span> <span class="na">created_at</span><span class="p">:</span> <span class="s2">"desc"</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">per</span><span class="p">(</span><span class="mi">10</span><span class="p">).</span><span class="nx">page</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">stats</span><span class="p">({</span> <span class="na">total</span><span class="p">:</span> <span class="s2">"count"</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">fields</span><span class="p">([</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">"byline"</span><span class="p">])</span>
+  </code></pre></figure>
+
+  </span>
+
+  
+  
+  
+  
+  
+
+  <div class="p">
+    <span class="m bold">Associations</span> are simple and customizable:
+
+    <span class="sample">
+  
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/post_resource.rb</span>
+<span class="n">has_many</span> <span class="ss">:comments</span><span class="p">,</span>
+  <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Comment</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+  <span class="ss">resource: </span><span class="no">CommentResource</span><span class="p">,</span>
+  <span class="ss">foreign_key: :post_id</span>
+  </code></pre></figure>
 
 
-    <div class="get-started">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-12">
-            <h2>Getting Started</h2>
-            <p>For a brief overview, head to the <a href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart">Quickstart</a>. For in-depth examples covering a variety of use-cases, including client-side development, head to the <a href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial">Tutorial</a>. For low-level documentation, see the <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Docs</a>. For specific questions, help, and advice, join our <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>.
-            <p>And of course, you can always <a target="_blank" href="https://github.com/jsonapi-suite/jsonapi_suite">fork this project on Github</a></p>
-          </div>
-        </div>
-      </div>
+  
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="c1">// In your JS app</span>
+<span class="nx">Post</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="s2">"comments"</span><span class="p">)</span>
+  </code></pre></figure>
+
+    </span>
+  </div>
+
+  <div class="p">
+    Associations are
+    <span class="bold">deep queryable</span>. In other words,
+    you could fetch the Post and only its
+    <code class="highlighter-rouge">active</code> comments,
+    sorted by
+    <code class="highlighter-rouge">created_at</code> descending.
+    This applies to your
+    <span class="s mag bold">entire graph of data.</span>
+    The server-side code would be nothing more than:
+  </div>
+
+  <span class="sample">
+  
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/comment_resource.rb</span>
+<span class="n">allow_filter</span> <span class="ss">:active</span>
+  </code></pre></figure>
+
+  </span>
+
+  <div class="p">
+    At this point, You may be thinking:
+
+    <div>
+      <span class="lg italic quote">
+        "Is this just a bunch of incomprehensible ruby magic
+      </span>
+      <span class="quote">😬
+      <span class="lg italic quote">
+      ?"
+      </span>
     </div>
 
-    <div class="features-grid-section">
-  <div class="container">
-    <div class="row">
-      <div class="col-md-4 feature">
-        <img src="https://jsonapi-suite.github.io/jsonapi_suite/assets/img/circle-icons/full-color/train.png" alt="train" />
-        <strong>Rails Standards</strong>
-        <p>If you choose to use Ruby on Rails, you'll find all the normal expectations of MVC development in place. We help you deal with the API contract, then get out of your way.</p>
-      </div>
-      <div class="col-md-4 feature">
-        <img src="https://jsonapi-suite.github.io/jsonapi_suite/assets/img/circle-icons/full-color/cloud.png" alt="cloud" />
-        <strong>Easy Microservices</strong>
-        <p>Because the API contract is standardized, the <a target="_blank" href="https://martinfowler.com/bliki/MicroservicePremium.html">microservice premium</a> is drastically lowered. Build quick, lightweight APIs without the hassle.</a>
-      </div>
-      <div class="col-md-4 feature">
-        <img src="https://jsonapi-suite.github.io/jsonapi_suite/assets/img/circle-icons/full-color/smartphone.png" alt="smartphone" />
-        <strong>One API, Many Clients</strong>
-        <p>The API for your website should be the same API for your mobile app or ETL process. Flexible APIs enable easy re-use across a variety of use-cases.</p>
-      </div>
+    <div>
+      <span class="m bold underline">No.</span>
     </div>
-    <div class="row">
-      <div class="col-md-4 feature">
-        <img src="https://jsonapi-suite.github.io/jsonapi_suite/assets/img/circle-icons/full-color/tools.png" alt="tools" />
-        <strong>Client Support</strong>
-        <p>We offer an ActiveRecord-like isomorphic javascript client in <a target="_blank" href="https://jsonapi-suite.github.io/jsorm/">JSORM</a>. Ruby and Python clients are upcoming.</p>
-      </div>
-      <div class="col-md-4 feature">
-        <img src="https://jsonapi-suite.github.io/jsonapi_suite/assets/img/circle-icons/full-color/caution.png" alt="caution" />
-        <strong>Error Handling</strong>
-        <p>Always render valid JSONAPI-compliant error responses. Use a simple DSL to customize messages and response codes.</p>
-      </div>
-      <div class="col-md-4 feature">
-        <img src="https://jsonapi-suite.github.io/jsonapi_suite/assets/img/circle-icons/full-color/document.png" alt="document" />
-        <strong>Automatic Documentation</strong>
-        <p>Full <a target="_blank" href="https://swagger.io/">Swagger</a> documentation enabled with one line of code. Use <a target="_blank" href="https://swagger.io/using-swagger-to-detect-breaking-api-changes/">swagger-diff</a> for an extra level of backwards-compatibility check.</p>
-      </div>
-    </div>
+
+    We're simply parsing the request, removing boilerplate, and supplying
+    <span class="s bold mag">sensible defaults</span> because we believe in
+    <span class="s bold">convention over configuration</span>.
+  </div>
+
+  <div class="p">
+    Let's make our filter a prefix query:
+  </div>
+
+  <span class="sample s">
+  
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">allow_filter</span> <span class="ss">:title_prefix</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">([</span><span class="s2">"title LIKE ?"</span><span class="p">,</span> <span class="s2">"</span><span class="si">#{</span><span class="n">value</span><span class="si">}</span><span class="s2">%"</span><span class="p">])</span>
+<span class="k">end</span>
+  </code></pre></figure>
+
+  </span>
+
+  <div class="p">
+    From filtering to pagination, these are all just
+    <span class="s mag">customizable lambdas</span>.
+    You have
+    <span class="m bold">complete control</span>
+    of the query.
+  </div>
+
+  <div class="p">
+    Just as you can
+    <span class="m bold mag">Query</span>
+    the full graph of data, you can also
+    <span class="m bold mag">Persist</span>
+    the full graph of data in a
+    <span class="underline">single request</span>:
+  </div>
+
+  <span class="sample s">
+  
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="nx">post</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Post</span><span class="p">({</span> <span class="na">title</span><span class="p">:</span> <span class="s2">"JSONAPI Rocks!"</span> <span class="p">})</span>
+<span class="nx">comment</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Comment</span><span class="p">({</span> <span class="na">body</span><span class="p">:</span> <span class="s2">"I agree!"</span> <span class="p">})</span>
+<span class="nx">post</span><span class="p">.</span><span class="nx">comments</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">comment</span><span class="p">)</span>
+<span class="nx">post</span><span class="p">.</span><span class="nx">save</span><span class="p">({</span> <span class="na">with</span><span class="p">:</span> <span class="s2">"comments"</span> <span class="p">})</span>
+  </code></pre></figure>
+
+  </span>
+
+  <div class="p">
+    All of this is easily validated with
+    <span class="m bold">end-to-end</span>
+    <span class="m bold">integration test patterns</span>
+    that ensure
+    <span class="s mag">backwards-compatibility</span>:
+  </div>
+
+  <span class="sample s">
+  
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">let</span><span class="p">(</span><span class="ss">:post1</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:post</span><span class="p">,</span> <span class="ss">title: </span><span class="s2">"Hello"</span><span class="p">)</span> <span class="p">}</span>
+<span class="n">let</span><span class="p">(</span><span class="ss">:post2</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:post</span><span class="p">,</span> <span class="ss">title: </span><span class="s2">"Hiya"</span><span class="p">)</span> <span class="p">}</span>
+
+<span class="n">it</span> <span class="s2">"filters correctly"</span> <span class="k">do</span>
+  <span class="n">jsonapi_get</span> <span class="s1">'/api/v1/posts'</span><span class="p">,</span> <span class="ss">params: </span><span class="p">{</span>
+    <span class="ss">filter: </span><span class="p">{</span> <span class="ss">title_prefix: </span><span class="s1">'He'</span> <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="n">expect</span><span class="p">(</span><span class="n">json_ids</span><span class="p">(</span><span class="kp">true</span><span class="p">)).</span><span class="nf">to</span> <span class="n">eq</span><span class="p">([</span><span class="n">post1</span><span class="p">.</span><span class="nf">id</span><span class="p">])</span>
+  <span class="n">assert_payload</span><span class="p">(</span><span class="ss">:post</span><span class="p">,</span> <span class="n">post1</span><span class="p">,</span> <span class="n">json_items</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">end</span>
+  </code></pre></figure>
+
+  </span>
+
+  <div class="p">
+    ...and
+    <span class="mag s bold">automatically documented</span>
+    in <span class="bold">Swagger</span>:
+  </div>
+
+  <div class="p">
+    <img width="100%" src="https://user-images.githubusercontent.com/55264/28526490-af7ce5a8-7055-11e7-88bf-1ce5ead32dd7.png">
+  </div>
+
+  <div class="p">
+    There's
+    <span class="m bold">so much more</span>
+    to talk about. To get your feet wet, check out
+    our
+    <a class="m bold" href="http://localhost:4000/quickstart">Quickstart</a>,
+    or step-by-step
+    <a class="m bold" href="http://localhost:4000/tutorial">Tutorial</a>.
+    We also have
+    <span class="m bold">comprehensive documentation</span>
+    on the
+    <a class="m bold" href="http://localhost:4000/ruby">Server</a>
+    and on the
+    <a class="m bold" href="http://localhost:4000/js/home">Client</a>.
+    Join our
+    <a target="_blank" class="m bold" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+    to ask questions or say hi - we'd
+    love to meet you and hear what you think ❤️
   </div>
 </div>
-
-
-    <br />
-    <br />
-
-    <div class="main-footer main-footer--dark">
-  <div class="container">
-    <div class="row">
-      <div class="col-sm-4 menu">
-        <h3>Overview</h3>
-        <ul>
-          <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/quickstart">Quickstart</a>
-          </li>
-          <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/tutorial">Tutorial</a>
-          </li>
-          <li>
-            <a href="https://jsonapi-suite.github.io/jsonapi_suite/concepts">Concepts</a>
-          </li>
-        </ul>
-      </div>
-      <div class="col-sm-4 menu">
-        <h3>Resources</h3>
-        <ul>
-          <li>
-            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
-          </li>
-          <li>
-            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
-          </li>
-          <li>
-            <a href="mailto:richmolj@gmail.com">Contact us</a>
-          </li>
-        </ul>
-      </div>
-      <div class="col-sm-4 menu">
-        <h3>Related</h3>
-        <ul>
-          <li>
-            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
-          </li>
-          <li>
-            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
-          </li>
-          <li>
-            <a target="_blank" href="https://vuejs.org/">VueJS</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
-
-  </div>
-</div>
-
-<script type="text/javascript">
-  $(function () {
-    // Makes the demo video appear/disappear 
-    var $demo = $("#demo");
-    $('#demo').on('hidden.bs.modal', function () {
-      $demo.find("iframe").remove();
-    })
-    $('#demo').on('show.bs.modal', function () {
-      if (!$demo.find("iframe").length) {
-        $demo.find(".modal-body").append("<iframe src='https://player.vimeo.com/video/22439234' width='650' height='370' frameborder='0' webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>")
-      }
-    });
-
-    // triggers the off-canvas panel
-    $(".sidebar-toggle").click(function (e) {
-      e.stopPropagation();
-      $(".st-container").toggleClass("nav-effect");
-    });
-    $(".st-pusher").click(function () {
-      $(".st-container").removeClass("nav-effect");
-    });
-
-    
-      $('#cover-image').addClass('prod-bg');
-    
-
-    // parallax header
-    $('#cover-image').css("background-position", "50% 50%");
-    $(window).scroll(function() {
-      var scroll = $(window).scrollTop(), 
-      slowScroll = scroll/4,
-      slowBg = 50 - slowScroll;
-
-      $('#cover-image').css("background-position", "50% " + slowBg + "%");
-    });
-   });
-</script>
 
       </div>
     </main>

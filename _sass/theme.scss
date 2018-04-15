@@ -445,3 +445,112 @@ img[alt=glimmer_logo] {
     }
   }
 }
+
+// TODO
+body {
+  background-color: white;
+}
+
+.home {
+  $base: 18px;
+
+  width: 80%;
+  margin: 0 auto;
+  text-align: center;
+  font-size: $base;
+  line-height: 1.4;
+  padding-top: 10px;
+  z-index: 20;
+
+  .skip-intro {
+    position: absolute;
+    right: 50px;
+    font-size: 102%;
+  }
+
+  .start {
+    margin-top: 50px;
+  }
+
+  // unused
+  .img {
+    position: absolute;
+    background-repeat: no-repeat;
+    opacity: 0.1;
+    width: 100%;
+    height: 100%;
+    background-position: 70% 10%;
+    background-size: 40%;
+  }
+
+  .sample {
+    .highlight pre code {
+      font-size: 20px !important;
+    }
+
+    &.s {
+      .highlight pre code {
+        font-size: 18px !important;
+      }
+    }
+
+    figure {
+      &:last-child {
+        margin-bottom: 18px;
+      }
+    }
+  }
+
+  .mag {
+    color: darken(magenta, 5%);
+  }
+
+  .lg {
+    color: grey;
+  }
+
+  .p {
+    margin-bottom: 2.5rem;
+  }
+
+  .bold {
+    font-weight: bold;
+  }
+
+  .italic {
+    font-style: italic;
+  }
+
+  .underline {
+    text-decoration: underline;
+  }
+
+  .s {
+    font-size: $base*1.2;
+  }
+
+  .m {
+    font-size: $base*1.6;
+  }
+
+  .l {
+    font-size: $base*2;
+  }
+
+  .xl {
+    font-size: $base*2.5;
+  }
+
+  .quote {
+    margin-top: 5px;
+    font-size: $base*1.5;
+  }
+
+  .highlight {
+    text-align: left;
+
+    pre {
+      padding-bottom: 0;
+    }
+  }
+}
