@@ -3,10 +3,10 @@ layout: default
 ---
 
 <div class="home">
-  {% comment %}<a class="btn btn-primary skip-intro" href="{{site.github.url}}/quickstart">Skip Intro &raquo;</a>{% endcomment %}
+  <a class="btn btn-primary skip-intro" href="{{site.github.url}}/quickstart">Skip Intro &raquo;</a>
 
   <div class="start p">
-    <a class="xl bold mag" href="{{site.github.url}}/ruby">JSONAPI SUITE</a>
+    <a class="l bold mag" href="{{site.github.url}}/ruby">JSONAPI SUITE</a>
     is a collection of
     <span class="s bold">ruby libraries</span>
     that facilitate the
@@ -14,7 +14,7 @@ layout: default
     specification.
   </div>
 
-  <div class="p">
+  <div class="p unfamiliar">
     If you're
     <span class="s">unfamiliar</span>
     with
@@ -96,7 +96,7 @@ end
   <span class="sample">
   {% highlight typescript %}
 await Post
-  .where({ title: "JSONAPI Rocks!" })
+  .where({ title: "Hello!" })
   .order({ created_at: "desc" })
   .per(10).page(2)
   .stats({ total: "count" })

@@ -452,9 +452,9 @@ body {
 }
 
 .home {
-  $base: 17px;
+  $base: 15px;
 
-  width: 80%;
+  width: 90%;
   margin: 0 auto;
   text-align: center;
   font-size: $base;
@@ -464,12 +464,13 @@ body {
 
   .skip-intro {
     position: absolute;
-    right: 50px;
-    font-size: 102%;
+    right: 20px;
+    padding: 3px 6px;
+    font-size: 90%;
   }
 
   .start {
-    margin-top: 50px;
+    margin-top: 40px;
   }
 
   // unused
@@ -485,12 +486,12 @@ body {
 
   .sample {
     .highlight pre code {
-      font-size: 18px !important;
+      font-size: 13px !important;
     }
 
     &.s {
       .highlight pre code {
-        font-size: 16px !important;
+        font-size: 10px !important;
       }
     }
 
@@ -543,7 +544,7 @@ body {
 
   .quote {
     margin-top: 5px;
-    font-size: $base*1.5;
+    font-size: $base*1.2;
   }
 
   .highlight {
