@@ -30,7 +30,7 @@ layout: default
 
 <span class="sample">
   {% highlight ruby %}
-# app/controllers/posts_controller.rb
+# controllers/posts_controller.rb
 class PostsController
   jsonapi resource: PostResource
 
@@ -42,7 +42,7 @@ end
   {% endhighlight %}
 
   {% highlight ruby %}
-# app/resources/post_resource.rb
+# resources/post_resource.rb
 class PostResource
   type :posts
   model Post
@@ -53,7 +53,7 @@ end
   {% endhighlight %}
 
   {% highlight ruby %}
-# app/controllers/posts_controller.rb
+# serializers/serializable_posts.rb
 class SerializablePosts
   type :posts
 

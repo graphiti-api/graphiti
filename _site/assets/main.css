@@ -12362,7 +12362,7 @@ body {
   background-color: white; }
 
 .home {
-  width: 90%;
+  width: 95%;
   margin: 0 auto;
   text-align: center;
   font-size: 15px;
@@ -12385,7 +12385,7 @@ body {
     background-position: 70% 10%;
     background-size: 40%; }
   .home .sample .highlight pre code {
-    font-size: 12px !important; }
+    font-size: 13px !important; }
   .home .sample.s .highlight pre code {
     font-size: 10px !important; }
   .home .sample figure:last-child {
