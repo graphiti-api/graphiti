@@ -12365,7 +12365,7 @@ body {
   width: 95%;
   margin: 0 auto;
   text-align: center;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.4;
   padding-top: 10px;
   z-index: 20; }
@@ -12385,9 +12385,9 @@ body {
     background-position: 70% 10%;
     background-size: 40%; }
   .home .sample .highlight pre code {
-    font-size: 13px !important; }
+    font-size: 14px !important; }
   .home .sample.s .highlight pre code {
-    font-size: 10px !important; }
+    font-size: 11px !important; }
   .home .sample figure:last-child {
     margin-bottom: 18px; }
   .home .mag {
@@ -12403,16 +12403,16 @@ body {
   .home .underline {
     text-decoration: underline; }
   .home .s {
-    font-size: 18px; }
+    font-size: 19.2px; }
   .home .m {
-    font-size: 24px; }
+    font-size: 25.6px; }
   .home .l {
-    font-size: 30px; }
+    font-size: 32px; }
   .home .xl {
-    font-size: 33px; }
+    font-size: 35.2px; }
   .home .quote {
     margin-top: 5px;
-    font-size: 18px; }
+    font-size: 19.2px; }
   .home .highlight {
     text-align: left; }
     .home .highlight pre {
