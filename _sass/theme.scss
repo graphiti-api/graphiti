@@ -462,6 +462,10 @@ body {
   padding-top: 10px;
   z-index: 20;
 
+  @media (min-width: 569px) {
+    font-size: 18px;
+  }
+
   .skip-intro {
     position: absolute;
     right: 20px;
@@ -487,11 +491,19 @@ body {
   .sample {
     .highlight pre code {
       font-size: 14px !important;
+
+      @media (min-width: 569px) {
+        font-size: 18px !important;
+      }
     }
 
     &.s {
       .highlight pre code {
         font-size: 11px !important;
+
+        @media (min-width: 569px) {
+          font-size: 18px !important;
+        }
       }
     }
 
@@ -545,6 +557,16 @@ body {
   .quote {
     margin-top: 5px;
     font-size: $base*1.2;
+
+    @media (min-width: 569px) {
+      font-size: 24px !important;
+    }
+
+    &.yehuda {
+      @media (min-width: 569px) {
+        font-size: 30px !important;
+      }
+    }
   }
 
   .highlight {

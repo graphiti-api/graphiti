@@ -12369,6 +12369,9 @@ body {
   line-height: 1.4;
   padding-top: 10px;
   z-index: 20; }
+  @media (min-width: 569px) {
+    .home {
+      font-size: 18px; } }
   .home .skip-intro {
     position: absolute;
     right: 20px;
@@ -12386,8 +12389,14 @@ body {
     background-size: 40%; }
   .home .sample .highlight pre code {
     font-size: 14px !important; }
+    @media (min-width: 569px) {
+      .home .sample .highlight pre code {
+        font-size: 18px !important; } }
   .home .sample.s .highlight pre code {
     font-size: 11px !important; }
+    @media (min-width: 569px) {
+      .home .sample.s .highlight pre code {
+        font-size: 18px !important; } }
   .home .sample figure:last-child {
     margin-bottom: 18px; }
   .home .mag {
@@ -12413,6 +12422,12 @@ body {
   .home .quote {
     margin-top: 5px;
     font-size: 19.2px; }
+    @media (min-width: 569px) {
+      .home .quote {
+        font-size: 24px !important; } }
+    @media (min-width: 569px) {
+      .home .quote.yehuda {
+        font-size: 30px !important; } }
   .home .highlight {
     text-align: left; }
     .home .highlight pre {
