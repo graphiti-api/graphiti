@@ -163,37 +163,47 @@
       <pre class="lines">
 
 
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55</pre>
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/generators/jsonapi/resource_generator.rb', line 42</span>
+      <pre class="code"><span class="info file"># File 'lib/generators/jsonapi/resource_generator.rb', line 19</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_copy_resource_file'>copy_resource_file</span>
   <span class='kw'>unless</span> <span class='id identifier rubyid_model_klass'>model_klass</span>
     <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>You must define a </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_class_name'>class_name</span><span class='embexpr_end'>}</span><span class='tstring_content'> model before generating the corresponding resource.</span><span class='tstring_end'>&quot;</span></span>
   <span class='kw'>end</span>
 
-  <span class='id identifier rubyid_generate_controller'>generate_controller</span> <span class='kw'>unless</span> <span class='id identifier rubyid_omit_controller?'>omit_controller?</span>
-  <span class='id identifier rubyid_generate_serializer'>generate_serializer</span> <span class='kw'>unless</span> <span class='id identifier rubyid_omit_serializer?'>omit_serializer?</span>
+  <span class='id identifier rubyid_generate_controller'>generate_controller</span>
+  <span class='id identifier rubyid_generate_serializer'>generate_serializer</span>
   <span class='id identifier rubyid_generate_application_resource'>generate_application_resource</span> <span class='kw'>unless</span> <span class='id identifier rubyid_application_resource_defined?'>application_resource_defined?</span>
-  <span class='id identifier rubyid_generate_spec_payload'>generate_spec_payload</span> <span class='kw'>unless</span> <span class='id identifier rubyid_omit_spec_payload?'>omit_spec_payload?</span>
-  <span class='id identifier rubyid_generate_strong_resource'>generate_strong_resource</span> <span class='kw'>unless</span> <span class='id identifier rubyid_omit_strong_resource?'>omit_strong_resource?</span>
-  <span class='id identifier rubyid_generate_route'>generate_route</span> <span class='kw'>unless</span> <span class='id identifier rubyid_omit_route?'>omit_route?</span>
-  <span class='id identifier rubyid_generate_tests'>generate_tests</span> <span class='kw'>unless</span> <span class='id identifier rubyid_omit_tests?'>omit_tests?</span>
+  <span class='id identifier rubyid_generate_spec_payload'>generate_spec_payload</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_actions?'>actions?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>create</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>update</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_generate_strong_resource'>generate_strong_resource</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_generate_route'>generate_route</span>
+  <span class='id identifier rubyid_generate_tests'>generate_tests</span>
   <span class='id identifier rubyid_generate_resource'>generate_resource</span>
+  <span class='id identifier rubyid_generate_swagger'>generate_swagger</span> <span class='kw'>if</span> <span class='id identifier rubyid_docs_controller?'>docs_controller?</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -205,7 +215,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Oct  3 14:55:08 2017 by
+  Generated on Wed Apr 18 07:58:13 2018 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>

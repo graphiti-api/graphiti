@@ -491,7 +491,7 @@ explicitly specified in the request.</p>
       <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/scoping/paginate.rb', line 63</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_apply_custom_scope'>apply_custom_scope</span>
-  <span class='id identifier rubyid_custom_scope'>custom_scope</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='ivar'>@scope</span><span class='comma'>,</span> <span class='id identifier rubyid_number'>number</span><span class='comma'>,</span> <span class='id identifier rubyid_size'>size</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_custom_scope'>custom_scope</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='ivar'>@scope</span><span class='comma'>,</span> <span class='id identifier rubyid_number'>number</span><span class='comma'>,</span> <span class='id identifier rubyid_size'>size</span><span class='comma'>,</span> <span class='id identifier rubyid_resource'>resource</span><span class='period'>.</span><span class='id identifier rubyid_context'>context</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -603,7 +603,7 @@ explicitly specified in the request.</p>
 </div>
 
       <div id="footer">
-  Generated on Tue Oct  3 14:55:08 2017 by
+  Generated on Wed Apr 18 07:58:13 2018 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>

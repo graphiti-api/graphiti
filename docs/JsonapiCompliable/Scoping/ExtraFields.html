@@ -276,7 +276,7 @@ for that field, run it. Otherwise, do nothing.</p>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_apply'>apply</span>
   <span class='id identifier rubyid_each_extra_field'>each_extra_field</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_callable'>callable</span><span class='op'>|</span>
-    <span class='ivar'>@scope</span> <span class='op'>=</span> <span class='id identifier rubyid_callable'>callable</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='ivar'>@scope</span><span class='rparen'>)</span>
+    <span class='ivar'>@scope</span> <span class='op'>=</span> <span class='id identifier rubyid_callable'>callable</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='ivar'>@scope</span><span class='comma'>,</span> <span class='id identifier rubyid_resource'>resource</span><span class='period'>.</span><span class='id identifier rubyid_context'>context</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
 
   <span class='ivar'>@scope</span>
@@ -291,7 +291,7 @@ for that field, run it. Otherwise, do nothing.</p>
 </div>
 
       <div id="footer">
-  Generated on Tue Oct  3 14:55:08 2017 by
+  Generated on Wed Apr 18 07:58:13 2018 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>
