@@ -70,9 +70,22 @@ RSpec.describe JsonapiCompliable::Scope do
         end
 
         it 'raises a helpful error' do
-          expect do
+          expect {
             instance.resolve
-          end.to raise_error(JsonapiCompliable::Errors::InvalidInclude, 'The requested included relationship "books" is not supported on resource "authors"')
+          }.to raise_error(JsonapiCompliable::Errors::InvalidInclude, 'The requested included relationship "books" is not supported on resource "authors"')
+        end
+
+        context 'but the config says not to raise errors' do
+          before do
+            allow(JsonapiCompliable.config)
+              .to receive(:raise_on_missing_sideload)
+          end
+
+          it 'does not raise an error' do
+            expect {
+              instance.resolve
+            }.to_not raise_error
+          end
         end
       end
     end

@@ -82,12 +82,15 @@ module JsonapiCompliable
       includes.each_pair do |name, nested|
         sideload = @resource.sideload(name)
 
-        unless sideload
-          raise JsonapiCompliable::Errors::InvalidInclude.new(name, @resource.type)
+        if sideload.nil?
+          if JsonapiCompliable.config.raise_on_missing_sideload
+            raise JsonapiCompliable::Errors::InvalidInclude
+              .new(name, @resource.type)
+          end
+        else
+          namespace = Util::Sideload.namespace(@namespace, sideload.name)
+          sideload.resolve(results, @query, namespace)
         end
-
-        namespace = Util::Sideload.namespace(@namespace, sideload.name)
-        sideload.resolve(results, @query, namespace)
       end
     end
 

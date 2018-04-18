@@ -1,4 +1,5 @@
 require "jsonapi_compliable/version"
+require "jsonapi_compliable/configuration"
 require "jsonapi_compliable/errors"
 require "jsonapi_compliable/resource"
 require "jsonapi_compliable/query"
@@ -63,5 +64,19 @@ module JsonapiCompliable
     ensure
       self.context = prior
     end
+  end
+
+  def self.config
+    @config ||= Configuration.new
+  end
+
+  # @example
+  #   JsonapiCompliable.configure do |c|
+  #     c.raise_on_missing_sideload = false
+  #   end
+  #
+  # @see Configuration
+  def self.configure
+    yield config
   end
 end
