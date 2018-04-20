@@ -293,7 +293,7 @@ def create(attributes)
 end
 {% endhighlight %}
 
-See the [Writes]({{ site.github.url }}/writes/basic-writes) section for
+See the [Writes]({{ site.github.url }}/ruby/writes/basic-writes) section for
 more.
 
 #### Wrapping Up
