@@ -254,7 +254,10 @@ The key lessons here:
     endpoint.
   * If you're not sure what the scope should be, look into the relevant
     `Resource`, particularly the [#resolve](https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Resource.html#resolve-instance_method) method,
-    to see how the query will actually be executed.
+    to see how the query will actually be executed. If there is no
+    #resolve method, it's using the default of the relevant `Adapter`.
+      * Typically, you'd define an `ApplicationRecord` who specifies the
+      `Adapter`. You'll see this pattern if you use our generators.
   * [Adapters]({{ site.github.url }}/ruby/alternate-datastores/adapters) can
     DRY-up this logic with `has_many`-style macros.
 
@@ -295,6 +298,36 @@ end
 
 See the [Writes]({{ site.github.url }}/ruby/writes/basic-writes) section for
 more.
+
+#### Generators
+
+If you're unsure of how a "default project" should look, use the
+`bin/rails g jsonapi:resource` generator:
+
+```ruby
+bin/rails g jsonapi:resource Post title:string
+```
+
+This generator can also limit the controller actions:
+
+```ruby
+bin/rails g jsonapi:resource Post title:string -a index
+```
+
+It's **highly encouraged** you run these generators at least once, as
+you'll get a bunch of helpful comments and understand baseline
+scenarios. You're getting:
+
+  * A controller (e.g. `PostsController`)
+  * A route (`/<api_namespace>/v1/posts`)
+  * A `Resource` (`PostResource`)
+  * Integration spec boilerplate
+    * including Factories
+    * ...and `Payload`s
+  * A whitelist of incoming parameters for writes
+  (`config/initializer/strong_resource.rb`)
+
+Type `bin/rails g jsonapi:resource --help for details`.
 
 #### Wrapping Up
 

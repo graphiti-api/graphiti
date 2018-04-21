@@ -338,7 +338,13 @@ defined in <code class="highlighter-rouge">CommentResource</code>. This allows t
 endpoint.</li>
     <li>If you’re not sure what the scope should be, look into the relevant
 <code class="highlighter-rouge">Resource</code>, particularly the <a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Resource.html#resolve-instance_method">#resolve</a> method,
-to see how the query will actually be executed.</li>
+to see how the query will actually be executed. If there is no
+#resolve method, it’s using the default of the relevant <code class="highlighter-rouge">Adapter</code>.
+      <ul>
+        <li>Typically, you’d define an <code class="highlighter-rouge">ApplicationRecord</code> who specifies the
+  <code class="highlighter-rouge">Adapter</code>. You’ll see this pattern if you use our generators.</li>
+      </ul>
+    </li>
     <li><a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/alternate-datastores/adapters">Adapters</a> can
 DRY-up this logic with <code class="highlighter-rouge">has_many</code>-style macros.</li>
   </ul>
@@ -376,6 +382,41 @@ you can always use <code class="highlighter-rouge">super</code> to override, han
 
   <p>See the <a href="https://jsonapi-suite.github.io/jsonapi_suite/ruby/writes/basic-writes">Writes</a> section for
 more.</p>
+
+  <h4 id="generators">Generators</h4>
+
+  <p>If you’re unsure of how a “default project” should look, use the
+<code class="highlighter-rouge">bin/rails g jsonapi:resource</code> generator:</p>
+
+  <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">bin</span><span class="o">/</span><span class="n">rails</span> <span class="n">g</span> <span class="n">jsonapi</span><span class="ss">:resource</span> <span class="no">Post</span> <span class="n">title</span><span class="ss">:string</span>
+</code></pre>
+  </div>
+
+  <p>This generator can also limit the controller actions:</p>
+
+  <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">bin</span><span class="o">/</span><span class="n">rails</span> <span class="n">g</span> <span class="n">jsonapi</span><span class="ss">:resource</span> <span class="no">Post</span> <span class="n">title</span><span class="ss">:string</span> <span class="o">-</span><span class="n">a</span> <span class="n">index</span>
+</code></pre>
+  </div>
+
+  <p>It’s <strong>highly encouraged</strong> you run these generators at least once, as
+you’ll get a bunch of helpful comments and understand baseline
+scenarios. You’re getting:</p>
+
+  <ul>
+    <li>A controller (e.g. <code class="highlighter-rouge">PostsController</code>)</li>
+    <li>A route (<code class="highlighter-rouge">/&lt;api_namespace&gt;/v1/posts</code>)</li>
+    <li>A <code class="highlighter-rouge">Resource</code> (<code class="highlighter-rouge">PostResource</code>)</li>
+    <li>Integration spec boilerplate
+      <ul>
+        <li>including Factories</li>
+        <li>…and <code class="highlighter-rouge">Payload</code>s</li>
+      </ul>
+    </li>
+    <li>A whitelist of incoming parameters for writes
+  (<code class="highlighter-rouge">config/initializer/strong_resource.rb</code>)</li>
+  </ul>
+
+  <p>Type <code class="highlighter-rouge">bin/rails g jsonapi:resource --help for details</code>.</p>
 
   <h4 id="wrapping-up">Wrapping Up</h4>
 
