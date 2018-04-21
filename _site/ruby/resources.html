@@ -166,7 +166,7 @@ care about - <strong>how to modify the scope</strong>:</p>
 
   <p>This code lives in a <code class="highlighter-rouge">Resource</code>. All we’re doing here is specifying <a href="http://ruby-doc.org/core-2.1.1/Proc.html">Procs</a> that modify the scope, leaving boilerplate to the underlying <code class="highlighter-rouge">jsonapi_suite</code> library.</p>
 
-  <p>Of course, with <code class="highlighter-rouge">ActiveRecord</code>, you’d see the same logic here over
+  <p>Of course, with <code class="highlighter-rouge">ActiveRecord</code>, you’d see the same logic repeated here over
 and over again. Let’s supply defaults to DRY up this code and end
 with:</p>
 
@@ -289,8 +289,8 @@ these questions:</p>
   <span class="k">end</span>
 <span class="k">end</span></code></pre></figure>
 
-  <p>Just like in our prior sections, we can see the same logic would apply
-over and over again…with some slight tweaks based on
+  <p>Just like in our prior sections, we can see the same logic would repeat
+over and over again each time we added a new relationship…with some slight tweaks based on
 <code class="highlighter-rouge">has_many/belongs_to</code>, non-standard foreign keys and such. So our
 default <code class="highlighter-rouge">ActiveRecord</code> adapter comes with <strong>macros</strong> that generate this
 lower-level code for us:</p>

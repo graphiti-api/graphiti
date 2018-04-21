@@ -71,7 +71,7 @@ end
 
 This code lives in a `Resource`. All we're doing here is specifying [Procs](http://ruby-doc.org/core-2.1.1/Proc.html) that modify the scope, leaving boilerplate to the underlying `jsonapi_suite` library.
 
-Of course, with `ActiveRecord`, you'd see the same logic here over
+Of course, with `ActiveRecord`, you'd see the same logic repeated here over
 and over again. Let's supply defaults to DRY up this code and end
 with:
 
@@ -202,8 +202,8 @@ allow_sideload :comments, resource: CommentResource do
 end
 {% endhighlight %}
 
-Just like in our prior sections, we can see the same logic would apply
-over and over again...with some slight tweaks based on
+Just like in our prior sections, we can see the same logic would repeat
+over and over again each time we added a new relationship...with some slight tweaks based on
 `has_many/belongs_to`, non-standard foreign keys and such. So our
 default `ActiveRecord` adapter comes with **macros** that generate this
 lower-level code for us:
