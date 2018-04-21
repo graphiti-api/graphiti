@@ -12,8 +12,7 @@ Contracts like JSONAPI and GraphQL treat the API like a database. When querying 
 database, we have two options:
 
   * Type the low-level query language directly (in the database world,
-    this would be hand-typing SQL). This is the direction of GraphQL and
-    apollo-client.
+    this would be hand-typing SQL).
   * Use an ORM (like Rails's `ActiveRecord`, Phoenix's `Ecto`, Django's
     `DjangoORM`, or Node's `Sequelize`).
 
