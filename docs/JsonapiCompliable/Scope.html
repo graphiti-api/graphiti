@@ -136,6 +136,69 @@ scope.</p>
 
 
 
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#object-instance_method" title="#object (instance method)">#<strong>object</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute object.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#unpaginated_object-instance_method" title="#unpaginated_object (instance method)">#<strong>unpaginated_object</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute unpaginated_object.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
 
 
 
@@ -443,8 +506,6 @@ scope.</p>
       <pre class="lines">
 
 
-27
-28
 29
 30
 31
@@ -455,10 +516,12 @@ scope.</p>
 36
 37
 38
-39</pre>
+39
+40
+41</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/scope.rb', line 27</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/scope.rb', line 29</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_object'>object</span><span class='comma'>,</span> <span class='id identifier rubyid_resource'>resource</span><span class='comma'>,</span> <span class='id identifier rubyid_query'>query</span><span class='comma'>,</span> <span class='id identifier rubyid_opts'>opts</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='ivar'>@object</span>    <span class='op'>=</span> <span class='id identifier rubyid_object'>object</span>
@@ -479,6 +542,97 @@ scope.</p>
 </div>
   
 </div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="object-instance_method">
+  
+    #<strong>object</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute object</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+17
+18
+19</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/scope.rb', line 17</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_object'>object</span>
+  <span class='ivar'>@object</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="unpaginated_object-instance_method">
+  
+    #<strong>unpaginated_object</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute unpaginated_object</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+17
+18
+19</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/scope.rb', line 17</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_unpaginated_object'>unpaginated_object</span>
+  <span class='ivar'>@unpaginated_object</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
 
 
   <div id="instance_method_details" class="method_details_list">
@@ -522,12 +676,12 @@ scope.</p>
       <pre class="lines">
 
 
-73
-74
-75</pre>
+75
+76
+77</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/scope.rb', line 73</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/scope.rb', line 75</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_query_hash'>query_hash</span>
   <span class='ivar'>@query_hash</span> <span class='op'>||=</span> <span class='ivar'>@query</span><span class='period'>.</span><span class='id identifier rubyid_to_hash'>to_hash</span><span class='lbracket'>[</span><span class='ivar'>@namespace</span><span class='rbracket'>]</span>
@@ -595,18 +749,18 @@ sideload</p>
       <pre class="lines">
 
 
-60
-61
 62
 63
 64
 65
 66
 67
-68</pre>
+68
+69
+70</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/scope.rb', line 60</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/scope.rb', line 62</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resolve'>resolve</span>
   <span class='kw'>if</span> <span class='ivar'>@query</span><span class='period'>.</span><span class='id identifier rubyid_zero_results?'>zero_results?</span>
@@ -673,12 +827,12 @@ sideload</p>
       <pre class="lines">
 
 
-47
-48
-49</pre>
+49
+50
+51</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/scope.rb', line 47</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/scope.rb', line 49</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resolve_stats'>resolve_stats</span>
   <span class='const'><span class='object_link'><a href="Stats.html" title="JsonapiCompliable::Stats (module)">Stats</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Stats/Payload.html" title="JsonapiCompliable::Stats::Payload (class)">Payload</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Stats/Payload.html#initialize-instance_method" title="JsonapiCompliable::Stats::Payload#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='ivar'>@resource</span><span class='comma'>,</span> <span class='id identifier rubyid_query_hash'>query_hash</span><span class='comma'>,</span> <span class='ivar'>@unpaginated_object</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_generate'><span class='object_link'><a href="Stats/Payload.html#generate-instance_method" title="JsonapiCompliable::Stats::Payload#generate (method)">generate</a></span></span>
@@ -693,7 +847,7 @@ sideload</p>
 </div>
 
       <div id="footer">
-  Generated on Wed Apr 18 07:58:12 2018 by
+  Generated on Thu May  3 15:52:17 2018 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>

@@ -14,6 +14,8 @@ module JsonapiCompliable
   #     scope.resolve #=> [#<Post ...>, #<Post ...>, etc]
   #   end
   class Scope
+    attr_reader :object, :unpaginated_object
+
     # @param object - The underlying, chainable base scope object
     # @param resource - The Resource that will process the object
     # @param query - The Query object for the current request
