@@ -207,6 +207,14 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(book).to_not have_key('alternate_title')
         expect(book['pages']).to eq(500)
       end
+
+      it 'allows extra fields and sparse fieldsets for the sideloaded resource' do
+        get :index, params: { include: 'books', fields: { books: 'pages' }, extra_fields: { books: 'alternate_title' } }
+        book = json_includes('books')[0]['attributes']
+        expect(book).to have_key('pages')
+        expect(book).to have_key('alternate_title')
+        expect(book).to_not have_key('title')
+      end
     end
 
     context 'sideloading belongs_to' do
@@ -225,6 +233,14 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(state).to_not have_key('abbreviation')
         expect(state).to_not have_key('population')
       end
+
+      it 'allows extra fields and sparse fieldsets for the sideloaded resource' do
+        get :index, params: { include: 'state', fields: { states: 'name' }, extra_fields: { states: 'population' } }
+        state = json_includes('states')[0]['attributes']
+        expect(state).to have_key('name')
+        expect(state).to have_key('population')
+        expect(state).to_not have_key('abbreviation')
+      end
     end
 
     context 'sideloading has_one' do
@@ -241,6 +257,14 @@ if ENV["APPRAISAL_INITIALIZED"]
         bio = json_includes('bios')[0]['attributes']
         expect(bio['description']).to be_present
         expect(bio).to_not have_key('created_at')
+        expect(bio).to_not have_key('picture')
+      end
+
+      it 'allows extra fields and sparse fieldsets for the sideloaded resource' do
+        get :index, params: { include: 'bio', fields: { bios: 'description' }, extra_fields: { bios: 'created_at' } }
+        bio = json_includes('bios')[0]['attributes']
+        expect(bio).to have_key('description')
+        expect(bio).to have_key('created_at')
         expect(bio).to_not have_key('picture')
       end
     end
@@ -270,6 +294,14 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(hobby['name']).to be_present
         expect(hobby).to_not have_key('description')
         expect(hobby).to_not have_key('reason')
+      end
+
+      it 'allows extra fields and sparse fieldsets for the sideloaded resource' do
+        get :index, params: { include: 'hobbies', fields: { hobbies: 'name' }, extra_fields: { hobbies: 'reason' } }
+        hobby = json_includes('hobbies')[0]['attributes']
+        expect(hobby).to have_key('name')
+        expect(hobby).to have_key('reason')
+        expect(hobby).to_not have_key('description')
       end
 
       it 'does not duplicate results' do
@@ -353,6 +385,22 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(condo['condo_description']).to be_present
         expect(condo).to_not have_key('name')
         expect(condo).to_not have_key('condo_price')
+      end
+
+      it 'allows extra fields and sparse fieldsets for the sideloaded resource' do
+        get :index, params: {
+          include: 'dwelling',
+          fields: { houses: 'name', condos: 'condo_description' },
+          extra_fields: { houses: 'house_price', condos: 'condo_price' }
+        }
+        house = json_includes('houses')[0]['attributes']
+        condo = json_includes('condos')[0]['attributes']
+        expect(house).to have_key('name')
+        expect(house).to have_key('house_price')
+        expect(house).to_not have_key('house_description')
+        expect(condo).to have_key('condo_description')
+        expect(condo).to have_key('condo_price')
+        expect(condo).to_not have_key('name')
       end
 
       it 'allows additional levels of nesting' do

@@ -12,15 +12,22 @@ module JsonapiCompliable
           h[k] = [*names, "Serializable#{klass}"].join('::').safe_constantize
         end
 
+        fields = query_hash[:fields].dup
+        extra_fields = query_hash[:extra_fields]
+
+        if extra_fields.any? && fields.any?
+          extra_fields.each { |k,v| fields[k] = fields[k].to_a + v }
+        end
+
         options            = {}
         options[:class]    = inferrer
         options[:include]  = query_hash[:include]
         options[:jsonapi]  = resolved
-        options[:fields]   = query_hash[:fields]
+        options[:fields]   = fields
         options.merge!(overrides)
         options[:meta]   ||= {}
         options[:expose] ||= {}
-        options[:expose][:extra_fields] = query_hash[:extra_fields]
+        options[:expose][:extra_fields] = extra_fields
 
         if object.respond_to?(:resolve_stats)
           stats = object.resolve_stats
