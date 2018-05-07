@@ -213,7 +213,15 @@
 28
 29
 30
-31</pre>
+31
+32
+33
+34
+35
+36
+37
+38
+39</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/util/render_options.rb', line 6</span>
@@ -227,15 +235,23 @@
     <span class='id identifier rubyid_h'>h</span><span class='lbracket'>[</span><span class='id identifier rubyid_k'>k</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='op'>*</span><span class='id identifier rubyid_names'>names</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Serializable</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_klass'>klass</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>::</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_safe_constantize'>safe_constantize</span>
   <span class='kw'>end</span>
 
+  <span class='id identifier rubyid_fields'>fields</span> <span class='op'>=</span> <span class='id identifier rubyid_query_hash'>query_hash</span><span class='lbracket'>[</span><span class='symbol'>:fields</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span>
+  <span class='id identifier rubyid_extra_fields'>extra_fields</span> <span class='op'>=</span> <span class='id identifier rubyid_query_hash'>query_hash</span><span class='lbracket'>[</span><span class='symbol'>:extra_fields</span><span class='rbracket'>]</span>
+
+  <span class='comment'># Ensure fields doesnt clobber extra fields
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_extra_fields'>extra_fields</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_fields'>fields</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
+    <span class='id identifier rubyid_extra_fields'>extra_fields</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_k'>k</span><span class='comma'>,</span><span class='id identifier rubyid_v'>v</span><span class='op'>|</span> <span class='id identifier rubyid_fields'>fields</span><span class='lbracket'>[</span><span class='id identifier rubyid_k'>k</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_fields'>fields</span><span class='lbracket'>[</span><span class='id identifier rubyid_k'>k</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_a'>to_a</span> <span class='op'>+</span> <span class='id identifier rubyid_v'>v</span> <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+
   <span class='id identifier rubyid_options'>options</span>            <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
   <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:class</span><span class='rbracket'>]</span>    <span class='op'>=</span> <span class='id identifier rubyid_inferrer'>inferrer</span>
   <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:include</span><span class='rbracket'>]</span>  <span class='op'>=</span> <span class='id identifier rubyid_query_hash'>query_hash</span><span class='lbracket'>[</span><span class='symbol'>:include</span><span class='rbracket'>]</span>
   <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:jsonapi</span><span class='rbracket'>]</span>  <span class='op'>=</span> <span class='id identifier rubyid_resolved'>resolved</span>
-  <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:fields</span><span class='rbracket'>]</span>   <span class='op'>=</span> <span class='id identifier rubyid_query_hash'>query_hash</span><span class='lbracket'>[</span><span class='symbol'>:fields</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:fields</span><span class='rbracket'>]</span>   <span class='op'>=</span> <span class='id identifier rubyid_fields'>fields</span>
   <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='id identifier rubyid_overrides'>overrides</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:meta</span><span class='rbracket'>]</span>   <span class='op'>||=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
   <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:expose</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
-  <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:expose</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:extra_fields</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_query_hash'>query_hash</span><span class='lbracket'>[</span><span class='symbol'>:extra_fields</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:expose</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:extra_fields</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_extra_fields'>extra_fields</span>
 
   <span class='kw'>if</span> <span class='id identifier rubyid_object'>object</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:resolve_stats</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_stats'>stats</span> <span class='op'>=</span> <span class='id identifier rubyid_object'>object</span><span class='period'>.</span><span class='id identifier rubyid_resolve_stats'>resolve_stats</span>
@@ -254,7 +270,7 @@
 </div>
 
       <div id="footer">
-  Generated on Thu May  3 15:52:19 2018 by
+  Generated on Mon May  7 09:24:13 2018 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>

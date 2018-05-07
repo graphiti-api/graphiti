@@ -109,6 +109,34 @@
       <li class="public ">
   <span class="summary_signature">
     
+      <a href="#experimental_concurrency-instance_method" title="#experimental_concurrency (instance method)">#<strong>experimental_concurrency</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Concurrently fetch sideloads? This is <strong>experimental</strong> and may
+be removed.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#raise_on_missing_sideload-instance_method" title="#raise_on_missing_sideload (instance method)">#<strong>raise_on_missing_sideload</strong>  &#x21d2; Boolean </a>
     
 
@@ -209,15 +237,17 @@ server? Defaults to true.</p>
       <pre class="lines">
 
 
-10
-11
-12</pre>
+13
+14
+15
+16</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/configuration.rb', line 10</span>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/configuration.rb', line 13</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span>
   <span class='ivar'>@raise_on_missing_sideload</span> <span class='op'>=</span> <span class='kw'>true</span>
+  <span class='ivar'>@experimental_concurrency</span> <span class='op'>=</span> <span class='kw'>false</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -230,9 +260,72 @@ server? Defaults to true.</p>
     <h2>Instance Attribute Details</h2>
     
       
-      <span id="raise_on_missing_sideload=-instance_method"></span>
+      <span id="experimental_concurrency=-instance_method"></span>
       <div class="method_details first">
-  <h3 class="signature first" id="raise_on_missing_sideload-instance_method">
+  <h3 class="signature first" id="experimental_concurrency-instance_method">
+  
+    #<strong>experimental_concurrency</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns Concurrently fetch sideloads? This is <strong>experimental</strong>
+and may be removed. Defaults to false</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Concurrently fetch sideloads? This is <strong>experimental</strong> and may
+be removed. Defaults to false</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+9
+10
+11</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/jsonapi_compliable/configuration.rb', line 9</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_experimental_concurrency'>experimental_concurrency</span>
+  <span class='ivar'>@experimental_concurrency</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="raise_on_missing_sideload=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="raise_on_missing_sideload-instance_method">
   
     #<strong>raise_on_missing_sideload</strong>  &#x21d2; <tt>Boolean</tt> 
   
@@ -298,7 +391,7 @@ server? Defaults to true.</p>
 </div>
 
       <div id="footer">
-  Generated on Thu May  3 15:52:18 2018 by
+  Generated on Mon May  7 09:24:12 2018 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.0).
 </div>

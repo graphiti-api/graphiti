@@ -15,6 +15,7 @@ module JsonapiCompliable
         fields = query_hash[:fields].dup
         extra_fields = query_hash[:extra_fields]
 
+        # Ensure fields doesnt clobber extra fields
         if extra_fields.any? && fields.any?
           extra_fields.each { |k,v| fields[k] = fields[k].to_a + v }
         end

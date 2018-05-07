@@ -81,6 +81,9 @@ module JsonapiCompliable
     def sideload(results, includes)
       return if results == []
 
+      concurrent = ::JsonapiCompliable.config.experimental_concurrency
+      promises = []
+
       includes.each_pair do |name, nested|
         sideload = @resource.sideload(name)
 
@@ -91,7 +94,25 @@ module JsonapiCompliable
           end
         else
           namespace = Util::Sideload.namespace(@namespace, sideload.name)
-          sideload.resolve(results, @query, namespace)
+          resolve_sideload = -> { sideload.resolve(results, @query, namespace) }
+          if concurrent
+            promises << Concurrent::Promise.execute(&resolve_sideload)
+          else
+            resolve_sideload.call
+          end
+        end
+      end
+
+      if concurrent
+        # Wait for all promises to finish
+        while !promises.all? { |p| p.fulfilled? || p.rejected? }
+          sleep 0.01
+        end
+        # Re-raise the error with correct stacktrace
+        # OPTION** to avoid failing here?? if so need serializable patch
+        # to avoid loading data when association not loaded
+        if rejected = promises.find(&:rejected?)
+          raise rejected.reason
         end
       end
     end
