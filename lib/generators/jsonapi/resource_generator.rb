@@ -92,6 +92,7 @@ module Jsonapi
       attributes.each do |a|
         type = a.type
         type = :string if type == :text
+        type = :number if [:float, :decimal].include?(type)
         code << "    attribute :#{a.name}, :#{type}\n"
       end
       code << "  end\n"
