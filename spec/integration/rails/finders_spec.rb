@@ -304,6 +304,22 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(hobby).to_not have_key('description')
       end
 
+      it 'allows extra fields and sparse fieldsets for multiple resources' do
+        get :index, params: {
+          include: 'hobbies,books',
+          fields: { hobbies: 'name', books: 'title',  },
+          extra_fields: { hobbies: 'reason', books: 'alternate_title' },
+        }
+        hobby = json_includes('hobbies')[0]['attributes']
+        book = json_includes('books')[0]['attributes']
+        expect(hobby).to have_key('name')
+        expect(hobby).to have_key('reason')
+        expect(hobby).to_not have_key('description')
+        expect(book).to have_key('title')
+        expect(book).to have_key('alternate_title')
+        expect(book).to_not have_key('pages')
+      end
+
       it 'does not duplicate results' do
         get :index, params: { include: 'hobbies' }
         author1_relationships = json['data'][0]['relationships']
