@@ -26,6 +26,15 @@ module BasicRailsApp
       fake_logger = Logger.new(nil)
       config.logger = fake_logger
       Rails.application.routes.default_url_options = { host: 'example.com' }
+      
+      # fix railties 5.2.0 issue with secret_key_base
+      # https://github.com/rails/rails/commit/7419a4f9 should take care of it 
+      # in the future.
+      if Rails::VERSION::STRING == '5.2.0' 
+        def secret_key_base
+          '3b7cd727ee24e8444053437c36cc66c4'
+        end
+      end
     end
     @app.respond_to?(:secrets) && @app.secrets.secret_key_base = '3b7cd727ee24e8444053437c36cc66c4'
 
