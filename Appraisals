@@ -5,7 +5,7 @@ appraise "rails-4" do
 end
 
 appraise "rails-5" do
-  gem "rails", "~> 5.0"
+  gem "rails", "~> 5.2"
   gem 'jsonapi-rails', '~> 0.3.1', require: 'jsonapi/rails'
   gem 'rspec-rails'
 end
