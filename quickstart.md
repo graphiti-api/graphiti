@@ -18,8 +18,6 @@ sensible defaults to get started quickly.
 
 Let's start with a classic Rails blog. We'll use a [template](http://guides.rubyonrails.org/rails_application_templates.html) to handle some of the boilerplate. Just run this command and accept all the defaults for now:
 
-*Note: We support up to Rails 5.1.5 - Rails 5.2 support coming soon!*
-
 {% highlight bash %}
 $ rails new blog --api -m https://raw.githubusercontent.com/jsonapi-suite/rails_template/master/all.rb
 {% endhighlight %}
