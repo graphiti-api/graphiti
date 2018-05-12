@@ -84,6 +84,21 @@ RSpec.describe JsonapiCompliable do
     end
   end
 
+  describe '#jsonapi_context' do
+    let(:ctx) { double('context') }
+
+    before do
+      allow(instance).to receive(:jsonapi_context) { ctx }
+      allow(instance).to receive(:action_name) { 'index' }
+    end
+
+    it 'sets the context to the given override' do
+      instance.wrap_context do
+        expect(instance.jsonapi_resource.context).to eq(ctx)
+      end
+    end
+  end
+
   describe '#render_jsonapi' do
     before do
       allow(instance).to receive(:force_includes?) { false }

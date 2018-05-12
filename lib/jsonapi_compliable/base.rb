@@ -130,9 +130,29 @@ module JsonapiCompliable
     # @api private
     # @yieldreturn Code to run within the current context
     def wrap_context
-      jsonapi_resource.with_context(self, action_name.to_sym) do
+      jsonapi_resource.with_context(jsonapi_context, action_name.to_sym) do
         yield
       end
+    end
+
+    # Override if you'd like the "context" to be something other than
+    # an instance of this class.
+    # In Rails, context is the controller instance.
+    #
+    # @example Overriding
+    #   # within your controller
+    #   def jsonapi_context
+    #     current_user
+    #   end
+    #
+    #   # within a resource
+    #   default_filter :by_user do |scope, context|
+    #     scope.where(user_id: context.id)
+    #   end
+    #
+    # @return the context object you'd like
+    def jsonapi_context
+      self
     end
 
     # Use when direct, low-level access to the scope is required.
