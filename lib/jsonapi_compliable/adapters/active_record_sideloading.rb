@@ -58,7 +58,13 @@ module JsonapiCompliable
               parent.association(association_name).loaded!
               relevant_child = children.find { |c| c.send(foreign_key) == parent.send(primary_key) }
               next unless relevant_child
-              parent.association(association_name).replace(relevant_child, false)
+
+              # Use private methods because of Rails bug
+              # https://github.com/rails/rails/issues/32886
+              association = parent.association(association_name)
+              association.send(:set_owner_attributes, relevant_child)
+              association.send(:set_inverse_instance, relevant_child)
+              association.send(:target=, relevant_child)
             end
           end
 
