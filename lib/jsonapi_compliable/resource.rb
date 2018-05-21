@@ -172,7 +172,8 @@ module JsonapiCompliable
       config[:filters][name.to_sym] = {
         aliases: aliases,
         if: opts[:if],
-        filter: blk
+        filter: blk,
+        required: opts[:required].respond_to?(:call) ? opts[:required] : !!opts[:required]
       }
     end
 

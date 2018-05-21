@@ -23,5 +23,19 @@ module JsonapiCompliable
     def filter_param
       query_hash[:filter]
     end
+
+    def missing_required_filters
+      required_filters.keys - filter_param.keys
+    end
+
+    def required_filters
+      resource.filters.select do |_name, opts|
+        opts[:required].respond_to?(:call) ? opts[:required].call(resource.context) : opts[:required]
+      end
+    end
+
+    def required_filters_provided?
+      missing_required_filters.empty?
+    end
   end
 end

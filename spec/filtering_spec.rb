@@ -208,4 +208,92 @@ RSpec.describe 'filtering' do
       }.to raise_error(JsonapiCompliable::Errors::BadFilter)
     end
   end
+
+  context 'when one or more filters are required' do
+    before do
+      author = author1
+      resource_class.class_eval do
+        allow_filter :required, required: true do |scope, value|
+          scope.where(id: author.id)
+        end
+
+        allow_filter :also_required, required: true do |scope, value|
+          scope.where(first_name: author.first_name)
+        end
+      end
+    end
+
+    context 'and all required filter are provided' do
+      before do
+        params[:filter] = { required: true, also_required: true }
+      end
+
+      it 'should return results' do
+        ids = scope.resolve.map(&:id)
+        expect(ids).to eq([author1.id])
+      end
+    end
+
+    context 'and at least one required filter is provided but some are missing' do
+      before do
+        params[:filter] = { required: true }
+      end
+
+      it 'raises an error' do
+        expect {
+          scope.resolve
+        }.to raise_error(JsonapiCompliable::Errors::RequiredFilter, 'The required filter "also_required" was not provided')
+      end
+    end
+
+    context 'and no required filters are provided' do
+      before do
+        params[:filter] = { }
+      end
+
+      it 'raises an error' do
+        expect {
+          scope.resolve
+        }.to raise_error(JsonapiCompliable::Errors::RequiredFilter, 'The required filters "required, also_required" were not provided')
+      end
+
+    end
+
+    context 'and required filter determined by proc' do
+      context 'when required proc evaluates to true' do
+        before do
+          resource_class.class_eval do
+            allow_filter :required_by_proc, required: Proc.new{|ctx| true} do |scope, value|
+              scope.where(first_name: author.first_name)
+            end
+          end
+
+          params[:filter] = { required: true, also_required: true }
+        end
+
+        it 'raises an error' do
+          expect {
+            scope.resolve
+          }.to raise_error(JsonapiCompliable::Errors::RequiredFilter, 'The required filter "required_by_proc" was not provided')
+        end
+      end
+
+      context 'when required proc evaluates to false' do
+        before do
+          resource_class.class_eval do
+            allow_filter :required_by_proc, required: Proc.new{|ctx| false} do |scope, value|
+              scope.where(first_name: author.first_name)
+            end
+          end
+
+          params[:filter] = { required: true, also_required: true }
+        end
+
+        it 'should not be required' do
+          ids = scope.resolve.map(&:id)
+          expect(ids).to eq([author1.id])
+        end
+      end
+    end
+  end
 end

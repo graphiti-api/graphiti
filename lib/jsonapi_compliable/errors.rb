@@ -47,5 +47,19 @@ module JsonapiCompliable
 
     class RecordNotFound < StandardError
     end
+
+    class RequiredFilter < StandardError
+      def initialize(attributes)
+        @attributes = Array(attributes)
+      end
+
+      def message
+        if @attributes.length > 1
+          "The required filters \"#{@attributes.join(', ')}\" were not provided"
+        else
+          "The required filter \"#{@attributes[0]}\" was not provided"
+        end
+      end
+    end
   end
 end
