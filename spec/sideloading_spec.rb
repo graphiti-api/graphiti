@@ -278,4 +278,53 @@ RSpec.describe 'sideloading' do
       expect(author[:books][0].instance_variable_get(:@the_genre)).to eq(genre)
     end
   end
+
+
+  context 'when sideload has required filter' do
+    before do
+      a = author
+      book_resource.class_eval do
+        allow_filter :required, required: true do |scope, value|
+          scope.where(author_id: a.id)
+        end
+      end
+    end
+
+    context 'and no required filters are provided' do
+      before do
+        params[:include] = 'books'
+      end
+
+      it 'raises an error' do
+        expect {
+          scope.resolve
+        }.to raise_error(JsonapiCompliable::Errors::RequiredFilter, 'The required filter "required" was not provided')
+      end
+
+    end
+
+    context 'and sideloaded filter is provided with symbolized keys' do
+      before do
+        params[:include] = 'books'
+        params[:filter] = { books: {required: true} }
+      end
+
+      it 'should return results' do
+        author = scope.resolve.first
+        expect(author[:books]).to eq([book1, book2])
+      end
+    end
+
+    context 'and sideloaded filter is provided with stringified keys' do
+      before do
+        params[:include] = 'books'
+        params[:filter] = { 'books' => {'required' => true} }
+      end
+
+      it 'should return results' do
+        author = scope.resolve.first
+        expect(author[:books]).to eq([book1, book2])
+      end
+    end
+  end
 end
