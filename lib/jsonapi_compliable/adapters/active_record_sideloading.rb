@@ -53,7 +53,15 @@ module JsonapiCompliable
             _scope.call.where(foreign_key => parent_ids.uniq.compact)
           end
 
+          # The 'assigned' code here is to remove all children that do not
+          # get assigned. This is because there is no 'limit(1)' in the query.
+          # If we did 'limit(1)' for the query, it wouldn't work for index
+          # actions (only 1 would come back, when we want one *per result*).
+          #
+          # Instead, avoid pagination in the query, assign only one result, and
+          # remove anything else. This is more or less what AR does.
           assign do |parents, children|
+            assigned = []
             parents.each do |parent|
               parent.association(association_name).loaded!
               relevant_child = children.find { |c| c.send(foreign_key) == parent.send(primary_key) }
@@ -65,6 +73,10 @@ module JsonapiCompliable
               association.send(:set_owner_attributes, relevant_child)
               association.send(:set_inverse_instance, relevant_child)
               association.send(:target=, relevant_child)
+              assigned << relevant_child
+            end
+            (children - assigned).each do |unassigned|
+              children.delete(unassigned)
             end
           end
 

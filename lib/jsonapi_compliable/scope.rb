@@ -64,6 +64,7 @@ module JsonapiCompliable
         []
       else
         resolved = @resource.resolve(@object)
+        yield resolved if block_given?
         sideload(resolved, query_hash[:include]) if query_hash[:include]
         resolved
       end

@@ -77,7 +77,11 @@ RSpec.describe JsonapiCompliable::Sideload do
       let(:results)    { [{ parent_id: 1 }] }
       let(:base_scope) { double }
       let(:scope_proc) { ->(parents) { base_scope } }
-      let(:scope)      { double(resolve: results) }
+      let(:scope) do
+        scope = double
+        allow(scope).to receive(:resolve).and_yield(results)
+        scope
+      end
 
       before do
         instance.scope  { |parents| base_scope }

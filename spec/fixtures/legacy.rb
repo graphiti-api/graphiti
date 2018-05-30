@@ -40,6 +40,10 @@ ActiveRecord::Schema.define(:version => 1) do
     t.string :picture
   end
 
+  create_table :bio_labels do |t|
+    t.integer :bio_id
+  end
+
   create_table :genres do |t|
     t.string :name
     t.timestamps
@@ -111,6 +115,11 @@ end
 
 class Bio < LegacyApplicationRecord
   belongs_to :author
+  has_many :bio_labels
+end
+
+class BioLabel < LegacyApplicationRecord
+  belongs_to :bio
 end
 
 class Genre < LegacyApplicationRecord
@@ -213,6 +222,12 @@ class SerializableBio < LegacySerializableAbstract
   extra_attribute :created_at do
     Time.now
   end
+
+  has_many :bio_labels
+end
+
+class SerializableBioLabel < LegacySerializableAbstract
+  type 'bio_labels'
 end
 
 class SerializableState < LegacySerializableAbstract

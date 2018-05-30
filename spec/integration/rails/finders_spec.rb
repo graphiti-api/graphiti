@@ -34,9 +34,27 @@ if ENV["APPRAISAL_INITIALIZED"]
           resource: StateResource
       end
 
+      class BioLabelResource < JsonapiCompliable::Resource
+        type :bio_labels
+        use_adapter JsonapiCompliable::Adapters::ActiveRecord
+      end
+
       class BioResource < JsonapiCompliable::Resource
         type :bios
         use_adapter JsonapiCompliable::Adapters::ActiveRecord
+
+        has_many :bio_labels,
+          foreign_key: :bio_id,
+          scope: -> { BioLabel.all },
+          resource: BioLabelResource do
+            # Ensure if we get too many bios/labels, they
+            # will still come back in the response.
+            assign do |bios, labels|
+              bios.each do |b|
+                b.bio_labels = labels
+              end
+            end
+          end
       end
 
       class HobbyResource < JsonapiCompliable::Resource
@@ -266,6 +284,23 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(bio).to have_key('description')
         expect(bio).to have_key('created_at')
         expect(bio).to_not have_key('picture')
+      end
+
+      # Model/Resource has has_one, but it's just a subset of a has_many
+      context 'when multiple records (faux-has_one)' do
+        let!(:bio2) { Bio.create!(author: author1, picture: 'imgur', description: 'author bio') }
+
+        context 'and there is another level of association' do
+          before do
+            bio.bio_labels << BioLabel.create!
+            bio2.bio_labels << BioLabel.create!
+          end
+
+          it 'still works' do
+            get :index, params: { include: 'bio.bio_labels' }
+            expect(json_includes('bio_labels').length).to eq(1)
+          end
+        end
       end
     end
 

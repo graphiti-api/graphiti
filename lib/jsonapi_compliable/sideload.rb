@@ -399,8 +399,9 @@ module JsonapiCompliable
     def resolve_basic(parents, query, namespace)
       sideload_scope   = scope_proc.call(parents)
       sideload_scope   = Scope.new(sideload_scope, resource_class.new, query, default_paginate: false, namespace: namespace)
-      sideload_results = sideload_scope.resolve
-      assign_proc.call(parents, sideload_results)
+      sideload_scope.resolve do |sideload_results|
+        assign_proc.call(parents, sideload_results)
+      end
     end
   end
 end
