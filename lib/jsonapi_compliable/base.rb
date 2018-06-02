@@ -288,7 +288,7 @@ module JsonapiCompliable
       opts  = default_jsonapi_render_options.merge(opts)
       opts  = Util::RenderOptions.generate(scope, query_hash, opts)
       opts[:expose][:context] = self
-      opts[:include] = deserialized_params.include_directive if force_includes?
+      opts[:include] ||= deserialized_params.include_directive if force_includes?
       perform_render_jsonapi(opts)
     end
 

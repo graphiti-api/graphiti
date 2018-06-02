@@ -124,5 +124,15 @@ RSpec.describe JsonapiCompliable do
         instance.render_jsonapi(Author.all, scope: false)
       end
     end
+    context 'when passing manual scope' do
+      it 'passes the manually included scope' do
+        author = Author.create!(first_name: 'Stephen', last_name: 'King')
+        author.books.create(title: "The Shining", genre: Genre.new(name: 'horror'))
+
+        expect(instance).to receive(:perform_render_jsonapi).with(hash_including(include: { foo: {}}))
+        instance.render_jsonapi(Author.all, { include: { foo: {} }, scope: false, meta: { foo: 'bar' } })
+      end
+    end
+
   end
 end
