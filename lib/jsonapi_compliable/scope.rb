@@ -118,13 +118,17 @@ module JsonapiCompliable
       end
     end
 
-    def apply_scoping(opts)
-      @object = JsonapiCompliable::Scoping::DefaultFilter.new(@resource, query_hash, @object).apply
-      @object = JsonapiCompliable::Scoping::Filter.new(@resource, query_hash, @object).apply unless opts[:filter] == false
-      @object = JsonapiCompliable::Scoping::ExtraFields.new(@resource, query_hash, @object).apply unless opts[:extra_fields] == false
-      @object = JsonapiCompliable::Scoping::Sort.new(@resource, query_hash, @object).apply unless opts[:sort] == false
-      @unpaginated_object = @object
-      @object = JsonapiCompliable::Scoping::Paginate.new(@resource, query_hash, @object, default: opts[:default_paginate]).apply unless opts[:paginate] == false
+     def apply_scoping(opts)
+      add_scoping(nil, JsonapiCompliable::Scoping::DefaultFilter, opts)
+      add_scoping(:filter, JsonapiCompliable::Scoping::Filter, opts)
+      add_scoping(:extra_fields, JsonapiCompliable::Scoping::ExtraFields, opts)
+      add_scoping(:sort, JsonapiCompliable::Scoping::Sort, opts)
+      add_scoping(:paginate, JsonapiCompliable::Scoping::Paginate, opts, default: opts[:default_paginate])
+    end
+
+    def add_scoping(key, scoping_class, opts, default = {})
+      @object = scoping_class.new(@resource, query_hash, @object, default).apply unless opts[key] == false
+      @unpaginated_object = @object unless key == :paginate
     end
   end
 end
