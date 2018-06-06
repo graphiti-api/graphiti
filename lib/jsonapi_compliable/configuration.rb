@@ -19,6 +19,8 @@ module JsonapiCompliable
     def experimental_concurrency=(val)
       if val && !defined?(Concurrent::Promise)
         raise "You must add the concurrent-ruby gem to opt-in to experimental concurrency"
+      else
+        @experimental_concurrency = val
       end
     end
   end
