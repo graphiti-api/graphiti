@@ -94,10 +94,14 @@ module JsonapiCompliable
             parent_ids = parents.map { |p| p.send(primary_key) }
             parent_ids.uniq!
             parent_ids.compact!
+
+            table_name = parents[0]
+              .class.reflections[through.to_s].klass.table_name
+
             _scope.call
               .joins(through)
               .preload(through) # otherwise n+1 as we reference in #assign
-              .where(through => { fk => parent_ids })
+              .where(table_name => { fk => parent_ids })
               .distinct
           end
 

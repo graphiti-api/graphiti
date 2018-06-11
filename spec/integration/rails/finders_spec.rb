@@ -367,6 +367,21 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(author1_hobbies.size).to eq(2)
         expect(author2_hobbies.size).to eq(1)
       end
+
+      context 'when the table name does not match the association name' do
+        before do
+          AuthorHobby.table_name = :author_hobby
+        end
+
+        let!(:other_table_hobby1)  { Hobby.create!(name: 'Fishing', authors: [author1]) }
+        let!(:other_table_hobby2)  { Hobby.create!(name: 'Woodworking', authors: [author1, author2]) }
+
+        it 'still works' do
+          get :index, params: { include: 'hobbies' }
+          expect(ids_for('hobbies'))
+            .to eq([other_table_hobby1.id, other_table_hobby2.id])
+        end
+      end
     end
 
     context 'sideloading self-referential' do

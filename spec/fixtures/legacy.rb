@@ -20,6 +20,12 @@ ActiveRecord::Schema.define(:version => 1) do
     t.integer :hobby_id
   end
 
+  # test non-standard table name
+  create_table :author_hobby do |t|
+    t.integer :author_id
+    t.integer :hobby_id
+  end
+
   create_table :hobbies do |t|
     t.string :name
   end
