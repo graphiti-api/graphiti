@@ -235,6 +235,18 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
+    context 'when no serializer is found' do
+      before do
+        allow_any_instance_of(String).to receive(:safe_constantize) { nil }
+      end
+
+      it 'raises helpful error' do
+        expect {
+          get :index
+        }.to raise_error(JsonapiCompliable::Errors::MissingSerializer)
+      end
+    end
+
     context 'sideloading has_many' do
       # TODO: may want to blow up here, only for index action
       it 'allows pagination of sideloaded resource' do
