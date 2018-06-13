@@ -48,6 +48,21 @@ end
 
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
+  attr_accessor :force_validation_error
+
+  before_save do
+    add_validation_error if force_validation_error
+
+    if Rails::VERSION::MAJOR >= 5
+      throw(:abort) if errors.present?
+    else
+      errors.blank?
+    end
+  end
+
+  def add_validation_error
+    errors.add(:base, 'Forced validation error')
+  end
 end
 
 class Classification < ApplicationRecord
@@ -74,8 +89,6 @@ class HomeOffice < ApplicationRecord
 end
 
 class Employee < ApplicationRecord
-  attr_accessor :force_validation_error
-
   belongs_to :workspace, polymorphic: true
   belongs_to :classification
   has_many :positions
@@ -97,10 +110,6 @@ class Employee < ApplicationRecord
     else
       errors.blank?
     end
-  end
-
-  def add_validation_error
-    errors.add(:base, 'Forced validation error')
   end
 end
 

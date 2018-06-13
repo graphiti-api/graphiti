@@ -27,10 +27,11 @@ class JsonapiCompliable::Util::Persistence
   # * associate parent objects with current object
   # * process children
   # * associate children
+  # * record hooks for later playback
   # * run post-process sideload hooks
   # * return current object
   #
-  # @return the persisted model instance
+  # @return a model instance
   def run
     parents = process_belongs_to(@relationships)
     update_foreign_key_for_parents(parents)
@@ -45,12 +46,19 @@ class JsonapiCompliable::Util::Persistence
     end
 
     associate_children(persisted, children) unless @meta[:method] == :destroy
+
     post_process(persisted, parents)
     post_process(persisted, children)
+    before_commit = -> { @resource.before_commit(persisted, @meta[:method]) }
+    add_hook(before_commit)
     persisted
   end
 
   private
+
+  def add_hook(prc)
+    ::JsonapiCompliable::Util::Hooks.add(prc)
+  end
 
   # The child's attributes should be modified to nil-out the
   # foreign_key when the parent is being destroyed or disassociated
@@ -147,7 +155,8 @@ class JsonapiCompliable::Util::Persistence
     groups.each_pair do |method, group|
       group.group_by { |g| g[:sideload] }.each_pair do |sideload, members|
         objects = members.map { |x| x[:object] }
-        sideload.fire_hooks!(caller_model, objects, method)
+        hook = -> { sideload.fire_hooks!(caller_model, objects, method) }
+        add_hook(hook)
       end
     end
   end

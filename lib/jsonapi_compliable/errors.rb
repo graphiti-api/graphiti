@@ -1,7 +1,14 @@
 module JsonapiCompliable
   module Errors
     class BadFilter < StandardError; end
-    class ValidationError < StandardError; end
+
+    class ValidationError < StandardError
+      attr_reader :validation_response
+
+      def initialize(validation_response)
+        @validation_response = validation_response
+      end
+    end
 
     class MissingSerializer < StandardError
       def initialize(class_name, serializer_name)

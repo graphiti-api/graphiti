@@ -30,6 +30,13 @@ class JsonapiCompliable::Util::ValidationResponse
     [object, success?]
   end
 
+  def validate!
+    unless success?
+      raise ::JsonapiCompliable::Errors::ValidationError.new(self)
+    end
+    self
+  end
+
   private
 
   def valid_object?(object)

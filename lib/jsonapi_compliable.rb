@@ -24,6 +24,7 @@ require "jsonapi_compliable/util/relationship_payload"
 require "jsonapi_compliable/util/persistence"
 require "jsonapi_compliable/util/validation_response"
 require "jsonapi_compliable/util/sideload"
+require "jsonapi_compliable/util/hooks"
 
 # require correct jsonapi-rb before extensions
 if defined?(Rails)

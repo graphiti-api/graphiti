@@ -253,9 +253,20 @@ module JsonapiCompliable
       end
     end
 
+    # Delete the model
+    # Any error, including validation errors, will roll back the transaction.
+    #
+    # Note: +before_commit+ hooks still run unless excluded
+    #
+    # @return [Util::ValidationResponse]
     def jsonapi_destroy
-      _persist do
-        jsonapi_resource.destroy(params[:id])
+      jsonapi_resource.transaction do
+        model = jsonapi_resource.destroy(params[:id])
+        validator = ::JsonapiCompliable::Util::ValidationResponse.new \
+          model, deserialized_params
+        validator.validate!
+        jsonapi_resource.before_commit(model, :destroy)
+        validator
       end
     end
 
@@ -321,6 +332,18 @@ module JsonapiCompliable
 
     private
 
+    def _persist
+      jsonapi_resource.transaction do
+        ::JsonapiCompliable::Util::Hooks.record do
+          model = yield
+          validator = ::JsonapiCompliable::Util::ValidationResponse.new \
+            model, deserialized_params
+          validator.validate!
+          validator
+        end
+      end
+    end
+
     def force_includes?
       not deserialized_params.data.nil?
     end
@@ -329,17 +352,6 @@ module JsonapiCompliable
       # TODO(beauby): Reuse renderer.
       JSONAPI::Serializable::Renderer.new
         .render(opts.delete(:jsonapi), opts).to_json
-    end
-
-    def _persist
-      validation_response = nil
-      jsonapi_resource.transaction do
-        object = yield
-        validation_response = Util::ValidationResponse.new \
-          object, deserialized_params
-        raise Errors::ValidationError unless validation_response.to_a[1]
-      end
-      validation_response
     end
   end
 end
