@@ -193,6 +193,16 @@ if ENV["APPRAISAL_INITIALIZED"]
       expect(json_included_types).to match_array(%w(books genres))
     end
 
+    context 'when passing sparse fieldsets on primary data' do
+      context 'and sideloading' do
+        it 'is able to sideload without adding the field' do
+          get :index, params: { fields: { authors: 'first_name' }, include: 'books' }
+          expect(json['data'][0]['relationships']).to be_present
+          expect(json_included_types).to match_array(%w(books))
+        end
+      end
+    end
+
     context 'sideloading has_many' do
       # TODO: may want to blow up here, only for index action
       it 'allows pagination of sideloaded resource' do

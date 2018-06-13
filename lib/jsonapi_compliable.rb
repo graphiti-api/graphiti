@@ -32,6 +32,14 @@ else
   require 'jsonapi/serializable'
 end
 
+# Temporary fix until fixed upstream
+# https://github.com/jsonapi-rb/jsonapi-serializable/pull/102
+JSONAPI::Serializable::Resource.class_eval do
+  def requested_relationships(fields)
+    @_relationships
+  end
+end
+
 require "jsonapi_compliable/extensions/extra_attribute"
 require "jsonapi_compliable/extensions/boolean_attribute"
 require "jsonapi_compliable/extensions/temp_id"
