@@ -6,12 +6,6 @@ module JsonapiCompliable
       def self.generate(object, query_hash, overrides = {})
         resolved = object.respond_to?(:resolve) ? object.resolve : object
 
-        inferrer = ::Hash.new do |h, k|
-          names = k.to_s.split('::')
-          klass = names.pop
-          h[k] = [*names, "Serializable#{klass}"].join('::').safe_constantize
-        end
-
         fields = query_hash[:fields].dup
         extra_fields = query_hash[:extra_fields]
 
@@ -37,6 +31,21 @@ module JsonapiCompliable
 
         options
       end
+
+      def self.inferrer
+        ::Hash.new do |h, k|
+          names = k.to_s.split('::')
+          klass = names.pop
+          serializer_name = [*names, "Serializable#{klass}"].join('::')
+          serializer = serializer_name.safe_constantize
+          if serializer
+            h[k] = serializer
+          else
+            raise Errors::MissingSerializer.new(k, serializer_name)
+          end
+        end
+      end
+      private_class_method :inferrer
     end
   end
 end
