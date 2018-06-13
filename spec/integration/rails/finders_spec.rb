@@ -131,6 +131,11 @@ if ENV["APPRAISAL_INITIALIZED"]
       def index
         render_jsonapi(Author.all)
       end
+
+      def show
+        scope = jsonapi_scope(Author.all)
+        render_jsonapi(scope.resolve.first, scope: false)
+      end
     end
 
     let!(:author1) { Author.create!(first_name: 'Stephen', dwelling: house, state: state, organization: org1) }
@@ -200,6 +205,33 @@ if ENV["APPRAISAL_INITIALIZED"]
           expect(json['data'][0]['relationships']).to be_present
           expect(json_included_types).to match_array(%w(books))
         end
+      end
+    end
+
+    context 'when action-specific resources' do
+      before do
+        klass = Class.new(JsonapiCompliable::Resource) do
+          type :authors
+          use_adapter JsonapiCompliable::Adapters::ActiveRecord
+        end
+
+        controller.class.jsonapi resource: {
+          index: Integration::AuthorResource,
+          show: klass
+        }
+      end
+
+      it 'uses the correct resource for each action' do
+        get :index, params: { include: 'books' }
+        expect(json_includes('books').length).to eq(2)
+        controller.instance_variable_set(:@jsonapi_resource, nil)
+        expect {
+          if Rails::VERSION::MAJOR >= 5
+            get :show, params: { id: author1.id, include: 'books' }
+          else
+            get :show, id: author1.id, params: { include: 'books' }
+          end
+        }.to raise_error(JsonapiCompliable::Errors::InvalidInclude)
       end
     end
 
