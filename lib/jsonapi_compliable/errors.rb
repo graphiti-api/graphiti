@@ -27,6 +27,23 @@ Use a custom Inferrer if you'd like different lookup logic.
       end
     end
 
+    class MissingSerializer < StandardError
+      def initialize(class_name, serializer_name)
+        @class_name = class_name
+        @serializer_name = serializer_name
+      end
+
+      def message
+        <<-MSG
+Could not find serializer for class '#{@class_name}'!
+
+Looked for '#{@serializer_name}' but doesn't appear to exist.
+
+Use a custom Inferrer if you'd like different lookup logic.
+        MSG
+      end
+    end
+
     class UnsupportedPageSize < StandardError
       def initialize(size, max)
         @size, @max = size, max
