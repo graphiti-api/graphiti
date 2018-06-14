@@ -99,8 +99,7 @@ module JsonapiCompliable
               .class.reflections[through.to_s].klass.table_name
 
             _scope.call
-              .joins(through)
-              .preload(through) # otherwise n+1 as we reference in #assign
+              .includes(through)
               .where(table_name => { fk => parent_ids })
               .distinct
           end
