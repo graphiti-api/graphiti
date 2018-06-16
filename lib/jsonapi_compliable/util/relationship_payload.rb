@@ -21,7 +21,7 @@ module JsonapiCompliable
 
       def iterate
         payload.each_pair do |relationship_name, relationship_payload|
-          if sl = resource.sideload(relationship_name.to_sym)
+          if sl = resource.class.sideload(relationship_name.to_sym)
             if should_yield?(sl.type)
               if relationship_payload.is_a?(Array)
                 relationship_payload.each do |rp|

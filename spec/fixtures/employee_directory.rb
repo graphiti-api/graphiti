@@ -65,52 +65,52 @@ class ApplicationRecord < ActiveRecord::Base
   end
 end
 
-class Classification < ApplicationRecord
-  has_many :employees
-  validates :description, presence: true
-end
+#class Classification < ApplicationRecord
+  #has_many :employees
+  #validates :description, presence: true
+#end
 
-class Team < ApplicationRecord
-  has_many :employee_teams
-  has_many :employees, through: :employee_teams
-end
+#class Team < ApplicationRecord
+  #has_many :employee_teams
+  #has_many :employees, through: :employee_teams
+#end
 
-class EmployeeTeam < ApplicationRecord
-  belongs_to :team
-  belongs_to :employee
-end
+#class EmployeeTeam < ApplicationRecord
+  #belongs_to :team
+  #belongs_to :employee
+#end
 
-class Office < ApplicationRecord
-  has_many :employees, as: :workspace
-end
+#class Office < ApplicationRecord
+  #has_many :employees, as: :workspace
+#end
 
-class HomeOffice < ApplicationRecord
-  has_many :employees, as: :workspace
-end
+#class HomeOffice < ApplicationRecord
+  #has_many :employees, as: :workspace
+#end
 
 class Employee < ApplicationRecord
-  belongs_to :workspace, polymorphic: true
-  belongs_to :classification
+  #belongs_to :workspace, polymorphic: true
+  #belongs_to :classification
   has_many :positions
-  validates :first_name, presence: true
-  validates :delete_confirmation,
-    presence: true,
-    on: :destroy
+  #validates :first_name, presence: true
+  #validates :delete_confirmation,
+    #presence: true,
+    #on: :destroy
 
-  has_many :employee_teams
-  has_many :teams, through: :employee_teams
+  #has_many :employee_teams
+  #has_many :teams, through: :employee_teams
 
-  has_one :salary
+  #has_one :salary
 
-  before_destroy do
-    add_validation_error if force_validation_error
+  #before_destroy do
+    #add_validation_error if force_validation_error
 
-    if Rails::VERSION::MAJOR >= 5
-      throw(:abort) if errors.present?
-    else
-      errors.blank?
-    end
-  end
+    #if Rails::VERSION::MAJOR >= 5
+      #throw(:abort) if errors.present?
+    #else
+      #errors.blank?
+    #end
+  #end
 end
 
 class Position < ApplicationRecord
@@ -122,119 +122,119 @@ class Department < ApplicationRecord
   has_many :positions
 end
 
-class Salary < ApplicationRecord
-  belongs_to :employee
-end
+#class Salary < ApplicationRecord
+  #belongs_to :employee
+#end
 
 class ApplicationResource < JsonapiCompliable::Resource
-  use_adapter JsonapiCompliable::Adapters::ActiveRecord
+  use_adapter JsonapiCompliable::Adapters::ActiveRecord::Base
 end
 
-class ClassificationResource < ApplicationResource
-  type :classifications
-  model Classification
-end
+#class ClassificationResource < ApplicationResource
+  #type :classifications
+  #model Classification
+#end
 
-class TeamResource < ApplicationResource
-  type :teams
-  model Team
-end
+#class TeamResource < ApplicationResource
+  #type :teams
+  #model Team
+#end
 
-class DepartmentResource < ApplicationResource
-  type :departments
-  model Department
-end
+#class DepartmentResource < ApplicationResource
+  #type :departments
+  #model Department
+#end
 
-class PositionResource < ApplicationResource
-  type :positions
-  model Position
+#class PositionResource < ApplicationResource
+  #type :positions
+  #model Position
 
-  belongs_to :department,
-    scope: -> { Department.all },
-    foreign_key: :department_id,
-    resource: DepartmentResource
-end
+  #belongs_to :department,
+    #scope: -> { Department.all },
+    #foreign_key: :department_id,
+    #resource: DepartmentResource
+#end
 
-class OfficeResource < ApplicationResource
-  type :offices
-  model Office
-end
+#class OfficeResource < ApplicationResource
+  #type :offices
+  #model Office
+#end
 
-class HomeOfficeResource < ApplicationResource
-  type :home_offices
-  model HomeOffice
-end
+#class HomeOfficeResource < ApplicationResource
+  #type :home_offices
+  #model HomeOffice
+#end
 
-class SalaryResource < ApplicationResource
-  type :salaries
-  model Salary
-end
+#class SalaryResource < ApplicationResource
+  #type :salaries
+  #model Salary
+#end
 
-class EmployeeResource < ApplicationResource
-  type :employees
-  model Employee
+#class EmployeeResource < ApplicationResource
+  #type :employees
+  #model Employee
 
-  belongs_to :classification,
-    scope: -> { Classification.all },
-    foreign_key: :classification_id,
-    resource: ClassificationResource
-  has_many :positions,
-    scope: -> { Position.all },
-    foreign_key: :employee_id,
-    resource: PositionResource
-  has_and_belongs_to_many :teams,
-    resource: TeamResource,
-    scope: -> { Team.all },
-    foreign_key: { employee_teams: :employee_id }
-  has_one :salary,
-    resource: SalaryResource,
-    scope: -> { Salary.all },
-    foreign_key: :employee_id
+  #belongs_to :classification,
+    #scope: -> { Classification.all },
+    #foreign_key: :classification_id,
+    #resource: ClassificationResource
+  #has_many :positions,
+    #base_scope: -> { Position.all },
+    #foreign_key: :employee_id,
+    #resource: PositionResource
+  #has_and_belongs_to_many :teams,
+    #resource: TeamResource,
+    #scope: -> { Team.all },
+    #foreign_key: { employee_teams: :employee_id }
+  #has_one :salary,
+    #resource: SalaryResource,
+    #scope: -> { Salary.all },
+    #foreign_key: :employee_id
 
-  polymorphic_belongs_to :workspace,
-    group_by: :workspace_type,
-    groups: {
-      'Office' => {
-        scope: -> { Office.all },
-        resource: OfficeResource,
-        foreign_key: :workspace_id
-      },
-      'HomeOffice' => {
-        scope: -> { HomeOffice.all },
-        resource: HomeOfficeResource,
-        foreign_key: :workspace_id
-      }
-    }
-end
+  #polymorphic_belongs_to :workspace,
+    #group_by: :workspace_type,
+    #groups: {
+      #'Office' => {
+        #scope: -> { Office.all },
+        #resource: OfficeResource,
+        #foreign_key: :workspace_id
+      #},
+      #'HomeOffice' => {
+        #scope: -> { HomeOffice.all },
+        #resource: HomeOfficeResource,
+        #foreign_key: :workspace_id
+      #}
+    #}
+#end
 
 class SerializableAbstract < JSONAPI::Serializable::Resource
 end
 
-class SerializableClassification < SerializableAbstract
-  type 'classifications'
+#class SerializableClassification < SerializableAbstract
+  #type 'classifications'
 
-  attribute :description
-end
+  #attribute :description
+#end
 
-class SerializableTeam < SerializableAbstract
-  type 'teams'
+#class SerializableTeam < SerializableAbstract
+  #type 'teams'
 
-  attribute :name
-end
+  #attribute :name
+#end
 
-class SerializableEmployee < SerializableAbstract
-  type 'employees'
+#class SerializableEmployee < SerializableAbstract
+  #type 'employees'
 
-  attribute :first_name
-  attribute :last_name
-  attribute :age
+  #attribute :first_name
+  #attribute :last_name
+  #attribute :age
 
-  belongs_to :classification
-  has_many :positions
-  has_many :teams
+  #belongs_to :classification
+  #has_many :positions
+  #has_many :teams
 
-  has_one :salary
-end
+  #has_one :salary
+#end
 
 class SerializablePosition < SerializableAbstract
   type 'positions'
@@ -253,9 +253,9 @@ class SerializableDepartment < SerializableAbstract
   has_many :positions
 end
 
-class SerializableSalary < SerializableAbstract
-  type 'salaries'
+#class SerializableSalary < SerializableAbstract
+  #type 'salaries'
 
-  attribute :base_rate
-  attribute :overtime_rate
-end
+  #attribute :base_rate
+  #attribute :overtime_rate
+#end

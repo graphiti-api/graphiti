@@ -20,7 +20,7 @@ ActiveRecord::Schema.define(:version => 1) do
     t.integer :hobby_id
   end
 
-  # test non-standard table name
+  ## test non-standard table name
   create_table :author_hobby do |t|
     t.integer :author_id
     t.integer :hobby_id
@@ -30,15 +30,15 @@ ActiveRecord::Schema.define(:version => 1) do
     t.string :name
   end
 
-  create_table :condos do |t|
-    t.integer :state_id
-    t.string :name
-  end
+  #create_table :condos do |t|
+    #t.integer :state_id
+    #t.string :name
+  #end
 
-  create_table :houses do |t|
-    t.integer :state_id
-    t.string :name
-  end
+  #create_table :houses do |t|
+    #t.integer :state_id
+    #t.string :name
+  #end
 
   create_table :bios do |t|
     t.integer :author_id
@@ -67,11 +67,11 @@ ActiveRecord::Schema.define(:version => 1) do
     t.timestamps
   end
 
-  create_table :tags do |t|
-    t.string :name
-    t.integer :book_id
-    t.timestamps
-  end
+  #create_table :tags do |t|
+    #t.string :name
+    #t.integer :book_id
+    #t.timestamps
+  #end
 end
 
 class LegacyApplicationRecord < ActiveRecord::Base
@@ -83,15 +83,15 @@ class State < LegacyApplicationRecord
 end
 
 class Author < LegacyApplicationRecord
-  belongs_to :dwelling, polymorphic: true
+  #belongs_to :dwelling, polymorphic: true
   belongs_to :state
   belongs_to :organization
   has_many :books
   has_many :author_hobbies
   has_many :hobbies, through: :author_hobbies
   has_one :bio
-  accepts_nested_attributes_for :books
-  accepts_nested_attributes_for :state
+  #accepts_nested_attributes_for :books
+  #accepts_nested_attributes_for :state
 end
 
 class Organization < LegacyApplicationRecord
@@ -99,15 +99,15 @@ class Organization < LegacyApplicationRecord
   has_many :children, class_name: 'Organization', foreign_key: :parent_id
 end
 
-class Condo < LegacyApplicationRecord
-  has_many :authors, as: :dwelling
-  belongs_to :state
-end
+#class Condo < LegacyApplicationRecord
+  #has_many :authors, as: :dwelling
+  #belongs_to :state
+#end
 
-class House < LegacyApplicationRecord
-  has_many :authors, as: :dwelling
-  belongs_to :state
-end
+#class House < LegacyApplicationRecord
+  #has_many :authors, as: :dwelling
+  #belongs_to :state
+#end
 
 class AuthorHobby < LegacyApplicationRecord
   belongs_to :author
@@ -130,22 +130,22 @@ end
 
 class Genre < LegacyApplicationRecord
   has_many :books
-  accepts_nested_attributes_for :books
+  #accepts_nested_attributes_for :books
 end
 
-class Tag < LegacyApplicationRecord
-  belongs_to :book
-  accepts_nested_attributes_for :book
-end
+#class Tag < LegacyApplicationRecord
+  #belongs_to :book
+  #accepts_nested_attributes_for :book
+#end
 
 class Book < LegacyApplicationRecord
   belongs_to :author
   belongs_to :genre
-  has_many :tags
+  #has_many :tags
 
-  accepts_nested_attributes_for :author
-  accepts_nested_attributes_for :genre
-  accepts_nested_attributes_for :tags
+  #accepts_nested_attributes_for :author
+  #accepts_nested_attributes_for :genre
+  #accepts_nested_attributes_for :tags
 end
 
 class LegacySerializableAbstract < JSONAPI::Serializable::Resource
@@ -174,39 +174,39 @@ class SerializableOrganization < LegacySerializableAbstract
   belongs_to :parent
 end
 
-class SerializableDwelling < LegacySerializableAbstract
-  type 'dwellings'
+#class SerializableDwelling < LegacySerializableAbstract
+  #type 'dwellings'
 
-  attribute :name
-end
+  #attribute :name
+#end
 
-class SerializableCondo < SerializableDwelling
-  type 'condos'
+#class SerializableCondo < SerializableDwelling
+  #type 'condos'
 
-  attribute :condo_description do
-    'condo desc'
-  end
+  #attribute :condo_description do
+    #'condo desc'
+  #end
 
-  extra_attribute :condo_price do
-    500_000
-  end
+  #extra_attribute :condo_price do
+    #500_000
+  #end
 
-  belongs_to :state
-end
+  #belongs_to :state
+#end
 
-class SerializableHouse < SerializableDwelling
-  type 'houses'
+#class SerializableHouse < SerializableDwelling
+  #type 'houses'
 
-  attribute :house_description do
-    'house desc'
-  end
+  #attribute :house_description do
+    #'house desc'
+  #end
 
-  extra_attribute :house_price do
-    1_000_000
-  end
+  #extra_attribute :house_price do
+    #1_000_000
+  #end
 
-  belongs_to :state
-end
+  #belongs_to :state
+#end
 
 class SerializableHobby < LegacySerializableAbstract
   type 'hobbies'
@@ -249,12 +249,12 @@ class SerializableState < LegacySerializableAbstract
   end
 end
 
-class SerializableTag < LegacySerializableAbstract
-  type 'tags'
+#class SerializableTag < LegacySerializableAbstract
+  #type 'tags'
 
-  attribute :name
-  belongs_to :book
-end
+  #attribute :name
+  #belongs_to :book
+#end
 
 class SerializableGenre < LegacySerializableAbstract
   type 'genres'
@@ -278,12 +278,12 @@ class SerializableBook < LegacySerializableAbstract
 
   belongs_to :genre
   belongs_to :author
-  has_many :tags
+  #has_many :tags
 end
 
-# supports `render jsonapi: double`
-class RSpec::Mocks::SerializableDouble < LegacySerializableAbstract
-  type 'doubles'
+## supports `render jsonapi: double`
+#class RSpec::Mocks::SerializableDouble < LegacySerializableAbstract
+  #type 'doubles'
 
-  id { rand(99999) }
-end
+  #id { rand(99999) }
+#end

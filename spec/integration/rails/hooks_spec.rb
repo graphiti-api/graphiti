@@ -17,21 +17,21 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     module IntegrationHooks
-      class BookResource < JsonapiCompliable::Resource
-        type :books
+      class ApplicationRecord < JsonapiCompliable::Resource
         use_adapter JsonapiCompliable::Adapters::ActiveRecord
+      end
+
+      class BookResource < ApplicationResource
+        type :books
         model Book
       end
 
-      class StateResource < JsonapiCompliable::Resource
+      class StateResource < ApplicationResource
         type :states
-        use_adapter JsonapiCompliable::Adapters::ActiveRecord
         model State
       end
 
-      class AuthorResource < JsonapiCompliable::Resource
-        type :authors
-        use_adapter JsonapiCompliable::Adapters::ActiveRecord
+      class AuthorResource < ApplicationResourcce
         model Author
 
         has_many :books,

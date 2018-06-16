@@ -88,48 +88,20 @@ module JsonapiCompliable
   #     resource: CommentResource,
   #     foreign_key: :post_id
   class Resource
+    include Sideloading
     extend Forwardable
     attr_reader :context
 
     class << self
       extend Forwardable
-      attr_accessor :config
-
-      # @!method allow_sideload
-      #   @see Sideload#allow_sideload
-      def_delegator :sideloading, :allow_sideload
-      # @!method has_many
-      #   @see Adapters::ActiveRecordSideloading#has_many
-      def_delegator :sideloading, :has_many
-      # @!method has_one
-      #   @see Adapters::ActiveRecordSideloading#has_one
-      def_delegator :sideloading, :has_one
-      # @!method belongs_to
-      #   @see Adapters::ActiveRecordSideloading#belongs_to
-      def_delegator :sideloading, :belongs_to
-      # @!method has_and_belongs_to_many
-      #   @see Adapters::ActiveRecordSideloading#has_and_belongs_to_many
-      def_delegator :sideloading, :has_and_belongs_to_many
-      # @!method polymorphic_belongs_to
-      #   @see Adapters::ActiveRecordSideloading#polymorphic_belongs_to
-      def_delegator :sideloading, :polymorphic_belongs_to
-      # @!method polymorphic_has_many
-      #   @see Adapters::ActiveRecordSideloading#polymorphic_has_many
-      def_delegator :sideloading, :polymorphic_has_many
+      attr_accessor :config, :sideloads
     end
-
-    # @!method sideload
-    #   @see Sideload#sideload
-    def_delegator :sideloading, :sideload
+    self.sideloads = {}
 
     # @private
     def self.inherited(klass)
       klass.config = Util::Hash.deep_dup(self.config)
-    end
-
-    # @api private
-    def self.sideloading
-      @sideloading ||= Sideload.new(:base, resource: self)
+      klass.sideloads = Util::Hash.deep_dup(sideloads)
     end
 
     # Whitelist a filter
@@ -537,11 +509,6 @@ module JsonapiCompliable
       adapter.destroy(model, id)
     end
 
-    # Delegates #associate to adapter. Built for overriding.
-    #
-    # @see .use_adapter
-    # @see Adapters::Abstract#associate
-    # @see Adapters::ActiveRecord#associate
     def associate(parent, child, association_name, type)
       adapter.associate(parent, child, association_name, type)
     end
@@ -560,11 +527,6 @@ module JsonapiCompliable
       persistence = JsonapiCompliable::Util::Persistence \
         .new(self, meta, attributes, relationships, caller_model)
       persistence.run
-    end
-
-    # @see Sideload#association_names
-    def association_names
-      sideloading.association_names
     end
 
     # The relevant proc for the given attribute and calculation.
@@ -592,16 +554,10 @@ module JsonapiCompliable
       stats_dsl.calculation(calculation)
     end
 
-    # Interface to the sideloads for this Resource
-    # @api private
-    def sideloading
-      self.class.sideloading
-    end
-
     # @see .default_sort
     # @api private
     def default_sort
-      self.class.config[:default_sort] || [{ id: :asc }]
+      self.class.config[:default_sort] || []
     end
 
     # @see .default_page_number

@@ -1,407 +1,196 @@
 module JsonapiCompliable
-  # @attr_reader [Symbol] name The name of the sideload
-  # @attr_reader [Class] resource_class The corresponding Resource class
-  # @attr_reader [Boolean] polymorphic Is this a polymorphic sideload?
-  # @attr_reader [Hash] polymorphic_groups The subgroups, when polymorphic
-  # @attr_reader [Hash] sideloads The associated sibling sideloads
-  # @attr_reader [Proc] scope_proc The configured 'scope' block
-  # @attr_reader [Proc] assign_proc The configured 'assign' block
-  # @attr_reader [Symbol] grouping_field The configured 'group_by' symbol
-  # @attr_reader [Symbol] foreign_key The attribute used to match objects - need not be a true database foreign key.
-  # @attr_reader [Symbol] primary_key The attribute used to match objects - need not be a true database primary key.
-  # @attr_reader [Symbol] type One of :has_many, :belongs_to, etc
   class Sideload
+    HOOK_ACTIONS = [:save, :create, :update, :destroy, :disassociate]
+    TYPES = [:has_many, :belongs_to, :has_one, :many_to_many]
+
     attr_reader :name,
       :resource_class,
-      :polymorphic,
-      :polymorphic_groups,
-      :parent,
-      :sideloads,
-      :scope_proc,
-      :assign_proc,
-      :grouping_field,
+      :parent_resource_class,
       :foreign_key,
-      :primary_key,
-      :type
+      :primary_key
 
-    # NB - the adapter's +#sideloading_module+ is mixed in on instantiation
-    #
-    # An anonymous Resource will be assigned when none provided.
-    #
-    # @see Adapters::Abstract#sideloading_module
-    def initialize(name, type: nil, resource: nil, polymorphic: false, primary_key: :id, foreign_key: nil, parent: nil)
-      @name               = name
-      @resource_class     = (resource || Class.new(Resource))
-      @sideloads          = {}
-      @polymorphic        = !!polymorphic
-      @polymorphic_groups = {} if polymorphic?
-      @parent             = parent
-      @primary_key        = primary_key
-      @foreign_key        = foreign_key
-      @type               = type
-
-      extend @resource_class.config[:adapter].sideloading_module
+    class << self
+      attr_reader :scope_proc, :assign_proc, :assign_each_proc
     end
 
-    # @see #resource_class
-    # @return [Resource] an instance of +#resource_class+
+    def initialize(name, parent_resource:, resource: nil, base_scope: nil, primary_key: :id, foreign_key: nil, type: nil)
+      @name                  = name
+      @parent_resource_class = parent_resource
+      @resource_class        = resource
+      @primary_key           = primary_key
+      @foreign_key           = foreign_key
+      @type                  = type
+      @base_scope            = base_scope
+    end
+
+    def self.scope(&blk)
+      @scope_proc = blk
+    end
+
+    def self.assign(&blk)
+      @assign_proc = blk
+    end
+
+    def self.assign_each(&blk)
+      @assign_each_proc = blk
+    end
+
+    def primary_key
+      @primary_key ||= :id
+    end
+
+    def foreign_key
+      @foreign_key ||= infer_foreign_key
+    end
+
+    def resource_class
+      @resource_class ||= infer_resource_class
+    end
+
+    def scope(parents)
+      raise "No #scope defined for sideload with name '#{name}'. Make sure to define this in your adapter, or pass a block that defines the scope."
+    end
+
+    def assign_each(parent, children)
+      raise 'Override #assign_each in subclass'
+    end
+
+    # TODO confirm need the if @type
+    def type
+      @type || raise("Override #type in subclass. Should be one of #{TYPES.inspect}")
+    end
+
+    def default_base_scope
+    end
+
+    def base_scope
+      @base_scope || default_base_scope
+    end
+
+    # Override in subclass
+    def infer_foreign_key
+      model = parent_resource_class.config[:model]
+      namespace = namespace_for(model)
+      model_name = model.name.gsub("#{namespace}::", '')
+      :"#{model_name.underscore}_id"
+    end
+
     def resource
       @resource ||= resource_class.new
     end
 
-    # Is this sideload polymorphic?
-    #
-    # Polymorphic sideloads group the parent objects in some fashion,
-    # so different 'types' can be resolved differently. Let's say an
-    # +Office+ has a polymorphic +Organization+, which can be either a
-    # +Business+ or +Government+:
-    #
-    #   allow_sideload :organization, :polymorphic: true do
-    #     group_by :organization_type
-    #
-    #     allow_sideload 'Business', resource: BusinessResource do
-    #       # ... code ...
-    #     end
-    #
-    #     allow_sideload 'Governemnt', resource: GovernmentResource do
-    #       # ... code ...
-    #     end
-    #   end
-    #
-    # You probably want to extract this code into an Adapter. For instance,
-    # with ActiveRecord:
-    #
-    #   polymorphic_belongs_to :organization,
-    #     group_by: :organization_type,
-    #     groups: {
-    #       'Business' => {
-    #         scope: -> { Business.all },
-    #         resource: BusinessResource,
-    #         foreign_key: :organization_id
-    #       },
-    #       'Government' => {
-    #         scope: -> { Government.all },
-    #         resource: GovernmentResource,
-    #         foreign_key: :organization_id
-    #       }
-    #     }
-    #
-    # @see Adapters::ActiveRecordSideloading#polymorphic_belongs_to
-    # @return [Boolean] is this sideload polymorphic?
-    def polymorphic?
-      @polymorphic == true
+    def parent_resource
+      @parent_resource ||= parent_resource_class.new
     end
 
-    # Build a scope that will be used to fetch the related records
-    # This scope will be further chained with filtering/sorting/etc
-    #
-    # You probably want to wrap this logic in an Adapter, instead of
-    # specifying in your resource directly.
-    #
-    # @example Default ActiveRecord
-    #   class PostResource < ApplicationResource
-    #     # ... code ...
-    #     allow_sideload :comments, resource: CommentResource do
-    #       scope do |posts|
-    #         Comment.where(post_id: posts.map(&:id))
-    #       end
-    #       # ... code ...
-    #     end
-    #   end
-    #
-    # @example Custom Scope
-    #   # In this example, our base scope is a Hash
-    #   scope do |posts|
-    #     { post_ids: posts.map(&:id) }
-    #   end
-    #
-    # @example ActiveRecord via Adapter
-    #   class PostResource < ApplicationResource
-    #     # ... code ...
-    #     has_many :comments,
-    #       scope: -> { Comment.all },
-    #       resource: CommentResource,
-    #       foreign_key: :post_id
-    #   end
-    #
-    # @see Adapters::Abstract
-    # @see Adapters::ActiveRecordSideloading#has_many
-    # @see #allow_sideload
-    # @yieldparam parents - The resolved parent records
-    def scope(&blk)
-      @scope_proc = blk
-    end
-
-    # The proc used to assign the resolved parents and children.
-    #
-    # You probably want to wrap this logic in an Adapter, instead of
-    # specifying in your resource directly.
-    #
-    # @example Default ActiveRecord
-    #   class PostResource < ApplicationResource
-    #     # ... code ...
-    #     allow_sideload :comments, resource: CommentResource do
-    #       # ... code ...
-    #       assign do |posts, comments|
-    #         posts.each do |post|
-    #           relevant_comments = comments.select { |c| c.post_id == post.id }
-    #           post.comments = relevant_comments
-    #         end
-    #       end
-    #     end
-    #   end
-    #
-    # @example ActiveRecord via Adapter
-    #   class PostResource < ApplicationResource
-    #     # ... code ...
-    #     has_many :comments,
-    #       scope: -> { Comment.all },
-    #       resource: CommentResource,
-    #       foreign_key: :post_id
-    #   end
-    #
-    # @see Adapters::Abstract
-    # @see Adapters::ActiveRecordSideloading#has_many
-    # @see #allow_sideload
-    # @yieldparam parents - The resolved parent records
-    # @yieldparam children - The resolved child records
-    def assign(&blk)
-      @assign_proc = blk
-    end
-
-    # Configure how to associate parent and child records.
-    # Delegates to #resource
-    #
-    # @see #name
-    # @see #type
-    # @api private
-    def associate(parent, child)
-      association_name = @parent ? @parent.name : name
-      resource.associate(parent, child, association_name, type)
-    end
-
-    # Configure how to disassociate parent and child records.
-    # Delegates to #resource
-    #
-    # @see #name
-    # @see #type
-    # @api private
-    def disassociate(parent, child)
-      association_name = @parent ? @parent.name : name
-      resource.disassociate(parent, child, association_name, type)
-    end
-
-    HOOK_ACTIONS = [:save, :create, :update, :destroy, :disassociate]
-
-    # Configure post-processing hooks
-    #
-    # In particular, helpful for bulk operations. "after_save" will fire
-    # for any persistence method - +:create+, +:update+, +:destroy+, +:disassociate+.
-    # Use "only" and "except" keyword arguments to fire only for a
-    # specific persistence method.
-    #
-    # @example Bulk Notify Users on Invite
-    #   class ProjectResource < ApplicationResource
-    #     # ... code ...
-    #     allow_sideload :users, resource: UserResource do
-    #       # scope {}
-    #       # assign {}
-    #       after_save only: [:create] do |project, users|
-    #         UserMailer.invite(project, users).deliver_later
-    #       end
-    #     end
-    #   end
-    #
-    # @see #hooks
-    # @see Util::Persistence
-    def after_save(only: [], except: [], &blk)
-      actions = HOOK_ACTIONS - except
-      actions = only & actions
-      actions = [:save] if only.empty? && except.empty?
-      actions.each do |a|
-        hooks[:"after_#{a}"] << blk
-      end
-    end
-
-    # Get the hooks the user has configured
-    # @see #after_save
-    # @return hash of hooks, ie +{ after_create: #<Proc>}+
-    def hooks
-      @hooks ||= {}.tap do |h|
-        HOOK_ACTIONS.each do |a|
-          h[:"after_#{a}"] = []
-          h[:"before_#{a}"] = []
-        end
-      end
-    end
-
-    # Define an attribute that groups the parent records. For instance, with
-    # an ActiveRecord polymorphic belongs_to there will be a +parent_id+
-    # and +parent_type+. We would want to group on +parent_type+:
-    #
-    #  allow_sideload :organization, polymorphic: true do
-    #    # group parent_type, parent here is 'organization'
-    #    group_by :organization_type
-    #  end
-    #
-    # @see #polymorphic?
-    def group_by(grouping_field)
-      @grouping_field = grouping_field
-    end
-
-    # Resolve the sideload.
-    #
-    # * Uses the 'scope' proc to build a 'base scope'
-    # * Chains additional criteria onto that 'base scope'
-    # * Resolves that scope (see Scope#resolve)
-    # * Assigns the resulting child objects to their corresponding parents
-    #
-    # @see Scope#resolve
-    # @param [Object] parents The resolved parent models
-    # @param [Query] query The Query instance
-    # @param [Symbol] namespace The current namespace (see Resource#with_context)
-    # @see Query
-    # @see Resource#with_context
-    # @return [void]
-    # @api private
-    def resolve(parents, query, namespace)
-      if polymorphic?
-        resolve_polymorphic(parents, query)
-      else
-        resolve_basic(parents, query, namespace)
-      end
-    end
-
-    # Configure a relationship between Resource objects
-    #
-    # You probably want to extract this logic into an adapter
-    # rather than using directly
-    #
-    # @example Default ActiveRecord
-    #   # What happens 'under the hood'
-    #   class CommentResource < ApplicationResource
-    #     # ... code ...
-    #     allow_sideload :post, resource: PostResource do
-    #       scope do |comments|
-    #         Post.where(id: comments.map(&:post_id))
-    #       end
-    #
-    #       assign do |comments, posts|
-    #         comments.each do |comment|
-    #           relevant_post = posts.find { |p| p.id == comment.post_id }
-    #           comment.post = relevant_post
-    #         end
-    #       end
-    #     end
-    #   end
-    #
-    #   # Rather than writing that code directly, go through the adapter:
-    #   class CommentResource < ApplicationResource
-    #     # ... code ...
-    #     use_adapter JsonapiCompliable::Adapters::ActiveRecord
-    #
-    #     belongs_to :post,
-    #       scope: -> { Post.all },
-    #       resource: PostResource,
-    #       foreign_key: :post_id
-    #   end
-    #
-    # @see Adapters::ActiveRecordSideloading#belongs_to
-    # @see #assign
-    # @see #scope
-    # @return void
-    def allow_sideload(name, opts = {}, &blk)
-      sideload = Sideload.new(name, opts)
-      sideload.instance_eval(&blk) if blk
-
-      if polymorphic?
-        @polymorphic_groups[name] = sideload
-      else
-        @sideloads[name] = sideload
-      end
-    end
-
-    # Fetch a Sideload object by its name
-    # @param [Symbol] name The name of the corresponding sideload
-    # @see +allow_sideload
-    # @return the corresponding Sideload object
-    def sideload(name)
-      @sideloads[name]
-    end
-
-    # @api private
-    def all_sideloads
-      {}.tap do |all|
-        if polymorphic?
-          polymorphic_groups.each_pair do |type, sl|
-            all.merge!(sl.resource.sideloading.all_sideloads)
+    def assign(parents, children)
+      associated = []
+      parents.each do |parent|
+        relevant_children = fire_assign_each(parent, children)
+        if relevant_children.is_a?(Array)
+          relevant_children.each do |child|
+            associated << child
+            associate(parent, child)
           end
         else
-          all.merge!(@sideloads.merge(resource.sideloading.sideloads))
+          associated << relevant_children
+          associate(parent, relevant_children)
         end
       end
-    end
-
-    def association_names(memo = [])
-      all_sideloads.each_pair do |name, sl|
-        unless memo.include?(sl.name)
-          memo << sl.name
-          memo |= sl.association_names(memo)
-        end
-      end
-
-      memo
-    end
-
-    # @api private
-    def polymorphic_child_for_type(type)
-      polymorphic_groups.values.find do |v|
-        v.resource_class.config[:type] == type.to_sym
+      (children - associated).each do |unassigned|
+        children.delete(unassigned)
       end
     end
 
-    def fire_hooks!(parent, objects, method)
-      return unless self.hooks
+    def resolve(parents, query, namespace)
+      sideload_scope   = fire_scope(parents)
 
-      hooks = self.hooks[:"after_#{method}"] + self.hooks[:after_save]
-      hooks.compact.each do |hook|
-        resource.instance_exec(parent, objects, &hook)
+      sideload_scope   = Scope.new sideload_scope,
+        resource,
+        query,
+        sideload_parent_length: parents.length,
+        default_paginate: false,
+        namespace: namespace
+      sideload_scope.resolve do |sideload_results|
+        fire_assign(parents, sideload_results)
       end
     end
+
+    #def after_save(only: [], except: [], &blk)
+      #actions = HOOK_ACTIONS - except
+      #actions = only & actions
+      #actions = [:save] if only.empty? && except.empty?
+      #actions.each do |a|
+        #hooks[:"after_#{a}"] << blk
+      #end
+    #end
+
+    #def hooks
+      #@hooks ||= {}.tap do |h|
+        #HOOK_ACTIONS.each do |a|
+          #h[:"after_#{a}"] = []
+          #h[:"before_#{a}"] = []
+        #end
+      #end
+    #end
+
+    #def fire_hooks!(parent, objects, method)
+      #return unless self.hooks
+
+      #hooks = self.hooks[:"after_#{method}"] + self.hooks[:after_save]
+      #hooks.compact.each do |hook|
+        #resource.instance_exec(parent, objects, &hook)
+      #end
+    #end
 
     private
 
-    def polymorphic_grouper(grouping_field)
-      lambda do |record|
-        if record.is_a?(Hash)
-          if record.keys[0].is_a?(Symbol)
-            record[grouping_field]
-          else
-            record[grouping_field.to_s]
-          end
-        else
-          record.send(grouping_field)
-        end
+    def associate(parent, child)
+      parent_resource.associate(parent, child, name, type)
+    end
+
+    def disassociate(parent, child)
+      parent_resource.disassociate(parent, child, name, type)
+    end
+
+    def fire_assign_each(parent, children)
+      if self.class.assign_each_proc
+        instance_exec(parent, children, &self.class.assign_each_proc)
+      else
+        assign_each(parent, children)
       end
     end
 
-    def resolve_polymorphic(parents, query)
-      grouper = polymorphic_grouper(@grouping_field)
-
-      parents.group_by(&grouper).each_pair do |group_type, group_members|
-        sideload_for_group = @polymorphic_groups[group_type]
-        if sideload_for_group
-          sideload_for_group.resolve(group_members, query, name)
-        end
+    def fire_assign(parents, children)
+      if self.class.assign_proc
+        instance_exec(parents, children, &self.class.assign_proc)
+      else
+        assign(parents, children)
       end
     end
 
-    def resolve_basic(parents, query, namespace)
-      sideload_scope   = scope_proc.call(parents)
-      sideload_scope   = Scope.new(sideload_scope, resource_class.new, query, default_paginate: false, namespace: namespace)
-      sideload_scope.resolve do |sideload_results|
-        assign_proc.call(parents, sideload_results)
+    def fire_scope(parents)
+      if self.class.scope_proc
+        instance_exec(parents, &self.class.scope_proc)
+      else
+        scope(parents)
       end
+    end
+
+    def namespace_for(klass)
+      namespace = klass.name
+      split = namespace.split('::')
+      split[0,split.length-1].join('::')
+    end
+
+    def infer_resource_class
+      namespace = namespace_for(parent_resource.class)
+      inferred_name = "#{name.to_s.singularize.classify}Resource"
+      klass = "#{namespace}::#{inferred_name}".safe_constantize
+      unless klass
+        raise Errors::ResourceNotFound.new(parent_resource, name)
+      end
+      klass
     end
   end
 end

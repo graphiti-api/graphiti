@@ -169,7 +169,7 @@ module JsonapiCompliable
     private
 
     def association?(name)
-      resource.association_names.include?(name)
+      resource.class.association_names.include?(name)
     end
 
     def parse_include(memo, incl_hash, namespace)

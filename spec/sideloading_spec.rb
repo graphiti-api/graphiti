@@ -1,330 +1,339 @@
 require 'spec_helper'
 
 RSpec.describe 'sideloading' do
-  include_context 'scoping'
+  include JsonHelpers
+  include_context 'resource testing'
+  let(:resource) { PORO::EmployeeResource.new }
+  let(:base_scope) { { type: :employees } }
 
-  let(:ar_resource) do
-    Class.new(JsonapiCompliable::Resource) do
-      use_adapter JsonapiCompliable::Adapters::ActiveRecord
-    end
-  end
-
-  let(:book_resource) do
-    book_resource_klass = Class.new(ar_resource) do
-      type :books
-      allow_filter :id
+  module Sideloading
+    class CustomPositionResource < ::PORO::PositionResource
+      default_sort([{ id: :desc }])
     end
 
-    book_resource_klass.allow_sideload :genre, resource: genre_resource do
-      scope do |books|
-        Genre.where(id: books.map(&:genre_id))
-      end
-
-      assign do |books, genres|
-        books.each do |book|
-          book.instance_variable_set(:@the_genre, genres.find { |g| g.id == book.genre_id })
-        end
+    class PositionSideload < ::JsonapiCompliable::Sideload::HasMany
+      def scope(employees)
+        { type: :positions, sort: { id: :desc } }
       end
     end
-
-    book_resource_klass
   end
 
-  let(:genre_resource) do
-    Class.new(ar_resource) do
-      type :genres
-    end
-  end
-
-  let(:state_resource) do
-    Class.new(ar_resource) do
-      type :states
-    end
-  end
-
-  let(:dwelling_resource) do
-    Class.new(ar_resource) do
-      type :dwellings
-    end
-  end
-
-  let(:scope_object) do
-    Author.all.map do |a|
-      a.attributes.symbolize_keys
-        .slice(:id, :state_id, :dwelling_id, :dwelling_type)
-    end
+  after do
+    PORO::EmployeeResource.sideloads = {}
+    PORO::DB.clear
   end
 
   before do
-    resource_class.use_adapter JsonapiCompliable::Adapters::Null
-    resource_class.allow_sideload :books, resource: book_resource do
-      scope do |authors|
-        Book.where(author_id: authors.map { |a| a[:id] })
-      end
-
-      assign do |authors, books|
-        authors.each do |author|
-          author[:books] = books.select { |b| b.author_id == author[:id] }
-        end
-      end
-    end
-
-    resource_class.allow_sideload :one_book, resource: book_resource do
-      scope do |authors|
-        Book.limit(1)
-      end
-
-      assign do |authors, books|
-        authors.each do |author|
-          author[:books] = books
-        end
-      end
-    end
-
-    resource_class.allow_sideload :state, resource: state_resource do
-      scope do |authors|
-        State.where(id: authors.map { |a| a[:state_id] })
-      end
-
-      assign do |authors, states|
-        authors.each do |author|
-          author[:state] = states.find { |s| s.id == author[:state_id] }
-        end
-      end
-    end
-
-    _dwelling_resource = dwelling_resource
-    resource_class.allow_sideload :dwelling, polymorphic: true do
-      group_by :dwelling_type
-
-      allow_sideload 'House', resource: _dwelling_resource do
-        scope do |authors|
-          House.where(id: authors.map { |a| a[:dwelling_id] })
-        end
-
-        assign do |authors, houses|
-          authors.each do |author|
-            author[:dwelling] = houses.find { |h| h.id == author[:dwelling_id] }
-          end
-        end
-      end
-
-      allow_sideload 'Condo', resource: _dwelling_resource do
-        scope do |authors|
-          Condo.where(id: authors.map { |a| a[:dwelling_id] })
-        end
-
-        assign do |authors, condos|
-          authors.each do |author|
-            author[:dwelling] = condos.find { |c| c.id == author[:dwelling_id] }
-          end
-        end
-      end
-    end
+    PORO::DB.data[:employees] << { id: 1  }
+    PORO::DB.data[:positions] << { id: 1, employee_id: 1, department_id: 1  }
+    PORO::DB.data[:positions] << { id: 2, employee_id: 1, department_id: 2  }
+    PORO::DB.data[:departments] << { id: 1 }
+    PORO::DB.data[:departments] << { id: 2 }
+    PORO::DB.data[:bios] << { id: 1, employee_id: 1  }
+    PORO::DB.data[:bios] << { id: 2, employee_id: 1  }
+    PORO::DB.data[:teams] << { id: 1, team_memberships: [PORO::TeamMembership.new(employee_id: 1, team_id: 1)] }
+    PORO::DB.data[:teams] << { id: 2, team_memberships: [PORO::TeamMembership.new(employee_id: 1, team_id: 2)] }
   end
 
-  let!(:state)  { State.create!(name: 'maine') }
-  let!(:genre)  { Genre.create!(name: 'horror') }
-  let!(:book1)  { Book.create!(title: 'The Shining', author: author, genre: genre) }
-  let!(:book2)  { Book.create!(title: 'The Stand', author: author, genre: genre) }
-
-  let!(:author) do
-    Author.create! \
-      first_name: 'Stephen',
-      last_name: 'King',
-      state: state
-  end
-
-  def json
-    authors = scope.resolve.map { |a| Author.new(a) }
-    render(authors)
-  end
-
-  it 'sideloads correctly using scope/assign procs' do
-    params[:include] = 'books'
-    author = scope.resolve.first
-    expect(author[:books]).to eq([book1, book2])
-  end
-
-  it 'supports filtering associations' do
-    params[:include] = 'books'
-    params[:filter]  = { books: { id: book2.id } }
-    expect(scope.resolve.first[:books]).to eq([book2])
-  end
-
-  it 'supports paginating associations' do
-    params[:include] = 'books'
-    params[:page]   = { books: { size: 1, number: 2 } }
-    expect(scope.resolve.first[:books]).to eq([book2])
-  end
-
-  it 'does not apply default pagination for sideloads' do
-    params[:include] = 'one_book'
-    expect(scope.resolve.first[:books]).to eq([book1])
-  end
-
-  it 'supports sorting associations' do
-    params[:include] = 'books'
-    params[:sort]    = '-books.title'
-    expect(scope.resolve.first[:books]).to eq([book2, book1])
-  end
-
-  it 'supports extra fields of sideloaded resource' do
-    params[:include]      = 'state'
-    params[:extra_fields] = { states: 'population' }
-
-    state = json['included'][0]['attributes']
-    expect(state['population']).to eq(10_000)
-    expect(state['abbreviation']).to_not be_nil
-    expect(state['name']).to_not be_nil
-  end
-
-  it 'supports sparse fielset of sideloaded resource' do
-    params[:include] = 'state'
-    params[:fields] = { states: 'name' }
-
-    state = json['included'][0]['attributes']
-    expect(state['name']).to_not be_nil
-    expect(state).to_not have_key('abbreviation')
-    expect(state).to_not have_key('population')
-  end
-
-  context 'when the sideload is polymorphic' do
-    let!(:condo)        { Condo.create!(name: 'My Condo') }
-    let!(:condo_author) { Author.create!(dwelling: condo) }
-    let!(:house)        { House.create!(name: 'Cozy House') }
-
+  context 'when basic manual sideloading' do
     before do
-      author.dwelling = house
-      author.save!
-
-      _dwelling_resource = dwelling_resource
-      resource_class.allow_sideload :dwelling, polymorphic: true do
-        group_by :dwelling_type
-
-        allow_sideload 'House', resource: _dwelling_resource do
-          scope do |authors|
-            House.where(id: authors.map { |a| a[:dwelling_id] })
+      PORO::EmployeeResource.class_eval do
+        allow_sideload :positions, type: :has_many do
+          scope do |employees|
+            {
+              type: :positions,
+              conditions: { employee_id: employees.map(&:id) }
+            }
           end
 
-          assign do |authors, houses|
-            authors.each do |author|
-              author[:dwelling] = houses.find { |h| h.id == author[:dwelling_id] }
-            end
+          assign_each do |employee, positions|
+            positions.select { |p| p.employee_id == employee.id }
           end
         end
+      end
+    end
 
-        allow_sideload 'Condo', resource: _dwelling_resource do
-          scope do |authors|
-            Condo.where(id: authors.map { |a| a[:dwelling_id] })
+    it 'works' do
+      params[:include] = 'positions'
+      render
+      expect(ids_for('positions')).to eq([1, 2])
+    end
+
+    context 'and deep querying' do
+      before do
+        params[:include] = 'positions'
+        params[:sort] = '-positions.id'
+      end
+
+      it 'works' do
+        render
+        expect(ids_for('positions')).to eq([2, 1])
+      end
+    end
+  end
+
+  context 'when using .assign instead of .assign_each' do
+    before do
+      PORO::EmployeeResource.class_eval do
+        allow_sideload :positions, type: :has_many do
+          scope do |employees|
+            {
+              type: :positions,
+              conditions: { employee_id: employees.map(&:id) }
+            }
           end
 
-          assign do |authors, condos|
-            authors.each do |author|
-              author[:dwelling] = condos.find { |c| c.id == author[:dwelling_id] }
+          assign do |employees, positions|
+            employees.each do |e|
+              relevant = positions.select { |p| p.employee_id == e.id }
+              e.positions = relevant
             end
           end
         end
       end
+      params[:include] = 'positions'
     end
 
-    it 'groups by type' do
-      params[:include] = 'dwelling'
-      authors = scope.resolve
-      expect(authors[0][:id]).to eq(author.id)
-      expect(authors[0][:dwelling]).to eq(house)
-      expect(authors[1][:id]).to eq(condo_author.id)
-      expect(authors[1][:dwelling]).to eq(condo)
-    end
-
-    it 'supports extra_fields for each type' do
-      params[:include] = 'dwelling'
-      params[:extra_fields] = { condos: 'condo_price', houses: 'house_price' }
-
-      house = json['included'].find { |i| i['type'] == 'houses' }
-      house = house['attributes']
-      expect(house['name']).to_not be_nil
-      expect(house['house_description']).to_not be_nil
-      expect(house['house_price']).to eq(1_000_000)
-      condo = json['included'].find { |i| i['type'] == 'condos' }
-      condo = condo['attributes']
-      expect(condo['name']).to_not be_nil
-      expect(condo['condo_description']).to_not be_nil
-      expect(condo['condo_price']).to eq(500_000)
-    end
-
-    it 'supports sparse fieldsets for each type' do
-      params[:include] = 'dwelling'
-      params[:fields] = { condos: 'name', houses: 'name' }
-
-      house = json['included'].find { |i| i['type'] == 'houses' }
-      house = house['attributes']
-      expect(house['name']).to_not be_nil
-      expect(house).to_not have_key('house_description')
-      expect(house).to_not have_key('price')
-      condo = json['included'].find { |i| i['type'] == 'condos' }
-      condo = condo['attributes']
-      expect(condo['name']).to_not be_nil
-      expect(condo).to_not have_key('condo_description')
-      expect(condo).to_not have_key('condo_price')
+    it 'works' do
+      render
+      expect(ids_for('positions')).to eq([1, 2])
     end
   end
 
-  context 'when nested includes' do
-    it 'sideloads all levels of nesting' do
-      params[:include] = 'books.genre,state'
-      author = scope.resolve.first
-      expect(author[:books]).to eq([book1, book2])
-      expect(author[:books][0].instance_variable_get(:@the_genre)).to eq(genre)
-    end
-  end
-
-
-  context 'when sideload has required filter' do
+  context 'when custom resource option given' do
     before do
-      a = author
-      book_resource.class_eval do
-        allow_filter :required, required: true do |scope, value|
-          scope.where(author_id: a.id)
+      PORO::EmployeeResource.class_eval do
+        allow_sideload :positions, type: :has_many, resource: Sideloading::CustomPositionResource do
+          scope do |employees|
+            {
+              type: :positions,
+              conditions: { employee_id: employees.map(&:id) }
+            }
+          end
+
+          assign_each do |employee, positions|
+            positions.select { |p| p.employee_id == employee.id }
+          end
         end
       end
+      params[:include] = 'positions'
     end
 
-    context 'and no required filters are provided' do
-      before do
-        params[:include] = 'books'
-      end
+    it 'works' do
+      render
+      expect(ids_for('positions')).to eq([2, 1])
+    end
+  end
 
-      it 'raises an error' do
-        expect {
-          scope.resolve
-        }.to raise_error(JsonapiCompliable::Errors::RequiredFilter, 'The required filter "required" was not provided')
+  context 'when class option given' do
+    before do
+      PORO::EmployeeResource.class_eval do
+        allow_sideload :positions, class: Sideloading::PositionSideload
       end
-
+      params[:include] = 'positions'
     end
 
-    context 'and sideloaded filter is provided with symbolized keys' do
-      before do
-        params[:include] = 'books'
-        params[:filter] = { books: {required: true} }
-      end
+    it 'works' do
+      render
+      expect(ids_for('positions')).to eq([2, 1])
+    end
+  end
 
-      it 'should return results' do
-        author = scope.resolve.first
-        expect(author[:books]).to eq([book1, book2])
+  describe 'has_many macro' do
+    before do
+      PORO::EmployeeResource.class_eval do
+        has_many :positions do
+          scope do |employees|
+            {
+              type: :positions,
+              conditions: { employee_id: employees.map(&:id) }
+            }
+          end
+        end
       end
+      params[:include] = 'positions'
     end
 
-    context 'and sideloaded filter is provided with stringified keys' do
+    it 'works' do
+      render
+      expect(ids_for('positions')).to eq([1, 2])
+    end
+
+    context 'when custom foreign key given' do
       before do
-        params[:include] = 'books'
-        params[:filter] = { 'books' => {'required' => true} }
+        PORO::DB.data[:positions][0] = { id: 1, e_id: 1  }
+        PORO::DB.data[:positions][1] = { id: 2, e_id: 1  }
+
+        PORO::EmployeeResource.class_eval do
+          has_many :positions, foreign_key: :e_id do
+            scope do |employees|
+              {
+                type: :positions,
+                conditions: { e_id: employees.map(&:id) }
+              }
+            end
+          end
+        end
+        params[:include] = 'positions'
       end
 
-      it 'should return results' do
-        author = scope.resolve.first
-        expect(author[:books]).to eq([book1, book2])
+      it 'is used' do
+        render
+        expect(ids_for('positions')).to eq([1, 2])
       end
+    end
+  end
+
+  describe 'belongs_to macro' do
+    let(:resource) { PORO::PositionResource.new }
+    let(:base_scope) { { type: :positions } }
+
+    before do
+      PORO::PositionResource.class_eval do
+        belongs_to :employee do
+          scope do |positions|
+            {
+              type: :employees,
+              conditions: { id: positions.map(&:employee_id) }
+            }
+          end
+        end
+      end
+      params[:include] = 'employee'
+    end
+
+    it 'works' do
+      render
+      expect(ids_for('employees')).to eq([1])
+    end
+  end
+
+  # Note we're seeding 2 bios
+  describe 'has_one macro' do
+    before do
+      PORO::EmployeeResource.class_eval do
+        has_one :bio do
+          scope do |employees|
+            {
+              type: :bios,
+              conditions: { employee_id: employees.map(&:id) }
+            }
+          end
+        end
+      end
+      params[:include] = 'bio'
+    end
+
+    it 'works' do
+      render
+      expect(ids_for('bios')).to eq([1])
+    end
+  end
+
+  describe 'many_to_many macro' do
+    before do
+      PORO::EmployeeResource.class_eval do
+        many_to_many :teams, foreign_key: { team_memberships: :employee_id } do
+          # fake the logic to join tables etc
+          scope do |employees|
+            {
+              type: :teams,
+              conditions: { id: [1, 2] }
+            }
+          end
+        end
+      end
+      params[:include] = 'teams'
+    end
+
+    it 'works' do
+      render
+      expect(ids_for('teams')).to eq([1, 2])
+    end
+  end
+
+
+  context 'when the associated resource has default pagination' do
+    before do
+      PORO::EmployeeResource.class_eval do
+        allow_sideload :positions, class: Sideloading::PositionSideload
+      end
+      PORO::PositionResource.class_eval do
+        default_page_size(1)
+      end
+      params[:include] = 'positions'
+    end
+
+    it 'is ignored for sideloads' do
+      render
+      expect(ids_for('positions')).to match_array([1, 2])
+    end
+  end
+
+  context 'when nesting sideloads' do
+    before do
+      PORO::EmployeeResource.class_eval do
+        allow_sideload :positions, class: Sideloading::PositionSideload
+      end
+      PORO::PositionResource.class_eval do
+        belongs_to :department do
+          scope do |positions|
+            {
+              type: :departments,
+              conditions: { id: positions.map(&:department_id) }
+            }
+          end
+        end
+      end
+      params[:include] = 'positions.department'
+    end
+
+    it 'works' do
+      render
+      expect(ids_for('positions')).to match_array([1, 2])
+      expect(ids_for('departments')).to match_array([1, 2])
+    end
+  end
+
+  context 'when passing pagination params for > 1 parent objects' do
+    before do
+      PORO::DB.data[:employees] << { id: 999  }
+      PORO::EmployeeResource.class_eval do
+        allow_sideload :positions, class: Sideloading::PositionSideload
+      end
+      params[:include] = 'positions'
+      params[:page] = {
+        positions: { size: 1 }
+      }
+    end
+
+    it 'raises an error, because this is difficult/impossible' do
+      expect {
+        render
+      }.to raise_error(JsonapiCompliable::Errors::UnsupportedPagination)
+    end
+  end
+
+  context 'when passing pagination params for only 1 object' do
+    before do
+      PORO::EmployeeResource.class_eval do
+        allow_sideload :positions, class: Sideloading::PositionSideload
+      end
+      params[:include] = 'positions'
+      params[:page] = {
+        size: 1,
+        positions: { size: 1 }
+      }
+    end
+
+    it 'works' do
+      render
+      expect(ids_for('positions')).to match_array([2])
+    end
+  end
+
+  context 'when a required filter on the sideloaded resource' do
+    xit 'should maybe raise, not sure yet. that is why this spec is spending' do
     end
   end
 end

@@ -86,7 +86,7 @@ module JsonapiCompliable
       promises = []
 
       includes.each_pair do |name, nested|
-        sideload = @resource.sideload(name)
+        sideload = @resource.class.sideload(name)
 
         if sideload.nil?
           if JsonapiCompliable.config.raise_on_missing_sideload
@@ -123,11 +123,11 @@ module JsonapiCompliable
       add_scoping(:filter, JsonapiCompliable::Scoping::Filter, opts)
       add_scoping(:extra_fields, JsonapiCompliable::Scoping::ExtraFields, opts)
       add_scoping(:sort, JsonapiCompliable::Scoping::Sort, opts)
-      add_scoping(:paginate, JsonapiCompliable::Scoping::Paginate, opts, default: opts[:default_paginate])
+      add_scoping(:paginate, JsonapiCompliable::Scoping::Paginate, opts)
     end
 
     def add_scoping(key, scoping_class, opts, default = {})
-      @object = scoping_class.new(@resource, query_hash, @object, default).apply unless opts[key] == false
+      @object = scoping_class.new(@resource, query_hash, @object, opts).apply unless opts[key] == false
       @unpaginated_object = @object unless key == :paginate
     end
   end

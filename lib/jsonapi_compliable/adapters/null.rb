@@ -56,10 +56,6 @@ module JsonapiCompliable
       def resolve(scope)
         scope
       end
-
-      # (see Adapters::Abstract#associate)
-      def associate(parent, child, association_name, association_type)
-      end
     end
   end
 end

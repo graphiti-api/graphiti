@@ -26,7 +26,7 @@ module BasicRailsApp
       fake_logger = Logger.new(nil)
       config.logger = fake_logger
       Rails.application.routes.default_url_options = { host: 'example.com' }
-      
+
       # fix railties 5.2.0 issue with secret_key_base
       # https://github.com/rails/rails/commit/7419a4f9 should take care of it 
       # in the future.
@@ -50,7 +50,7 @@ class ApplicationController < ActionController::Base
   include JsonapiCompliable::Rails
 
   jsonapi do
-    use_adapter JsonapiCompliable::Adapters::ActiveRecord
+    use_adapter JsonapiCompliable::Adapters::ActiveRecord::Base
   end
 
   prepend_before_action :fix_params!

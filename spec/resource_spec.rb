@@ -116,6 +116,48 @@ RSpec.describe JsonapiCompliable::Resource do
     end
   end
 
+  describe '.allow_sideload' do
+    it 'uses Sideload as default class' do
+      sideload = klass.allow_sideload :comments
+      expect(sideload.class.ancestors[1]).to eq(JsonapiCompliable::Sideload)
+    end
+
+    it 'assigns parent resource as self' do
+      sideload = klass.allow_sideload :comments
+      expect(sideload.parent_resource_class).to eq(klass)
+    end
+
+    it 'adds to the list of sideloads' do
+      sideload = klass.allow_sideload :comments
+      expect(klass.sideloads[:comments]).to eq(sideload)
+    end
+
+    it 'passes options to the sideload constructor' do
+      sideload = klass.allow_sideload :comments, type: :foo
+      expect(sideload.type).to eq(:foo)
+    end
+
+    context 'when passed a block' do
+      it 'is processed' do
+        sideload = klass.allow_sideload :comments do
+          scope do |parents|
+            'foo'
+          end
+        end
+        expect(sideload.class.scope_proc.call([])).to eq('foo')
+      end
+    end
+
+    context 'when passed explicit :class' do
+      it 'is used' do
+        sideload = klass.allow_sideload :comments,
+          class: JsonapiCompliable::Sideload::HasMany
+        expect(sideload.class.ancestors[1])
+          .to eq(JsonapiCompliable::Sideload::HasMany)
+      end
+    end
+  end
+
   describe '#association_names' do
     it 'collects nested + resource sideloads' do
       klass.allow_sideload :books do

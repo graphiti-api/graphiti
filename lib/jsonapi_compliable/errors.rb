@@ -1,8 +1,9 @@
 module JsonapiCompliable
   module Errors
-    class BadFilter < StandardError; end
+    class Base < StandardError;end
+    class BadFilter < Base; end
 
-    class ValidationError < StandardError
+    class ValidationError < Base
       attr_reader :validation_response
 
       def initialize(validation_response)
@@ -10,7 +11,44 @@ module JsonapiCompliable
       end
     end
 
-    class MissingSerializer < StandardError
+    class ResourceNotFound < Base
+      def initialize(resource, sideload_name)
+        @resource = resource
+        @sideload_name = sideload_name
+      end
+
+      def message
+        <<-MSG
+Could not find resource class for sideload '#{@sideload_name}' on Resource '#{@resource.class.name}'!
+
+If this follows a non-standard naming convention, use the :resource option to pass it directly:
+
+has_many :comments, resource: SpecialCommentResource
+        MSG
+      end
+    end
+
+    class UnsupportedPagination < Base
+      def message
+        <<-MSG
+It looks like you are requesting pagination of a sideload, but there are > 1 parents.
+
+This is not supported. In other words, you can do
+
+/employees/1?include=positions&page[positions][size]=2
+
+But not
+
+/employees?include=positions&page[positions][size]=2
+
+This is a limitation of most datastores; the same issue exists in ActiveRecord.
+
+Consider using a named relationship instead, e.g. 'has_one :top_comment'
+        MSG
+      end
+    end
+
+    class MissingSerializer < Base
       def initialize(class_name, serializer_name)
         @class_name = class_name
         @serializer_name = serializer_name
@@ -27,7 +65,7 @@ Use a custom Inferrer if you'd like different lookup logic.
       end
     end
 
-    class MissingSerializer < StandardError
+    class MissingSerializer < Base
       def initialize(class_name, serializer_name)
         @class_name = class_name
         @serializer_name = serializer_name
@@ -44,7 +82,7 @@ Use a custom Inferrer if you'd like different lookup logic.
       end
     end
 
-    class UnsupportedPageSize < StandardError
+    class UnsupportedPageSize < Base
       def initialize(size, max)
         @size, @max = size, max
       end
@@ -54,7 +92,7 @@ Use a custom Inferrer if you'd like different lookup logic.
       end
     end
 
-    class InvalidInclude < StandardError
+    class InvalidInclude < Base
       def initialize(relationship, parent_resource)
         @relationship = relationship
         @parent_resource = parent_resource
@@ -65,7 +103,7 @@ Use a custom Inferrer if you'd like different lookup logic.
       end
     end
 
-    class StatNotFound < StandardError
+    class StatNotFound < Base
       def initialize(attribute, calculation)
         @attribute = attribute
         @calculation = calculation
@@ -86,10 +124,10 @@ Use a custom Inferrer if you'd like different lookup logic.
       end
     end
 
-    class RecordNotFound < StandardError
+    class RecordNotFound < Base
     end
 
-    class RequiredFilter < StandardError
+    class RequiredFilter < Base
       def initialize(attributes)
         @attributes = Array(attributes)
       end

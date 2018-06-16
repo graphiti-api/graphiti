@@ -211,30 +211,13 @@ module JsonapiCompliable
         scope
       end
 
-      # Assign these two objects together.
-      #
-      # @example Basic accessor
-      #   def associate(parent, child, association_name, association_type)
-      #     if association_type == :has_many
-      #       parent.send(association_name).push(child)
-      #     else
-      #       child.send(:"#{association_name}=", parent)
-      #     end
-      #   end
-      #
-      # +association_name+ and +association_type+ come from your sideload
-      # configuration:
-      #
-      #   allow_sideload :the_name, type: the_type do
-      #     # ... code.
-      #   end
-      #
-      # @param parent The parent object (via the JSONAPI 'relationships' graph)
-      # @param child The child object (via the JSONAPI 'relationships' graph)
-      # @param association_name The 'relationships' key we are processing
-      # @param association_type The Sideload type (see Sideload#type). Usually :has_many/:belongs_to/etc
+      # Probably want to override
       def associate(parent, child, association_name, association_type)
-        raise 'you must override #associate in an adapter subclass'
+        if [:has_many, :many_to_many].include?(association_type)
+          parent.send(:"#{association_name}") << child
+        else
+          parent.send(:"#{association_name}=", child)
+        end
       end
 
       # Remove the association without destroying objects
@@ -277,17 +260,17 @@ module JsonapiCompliable
         raise 'you must override #disassociate in an adapter subclass'
       end
 
-      # This module gets mixed in to Sideload classes
-      # This is where you define methods like has_many,
-      # belongs_to etc that wrap the lower-level Sideload#allow_sideload
-      #
-      # @see Resource#allow_sideload
-      # @see Sideload#allow_sideload
-      # @see Adapters::ActiveRecord#sideloading_module
-      # @see Adapters::ActiveRecordSideloading
-      # @return the module to mix in
-      def sideloading_module
-        Module.new
+      # You want to override this!
+      # Map of association_type => sideload_class
+      # e.g.
+      # { has_many: Adapters::ActiveRecord::HasManySideload }
+      def sideloading_classes
+        {
+          has_many: ::JsonapiCompliable::Sideload::HasMany,
+          belongs_to: ::JsonapiCompliable::Sideload::BelongsTo,
+          has_one: ::JsonapiCompliable::Sideload::HasOne,
+          many_to_many: ::JsonapiCompliable::Sideload::ManyToMany
+        }
       end
 
       # @param [Class] model_class The configured model class (see Resource.model)
