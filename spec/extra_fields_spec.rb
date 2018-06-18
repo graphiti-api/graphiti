@@ -1,99 +1,82 @@
 require 'spec_helper'
 
 RSpec.describe 'extra_fields' do
-  include_context 'scoping'
+  include JsonHelpers
+  include_context 'resource testing'
+  let(:resource) { Class.new(PORO::EmployeeResource).new }
+  let(:base_scope) { { type: :employees } }
 
-  class SerializableTestExtraFields < JSONAPI::Serializable::Resource
-    type 'authors'
-    attributes :first_name, :last_name
-    extra_attribute :net_worth, if: proc { !@context || @context.allow_net_worth? } do
-      100_000_000
-    end
+  let!(:employee) { PORO::Employee.create }
 
-    extra_attribute :runtime_id do
-      @context.runtime_id
-    end
-  end
-
-  before do
-    resource_class.class_eval do
-      extra_field :net_worth do |scope|
-        scope.include_foo!
-      end
-
-      extra_field :runtime_id do |scope, ctx|
-        scope.runtime_id = ctx.runtime_id
-        scope
-      end
-    end
-  end
-
-  let!(:scope_object) do
-    scope = Author.all
-    scope.instance_eval do
-      def runtime_id=(val)
-        @runtime_id = val
-      end
-
-      def runtime_id
-        @runtime_id
-      end
-
-      def include_foo!
-        self
-      end
-    end
-    scope
-  end
-
-  let!(:author) { Author.create!(first_name: 'Stephen', last_name: 'King') }
-
-  before do
-    allow(Author).to receive(:all) { scope_object }
-  end
-
-  let(:json) do
-    render(scope.resolve, class: { Author: SerializableTestExtraFields })
+  def attributes
+    json['data'][0]['attributes']
   end
 
   it 'does not include extra fields when not requested' do
-    expect(json['data'][0]['attributes'].keys).to match_array(%w(first_name last_name))
+    render
+    expect(attributes.keys).to match_array(%w(first_name last_name age))
   end
 
   it 'includes the extra fields in the response when requested' do
-    params[:extra_fields] = { authors: 'net_worth' }
-    expect(json['data'][0]['attributes'].keys).to match_array(%w(first_name last_name net_worth))
+    params[:extra_fields] = { employees: 'stack_ranking' }
+    render
+    expect(attributes.keys)
+      .to match_array(%w(first_name last_name age stack_ranking))
   end
 
-  it 'alters the scope based on the supplied block' do
-    params[:extra_fields] = { authors: 'net_worth' }
-    expect(json['data'][0]['attributes'].keys).to match_array(%w(first_name last_name net_worth))
-  end
-
-  context 'when accessing runtime context' do
+  context 'when altering scope based on extra attrs' do
     before do
-      params[:extra_fields] = { authors: 'runtime_id' }
+      resource.class.class_eval do
+        extra_field :net_worth do |scope|
+          scope[:foo] = 'bar'
+          scope
+        end
+      end
+    end
+
+    it 'modifies the scope' do
+      params[:extra_fields] = { employees: 'net_worth' }
+      expect(PORO::DB).to receive(:all).with(hash_including(foo: 'bar'))
+      render
+    end
+  end
+
+  context 'when acessing runtime context' do
+    before do
+      params[:extra_fields] = { employees: 'runtime_id' }
     end
 
     it 'works' do
-      expect(scope_object).to receive(:runtime_id=).with(789)
       ctx = double(runtime_id: 789).as_null_object
       resource.with_context ctx do
-        attrs = json['data'][0]['attributes']
-        expect(attrs['runtime_id']).to eq(789)
+        render
+        expect(attributes['runtime_id']).to eq(789)
       end
     end
   end
 
-  context 'when extra field is requested but guarded' do
+  context 'when extra field is guarded' do
     before do
-      params[:extra_fields] = { authors: 'net_worth' }
+      params[:extra_fields] = { employees: 'admin_stack_ranking' }
     end
 
-    it 'does not include the extra field in the response' do
-      ctx = double(allow_net_worth?: false).as_null_object
-      resource.with_context ctx do
-        expect(json['data'][0]['attributes'].keys).to match_array(%w(first_name last_name))
+    context 'and the guard passes' do
+      it 'renders the field' do
+        ctx = double(current_user: 'admin').as_null_object
+        resource.with_context ctx do
+          render
+          expect(attributes.keys).to include('admin_stack_ranking')
+        end
+      end
+    end
+
+    context 'and the guard fails' do
+      it 'does not render the field' do
+        ctx = double(current_user: 'foo').as_null_object
+        resource.with_context ctx do
+          render
+          expect(attributes.keys).to_not include('admin_stack_ranking')
+        end
       end
     end
   end

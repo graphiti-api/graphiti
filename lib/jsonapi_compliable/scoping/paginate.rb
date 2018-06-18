@@ -77,7 +77,7 @@ module JsonapiCompliable
     end
 
     def number
-      (page_param[:number] || resource.default_page_number).to_i
+      (page_param[:number] || 1).to_i
     end
 
     def size

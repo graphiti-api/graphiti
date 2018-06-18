@@ -354,12 +354,6 @@ module JsonapiCompliable
       config[:type] = value
     end
 
-    # Set an alternative default page number. Defaults to 1.
-    # @param [Integer] val The new default
-    def self.default_page_number(val)
-      config[:default_page_number] = val
-    end
-
     # Set an alternate default page size, when not specified in query parameters.
     #
     # @example
@@ -558,12 +552,6 @@ module JsonapiCompliable
     # @api private
     def default_sort
       self.class.config[:default_sort] || []
-    end
-
-    # @see .default_page_number
-    # @api private
-    def default_page_number
-      self.class.config[:default_page_number] || 1
     end
 
     # @see .default_page_size

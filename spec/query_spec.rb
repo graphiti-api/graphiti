@@ -1,22 +1,9 @@
 require 'spec_helper'
 
 RSpec.describe JsonapiCompliable::Query do
-  let(:resource_class) do
-    Class.new(JsonapiCompliable::Resource) do
-      type :authors
-
-      allow_sideload :books do
-        allow_sideload :genre do
-          allow_sideload :owner
-        end
-        allow_sideload :publisher
-      end
-      allow_sideload :state
-    end
-  end
-
+  let(:resource_class) { Class.new(PORO::EmployeeResource) }
   let(:resource) { resource_class.new }
-  let(:params)   { { include: 'books' } }
+  let(:params)   { { include: 'positions' } }
   let(:instance) { described_class.new(resource, params) }
 
   describe '#to_hash' do
@@ -24,11 +11,11 @@ RSpec.describe JsonapiCompliable::Query do
 
     describe 'filters' do
       it 'defaults main entity' do
-        expect(subject[:authors][:filter]).to eq({})
+        expect(subject[:employees][:filter]).to eq({})
       end
 
       it 'does not default associations' do
-        expect(subject[:books][:filter]).to eq({})
+        expect(subject[:employees][:filter]).to eq({})
       end
 
       context 'when association is not requested' do
@@ -37,21 +24,21 @@ RSpec.describe JsonapiCompliable::Query do
         end
 
         it 'does not default the association query' do
-          expect(subject).to_not have_key(:books)
+          expect(subject).to_not have_key(:positions)
         end
       end
 
       context 'when filter param present' do
         before do
-          params[:filter] = { id: 1, books: { title: 'foo' } }
+          params[:filter] = { id: 1, positions: { title: 'foo' } }
         end
 
         it 'applies to main entity' do
-          expect(subject[:authors][:filter]).to eq({ id: 1 })
+          expect(subject[:employees][:filter]).to eq({ id: 1 })
         end
 
         it 'applies to associations' do
-          expect(subject[:books][:filter]).to eq({ title: 'foo' })
+          expect(subject[:positions][:filter]).to eq({ title: 'foo' })
         end
 
         context 'as a string' do
@@ -60,7 +47,7 @@ RSpec.describe JsonapiCompliable::Query do
           end
 
           it 'stringifies' do
-            expect(subject[:authors][:filter]).to eq({ id: 1 })
+            expect(subject[:employees][:filter]).to eq({ id: 1 })
           end
         end
       end
@@ -68,77 +55,83 @@ RSpec.describe JsonapiCompliable::Query do
 
     describe 'fields' do
       it 'defaults main entity' do
-        expect(subject[:authors][:fields]).to eq({})
+        expect(subject[:employees][:fields]).to eq({})
       end
 
       it 'defaults associations' do
-        expect(subject[:books][:fields]).to eq({})
+        expect(subject[:positions][:fields]).to eq({})
       end
 
       context 'when fields param' do
         before do
-          params[:fields] = { authors: 'first_name,last_name', books: 'title' }
+          params[:fields] = {
+            employees: 'first_name,last_name',
+            positions: 'title'
+          }
         end
 
         it 'applies to main entity' do
-          expect(subject[:authors][:fields])
-            .to eq(authors: [:first_name, :last_name], books: [:title])
+          expect(subject[:employees][:fields])
+            .to eq(employees: [:first_name, :last_name], positions: [:title])
         end
 
         it 'applies to associations' do
-          expect(subject[:books][:fields])
-            .to eq(authors: [:first_name, :last_name], books: [:title])
+          expect(subject[:positions][:fields])
+            .to eq(employees: [:first_name, :last_name], positions: [:title])
         end
       end
     end
 
     describe 'extra_fields' do
       it 'defaults main entity' do
-        expect(subject[:authors][:extra_fields]).to eq({})
+        expect(subject[:employees][:extra_fields]).to eq({})
       end
 
       it 'defaults associations' do
-        expect(subject[:books][:extra_fields]).to eq({})
+        expect(subject[:employees][:extra_fields]).to eq({})
       end
 
       context 'when extra_fields param' do
         before do
-          params[:extra_fields] = { authors: 'first_name,last_name', books: 'title' }
+          params[:extra_fields] = {
+            employees: 'foo,bar',
+            positions: 'baz'
+          }
         end
 
         it 'applies to main entity' do
-          expect(subject[:authors][:extra_fields])
-            .to eq(authors: [:first_name, :last_name], books: [:title])
+          expect(subject[:employees][:extra_fields])
+            .to eq(employees: [:foo, :bar], positions: [:baz])
         end
 
         it 'applies to associations' do
-          expect(subject[:books][:extra_fields])
-            .to eq(authors: [:first_name, :last_name], books: [:title])
+          expect(subject[:positions][:extra_fields])
+            .to eq(employees: [:foo, :bar], positions: [:baz])
         end
       end
     end
 
     describe 'sort' do
       it 'defaults main entity' do
-        expect(subject[:authors][:sort]).to eq([])
+        expect(subject[:employees][:sort]).to eq([])
       end
 
       it 'defaults associations' do
-        expect(subject[:books][:sort]).to eq([])
+        expect(subject[:employees][:sort]).to eq([])
       end
 
       context 'when sort param' do
         before do
-          params[:sort] = 'authors.first_name,-authors.last_name,books.title'
+          params[:sort] = 'employees.first_name,-employees.last_name,positions.title'
         end
 
         it 'applies to main entity' do
-          expect(subject[:authors][:sort])
+          expect(subject[:employees][:sort])
             .to eq([{ first_name: :asc }, { last_name: :desc }])
         end
 
         it 'applies to associations' do
-          expect(subject[:books][:sort])
+          expect(subject[:positions][:sort])
             .to eq([{ title: :asc }])
         end
 
@@ -148,7 +141,7 @@ RSpec.describe JsonapiCompliable::Query do
           end
 
           it 'applies to main entity' do
-            expect(subject[:authors][:sort])
+            expect(subject[:employees][:sort])
               .to eq([{ first_name: :desc }])
           end
         end
@@ -157,108 +150,111 @@ RSpec.describe JsonapiCompliable::Query do
 
     describe 'pagination' do
       it 'defaults main entity' do
-        expect(subject[:authors][:page]).to eq({})
+        expect(subject[:employees][:page]).to eq({})
       end
 
       it 'defaults associations' do
-        expect(subject[:books][:page]).to eq({})
+        expect(subject[:positions][:page]).to eq({})
       end
 
       context 'when pagination param' do
         before do
-          params[:page] = { size: 10, number: 2, books: { size: 5, number: 3 } }
+          params[:page] = { size: 10, number: 2, positions: { size: 5, number: 3 } }
         end
 
         it 'applies to main entity' do
-          expect(subject[:authors][:page]).to eq(size: 10, number: 2)
+          expect(subject[:employees][:page]).to eq(size: 10, number: 2)
         end
 
         it 'applies to associations' do
-          expect(subject[:books][:page]).to eq(size: 5, number: 3)
+          expect(subject[:positions][:page]).to eq(size: 5, number: 3)
         end
       end
     end
 
     describe 'include' do
       before do
-        params[:include] = 'books.genre,books.publisher'
+        params[:include] = 'positions.department,positions.foo'
       end
 
       it 'sets main entity' do
-        expect(subject[:authors][:include])
-          .to eq(books: { genre: {}, publisher: {} })
+        expect(subject[:employees][:include])
+          .to eq(positions: { department: {}, foo: {} })
       end
 
       it 'sets associations' do
-        books_include = subject[:books][:include]
-        expected = { genre: {}, publisher: {} }
-        expect(books_include).to eq(expected)
+        positions_include = subject[:positions][:include]
+        expected = { department: {}, foo: {} }
+        expect(positions_include).to eq(expected)
       end
 
       it 'excludes relations not in the whitelist' do
-        params[:include] = 'books.genre,books.publisher'
-        ctx = double(sideload_whitelist: { index: { books: { genre: {} } } })
+        params[:include] = 'positions.department,positions.foo'
+        ctx = double sideload_whitelist: {
+          index: { positions: { department: {} } }
+        }
 
         resource.with_context ctx, :index do
-          expect(subject[:authors][:include]).to eq(books: { genre: {} })
-          expect(subject[:books][:include]).to eq(genre: {})
+          expect(subject[:employees][:include])
+            .to eq(positions: { department: {} })
+          expect(subject[:positions][:include]).to eq(department: {})
         end
       end
 
       context 'when include param present' do
         before do
-          params[:include] = 'books.genre.owner,state'
+          params[:include] = 'positions.department.foo,bio'
         end
 
         it 'transforms to hash' do
-          expect(subject[:authors][:include]).to eq({
-            books: { genre: { owner: {} } },
-            state: {}
+          expect(subject[:employees][:include]).to eq({
+            positions: { department: { foo: {} } },
+            bio: {}
           })
-          expect(subject[:books][:include]).to eq({
-            genre: { owner: {} }
+          expect(subject[:positions][:include]).to eq({
+            department: { foo: {} }
           })
-          expect(subject[:genre][:include]).to eq({
-            owner: {}
+          expect(subject[:department][:include]).to eq({
+            foo: {}
           })
-          expect(subject[:owner][:include]).to eq({})
-          expect(subject[:state][:include]).to eq({})
+          expect(subject[:foo][:include]).to eq({})
+          expect(subject[:bio][:include]).to eq({})
         end
       end
     end
 
     describe 'stats' do
       it 'defaults main entity' do
-        expect(subject[:authors][:stats]).to eq({})
+        expect(subject[:employees][:stats]).to eq({})
       end
 
       it 'defaults associations' do
-        expect(subject[:books][:stats]).to eq({})
+        expect(subject[:positions][:stats]).to eq({})
       end
     end
 
     context 'when stats param present' do
       before do
         params[:stats] = {
-          authors: {
+          employees: {
             total: 'count,sum',
             stddev: 'amount'
           },
-          books: {
+          positions: {
             foo: 'bar'
           }
         }
       end
 
       it 'applies to main entity' do
-        expect(subject[:authors][:stats]).to eq({
+        expect(subject[:employees][:stats]).to eq({
           total: [:count, :sum],
           stddev: [:amount]
         })
       end
 
       it 'applies to associations' do
-        expect(subject[:books][:stats]).to eq({
+        expect(subject[:positions][:stats]).to eq({
           foo: [:bar]
         })
       end
@@ -269,7 +265,7 @@ RSpec.describe JsonapiCompliable::Query do
         end
 
         it 'applies to main entity' do
-          expect(subject[:authors][:stats]).to eq({
+          expect(subject[:employees][:stats]).to eq({
             total: [:count, :sum],
             stddev: [:amount]
           })

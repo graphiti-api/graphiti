@@ -1,26 +1,31 @@
 require 'spec_helper'
 
 RSpec.describe 'sorting' do
-  include_context 'scoping'
+  include JsonHelpers
+  include_context 'resource testing'
+  let(:resource) { Class.new(PORO::EmployeeResource).new }
+  let(:base_scope) { { type: :employees } }
+
+  subject(:ids) { scope.resolve.map(&:id) }
 
   before do
-    Author.create!(first_name: 'Stephen', last_name: 'King')
-    Author.create!(first_name: 'Philip', last_name: 'Dick')
+    PORO::Employee.create(first_name: 'John', last_name: 'Doe')
+    PORO::Employee.create(first_name: 'Jane', last_name: 'Doe')
   end
 
   it 'defaults sort to resource default_sort' do
-    expect(scope.resolve.map(&:id)).to eq(Author.pluck(:id))
+    expect(ids).to eq([1,2])
   end
 
   context 'when default_sort is overridden' do
     before do
-      resource_class.class_eval do
+      resource.class.class_eval do
         default_sort([{ id: :desc }])
       end
     end
 
     it 'respects the override' do
-      expect(scope.resolve.map(&:id)).to eq(Author.pluck(:id).reverse)
+      expect(ids).to eq([2,1])
     end
   end
 
@@ -34,30 +39,30 @@ RSpec.describe 'sorting' do
     context 'asc' do
       let(:sort_param) { 'first_name' }
 
-      it { is_expected.to eq(%w(Philip Stephen)) }
+      it { is_expected.to eq(%w(Jane John)) }
     end
 
     context 'desc' do
       let(:sort_param) { '-first_name' }
 
-      it { is_expected.to eq(%w(Stephen Philip)) }
+      it { is_expected.to eq(%w(John Jane)) }
     end
 
     context 'when prefixed with type' do
-      let(:sort_param) { 'authors.first_name' }
+      let(:sort_param) { 'employees.first_name' }
 
-      it { is_expected.to eq(%w(Philip Stephen)) }
+      it { is_expected.to eq(%w(Jane John)) }
     end
 
     context 'when passed multisort' do
       let(:sort_param) { 'first_name,last_name' }
 
       before do
-        Author.create(first_name: 'Stephen', last_name: 'Adams')
+        PORO::Employee.create(first_name: 'John', last_name: 'Adams')
       end
 
       it 'sorts correctly' do
-        expect(scope.resolve.map(&:last_name)).to eq(%w(Dick Adams King))
+        expect(ids).to eq([2, 3, 1])
       end
     end
 
@@ -65,22 +70,24 @@ RSpec.describe 'sorting' do
       let(:sort_param) { 'first_name' }
 
       before do
-        resource_class.class_eval do
+        resource.class.class_eval do
           sort do |scope, att, dir|
-            scope.order(id: :desc)
+            scope[:sort] = [{ id: :desc }]
+            scope
           end
         end
       end
 
       it 'uses the custom sort function' do
-        expect(scope.resolve.map(&:id)).to eq(Author.pluck(:id).reverse)
+        expect(ids).to eq([2, 1])
       end
 
       context 'and it accesses runtime context' do
         before do
-          resource_class.class_eval do
+          resource.class.class_eval do
             sort do |scope, att, dir, ctx|
-              scope.order(id: ctx.runtime_direction)
+              scope[:sort] = [{ id: ctx.runtime_direction }]
+              scope
             end
           end
         end
@@ -88,14 +95,14 @@ RSpec.describe 'sorting' do
         it 'works (desc)' do
           ctx = double(runtime_direction: :desc).as_null_object
           JsonapiCompliable.with_context(ctx, {}) do
-            expect(scope.resolve.map(&:id)).to eq(Author.pluck(:id).reverse)
+            expect(ids).to eq([2,1])
           end
         end
 
         it 'works (asc)' do
           ctx = double(runtime_direction: :asc).as_null_object
           JsonapiCompliable.with_context(ctx, {}) do
-            expect(scope.resolve.map(&:id)).to eq(Author.pluck(:id))
+            expect(ids).to eq([1,2])
           end
         end
       end

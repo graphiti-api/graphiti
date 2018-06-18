@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe JsonapiCompliable::Stats::DSL do
   let(:config)   { :myattr }
-  let(:adapter)  { JsonapiCompliable::Adapters::ActiveRecord.new }
+  let(:adapter)  { JsonapiCompliable::Adapters::ActiveRecord::Base.new }
   let(:instance) { described_class.new(adapter, config) }
 
   describe '.new' do

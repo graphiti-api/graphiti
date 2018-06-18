@@ -116,32 +116,32 @@ module JsonapiCompliable
       end
     end
 
-    #def after_save(only: [], except: [], &blk)
-      #actions = HOOK_ACTIONS - except
-      #actions = only & actions
-      #actions = [:save] if only.empty? && except.empty?
-      #actions.each do |a|
-        #hooks[:"after_#{a}"] << blk
-      #end
-    #end
+    def self.after_save(only: [], except: [], &blk)
+      actions = HOOK_ACTIONS - except
+      actions = only & actions
+      actions = [:save] if only.empty? && except.empty?
+      actions.each do |a|
+        hooks[:"after_#{a}"] << blk
+      end
+    end
 
-    #def hooks
-      #@hooks ||= {}.tap do |h|
-        #HOOK_ACTIONS.each do |a|
-          #h[:"after_#{a}"] = []
-          #h[:"before_#{a}"] = []
-        #end
-      #end
-    #end
+    def self.hooks
+      @hooks ||= {}.tap do |h|
+        HOOK_ACTIONS.each do |a|
+          h[:"after_#{a}"] = []
+          h[:"before_#{a}"] = []
+        end
+      end
+    end
 
-    #def fire_hooks!(parent, objects, method)
-      #return unless self.hooks
+    def self.fire_hooks!(parent, objects, method)
+      return unless self.hooks
 
-      #hooks = self.hooks[:"after_#{method}"] + self.hooks[:after_save]
-      #hooks.compact.each do |hook|
-        #resource.instance_exec(parent, objects, &hook)
-      #end
-    #end
+      hooks = self.hooks[:"after_#{method}"] + self.hooks[:after_save]
+      hooks.compact.each do |hook|
+        resource.instance_exec(parent, objects, &hook)
+      end
+    end
 
     private
 

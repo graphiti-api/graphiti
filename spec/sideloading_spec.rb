@@ -13,7 +13,7 @@ RSpec.describe 'sideloading' do
 
     class PositionSideload < ::JsonapiCompliable::Sideload::HasMany
       def scope(employees)
-        { type: :positions, sort: { id: :desc } }
+        { type: :positions, sort: [{ id: :desc }] }
       end
     end
   end
@@ -23,16 +23,28 @@ RSpec.describe 'sideloading' do
     PORO::DB.clear
   end
 
-  before do
-    PORO::DB.data[:employees] << { id: 1  }
-    PORO::DB.data[:positions] << { id: 1, employee_id: 1, department_id: 1  }
-    PORO::DB.data[:positions] << { id: 2, employee_id: 1, department_id: 2  }
-    PORO::DB.data[:departments] << { id: 1 }
-    PORO::DB.data[:departments] << { id: 2 }
-    PORO::DB.data[:bios] << { id: 1, employee_id: 1  }
-    PORO::DB.data[:bios] << { id: 2, employee_id: 1  }
-    PORO::DB.data[:teams] << { id: 1, team_memberships: [PORO::TeamMembership.new(employee_id: 1, team_id: 1)] }
-    PORO::DB.data[:teams] << { id: 2, team_memberships: [PORO::TeamMembership.new(employee_id: 1, team_id: 2)] }
+  let!(:employee) { PORO::Employee.create }
+  let!(:position1) do
+    PORO::Position.create employee_id: employee.id,
+      department_id: department1.id
+  end
+  let!(:position2) do
+    PORO::Position.create employee_id: employee.id,
+      department_id: department2.id
+  end
+  let!(:department1) { PORO::Department.create }
+  let!(:department2) { PORO::Department.create }
+  let!(:bio1) { PORO::Bio.create(employee_id: employee.id) }
+  let!(:bio2) { PORO::Bio.create(employee_id: employee.id) }
+  let!(:team1) do
+    PORO::Team.create team_memberships: [
+      PORO::TeamMembership.new(employee_id: employee.id, team_id: 1)
+    ]
+  end
+  let!(:team2) do
+    PORO::Team.create team_memberships: [
+      PORO::TeamMembership.new(employee_id: employee.id, team_id: 2)
+    ]
   end
 
   context 'when basic manual sideloading' do

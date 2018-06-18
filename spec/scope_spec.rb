@@ -3,11 +3,11 @@ require 'spec_helper'
 RSpec.describe JsonapiCompliable::Scope do
   let(:object)     { double.as_null_object }
   let(:query_hash) { JsonapiCompliable::Query.default_hash }
-  let(:query)      { double(to_hash: { authors: query_hash }) }
+  let(:query)      { double(to_hash: { employees: query_hash }) }
   let(:instance)   { described_class.new(object, resource, query) }
 
   let(:resource) do
-    dbl = double type: :authors,
+    dbl = double type: :employees,
       default_page_size: 1,
       pagination: nil
     dbl.as_null_object
@@ -30,18 +30,18 @@ RSpec.describe JsonapiCompliable::Scope do
     end
 
     context 'when sideloading' do
-      let(:sideload) { double(name: :books) }
+      let(:sideload) { double(name: :positions) }
       let(:results)  { double }
 
       before do
-        query_hash[:include] = { books: {} }
+        query_hash[:include] = { positions: {} }
         objekt = instance.instance_variable_get(:@object)
         allow(resource).to receive(:resolve).with(objekt) { results }
       end
 
       context 'when the requested sideload exists on the resource' do
         before do
-          allow(resource).to receive(:sideload).with(:books) { sideload }
+          allow(resource.class).to receive(:sideload).with(:positions) { sideload }
         end
 
         it 'resolves the sideload' do
@@ -66,13 +66,13 @@ RSpec.describe JsonapiCompliable::Scope do
 
       context 'when the requested sideload does not exist' do
         before do
-          allow(resource).to receive(:sideload).with(:books) { nil }
+          allow(resource.class).to receive(:sideload).with(:positions) { nil }
         end
 
         it 'raises a helpful error' do
           expect {
             instance.resolve
-          }.to raise_error(JsonapiCompliable::Errors::InvalidInclude, 'The requested included relationship "books" is not supported on resource "authors"')
+          }.to raise_error(JsonapiCompliable::Errors::InvalidInclude)
         end
 
         context 'but the config says not to raise errors' do

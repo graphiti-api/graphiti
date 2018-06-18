@@ -20,6 +20,10 @@ require 'jsonapi_compliable/adapters/null'
 require 'jsonapi_compliable/adapters/active_record'
 
 RSpec.configure do |config|
+  config.after do
+    PORO::DB.clear
+  end
+
   config.before(:suite) do
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with(:truncation)

@@ -1,49 +1,53 @@
 require 'spec_helper'
 
 RSpec.describe 'fields' do
-  include_context 'scoping'
+  include JsonHelpers
+  include_context 'resource testing'
+  let(:resource) { Class.new(PORO::EmployeeResource).new }
+  let(:base_scope) { { type: :employees } }
 
-  class SerializableTestFields < JSONAPI::Serializable::Resource
-    type 'authors'
-
-    attribute :first_name
-    attribute :last_name
-    attribute :uuid do
-      SecureRandom.uuid
-    end
-    attribute :salary, if: proc { !@context || @context.current_user == 'admin' } do
-      50_000
-    end
-
-    def admin?
-      scope == 'admin'
-    end
+  let!(:employee) do
+    PORO::Employee.create(first_name: 'John', last_name: 'Doe')
   end
 
-  let!(:author) { Author.create!(first_name: 'Stephen', last_name: 'King') }
-
-  def json
-    render(scope.resolve, class: { Author: SerializableTestFields })
-  end
+  subject(:attributes) { json['data'][0]['attributes'] }
 
   it 'does not limit without fields param' do
-    expect(json['data'][0]['attributes'].keys).to eq(%w(first_name last_name uuid salary))
+    render
+    expect(attributes.keys).to eq(%w(first_name last_name age))
   end
 
   it 'limits to only the requested fields' do
-    params[:fields] = { authors: 'first_name,last_name' }
-    expect(json['data'][0]['attributes'].keys).to eq(%w(first_name last_name))
+    params[:fields] = { employees: 'first_name,last_name' }
+    render
+    expect(attributes.keys).to eq(%w(first_name last_name))
   end
 
-  it 'disallows fields guarded by :if, even if specified' do
-    params[:fields] = { authors: 'first_name,salary' }
-    ctx = double(current_user: 'non-admin').as_null_object
-    resource.with_context ctx do
-      expect(json['data'][0]['attributes'].keys).to_not include('salary')
+  context 'when a field is guarded' do
+    before do
+      params[:fields] = { authors: 'first_name,salary' }
     end
-    ctx = double(current_user: 'admin')
-    resource.with_context ctx do
-      expect(json['data'][0]['attributes'].keys).to include('salary')
+
+    context 'and the guard does not pass' do
+      let(:ctx) { double(current_user: 'non-admin').as_null_object }
+
+      it 'does not render the field' do
+        resource.with_context ctx do
+          render
+          expect(attributes.keys).to_not include('salary')
+        end
+      end
+    end
+
+    context 'and the guard passes' do
+      let(:ctx) { double(current_user: 'admin').as_null_object }
+
+      it 'renders the field' do
+        resource.with_context ctx do
+          render
+          expect(attributes.keys).to include('salary')
+        end
+      end
     end
   end
 end

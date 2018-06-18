@@ -1,18 +1,25 @@
 require 'spec_helper'
 
 RSpec.describe 'pagination' do
-  include_context 'scoping'
+  include JsonHelpers
+  include_context 'resource testing'
+  let(:resource) { Class.new(PORO::EmployeeResource).new }
+  let(:base_scope) { { type: :employees } }
 
-  let!(:author1) { Author.create! }
-  let!(:author2) { Author.create! }
-  let!(:author3) { Author.create! }
-  let!(:author4) { Author.create! }
+  subject(:ids) { scope.resolve.map(&:id) }
+
+  before do
+    PORO::Employee.create
+    PORO::Employee.create
+    PORO::Employee.create
+    PORO::Employee.create
+  end
 
   it 'applies default pagination' do
-    resource_class.class_eval do
+    resource.class.class_eval do
       default_page_size 2
     end
-    expect(scope.resolve.length).to eq(2)
+    expect(ids.length).to eq(2)
   end
 
   context 'when requested size > 1000' do
@@ -29,35 +36,35 @@ RSpec.describe 'pagination' do
 
   it 'limits by size, offsets by number' do
     params[:page] = { number: 2, size: 2 }
-    expect(scope.resolve.map(&:id)).to eq([author3.id, author4.id])
+    expect(ids).to eq([3, 4])
   end
 
   # for metadata
   context 'with page size 0' do
     it 'should return empty array' do
       params[:page] = { size: 0 }
-      expect(scope.resolve).to eq([])
+      expect(ids).to eq([])
     end
   end
 
   context 'when a custom pagination function is given' do
     before do
-      resource_class.class_eval do
+      resource.class.class_eval do
         paginate do |scope, page, per_page|
-          scope.limit(0)
+          scope.merge!(page: 1, per: 0)
         end
       end
     end
 
     it 'uses the custom pagination function' do
-      expect(scope.resolve).to eq([])
+      expect(ids).to eq([])
     end
 
     context 'and it accesses runtime context' do
       before do
-        resource_class.class_eval do
+        resource.class.class_eval do
           paginate do |scope, page, per_page, ctx|
-            scope.limit(ctx.runtime_limit)
+            scope.merge!(page: 1, per: ctx.runtime_limit)
           end
         end
       end
@@ -65,7 +72,7 @@ RSpec.describe 'pagination' do
       it 'works' do
         ctx = double(runtime_limit: 2).as_null_object
         JsonapiCompliable.with_context(ctx, {}) do
-          expect(scope.resolve.length).to eq(2)
+          expect(ids.length).to eq(2)
         end
       end
     end

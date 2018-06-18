@@ -17,8 +17,8 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     module IntegrationHooks
-      class ApplicationRecord < JsonapiCompliable::Resource
-        use_adapter JsonapiCompliable::Adapters::ActiveRecord
+      class ApplicationResource < JsonapiCompliable::Resource
+        use_adapter JsonapiCompliable::Adapters::ActiveRecord::Base
       end
 
       class BookResource < ApplicationResource
@@ -31,12 +31,10 @@ if ENV["APPRAISAL_INITIALIZED"]
         model State
       end
 
-      class AuthorResource < ApplicationResourcce
+      class AuthorResource < ApplicationResource
         model Author
 
         has_many :books,
-          foreign_key: :author_id,
-          scope: -> { Book.all },
           resource: BookResource do
             after_save only: [:create] do |author, books|
               Callbacks.fired[:after_create] = [author, books]
@@ -60,8 +58,6 @@ if ENV["APPRAISAL_INITIALIZED"]
           end
 
         belongs_to :state,
-          foreign_key: :state_id,
-          scope: -> { State.all },
           resource: StateResource do
             after_save only: [:create] do |author, states|
               Callbacks.fired[:state_after_create] = [author, states]

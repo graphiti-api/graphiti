@@ -1,120 +1,176 @@
 require 'spec_helper'
 
 RSpec.describe 'stats' do
-  include_context 'scoping'
+  include JsonHelpers
+  include_context 'resource testing'
+  let(:resource) { Class.new(PORO::EmployeeResource).new }
+  let(:base_scope) { { type: :employees } }
 
-  before do
-    resource_class.class_eval do
-      allow_stat total: :count
-
-      allow_stat state_id: [:sum, :average, :maximum, :minimum] do
-        second { |scope| scope.all[1].state_id }
-      end
-
-      allow_stat :just_symbol do
-        foo { 'bar' }
-      end
-
-      allow_stat :override do
-        sum { |scope, attr| 101 }
-      end
-    end
+  let!(:employee1) do
+    PORO::Employee.create first_name: 'Stephen',
+      last_name: 'King'
+  end
+  let!(:employee1) do
+    PORO::Employee.create first_name: 'Stephen',
+      last_name: 'King'
   end
 
-  let!(:author1) { Author.create!(first_name: 'Stephen', last_name: 'King', state_id: 1) }
-  let!(:author2) { Author.create!(first_name: 'Stephen', last_name: 'King', state_id: 3) }
-
-  def json
-    render(scope, meta: { other: 'things' })
+  after do
+    PORO::DB.clear
   end
 
   context 'when total count requested' do
     before do
       params[:stats] = { total: 'count' }
+      resource.class.class_eval do
+        allow_stat total: :count
+      end
     end
 
     it 'responds with count in meta stats' do
-      expect(json['meta']['stats']).to eq({ 'total' => { 'count' => 2 } })
+      render
+      expect(json['meta']['stats']).to eq({ 'total' => { 'count' => 'poro_count_total' } })
     end
 
-    it 'does not override other meta content' do
+    # Must be integration spec
+    xit 'does not override other meta content' do
+      render(meta: { other: 'things' })
       expect(json['meta']['other']).to eq('things')
     end
   end
 
   context 'when specific attribute requested' do
     before do
-      params[:stats] = { state_id: calculation }
+      params[:stats] = { age: calculation }
     end
 
     context 'when sum' do
       let(:calculation) { 'sum' }
 
+      before do
+        resource.class.class_eval do
+          allow_stat age: [:sum]
+        end
+      end
+
       it 'responds with sum in meta stats' do
-        expect(json['meta']['stats']).to eq({ 'state_id' => { 'sum' => 4 } })
+        render
+        expect(json['meta']['stats'])
+          .to eq({ 'age' => { 'sum' => 'poro_sum_age' } })
       end
     end
 
     context 'when average' do
       let(:calculation) { 'average' }
 
+      before do
+        resource.class.class_eval do
+          allow_stat age: [:average]
+        end
+      end
+
       it 'responds with average in meta stats' do
-        expect(json['meta']['stats']).to eq({ 'state_id' => { 'average' => 2.0 } })
+        render
+        expect(json['meta']['stats'])
+          .to eq({ 'age' => { 'average' => 'poro_average_age' } })
       end
     end
 
     context 'when maximum' do
       let(:calculation) { 'maximum' }
 
+      before do
+        resource.class.class_eval do
+          allow_stat age: [:maximum]
+        end
+      end
+
       it 'responds with maximum in meta stats' do
-        expect(json['meta']['stats']).to eq({ 'state_id' => { 'maximum' => 3 } })
+        render
+        expect(json['meta']['stats'])
+          .to eq({ 'age' => { 'maximum' => 'poro_maximum_age' } })
       end
     end
 
     context 'when minimum' do
       let(:calculation) { 'minimum' }
 
+      before do
+        resource.class.class_eval do
+          allow_stat age: [:minimum]
+        end
+      end
+
       it 'responds with minimum in meta stats' do
-        expect(json['meta']['stats']).to eq({ 'state_id' => { 'minimum' => 1 } })
+        render
+        expect(json['meta']['stats'])
+          .to eq({ 'age' => { 'minimum' => 'poro_minimum_age' } })
       end
     end
 
     context 'when user-specified calculation' do
       let(:calculation) { 'second' }
 
+      before do
+        resource.class.class_eval do
+          allow_stat :age do
+            second { |scope| 1337 }
+          end
+        end
+      end
+
       it 'responds with user-specified calculation in meta stats' do
-        expect(json['meta']['stats']).to eq({ 'state_id' => { 'second' => 3 } })
+        render
+        expect(json['meta']['stats'])
+          .to eq({ 'age' => { 'second' => 1337 } })
       end
     end
   end
 
   context 'when multiple stats requested' do
     before do
-      params[:stats] = { total: 'count', state_id: 'sum,average' }
+      params[:stats] = { total: 'count', age: 'sum,average' }
+    end
+
+    before do
+      resource.class.class_eval do
+        allow_stat total: :count
+        allow_stat age: [:sum, :average]
+      end
     end
 
     it 'responds with both' do
+      render
       expect(json['meta']['stats']).to eq({
-        'total' => { 'count' => 2 },
-        'state_id' => { 'sum' => 4, 'average' => 2.0 }
+        'total' => { 'count' => 'poro_count_total' },
+        'age' => { 'sum' => 'poro_sum_age', 'average' => 'poro_average_age' }
       })
     end
   end
 
   context 'when passing symbol to allow_stat' do
     before do
-      params[:stats] = { just_symbol: 'foo' }
+      params[:stats] = { age: 'sum' }
+    end
+
+    before do
+      resource.class.class_eval do
+        allow_stat age: :sum
+      end
     end
 
     it 'works correctly' do
+      render
       expect(json['meta']['stats']).to eq({
-        'just_symbol' => { 'foo' => 'bar' }
+        'age' => { 'sum' => 'poro_sum_age' }
       })
     end
   end
 
   context 'when no stats requested' do
-    it 'should not be in payload' do
+    # TODO: must be integration tested
+    xit 'should not be in payload' do
+      render(meta: { other: 'things' })
       expect(json['meta']).to eq({ 'other' => 'things' })
     end
   end
@@ -125,18 +181,29 @@ RSpec.describe 'stats' do
       params[:stats]  = { total: 'count' }
     end
 
-    it 'should not affect the stats' do
+    # TODO: must be integration tested
+    xit 'should not affect the stats' do
       expect(json['meta']['stats']).to eq({ 'total' => { 'count' => 2 } })
     end
   end
 
   context 'overriding a default' do
     before do
-      params[:stats] = { override: 'sum' }
+      params[:stats] = { age: 'sum' }
+    end
+
+    before do
+      resource.class.class_eval do
+        allow_stat :age do
+          sum { |scope, attr| "overridden_#{attr}" }
+        end
+      end
     end
 
     it 'should return the override' do
-      expect(json['meta']['stats']).to eq({ 'override' => { 'sum' => 101 } })
+      render
+      expect(json['meta']['stats'])
+        .to eq({ 'age' => { 'sum' => 'overridden_age' } })
     end
   end
 
@@ -146,32 +213,26 @@ RSpec.describe 'stats' do
       params[:stats] = { total: 'count' }
     end
 
+    before do
+      resource.class.class_eval do
+        allow_stat total: [:count]
+      end
+    end
+
     it 'returns empty data' do
+      render
       expect(json['data']).to be_empty
     end
 
     it 'does not query DB' do
-      expect(Author).to_not receive(:find_by_sql)
-      json
+      expect(PORO::DB).to_not receive(:all)
+      render
     end
 
     it 'returns correct stats' do
-      expect(json['meta']['stats']).to eq({ 'total' => { 'count' => 2 } })
-    end
-  end
-
-  context 'when not AR scope' do
-    before do
-      resource_class.class_eval do
-        allow_stat :total do
-          count { |scope| scope.length + 100 }
-        end
-      end
-    end
-
-    it 'should stil allow custom stats' do
-      params[:stats] = { total: 'count' }
-      expect(json['meta']['stats']).to eq({ 'total' => { 'count' => 102 } })
+      render
+      expect(json['meta']['stats'])
+        .to eq({ 'total' => { 'count' => 'poro_count_total' } })
     end
   end
 
@@ -179,7 +240,7 @@ RSpec.describe 'stats' do
     it 'raises error' do
       params[:stats] = { asdf: 'count' }
       expect {
-        json
+        render
       }.to raise_error(JsonapiCompliable::Errors::StatNotFound, "No stat configured for calculation :count on attribute :asdf")
     end
   end

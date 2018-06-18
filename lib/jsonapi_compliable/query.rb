@@ -245,7 +245,8 @@ module JsonapiCompliable
           if [:number, :size].include?(key)
             hash[resource.type][:page][key] = value.to_i
           else
-            hash[key][:page] = { number: value[:number].to_i, size: value[:size].to_i }
+            number = value[:number].to_i if value[:number]
+            hash[key][:page] = { number: number, size: value[:size].to_i }
           end
         end
       end

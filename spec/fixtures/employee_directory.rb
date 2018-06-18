@@ -170,9 +170,9 @@ end
   #model Salary
 #end
 
-#class EmployeeResource < ApplicationResource
-  #type :employees
-  #model Employee
+class EmployeeResource < ApplicationResource
+  type :employees
+  model Employee
 
   #belongs_to :classification,
     #scope: -> { Classification.all },
@@ -205,7 +205,7 @@ end
         #foreign_key: :workspace_id
       #}
     #}
-#end
+end
 
 class SerializableAbstract < JSONAPI::Serializable::Resource
 end
@@ -222,19 +222,19 @@ end
   #attribute :name
 #end
 
-#class SerializableEmployee < SerializableAbstract
-  #type 'employees'
+class SerializableEmployee < SerializableAbstract
+  type 'employees'
 
-  #attribute :first_name
-  #attribute :last_name
-  #attribute :age
+  attribute :first_name
+  attribute :last_name
+  attribute :age
 
   #belongs_to :classification
   #has_many :positions
   #has_many :teams
 
   #has_one :salary
-#end
+end
 
 class SerializablePosition < SerializableAbstract
   type 'positions'

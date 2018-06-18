@@ -79,18 +79,7 @@ RSpec.describe JsonapiCompliable::Resource do
     end
 
     it 'defaults' do
-      expect(instance.default_sort).to eq([{ id: :asc }])
-    end
-  end
-
-  describe '#default_page_number' do
-    it 'gets/sets correctly' do
-      klass.default_page_number(2)
-      expect(instance.default_page_number).to eq(2)
-    end
-
-    it 'defaults' do
-      expect(instance.default_page_number).to eq(1)
+      expect(instance.default_sort).to eq([])
     end
   end
 
@@ -158,24 +147,22 @@ RSpec.describe JsonapiCompliable::Resource do
     end
   end
 
-  describe '#association_names' do
+  describe '.association_names' do
     it 'collects nested + resource sideloads' do
-      klass.allow_sideload :books do
-        genre_resource = Class.new(JsonapiCompliable::Resource) do
-          allow_sideload :from_genre_resource do
-            allow_sideload :nested_from_genre_resource
-          end
+      position_resource = Class.new(PORO::PositionResource) do
+        belongs_to :department
+        def self.name
+          'PORO::PositionResource'
         end
-        allow_sideload :genre, resource: genre_resource
       end
-      klass.allow_sideload :state, polymorphic: true
-      expect(instance.association_names)
-        .to match_array([:books, :genre, :state, :from_genre_resource, :nested_from_genre_resource])
+      klass.has_many :positions, resource: position_resource
+      expect(klass.association_names)
+        .to match_array([:positions, :department])
     end
 
     context 'when no whitelist' do
       it 'defaults to empty array' do
-        expect(instance.association_names).to eq([])
+        expect(klass.association_names).to eq([])
       end
     end
   end
