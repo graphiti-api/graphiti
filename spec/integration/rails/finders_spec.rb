@@ -112,14 +112,14 @@ if ENV["APPRAISAL_INITIALIZED"]
         scope = jsonapi_scope(Author.all)
         records = scope.resolve
         delete_all
-        render_jsonapi(records, scope: false)
+        render jsonapi: records, apply_scoping: false
       end
 
       def show
         scope = jsonapi_scope(Author.all)
-        record = scope.resolve.first
+        records = scope.resolve
         delete_all
-        render_jsonapi(record, scope: false)
+        render jsonapi: records, single: true, apply_scoping: false
       end
 
       private
@@ -176,8 +176,23 @@ if ENV["APPRAISAL_INITIALIZED"]
       JSON.parse(response.body)
     end
 
+    context 'when auto-scoping' do
+      before do
+        controller.class.class_eval do
+          def index
+            render jsonapi: Author.all
+          end
+        end
+      end
+
+      # Sort, to ensure we aren't just rendering Author.all
+      it 'works' do
+        get :index, params: { sort: '-id' }
+        expect(json_ids).to eq([author2.id, author1.id])
+      end
+    end
+
     it 'allows basic sorting' do
-      include Rails.application.routes.url_helpers
       get :index, params: { sort: '-id' }
       expect(json_ids).to eq([author2.id, author1.id])
     end

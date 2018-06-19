@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe 'sideloading' do
   include JsonHelpers
   include_context 'resource testing'
-  let(:resource) { PORO::EmployeeResource.new }
+  let(:resource) { PORO::EmployeeResource }
   let(:base_scope) { { type: :employees } }
 
   module Sideloading
@@ -197,7 +197,7 @@ RSpec.describe 'sideloading' do
   end
 
   describe 'belongs_to macro' do
-    let(:resource) { PORO::PositionResource.new }
+    let(:resource) { PORO::PositionResource }
     let(:base_scope) { { type: :positions } }
 
     before do

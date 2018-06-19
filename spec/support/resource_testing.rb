@@ -1,34 +1,29 @@
 RSpec.shared_context 'resource testing' do |parameter|
   let(:resource)     { described_class.new }
   let(:params)       { {} }
-  let(:query)        { JsonapiCompliable::Query.new(resource, params) }
   let(:base_scope)   { double('please define base_scope in your test') }
-  let(:scope)        { resource.build_scope(base_scope, query) }
 
-  # TODO: Need to dedup this with render_jsonapi
-  def render(runtime_options = {})
-    records = scope.resolve
-    stats = scope.resolve_stats
-    opts = params
-    opts = JsonapiCompliable::Util::RenderOptions
-      .generate(records, query.to_hash[resource.class.config[:type]])
-    opts[:expose].merge!(context: resource.context)
-    resolved = opts.delete(:jsonapi)
-    before_render
-    opts.merge!(runtime_options)
-
-    if stats && !stats.empty?
-      opts[:meta].merge!(stats: stats)
+  class TestRunner < JsonapiCompliable::Runner
+    def current_user
+      nil
     end
-
-    raw_json = JSONAPI::Serializable::Renderer.new
-      .render(resolved, opts).to_json
-    response.body = raw_json
-    JSON.parse(raw_json)
   end
 
-  # override
-  def before_render
+  # If you need to set context:
+  #
+  # JsonapiCompliable.with_context my_context, {} do
+  #   render
+  # end
+  def render(runtime_options = {})
+    ctx = TestRunner.new(resource, params)
+    json = ctx.render_jsonapi(base_scope, runtime_options)
+    response.body = json
+    json
+  end
+
+  def records
+    ctx = TestRunner.new(resource, params)
+    ctx.resolve(base_scope)[0]
   end
 
   def response

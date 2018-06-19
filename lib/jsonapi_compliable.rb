@@ -15,6 +15,7 @@ require "jsonapi_compliable/resource"
 require "jsonapi_compliable/query"
 require "jsonapi_compliable/scope"
 require "jsonapi_compliable/deserializer"
+require "jsonapi_compliable/renderer"
 require "jsonapi_compliable/scoping/base"
 require "jsonapi_compliable/scoping/sort"
 require "jsonapi_compliable/scoping/paginate"
@@ -36,17 +37,7 @@ require "jsonapi_compliable/util/sideload"
 require "jsonapi_compliable/util/hooks"
 
 require 'jsonapi_compliable/adapters/null'
-
-# require correct jsonapi-rb before extensions
-if defined?(Rails)
-  require 'jsonapi_compliable/rails'
-else
-  require 'jsonapi/serializable'
-end
-
-if defined?(ActiveRecord)
-  require 'jsonapi_compliable/adapters/active_record'
-end
+require 'jsonapi/serializable'
 
 # Temporary fix until fixed upstream
 # https://github.com/jsonapi-rb/jsonapi-serializable/pull/102
@@ -59,6 +50,14 @@ end
 require "jsonapi_compliable/extensions/extra_attribute"
 require "jsonapi_compliable/extensions/boolean_attribute"
 require "jsonapi_compliable/extensions/temp_id"
+
+if defined?(ActiveRecord)
+  require 'jsonapi_compliable/adapters/active_record'
+end
+
+if defined?(Rails)
+  require 'jsonapi_compliable/railtie'
+end
 
 module JsonapiCompliable
   autoload :Base, 'jsonapi_compliable/base'
@@ -104,3 +103,5 @@ module JsonapiCompliable
     yield config
   end
 end
+
+require "jsonapi_compliable/runner"

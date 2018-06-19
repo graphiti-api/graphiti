@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe 'fields' do
   include JsonHelpers
   include_context 'resource testing'
-  let(:resource) { Class.new(PORO::EmployeeResource).new }
+  let(:resource) { Class.new(PORO::EmployeeResource) }
   let(:base_scope) { { type: :employees } }
 
   let!(:employee) do
@@ -32,7 +32,7 @@ RSpec.describe 'fields' do
       let(:ctx) { double(current_user: 'non-admin').as_null_object }
 
       it 'does not render the field' do
-        resource.with_context ctx do
+        JsonapiCompliable.with_context ctx, {} do
           render
           expect(attributes.keys).to_not include('salary')
         end
@@ -43,7 +43,7 @@ RSpec.describe 'fields' do
       let(:ctx) { double(current_user: 'admin').as_null_object }
 
       it 'renders the field' do
-        resource.with_context ctx do
+        JsonapiCompliable.with_context ctx, {} do
           render
           expect(attributes.keys).to include('salary')
         end

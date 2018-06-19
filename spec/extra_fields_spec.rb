@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe 'extra_fields' do
   include JsonHelpers
   include_context 'resource testing'
-  let(:resource) { Class.new(PORO::EmployeeResource).new }
+  let(:resource) { Class.new(PORO::EmployeeResource) }
   let(:base_scope) { { type: :employees } }
 
   let!(:employee) { PORO::Employee.create }
@@ -26,7 +26,7 @@ RSpec.describe 'extra_fields' do
 
   context 'when altering scope based on extra attrs' do
     before do
-      resource.class.class_eval do
+      resource.class_eval do
         extra_field :net_worth do |scope|
           scope[:foo] = 'bar'
           scope
@@ -48,7 +48,7 @@ RSpec.describe 'extra_fields' do
 
     it 'works' do
       ctx = double(runtime_id: 789).as_null_object
-      resource.with_context ctx do
+      JsonapiCompliable.with_context ctx, {} do
         render
         expect(attributes['runtime_id']).to eq(789)
       end
@@ -63,7 +63,7 @@ RSpec.describe 'extra_fields' do
     context 'and the guard passes' do
       it 'renders the field' do
         ctx = double(current_user: 'admin').as_null_object
-        resource.with_context ctx do
+        JsonapiCompliable.with_context ctx, {} do
           render
           expect(attributes.keys).to include('admin_stack_ranking')
         end
@@ -73,7 +73,7 @@ RSpec.describe 'extra_fields' do
     context 'and the guard fails' do
       it 'does not render the field' do
         ctx = double(current_user: 'foo').as_null_object
-        resource.with_context ctx do
+        JsonapiCompliable.with_context ctx, {} do
           render
           expect(attributes.keys).to_not include('admin_stack_ranking')
         end

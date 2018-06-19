@@ -130,34 +130,12 @@ module JsonapiCompliable
       @query_hash ||= query.to_hash[jsonapi_resource.type]
     end
 
-    # Tracks the current context so we can refer to it within any
-    # random object. Helpful for easy-access to things like the current
-    # user.
-    #
-    # @api private
-    # @yieldreturn Code to run within the current context
     def wrap_context
-      jsonapi_resource.with_context(jsonapi_context, action_name.to_sym) do
+      JsonapiCompliable.with_context(jsonapi_context, action_name.to_sym) do
         yield
       end
     end
 
-    # Override if you'd like the "context" to be something other than
-    # an instance of this class.
-    # In Rails, context is the controller instance.
-    #
-    # @example Overriding
-    #   # within your controller
-    #   def jsonapi_context
-    #     current_user
-    #   end
-    #
-    #   # within a resource
-    #   default_filter :by_user do |scope, context|
-    #     scope.where(user_id: context.id)
-    #   end
-    #
-    # @return the context object you'd like
     def jsonapi_context
       self
     end
@@ -186,7 +164,11 @@ module JsonapiCompliable
     # @see Deserializer#initialize
     # @return [Deserializer]
     def deserialized_params
-      @deserialized_params ||= JsonapiCompliable::Deserializer.new(params, request.env)
+      @deserialized_params ||= JsonapiCompliable::Deserializer.new(params, verb)
+    end
+
+    def verb
+      request.env['REQUEST_METHOD'].downcase.to_sym
     end
 
     # Create the resource model and process all nested relationships via the
@@ -270,48 +252,30 @@ module JsonapiCompliable
       end
     end
 
-    # Similar to +render :json+ or +render :jsonapi+
-    #
-    # By default, this will "build" the scope via +#jsonapi_scope+. To avoid
-    # this, pass +scope: false+
-    #
-    # This builds relevant options and sends them to
-    # +JSONAPI::Serializable::SuccessRenderer#render+from
-    # {http://jsonapi-rb.org jsonapi-rb}
-    #
-    # @example Build Scope by Default
-    #   # Employee.all returns an ActiveRecord::Relation. No SQL is fired at this point.
-    #   # We further 'chain' onto this scope, applying pagination, sorting,
-    #   # filters, etc that the user has requested.
-    #   def index
-    #     employees = Employee.all
-    #     render_jsonapi(employees)
-    #   end
-    #
-    # @example Avoid Building Scope by Default
-    #   # Maybe we already manually scoped, and don't want to fire the logic twice
-    #   # This code is equivalent to the above example
-    #   def index
-    #     scope = jsonapi_scope(Employee.all)
-    #     # ... do other things with the scope ...
-    #     render_jsonapi(scope.resolve, scope: false)
-    #   end
-    #
-    # @param scope [Scope, Object] the scope to build or render.
-    # @param [Hash] opts the render options passed to {http://jsonapi-rb.org jsonapi-rb}
-    # @option opts [Boolean] :scope Default: true. Should we call #jsonapi_scope on this object?
-    # @see #jsonapi_scope
-    def render_jsonapi(scope, opts = {})
-      scope = jsonapi_scope(scope) unless opts[:scope] == false || scope.is_a?(JsonapiCompliable::Scope)
-      opts  = default_jsonapi_render_options.merge(opts)
-      opts  = Util::RenderOptions.generate(scope, query_hash, opts)
-      opts[:expose][:context] = self
-
-      if opts[:include].empty? && force_includes?
-        opts[:include] = deserialized_params.include_directive
+    def jsonapi_render_options
+      defaults = default_jsonapi_render_options
+      options = Util::RenderOptions.generate(query_hash, defaults)
+      options[:expose][:context] = jsonapi_context
+      if options[:include].empty? && force_includes?
+        options[:include] = deserialized_params.include_directive
       end
+      options
+    end
 
-      perform_render_jsonapi(opts)
+    def resolve(base)
+      scope = jsonapi_scope(base)
+      [scope.resolve, scope.resolve_stats]
+    end
+
+    def render_jsonapi(scope, options = {})
+      models, stats = scope, nil
+      unless options[:apply_scoping] == false
+        models, stats = resolve(scope)
+      end
+      models = models[0] if options[:single]
+      options = jsonapi_render_options.merge(options)
+      options[:meta][:stats] = stats unless stats.blank?
+      Renderer.new(models, options).to_jsonapi
     end
 
     # Define a hash that will be automatically merged into your
@@ -346,12 +310,6 @@ module JsonapiCompliable
 
     def force_includes?
       not deserialized_params.data.nil?
-    end
-
-    def perform_render_jsonapi(opts)
-      # TODO(beauby): Reuse renderer.
-      JSONAPI::Serializable::Renderer.new
-        .render(opts.delete(:jsonapi), opts).to_json
     end
   end
 end

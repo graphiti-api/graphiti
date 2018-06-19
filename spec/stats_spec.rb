@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe 'stats' do
   include JsonHelpers
   include_context 'resource testing'
-  let(:resource) { Class.new(PORO::EmployeeResource).new }
+  let(:resource) { Class.new(PORO::EmployeeResource) }
   let(:base_scope) { { type: :employees } }
 
   let!(:employee1) do
@@ -15,14 +15,10 @@ RSpec.describe 'stats' do
       last_name: 'King'
   end
 
-  after do
-    PORO::DB.clear
-  end
-
   context 'when total count requested' do
     before do
       params[:stats] = { total: 'count' }
-      resource.class.class_eval do
+      resource.class_eval do
         allow_stat total: :count
       end
     end
@@ -48,7 +44,7 @@ RSpec.describe 'stats' do
       let(:calculation) { 'sum' }
 
       before do
-        resource.class.class_eval do
+        resource.class_eval do
           allow_stat age: [:sum]
         end
       end
@@ -64,7 +60,7 @@ RSpec.describe 'stats' do
       let(:calculation) { 'average' }
 
       before do
-        resource.class.class_eval do
+        resource.class_eval do
           allow_stat age: [:average]
         end
       end
@@ -80,7 +76,7 @@ RSpec.describe 'stats' do
       let(:calculation) { 'maximum' }
 
       before do
-        resource.class.class_eval do
+        resource.class_eval do
           allow_stat age: [:maximum]
         end
       end
@@ -96,7 +92,7 @@ RSpec.describe 'stats' do
       let(:calculation) { 'minimum' }
 
       before do
-        resource.class.class_eval do
+        resource.class_eval do
           allow_stat age: [:minimum]
         end
       end
@@ -112,7 +108,7 @@ RSpec.describe 'stats' do
       let(:calculation) { 'second' }
 
       before do
-        resource.class.class_eval do
+        resource.class_eval do
           allow_stat :age do
             second { |scope| 1337 }
           end
@@ -133,7 +129,7 @@ RSpec.describe 'stats' do
     end
 
     before do
-      resource.class.class_eval do
+      resource.class_eval do
         allow_stat total: :count
         allow_stat age: [:sum, :average]
       end
@@ -154,7 +150,7 @@ RSpec.describe 'stats' do
     end
 
     before do
-      resource.class.class_eval do
+      resource.class_eval do
         allow_stat age: :sum
       end
     end
@@ -193,7 +189,7 @@ RSpec.describe 'stats' do
     end
 
     before do
-      resource.class.class_eval do
+      resource.class_eval do
         allow_stat :age do
           sum { |scope, attr| "overridden_#{attr}" }
         end
@@ -214,7 +210,7 @@ RSpec.describe 'stats' do
     end
 
     before do
-      resource.class.class_eval do
+      resource.class_eval do
         allow_stat total: [:count]
       end
     end

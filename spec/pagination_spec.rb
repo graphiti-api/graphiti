@@ -3,10 +3,10 @@ require 'spec_helper'
 RSpec.describe 'pagination' do
   include JsonHelpers
   include_context 'resource testing'
-  let(:resource) { Class.new(PORO::EmployeeResource).new }
+  let(:resource) { Class.new(PORO::EmployeeResource) }
   let(:base_scope) { { type: :employees } }
 
-  subject(:ids) { scope.resolve.map(&:id) }
+  subject(:ids) { records.map(&:id) }
 
   before do
     PORO::Employee.create
@@ -16,7 +16,7 @@ RSpec.describe 'pagination' do
   end
 
   it 'applies default pagination' do
-    resource.class.class_eval do
+    resource.class_eval do
       default_page_size 2
     end
     expect(ids.length).to eq(2)
@@ -29,7 +29,7 @@ RSpec.describe 'pagination' do
 
     it 'raises an error' do
       expect {
-        scope.resolve
+        records
       }.to raise_error(JsonapiCompliable::Errors::UnsupportedPageSize)
     end
   end
@@ -49,7 +49,7 @@ RSpec.describe 'pagination' do
 
   context 'when a custom pagination function is given' do
     before do
-      resource.class.class_eval do
+      resource.class_eval do
         paginate do |scope, page, per_page|
           scope.merge!(page: 1, per: 0)
         end
@@ -62,7 +62,7 @@ RSpec.describe 'pagination' do
 
     context 'and it accesses runtime context' do
       before do
-        resource.class.class_eval do
+        resource.class_eval do
           paginate do |scope, page, per_page, ctx|
             scope.merge!(page: 1, per: ctx.runtime_limit)
           end

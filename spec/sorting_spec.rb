@@ -3,10 +3,10 @@ require 'spec_helper'
 RSpec.describe 'sorting' do
   include JsonHelpers
   include_context 'resource testing'
-  let(:resource) { Class.new(PORO::EmployeeResource).new }
+  let(:resource) { Class.new(PORO::EmployeeResource) }
   let(:base_scope) { { type: :employees } }
 
-  subject(:ids) { scope.resolve.map(&:id) }
+  subject(:ids) { records.map(&:id) }
 
   before do
     PORO::Employee.create(first_name: 'John', last_name: 'Doe')
@@ -14,12 +14,13 @@ RSpec.describe 'sorting' do
   end
 
   it 'defaults sort to resource default_sort' do
-    expect(ids).to eq([1,2])
+    params[:sort] = '-id'
+    expect(ids).to eq([2,1])
   end
 
   context 'when default_sort is overridden' do
     before do
-      resource.class.class_eval do
+      resource.class_eval do
         default_sort([{ id: :desc }])
       end
     end
@@ -34,7 +35,7 @@ RSpec.describe 'sorting' do
       params[:sort] = sort_param
     end
 
-    subject { scope.resolve.map(&:first_name) }
+    subject { records.map(&:first_name) }
 
     context 'asc' do
       let(:sort_param) { 'first_name' }
@@ -70,7 +71,7 @@ RSpec.describe 'sorting' do
       let(:sort_param) { 'first_name' }
 
       before do
-        resource.class.class_eval do
+        resource.class_eval do
           sort do |scope, att, dir|
             scope[:sort] = [{ id: :desc }]
             scope
@@ -84,7 +85,7 @@ RSpec.describe 'sorting' do
 
       context 'and it accesses runtime context' do
         before do
-          resource.class.class_eval do
+          resource.class_eval do
             sort do |scope, att, dir, ctx|
               scope[:sort] = [{ id: ctx.runtime_direction }]
               scope

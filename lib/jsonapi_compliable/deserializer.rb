@@ -47,10 +47,10 @@
 class JsonapiCompliable::Deserializer
   # @param payload [Hash] The incoming payload with symbolized keys
   # @param env [Hash] the Rack env (e.g. +request.env+).
-  def initialize(payload, env)
+  def initialize(payload, verb)
     @payload = payload
     @payload = @payload[:_jsonapi] if @payload.has_key?(:_jsonapi)
-    @env = env
+    @verb = verb
   end
 
   # @return [Hash] the raw :data value of the payload
@@ -131,10 +131,10 @@ class JsonapiCompliable::Deserializer
   end
 
   def method
-    case @env['REQUEST_METHOD']
-      when 'POST' then :create
-      when 'PUT', 'PATCH' then :update
-      when 'DELETE' then :destroy
+    case @verb
+      when :post then :create
+      when :put, :patch then :update
+      when :delete then :destroy
     end
   end
 

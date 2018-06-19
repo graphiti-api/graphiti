@@ -3,11 +3,11 @@ require 'spec_helper'
 RSpec.describe 'filtering' do
   include JsonHelpers
   include_context 'resource testing'
-  let(:resource) { Class.new(PORO::EmployeeResource).new }
+  let(:resource) { Class.new(PORO::EmployeeResource) }
   let(:base_scope) { { type: :employees, conditions: {} } }
 
   before do
-    resource.class.class_eval do
+    resource.class_eval do
       allow_filter :id
       allow_filter :first_name, aliases: [:name]
       allow_filter :first_name_guarded, if: :can_filter_first_name? do |scope, value|
@@ -37,7 +37,7 @@ RSpec.describe 'filtering' do
 
   it 'scopes correctly' do
     params[:filter] = { id: employee1.id }
-    expect(scope.resolve.map(&:id)).to eq([employee1.id])
+    expect(records.map(&:id)).to eq([employee1.id])
   end
 
   # For example, getting current user from controller
@@ -45,7 +45,7 @@ RSpec.describe 'filtering' do
     ctx = double(runtime_id: employee3.id).as_null_object
     JsonapiCompliable.with_context(ctx, {}) do
       params[:filter] = { temp: true }
-      expect(scope.resolve.map(&:id)).to eq([employee3.id])
+      expect(records.map(&:id)).to eq([employee3.id])
     end
   end
 
@@ -57,7 +57,7 @@ RSpec.describe 'filtering' do
     end
 
     it 'converts to a real nil' do
-      ids = scope.resolve.map(&:id)
+      ids = records.map(&:id)
       expect(ids).to eq([employee2.id])
     end
   end
@@ -69,7 +69,7 @@ RSpec.describe 'filtering' do
     end
 
     it 'converts to a real nil' do
-      ids = scope.resolve.map(&:id)
+      ids = records.map(&:id)
       expect(ids).to eq([employee2.id])
     end
   end
@@ -84,7 +84,7 @@ RSpec.describe 'filtering' do
     end
 
     it 'automatically casts to a real boolean' do
-      ids = scope.resolve.map(&:id)
+      ids = records.map(&:id)
       expect(ids.length).to eq(3)
       expect(ids).to_not include(employee2.id)
     end
@@ -95,7 +95,7 @@ RSpec.describe 'filtering' do
       end
 
       it 'still works' do
-        ids = scope.resolve.map(&:id)
+        ids = records.map(&:id)
         expect(ids.length).to eq(4)
       end
     end
@@ -107,7 +107,7 @@ RSpec.describe 'filtering' do
     end
 
     it 'still works' do
-      expect(scope.resolve.map(&:id)).to eq([employee1.id])
+      expect(records.map(&:id)).to eq([employee1.id])
     end
   end
 
@@ -117,7 +117,7 @@ RSpec.describe 'filtering' do
     end
 
     it 'filters based on the correct name' do
-      expect(scope.resolve.map(&:id)).to eq([employee1.id])
+      expect(records.map(&:id)).to eq([employee1.id])
     end
   end
 
@@ -127,13 +127,13 @@ RSpec.describe 'filtering' do
     end
 
     it 'parses into a ruby array' do
-      expect(scope.resolve.map(&:id)).to eq([employee1.id, employee2.id])
+      expect(records.map(&:id)).to eq([employee1.id, employee2.id])
     end
   end
 
   context 'when a default filter' do
     before do
-      resource.class.class_eval do
+      resource.class_eval do
         default_filter :first_name do |scope|
           scope[:conditions].merge!(first_name: 'William')
           scope
@@ -142,22 +142,22 @@ RSpec.describe 'filtering' do
     end
 
     it 'applies by default' do
-      expect(scope.resolve.map(&:id)).to eq([employee3.id])
+      expect(records.map(&:id)).to eq([employee3.id])
     end
 
     it 'is overrideable' do
       params[:filter] = { first_name: 'Stephen' }
-      expect(scope.resolve.map(&:id)).to eq([employee1.id])
+      expect(records.map(&:id)).to eq([employee1.id])
     end
 
     it "is overrideable when overriding via an allowed filter's alias" do
       params[:filter] = { name: 'Stephen' }
-      expect(scope.resolve.map(&:id)).to eq([employee1.id])
+      expect(records.map(&:id)).to eq([employee1.id])
     end
 
     context 'when accessing calling context' do
       before do
-        resource.class.class_eval do
+        resource.class_eval do
           default_filter :first_name do |scope, ctx|
             scope[:conditions].merge!(id: ctx.runtime_id)
             scope
@@ -168,7 +168,7 @@ RSpec.describe 'filtering' do
       it 'works' do
         ctx = double(runtime_id: employee3.id).as_null_object
         JsonapiCompliable.with_context(ctx, {}) do
-          expect(scope.resolve.map(&:id)).to eq([employee3.id])
+          expect(records.map(&:id)).to eq([employee3.id])
         end
       end
     end
@@ -184,8 +184,8 @@ RSpec.describe 'filtering' do
 
     context 'and the guard passes' do
       it 'filters normally' do
-        resource.with_context ctx do
-          expect(scope.resolve.map(&:id)).to eq([employee1.id])
+        JsonapiCompliable.with_context(ctx, {}) do
+          expect(records.map(&:id)).to eq([employee1.id])
         end
       end
     end
@@ -195,8 +195,8 @@ RSpec.describe 'filtering' do
 
       it 'raises an error' do
         expect {
-          resource.with_context ctx do
-            scope.resolve
+        JsonapiCompliable.with_context(ctx, {}) do
+            records
           end
         }.to raise_error(JsonapiCompliable::Errors::BadFilter)
       end
@@ -210,7 +210,7 @@ RSpec.describe 'filtering' do
 
     it 'raises an error' do
       expect {
-        scope.resolve
+        records
       }.to raise_error(JsonapiCompliable::Errors::BadFilter)
     end
   end
@@ -218,7 +218,7 @@ RSpec.describe 'filtering' do
   context 'when one or more filters are required' do
     before do
       employee = employee1
-      resource.class.class_eval do
+      resource.class_eval do
         allow_filter :required, required: true do |scope, value|
           scope[:conditions].merge!(id: employee.id)
           scope
@@ -237,7 +237,7 @@ RSpec.describe 'filtering' do
       end
 
       it 'should return results' do
-        ids = scope.resolve.map(&:id)
+        ids = records.map(&:id)
         expect(ids).to eq([employee1.id])
       end
     end
@@ -249,7 +249,7 @@ RSpec.describe 'filtering' do
 
       it 'raises an error' do
         expect {
-          scope.resolve
+          records
         }.to raise_error(JsonapiCompliable::Errors::RequiredFilter, 'The required filter "also_required" was not provided')
       end
     end
@@ -261,7 +261,7 @@ RSpec.describe 'filtering' do
 
       it 'raises an error' do
         expect {
-          scope.resolve
+          records
         }.to raise_error(JsonapiCompliable::Errors::RequiredFilter, 'The required filters "required, also_required" were not provided')
       end
     end
@@ -269,7 +269,7 @@ RSpec.describe 'filtering' do
     context 'and required filter determined by proc' do
       context 'when required proc evaluates to true' do
         before do
-          resource.class.class_eval do
+          resource.class_eval do
             allow_filter :required_by_proc, required: Proc.new{|ctx| true} do |scope, value|
               scope[:conditions].merge!(first_name: employee1.first_name)
               scope
@@ -281,14 +281,14 @@ RSpec.describe 'filtering' do
 
         it 'raises an error' do
           expect {
-            scope.resolve
+            records
           }.to raise_error(JsonapiCompliable::Errors::RequiredFilter, 'The required filter "required_by_proc" was not provided')
         end
       end
 
       context 'when required proc evaluates to false' do
         before do
-          resource.class.class_eval do
+          resource.class_eval do
             allow_filter :required_by_proc, required: Proc.new{|ctx| false} do |scope, value|
               scope[:conditions].merge!(first_name: employee1.first_name)
               scope
@@ -299,7 +299,7 @@ RSpec.describe 'filtering' do
         end
 
         it 'should not be required' do
-          ids = scope.resolve.map(&:id)
+          ids = records.map(&:id)
           expect(ids).to eq([employee1.id])
         end
       end
