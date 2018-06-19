@@ -1,6 +1,4 @@
 if ENV["APPRAISAL_INITIALIZED"]
-  require 'rails_spec_helper'
-
   RSpec.describe 'integrated resources and adapters', type: :controller do
     module Integration
       class ApplicationResource < JsonapiCompliable::Resource

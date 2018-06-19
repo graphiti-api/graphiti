@@ -1,6 +1,4 @@
 if ENV["APPRAISAL_INITIALIZED"]
-  require 'rails_spec_helper'
-
   RSpec.describe 'before_commit hook', type: :controller do
     class Callbacks
       class << self

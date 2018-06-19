@@ -1,6 +1,4 @@
 if ENV["APPRAISAL_INITIALIZED"]
-  require 'rails_spec_helper'
-
   RSpec.describe 'sideload whitelist', type: :controller do
     module SideloadWhitelist
       class ApplicationResource < JsonapiCompliable::Resource

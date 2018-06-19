@@ -1,6 +1,4 @@
 if ENV["APPRAISAL_INITIALIZED"]
-  require 'rails_spec_helper'
-
   RSpec.describe 'persistence', type: :controller do
     include JsonHelpers
 

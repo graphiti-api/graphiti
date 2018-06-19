@@ -1,3 +1,7 @@
+require 'json'
+require 'active_support/core_ext/string'
+require 'active_support/concern'
+
 require "jsonapi_compliable/version"
 require "jsonapi_compliable/configuration"
 require "jsonapi_compliable/errors"
@@ -31,11 +35,17 @@ require "jsonapi_compliable/util/validation_response"
 require "jsonapi_compliable/util/sideload"
 require "jsonapi_compliable/util/hooks"
 
+require 'jsonapi_compliable/adapters/null'
+
 # require correct jsonapi-rb before extensions
 if defined?(Rails)
   require 'jsonapi_compliable/rails'
 else
   require 'jsonapi/serializable'
+end
+
+if defined?(ActiveRecord)
+  require 'jsonapi_compliable/adapters/active_record'
 end
 
 # Temporary fix until fixed upstream
