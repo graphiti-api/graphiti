@@ -11,11 +11,125 @@ RSpec.describe 'sorting' do
   before do
     PORO::Employee.create(first_name: 'John', last_name: 'Doe')
     PORO::Employee.create(first_name: 'Jane', last_name: 'Doe')
+
+    resource.class_eval do
+      attribute :first_name, :string
+      attribute :last_name, :string
+    end
   end
 
   it 'defaults sort to resource default_sort' do
     params[:sort] = '-id'
     expect(ids).to eq([2,1])
+  end
+
+  context 'when sorting on an unknown attribute' do
+    before do
+      params[:sort] = 'asdf'
+    end
+
+    it 'raises helpful error' do
+      expect {
+        ids
+      }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on on attribute :asdf, but could not find an attribute with that name.')
+    end
+
+    context 'but there is a corresponding extra attribute' do
+      before do
+        resource.extra_attribute :asdf, :string
+      end
+
+      context 'but it is not sortable' do
+        it 'raises helpful error' do
+          expect {
+            ids
+          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on on attribute :asdf, but the attribute was marked :sortable => false.')
+        end
+      end
+
+      context 'and it is sortable' do
+        before do
+          resource.extra_attribute :asdf, :string, sortable: true
+          resource.sort :asdf do |scope, dir|
+            scope[:sort] = [{ id: :desc }]
+            scope
+          end
+        end
+
+        it 'works' do
+          expect(ids).to eq([2, 1])
+        end
+      end
+    end
+  end
+
+  context 'when sorting on known unsortable attribute' do
+    before do
+      resource.attribute :foo, :string, sortable: false
+    end
+
+    it 'raises helpful error' do
+      params[:sort] = 'foo'
+      expect {
+        ids
+      }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on on attribute :foo, but the attribute was marked :sortable => false.')
+    end
+  end
+
+  context 'when sort is guarded' do
+    before do
+      resource.class_eval do
+        attribute :first_name, :string, sortable: :admin?
+
+        def admin?
+          !!context.admin
+        end
+      end
+
+      params[:sort] = 'first_name'
+    end
+
+    context 'and the guard passes' do
+      around do |e|
+        JsonapiCompliable.with_context(OpenStruct.new(admin: true)) do
+          e.run
+        end
+      end
+
+      it 'works' do
+        expect(ids).to eq([2, 1])
+      end
+    end
+
+    context 'and the guard fails' do
+      around do |e|
+        JsonapiCompliable.with_context(OpenStruct.new(admin: false)) do
+          e.run
+        end
+      end
+
+      it 'raises helpful error' do
+        expect {
+          ids
+        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on on attribute :first_name, but the guard :admin? did not pass.')
+      end
+    end
+  end
+
+  context 'when custom sorting for a specific attribute' do
+    before do
+      resource.attribute :foo, :string
+      resource.sort :foo do |scope, direction|
+        scope[:sort] ||= []
+        scope[:sort] << { id: :desc }
+        scope
+      end
+    end
+
+    it 'is correctly applied' do
+      params[:sort] = 'foo'
+      expect(ids).to eq([2,1])
+    end
   end
 
   context 'when default_sort is overridden' do
@@ -72,7 +186,7 @@ RSpec.describe 'sorting' do
 
       before do
         resource.class_eval do
-          sort do |scope, att, dir|
+          sort_all do |scope, att, dir|
             scope[:sort] = [{ id: :desc }]
             scope
           end
@@ -86,7 +200,7 @@ RSpec.describe 'sorting' do
       context 'and it accesses runtime context' do
         before do
           resource.class_eval do
-            sort do |scope, att, dir, ctx|
+            sort_all do |scope, att, dir, ctx|
               scope[:sort] = [{ id: ctx.runtime_direction }]
               scope
             end

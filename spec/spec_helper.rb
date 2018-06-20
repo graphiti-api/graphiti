@@ -25,6 +25,8 @@ end
 
 # We test rails through appraisal
 if ENV["APPRAISAL_INITIALIZED"]
+  # include folder
+
   require 'database_cleaner'
   require 'kaminari'
   require 'active_record'

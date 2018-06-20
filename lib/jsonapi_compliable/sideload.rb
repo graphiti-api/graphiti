@@ -13,14 +13,16 @@ module JsonapiCompliable
       attr_reader :scope_proc, :assign_proc, :assign_each_proc
     end
 
-    def initialize(name, parent_resource:, resource: nil, base_scope: nil, primary_key: :id, foreign_key: nil, type: nil)
+    def initialize(name, opts)
       @name                  = name
-      @parent_resource_class = parent_resource
-      @resource_class        = resource
-      @primary_key           = primary_key
-      @foreign_key           = foreign_key
-      @type                  = type
-      @base_scope            = base_scope
+      @parent_resource_class = opts[:parent_resource]
+      @resource_class        = opts[:resource]
+      @primary_key           = opts[:primary_key]
+      @foreign_key           = opts[:foreign_key]
+      @type                  = opts[:type]
+      @base_scope            = opts[:base_scope]
+      @readable              = opts[:readable]
+      @writable              = opts[:writable]
     end
 
     def self.scope(&blk)
@@ -33,6 +35,14 @@ module JsonapiCompliable
 
     def self.assign_each(&blk)
       @assign_each_proc = blk
+    end
+
+    def readable?
+      !!@readable
+    end
+
+    def writable?
+      !!@writable
     end
 
     def primary_key

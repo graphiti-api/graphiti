@@ -28,7 +28,10 @@ module JsonapiCompliable
     # aliases. If valid, call either the default or custom filtering logic.
     # @return the scope we are chaining/modifying
     def apply
-      raise JsonapiCompliable::Errors::RequiredFilter.new(missing_required_filters) unless required_filters_provided?
+      if missing_required_filters.any?
+        raise Errors::RequiredFilter.new(resource, missing_required_filters)
+      end
+
       each_filter do |filter, value|
         @scope = filter_scope(filter, value)
       end
@@ -41,7 +44,7 @@ module JsonapiCompliable
     # If there's custom logic, run it, otherwise run the default logic
     # specified in the adapter.
     def filter_scope(filter, value)
-      if custom_scope = filter.values.first[:filter]
+      if custom_scope = filter.values.first[:proc]
         custom_scope.call(@scope, value, resource.context)
       else
         resource.adapter.filter(@scope, filter.keys.first, value)

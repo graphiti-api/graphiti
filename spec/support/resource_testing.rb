@@ -16,7 +16,10 @@ RSpec.shared_context 'resource testing' do |parameter|
   # end
   def render(runtime_options = {})
     ctx = TestRunner.new(resource, params)
-    json = ctx.render_jsonapi(base_scope, runtime_options)
+    records, meta = ctx.resolve(base_scope)
+    runtime_options[:meta] ||= {}
+    runtime_options[:meta].merge!(meta)
+    json = ctx.render_jsonapi(records, runtime_options)
     response.body = json
     json
   end

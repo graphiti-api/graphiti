@@ -1,13 +1,97 @@
 module JsonapiCompliable
   module Errors
     class Base < StandardError;end
-    class BadFilter < Base; end
+
+    class AttributeError < Base
+      attr_reader :resource,
+        :name,
+        :flag,
+        :exists,
+        :request,
+        :guard
+
+      def initialize(resource, name, flag, **opts)
+        @resource = resource
+        @name = name
+        @flag = flag
+        @exists = opts[:exists] || false
+        @request = opts[:request] || false
+        @guard = opts[:guard]
+      end
+
+      def action
+        if @request
+          {
+            sortable: 'sort on',
+            filterable: 'filter on'
+          }[@flag]
+        else
+          {
+            sortable: 'add sort',
+            filterable: 'add filter'
+          }[@flag]
+        end
+      end
+
+      def resource_name
+        name = if @resource.is_a?(JsonapiCompliable::Resource)
+          @resource.class.name
+        else
+          @resource.name
+        end
+        name || 'AnonymousResourceClass'
+      end
+
+      def message
+        msg = "#{resource_name}: Tried to #{action} on attribute #{@name.inspect}"
+        if @exists
+          if @guard
+            msg << ", but the guard #{@guard.inspect} did not pass."
+          else
+            msg << ", but the attribute was marked #{@flag.inspect} => false."
+          end
+        else
+          msg << ", but could not find an attribute with that name."
+        end
+        msg
+      end
+    end
 
     class ValidationError < Base
       attr_reader :validation_response
 
       def initialize(validation_response)
         @validation_response = validation_response
+      end
+    end
+
+    class ModelNotFound < Base
+      def initialize(resource_class)
+        @resource_class = resource_class
+      end
+
+      def message
+        <<-MSG
+Could not find model for Resource '#{@resource_class}'
+
+Manually set model (self.model = MyModel) if it does not match name of the Resource.
+        MSG
+      end
+    end
+
+    class TypeNotFound < Base
+      def initialize(resource, attribute, type)
+        @resource = resource
+        @attribute = attribute
+        @type = type
+      end
+
+      def message
+        <<-MSG
+Could not find type #{@type.inspect}! This was specified on attribute #{@attribute.inspect} within resource #{@resource.name}
+
+Valid types are: #{JsonapiCompliable::Types::MAP.keys.inspect}
+        MSG
       end
     end
 
@@ -44,40 +128,6 @@ But not
 This is a limitation of most datastores; the same issue exists in ActiveRecord.
 
 Consider using a named relationship instead, e.g. 'has_one :top_comment'
-        MSG
-      end
-    end
-
-    class MissingSerializer < Base
-      def initialize(class_name, serializer_name)
-        @class_name = class_name
-        @serializer_name = serializer_name
-      end
-
-      def message
-        <<-MSG
-Could not find serializer for class '#{@class_name}'!
-
-Looked for '#{@serializer_name}' but doesn't appear to exist.
-
-Use a custom Inferrer if you'd like different lookup logic.
-        MSG
-      end
-    end
-
-    class MissingSerializer < Base
-      def initialize(class_name, serializer_name)
-        @class_name = class_name
-        @serializer_name = serializer_name
-      end
-
-      def message
-        <<-MSG
-Could not find serializer for class '#{@class_name}'!
-
-Looked for '#{@serializer_name}' but doesn't appear to exist.
-
-Use a custom Inferrer if you'd like different lookup logic.
         MSG
       end
     end
@@ -128,15 +178,16 @@ Use a custom Inferrer if you'd like different lookup logic.
     end
 
     class RequiredFilter < Base
-      def initialize(attributes)
+      def initialize(resource, attributes)
+        @resource = resource
         @attributes = Array(attributes)
       end
 
       def message
         if @attributes.length > 1
-          "The required filters \"#{@attributes.join(', ')}\" were not provided"
+          "The required filters \"#{@attributes.join(', ')}\" on resource #{@resource.class} were not provided"
         else
-          "The required filter \"#{@attributes[0]}\" was not provided"
+          "The required filter \"#{@attributes[0]}\" on resource #{@resource.class} was not provided"
         end
       end
     end

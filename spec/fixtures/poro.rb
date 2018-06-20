@@ -187,48 +187,7 @@ module PORO
     end
   end
 
-  class ApplicationResource < JsonapiCompliable::Resource
-    self.adapter = Adapter.new
-
-    def resolve(scope)
-      ::PORO::DB.all(scope)
-    end
-  end
-
-  class EmployeeResource < ApplicationResource
-    self.type = :employees
-    self.model = PORO::Employee
-
-    has_many :positions
-  end
-
-  class PositionResource < ApplicationResource
-    self.type = :positions
-    self.model = PORO::Position
-  end
-
-  class DepartmentResource < ApplicationResource
-    self.type = :departments
-    self.model = PORO::Department
-  end
-
-  class BioResource < ApplicationResource
-    self.type = :bios
-    self.model = PORO::Bio
-  end
-
-  class TeamResource < ApplicationResource
-    self.type = :teams
-    self.model = PORO::Team
-  end
-
-  class SerializableEmployee < JSONAPI::Serializable::Resource
-    type :employees
-
-    attribute :first_name
-    attribute :last_name
-    attribute :age
-
+  class EmployeeSerializer < JSONAPI::Serializable::Resource
     is_admin = proc { |c| @context && @context.current_user == 'admin' }
     attribute :salary, if: is_admin do
       100_000
@@ -245,36 +204,39 @@ module PORO
     extra_attribute :runtime_id do
       @context.runtime_id
     end
+  end
+
+  class ApplicationResource < JsonapiCompliable::Resource
+    self.adapter = Adapter.new
+    self.abstract_class = true
+
+    def resolve(scope)
+      ::PORO::DB.all(scope)
+    end
+  end
+
+  class EmployeeResource < ApplicationResource
+    self.serializer = PORO::EmployeeSerializer
+
+    attribute :first_name, :string
+    attribute :last_name, :string
+    attribute :age, :string
 
     has_many :positions
-    has_many :teams
-    has_one :bio
   end
 
-  class SerializablePosition < JSONAPI::Serializable::Resource
-    type :positions
-
-    attribute :title
-
-    belongs_to :employee
-    belongs_to :department
+  class PositionResource < ApplicationResource
   end
 
-  class SerializableDepartment < JSONAPI::Serializable::Resource
-    type :departments
-
-    attribute :name
+  class DepartmentResource < ApplicationResource
   end
 
-  class SerializableBio < JSONAPI::Serializable::Resource
-    type :bios
-
-    attribute :text
+  class BioResource < ApplicationResource
   end
 
-  class SerializableTeam < JSONAPI::Serializable::Resource
-    type :teams
+  class TeamResource < ApplicationResource
+  end
 
-    attribute :name
+  class ApplicationSerializer < JSONAPI::Serializable::Resource
   end
 end

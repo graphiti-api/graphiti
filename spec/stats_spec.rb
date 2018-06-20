@@ -25,7 +25,8 @@ RSpec.describe 'stats' do
 
     it 'responds with count in meta stats' do
       render
-      expect(json['meta']['stats']).to eq({ 'total' => { 'count' => 'poro_count_total' } })
+      expect(json['meta']['stats'])
+        .to eq({ 'total' => { 'count' => 'poro_count_total' } })
     end
 
     # Must be integration spec

@@ -27,16 +27,24 @@ RSpec.describe 'extra_fields' do
   context 'when altering scope based on extra attrs' do
     before do
       resource.class_eval do
-        extra_field :net_worth do |scope|
-          scope[:foo] = 'bar'
-          scope
+        extra_attribute :net_worth, :integer do
+          100_000
+        end
+
+        def around_scoping(scope, query_hash)
+          if query_hash[:extra_fields][type].include?(:net_worth)
+            scope = { foo: 'bar' }
+          end
+          yield scope
         end
       end
     end
 
     it 'modifies the scope' do
       params[:extra_fields] = { employees: 'net_worth' }
-      expect(PORO::DB).to receive(:all).with(hash_including(foo: 'bar'))
+      expect(PORO::DB)
+        .to receive(:all).with(hash_including(foo: 'bar'))
+        .and_return([])
       render
     end
   end

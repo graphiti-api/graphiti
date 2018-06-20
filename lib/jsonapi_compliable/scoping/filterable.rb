@@ -10,13 +10,8 @@ module JsonapiCompliable
 
     # @api private
     def find_filter!(name)
-      filter_name, filter_value = \
-        resource.filters.find { |_name, opts| opts[:aliases].include?(name.to_sym) }
-      raise JsonapiCompliable::Errors::BadFilter unless filter_name
-      if guard = filter_value[:if]
-        raise JsonapiCompliable::Errors::BadFilter if resource.context.send(guard) == false
-      end
-      { filter_name => filter_value }
+      resource.class.get_attr!(name, :filterable, request: true)
+      { name => resource.filters[name] }
     end
 
     # @api private
@@ -25,13 +20,13 @@ module JsonapiCompliable
     end
 
     def missing_required_filters
-      required_filters.keys - filter_param.keys
+      required_attributes - filter_param.keys
     end
 
-    def required_filters
-      resource.filters.select do |_name, opts|
-        opts[:required].respond_to?(:call) ? opts[:required].call(resource.context) : opts[:required]
-      end
+    def required_attributes
+      resource.attributes.map do |k, v|
+        k if v[:filterable] == :required
+      end.compact
     end
 
     def required_filters_provided?

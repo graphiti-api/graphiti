@@ -10,9 +10,20 @@ module JsonapiCompliable
           klass = Class.new(opts.delete(:class) || Sideload)
           klass.class_eval(&blk) if blk
           opts[:parent_resource] = self
+          relationship_option(opts, :readable)
+          relationship_option(opts, :writable)
           sideload = klass.new(name, opts)
           config[:sideloads][name] = sideload
+          apply_sideloads_to_serializer
           sideload
+        end
+
+        def apply_sideloads_to_serializer
+          config[:sideloads].each_pair do |name, sideload|
+            if serializer.relationship_blocks[name].nil? && sideload.readable?
+              serializer.relationship(name)
+            end
+          end
         end
 
         def has_many(name, opts = {}, &blk)

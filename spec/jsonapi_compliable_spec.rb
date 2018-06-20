@@ -71,7 +71,7 @@ RSpec.describe JsonapiCompliable do
     it 'scopes, returning stats and models' do
       scope = double(resolve: 'resolved', resolve_stats: 'stats')
       expect(instance).to receive(:jsonapi_scope).with('foo') { scope }
-      expect(instance.resolve('foo')).to eq(['resolved', 'stats'])
+      expect(instance.resolve('foo')).to eq(['resolved', { stats: 'stats' }])
     end
   end
 

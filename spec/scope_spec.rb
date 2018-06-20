@@ -7,10 +7,14 @@ RSpec.describe JsonapiCompliable::Scope do
   let(:instance)   { described_class.new(object, resource, query) }
 
   let(:resource) do
-    dbl = double type: :employees,
-      default_page_size: 1,
-      pagination: nil
-    dbl.as_null_object
+    Class.new(PORO::EmployeeResource) do
+      self.default_page_size = 1
+    end.new
+  end
+  let(:results) { [] }
+
+  before do
+    allow(resource).to receive(:resolve) { results }
   end
 
   describe '#resolve' do
@@ -25,13 +29,13 @@ RSpec.describe JsonapiCompliable::Scope do
       instance.resolve
     end
 
-    it 'returns the object' do
-      expect(instance.resolve).to eq(instance.instance_variable_get(:@object))
+    it 'returns results' do
+      expect(instance.resolve).to eq([])
     end
 
     context 'when sideloading' do
       let(:sideload) { double(name: :positions) }
-      let(:results)  { double }
+      let(:results)  { [double.as_null_object] }
 
       before do
         query_hash[:include] = { positions: {} }

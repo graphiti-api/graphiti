@@ -262,20 +262,18 @@ module JsonapiCompliable
       options
     end
 
-    def resolve(base)
+    # Todo: es no need for sep query
+    def resolve(base, single: false)
       scope = jsonapi_scope(base)
-      [scope.resolve, scope.resolve_stats]
+      records = scope.resolve
+      records = records[0] if single
+      [records, { stats: scope.resolve_stats }]
     end
 
-    def render_jsonapi(scope, options = {})
-      models, stats = scope, nil
-      unless options[:apply_scoping] == false
-        models, stats = resolve(scope)
-      end
-      models = models[0] if options[:single]
+    def render_jsonapi(records, options = {})
+      records = records[0] if options[:single]
       options = jsonapi_render_options.merge(options)
-      options[:meta][:stats] = stats unless stats.blank?
-      Renderer.new(models, options).to_jsonapi
+      Renderer.new(records, options).to_jsonapi
     end
 
     # Define a hash that will be automatically merged into your

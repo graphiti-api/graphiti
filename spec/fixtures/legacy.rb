@@ -74,216 +74,204 @@ ActiveRecord::Schema.define(:version => 1) do
   #end
 end
 
-class LegacyApplicationRecord < ActiveRecord::Base
-  self.abstract_class = true
-end
+module Legacy
+  class ApplicationRecord < ActiveRecord::Base
+    self.abstract_class = true
+  end
 
-class State < LegacyApplicationRecord
-  has_many :books
-end
+  class State < ApplicationRecord
+    has_many :books
+  end
 
-class Author < LegacyApplicationRecord
-  #belongs_to :dwelling, polymorphic: true
-  belongs_to :state
-  belongs_to :organization
-  has_many :books
-  has_many :author_hobbies
-  has_many :hobbies, through: :author_hobbies
-  has_one :bio
-  #accepts_nested_attributes_for :books
-  #accepts_nested_attributes_for :state
-end
+  class Author < ApplicationRecord
+    #belongs_to :dwelling, polymorphic: true
+    belongs_to :state
+    belongs_to :organization
+    has_many :books
+    has_many :author_hobbies
+    has_many :hobbies, through: :author_hobbies
+    has_one :bio
+  end
 
-class Organization < LegacyApplicationRecord
-  belongs_to :parent, class_name: 'Organization', foreign_key: :parent_id
-  has_many :children, class_name: 'Organization', foreign_key: :parent_id
-end
+  class Organization < ApplicationRecord
+    belongs_to :parent, class_name: 'Organization', foreign_key: :parent_id
+    has_many :children, class_name: 'Organization', foreign_key: :parent_id
+  end
 
-#class Condo < LegacyApplicationRecord
-  #has_many :authors, as: :dwelling
-  #belongs_to :state
-#end
-
-#class House < LegacyApplicationRecord
-  #has_many :authors, as: :dwelling
-  #belongs_to :state
-#end
-
-class AuthorHobby < LegacyApplicationRecord
-  belongs_to :author
-  belongs_to :hobby
-end
-
-class Hobby < LegacyApplicationRecord
-  has_many :author_hobbies
-  has_many :authors, through: :author_hobbies
-end
-
-class Bio < LegacyApplicationRecord
-  belongs_to :author
-  has_many :bio_labels
-end
-
-class BioLabel < LegacyApplicationRecord
-  belongs_to :bio
-end
-
-class Genre < LegacyApplicationRecord
-  has_many :books
-  #accepts_nested_attributes_for :books
-end
-
-#class Tag < LegacyApplicationRecord
-  #belongs_to :book
-  #accepts_nested_attributes_for :book
-#end
-
-class Book < LegacyApplicationRecord
-  belongs_to :author
-  belongs_to :genre
-  #has_many :tags
-
-  #accepts_nested_attributes_for :author
-  #accepts_nested_attributes_for :genre
-  #accepts_nested_attributes_for :tags
-end
-
-class LegacySerializableAbstract < JSONAPI::Serializable::Resource
-end
-
-class SerializableAuthor < LegacySerializableAbstract
-  type 'authors'
-
-  attribute :first_name
-  attribute :last_name
-
-  belongs_to :dwelling
-  belongs_to :state
-  belongs_to :organization
-  has_many :books
-  has_many :hobbies
-  has_one :bio
-end
-
-class SerializableOrganization < LegacySerializableAbstract
-  type 'organizations'
-
-  attribute :name
-
-  has_many :children
-  belongs_to :parent
-end
-
-#class SerializableDwelling < LegacySerializableAbstract
-  #type 'dwellings'
-
-  #attribute :name
-#end
-
-#class SerializableCondo < SerializableDwelling
-  #type 'condos'
-
-  #attribute :condo_description do
-    #'condo desc'
+  #class Condo < LegacyApplicationRecord
+    #has_many :authors, as: :dwelling
+    #belongs_to :state
   #end
 
-  #extra_attribute :condo_price do
-    #500_000
+  #class House < LegacyApplicationRecord
+    #has_many :authors, as: :dwelling
+    #belongs_to :state
   #end
 
-  #belongs_to :state
-#end
+  class AuthorHobby < ApplicationRecord
+    belongs_to :author
+    belongs_to :hobby
+  end
 
-#class SerializableHouse < SerializableDwelling
-  #type 'houses'
+  class Hobby < ApplicationRecord
+    has_many :author_hobbies
+    has_many :authors, through: :author_hobbies
+  end
 
-  #attribute :house_description do
-    #'house desc'
+  class Bio < ApplicationRecord
+    belongs_to :author
+    has_many :bio_labels
+  end
+
+  class BioLabel < ApplicationRecord
+    belongs_to :bio
+  end
+
+  class Genre < ApplicationRecord
+    has_many :books
+  end
+
+  #class Tag < LegacyApplicationRecord
+    #belongs_to :book
   #end
 
-  #extra_attribute :house_price do
-    #1_000_000
+  class Book < ApplicationRecord
+    belongs_to :author
+    belongs_to :genre
+    #has_many :tags
+  end
+
+  class LegacyApplicationSerializer < JSONAPI::Serializable::Resource
+  end
+
+  #class SerializableDwelling < LegacySerializableAbstract
+    #type 'dwellings'
+
+    #attribute :name
   #end
 
-  #belongs_to :state
-#end
+  #class SerializableCondo < SerializableDwelling
+    #type 'condos'
 
-class SerializableHobby < LegacySerializableAbstract
-  type 'hobbies'
+    #attribute :condo_description do
+      #'condo desc'
+    #end
 
-  attribute :name
-  attribute :description do
-    'hobby desc'
+    #extra_attribute :condo_price do
+      #500_000
+    #end
+
+    #belongs_to :state
+  #end
+
+  #class SerializableHouse < SerializableDwelling
+    #type 'houses'
+
+    #attribute :house_description do
+      #'house desc'
+    #end
+
+    #extra_attribute :house_price do
+      #1_000_000
+    #end
+
+    #belongs_to :state
+  #end
+
+  #class SerializableTag < LegacySerializableAbstract
+    #type 'tags'
+
+    #attribute :name
+    #belongs_to :book
+  #end
+
+  class ApplicationResource < JsonapiCompliable::Resource
+    self.adapter = JsonapiCompliable::Adapters::ActiveRecord::Base.new
+    self.abstract_class = true
   end
-  extra_attribute :reason do
-    'hobby reason'
+
+  class GenreResource < ApplicationResource
+    attribute :name, :string
+  end
+
+  class BookResource < ApplicationResource
+    attribute :title, :string
+    attribute :pages, :integer do
+      500
+    end
+
+    extra_attribute :alternate_title, :string do
+      'alt title'
+    end
+
+    belongs_to :genre
+  end
+
+  class StateResource < ApplicationResource
+    attribute :name, :string
+    attribute :abbreviation, :string do
+      'abbr'
+    end
+
+    extra_attribute :population, :integer do
+      10_000
+    end
+  end
+
+  class BioLabelResource < ApplicationResource
+  end
+
+  class BioResource < ApplicationResource
+    attribute :description, :string
+    attribute :picture, :string
+
+    extra_attribute :created_at, :time do
+      Time.now
+    end
+
+    has_many :bio_labels do
+      # Ensure if we get too many bios/labels, they
+      # will still come back in the response.
+      assign do |bios, labels|
+        bios.each do |b|
+          b.bio_labels = labels
+        end
+      end
+    end
+  end
+
+      # todo autostats
+      #allow_stat total: [:count]
+
+  class HobbyResource < ApplicationResource
+    attribute :name, :string
+    attribute :description, :string do
+      'hobby desc'
+    end
+    extra_attribute :reason, :string do
+      'hobby reason'
+    end
+  end
+
+  class OrganizationResource < ApplicationResource
+    attribute :name, :string
+
+    has_many :children,
+      resource: OrganizationResource
+    belongs_to :parent,
+      resource: OrganizationResource
+  end
+
+  class AuthorResource < ApplicationResource
+    attribute :first_name, :string
+
+    # todo autostats
+    allow_stat total: [:count]
+
+    has_many :books
+    belongs_to :state
+    belongs_to :organization
+    has_one :bio
+    many_to_many :hobbies
   end
 end
-
-class SerializableBio < LegacySerializableAbstract
-  type 'bios'
-
-  attribute :description
-  attribute :picture
-  extra_attribute :created_at do
-    Time.now
-  end
-
-  has_many :bio_labels
-end
-
-class SerializableBioLabel < LegacySerializableAbstract
-  type 'bio_labels'
-end
-
-class SerializableState < LegacySerializableAbstract
-  type 'states'
-
-  attribute :name
-  attribute :abbreviation do
-    'abbr'
-  end
-
-  extra_attribute :population do
-    10_000
-  end
-end
-
-#class SerializableTag < LegacySerializableAbstract
-  #type 'tags'
-
-  #attribute :name
-  #belongs_to :book
-#end
-
-class SerializableGenre < LegacySerializableAbstract
-  type 'genres'
-
-  attribute :name
-  has_many :books
-end
-
-class SerializableBook < LegacySerializableAbstract
-  type 'books'
-
-  attribute :title
-
-  attribute :pages do
-    500
-  end
-
-  extra_attribute :alternate_title do
-    'alt title'
-  end
-
-  belongs_to :genre
-  belongs_to :author
-  #has_many :tags
-end
-
-## supports `render jsonapi: double`
-#class RSpec::Mocks::SerializableDouble < LegacySerializableAbstract
-  #type 'doubles'
-
-  #id { rand(99999) }
-#end

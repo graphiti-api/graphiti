@@ -128,6 +128,7 @@ end
 
 class ApplicationResource < JsonapiCompliable::Resource
   self.adapter = JsonapiCompliable::Adapters::ActiveRecord::Base.new
+  self.abstract_class = true
 end
 
 #class ClassificationResource < ApplicationResource
@@ -169,10 +170,38 @@ end
   #type :salaries
   #model Salary
 #end
+#
+class ApplicationSerializer < JSONAPI::Serializable::Resource
+end
+
+class SerializableEmployee < ApplicationSerializer
+  #type :employees
+
+  #attribute :first_name
+  #attribute :last_name
+  #attribute :age
+
+  #belongs_to :classification
+  # TODO MAKE SURE USES RESOURCE CLASS
+  has_many :positions
+  #has_many :teams
+
+  #has_one :salary
+end
+
+class PositionSerializer < ApplicationSerializer
+  belongs_to :employee
+  belongs_to :department
+end
+
+class DepartmentSerializer < ApplicationSerializer
+  has_many :positions
+end
 
 class EmployeeResource < ApplicationResource
   self.type = :employees
   self.model = Employee
+  self.serializer = SerializableEmployee
 
   #belongs_to :classification,
     #scope: -> { Classification.all },
@@ -207,8 +236,6 @@ class EmployeeResource < ApplicationResource
     #}
 end
 
-class SerializableAbstract < JSONAPI::Serializable::Resource
-end
 
 #class SerializableClassification < SerializableAbstract
   #type 'classifications'
@@ -222,36 +249,7 @@ end
   #attribute :name
 #end
 
-class SerializableEmployee < SerializableAbstract
-  type 'employees'
 
-  attribute :first_name
-  attribute :last_name
-  attribute :age
-
-  #belongs_to :classification
-  #has_many :positions
-  #has_many :teams
-
-  #has_one :salary
-end
-
-class SerializablePosition < SerializableAbstract
-  type 'positions'
-
-  attribute :title
-
-  belongs_to :employee
-  belongs_to :department
-end
-
-class SerializableDepartment < SerializableAbstract
-  type 'departments'
-
-  attribute :name
-
-  has_many :positions
-end
 
 #class SerializableSalary < SerializableAbstract
   #type 'salaries'

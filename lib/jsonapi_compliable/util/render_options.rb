@@ -13,7 +13,6 @@ module JsonapiCompliable
         end
 
         options            = {}
-        options[:class]    = inferrer
         options[:include]  = query_hash[:include]
         options[:fields]   = fields
         options.merge!(overrides)
@@ -22,21 +21,6 @@ module JsonapiCompliable
         options[:expose][:extra_fields] = extra_fields
         options
       end
-
-      def self.inferrer
-        ::Hash.new do |h, k|
-          names = k.to_s.split('::')
-          klass = names.pop
-          serializer_name = [*names, "Serializable#{klass}"].join('::')
-          serializer = serializer_name.safe_constantize
-          if serializer
-            h[k] = serializer
-          else
-            raise Errors::MissingSerializer.new(k, serializer_name)
-          end
-        end
-      end
-      private_class_method :inferrer
     end
   end
 end
