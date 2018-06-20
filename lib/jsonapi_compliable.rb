@@ -1,11 +1,15 @@
 require 'json'
 require 'active_support/core_ext/string'
+require 'active_support/core_ext/class/attribute'
 require 'active_support/concern'
 
 require "jsonapi_compliable/version"
 require "jsonapi_compliable/configuration"
 require "jsonapi_compliable/errors"
+require "jsonapi_compliable/adapters/abstract"
 require "jsonapi_compliable/resource/sideloading"
+require "jsonapi_compliable/resource/configuration"
+require "jsonapi_compliable/resource/dsl"
 require "jsonapi_compliable/sideload"
 require "jsonapi_compliable/sideload/has_many"
 require "jsonapi_compliable/sideload/belongs_to"
@@ -24,7 +28,6 @@ require "jsonapi_compliable/scoping/filterable"
 require "jsonapi_compliable/scoping/default_filter"
 require "jsonapi_compliable/scoping/filter"
 require "jsonapi_compliable/util/render_options"
-require "jsonapi_compliable/adapters/abstract"
 require "jsonapi_compliable/stats/dsl"
 require "jsonapi_compliable/stats/payload"
 require "jsonapi_compliable/util/include_params"

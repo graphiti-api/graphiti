@@ -17,7 +17,7 @@ RSpec.describe 'pagination' do
 
   it 'applies default pagination' do
     resource.class_eval do
-      default_page_size 2
+      self.default_page_size = 2
     end
     expect(ids.length).to eq(2)
   end

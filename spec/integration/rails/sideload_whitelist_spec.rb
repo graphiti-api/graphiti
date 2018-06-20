@@ -2,17 +2,17 @@ if ENV["APPRAISAL_INITIALIZED"]
   RSpec.describe 'sideload whitelist', type: :controller do
     module SideloadWhitelist
       class ApplicationResource < JsonapiCompliable::Resource
-        use_adapter JsonapiCompliable::Adapters::ActiveRecord::Base
+        self.adapter = JsonapiCompliable::Adapters::ActiveRecord::Base.new
       end
 
       class GenreResource < ApplicationResource
-        type :genres
-        model Genre
+        self.type = :genres
+        self.model = Genre
       end
 
       class BookResource < ApplicationResource
-        type :books
-        model Book
+        self.type = :books
+        self.model = Book
 
         allow_filter :id
 
@@ -20,8 +20,8 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       class AuthorResource < ApplicationResource
-        type :authors
-        model Author
+        self.type = :authors
+        self.model = Author
 
         has_many :books
       end
@@ -31,7 +31,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       jsonapi resource: SideloadWhitelist::AuthorResource
 
       def index
-        render_jsonapi(Author.all)
+        render jsonapi: Author.all
       end
     end
 

@@ -116,7 +116,7 @@ RSpec.describe JsonapiCompliable::Sideload do
 
       before do
         opts[:parent_resource] = Class.new(JsonapiCompliable::Resource)
-        opts[:parent_resource].config[:model] = SideloadSpec::Employee
+        opts[:parent_resource].model = SideloadSpec::Employee
       end
 
       it 'derives a to_many foreign key from the resource model' do
@@ -132,7 +132,7 @@ RSpec.describe JsonapiCompliable::Sideload do
 
       before do
         opts[:parent_resource] = Class.new(JsonapiCompliable::Resource)
-        opts[:parent_resource].config[:model] = SideloadSpecEmployee
+        opts[:parent_resource].model = SideloadSpecEmployee
       end
 
       it 'derives a to_many foreign key from the resource model' do

@@ -188,7 +188,7 @@ module PORO
   end
 
   class ApplicationResource < JsonapiCompliable::Resource
-    use_adapter Adapter
+    self.adapter = Adapter.new
 
     def resolve(scope)
       ::PORO::DB.all(scope)
@@ -196,30 +196,30 @@ module PORO
   end
 
   class EmployeeResource < ApplicationResource
-    type :employees
-    model PORO::Employee
+    self.type = :employees
+    self.model = PORO::Employee
 
     has_many :positions
   end
 
   class PositionResource < ApplicationResource
-    type :positions
-    model PORO::Position
+    self.type = :positions
+    self.model = PORO::Position
   end
 
   class DepartmentResource < ApplicationResource
-    type :departments
-    model PORO::Department
+    self.type = :departments
+    self.model = PORO::Department
   end
 
   class BioResource < ApplicationResource
-    type :bios
-    model PORO::Bio
+    self.type = :bios
+    self.model = PORO::Bio
   end
 
   class TeamResource < ApplicationResource
-    type :teams
-    model PORO::Team
+    self.type = :teams
+    self.model = PORO::Team
   end
 
   class SerializableEmployee < JSONAPI::Serializable::Resource

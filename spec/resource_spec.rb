@@ -4,6 +4,31 @@ RSpec.describe JsonapiCompliable::Resource do
   let(:klass) { Class.new(described_class) }
   let(:instance) { klass.new }
 
+  # This is the test for all 'config' behavior
+  context 'when inheriting' do
+    before do
+      klass.class_eval do
+        allow_sideload :foo
+      end
+    end
+
+    let(:subclass) do
+      Class.new(klass)
+    end
+
+    it 'inherits sideloads'  do
+      expect(subclass.config[:sideloads].keys).to eq([:foo])
+    end
+
+    it 'does not modify superclass sideloads' do
+      subclass.class_eval do
+        allow_sideload :bar
+      end
+      expect(subclass.config[:sideloads].keys).to eq([:foo, :bar])
+      expect(klass.config[:sideloads].keys).to eq([:foo])
+    end
+  end
+
   describe '#stat' do
     let(:avg_proc) { proc { |scope, attr| 1 } }
 
@@ -73,35 +98,26 @@ RSpec.describe JsonapiCompliable::Resource do
   end
 
   describe '#default_sort' do
-    it 'gets/sets correctly' do
-      klass.default_sort([{ name: :desc }])
-      expect(instance.default_sort).to eq([{ name: :desc }])
-    end
-
     it 'defaults' do
       expect(instance.default_sort).to eq([])
     end
   end
 
   describe '#default_page_size' do
-    it 'gets/sets correctly' do
-      klass.default_page_size(10)
-      expect(instance.default_page_size).to eq(10)
-    end
-
     it 'defaults' do
       expect(instance.default_page_size).to eq(20)
     end
   end
 
   describe '#type' do
-    it 'gets/sets correctly' do
-      klass.type :authors
-      expect(instance.type).to eq(:authors)
-    end
-
     it 'defaults' do
       expect(instance.type).to eq(:undefined_jsonapi_type)
+    end
+  end
+
+  describe '#adapter' do
+    it 'defaults' do
+      expect(instance.adapter.class).to eq(JsonapiCompliable::Adapters::Abstract)
     end
   end
 

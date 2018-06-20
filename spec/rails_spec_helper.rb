@@ -53,7 +53,7 @@ class ApplicationController < ActionController::Base
   include JsonapiCompliable::Rails
 
   jsonapi do
-    use_adapter JsonapiCompliable::Adapters::ActiveRecord::Base
+    self.adapter = JsonapiCompliable::Adapters::ActiveRecord::Base.new
   end
 
   prepend_before_action :fix_params!

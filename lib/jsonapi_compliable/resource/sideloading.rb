@@ -11,27 +11,27 @@ module JsonapiCompliable
           klass.class_eval(&blk) if blk
           opts[:parent_resource] = self
           sideload = klass.new(name, opts)
-          sideloads[name] = sideload
+          config[:sideloads][name] = sideload
           sideload
         end
 
         def has_many(name, opts = {}, &blk)
-          opts[:class] = config[:adapter].sideloading_classes[:has_many]
+          opts[:class] = adapter.sideloading_classes[:has_many]
           allow_sideload(name, opts, &blk)
         end
 
         def belongs_to(name, opts = {}, &blk)
-          opts[:class] = config[:adapter].sideloading_classes[:belongs_to]
+          opts[:class] = adapter.sideloading_classes[:belongs_to]
           allow_sideload(name, opts, &blk)
         end
 
         def has_one(name, opts = {}, &blk)
-          opts[:class] = config[:adapter].sideloading_classes[:has_one]
+          opts[:class] = adapter.sideloading_classes[:has_one]
           allow_sideload(name, opts, &blk)
         end
 
         def many_to_many(name, opts = {}, &blk)
-          opts[:class] = config[:adapter].sideloading_classes[:many_to_many]
+          opts[:class] = adapter.sideloading_classes[:many_to_many]
           allow_sideload(name, opts, &blk)
         end
 

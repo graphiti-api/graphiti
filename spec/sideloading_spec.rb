@@ -3,12 +3,18 @@ require 'spec_helper'
 RSpec.describe 'sideloading' do
   include JsonHelpers
   include_context 'resource testing'
-  let(:resource) { PORO::EmployeeResource }
+  let(:resource) do
+    Class.new(PORO::EmployeeResource) do
+      def self.name
+        'PORO::EmployeeResource'
+      end
+    end
+  end
   let(:base_scope) { { type: :employees } }
 
   module Sideloading
     class CustomPositionResource < ::PORO::PositionResource
-      default_sort([{ id: :desc }])
+      self.default_sort = [{ id: :desc }]
     end
 
     class PositionSideload < ::JsonapiCompliable::Sideload::HasMany
@@ -16,11 +22,6 @@ RSpec.describe 'sideloading' do
         { type: :positions, sort: [{ id: :desc }] }
       end
     end
-  end
-
-  after do
-    PORO::EmployeeResource.sideloads = {}
-    PORO::DB.clear
   end
 
   let!(:employee) { PORO::Employee.create }
@@ -49,7 +50,7 @@ RSpec.describe 'sideloading' do
 
   context 'when basic manual sideloading' do
     before do
-      PORO::EmployeeResource.class_eval do
+      resource.class_eval do
         allow_sideload :positions, type: :has_many do
           scope do |employees|
             {
@@ -86,7 +87,7 @@ RSpec.describe 'sideloading' do
 
   context 'when using .assign instead of .assign_each' do
     before do
-      PORO::EmployeeResource.class_eval do
+      resource.class_eval do
         allow_sideload :positions, type: :has_many do
           scope do |employees|
             {
@@ -114,7 +115,7 @@ RSpec.describe 'sideloading' do
 
   context 'when custom resource option given' do
     before do
-      PORO::EmployeeResource.class_eval do
+      resource.class_eval do
         allow_sideload :positions, type: :has_many, resource: Sideloading::CustomPositionResource do
           scope do |employees|
             {
@@ -139,7 +140,7 @@ RSpec.describe 'sideloading' do
 
   context 'when class option given' do
     before do
-      PORO::EmployeeResource.class_eval do
+      resource.class_eval do
         allow_sideload :positions, class: Sideloading::PositionSideload
       end
       params[:include] = 'positions'
@@ -153,7 +154,7 @@ RSpec.describe 'sideloading' do
 
   describe 'has_many macro' do
     before do
-      PORO::EmployeeResource.class_eval do
+      resource.class_eval do
         has_many :positions do
           scope do |employees|
             {
@@ -176,7 +177,7 @@ RSpec.describe 'sideloading' do
         PORO::DB.data[:positions][0] = { id: 1, e_id: 1  }
         PORO::DB.data[:positions][1] = { id: 2, e_id: 1  }
 
-        PORO::EmployeeResource.class_eval do
+        resource.class_eval do
           has_many :positions, foreign_key: :e_id do
             scope do |employees|
               {
@@ -197,11 +198,18 @@ RSpec.describe 'sideloading' do
   end
 
   describe 'belongs_to macro' do
-    let(:resource) { PORO::PositionResource }
+    let(:resource) do
+      Class.new(PORO::PositionResource) do
+        def self.name
+          'PORO::PositionResource'
+        end
+      end
+    end
+
     let(:base_scope) { { type: :positions } }
 
     before do
-      PORO::PositionResource.class_eval do
+      resource.class_eval do
         belongs_to :employee do
           scope do |positions|
             {
@@ -223,7 +231,7 @@ RSpec.describe 'sideloading' do
   # Note we're seeding 2 bios
   describe 'has_one macro' do
     before do
-      PORO::EmployeeResource.class_eval do
+      resource.class_eval do
         has_one :bio do
           scope do |employees|
             {
@@ -244,7 +252,7 @@ RSpec.describe 'sideloading' do
 
   describe 'many_to_many macro' do
     before do
-      PORO::EmployeeResource.class_eval do
+      resource.class_eval do
         many_to_many :teams, foreign_key: { team_memberships: :employee_id } do
           # fake the logic to join tables etc
           scope do |employees|
@@ -267,11 +275,11 @@ RSpec.describe 'sideloading' do
 
   context 'when the associated resource has default pagination' do
     before do
-      PORO::EmployeeResource.class_eval do
+      resource.class_eval do
         allow_sideload :positions, class: Sideloading::PositionSideload
       end
-      PORO::PositionResource.class_eval do
-        default_page_size(1)
+      resource.class_eval do
+        self.default_page_size = 1
       end
       params[:include] = 'positions'
     end
@@ -310,7 +318,7 @@ RSpec.describe 'sideloading' do
   context 'when passing pagination params for > 1 parent objects' do
     before do
       PORO::DB.data[:employees] << { id: 999  }
-      PORO::EmployeeResource.class_eval do
+      resource.class_eval do
         allow_sideload :positions, class: Sideloading::PositionSideload
       end
       params[:include] = 'positions'
@@ -328,7 +336,7 @@ RSpec.describe 'sideloading' do
 
   context 'when passing pagination params for only 1 object' do
     before do
-      PORO::EmployeeResource.class_eval do
+      resource.class_eval do
         allow_sideload :positions, class: Sideloading::PositionSideload
       end
       params[:include] = 'positions'

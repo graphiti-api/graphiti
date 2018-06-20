@@ -12,7 +12,7 @@ class JsonapiCompliable::Sideload::BelongsTo < JsonapiCompliable::Sideload
   end
 
   def infer_foreign_key
-    model = resource_class.config[:model]
+    model = resource.model
     namespace = namespace_for(model)
     model_name = model.name.gsub("#{namespace}::", '')
     "#{model_name.underscore}_id"

@@ -69,7 +69,7 @@ module JsonapiCompliable
 
     # Override in subclass
     def infer_foreign_key
-      model = parent_resource_class.config[:model]
+      model = parent_resource_class.model
       namespace = namespace_for(model)
       model_name = model.name.gsub("#{namespace}::", '')
       :"#{model_name.underscore}_id"

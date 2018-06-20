@@ -2,17 +2,17 @@ if ENV["APPRAISAL_INITIALIZED"]
   RSpec.describe 'integrated resources and adapters', type: :controller do
     module Integration
       class ApplicationResource < JsonapiCompliable::Resource
-        use_adapter JsonapiCompliable::Adapters::ActiveRecord::Base
+        self.adapter = JsonapiCompliable::Adapters::ActiveRecord::Base.new
       end
 
       class GenreResource < ApplicationResource
-        type :genres
-        model Genre
+        self.type = :genres
+        self.model = Genre
       end
 
       class BookResource < ApplicationResource
-        type :books
-        model Book
+        self.type = :books
+        self.model = Book
 
         allow_filter :id
 
@@ -20,8 +20,8 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       class StateResource < ApplicationResource
-        type :states
-        model State
+        self.type = :states
+        self.model = State
       end
 
       #class DwellingResource < ApplicationResource
@@ -34,13 +34,13 @@ if ENV["APPRAISAL_INITIALIZED"]
       #end
 
       class BioLabelResource < ApplicationResource
-        type :bio_labels
-        model BioLabel
+        self.type = :bio_labels
+        self.model = BioLabel
       end
 
       class BioResource < ApplicationResource
-        type :bios
-        model Bio
+        self.type = :bios
+        self.model = Bio
 
         has_many :bio_labels do
           # Ensure if we get too many bios/labels, they
@@ -54,15 +54,15 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       class HobbyResource < ApplicationResource
-        type :hobbies
-        model Hobby
+        self.type = :hobbies
+        self.model = Hobby
 
         allow_filter :id
       end
 
       class OrganizationResource < ApplicationResource
-        type :organizations
-        model Organization
+        self.type = :organizations
+        self.model = Organization
 
         has_many :children,
           resource: OrganizationResource
@@ -71,8 +71,8 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       class AuthorResource < ApplicationResource
-        type :authors
-        model Author
+        self.type = :authors
+        self.model = Author
 
         allow_filter :first_name
 
@@ -230,8 +230,8 @@ if ENV["APPRAISAL_INITIALIZED"]
     context 'when action-specific resources' do
       before do
         klass = Class.new(JsonapiCompliable::Resource) do
-          type :authors
-          use_adapter JsonapiCompliable::Adapters::ActiveRecord::Base
+          self.type = :authors
+          self.adapter = JsonapiCompliable::Adapters::ActiveRecord::Base.new
         end
 
         controller.class.jsonapi resource: {

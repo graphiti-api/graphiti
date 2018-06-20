@@ -29,12 +29,12 @@ RSpec.describe JsonapiCompliable do
 
     context 'when subclassing and customizing' do
       it 'preserves values from superclass' do
-        expect(subclass1._jsonapi_compliable.config[:type]).to eq(:employees)
+        expect(subclass1._jsonapi_compliable.type).to eq(:employees)
       end
 
       it 'can override in subclass' do
-        expect(subclass1._jsonapi_compliable.config[:type]).to eq(:employees)
-        expect(subclass2._jsonapi_compliable.config[:type]).to eq(:positions)
+        expect(subclass1._jsonapi_compliable.type).to eq(:employees)
+        expect(subclass2._jsonapi_compliable.type).to eq(:positions)
       end
     end
   end

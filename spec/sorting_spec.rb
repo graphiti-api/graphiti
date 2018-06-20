@@ -21,7 +21,7 @@ RSpec.describe 'sorting' do
   context 'when default_sort is overridden' do
     before do
       resource.class_eval do
-        default_sort([{ id: :desc }])
+        self.default_sort = [{ id: :desc }]
       end
     end
 

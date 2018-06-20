@@ -5,7 +5,7 @@ module JsonapiCompliable
         include Inferrence
 
         def default_base_scope
-          resource_class.config[:model].all
+          resource_class.model.all
         end
 
         def scope(parents)

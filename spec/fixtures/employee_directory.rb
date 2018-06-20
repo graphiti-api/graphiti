@@ -127,7 +127,7 @@ end
 #end
 
 class ApplicationResource < JsonapiCompliable::Resource
-  use_adapter JsonapiCompliable::Adapters::ActiveRecord::Base
+  self.adapter = JsonapiCompliable::Adapters::ActiveRecord::Base.new
 end
 
 #class ClassificationResource < ApplicationResource
@@ -171,8 +171,8 @@ end
 #end
 
 class EmployeeResource < ApplicationResource
-  type :employees
-  model Employee
+  self.type = :employees
+  self.model = Employee
 
   #belongs_to :classification,
     #scope: -> { Classification.all },
