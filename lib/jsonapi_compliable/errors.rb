@@ -90,7 +90,7 @@ Manually set model (self.model = MyModel) if it does not match name of the Resou
         <<-MSG
 Could not find type #{@type.inspect}! This was specified on attribute #{@attribute.inspect} within resource #{@resource.name}
 
-Valid types are: #{JsonapiCompliable::Types::MAP.keys.inspect}
+Valid types are: #{JsonapiCompliable::Types.map.keys.inspect}
         MSG
       end
     end

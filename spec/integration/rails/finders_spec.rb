@@ -79,31 +79,6 @@ if ENV['APPRAISAL_INITIALIZED']
       end
     end
 
-    context 'when action-specific resources' do
-      before do
-        klass = Class.new(JsonapiCompliable::Resource) do
-          self.type = :authors
-          self.adapter = JsonapiCompliable::Adapters::ActiveRecord::Base.new
-        end
-
-        controller.class.jsonapi resource: {
-          index: Legacy::AuthorResource,
-          show: klass
-        }
-      end
-
-      it 'uses the correct resource for each action' do
-        #expect {
-          if Rails::VERSION::MAJOR >= 5
-            get :show, params: { id: author1.id, include: 'books' }
-          else
-            get :show, id: author1.id, params: { include: 'books' }
-          end
-        #}.to raise_error(JsonapiCompliable::Errors::InvalidInclude)
-        #binding.pry
-      end
-    end
-
     context 'sideloading has_many' do
       it 'can sideload' do
         get :index, params: { include: 'books' }

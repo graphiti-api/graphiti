@@ -262,12 +262,20 @@ module JsonapiCompliable
       options
     end
 
-    # Todo: es no need for sep query
-    def resolve(base, single: false)
-      scope = jsonapi_scope(base)
-      records = scope.resolve
-      records = records[0] if single
-      [records, { stats: scope.resolve_stats }]
+    def resolve(base = nil, opts = {})
+      base       ||= jsonapi_resource.base_scope
+      scope        = jsonapi_scope(base)
+      records      = scope.resolve
+
+      if opts[:raise_on_missing] && records.empty?
+        raise JsonapiCompliable::Errors::RecordNotFound
+      end
+
+      records      = records[0] if opts[:single]
+      stats        = scope.resolve_stats
+      meta         = {}
+      meta[:stats] = stats unless stats.empty?
+      [records, meta]
     end
 
     def render_jsonapi(records, options = {})

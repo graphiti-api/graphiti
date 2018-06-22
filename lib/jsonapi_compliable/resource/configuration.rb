@@ -52,15 +52,6 @@ module JsonapiCompliable
           :relationships_readable_by_default,
           :relationships_writable_by_default
 
-        # automodel
-        # autofilter
-        # autosort
-        # refactor finder tests to add serializer etc
-        #
-        # wrap restrict_filters, restrcit_sort
-        # restrict_filters_if
-        # restrict_sort_if
-
         class << self
           prepend Overrides
         end
@@ -196,32 +187,8 @@ module JsonapiCompliable
         get_attr(name, flag, options)
       end
 
-      # Todo: refactor into Util class
       def get_attr(name, flag, request: false, raise_error: false)
-        if att = all_attributes[name]
-          if att[flag] == false
-            if raise_error
-              raise Errors::AttributeError.new self,
-                name, flag, request: request, exists: true
-            end
-          elsif request && att[flag].is_a?(Symbol) && att[flag] != :required
-            if !!send(att[flag])
-              att
-            else
-              if raise_error
-                raise Errors::AttributeError.new self,
-                  name, flag, request: true, exists: true, guard: att[flag]
-              end
-            end
-          else
-            att
-          end
-        else
-          if raise_error
-            raise Errors::AttributeError.new self,
-              name, flag, exists: false, request: request
-          end
-        end
+        Util::AttributeCheck.run(self, name, flag, request, raise_error)
       end
 
       def filters

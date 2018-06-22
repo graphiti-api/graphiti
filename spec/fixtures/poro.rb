@@ -31,6 +31,7 @@ module PORO
 
       def all(params)
         type = params[:type]
+        return [] unless data[type]
         records = data[type].map { |attrs| klasses[type].new(attrs) }
         records = apply_filtering(records, params)
         records = apply_sorting(records, params)
@@ -45,7 +46,7 @@ module PORO
         return records unless params[:conditions]
         records.select! do |record|
           params[:conditions].all? do |key, value|
-            db_value = record.send(key)
+            db_value = record.send(key) if record.respond_to?(key)
             if key == :id
               value = value.is_a?(Array) ? value.map(&:to_i) : value.to_i
             end
@@ -185,6 +186,10 @@ module PORO
     def minimum(scope, attr)
       "poro_minimum_#{attr}"
     end
+
+    def resolve(scope)
+      ::PORO::DB.all(scope)
+    end
   end
 
   class EmployeeSerializer < JSONAPI::Serializable::Resource
@@ -209,10 +214,6 @@ module PORO
   class ApplicationResource < JsonapiCompliable::Resource
     self.adapter = Adapter.new
     self.abstract_class = true
-
-    def resolve(scope)
-      ::PORO::DB.all(scope)
-    end
   end
 
   class EmployeeResource < ApplicationResource

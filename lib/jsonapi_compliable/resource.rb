@@ -24,37 +24,24 @@ module JsonapiCompliable
       JsonapiCompliable.context[:namespace]
     end
 
-    # return single/raise if not found
-    # EmployeeResource.find(params)
-    #
-    # return single/DONT raise if not found
-    #
-    # return multiple
-    # EmployeeResource.all(params) # base_scope if needed
-    #
-    # posts = EmployeeResource.query(params)
-    # render jsonapi: posts
-    #
-    # maybe
-    # EmployeeResource.create(params)
-    # EmployeeResource.update(params)
-    # EmployeeResource.destroy(params)
     def self.all(params, base_scope = nil)
       runner = Runner.new(self, params)
-      # todo resource base scope
-      runner.resolve(base_scope || model.all)
+      runner.resolve(base_scope)
     end
 
     def self.find(params, base_scope = nil)
       params[:filter] ||= {}
       params[:filter].merge!(id: params[:id])
       runner = Runner.new(self, params)
-      # todo resource base scope
-      runner.resolve(base_scope || model.all, single: true)
+      runner.resolve(base_scope, single: true, raise_on_missing: true)
     end
 
     def build_scope(base, query, opts = {})
       Scope.new(base, self, query, opts)
+    end
+
+    def base_scope
+      adapter.base_scope(model)
     end
 
     def create(create_params)

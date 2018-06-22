@@ -36,7 +36,8 @@ module JsonapiCompliable
           config[:stats][dsl.name] = dsl
         end
 
-        def default_filter(name, &blk)
+        def default_filter(name = nil, &blk)
+          name ||= :__default
           config[:default_filters][name.to_sym] = {
             filter: blk
           }
@@ -49,7 +50,7 @@ module JsonapiCompliable
         end
 
         def attribute(name, type, options = {}, &blk)
-          raise Errors::TypeNotFound.new(self, name, type) unless Types::MAP.keys.include?(type)
+          raise Errors::TypeNotFound.new(self, name, type) unless Types[type]
           attribute_option(options, :readable)
           attribute_option(options, :writable)
           attribute_option(options, :sortable)
@@ -62,7 +63,7 @@ module JsonapiCompliable
         end
 
         def extra_attribute(name, type, options = {}, &blk)
-          raise Errors::TypeNotFound.new(self, name, type) unless Types::MAP.keys.include?(type)
+          raise Errors::TypeNotFound.new(self, name, type) unless Types[type]
           defaults = {
             type: type,
             proc: blk,
@@ -80,42 +81,14 @@ module JsonapiCompliable
           attributes.merge(extra_attributes)
         end
 
-        # If you pass a block, you 'win'
-        # otherwise, the serializer 'wins'
         def apply_attributes_to_serializer
           serializer.type(type)
-          config[:attributes].each_pair do |name, attr|
-            if name == :id
-              serializer.id(&attr[:proc]) if attr[:proc]
-            elsif attr[:readable]
-              opts = {}
-              if attr[:readable] != true
-                instance = self.new
-                prc = -> { instance.instance_eval(&attr[:readable]) }
-                opts[:if] = prc
-              end
-              if attr[:proc]
-                serializer.attribute(name, opts, &attr[:proc])
-              else
-                if serializer.attribute_blocks[name].nil?
-                  serializer.attribute(name, opts)
-                end
-              end
-            end
-          end
+          Util::SerializerAttributes.new(self, attributes).apply
         end
         private :apply_attributes_to_serializer
 
         def apply_extra_attributes_to_serializer
-          config[:extra_attributes].each_pair do |name, opts|
-            if opts[:proc]
-              serializer.extra_attribute(name, &opts[:proc])
-            else
-              if serializer.attribute_blocks[name].nil?
-                serializer.extra_attribute(name)
-              end
-            end
-          end
+          Util::SerializerAttributes.new(self, extra_attributes, true).apply
         end
 
         def attribute_option(options, name)

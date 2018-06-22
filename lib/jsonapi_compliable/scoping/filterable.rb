@@ -4,7 +4,7 @@ module JsonapiCompliable
     # @api private
     def find_filter(name)
       find_filter!(name)
-    rescue JsonapiCompliable::Errors::BadFilter
+    rescue JsonapiCompliable::Errors::AttributeError
       nil
     end
 

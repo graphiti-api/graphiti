@@ -225,7 +225,7 @@ module Legacy
     attribute :description, :string
     attribute :picture, :string
 
-    extra_attribute :created_at, :time do
+    extra_attribute :created_at, :datetime do
       Time.now
     end
 

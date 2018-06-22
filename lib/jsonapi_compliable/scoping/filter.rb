@@ -53,33 +53,28 @@ module JsonapiCompliable
 
     def each_filter
       filter_param.each_pair do |param_name, param_value|
-        filter = find_filter!(param_name.to_sym)
-        value  = param_value
-        value  = value.split(',') if value.is_a?(String) && value.include?(',')
-        value  = normalize_string_values(value)
+        param_name = param_name.to_sym
+        filter     = find_filter!(param_name)
+        value      = param_value
+        value      = value.split(',') if value.is_a?(String) && value.include?(',')
+        value      = coerce_types(param_name, value)
         yield filter, value
       end
     end
 
-    # Convert a string of "true" to true, etc
-    #
     # NB - avoid Array(value) here since we might want to
     # return a single element instead of array
-    def normalize_string_values(value)
+    def coerce_types(name, value)
+      type_name = resource.all_attributes[name][:type]
+      type = Types[type_name][:params]
       if value.is_a?(Array)
-        value.map { |v| normalize_string_value(v) }
+        if type_name.to_s.starts_with?('array')
+          type[value]
+        else
+          value.map { |v| type[v] }
+        end
       else
-        normalize_string_value(value)
-      end
-    end
-
-    def normalize_string_value(value)
-      case value
-      when 'true' then true
-      when 'false' then false
-      when 'nil', 'null' then nil
-      else
-        value
+        type[value]
       end
     end
   end

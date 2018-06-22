@@ -37,7 +37,7 @@ module JsonapiCompliable
       # when hitting /authors?include=state its 'state'
       @namespace = opts.delete(:namespace) || resource.type
 
-      @resource.around_scoping(@object, query_hash) do |scope|
+      @object = @resource.around_scoping(@object, query_hash) do |scope|
         apply_scoping(scope, opts)
       end
     end
@@ -136,6 +136,7 @@ module JsonapiCompliable
       add_scoping(:filter, JsonapiCompliable::Scoping::Filter, opts)
       add_scoping(:sort, JsonapiCompliable::Scoping::Sort, opts)
       add_scoping(:paginate, JsonapiCompliable::Scoping::Paginate, opts)
+      @object
     end
 
     def add_scoping(key, scoping_class, opts, default = {})

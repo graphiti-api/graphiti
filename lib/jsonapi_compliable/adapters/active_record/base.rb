@@ -7,6 +7,10 @@ module JsonapiCompliable
           scope.where(attribute => value)
         end
 
+        def base_scope(model)
+          model.all
+        end
+
         # (see Adapters::Abstract#order)
         def order(scope, attribute, direction)
           scope.order(attribute => direction)

@@ -9,6 +9,10 @@ module JsonapiCompliable
         scope
       end
 
+      def base_scope(model)
+        raise 'Null adapter has no base scope!'
+      end
+
       # (see Adapters::Abstract#order)
       def order(scope, attribute, direction)
         scope

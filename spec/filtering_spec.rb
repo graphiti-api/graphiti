@@ -24,6 +24,404 @@ RSpec.describe 'filtering' do
     expect(records.map(&:id)).to eq([employee1.id])
   end
 
+  # NB: even though query params are always strings, I'd like to
+  # support vanilla query interface coercions as well.
+  # Which is why you see tests for it.
+  describe 'types' do
+    def assert_filter_value(value)
+      expect(PORO::DB).to receive(:all)
+        .with(hash_including(conditions: { foo: value }))
+        .and_return([])
+      records
+    end
+
+    context 'when string' do
+      before do
+        resource.attribute :foo, :string
+      end
+
+      it 'coerces' do
+        params[:filter] = { foo: 1 }
+        assert_filter_value('1')
+      end
+    end
+
+    context 'when integer' do
+      before do
+        resource.attribute :foo, :integer
+      end
+
+      it 'coerces' do
+        params[:filter] = { foo: '1' }
+        assert_filter_value(1)
+      end
+
+      it 'does NOT allow nils' do
+        expect {
+          params[:filter] = { foo: nil }
+          records
+        }.to raise_error(TypeError)
+      end
+
+      context 'when cannot coerce' do
+        before do
+          params[:filter] = { foo: 'foo' }
+        end
+
+        it 'raises error' do
+          expect {
+            records
+          }.to raise_error(ArgumentError)
+        end
+      end
+    end
+
+    context 'when decimal' do
+      before do
+        resource.attribute :foo, :decimal
+      end
+
+      it 'coerces integers' do
+        params[:filter] = { foo: 40 }
+        assert_filter_value(BigDecimal.new(40))
+      end
+
+      it 'coerces strings' do
+        params[:filter] = { foo: '40.01' }
+        assert_filter_value(BigDecimal('40.01'))
+      end
+
+      it 'does NOT allow nils' do
+        expect {
+          params[:filter] = { foo: nil }
+          records
+        }.to raise_error(TypeError)
+      end
+
+      context 'when cannot coerce' do
+        before do
+          params[:filter] = { foo: 'foo' }
+        end
+
+        # NB ArgumentError not TypeError
+        it 'raises error' do
+          expect {
+            records
+          }.to raise_error(ArgumentError)
+        end
+      end
+    end
+
+    context 'when float' do
+      before do
+        resource.attribute :foo, :float
+      end
+
+      it 'coerces strings' do
+        params[:filter] = { foo: '40.01' }
+        assert_filter_value(40.01)
+      end
+
+      it 'coerces integers' do
+        params[:filter] = { foo: '40' }
+        assert_filter_value(40.0)
+      end
+
+      it 'does NOT allow nils' do
+        expect {
+          params[:filter] = { foo: nil }
+          records
+        }.to raise_error(TypeError)
+      end
+
+      context 'when cannot coerce' do
+        before do
+          params[:filter] = { foo: 'foo' }
+        end
+
+        # NB ArgumentError
+        it 'raises error' do
+          expect {
+            records
+          }.to raise_error(ArgumentError)
+        end
+      end
+    end
+
+    context 'when boolean' do
+      before do
+        resource.attribute :foo, :boolean
+      end
+
+      it 'coerces string true' do
+        params[:filter] = { foo: 'true' }
+        assert_filter_value(true)
+      end
+
+      it 'coerces string false' do
+        params[:filter] = { foo: 'false' }
+        assert_filter_value(false)
+      end
+
+      it 'coerces integers' do
+        params[:filter] = { foo: 1 }
+        assert_filter_value(true)
+        params[:filter] = { foo: 0 }
+        assert_filter_value(false)
+      end
+
+      it 'coerces string integers' do
+        params[:filter] = { foo: '1' }
+        assert_filter_value(true)
+        params[:filter] = { foo: '0' }
+        assert_filter_value(false)
+      end
+
+      it 'does NOT allow nils' do
+        expect {
+          params[:filter] = { foo: nil }
+          records
+        }.to raise_error(TypeError)
+      end
+
+      context 'when cannot coerce' do
+        before do
+          params[:filter] = { foo: 'asdf' }
+        end
+
+        it 'raises error' do
+          expect {
+            records
+          }.to raise_error(TypeError)
+        end
+      end
+    end
+
+    context 'when date' do
+      before do
+        resource.attribute :foo, :date
+      end
+
+      it 'coerces Date to correct string format' do
+        params[:filter] = { foo: '2018/01/06' }
+        assert_filter_value(Date.parse('2018-01-06'))
+      end
+
+      it 'coerces Time to correct date string format' do
+        params[:filter] = { foo: Time.now.iso8601 }
+        assert_filter_value(Date.today)
+      end
+
+      it 'does NOT allow nils' do
+        params[:filter] = { foo: nil }
+        expect {
+          records
+        }.to raise_error(TypeError)
+      end
+
+      context 'when only month' do
+        before do
+          params[:filter] = { foo: '2018-01' }
+        end
+
+        it 'raises error because that is not a date' do
+          expect {
+            records
+          }.to raise_error(Dry::Types::ConstraintError)
+        end
+      end
+
+      context 'when cannot coerce' do
+        before do
+          params[:filter] = { foo: 'foo' }
+        end
+
+        it 'raises error' do
+          expect {
+            records
+          }.to raise_error(Dry::Types::ConstraintError)
+        end
+      end
+    end
+
+    context 'when datetime' do
+      before do
+        resource.attribute :foo, :datetime
+      end
+
+      it 'coerces strings correctly' do
+        params[:filter] = { foo: '2018-01-01 4:36pm PST' }
+        time = Time.parse('2018-01-01 16:36:00.000000000 -0800')
+        assert_filter_value(time)
+      end
+
+      it 'coerces iso8601 strings correctly' do
+        time = Time.parse('2018-01-06 4:36pm PST')
+        params[:filter] = { foo: time.iso8601 }
+        assert_filter_value(time)
+      end
+
+      it 'coerces Date correctly' do
+        params[:filter] = { foo: '2018-01-06' }
+        assert_filter_value(DateTime.parse('2018-01-06'))
+      end
+
+      it 'does NOT allows nils' do
+        params[:filter] = { foo: nil }
+        expect {
+          records
+        }.to raise_error(TypeError)
+      end
+
+      context 'when cannot coerce' do
+        before do
+          params[:filter] = { foo: 'foo' }
+        end
+
+        it 'raises error' do
+          expect {
+            records
+          }.to raise_error(TypeError)
+        end
+      end
+    end
+
+    context 'when hash' do
+      before do
+        resource.attribute :foo, :hash
+      end
+
+      it 'works' do
+        params[:filter] = { foo: { bar: 'baz' } }
+        assert_filter_value(bar: 'baz')
+      end
+
+      context 'when stringified keys' do
+        before do
+          params[:filter] = {
+            'foo' => {
+              'bar' => {
+                'baz' => 'blah'
+              }
+            }
+          }
+        end
+
+        it 'converts to symbolized keys' do
+          assert_filter_value(bar: { baz: 'blah' })
+        end
+      end
+
+      context 'when cannot coerce' do
+        before do
+          params[:filter] = 'foo'
+        end
+
+        it 'raises error' do
+          expect {
+            records
+          }.to raise_error(NoMethodError)
+        end
+      end
+    end
+
+    context 'when array' do
+      before do
+        resource.attribute :foo, :array
+      end
+
+      it 'works for arrays' do
+        params[:filter] = { foo: [1, 2] }
+        assert_filter_value([1, 2])
+      end
+
+      it 'works for string arrays' do
+        params[:filter] = { foo: '1,2' }
+        assert_filter_value(['1', '2'])
+      end
+
+      # If we did Array(value), you'd get something incorrect
+      # for hashes
+      it 'raises error on single values' do
+        params[:filter] = { foo: 1 }
+        expect {
+          records
+        }.to raise_error(TypeError)
+      end
+
+      context 'when cannot coerce' do
+        before do
+          params[:filter] = { foo: 'foo' }
+        end
+
+        it 'raises error' do
+          expect {
+            records
+          }.to raise_error(TypeError)
+        end
+      end
+    end
+
+    # test for all array_of_*
+    context 'when array_of_integers' do
+      before do
+        resource.attribute :foo, :array_of_integers
+      end
+
+      it 'works' do
+        params[:filter] = { foo: [1, 2, 3] }
+        assert_filter_value([1, 2, 3])
+      end
+
+      it 'applies basic coercion of elements' do
+        params[:filter] = { foo: ['1', '2', '3'] }
+        assert_filter_value([1, 2, 3])
+      end
+
+      # If we did Array(value), you'd get something incorrect
+      # for hashes
+      it 'raises error on single values' do
+        params[:filter] = { foo: 1 }
+        expect {
+          records
+        }.to raise_error(Dry::Types::ConstraintError)
+      end
+
+      context 'when cannot coerce' do
+        before do
+          params[:filter] = { foo: {} }
+        end
+
+        it 'raises error' do
+          expect {
+            render
+          }.to raise_error(Dry::Types::ConstraintError)
+        end
+      end
+    end
+
+    context 'when custom type' do
+      before do
+        type = Dry::Types::Definition
+          .new(nil)
+          .constructor { |input|
+            'custom!'
+          }
+        JsonapiCompliable::Types[:custom] = { params: type }
+        resource.attribute :foo, :custom
+      end
+
+      after do
+        JsonapiCompliable::Types.map.delete(:custom)
+      end
+
+      it 'works' do
+        params[:filter] = { foo: '1' }
+        assert_filter_value('custom!')
+      end
+    end
+  end
+
   context 'when filtering based on calling context' do
     around do |e|
       JsonapiCompliable.with_context(OpenStruct.new(runtime_id: employee3.id)) do
@@ -57,31 +455,6 @@ RSpec.describe 'filtering' do
       end
       employee2.update_attributes(active: false)
       expect(records.map(&:id)).to eq([employee1.id, employee3.id, employee4.id])
-    end
-  end
-
-  context 'when filter is a "string nil"' do
-    before do
-      params[:filter] = { first_name: 'nil' }
-      PORO::DB.data
-      employee2.update_attributes(first_name: nil)
-    end
-
-    it 'converts to a real nil' do
-      ids = records.map(&:id)
-      expect(ids).to eq([employee2.id])
-    end
-  end
-
-  context 'when filter is a "string null"' do
-    before do
-      params[:filter] = { first_name: 'null' }
-      employee2.update_attributes(first_name: nil)
-    end
-
-    it 'converts to a real nil' do
-      ids = records.map(&:id)
-      expect(ids).to eq([employee2.id])
     end
   end
 
@@ -160,6 +533,20 @@ RSpec.describe 'filtering' do
     it 'is overrideable' do
       params[:filter] = { first_name: 'Stephen' }
       expect(records.map(&:id)).to eq([employee1.id])
+    end
+
+    context 'without an attribute name' do
+      before do
+        resource.default_filter do |scope|
+          scope[:conditions].merge!(first_name: 'Agatha')
+          scope
+        end
+      end
+
+      it 'is allowed' do
+        expect(records.map(&:id)).to eq([employee2.id])
+        expect(resource.default_filters[:__default]).to be_present
+      end
     end
 
     xit "is overrideable when overriding via an allowed filter's alias" do

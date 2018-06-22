@@ -2,6 +2,9 @@ require 'json'
 require 'active_support/core_ext/string'
 require 'active_support/core_ext/class/attribute'
 require 'active_support/concern'
+require 'active_support/time'
+
+require 'dry-types'
 
 require 'jsonapi/serializable'
 # Temporary fix until fixed upstream
@@ -80,6 +83,8 @@ require "jsonapi_compliable/util/persistence"
 require "jsonapi_compliable/util/validation_response"
 require "jsonapi_compliable/util/sideload"
 require "jsonapi_compliable/util/hooks"
+require "jsonapi_compliable/util/attribute_check"
+require "jsonapi_compliable/util/serializer_attributes"
 
 require 'jsonapi_compliable/adapters/null'
 

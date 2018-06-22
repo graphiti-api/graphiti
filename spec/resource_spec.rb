@@ -725,6 +725,39 @@ RSpec.describe JsonapiCompliable::Resource do
     end
   end
 
+  describe '#base_scope' do
+    let(:adapter) do
+      Class.new(JsonapiCompliable::Adapters::Null) do
+        def base_scope(model)
+          'foo'
+        end
+      end
+    end
+
+    before do
+      klass.model = PORO::Employee
+      klass.adapter = adapter.new
+    end
+
+    it 'delegates to the adapter' do
+      expect(instance.base_scope).to eq('foo')
+    end
+
+    context 'when overridden' do
+      before do
+        klass.class_eval do
+          def base_scope
+            'bar'
+          end
+        end
+      end
+
+      it 'is used' do
+        expect(instance.base_scope).to eq('bar')
+      end
+    end
+  end
+
   describe '.filter' do
     context 'when no corresponding attribute' do
       it 'raises helpful error' do
@@ -763,14 +796,245 @@ RSpec.describe JsonapiCompliable::Resource do
     end
   end
 
+  describe 'query methods' do
+    before do
+      klass.class_eval do
+        self.adapter = PORO::Adapter.new
+        self.model = PORO::Employee
+
+        allow_stat total: [:count]
+
+        def base_scope
+          { type: :employees }
+        end
+      end
+    end
+
+    let!(:employee1) { PORO::Employee.create(first_name: 'Foo') }
+    let!(:employee2) { PORO::Employee.create(first_name: 'Bar') }
+    let!(:employee3) { PORO::Employee.create(first_name: 'Baz') }
+
+    describe '.all' do
+      it 'executes the request correctly, returning meta and stats' do
+        employees, _ = klass.all(filter: { id: employee2.id })
+        expect(employees.map(&:id)).to eq([employee2.id])
+      end
+
+      context 'when stats' do
+        it 'returns correct hash' do
+          _, meta = klass.all(stats: { total: 'count' })
+          expect(meta).to eq({
+            stats: { total: { count: 'poro_count_total' } }
+          })
+        end
+      end
+
+      context 'when no stats' do
+        it 'returns empty hash' do
+          _, meta = klass.all({})
+          expect(meta).to eq({})
+        end
+      end
+
+      context 'when passed a base scope' do
+        it 'uses the scope' do
+          base = { type: :employees, conditions: { id: employee3.id } }
+          employees, _ = klass.all({}, base)
+          expect(employees.map(&:id)).to eq([employee3.id])
+        end
+      end
+    end
+
+    describe '.find' do
+      it 'takes the id param and applies as a filter, returning single record' do
+        employee, _ = klass.find(id: employee2.id)
+        expect(employee.id).to eq(employee2.id)
+      end
+
+      it 'supports other params as well' do
+        klass.class_eval do
+          attr_accessor :got_foo
+          extra_attribute(:foo, :string)
+          def around_scoping(scope, query_hash)
+            yield scope
+            if query_hash[:extra_fields][:employees] == [:foo]
+              scope[:conditions][:id] = 3
+            end
+            scope
+          end
+        end
+
+        employee, _ = klass.find({
+          id: employee2.id,
+          extra_fields: { employees: 'foo' }
+        })
+        expect(employee.id).to eq(3)
+      end
+
+      context 'when stats' do
+        it 'returns correct hash' do
+          _, meta = klass.find({
+            id: employee2.id,
+            stats: { total: 'count' }
+          })
+          expect(meta).to eq(stats: { total: { count: 'poro_count_total' } })
+        end
+      end
+
+      context 'when no stats' do
+        it 'returns empty hash' do
+          _, meta = klass.find(id: employee2.id)
+          expect(meta).to eq({})
+        end
+      end
+
+      context 'when no record found' do
+        it 'raises helpful error' do
+          expect {
+            klass.find(id: 9999)
+          }.to raise_error(JsonapiCompliable::Errors::RecordNotFound)
+        end
+      end
+
+      context 'when passed a base scope' do
+        before do
+          PORO::Position.create
+          klass.find({ id: 1 }, { type: :positions })
+        end
+
+        it 'is used' do
+          expect {
+            klass.find({ id: employee1.id }, {
+              conditions: { first_name: 'adsf' }
+            })
+          }.to raise_error(JsonapiCompliable::Errors::RecordNotFound)
+        end
+      end
+    end
+  end
+
+  describe 'get_attr' do
+    it 'returns the relevant attribute' do
+      klass.attribute :foo, :string
+      expect(instance.get_attr(:foo, :sortable))
+        .to eq(klass.attributes[:foo])
+    end
+
+    context 'when the attribute is not found' do
+      it 'returns false' do
+        expect(instance.get_attr(:foo, :sortable)).to eq(false)
+      end
+    end
+
+    context 'when the attribute does not support the flag' do
+      before do
+        klass.attribute :foo, :string, sortable: false
+      end
+
+      it 'returns false' do
+        expect(instance.get_attr(:foo, :sortable)).to eq(false)
+      end
+    end
+
+    context 'when the attribute does not pass the guard' do
+      before do
+        klass.class_eval do
+          attribute :foo, :string, sortable: :admin?
+          def admin?; false; end
+        end
+      end
+
+      it 'returns false' do
+        expect(instance.get_attr(:foo, :sortable, request: true)).to eq(false)
+      end
+    end
+  end
+
+  describe 'get_attr!' do
+    it 'returns the relevant attribute' do
+      klass.attribute :foo, :string
+      expect(instance.get_attr!(:foo, :sortable))
+        .to eq(klass.attributes[:foo])
+    end
+
+    context 'when the attribute is not found' do
+      it 'raises helpful error' do
+        expect {
+          instance.get_attr!(:foo, :sortable)
+        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort on attribute :foo, but could not find an attribute with that name.')
+      end
+    end
+
+    context 'when the attribute does not support the flag' do
+      before do
+        klass.attribute :foo, :string, sortable: false
+      end
+
+      it 'raises helpful error' do
+        expect {
+          instance.get_attr!(:foo, :sortable)
+        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort on attribute :foo, but the attribute was marked :sortable => false.')
+      end
+    end
+
+    context 'when not running in a request context' do
+      before do
+        klass.attribute :foo, :string, sortable: :admin?
+      end
+
+      it 'does not check the guard' do
+        expect_any_instance_of(klass).to_not receive(:admin?)
+        instance.get_attr!(:foo, :sortable)
+      end
+    end
+
+    context 'when the attribute does not pass the guard' do
+      before do
+        klass.class_eval do
+          attribute :foo, :string, sortable: :admin?
+          def admin?; false; end
+        end
+      end
+
+      it 'raises helpful error' do
+        expect {
+          instance.get_attr!(:foo, :sortable, request: true)
+        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on on attribute :foo, but the guard :admin? did not pass.')
+      end
+    end
+
+    context 'when the attribute is required' do
+      before do
+        klass.attribute :foo, :string, filterable: :required
+      end
+
+      it 'returns the attribute' do
+        att = instance.get_attr!(:foo, :sortable, request: true)
+        expect(att).to eq(klass.attributes[:foo])
+      end
+    end
+  end
+
   describe '#around_scoping' do
     before do
       klass.class_eval do
         self.adapter = JsonapiCompliable::Adapters::Null.new
         attr_accessor :scope
+
+        attribute :foo, :string
+        default_filter :foo do |scope, ctx|
+          ctx.middle = scope.dup
+          scope[:default] = true
+          scope
+        end
+
         def around_scoping(scope, query_hash)
-          scope = { foo: 'bar' }
+          context.before = scope.dup
+          scope = scope.merge(before: true)
           yield scope
+          context.after = scope.dup
+          scope = scope.merge(after: true)
+          scope
         end
 
         def resolve(scope)
@@ -781,9 +1045,16 @@ RSpec.describe JsonapiCompliable::Resource do
     end
 
     it 'modifies scope' do
-      runner = JsonapiCompliable::Runner.new(klass, {})
-      runner.resolve({})
-      expect(runner.jsonapi_resource.scope).to eq(foo: 'bar')
+      ctx = OpenStruct.new
+      JsonapiCompliable.with_context(ctx) do
+        runner = JsonapiCompliable::Runner.new(klass, {})
+        runner.resolve(start: true)
+        expect(ctx.before).to eq(start: true)
+        expect(ctx.middle).to eq(start: true, before: true)
+        expect(ctx.after).to eq(start: true, before: true, default: true)
+        expect(runner.jsonapi_resource.scope)
+          .to eq(start: true, before: true, default: true, after: true)
+      end
     end
   end
 

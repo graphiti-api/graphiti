@@ -89,6 +89,10 @@ module JsonapiCompliable
         raise 'you must override #filter in an adapter subclass'
       end
 
+      def base_scope(model)
+        raise 'you must override #base_scope in an adapter subclass'
+      end
+
       # @param scope The scope object we are chaining
       # @param [Symbol] attribute The attribute name we are sorting
       # @param [Symbol] direction The direction we are sorting (asc/desc)
