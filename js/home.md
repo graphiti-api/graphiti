@@ -69,8 +69,10 @@ person.save()
 // * Replace *ux patterns
 // * ...and much more!
 
+var jsorm = require('jsorm')
+
 // define models
-const ApplicationRecord = JSORMBase.extend({
+const ApplicationRecord = jsorm.JSORMBase.extend({
   static: {
     baseUrl: 'http://my-api.com',
     apiNamespace: '/api/v1'
@@ -79,8 +81,8 @@ const ApplicationRecord = JSORMBase.extend({
 
 const Person = ApplicationRecord.extend({
   attrs: {
-    firstName: attr(),
-    lastName: attr()
+    firstName: jsorm.attr(),
+    lastName: jsorm.attr()
   },
   methods: {
     fullName: function() {
