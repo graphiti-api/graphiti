@@ -1,308 +1,694 @@
 require 'spec_helper'
 
 RSpec.describe JsonapiCompliable::Query do
-  let(:resource_class) { Class.new(PORO::EmployeeResource) }
-  let(:resource) { resource_class.new }
-  let(:params)   { { include: 'positions' } }
+  let(:employee_resource) { Class.new(PORO::EmployeeResource) }
+  let(:position_resource) { Class.new(PORO::PositionResource) }
+  let(:department_resource) { Class.new(PORO::DepartmentResource) }
+  let(:resource) { employee_resource.new }
+  let(:params)   { {} }
   let(:instance) { described_class.new(resource, params) }
 
+  before do
+    employee_resource.has_many :positions,
+      resource: position_resource
+    position_resource.belongs_to :department,
+      resource: department_resource
+    employee_resource.attribute :name, :string
+    position_resource.attribute :title, :string
+    position_resource.attribute :rank, :integer
+    department_resource.attribute :description, :string
+  end
+
+  xit 'by dot syntax' do
+
+  end
+
   describe '#to_hash' do
-    subject { instance.to_hash }
+    subject(:hash) { instance.to_hash }
+
+    before do
+      params[:include] = 'positions.department'
+    end
+
+    describe 'includes' do
+      let(:expected) do
+        {
+          positions: { include: { department: {} } }
+        }
+      end
+
+      it 'parses correctly' do
+        expect(hash[:include]).to eq(expected)
+      end
+
+      context 'when stringified keys' do
+        before do
+          params.deep_stringify_keys!
+        end
+
+        it 'works' do
+          expect(hash[:include]).to eq(expected)
+        end
+      end
+
+      context 'when invalid' do
+        before do
+          params[:include] = 'foo'
+        end
+
+        it 'raises error' do
+          expect {
+            hash
+          }.to raise_error(JsonapiCompliable::Errors::InvalidInclude)
+        end
+
+        context 'but the config says not to raise' do
+          before do
+            params[:include] = 'foo,positions'
+            JsonapiCompliable.config.raise_on_missing_sideload = false
+          end
+
+          it 'does not raise' do
+            expect {
+              hash
+            }.to_not raise_error
+            expect(hash).to eq(include: { positions: {} })
+          end
+        end
+      end
+    end
 
     describe 'filters' do
-      it 'defaults main entity' do
-        expect(subject[:employees][:filter]).to eq({})
-      end
-
-      it 'does not default associations' do
-        expect(subject[:employees][:filter]).to eq({})
-      end
-
-      context 'when association is not requested' do
+      context 'when unknown attribute' do
         before do
-          params.delete(:include)
+          params[:filter] = { asdf: 'adsf' }
         end
 
-        it 'does not default the association query' do
-          expect(subject).to_not have_key(:positions)
-        end
-      end
-
-      context 'when filter param present' do
-        before do
-          params[:filter] = { id: 1, positions: { title: 'foo' } }
+        it 'raises error' do
+          expect {
+            hash
+          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :asdf, but could not find an attribute with that name.')
         end
 
-        it 'applies to main entity' do
-          expect(subject[:employees][:filter]).to eq({ id: 1 })
-        end
+        context 'on an association' do
+          context 'via type' do
+            before do
+              params[:filter] = { departments: { via_type: 'asdf' } }
+            end
 
-        it 'applies to associations' do
-          expect(subject[:positions][:filter]).to eq({ title: 'foo' })
-        end
-
-        context 'as a string' do
-          before do
-            params[:filter] = { 'id' => 1 }
+            it 'raises error' do
+              expect {
+                hash
+              }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :via_type, but could not find an attribute with that name.')
+            end
           end
 
-          it 'stringifies' do
-            expect(subject[:employees][:filter]).to eq({ id: 1 })
+          context 'via name' do
+            before do
+              params[:filter] = { department: { via_name: 'asdf' } }
+            end
+
+            it 'raises error' do
+              expect {
+                hash
+              }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :via_name, but could not find an attribute with that name.')
+            end
           end
         end
       end
-    end
 
-    describe 'fields' do
-      it 'defaults main entity' do
-        expect(subject[:employees][:fields]).to eq({})
-      end
-
-      it 'defaults associations' do
-        expect(subject[:positions][:fields]).to eq({})
-      end
-
-      context 'when fields param' do
+      context 'when known unfilterable attribute' do
         before do
-          params[:fields] = {
-            employees: 'first_name,last_name',
-            positions: 'title'
+          employee_resource.attribute :asdf, :string, filterable: false
+          params[:filter] = { asdf: 'adsf' }
+        end
+
+        it 'raises error' do
+          expect {
+            hash
+          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :asdf, but the attribute was marked :filterable => false.')
+        end
+
+        context 'on an association' do
+          context 'via type' do
+            before do
+              params[:filter] = { departments: { via_type: 'asdf' } }
+            end
+
+            it 'raises error' do
+              expect {
+                hash
+              }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :via_type, but could not find an attribute with that name.')
+            end
+          end
+
+          context 'via name' do
+            before do
+              department_resource.attribute :via_name, :string, filterable: false
+              params[:filter] = { department: { via_name: 'asdf' } }
+            end
+
+            it 'raises error' do
+              expect {
+                hash
+              }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :via_name, but the attribute was marked :filterable => false.')
+            end
+          end
+        end
+      end
+
+      context 'via type' do
+        before do
+          params[:filter] = {
+            name: 'foo',
+            positions: { title: 'bar' },
+            departments: { description: 'baz' }
           }
         end
 
-        it 'applies to main entity' do
-          expect(subject[:employees][:fields])
-            .to eq(employees: [:first_name, :last_name], positions: [:title])
-        end
-
-        it 'applies to associations' do
-          expect(subject[:positions][:fields])
-            .to eq(employees: [:first_name, :last_name], positions: [:title])
-        end
-      end
-    end
-
-    describe 'extra_fields' do
-      it 'defaults main entity' do
-        expect(subject[:employees][:extra_fields]).to eq({})
-      end
-
-      it 'defaults associations' do
-        expect(subject[:employees][:extra_fields]).to eq({})
-      end
-
-      context 'when extra_fields param' do
-        before do
-          params[:extra_fields] = {
-            employees: 'foo,bar',
-            positions: 'baz'
+        let(:expected) do
+          {
+            filter: { name: 'foo' },
+            include: {
+              positions: {
+                filter: { title: 'bar' },
+                include: {
+                  department: {
+                    filter: { description: 'baz' }
+                  }
+                }
+              }
+            }
           }
         end
 
-        it 'applies to main entity' do
-          expect(subject[:employees][:extra_fields])
-            .to eq(employees: [:foo, :bar], positions: [:baz])
+        it 'parses correctly' do
+          expect(hash).to eq(expected)
         end
 
-        it 'applies to associations' do
-          expect(subject[:positions][:extra_fields])
-            .to eq(employees: [:foo, :bar], positions: [:baz])
+        context 'with stringified keys' do
+          before do
+            params.deep_stringify_keys!
+          end
+
+          it 'parses correctly' do
+            expect(hash).to eq(expected)
+          end
+        end
+      end
+
+      context 'via association name' do
+        # department vs departments
+        before do
+          params[:filter] = {
+            name: 'foo',
+            positions: { title: 'bar' },
+            department: { description: 'baz' }
+          }
+        end
+
+        let(:expected) do
+          {
+            filter: { name: 'foo' },
+            include: {
+              positions: {
+                filter: { title: 'bar' },
+                include: {
+                  department: {
+                    filter: { description: 'baz' }
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        it 'parses correctly' do
+          expect(hash).to eq(expected)
+        end
+
+        context 'with stringified keys' do
+          before do
+            params.deep_stringify_keys!
+          end
+
+          it 'parses correctly' do
+            expect(hash).to eq(expected)
+          end
         end
       end
     end
 
-    describe 'sort' do
-      it 'defaults main entity' do
-        expect(subject[:employees][:sort]).to eq([])
-      end
-
-      it 'defaults associations' do
-        expect(subject[:employees][:sort]).to eq([])
-      end
-
-      context 'when sort param' do
+    describe 'sorts' do
+      context 'when unknown attribute' do
         before do
-          params[:sort] = 'employees.first_name,-employees.last_name,positions.title'
+          params[:sort] = 'asdf'
         end
 
-        it 'applies to main entity' do
-          expect(subject[:employees][:sort])
-            .to eq([{ first_name: :asc }, { last_name: :desc }])
+        it 'raises error' do
+          expect {
+            hash
+          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :asdf, but could not find an attribute with that name.')
         end
 
-        it 'applies to associations' do
-          expect(subject[:positions][:sort])
-            .to eq([{ title: :asc }])
-        end
+        context 'on association' do
+          context 'by type' do
+            before do
+              params[:sort] = 'departments.by_type'
+            end
 
-        context 'when no type prefix' do
-          before do
-            params[:sort] = '-first_name'
+            it 'raises error' do
+              expect {
+                hash
+              }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :by_type, but could not find an attribute with that name.')
+            end
           end
 
-          it 'applies to main entity' do
-            expect(subject[:employees][:sort])
-              .to eq([{ first_name: :desc }])
+          context 'by name' do
+            before do
+              params[:sort] = 'department.by_name'
+            end
+
+            it 'raises error' do
+              expect {
+                hash
+              }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :by_name, but could not find an attribute with that name.')
+            end
+          end
+        end
+      end
+
+      context 'when known unsortable attribute' do
+        before do
+          employee_resource.attribute :foo, :string, sortable: false
+          params[:sort] = 'foo'
+        end
+
+        it 'raises error' do
+          expect {
+            hash
+          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :foo, but the attribute was marked :sortable => false.')
+        end
+
+        context 'on association' do
+          context 'via type' do
+            before do
+              params[:sort] = 'departments.by_type'
+              department_resource.attribute :by_type, :string, sortable: false
+            end
+
+            it 'raises error' do
+              expect {
+                hash
+              }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :by_type, but the attribute was marked :sortable => false.')
+            end
+          end
+
+          context 'via name' do
+            before do
+              params[:sort] = 'department.by_name'
+              department_resource.attribute :by_name, :string, sortable: false
+            end
+
+            it 'raises error' do
+              expect {
+                hash
+              }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :by_name, but the attribute was marked :sortable => false.')
+            end
+          end
+        end
+      end
+
+      context 'via type' do
+        before do
+          params[:sort] = 'name,positions.title,-positions.rank,-departments.description'
+        end
+
+        let(:expected) do
+          {
+            sort: [{ name: :asc }],
+            include: {
+              positions: {
+                sort: [{ title: :asc }, { rank: :desc }],
+                include: {
+                  department: {
+                    sort: [{ description: :desc }]
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        it 'parses correctly' do
+          expect(hash).to eq(expected)
+        end
+
+        context 'and stringified keys' do
+          before do
+            params.deep_stringify_keys!
+          end
+
+          it 'parses correctly' do
+            expect(hash).to eq(expected)
+          end
+        end
+      end
+
+      context 'via name' do
+        before do
+          params[:sort] = 'name,positions.title,-positions.rank,-department.description'
+        end
+
+        let(:expected) do
+          {
+            sort: [{ name: :asc }],
+            include: {
+              positions: {
+                sort: [{ title: :asc }, { rank: :desc }],
+                include: {
+                  department: {
+                    sort: [{ description: :desc }]
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        it 'parses correctly' do
+          expect(hash).to eq(expected)
+        end
+
+        context 'and stringified keys' do
+          before do
+            params.deep_stringify_keys!
+          end
+
+          it 'parses correctly' do
+            expect(hash).to eq(expected)
           end
         end
       end
     end
 
     describe 'pagination' do
-      it 'defaults main entity' do
-        expect(subject[:employees][:page]).to eq({})
-      end
-
-      it 'defaults associations' do
-        expect(subject[:positions][:page]).to eq({})
-      end
-
-      context 'when pagination param' do
+      context 'via type' do
         before do
-          params[:page] = { size: 10, number: 2, positions: { size: 5, number: 3 } }
+          params[:page] = {
+            number: 2, size: 1,
+            positions: { number: 3, size: 2 },
+            departments: { number: 4, size: 3 }
+          }
         end
 
-        it 'applies to main entity' do
-          expect(subject[:employees][:page]).to eq(size: 10, number: 2)
+        let(:expected) do
+          {
+            page: { number: 2, size: 1 },
+            include: {
+              positions: {
+                page: { number: 3, size: 2 },
+                include: {
+                  department: {
+                    page: { number: 4, size: 3 }
+                  }
+                }
+              }
+            }
+          }
         end
 
-        it 'applies to associations' do
-          expect(subject[:positions][:page]).to eq(size: 5, number: 3)
+
+        it 'parses correctly' do
+          expect(hash).to eq(expected)
+        end
+
+        context 'and stringified keys' do
+          before do
+            params.deep_stringify_keys!
+          end
+
+          it 'still works' do
+            expect(hash).to eq(expected)
+          end
+        end
+      end
+
+      context 'via association name' do
+        before do
+          params[:page] = {
+            number: 2, size: 1,
+            positions: { number: 3, size: 2 },
+            department: { number: 4, size: 3 }
+          }
+        end
+
+        let(:expected) do
+          {
+            page: { number: 2, size: 1 },
+            include: {
+              positions: {
+                page: { number: 3, size: 2 },
+                include: {
+                  department: {
+                    page: { number: 4, size: 3 }
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        it 'parses correctly' do
+          expect(hash).to eq(expected)
+        end
+
+        context 'and stringified keys' do
+          before do
+            params.deep_stringify_keys!
+          end
+
+          it 'still works' do
+            expect(hash).to eq(expected)
+          end
         end
       end
     end
 
-    describe 'include' do
-      before do
-        params[:include] = 'positions.department,positions.foo'
-      end
-
-      it 'sets main entity' do
-        expect(subject[:employees][:include])
-          .to eq(positions: { department: {}, foo: {} })
-      end
-
-      it 'sets associations' do
-        positions_include = subject[:positions][:include]
-        expected = { department: {}, foo: {} }
-        expect(positions_include).to eq(expected)
-      end
-
-      it 'excludes relations not in the whitelist' do
-        params[:include] = 'positions.department,positions.foo'
-        ctx = double sideload_whitelist: {
-          index: { positions: { department: {} } }
-        }
-
-        resource.with_context ctx, :index do
-          expect(subject[:employees][:include])
-            .to eq(positions: { department: {} })
-          expect(subject[:positions][:include]).to eq(department: {})
-        end
-      end
-
-      context 'when include param present' do
+    describe 'fieldsets' do
+      context 'when unknown attribute' do
         before do
-          params[:include] = 'positions.department.foo,bio'
+          params[:fields] = { employees: 'asdf' }
         end
 
-        it 'transforms to hash' do
-          expect(subject[:employees][:include]).to eq({
-            positions: { department: { foo: {} } },
-            bio: {}
-          })
-          expect(subject[:positions][:include]).to eq({
-            department: { foo: {} }
-          })
-          expect(subject[:department][:include]).to eq({
-            foo: {}
-          })
-          expect(subject[:foo][:include]).to eq({})
-          expect(subject[:bio][:include]).to eq({})
+        it 'raises error' do
+          #expect {
+            hash
+          #}.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to read attribute :asdf, but could not find an attribute with that name.')
         end
+      end
+
+      context 'when known but unreadable attribute' do
+        before do
+          employee_resource.attribute :first_name, :string, readable: false
+          params[:fields] = { employees: 'first_name' }
+        end
+
+        xit 'raises error' do
+          expect {
+            hash
+          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to read attribute :first_name, but the attribute was marked :readable => false.')
+        end
+      end
+
+      context 'via type' do
+        before do
+          params[:fields] = {
+            employees: 'first_name,last_name',
+            positions: 'title',
+            departments: 'description'
+          }
+        end
+
+        let(:expected) do
+          {
+            fields: {
+              employees: [:first_name, :last_name],
+              positions: [:title],
+              departments: [:description]
+            },
+            include: {
+              positions: {
+                include: {
+                  department: { }
+                }
+              }
+            }
+          }
+        end
+
+        it 'parses correctly' do
+          expect(hash).to eq(expected)
+        end
+
+        context 'and stringified keys' do
+          it 'still works' do
+            expect(hash).to eq(expected)
+          end
+        end
+      end
+    end
+
+    describe 'extra fields' do
+      context 'when unknown extra_attribute' do
+        before do
+          params[:extra_fields] = { employees: 'asdf' }
+        end
+
+        xit 'raises error' do
+          expect {
+            hash
+          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to read attribute :asdf, but could not find an attribute with that name.')
+        end
+      end
+
+      context 'when known but unreadable attribute' do
+        before do
+          employee_resource.attribute :first_name, :string, readable: false
+          params[:extra_fields] = { employees: 'first_name' }
+        end
+
+        xit 'raises error' do
+          expect {
+            hash
+          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to read attribute :first_name, but the attribute was marked :readable => false.')
+        end
+      end
+
+      context 'via type' do
+        before do
+          params[:extra_fields] = {
+            employees: 'foo,bar',
+            positions: 'baz',
+            departments: 'bax'
+          }
+        end
+
+        let(:expected) do
+          {
+            extra_fields: {
+              employees: [:foo, :bar],
+              positions: [:baz],
+              departments: [:bax]
+            },
+            include: {
+              positions: {
+                include: {
+                  department: { }
+                }
+              }
+            }
+          }
+        end
+
+        it 'parses correctly' do
+          expect(hash).to eq(expected)
+        end
+
+        context 'and stringified keys' do
+          before do
+            params.deep_stringify_keys!
+          end
+
+          it 'still works' do
+            expect(hash).to eq(expected)
+          end
+        end
+      end
+    end
+
+    context 'when fields are also present' do
+      before do
+        params[:fields] = {
+          employees: 'foo,bar'
+        }
+        params[:extra_fields] = {
+          employees: 'baz,bax'
+        }
+      end
+
+      it 'adds extra fields to fields' do
+        expect(hash).to eq({
+          fields: {
+            employees: [:foo, :bar, :baz, :bax]
+          },
+          extra_fields: {
+            employees: [:baz, :bax],
+          },
+          include: {
+            positions: {
+              include: {
+                department: { }
+              }
+            }
+          }
+        })
       end
     end
 
     describe 'stats' do
-      it 'defaults main entity' do
-        expect(subject[:employees][:stats]).to eq({})
-      end
-
-      it 'defaults associations' do
-        expect(subject[:positions][:stats]).to eq({})
-      end
-    end
-
-    context 'when stats param present' do
       before do
-        params[:stats] = {
-          employees: {
-            total: 'count,sum',
-            stddev: 'amount'
-          },
-          positions: {
-            foo: 'bar'
+        params[:stats] = { total: 'count' }
+      end
+
+      let(:expected) do
+        {
+          stats: { total: [:count] },
+          include: {
+            positions: {
+              include: {
+                department: {}
+              }
+            }
           }
         }
       end
 
-      it 'applies to main entity' do
-        expect(subject[:employees][:stats]).to eq({
-          total: [:count, :sum],
-          stddev: [:amount]
-        })
+      it 'parses correctly' do
+        expect(hash).to eq(expected)
       end
 
-      it 'applies to associations' do
-        expect(subject[:positions][:stats]).to eq({
-          foo: [:bar]
-        })
-      end
-
-      context 'when no type prefix' do
+      context 'when stringified keys' do
         before do
-          params[:stats] = { total: 'count,sum', stddev: 'amount' }
+          params.deep_stringify_keys!
         end
 
-        it 'applies to main entity' do
-          expect(subject[:employees][:stats]).to eq({
-            total: [:count, :sum],
-            stddev: [:amount]
-          })
+        it 'still works' do
+          expect(hash).to eq(expected)
         end
       end
-    end
-  end
 
-  describe '#zero_results?' do
-    subject { instance.zero_results? }
+      context 'when multiple' do
+        before do
+          params[:stats] = { total: 'count,sum' }
+        end
 
-    context 'when no pagination' do
-      it { is_expected.to eq(false) }
-    end
-
-    context 'with positive page size' do
-      before do
-        params[:page] = { size: '2' }
+        it 'works' do
+          expect(hash[:stats]).to eq(total: [:count, :sum])
+        end
       end
 
-      it { is_expected.to eq(false) }
-    end
+      context 'when association' do
+        before do
+          params[:stats] = { positions: { total: :count } }
+        end
 
-    context 'with page size "0" string' do
-      before do
-        params[:page] = { size: '0' }
+        it 'raises error' do
+          expect {
+            hash
+          }.to raise_error(NotImplementedError, 'Association statistics are not currently supported')
+        end
       end
-
-      it { is_expected.to eq(true) }
-    end
-
-    context 'with page size 0 integer' do
-      before do
-        params[:page] = { size: 0 }
-      end
-
-      it { is_expected.to eq(true) }
     end
   end
 end

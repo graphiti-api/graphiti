@@ -3,6 +3,21 @@ class JsonapiCompliable::Sideload::BelongsTo < JsonapiCompliable::Sideload
     :belongs_to
   end
 
+  def query(parents, query)
+    hash = query.to_hash
+    hash[:filter] ||= {}
+    hash[:filter][primary_key] = parents.map(&foreign_key)
+
+    opts = {}
+    opts[:default_paginate] = false
+    opts[:sideload_parent_length] = parents.length
+    opts[:after_resolve] = ->(results) {
+      fire_assign(parents, results)
+    }
+
+    resource.class._all(hash, opts, base_scope).to_a
+  end
+
   def assign_each(parent, children)
     children.find { |c| c.send(primary_key) == parent.send(foreign_key) }
   end

@@ -70,6 +70,17 @@ module JsonapiCompliable
 
           memo
         end
+
+        def association_types(memo = [])
+          all_sideloads.each_pair do |name, sl|
+            unless memo.include?(sl.resource.type)
+              memo << sl.resource.type
+              memo |= sl.resource.class.association_types(memo)
+            end
+          end
+
+          memo
+        end
       end
     end
   end

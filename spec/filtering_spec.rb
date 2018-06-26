@@ -581,7 +581,7 @@ RSpec.describe 'filtering' do
     it 'raises helpful error' do
       expect {
         records
-      }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on on attribute :foo, but could not find an attribute with that name.')
+      }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :foo, but could not find an attribute with that name.')
     end
 
     context 'but there is a corresponding extra attribute' do
@@ -593,7 +593,7 @@ RSpec.describe 'filtering' do
         it 'raises helpful error' do
           expect {
             records
-          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on on attribute :foo, but the attribute was marked :filterable => false.')
+          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :foo, but the attribute was marked :filterable => false.')
         end
       end
 
@@ -647,7 +647,7 @@ RSpec.describe 'filtering' do
       it 'raises helpful error' do
         expect {
           records
-        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on on attribute :first_name, but the guard :admin? did not pass.')
+        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :first_name, but the guard :admin? did not pass.')
       end
     end
   end

@@ -2,13 +2,13 @@ if ENV['APPRAISAL_INITIALIZED']
   RSpec.describe 'integrated resources and adapters', type: :controller do
     controller(ApplicationController) do
       def index
-        authors, meta = Legacy::AuthorResource.all(params)
-        render jsonapi: authors, meta: meta
+        authors = Legacy::AuthorResource.all(params)
+        render jsonapi: authors
       end
 
       def show
-        author, meta = Legacy::AuthorResource.find(params)
-        render jsonapi: author, meta: meta
+        author = Legacy::AuthorResource.find(params)
+        render jsonapi: author
       end
     end
 
@@ -69,6 +69,37 @@ if ENV['APPRAISAL_INITIALIZED']
       expect(json_included_types).to match_array(%w(books genres))
     end
 
+    context 'when hitting #show' do
+      subject(:make_request) do
+        if Rails::VERSION::MAJOR >= 5
+          get :show, params: { id: id, include: 'books' }
+        else
+          get :show, id: id, params: {
+            id: id, include: 'books'
+          }
+        end
+      end
+
+      let(:id) { author1.id.to_s }
+
+      it 'works' do
+        make_request
+        expect(json['data']['id']).to eq(author1.id.to_s)
+        expect(json['data']['attributes']).to eq({ 'first_name' => 'Stephen' })
+        expect(json_included_types).to match_array(%w(books))
+      end
+
+      context 'and record not found' do
+        let(:id) { '99999' }
+
+        it 'raises not found error' do
+          expect {
+            make_request
+          }.to raise_error(JsonapiCompliable::Errors::RecordNotFound)
+        end
+      end
+    end
+
     context 'when passing sparse fieldsets on primary data' do
       context 'and sideloading' do
         it 'is able to sideload without adding the field' do
@@ -111,7 +142,7 @@ if ENV['APPRAISAL_INITIALIZED']
       end
 
       it 'allows sorting of sideloaded resource' do
-        get :index, params: { include: 'books', sort: '-books.title' }
+        get :index, params: { include: 'books', sort: '-books.id' }
         expect(ids_for('books')).to eq([book2.id, book1.id])
       end
 

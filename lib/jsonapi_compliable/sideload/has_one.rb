@@ -1,4 +1,4 @@
-class JsonapiCompliable::Sideload::HasOne < JsonapiCompliable::Sideload
+class JsonapiCompliable::Sideload::HasOne < JsonapiCompliable::Sideload::HasMany
   def type
     :has_one
   end

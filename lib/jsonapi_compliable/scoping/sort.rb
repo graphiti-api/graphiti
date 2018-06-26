@@ -47,13 +47,18 @@ module JsonapiCompliable
       sort_param.each do |sort_hash|
         attribute = sort_hash.keys.first
         direction = sort_hash.values.first
-        resource.class.get_attr!(attribute, :sortable, request: true)
         yield attribute, direction
       end
     end
 
     def sort_param
-      @sort_param ||= query_hash[:sort].empty? ? resource.default_sort : query_hash[:sort]
+      @sort_param ||= begin
+        if query_hash[:sort].blank?
+          resource.default_sort
+        else
+          query_hash[:sort]
+        end
+      end
     end
   end
 end

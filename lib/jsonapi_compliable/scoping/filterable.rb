@@ -16,7 +16,7 @@ module JsonapiCompliable
 
     # @api private
     def filter_param
-      query_hash[:filter]
+      query_hash[:filter] || {}
     end
 
     def missing_required_filters

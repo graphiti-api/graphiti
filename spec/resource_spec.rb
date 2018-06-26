@@ -504,6 +504,95 @@ RSpec.describe JsonapiCompliable::Resource do
       expect(attribute[:filterable]).to eq(true)
     end
 
+    context 'when :only passed' do
+      context 'as single' do
+        before do
+          klass.attribute :foo, :string, only: :filterable
+        end
+
+        it 'sets only the relevant flag' do
+          att = klass.attributes[:foo]
+          expect(att[:filterable]).to eq(true)
+          expect(att[:readable]).to eq(false)
+          expect(att[:sortable]).to eq(false)
+          expect(att[:writable]).to eq(false)
+        end
+      end
+
+      context 'as array' do
+        before do
+          klass.attribute :foo, :string, only: [:filterable, :sortable]
+        end
+
+        it 'sets only the relevant flag' do
+          att = klass.attributes[:foo]
+          expect(att[:filterable]).to eq(true)
+          expect(att[:readable]).to eq(false)
+          expect(att[:sortable]).to eq(true)
+          expect(att[:writable]).to eq(false)
+        end
+      end
+
+      context 'and given a guard' do
+        before do
+          klass.attribute :foo, :string,
+            only: [:filterable], filterable: :admin?
+        end
+
+        it 'respects the option' do
+          att = klass.attributes[:foo]
+          expect(att[:filterable]).to eq(:admin?)
+          expect(att[:readable]).to eq(false)
+          expect(att[:sortable]).to eq(false)
+          expect(att[:writable]).to eq(false)
+        end
+      end
+    end
+
+    context 'when :except passed' do
+      context 'as single' do
+        before do
+          klass.attribute :foo, :string, except: :writable
+        end
+
+        it 'sets only the relevant flags' do
+          att = klass.attributes[:foo]
+          expect(att[:filterable]).to eq(true)
+          expect(att[:readable]).to eq(true)
+          expect(att[:sortable]).to eq(true)
+          expect(att[:writable]).to eq(false)
+        end
+      end
+
+      context 'as array' do
+        before do
+          klass.attribute :foo, :string, except: [:writable, :sortable]
+        end
+
+        it 'sets only the relevant flags' do
+          att = klass.attributes[:foo]
+          expect(att[:filterable]).to eq(true)
+          expect(att[:readable]).to eq(true)
+          expect(att[:sortable]).to eq(false)
+          expect(att[:writable]).to eq(false)
+        end
+      end
+    end
+
+    context 'and given a guard' do
+      before do
+        klass.attribute :foo, :string, except: [:writable], sortable: :admin?
+      end
+
+      it 'respects the option' do
+        att = klass.attributes[:foo]
+        expect(att[:filterable]).to eq(true)
+        expect(att[:readable]).to eq(true)
+        expect(att[:sortable]).to eq(:admin?)
+        expect(att[:writable]).to eq(false)
+      end
+    end
+
     context 'when attribute is :id' do
       before do
         klass.attribute :id, :string
@@ -763,7 +852,7 @@ RSpec.describe JsonapiCompliable::Resource do
       it 'raises helpful error' do
         expect {
           klass.filter :asdf
-        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add filter on attribute :asdf, but could not find an attribute with that name.')
+        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add filter attribute :asdf, but could not find an attribute with that name.')
       end
     end
 
@@ -772,7 +861,7 @@ RSpec.describe JsonapiCompliable::Resource do
         expect {
           klass.attribute :asdf, :string, filterable: false
           klass.filter :asdf
-        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add filter on attribute :asdf, but the attribute was marked :filterable => false.')
+        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add filter attribute :asdf, but the attribute was marked :filterable => false.')
       end
     end
   end
@@ -782,7 +871,7 @@ RSpec.describe JsonapiCompliable::Resource do
       it 'raises helpful error' do
         expect {
           klass.sort :asdf
-        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort on attribute :asdf, but could not find an attribute with that name.')
+        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort attribute :asdf, but could not find an attribute with that name.')
       end
     end
 
@@ -791,7 +880,7 @@ RSpec.describe JsonapiCompliable::Resource do
         expect {
           klass.attribute :asdf, :string, sortable: false
           klass.sort :asdf
-        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort on attribute :asdf, but the attribute was marked :sortable => false.')
+        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort attribute :asdf, but the attribute was marked :sortable => false.')
       end
     end
   end
@@ -815,24 +904,25 @@ RSpec.describe JsonapiCompliable::Resource do
     let!(:employee3) { PORO::Employee.create(first_name: 'Baz') }
 
     describe '.all' do
-      it 'executes the request correctly, returning meta and stats' do
-        employees, _ = klass.all(filter: { id: employee2.id })
+      it 'executes the request correctly, returning proxy' do
+        employees = klass.all(filter: { id: employee2.id })
+        expect(employees).to be_a(JsonapiCompliable::ResourceProxy)
         expect(employees.map(&:id)).to eq([employee2.id])
       end
 
       context 'when stats' do
         it 'returns correct hash' do
-          _, meta = klass.all(stats: { total: 'count' })
-          expect(meta).to eq({
-            stats: { total: { count: 'poro_count_total' } }
+          proxy = klass.all(stats: { total: 'count' })
+          expect(proxy.stats).to eq({
+            total: { count: 'poro_count_total' }
           })
         end
       end
 
       context 'when no stats' do
         it 'returns empty hash' do
-          _, meta = klass.all({})
-          expect(meta).to eq({})
+          proxy = klass.all({})
+          expect(proxy.stats).to eq({})
         end
       end
 
@@ -847,8 +937,8 @@ RSpec.describe JsonapiCompliable::Resource do
 
     describe '.find' do
       it 'takes the id param and applies as a filter, returning single record' do
-        employee, _ = klass.find(id: employee2.id)
-        expect(employee.id).to eq(employee2.id)
+        proxy = klass.find(id: employee2.id)
+        expect(proxy.to_a[0].id).to eq(employee2.id)
       end
 
       it 'supports other params as well' do
@@ -864,49 +954,52 @@ RSpec.describe JsonapiCompliable::Resource do
           end
         end
 
-        employee, _ = klass.find({
+        employees = klass.find({
           id: employee2.id,
           extra_fields: { employees: 'foo' }
         })
-        expect(employee.id).to eq(3)
+        expect(employees.to_a[0].id).to eq(3)
       end
 
       context 'when stats' do
         it 'returns correct hash' do
-          _, meta = klass.find({
+          proxy = klass.find({
             id: employee2.id,
             stats: { total: 'count' }
           })
-          expect(meta).to eq(stats: { total: { count: 'poro_count_total' } })
+          expect(proxy.stats).to eq(total: { count: 'poro_count_total' })
         end
       end
 
       context 'when no stats' do
         it 'returns empty hash' do
-          _, meta = klass.find(id: employee2.id)
-          expect(meta).to eq({})
+          proxy = klass.find(id: employee2.id)
+          expect(proxy.stats).to eq({})
         end
       end
 
       context 'when no record found' do
         it 'raises helpful error' do
           expect {
-            klass.find(id: 9999)
+            klass.find(id: 9999).data
           }.to raise_error(JsonapiCompliable::Errors::RecordNotFound)
         end
       end
 
       context 'when passed a base scope' do
         before do
-          PORO::Position.create
-          klass.find({ id: 1 }, { type: :positions })
+          expect(PORO::DB).to receive(:all).with({
+            conditions: { first_name: 'adsf', id: '1'},
+            page: 1,
+            per: 20
+          }).and_call_original
         end
 
         it 'is used' do
           expect {
             klass.find({ id: employee1.id }, {
               conditions: { first_name: 'adsf' }
-            })
+            }).data
           }.to raise_error(JsonapiCompliable::Errors::RecordNotFound)
         end
       end
@@ -961,7 +1054,7 @@ RSpec.describe JsonapiCompliable::Resource do
       it 'raises helpful error' do
         expect {
           instance.get_attr!(:foo, :sortable)
-        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort on attribute :foo, but could not find an attribute with that name.')
+        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort attribute :foo, but could not find an attribute with that name.')
       end
     end
 
@@ -973,7 +1066,7 @@ RSpec.describe JsonapiCompliable::Resource do
       it 'raises helpful error' do
         expect {
           instance.get_attr!(:foo, :sortable)
-        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort on attribute :foo, but the attribute was marked :sortable => false.')
+        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort attribute :foo, but the attribute was marked :sortable => false.')
       end
     end
 
@@ -999,7 +1092,7 @@ RSpec.describe JsonapiCompliable::Resource do
       it 'raises helpful error' do
         expect {
           instance.get_attr!(:foo, :sortable, request: true)
-        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on on attribute :foo, but the guard :admin? did not pass.')
+        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :foo, but the guard :admin? did not pass.')
       end
     end
 
@@ -1048,11 +1141,11 @@ RSpec.describe JsonapiCompliable::Resource do
       ctx = OpenStruct.new
       JsonapiCompliable.with_context(ctx) do
         runner = JsonapiCompliable::Runner.new(klass, {})
-        runner.resolve(start: true)
+        proxy = runner.proxy(start: true)
         expect(ctx.before).to eq(start: true)
         expect(ctx.middle).to eq(start: true, before: true)
         expect(ctx.after).to eq(start: true, before: true, default: true)
-        expect(runner.jsonapi_resource.scope)
+        expect(proxy.scope.object)
           .to eq(start: true, before: true, default: true, after: true)
       end
     end

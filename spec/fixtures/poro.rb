@@ -156,6 +156,10 @@ module PORO
       scope
     end
 
+    def base_scope(model)
+      {}
+    end
+
     def paginate(scope, current_page, per_page)
       scope.merge!(page: current_page, per: per_page)
     end

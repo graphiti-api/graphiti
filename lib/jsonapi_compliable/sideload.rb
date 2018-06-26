@@ -9,9 +9,7 @@ module JsonapiCompliable
       :foreign_key,
       :primary_key
 
-    class << self
-      attr_reader :scope_proc, :assign_proc, :assign_each_proc
-    end
+    class_attribute :scope_proc, :assign_proc, :assign_each_proc
 
     def initialize(name, opts)
       @name                  = name
@@ -26,15 +24,15 @@ module JsonapiCompliable
     end
 
     def self.scope(&blk)
-      @scope_proc = blk
+      self.scope_proc = blk
     end
 
     def self.assign(&blk)
-      @assign_proc = blk
+      self.assign_proc = blk
     end
 
     def self.assign_each(&blk)
-      @assign_each_proc = blk
+      self.assign_each_proc = blk
     end
 
     def readable?
@@ -112,17 +110,20 @@ module JsonapiCompliable
       end
     end
 
-    def resolve(parents, query, namespace)
-      sideload_scope   = fire_scope(parents)
-
-      sideload_scope   = Scope.new sideload_scope,
-        resource,
-        query,
-        sideload_parent_length: parents.length,
-        default_paginate: false,
-        namespace: namespace
-      sideload_scope.resolve do |sideload_results|
-        fire_assign(parents, sideload_results)
+    def resolve(parents, query)
+      # legacy / custom / many-to-many
+      if self.class.scope_proc || type == :many_to_many
+        sideload_scope = fire_scope(parents)
+        sideload_scope = Scope.new sideload_scope,
+          resource,
+          query,
+          sideload_parent_length: parents.length,
+          default_paginate: false
+        sideload_scope.resolve do |sideload_results|
+          fire_assign(parents, sideload_results)
+        end
+      else
+        query(parents, query)
       end
     end
 

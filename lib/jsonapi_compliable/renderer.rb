@@ -2,16 +2,24 @@ module JsonapiCompliable
   class Renderer
     CONTENT_TYPE = 'application/vnd.api+json'
 
-    attr_reader :records, :options
+    attr_reader :proxy, :options
 
-    def initialize(records, options)
-      @records = records
+    def initialize(proxy, options)
+      @proxy = proxy
       @options = options
+    end
+
+    def records
+      @records ||= @proxy.data
     end
 
     def to_jsonapi
       notify do
         instance = JSONAPI::Serializable::Renderer.new
+        options[:fields] = proxy.query.fields
+        options[:expose][:extra_fields] = proxy.query.extra_fields
+        options[:include] = proxy.query.include_hash
+        options[:meta].merge!(stats: proxy.stats) unless proxy.stats.empty?
         instance.render(records, options).to_json
       end
     end

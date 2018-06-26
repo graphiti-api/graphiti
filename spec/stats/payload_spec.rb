@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe JsonapiCompliable::Stats::Payload do
   let(:dsl)      { double }
-  let(:query)    { { stats: { attr1: [:count, :average], attr2: [:maximum] } } }
+  let(:query)    { double(stats: { attr1: [:count, :average], attr2: [:maximum] }) }
   let(:scope)    { double.as_null_object }
   let(:instance) { described_class.new(dsl, query, scope) }
 

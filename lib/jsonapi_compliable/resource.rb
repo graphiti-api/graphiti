@@ -24,16 +24,21 @@ module JsonapiCompliable
       JsonapiCompliable.context[:namespace]
     end
 
+    # external facing; does not accept internal-specific options
     def self.all(params, base_scope = nil)
+      _all(params, {}, base_scope)
+    end
+
+    def self._all(params, opts, base_scope)
       runner = Runner.new(self, params)
-      runner.resolve(base_scope)
+      runner.proxy(base_scope, opts)
     end
 
     def self.find(params, base_scope = nil)
       params[:filter] ||= {}
-      params[:filter].merge!(id: params[:id])
+      params[:filter].merge!(id: params.delete(:id))
       runner = Runner.new(self, params)
-      runner.resolve(base_scope, single: true, raise_on_missing: true)
+      runner.proxy(base_scope, single: true)
     end
 
     def build_scope(base, query, opts = {})

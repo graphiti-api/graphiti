@@ -14,12 +14,9 @@ module JsonapiCompliable
     #     meta: { stats: { total: { count: 100 } } }
     #   }
     class Payload
-      # @param [Resource] resource the resource instance
-      # @param [Hash] query_hash the Query#to_hash for the current resource
-      # @param scope the scope we are chaining/modifying
-      def initialize(resource, query_hash, scope)
+      def initialize(resource, query, scope)
         @resource   = resource
-        @query_hash = query_hash[:stats]
+        @query      = query
         @scope      = scope
       end
 
@@ -29,7 +26,7 @@ module JsonapiCompliable
       # @return [Hash] the generated payload
       def generate
         {}.tap do |stats|
-          @query_hash.each_pair do |name, calculation|
+          @query.stats.each_pair do |name, calculation|
             stats[name] = {}
 
             each_calculation(name, calculation) do |calc, function|

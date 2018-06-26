@@ -93,7 +93,14 @@ module JsonapiCompliable
 
         def attribute_option(options, name)
           if options[name] != false
-            options[name] ||= send(:"attributes_#{name}_by_default")
+            default = if only = options[:only]
+                        Array(only).include?(name) ? true : false
+                      elsif except = options[:except]
+                        Array(except).include?(name) ? false : true
+                      else
+                        send(:"attributes_#{name}_by_default")
+                      end
+            options[name] ||= default
           end
         end
         private :attribute_option

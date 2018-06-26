@@ -18,7 +18,7 @@ RSpec.describe 'sideloading' do
     end
 
     class PositionSideload < ::JsonapiCompliable::Sideload::HasMany
-      def scope(employees)
+      scope do |employees|
         { type: :positions, sort: [{ id: :desc }] }
       end
     end

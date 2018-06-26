@@ -8,6 +8,10 @@ RSpec.describe JsonapiCompliable do
 
       jsonapi resource: PORO::EmployeeResource
 
+      def jsonapi_resource
+        PORO::EmployeeResource.new
+      end
+
       def params
         @params || {}
       end
@@ -67,22 +71,23 @@ RSpec.describe JsonapiCompliable do
     end
   end
 
-  describe '#records' do
-    it 'scopes, returning stats and models' do
+  describe '#proxy' do
+    it 'returns a proxy with access to records, stats, and query' do
       scope = double(resolve: 'resolved', resolve_stats: 'stats')
-      expect(instance).to receive(:jsonapi_scope).with('foo') { scope }
-      expect(instance.resolve('foo')).to eq(['resolved', { stats: 'stats' }])
+      expect(instance).to receive(:jsonapi_scope).with('foo', {}) { scope }
+      proxy = instance.proxy('foo')
+      expect(proxy).to be_a(JsonapiCompliable::ResourceProxy)
+      expect(proxy.query).to be_a(JsonapiCompliable::Query)
+      expect(proxy.to_a).to eq('resolved')
+      expect(proxy.stats).to eq('stats')
     end
   end
 
   describe '#render_jsonapi' do
-    before do
-      allow(instance).to receive(:force_includes?) { false }
-    end
-
     it 'is able to override options' do
-      json = instance.render_jsonapi([], {
-        apply_scoping: false, meta: { foo: 'bar' }
+      proxy = double(data: [], stats: {}).as_null_object
+      json = instance.render_jsonapi(proxy, {
+        meta: { foo: 'bar' }
       })
       hash = JSON.parse(json)
       expect(hash['meta']).to eq('foo' => 'bar')
@@ -90,17 +95,19 @@ RSpec.describe JsonapiCompliable do
 
     context 'when passing apply_scoping: false' do
       it 'does not appy jsonapi_scope' do
+        proxy = double(data: [], stats: {}).as_null_object
         expect(PORO::DB).to_not receive(:all)
-        instance.render_jsonapi([], apply_scoping: false)
+        instance.render_jsonapi(proxy, apply_scoping: false)
       end
     end
 
     context 'when passing manual :include' do
       it 'respects the :include option' do
+        proxy = double(data: [], stats: {}).as_null_object
         expect(JsonapiCompliable::Renderer).to receive(:new)
           .with(anything, hash_including(include: { foo: {}}))
           .and_call_original
-        instance.render_jsonapi([], {
+        instance.render_jsonapi(proxy, {
           include: { foo: {} }, apply_scoping: false
         })
       end

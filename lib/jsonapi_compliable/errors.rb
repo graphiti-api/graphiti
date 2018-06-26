@@ -23,12 +23,14 @@ module JsonapiCompliable
         if @request
           {
             sortable: 'sort on',
-            filterable: 'filter on'
+            filterable: 'filter on',
+            readable: 'read'
           }[@flag]
         else
           {
             sortable: 'add sort',
-            filterable: 'add filter'
+            filterable: 'add filter',
+            readable: 'read'
           }[@flag]
         end
       end
@@ -43,7 +45,7 @@ module JsonapiCompliable
       end
 
       def message
-        msg = "#{resource_name}: Tried to #{action} on attribute #{@name.inspect}"
+        msg = "#{resource_name}: Tried to #{action} attribute #{@name.inspect}"
         if @exists
           if @guard
             msg << ", but the guard #{@guard.inspect} did not pass."

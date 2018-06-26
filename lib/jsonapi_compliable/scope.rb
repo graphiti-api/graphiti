@@ -1,66 +1,26 @@
 module JsonapiCompliable
-  # A Scope wraps an underlying object. It modifies that object
-  # using the corresponding Resource and Query, and how to resolve
-  # that underlying object scope.
-  #
-  # @example Basic Controller usage
-  #   def index
-  #     base  = Post.all
-  #     scope = jsonapi_scope(base)
-  #     scope.object == base # => true
-  #     scope.object = scope.object.where(active: true)
-  #
-  #     # actually fires sql
-  #     scope.resolve #=> [#<Post ...>, #<Post ...>, etc]
-  #   end
   class Scope
     attr_reader :object, :unpaginated_object
 
-    # @param object - The underlying, chainable base scope object
-    # @param resource - The Resource that will process the object
-    # @param query - The Query object for the current request
-    # @param [Hash] opts Options to configure the Scope
-    # @option opts [String] :namespace The nested relationship name
-    # @option opts [Boolean] :filter Opt-out of filter scoping
-    # @option opts [Boolean] :extra_fields Opt-out of extra_fields scoping
-    # @option opts [Boolean] :sort Opt-out of sort scoping
-    # @option opts [Boolean] :pagination Opt-out of pagination scoping
-    # @option opts [Boolean] :default_paginate Opt-out of default pagination when not specified in request
     def initialize(object, resource, query, opts = {})
       @object    = object
       @resource  = resource
       @query     = query
-
-      # Namespace for the 'outer' or 'main' resource is its type
-      # For its relationships, its the relationship name
-      # IOW when hitting /states, it's resource type 'states'
-      # when hitting /authors?include=state its 'state'
-      @namespace = opts.delete(:namespace) || resource.type
+      @opts      = opts
 
       @object = @resource.around_scoping(@object, query_hash) do |scope|
         apply_scoping(scope, opts)
       end
     end
 
-    # Resolve the requested stats. Returns hash like:
-    #
-    #   { rating: { average: 5.5, maximum: 9 } }
-    #
-    # @return [Hash] the resolved stat info
-    # @api private
     def resolve_stats
-      Stats::Payload.new(@resource, query_hash, @unpaginated_object).generate
+      if query_hash[:stats]
+        Stats::Payload.new(@resource, @query, @unpaginated_object).generate
+      else
+        {}
+      end
     end
 
-    # Resolve the scope. This is where SQL is actually fired, an HTTP
-    # request is actually made, etc.
-    #
-    # Does nothing if the user requested zero results, ie /posts?page[size]=0
-    #
-    # First resolves the top-level resource, then processes each relevant sideload
-    #
-    # @see Resource#resolve
-    # @return [Array] an array of resolved model instances
     def resolve
       if @query.zero_results?
         []
@@ -68,16 +28,16 @@ module JsonapiCompliable
         resolved = @resource.resolve(@object)
         assign_serializer(resolved)
         yield resolved if block_given?
-        sideload(resolved, query_hash[:include]) if query_hash[:include]
+        if @opts[:after_resolve]
+          @opts[:after_resolve].call(resolved)
+        end
+        sideload(resolved) unless @query.sideloads.empty?
         resolved
       end
     end
 
-    # The slice of Query#to_hash for the current namespace
-    # @see Query#to_hash
-    # @api private
     def query_hash
-      @query_hash ||= @query.to_hash[@namespace]
+      @query_hash ||= @query.to_hash
     end
 
     private
@@ -91,28 +51,19 @@ module JsonapiCompliable
       end
     end
 
-    def sideload(results, includes)
+    def sideload(results)
       return if results == []
 
       concurrent = ::JsonapiCompliable.config.experimental_concurrency
       promises = []
 
-      includes.each_pair do |name, nested|
+      @query.sideloads.each_pair do |name, q|
         sideload = @resource.class.sideload(name)
-
-        if sideload.nil?
-          if JsonapiCompliable.config.raise_on_missing_sideload
-            raise JsonapiCompliable::Errors::InvalidInclude
-              .new(name, @resource.type)
-          end
+        resolve_sideload = -> { sideload.resolve(results, q) }
+        if concurrent
+          promises << Concurrent::Promise.execute(&resolve_sideload)
         else
-          namespace = Util::Sideload.namespace(@namespace, sideload.name)
-          resolve_sideload = -> { sideload.resolve(results, @query, namespace) }
-          if concurrent
-            promises << Concurrent::Promise.execute(&resolve_sideload)
-          else
-            resolve_sideload.call
-          end
+          resolve_sideload.call
         end
       end
 
@@ -140,7 +91,7 @@ module JsonapiCompliable
     end
 
     def add_scoping(key, scoping_class, opts, default = {})
-      @object = scoping_class.new(@resource, query_hash, @object, opts).apply unless opts[key] == false
+      @object = scoping_class.new(@resource, query_hash, @object, opts).apply
       @unpaginated_object = @object unless key == :paginate
     end
   end

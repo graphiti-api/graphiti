@@ -31,7 +31,7 @@ RSpec.describe 'sorting' do
     it 'raises helpful error' do
       expect {
         ids
-      }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on on attribute :asdf, but could not find an attribute with that name.')
+      }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :asdf, but could not find an attribute with that name.')
     end
 
     context 'but there is a corresponding extra attribute' do
@@ -43,7 +43,7 @@ RSpec.describe 'sorting' do
         it 'raises helpful error' do
           expect {
             ids
-          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on on attribute :asdf, but the attribute was marked :sortable => false.')
+          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :asdf, but the attribute was marked :sortable => false.')
         end
       end
 
@@ -72,7 +72,7 @@ RSpec.describe 'sorting' do
       params[:sort] = 'foo'
       expect {
         ids
-      }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on on attribute :foo, but the attribute was marked :sortable => false.')
+      }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :foo, but the attribute was marked :sortable => false.')
     end
   end
 
@@ -111,7 +111,7 @@ RSpec.describe 'sorting' do
       it 'raises helpful error' do
         expect {
           ids
-        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on on attribute :first_name, but the guard :admin? did not pass.')
+        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :first_name, but the guard :admin? did not pass.')
       end
     end
   end
@@ -161,12 +161,6 @@ RSpec.describe 'sorting' do
       let(:sort_param) { '-first_name' }
 
       it { is_expected.to eq(%w(John Jane)) }
-    end
-
-    context 'when prefixed with type' do
-      let(:sort_param) { 'employees.first_name' }
-
-      it { is_expected.to eq(%w(Jane John)) }
     end
 
     context 'when passed multisort' do

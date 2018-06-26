@@ -106,14 +106,7 @@ module JsonapiCompliable
     #
     # @return [Resource] the configured Resource for this controller
     def jsonapi_resource
-      @jsonapi_resource ||= begin
-        resource = self.class._jsonapi_compliable
-        if resource.is_a?(Hash)
-          resource[action_name.to_sym].new
-        else
-          resource.new
-        end
-      end
+      @jsonapi_resource
     end
 
     # Instantiates the relevant Query object
@@ -127,7 +120,7 @@ module JsonapiCompliable
     # @see Query#to_hash
     # @return [Hash] the normalized query hash for only the *current* resource
     def query_hash
-      @query_hash ||= query.to_hash[jsonapi_resource.type]
+      @query_hash ||= query.to_hash
     end
 
     def wrap_context
@@ -253,35 +246,25 @@ module JsonapiCompliable
     end
 
     def jsonapi_render_options
-      defaults = default_jsonapi_render_options
-      options = Util::RenderOptions.generate(query_hash, defaults)
+      options = {}
+      options.merge!(default_jsonapi_render_options)
+      options[:meta]   ||= {}
+      options[:expose] ||= {}
       options[:expose][:context] = jsonapi_context
-      if options[:include].empty? && force_includes?
-        options[:include] = deserialized_params.include_directive
-      end
       options
     end
 
-    def resolve(base = nil, opts = {})
+    def proxy(base = nil, opts = {})
       base       ||= jsonapi_resource.base_scope
-      scope        = jsonapi_scope(base)
-      records      = scope.resolve
-
-      if opts[:raise_on_missing] && records.empty?
-        raise JsonapiCompliable::Errors::RecordNotFound
-      end
-
-      records      = records[0] if opts[:single]
-      stats        = scope.resolve_stats
-      meta         = {}
-      meta[:stats] = stats unless stats.empty?
-      [records, meta]
+      scope_opts   = opts.slice(:sideload_parent_length, :default_paginate, :after_resolve)
+      scope        = jsonapi_scope(base, scope_opts)
+      proxy_class  = !!opts[:single] ? SingleResourceProxy : ResourceProxy
+      proxy_class.new(jsonapi_resource, scope, query)
     end
 
-    def render_jsonapi(records, options = {})
-      records = records[0] if options[:single]
+    def render_jsonapi(proxy, options = {})
       options = jsonapi_render_options.merge(options)
-      Renderer.new(records, options).to_jsonapi
+      Renderer.new(proxy, options).to_jsonapi
     end
 
     # Define a hash that will be automatically merged into your

@@ -195,6 +195,8 @@ module Legacy
   end
 
   class BookResource < ApplicationResource
+    attribute :author_id, :integer, only: :filterable
+
     attribute :title, :string
     attribute :pages, :integer do
       500
@@ -219,9 +221,11 @@ module Legacy
   end
 
   class BioLabelResource < ApplicationResource
+    attribute :bio_id, :integer, only: [:filterable]
   end
 
   class BioResource < ApplicationResource
+    attribute :author_id, :integer, only: [:filterable]
     attribute :description, :string
     attribute :picture, :string
 
@@ -240,9 +244,6 @@ module Legacy
     end
   end
 
-      # todo autostats
-      #allow_stat total: [:count]
-
   class HobbyResource < ApplicationResource
     attribute :name, :string
     attribute :description, :string do
@@ -254,6 +255,7 @@ module Legacy
   end
 
   class OrganizationResource < ApplicationResource
+    attribute :parent_id, :integer, only: [:filterable]
     attribute :name, :string
 
     has_many :children,
