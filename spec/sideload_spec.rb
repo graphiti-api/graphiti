@@ -1,10 +1,25 @@
 require 'spec_helper'
 
 RSpec.describe JsonapiCompliable::Sideload do
-  let(:parent_resource_class) { PORO::EmployeeResource }
-  let(:opts) { { parent_resource: parent_resource_class } }
+  let(:parent_resource_class) do
+    Class.new(PORO::EmployeeResource) do
+      def self.name;'PORO::EmployeeResource';end
+    end
+  end
+  let(:resource_class) do
+    Class.new(PORO::PositionResource) do
+      self.model = PORO::Position
+      def self.name;'PORO::PositionResource';end
+    end
+  end
+  let(:opts) do
+    {
+      parent_resource: parent_resource_class,
+      resource: resource_class
+    }
+  end
   let(:name) { :foo }
-  let(:instance) { described_class.new(name, opts) }
+  let(:instance) { Class.new(described_class).new(name, opts) }
 
   describe '#primary_key' do
     it 'defaults to id' do
@@ -40,10 +55,10 @@ RSpec.describe JsonapiCompliable::Sideload do
   end
 
   describe '#resource_class' do
-    let(:name) { 'positions' }
+    let(:name) { :positions }
 
     before do
-      opts[:parent_resource] = PORO::EmployeeResource
+      opts.delete(:resource)
     end
 
     it 'is inferred by default' do
@@ -51,7 +66,7 @@ RSpec.describe JsonapiCompliable::Sideload do
     end
 
     context 'when not found by inferrence' do
-      let(:name) { 'asdf' }
+      let(:name) { :foo }
 
       it 'raises helpful error' do
         expect {
@@ -182,6 +197,10 @@ RSpec.describe JsonapiCompliable::Sideload do
     end
 
     context 'when a to-one relationship' do
+      before do
+        opts.delete(:resource)
+      end
+
       let(:parent_resource_class) { PORO::PositionResource }
       let(:instance) { JsonapiCompliable::Sideload::BelongsTo.new(:department, opts) }
 
@@ -217,6 +236,116 @@ RSpec.describe JsonapiCompliable::Sideload do
           instance.assign(positions, departments)
           expect(departments.include?(other)).to eq(false)
         end
+      end
+    end
+  end
+
+  describe '.params' do
+    before do
+      instance.class.params do |hash, parents, query|
+        hash[:parents] = parents
+        hash[:query] = query
+      end
+    end
+
+    it 'sets params proc' do
+      hash, parents, query = {}, [double('parent')], double('query')
+      instance.params_proc.call(hash, parents, query)
+      expect(hash).to eq(parents: parents, query: query)
+    end
+  end
+
+  describe '.pre_load' do
+    before do
+      instance.class.pre_load do |proxy|
+        proxy[:foo] = 'bar'
+      end
+    end
+
+    it 'sets pre_load proc' do
+      hash = {}
+      instance.pre_load_proc.call(hash)
+      expect(hash).to eq(foo: 'bar')
+    end
+  end
+
+  describe '#load' do
+    let(:params) { {} }
+    let(:query) { JsonapiCompliable::Query.new(instance.resource, params) }
+    let(:parents) { [double, double] }
+    let(:results) { [double('result')] }
+
+    before do
+      allow(instance).to receive(:load_params) { { foo: 'bar' } }
+      allow(resource_class).to receive(:_all) { results }
+    end
+
+    it 'uses base scope' do
+      base = double
+      allow(instance).to receive(:base_scope) { base }
+      expect(resource_class).to receive(:_all)
+        .with(anything, anything, base)
+      instance.load(parents, query)
+    end
+
+    it 'uses load params' do
+      expect(resource_class).to receive(:_all)
+        .with({ foo: 'bar' }, anything, nil)
+      instance.load(parents, query)
+    end
+
+    it 'passes internal load options' do
+      expected = {
+        default_paginate: false,
+        sideload_parent_length: 2,
+        after_resolve: anything
+      }
+      expect(resource_class).to receive(:_all)
+        .with(anything, expected, nil)
+      instance.load(parents, query)
+    end
+
+    it 'returns records' do
+      records = instance.load(parents, query)
+      expect(records).to eq(results)
+    end
+
+    context 'when params customization' do
+      before do
+        instance.class.params do |hash, parents, query|
+          hash[:a] = parents
+          hash[:b] = query
+        end
+      end
+
+      it 'is respected' do
+        expected = {
+          foo: 'bar',
+          a: parents,
+          b: query
+        }
+        expect(resource_class).to receive(:_all)
+          .with(expected, anything, nil)
+        instance.load(parents, query)
+      end
+    end
+
+    context 'when pre_load customization' do
+      let(:parents) { [] }
+
+      before do
+        allow(instance).to receive(:load_params) { { sort: '-id' } }
+        allow(resource_class).to receive(:_all).and_call_original
+        instance.class.pre_load do |proxy|
+          proxy.scope.object[:modified] = true
+        end
+      end
+
+      it 'is respected' do
+        expect(PORO::DB).to receive(:all).with({
+          modified: true, sort: [{ id: :desc }]
+        }).and_return([])
+        instance.load(parents, query)
       end
     end
   end

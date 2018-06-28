@@ -2,7 +2,17 @@ require 'spec_helper'
 
 RSpec.describe JsonapiCompliable::Sideload::BelongsTo do
   let(:parent_resource_class) { PORO::PositionResource }
-  let(:opts) { { parent_resource: parent_resource_class } }
+  let(:resource_class) do
+    Class.new(PORO::EmployeeResource) do
+      self.model = PORO::Employee
+    end
+  end
+  let(:opts) do
+    {
+      parent_resource: parent_resource_class,
+      resource: resource_class
+    }
+  end
   let(:name) { :employee }
   let(:instance) { described_class.new(name, opts) }
 
@@ -38,14 +48,67 @@ RSpec.describe JsonapiCompliable::Sideload::BelongsTo do
     let!(:employee) { PORO::Employee.new }
 
     it 'associates correctly, via the *parent* resource' do
-      #expect(instance.parent_resource).to receive(:associate)
-        #.with(employee, position, :employee, :belongs_to)
+      expect(instance.parent_resource).to receive(:associate)
+        .with(position, employee, :employee, :belongs_to)
+        .and_call_original
       instance.send(:associate, position, employee)
       expect(position.employee).to eq(employee)
     end
   end
 
   describe 'infer_foreign_key' do
+    let(:opts) { { resource: resource } }
+    let(:resource) do
+      Class.new(PORO::EmployeeResource)
+    end
 
+    subject { instance.infer_foreign_key }
+
+    context 'when the model has a namespace' do
+      before do
+        resource.model = double('Model Class')
+        allow(resource.model).to receive(:name) { 'PORO::FooBar' }
+      end
+
+      it { is_expected.to eq(:foo_bar_id) }
+    end
+
+    context 'when the model does not have a namespace' do
+      before do
+        resource.model = double('Model Class')
+        allow(resource.model).to receive(:name) { 'BarFoo' }
+      end
+
+      it { is_expected.to eq(:bar_foo_id) }
+    end
+  end
+
+  describe '#load_params' do
+    let(:params) { {} }
+    let(:query) { JsonapiCompliable::Query.new(instance.resource, params) }
+    let(:parents) { [double(bar_id: 7), double(bar_id: 8)] }
+
+    before do
+      opts[:primary_key] = :foo_id
+      opts[:foreign_key] = :bar_id
+      allow(instance.resource).to receive(:_all) { [] }
+    end
+
+    it 'adds primary key filter' do
+      params = instance.load_params(parents, query)
+      expect(params).to eq({
+        filter: { foo_id: [7, 8] }
+      })
+    end
+
+    it 'includes deep query params' do
+      resource_class.attribute :a, :string
+      params.merge!(filter: { a: 'b' }, sort: '-id')
+      result = instance.load_params(parents, query)
+      expect(result).to eq({
+        filter: { foo_id: [7, 8], a: 'b' },
+        sort: [{ id: :desc }]
+      })
+    end
   end
 end

@@ -9,7 +9,11 @@ module JsonapiCompliable
       :foreign_key,
       :primary_key
 
-    class_attribute :scope_proc, :assign_proc, :assign_each_proc
+    class_attribute :scope_proc,
+      :assign_proc,
+      :assign_each_proc,
+      :params_proc,
+      :pre_load_proc
 
     def initialize(name, opts)
       @name                  = name
@@ -33,6 +37,14 @@ module JsonapiCompliable
 
     def self.assign_each(&blk)
       self.assign_each_proc = blk
+    end
+
+    def self.params(&blk)
+      self.params_proc = blk
+    end
+
+    def self.pre_load(&blk)
+      self.pre_load_proc = blk
     end
 
     def readable?
@@ -63,9 +75,12 @@ module JsonapiCompliable
       raise 'Override #assign_each in subclass'
     end
 
-    # TODO confirm need the if @type
     def type
       @type || raise("Override #type in subclass. Should be one of #{TYPES.inspect}")
+    end
+
+    def load_params(parents, query)
+      raise 'Override #load_params in subclass'
     end
 
     def default_base_scope
@@ -73,6 +88,15 @@ module JsonapiCompliable
 
     def base_scope
       @base_scope || default_base_scope
+    end
+
+    def load(parents, query)
+      params = load_params(parents, query)
+      params_proc.call(params, parents, query) if params_proc
+      opts = load_options(parents, query)
+      proxy = resource.class._all(params, opts, base_scope)
+      pre_load_proc.call(proxy) if pre_load_proc
+      proxy.to_a
     end
 
     # Override in subclass
@@ -123,7 +147,7 @@ module JsonapiCompliable
           fire_assign(parents, sideload_results)
         end
       else
-        query(parents, query)
+        load(parents, query)
       end
     end
 
@@ -155,6 +179,16 @@ module JsonapiCompliable
     end
 
     private
+
+    def load_options(parents, query)
+      {}.tap do |opts|
+        opts[:default_paginate] = false
+        opts[:sideload_parent_length] = parents.length
+        opts[:after_resolve] = ->(results) {
+          fire_assign(parents, results)
+        }
+      end
+    end
 
     def associate(parent, child)
       parent_resource.associate(parent, child, name, type)

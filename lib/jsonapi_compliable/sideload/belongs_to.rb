@@ -3,19 +3,11 @@ class JsonapiCompliable::Sideload::BelongsTo < JsonapiCompliable::Sideload
     :belongs_to
   end
 
-  def query(parents, query)
-    hash = query.to_hash
-    hash[:filter] ||= {}
-    hash[:filter][primary_key] = parents.map(&foreign_key)
-
-    opts = {}
-    opts[:default_paginate] = false
-    opts[:sideload_parent_length] = parents.length
-    opts[:after_resolve] = ->(results) {
-      fire_assign(parents, results)
-    }
-
-    resource.class._all(hash, opts, base_scope).to_a
+  def load_params(parents, query)
+    query.to_hash.tap do |hash|
+      hash[:filter] ||= {}
+      hash[:filter][primary_key] = parents.map(&foreign_key)
+    end
   end
 
   def assign_each(parent, children)
@@ -30,6 +22,6 @@ class JsonapiCompliable::Sideload::BelongsTo < JsonapiCompliable::Sideload
     model = resource.model
     namespace = namespace_for(model)
     model_name = model.name.gsub("#{namespace}::", '')
-    "#{model_name.underscore}_id"
+    :"#{model_name.underscore}_id"
   end
 end

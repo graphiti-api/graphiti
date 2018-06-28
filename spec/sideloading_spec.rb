@@ -272,7 +272,6 @@ RSpec.describe 'sideloading' do
     end
   end
 
-
   context 'when the associated resource has default pagination' do
     before do
       resource.class_eval do
@@ -349,6 +348,168 @@ RSpec.describe 'sideloading' do
     it 'works' do
       render
       expect(ids_for('positions')).to match_array([2])
+    end
+  end
+
+  context 'when resource sideloading' do
+    let(:position_resource) do
+      Class.new(PORO::PositionResource) do
+        attribute :employee_id, :integer, only: [:filterable]
+
+        def base_scope
+          { type: :positions }
+        end
+      end
+    end
+
+    context 'via has_many' do
+      before do
+        resource.has_many :positions, resource: position_resource
+        params[:include] = 'positions'
+      end
+
+      it 'works' do
+        render
+        expect(ids_for('positions')).to match_array([1, 2])
+      end
+
+      context 'and params customization' do
+        before do
+          resource.has_many :positions, resource: position_resource do
+            params do |hash|
+              hash[:filter][:id] = 2
+            end
+          end
+        end
+
+        it 'is respected' do
+          render
+          expect(ids_for('positions')).to match_array([2])
+        end
+      end
+
+      context 'and pre_load customization' do
+        before do
+          resource.has_many :positions, resource: position_resource do
+            pre_load do |proxy|
+              proxy.scope.object[:conditions][:id] = 2
+            end
+          end
+        end
+
+        it 'is respected' do
+          render
+          expect(ids_for('positions')).to match_array([2])
+        end
+      end
+    end
+
+    context 'via_belongs_to' do
+      let(:resource) { position_resource }
+      let(:base_scope) { { type: :positions } }
+
+      let(:department_resource) do
+        Class.new(PORO::DepartmentResource) do
+          self.model = PORO::Department
+
+          def base_scope
+            { type: :departments }
+          end
+        end
+      end
+
+      before do
+        position_resource.belongs_to :department, resource: department_resource
+        params[:include] = 'department'
+      end
+
+      it 'works' do
+        render
+        expect(ids_for('departments')).to match_array([1, 2])
+      end
+
+      context 'and params customization' do
+        before do
+          position_resource.belongs_to :department, resource: department_resource do
+            params do |hash|
+              hash[:filter][:id] = 2
+            end
+          end
+        end
+
+        it 'is respected' do
+          render
+          expect(ids_for('departments')).to match_array([2])
+        end
+      end
+
+      context 'and pre_load customization' do
+        before do
+          position_resource.belongs_to :department, resource: department_resource do
+            pre_load do |proxy|
+              proxy.scope.object[:conditions][:id] = 2
+            end
+          end
+        end
+
+        it 'is respected' do
+          render
+          expect(ids_for('departments')).to match_array([2])
+        end
+      end
+    end
+
+    context 'via has_one' do
+      let(:bio_resource) do
+        Class.new(PORO::BioResource) do
+          self.model = PORO::Bio
+          attribute :employee_id, :integer, only: [:filterable]
+
+          def base_scope
+            { type: :bios }
+          end
+        end
+      end
+
+      before do
+        resource.has_one :bio, resource: bio_resource
+        params[:include] = 'bio'
+      end
+
+      it 'works' do
+        render
+        expect(ids_for('bios')).to match_array([1])
+      end
+
+      context 'and params customization' do
+        before do
+          resource.has_one :bio, resource: bio_resource do
+            params do |hash|
+              hash[:filter][:id] = 2
+            end
+          end
+        end
+
+        it 'is respected' do
+          render
+          expect(ids_for('bios')).to match_array([2])
+        end
+      end
+
+      context 'and pre_load customization' do
+        before do
+          resource.has_one :bio, resource: bio_resource do
+            pre_load do |proxy|
+              proxy.scope.object[:conditions][:id] = 2
+            end
+          end
+        end
+
+        it 'is respected' do
+          render
+          expect(ids_for('bios')).to match_array([2])
+        end
+      end
     end
   end
 
