@@ -1,7 +1,6 @@
 RSpec.shared_context 'resource testing' do |parameter|
   let(:resource)     { described_class.new }
   let(:params)       { {} }
-  let(:base_scope)   { double('please define base_scope in your test') }
 
   class TestRunner < JsonapiCompliable::Runner
     def current_user
@@ -16,7 +15,7 @@ RSpec.shared_context 'resource testing' do |parameter|
   # end
   def render(runtime_options = {})
     ctx = TestRunner.new(resource, params)
-    proxy = ctx.proxy(base_scope)
+    proxy = defined?(base_scope) ? ctx.proxy(base_scope) : ctx.proxy
     json = ctx.render_jsonapi(proxy, runtime_options)
     response.body = json
     json

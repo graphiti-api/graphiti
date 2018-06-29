@@ -59,6 +59,23 @@ module JsonapiCompliable
       end
     end
 
+    class PolymorphicChildNotFound < Base
+      def initialize(resource_class, model)
+        @resource_class = resource_class
+        @model = model
+      end
+
+      def message
+        <<-MSG
+#{@resource_class}: Tried to find subclass with model #{@model.class}, but nothing found!
+
+Make sure all your child classes are assigned and associated to the right models:
+
+self.polymorphic = ['Array', 'Of', 'Child', 'Resource', 'Classes']
+        MSG
+      end
+    end
+
     class ValidationError < Base
       attr_reader :validation_response
 

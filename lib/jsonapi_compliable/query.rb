@@ -54,7 +54,7 @@ module JsonapiCompliable
       @sideloads ||= begin
         {}.tap do |hash|
           include_hash.each_pair do |key, sub_hash|
-            sideload = @resource.class.sideloads[key]
+            sideload = @resource.class.sideload(key)
             if sideload
               hash[key] = Query.new(sideload.resource, @params, key, sub_hash)
             else

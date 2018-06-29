@@ -46,7 +46,7 @@ module JsonapiCompliable
     # Not one derived through the usual jsonapi-rb logic
     def assign_serializer(records)
       records.each do |r|
-        serializer = @resource.class.serializer
+        serializer = @resource.serializer_for(r)
         r.instance_variable_set(:@__serializer_klass, serializer)
       end
     end

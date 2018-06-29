@@ -15,6 +15,11 @@ module JsonapiCompliable
           end
         end
 
+        def polymorphic=(klasses)
+          super
+          send(:prepend, Polymorphism)
+        end
+
         def type=(val)
           if val = super
             self.serializer.type(val)
@@ -42,6 +47,8 @@ module JsonapiCompliable
         class_attribute :adapter,
           :model,
           :type,
+          :polymorphic,
+          :polymorphic_child,
           :serializer,
           :default_page_size,
           :default_sort,

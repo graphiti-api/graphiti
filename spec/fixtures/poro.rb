@@ -9,7 +9,10 @@ module PORO
             departments: [],
             bios: [],
             team_memberships: [],
-            teams: []
+            teams: [],
+            visas: [],
+            mastercards: [],
+            visa_rewards: []
           }
       end
 
@@ -25,14 +28,20 @@ module PORO
           positions: PORO::Position,
           departments: PORO::Department,
           bios: PORO::Bio,
-          teams: PORO::Team
+          teams: PORO::Team,
+          visas: PORO::Visa,
+          mastercards: PORO::Mastercard,
+          visa_rewards: PORO::VisaReward
         }
       end
 
       def all(params)
         type = params[:type]
-        return [] unless data[type]
-        records = data[type].map { |attrs| klasses[type].new(attrs) }
+        records = data.select { |k,v| Array(type).include?(k) }
+        return [] unless records
+        records = records.map do |type, _records|
+          _records.map { |attrs| klasses[type].new(attrs) }
+        end.flatten
         records = apply_filtering(records, params)
         records = apply_sorting(records, params)
         records = apply_pagination(records, params)
@@ -149,6 +158,26 @@ module PORO
     attr_accessor :name, :team_memberships
   end
 
+  class CreditCard < Base
+    attr_accessor :number, :description
+  end
+
+  class Visa < CreditCard
+    attr_accessor :visa_rewards
+
+    def initialize(*)
+      super
+      @visa_rewards ||= []
+    end
+  end
+
+  class Mastercard < CreditCard
+  end
+
+  class VisaReward < Base
+    attr_accessor :visa_id, :points
+  end
+
   class Adapter < JsonapiCompliable::Adapters::Null
     def order(scope, att, dir)
       scope[:sort] ||= []
@@ -240,6 +269,43 @@ module PORO
   end
 
   class TeamResource < ApplicationResource
+  end
+
+  class CreditCardResource < ApplicationResource
+    self.polymorphic = %w(PORO::VisaResource PORO::MastercardResource)
+
+    def base_scope
+      { type: [:visas, :mastercards] }
+    end
+
+    attribute :number, :integer
+    attribute :description, :string
+  end
+
+  class VisaResource < CreditCardResource
+    attribute :description, :string do
+      'visa description'
+    end
+    attribute :visa_only_attr, :string do
+      'visa only'
+    end
+
+    has_many :visa_rewards
+  end
+
+  class MastercardResource < CreditCardResource
+    attribute :description, :string do
+      'mastercard description'
+    end
+  end
+
+  class VisaRewardResource < ApplicationResource
+    attribute :visa_id, :integer, only: [:filterable]
+    attribute :points, :integer
+
+    def base_scope
+      { type: :visa_rewards }
+    end
   end
 
   class ApplicationSerializer < JSONAPI::Serializable::Resource

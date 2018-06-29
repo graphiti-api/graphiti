@@ -10,6 +10,10 @@ module JsonapiCompliable
       yield scope
     end
 
+    def serializer_for(model)
+      serializer
+    end
+
     def with_context(object, namespace = nil)
       JsonapiCompliable.with_context(object, namespace) do
         yield
@@ -25,7 +29,7 @@ module JsonapiCompliable
     end
 
     # external facing; does not accept internal-specific options
-    def self.all(params, base_scope = nil)
+    def self.all(params = {}, base_scope = nil)
       _all(params, {}, base_scope)
     end
 
