@@ -7,7 +7,9 @@ module JsonapiCompliable
       :resource_class,
       :parent_resource_class,
       :foreign_key,
-      :primary_key
+      :primary_key,
+      :parent,
+      :group_name
 
     class_attribute :scope_proc,
       :assign_proc,
@@ -25,6 +27,15 @@ module JsonapiCompliable
       @base_scope            = opts[:base_scope]
       @readable              = opts[:readable]
       @writable              = opts[:writable]
+      @as                    = opts[:as]
+
+      # polymorphic-specific
+      @group_name            = opts[:group_name]
+      @polymorphic_child     = opts[:polymorphic_child]
+      @parent                = opts[:parent]
+      if polymorphic_child?
+        parent.resource.polymorphic << resource_class
+      end
     end
 
     def self.scope(&blk)
@@ -55,12 +66,20 @@ module JsonapiCompliable
       !!@writable
     end
 
+    def polymorphic_child?
+      !!@polymorphic_child
+    end
+
     def primary_key
       @primary_key ||= :id
     end
 
     def foreign_key
       @foreign_key ||= infer_foreign_key
+    end
+
+    def association_name
+      @as || name
     end
 
     def resource_class
@@ -178,6 +197,10 @@ module JsonapiCompliable
       end
     end
 
+    def associate(parent, child)
+      parent_resource.associate(parent, child, association_name, type)
+    end
+
     private
 
     def load_options(parents, query)
@@ -190,12 +213,9 @@ module JsonapiCompliable
       end
     end
 
-    def associate(parent, child)
-      parent_resource.associate(parent, child, name, type)
-    end
 
     def disassociate(parent, child)
-      parent_resource.disassociate(parent, child, name, type)
+      parent_resource.disassociate(parent, child, association_name, type)
     end
 
     def fire_assign_each(parent, children)
@@ -232,6 +252,7 @@ module JsonapiCompliable
       namespace = namespace_for(parent_resource.class)
       inferred_name = "#{name.to_s.singularize.classify}Resource"
       klass = "#{namespace}::#{inferred_name}".safe_constantize
+      klass ||= inferred_name.safe_constantize
       unless klass
         raise Errors::ResourceNotFound.new(parent_resource, name)
       end

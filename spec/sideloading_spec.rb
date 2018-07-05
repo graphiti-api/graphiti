@@ -272,6 +272,148 @@ RSpec.describe 'sideloading' do
     end
   end
 
+  describe 'polymorphic_belongs_to macro' do
+    let!(:visa) { PORO::Visa.create }
+    let!(:mastercard) { PORO::Mastercard.create }
+    let!(:employee2) do
+      PORO::Employee.create credit_card_type: 'Mastercard',
+          credit_card_id: mastercard.id
+    end
+
+    before do
+      employee.update_attributes credit_card_type: 'Visa',
+        credit_card_id: visa.id
+      params[:include] = 'credit_card'
+    end
+
+    def credit_card(index)
+      json['data'][index]['relationships']['credit_card']['data']
+    end
+
+    def included(index)
+      json['included'][index]
+    end
+
+    def assert_correct_response
+      expect(credit_card(0)).to eq({
+        'type' => 'visas', 'id' => '1'
+      })
+      expect(credit_card(1)).to eq({
+        'type' => 'mastercards', 'id' => '1'
+      })
+      expect(included(0)['type']).to eq('visas')
+      expect(included(0)['relationships']).to eq({
+        'visa_rewards' => { 'meta' => { 'included' => false } }
+      })
+      expect(included(1)['type']).to eq('mastercards')
+      expect(included(1)).to_not have_key('relationships')
+    end
+
+    context 'when defaults' do
+      before do
+        resource.polymorphic_belongs_to :credit_card do
+          group_by(:credit_card_type) do
+            on(:Visa)
+            on(:Mastercard)
+          end
+        end
+      end
+
+      it 'works' do
+        render
+        assert_correct_response
+      end
+
+      it 'does not register children on the resource, but the parent sideload' do
+        expect(resource.sideloads).to_not have_key(:visa)
+        expect(resource.sideloads[:credit_card].children[:visa])
+          .to be_a(JsonapiCompliable::Sideload::BelongsTo)
+      end
+
+      it 'creates child sideloads correctly' do
+        sl = resource.sideloads[:credit_card]
+        children = sl.children.values
+        expect(children.map(&:group_name)).to match_array([:Visa, :Mastercard])
+        expect(children).to all(be_polymorphic_child)
+        expect(children.map(&:parent)).to all(eq(sl))
+      end
+
+      it 'creates a polymorphic, abstract resource' do
+        sl = resource.sideload(:credit_card)
+        expect(sl.resource).to be_polymorphic
+        expect(sl.resource.class).to be_abstract_class
+        expect(sl.resource.polymorphic).to match_array([
+          sl.children[:visa].resource_class,
+          sl.children[:mastercard].resource_class
+        ])
+      end
+    end
+
+    context 'when custom class is specified' do
+      let(:custom) { Class.new(JsonapiCompliable::Sideload) }
+
+      it 'is used' do
+        sl = resource.polymorphic_belongs_to :credit_card, class: custom
+        expect(sl).to be_a(custom)
+      end
+    end
+
+    context 'when adapter class is specified' do
+      let(:custom) { Class.new(JsonapiCompliable::Sideload) }
+
+      it 'is used' do
+        expect(resource.adapter).to receive(:sideloading_classes)
+          .and_return(polymorphic_belongs_to: custom)
+        sl = resource.polymorphic_belongs_to :credit_card
+        expect(sl).to be_a(custom)
+      end
+    end
+
+    context 'when custom FK' do
+      before do
+        resource.polymorphic_belongs_to :credit_card, foreign_key: :cc_id do
+          group_by(:credit_card_type) do
+            on(:Visa)
+            on(:Mastercard)
+          end
+        end
+
+        employee.update_attributes(cc_id: visa.id, credit_card_id: nil)
+        employee2.update_attributes(cc_id: mastercard.id, credit_card_id: nil)
+      end
+
+      it 'is respected' do
+        render
+        assert_correct_response
+      end
+    end
+
+    context 'when customized child relationship' do
+      let(:special_visa_resource) do
+        Class.new(PORO::VisaResource) do
+          self.type = :special_visas
+        end
+      end
+
+      before do
+        _resource = special_visa_resource
+        resource.polymorphic_belongs_to :credit_card do
+          group_by(:credit_card_type) do
+            on(:Visa).belongs_to :visa, resource: _resource
+            on(:Mastercard)
+          end
+        end
+      end
+
+      it 'is respected' do
+        render
+        expect(credit_card(0)).to eq({
+          'type' => 'special_visas', 'id' => '1'
+        })
+      end
+    end
+  end
+
   context 'when the associated resource has default pagination' do
     before do
       resource.class_eval do

@@ -1,3 +1,5 @@
+# For "Rails STI" behavior
+# CreditCard.all # => [<Visa>, <Mastercard>, etc]
 module JsonapiCompliable
   class Resource
     module Polymorphism
@@ -6,8 +8,12 @@ module JsonapiCompliable
       end
 
       def serializer_for(model)
-        child = self.class.resource_for_model(model)
-        child.serializer
+        if polymorphic_child?
+          serializer
+        else
+          child = self.class.resource_for_model(model)
+          child.serializer
+        end
       end
 
       def associate(parent, child, association_name, type)
@@ -28,7 +34,7 @@ module JsonapiCompliable
 
         def sideload(name)
           sl = super
-          if sl.nil?
+          if !polymorphic_child? && sl.nil?
             children.each do |c|
               break if sl = c.sideloads[name]
             end

@@ -15,13 +15,17 @@ class JsonapiCompliable::Sideload::BelongsTo < JsonapiCompliable::Sideload
   end
 
   def associate(parent, child)
-    parent_resource.associate(parent, child, name, type)
+    parent_resource.associate(parent, child, association_name, type)
   end
 
   def infer_foreign_key
-    model = resource.model
-    namespace = namespace_for(model)
-    model_name = model.name.gsub("#{namespace}::", '')
-    :"#{model_name.underscore}_id"
+    if polymorphic_child?
+      parent.foreign_key
+    else
+      model = resource.model
+      namespace = namespace_for(model)
+      model_name = model.name.gsub("#{namespace}::", '')
+      :"#{model_name.underscore}_id"
+    end
   end
 end

@@ -22,6 +22,10 @@ module JsonapiCompliable
       to_a
     end
 
+    def [](val)
+      data[val]
+    end
+
     def to_a
       records = @scope.resolve
       if records.empty? && raise_on_missing?

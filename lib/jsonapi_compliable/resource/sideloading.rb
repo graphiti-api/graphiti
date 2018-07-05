@@ -13,8 +13,12 @@ module JsonapiCompliable
           relationship_option(opts, :readable)
           relationship_option(opts, :writable)
           sideload = klass.new(name, opts)
-          config[:sideloads][name] = sideload
-          apply_sideloads_to_serializer
+          if parent = opts[:parent]
+            parent.children[name] = sideload
+          else
+            config[:sideloads][name] = sideload
+            apply_sideloads_to_serializer
+          end
           sideload
         end
 
@@ -43,6 +47,17 @@ module JsonapiCompliable
 
         def many_to_many(name, opts = {}, &blk)
           opts[:class] = adapter.sideloading_classes[:many_to_many]
+          allow_sideload(name, opts, &blk)
+        end
+
+        def polymorphic_belongs_to(name, opts = {}, &blk)
+          opts[:resource] ||= Class.new(::JsonapiCompliable::Resource) do
+            self.polymorphic = []
+            self.abstract_class = true
+          end
+          # adapters *probably* don't need to override this, but it's allowed
+          opts[:class] ||= adapter.sideloading_classes[:polymorphic_belongs_to]
+          opts[:class] ||= ::JsonapiCompliable::Sideload::PolymorphicBelongsTo
           allow_sideload(name, opts, &blk)
         end
 

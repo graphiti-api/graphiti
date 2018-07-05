@@ -4,7 +4,7 @@ module JsonapiCompliable
       module Inferrence
         def infer_foreign_key
           parent_model = parent_resource_class.model
-          parent_model.reflections[name.to_s].foreign_key.to_sym
+          parent_model.reflections[association_name.to_s].foreign_key.to_sym
         end
       end
     end

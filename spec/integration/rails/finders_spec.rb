@@ -12,8 +12,16 @@ if ENV['APPRAISAL_INITIALIZED']
       end
     end
 
-    let!(:author1) { Legacy::Author.create!(first_name: 'Stephen', state: state, organization: org1) }
-    let!(:author2) { Legacy::Author.create!(first_name: 'George') }
+    let!(:author1) do
+      Legacy::Author.create! first_name: 'Stephen',
+        state: state,
+        organization: org1,
+        dwelling: house
+    end
+    let!(:author2) do
+      Legacy::Author.create! first_name: 'George',
+        dwelling: condo
+    end
     let!(:book1)   { Legacy::Book.create!(author: author1, genre: genre, title: 'The Shining') }
     let!(:book2)   { Legacy::Book.create!(author: author1, genre: genre, title: 'The Stand') }
     let!(:state)   { Legacy::State.create!(name: 'Maine') }
@@ -23,6 +31,8 @@ if ENV['APPRAISAL_INITIALIZED']
     let!(:genre)   { Legacy::Genre.create!(name: 'Horror') }
     let!(:hobby1)  { Legacy::Hobby.create!(name: 'Fishing', authors: [author1]) }
     let!(:hobby2)  { Legacy::Hobby.create!(name: 'Woodworking', authors: [author1, author2]) }
+    let!(:house)   { Legacy::House.new(name: 'Cozy', state: state) }
+    let!(:condo)   { Legacy::Condo.new(name: 'Modern') }
 
     def ids_for(type)
       json_includes(type).map { |i| i['id'].to_i }
@@ -383,58 +393,59 @@ if ENV['APPRAISAL_INITIALIZED']
       end
     end
 
-    #context 'sideloading polymorphic belongs_to' do
-      #it 'allows extra fields for the sideloaded resource' do
-        #get :index, params: {
-          #include: 'dwelling',
-          #extra_fields: { houses: 'house_price', condos: 'condo_price' }
-        #}
-        #house = json_includes('houses')[0]['attributes']
-        #expect(house['name']).to be_present
-        #expect(house['house_description']).to be_present
-        #expect(house['house_price']).to eq(1_000_000)
-        #condo = json_includes('condos')[0]['attributes']
-        #expect(condo['name']).to be_present
-        #expect(condo['condo_description']).to be_present
-        #expect(condo['condo_price']).to eq(500_000)
-      #end
+    context 'sideloading polymorphic belongs_to' do
+      it 'allows extra fields for the sideloaded resource' do
+        get :index, params: {
+          include: 'dwelling',
+          extra_fields: { houses: 'house_price', condos: 'condo_price' }
+        }
+        house = json_includes('houses')[0]['attributes']
+        expect(house['name']).to be_present
+        expect(house['house_description']).to be_present
+        expect(house['house_price']).to eq(1_000_000)
+        condo = json_includes('condos')[0]['attributes']
+        expect(condo['name']).to be_present
+        expect(condo['condo_description']).to be_present
+        expect(condo['condo_price']).to eq(500_000)
+      end
 
-      #it 'allows sparse fieldsets for the sideloaded resource' do
-        #get :index, params: {
-          #include: 'dwelling',
-          #fields: { houses: 'name', condos: 'condo_description' }
-        #}
-        #house = json_includes('houses')[0]['attributes']
-        #expect(house['name']).to be_present
-        #expect(house).to_not have_key('house_description')
-        #expect(house).to_not have_key('house_price')
-        #condo = json_includes('condos')[0]['attributes']
-        #expect(condo['condo_description']).to be_present
-        #expect(condo).to_not have_key('name')
-        #expect(condo).to_not have_key('condo_price')
-      #end
+      it 'allows sparse fieldsets for the sideloaded resource' do
+        get :index, params: {
+          include: 'dwelling',
+          fields: { houses: 'name', condos: 'condo_description' }
+        }
+        house = json_includes('houses')[0]['attributes']
+        expect(house['name']).to be_present
+        expect(house).to_not have_key('house_description')
+        expect(house).to_not have_key('house_price')
+        condo = json_includes('condos')[0]['attributes']
+        expect(condo['condo_description']).to be_present
+        expect(condo).to_not have_key('name')
+        expect(condo).to_not have_key('condo_price')
+      end
 
-      #it 'allows extra fields and sparse fieldsets for the sideloaded resource' do
-        #get :index, params: {
-          #include: 'dwelling',
-          #fields: { houses: 'name', condos: 'condo_description' },
-          #extra_fields: { houses: 'house_price', condos: 'condo_price' }
-        #}
-        #house = json_includes('houses')[0]['attributes']
-        #condo = json_includes('condos')[0]['attributes']
-        #expect(house).to have_key('name')
-        #expect(house).to have_key('house_price')
-        #expect(house).to_not have_key('house_description')
-        #expect(condo).to have_key('condo_description')
-        #expect(condo).to have_key('condo_price')
-        #expect(condo).to_not have_key('name')
-      #end
+      it 'allows extra fields and sparse fieldsets for the sideloaded resource' do
+        get :index, params: {
+          include: 'dwelling',
+          fields: { houses: 'name', condos: 'condo_description' },
+          extra_fields: { houses: 'house_price', condos: 'condo_price' }
+        }
+        house = json_includes('houses')[0]['attributes']
+        condo = json_includes('condos')[0]['attributes']
+        expect(house).to have_key('name')
+        expect(house).to have_key('house_price')
+        expect(house).to_not have_key('house_description')
+        expect(condo).to have_key('condo_description')
+        expect(condo).to have_key('condo_price')
+        expect(condo).to_not have_key('name')
+      end
 
-      #it 'allows additional levels of nesting' do
-        #get :index, params: { include: 'dwelling.state' }
-        #expect(json_includes('states').length).to eq(1)
-      #end
-    #end
+      # NB: Condo does NOT have a state relationship
+      it 'allows additional levels of nesting' do
+        get :index, params: { include: 'dwelling.state' }
+        expect(json_includes('states').length).to eq(1)
+      end
+    end
 
     context 'when overriding the resource' do
       before do

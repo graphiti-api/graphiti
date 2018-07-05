@@ -71,7 +71,7 @@ module JsonapiCompliable
 
 Make sure all your child classes are assigned and associated to the right models:
 
-self.polymorphic = ['Array', 'Of', 'Child', 'Resource', 'Classes']
+self.polymorphic = ['Subclass1Resource', 'Subclass2Resource']
         MSG
       end
     end
@@ -110,6 +110,28 @@ Manually set model (self.model = MyModel) if it does not match name of the Resou
 Could not find type #{@type.inspect}! This was specified on attribute #{@attribute.inspect} within resource #{@resource.name}
 
 Valid types are: #{JsonapiCompliable::Types.map.keys.inspect}
+        MSG
+      end
+    end
+
+    class PolymorphicChildNotFound < Base
+      def initialize(sideload, name)
+        @sideload = sideload
+        @name = name
+      end
+
+      def message
+        <<-MSG
+#{@sideload.parent_resource}: Found record with #{@sideload.grouper.column_name.inspect} == #{@name.inspect}, which is not registered!
+
+Register the behavior of different types like so:
+
+polymorphic_belongs_to #{@sideload.name.inspect} do
+  group_by(#{@sideload.grouper.column_name.inspect}) do
+    on(#{@name.to_sym.inspect}) <---- this is what's missing
+    on(:foo).belongs_to :foo, resource: FooResource (long-hand example)
+  end
+end
         MSG
       end
     end

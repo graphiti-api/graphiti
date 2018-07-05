@@ -30,15 +30,14 @@ ActiveRecord::Schema.define(:version => 1) do
     t.string :name
   end
 
-  #create_table :condos do |t|
-    #t.integer :state_id
-    #t.string :name
-  #end
+  create_table :condos do |t|
+    t.string :name
+  end
 
-  #create_table :houses do |t|
-    #t.integer :state_id
-    #t.string :name
-  #end
+  create_table :houses do |t|
+    t.integer :state_id
+    t.string :name
+  end
 
   create_table :bios do |t|
     t.integer :author_id
@@ -84,7 +83,7 @@ module Legacy
   end
 
   class Author < ApplicationRecord
-    #belongs_to :dwelling, polymorphic: true
+    belongs_to :dwelling, polymorphic: true
     belongs_to :state
     belongs_to :organization
     has_many :books
@@ -98,15 +97,14 @@ module Legacy
     has_many :children, class_name: 'Organization', foreign_key: :parent_id
   end
 
-  #class Condo < LegacyApplicationRecord
-    #has_many :authors, as: :dwelling
-    #belongs_to :state
-  #end
+  class Condo < ApplicationRecord
+    has_many :authors, as: :dwelling
+  end
 
-  #class House < LegacyApplicationRecord
-    #has_many :authors, as: :dwelling
-    #belongs_to :state
-  #end
+  class House < ApplicationRecord
+    has_many :authors, as: :dwelling
+    belongs_to :state
+  end
 
   class AuthorHobby < ApplicationRecord
     belongs_to :author
@@ -143,47 +141,6 @@ module Legacy
 
   class LegacyApplicationSerializer < JSONAPI::Serializable::Resource
   end
-
-  #class SerializableDwelling < LegacySerializableAbstract
-    #type 'dwellings'
-
-    #attribute :name
-  #end
-
-  #class SerializableCondo < SerializableDwelling
-    #type 'condos'
-
-    #attribute :condo_description do
-      #'condo desc'
-    #end
-
-    #extra_attribute :condo_price do
-      #500_000
-    #end
-
-    #belongs_to :state
-  #end
-
-  #class SerializableHouse < SerializableDwelling
-    #type 'houses'
-
-    #attribute :house_description do
-      #'house desc'
-    #end
-
-    #extra_attribute :house_price do
-      #1_000_000
-    #end
-
-    #belongs_to :state
-  #end
-
-  #class SerializableTag < LegacySerializableAbstract
-    #type 'tags'
-
-    #attribute :name
-    #belongs_to :book
-  #end
 
   class ApplicationResource < JsonapiCompliable::Resource
     self.adapter = JsonapiCompliable::Adapters::ActiveRecord::Base.new
@@ -254,6 +211,32 @@ module Legacy
     end
   end
 
+  class HouseResource < ApplicationResource
+    attribute :name, :string
+
+    attribute :house_description, :string do
+      'house desc'
+    end
+
+    extra_attribute :house_price, :integer do
+      1_000_000
+    end
+
+    belongs_to :state
+  end
+
+  class CondoResource < ApplicationResource
+    attribute :name, :string
+
+    attribute :condo_description, :string do
+      'condo desc'
+    end
+
+    extra_attribute :condo_price, :integer do
+      500_000
+    end
+  end
+
   class OrganizationResource < ApplicationResource
     attribute :parent_id, :integer, only: [:filterable]
     attribute :name, :string
@@ -275,5 +258,12 @@ module Legacy
     belongs_to :organization
     has_one :bio
     many_to_many :hobbies
+
+    polymorphic_belongs_to :dwelling do
+      group_by(:dwelling_type) do
+        on(:"Legacy::House")
+        on(:"Legacy::Condo")
+      end
+    end
   end
 end

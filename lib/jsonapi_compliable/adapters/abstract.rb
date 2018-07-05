@@ -273,7 +273,8 @@ module JsonapiCompliable
           has_many: ::JsonapiCompliable::Sideload::HasMany,
           belongs_to: ::JsonapiCompliable::Sideload::BelongsTo,
           has_one: ::JsonapiCompliable::Sideload::HasOne,
-          many_to_many: ::JsonapiCompliable::Sideload::ManyToMany
+          many_to_many: ::JsonapiCompliable::Sideload::ManyToMany,
+          polymorphic_belongs_to: ::JsonapiCompliable::Sideload::PolymorphicBelongsTo
         }
       end
 

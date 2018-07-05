@@ -16,6 +16,13 @@ RSpec.describe JsonapiCompliable::Sideload::BelongsTo do
   let(:name) { :employee }
   let(:instance) { described_class.new(name, opts) }
 
+  describe "initialize" do
+    it 'accepts group name (for polymorphic children)' do
+      opts[:group_name] = :mygroup
+      expect(instance.group_name).to eq(:mygroup)
+    end
+  end
+
   describe '#assign_each' do
     let!(:position) { PORO::Position.new(id: 1, employee_id: 2) }
     let!(:employee1) { PORO::Position.new(id: 1) }
@@ -54,6 +61,18 @@ RSpec.describe JsonapiCompliable::Sideload::BelongsTo do
       instance.send(:associate, position, employee)
       expect(position.employee).to eq(employee)
     end
+
+    context 'when given :as option' do
+      before do
+        opts[:as] = :blah
+      end
+
+      it 'uses that as the association name' do
+        expect(instance.parent_resource).to receive(:associate)
+          .with(position, employee, :blah, :belongs_to)
+        instance.send(:associate, position, employee)
+      end
+    end
   end
 
   describe 'infer_foreign_key' do
@@ -80,6 +99,17 @@ RSpec.describe JsonapiCompliable::Sideload::BelongsTo do
       end
 
       it { is_expected.to eq(:bar_foo_id) }
+    end
+
+    context 'when a polymorphic child' do
+      let(:parent) { double(foreign_key: :from_parent_id) }
+
+      before do
+        allow(instance).to receive(:polymorphic_child?) { true }
+        allow(instance).to receive(:parent) { parent }
+      end
+
+      it { is_expected.to eq(:from_parent_id) }
     end
   end
 

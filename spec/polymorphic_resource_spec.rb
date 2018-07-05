@@ -1,13 +1,28 @@
 require 'spec_helper'
 
 RSpec.describe 'polymorphic resources' do
-  let(:klass) { Class.new(PORO::CreditCardResource) }
+  # Inheriting causes us to think this class is a polymorphic
+  # child. Let it know this is not so, we just want a subclass for testing
+  let(:klass) do
+    Class.new(PORO::CreditCardResource) do
+      self.polymorphic_child = false
+    end
+  end
   let(:instance) { klass.new }
 
   describe '#serializer_for' do
     it 'returns the serializer of the child resource associated to the given model' do
       expect(instance.serializer_for(PORO::Visa.new))
         .to eq(PORO::VisaResource.serializer)
+    end
+
+    context 'when a polymorphic child' do
+      let(:child) { Class.new(klass) }
+
+      it 'uses the child serializer' do
+        expect(child.new.serializer_for(PORO::Visa.new))
+          .to eq(child.serializer)
+      end
     end
 
     context 'when resource not found' do
@@ -36,6 +51,19 @@ RSpec.describe 'polymorphic resources' do
 
       it 'does nothing' do
         expect(associate).to be_nil
+      end
+    end
+  end
+
+  describe '.sideload' do
+    it 'scans children' do
+      expect(klass.sideload(:visa_rewards))
+        .to eq(PORO::VisaResource.sideload(:visa_rewards))
+    end
+
+    context 'when a child' do
+      it 'does not scan other children' do
+        expect(Class.new(klass).sideload(:visa_rewards)).to be_nil
       end
     end
   end

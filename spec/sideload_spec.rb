@@ -65,6 +65,17 @@ RSpec.describe JsonapiCompliable::Sideload do
       expect(instance.resource_class).to eq(PORO::PositionResource)
     end
 
+    context 'when no class in that namespace' do
+      before do
+        stub_const('PositionResource', PORO::PositionResource)
+        hide_const('PORO::PositionResource')
+      end
+
+      it 'falls back to non-namespaced' do
+        expect(instance.resource_class).to eq(PositionResource)
+      end
+    end
+
     context 'when not found by inferrence' do
       let(:name) { :foo }
 
@@ -152,6 +163,32 @@ RSpec.describe JsonapiCompliable::Sideload do
 
       it 'derives a to_many foreign key from the resource model' do
         expect(instance.infer_foreign_key).to eq(:sideload_spec_employee_id)
+      end
+    end
+  end
+
+  describe '#associate' do
+    before do
+      opts[:type] = :has_many
+    end
+
+    it 'delegates to parent resource' do
+      parent, child = 'a', 'b'
+      expect(instance.parent_resource).to receive(:associate)
+        .with(parent, child, :foo, :has_many)
+      instance.associate(parent, child)
+    end
+
+    context 'when given the :as option' do
+      before do
+        opts[:as] = :bar
+      end
+
+      it 'is passed as the association name' do
+        parent, child = 'a', 'b'
+        expect(instance.parent_resource).to receive(:associate)
+          .with(parent, child, :bar, :has_many)
+        instance.associate(parent, child)
       end
     end
   end
@@ -266,6 +303,23 @@ RSpec.describe JsonapiCompliable::Sideload do
       hash = {}
       instance.pre_load_proc.call(hash)
       expect(hash).to eq(foo: 'bar')
+    end
+  end
+
+
+  describe '#association_name' do
+    it 'defaults to name' do
+      expect(instance.association_name).to eq(:foo)
+    end
+
+    context 'when given :as option' do
+      before do
+        opts[:as] = :bar
+      end
+
+      it 'uses the option' do
+        expect(instance.association_name).to eq(:bar)
+      end
     end
   end
 

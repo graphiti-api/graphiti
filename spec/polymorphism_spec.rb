@@ -4,34 +4,51 @@ RSpec.describe 'polymorphic resource behavior' do
   include JsonHelpers
   include_context 'resource testing'
 
-  let(:resource) { Class.new(PORO::CreditCardResource) }
+  # Inheriting causes us to think this class is a polymorphic
+  # child. Let it know this is not so, we just want a subclass for testing
+  let(:resource) do
+    Class.new(PORO::CreditCardResource) do
+      self.polymorphic_child = false
+    end
+  end
 
   let!(:visa) { PORO::Visa.create(number: 123) }
   let!(:mastercard) { PORO::Mastercard.create(number: 456) }
 
   describe 'querying' do
-    it 'uses superclass' do
-      records = resource.all.to_a
-      expect(records[0]).to be_a(PORO::Visa)
-      expect(records[1]).to be_a(PORO::Mastercard)
-      expect(records.map(&:id)).to eq([1, 1])
-    end
-
-    context 'when unknown model returned' do
-      around do |e|
-        original = PORO::CreditCardResource.polymorphic
-        PORO::CreditCardResource.polymorphic = []
-        begin
-          e.run
-        ensure
-          PORO::CreditCardResource.polymorphic = original
-        end
+    context 'via superclass' do
+      it 'works' do
+        records = resource.all.to_a
+        expect(records[0]).to be_a(PORO::Visa)
+        expect(records[1]).to be_a(PORO::Mastercard)
+        expect(records.map(&:id)).to eq([1, 1])
       end
 
-      it 'raises helpful error' do
-        expect {
-          resource.all.to_a
-        }.to raise_error(JsonapiCompliable::Errors::PolymorphicChildNotFound)
+      context 'when unknown model returned' do
+        around do |e|
+          original = PORO::CreditCardResource.polymorphic
+          PORO::CreditCardResource.polymorphic = []
+          begin
+            e.run
+          ensure
+            PORO::CreditCardResource.polymorphic = original
+          end
+        end
+
+        it 'raises helpful error' do
+          expect {
+            resource.all.to_a
+          }.to raise_error(JsonapiCompliable::Errors::PolymorphicChildNotFound)
+        end
+      end
+    end
+
+    context 'via subclass' do
+      it 'works' do
+        visas = PORO::VisaResource.all
+        expect(visas[0]).to be_a(PORO::Visa)
+        expect(visas[0].id).to eq(visa.id)
+        expect(visas[0].number).to eq(123)
       end
     end
   end

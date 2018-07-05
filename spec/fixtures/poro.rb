@@ -97,7 +97,7 @@ module PORO
     attr_accessor :id
 
     def self.create(attrs = {})
-      id = DB.data[type].length + 1
+      id = attrs[:id] || DB.data[type].length + 1
       attrs = { id: id }.merge(attrs)
       DB.data[type] << attrs
       new(attrs)
@@ -124,7 +124,11 @@ module PORO
       :active,
       :positions,
       :bio,
-      :teams
+      :teams,
+      :credit_card,
+      :credit_card_id,
+      :cc_id,
+      :credit_card_type
 
     def initialize(*)
       super
@@ -290,12 +294,20 @@ module PORO
       'visa only'
     end
 
+    def base_scope
+      { type: :visas }
+    end
+
     has_many :visa_rewards
   end
 
   class MastercardResource < CreditCardResource
     attribute :description, :string do
       'mastercard description'
+    end
+
+    def base_scope
+      { type: :mastercards }
     end
   end
 
