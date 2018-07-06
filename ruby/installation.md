@@ -15,13 +15,7 @@ To generate a new application with the template:
 $ rails new myapp --api -m https://raw.githubusercontent.com/jsonapi-suite/rails_template/master/all.rb
 {% endhighlight %}
 
-To run the same generator on an *existing* application:
-
-{% highlight bash %}
-$ rails app:template LOCATION=https://raw.githubusercontent.com/jsonapi-suite/rails_template/master/all.rb
-{% endhighlight %}
-
-Again, both these commands can be run by downloading `all.rb` and
+If needed, this command can be run by downloading `all.rb` and
 pointing to it on your filesystem:
 
 {% highlight bash %}
