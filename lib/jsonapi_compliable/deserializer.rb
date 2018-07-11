@@ -45,12 +45,17 @@
 #
 #   { type: 'authors', method: :create, temp_id: 'abc123' }
 class JsonapiCompliable::Deserializer
-  # @param payload [Hash] The incoming payload with symbolized keys
-  # @param env [Hash] the Rack env (e.g. +request.env+).
-  def initialize(payload, verb)
+  def initialize(payload)
     @payload = payload
     @payload = @payload[:_jsonapi] if @payload.has_key?(:_jsonapi)
-    @verb = verb
+  end
+
+  def params
+    @payload
+  end
+
+  def action
+    JsonapiCompliable.context[:namespace]
   end
 
   # @return [Hash] the raw :data value of the payload
@@ -87,7 +92,7 @@ class JsonapiCompliable::Deserializer
     {
       type: data[:type],
       temp_id: data[:'temp-id'],
-      method: method
+      method: action
     }
   end
 
@@ -128,14 +133,6 @@ class JsonapiCompliable::Deserializer
 
   def included
     @payload[:included] || []
-  end
-
-  def method
-    case @verb
-      when :post then :create
-      when :put, :patch then :update
-      when :delete then :destroy
-    end
   end
 
   def removed?(relationship_payload)

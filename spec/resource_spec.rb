@@ -847,44 +847,6 @@ RSpec.describe JsonapiCompliable::Resource do
     end
   end
 
-  describe '.filter' do
-    context 'when no corresponding attribute' do
-      it 'raises helpful error' do
-        expect {
-          klass.filter :asdf
-        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add filter attribute :asdf, but could not find an attribute with that name.')
-      end
-    end
-
-    context 'when corresponding but unfilterable attribute' do
-      it 'raises helpful error' do
-        expect {
-          klass.attribute :asdf, :string, filterable: false
-          klass.filter :asdf
-        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add filter attribute :asdf, but the attribute was marked :filterable => false.')
-      end
-    end
-  end
-
-  describe '.sort' do
-    context 'when no corresponding attribute' do
-      it 'raises helpful error' do
-        expect {
-          klass.sort :asdf
-        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort attribute :asdf, but could not find an attribute with that name.')
-      end
-    end
-
-    context 'when corresponding but sortable attribute' do
-      it 'raises helpful error' do
-        expect {
-          klass.attribute :asdf, :string, sortable: false
-          klass.sort :asdf
-        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort attribute :asdf, but the attribute was marked :sortable => false.')
-      end
-    end
-  end
-
   describe 'query methods' do
     before do
       klass.class_eval do
@@ -1104,6 +1066,121 @@ RSpec.describe JsonapiCompliable::Resource do
       it 'returns the attribute' do
         att = instance.get_attr!(:foo, :sortable, request: true)
         expect(att).to eq(klass.attributes[:foo])
+      end
+    end
+  end
+
+  describe '#typecast' do
+    subject(:typecast) { instance.typecast(:foo, value, flag) }
+    let(:value) { '1' }
+
+    before do
+      klass.attribute :foo, :integer
+    end
+
+    context 'when readable' do
+      let(:flag) { :readable }
+
+      context 'and the attribute exists' do
+        it 'works' do
+          expect(JsonapiCompliable::Types[:integer])
+            .to receive(:[]).with(:read).and_call_original
+          expect(typecast).to eq(1)
+        end
+
+        context 'when coercion fails' do
+          let(:value) { {} }
+
+          it 'raises helpful error' do
+            expect {
+              typecast
+            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          end
+        end
+
+        context 'but it is not readable' do
+          before do
+            klass.attributes[:foo][:readable] = false
+          end
+
+          it 'raises helpful error' do
+            expect {
+              typecast
+            }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to read attribute :foo, but the attribute was marked :readable => false.')
+          end
+        end
+      end
+
+      context 'and the attribute does not exist' do
+        before do
+          klass.attributes.delete(:foo)
+        end
+
+        it 'raises helpful error' do
+          expect {
+            typecast
+          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to read attribute :foo, but could not find an attribute with that name.')
+        end
+      end
+    end
+
+    context 'when writable' do
+      let(:flag) { :writable }
+
+      it 'works' do
+        expect(JsonapiCompliable::Types[:integer])
+          .to receive(:[]).with(:write).and_call_original
+        expect(typecast).to eq(1)
+      end
+
+      context 'when coercion fails' do
+        let(:value) { {} }
+
+        it 'raises helpful error' do
+          expect {
+            typecast
+          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+        end
+      end
+    end
+
+    context 'when sortable' do
+      let(:flag) { :sortable }
+
+      it 'works' do
+        expect(JsonapiCompliable::Types[:integer])
+          .to receive(:[]).with(:params).and_call_original
+        expect(typecast).to eq(1)
+      end
+
+      context 'when coercion fails' do
+        let(:value) { {} }
+
+        it 'raises helpful error' do
+          expect {
+            typecast
+          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+        end
+      end
+    end
+
+    context 'when filterable' do
+      let(:flag) { :filterable }
+
+      it 'works' do
+        expect(JsonapiCompliable::Types[:integer])
+          .to receive(:[]).with(:params).and_call_original
+        expect(typecast).to eq(1)
+      end
+
+      context 'when coercion fails' do
+        let(:value) { {} }
+
+        it 'raises helpful error' do
+          expect {
+            typecast
+          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+        end
       end
     end
   end

@@ -60,7 +60,7 @@ RSpec.describe 'filtering' do
         expect {
           params[:filter] = { foo: nil }
           records
-        }.to raise_error(TypeError)
+        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
       end
 
       context 'when cannot coerce' do
@@ -71,7 +71,7 @@ RSpec.describe 'filtering' do
         it 'raises error' do
           expect {
             records
-          }.to raise_error(ArgumentError)
+          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
         end
       end
     end
@@ -95,7 +95,7 @@ RSpec.describe 'filtering' do
         expect {
           params[:filter] = { foo: nil }
           records
-        }.to raise_error(TypeError)
+        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
       end
 
       context 'when cannot coerce' do
@@ -107,7 +107,7 @@ RSpec.describe 'filtering' do
         it 'raises error' do
           expect {
             records
-          }.to raise_error(ArgumentError)
+          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
         end
       end
     end
@@ -131,7 +131,7 @@ RSpec.describe 'filtering' do
         expect {
           params[:filter] = { foo: nil }
           records
-        }.to raise_error(TypeError)
+        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
       end
 
       context 'when cannot coerce' do
@@ -143,7 +143,7 @@ RSpec.describe 'filtering' do
         it 'raises error' do
           expect {
             records
-          }.to raise_error(ArgumentError)
+          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
         end
       end
     end
@@ -181,7 +181,7 @@ RSpec.describe 'filtering' do
         expect {
           params[:filter] = { foo: nil }
           records
-        }.to raise_error(TypeError)
+        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
       end
 
       context 'when cannot coerce' do
@@ -192,7 +192,7 @@ RSpec.describe 'filtering' do
         it 'raises error' do
           expect {
             records
-          }.to raise_error(TypeError)
+          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
         end
       end
     end
@@ -216,7 +216,7 @@ RSpec.describe 'filtering' do
         params[:filter] = { foo: nil }
         expect {
           records
-        }.to raise_error(TypeError)
+        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
       end
 
       context 'when only month' do
@@ -227,7 +227,7 @@ RSpec.describe 'filtering' do
         it 'raises error because that is not a date' do
           expect {
             records
-          }.to raise_error(Dry::Types::ConstraintError)
+          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
         end
       end
 
@@ -239,7 +239,7 @@ RSpec.describe 'filtering' do
         it 'raises error' do
           expect {
             records
-          }.to raise_error(Dry::Types::ConstraintError)
+          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
         end
       end
     end
@@ -270,7 +270,7 @@ RSpec.describe 'filtering' do
         params[:filter] = { foo: nil }
         expect {
           records
-        }.to raise_error(TypeError)
+        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
       end
 
       context 'when cannot coerce' do
@@ -281,7 +281,7 @@ RSpec.describe 'filtering' do
         it 'raises error' do
           expect {
             records
-          }.to raise_error(TypeError)
+          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
         end
       end
     end
@@ -314,13 +314,13 @@ RSpec.describe 'filtering' do
 
       context 'when cannot coerce' do
         before do
-          params[:filter] = 'foo'
+          params[:filter] = { foo: 'bar' }
         end
 
         it 'raises error' do
           expect {
             records
-          }.to raise_error(NoMethodError)
+          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
         end
       end
     end
@@ -346,7 +346,7 @@ RSpec.describe 'filtering' do
         params[:filter] = { foo: 1 }
         expect {
           records
-        }.to raise_error(TypeError)
+        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
       end
 
       context 'when cannot coerce' do
@@ -357,7 +357,7 @@ RSpec.describe 'filtering' do
         it 'raises error' do
           expect {
             records
-          }.to raise_error(TypeError)
+          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
         end
       end
     end
@@ -384,7 +384,7 @@ RSpec.describe 'filtering' do
         params[:filter] = { foo: 1 }
         expect {
           records
-        }.to raise_error(Dry::Types::ConstraintError)
+        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
       end
 
       context 'when cannot coerce' do
@@ -395,7 +395,7 @@ RSpec.describe 'filtering' do
         it 'raises error' do
           expect {
             render
-          }.to raise_error(Dry::Types::ConstraintError)
+          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
         end
       end
     end
@@ -418,6 +418,74 @@ RSpec.describe 'filtering' do
       it 'works' do
         params[:filter] = { foo: '1' }
         assert_filter_value('custom!')
+      end
+    end
+  end
+
+  context 'when custom filtering' do
+    context 'and the attribute exists' do
+      before do
+        _2 = employee2.id
+        resource.attribute :foo, :string
+        resource.filter :foo do |scope, value|
+          scope[:conditions][:id] = _2
+          scope
+        end
+      end
+
+      it 'is correctly applied' do
+        params[:filter] = { foo: 'bar' }
+        expect(records.map(&:id)).to eq([employee2.id])
+      end
+
+      context 'but it is not filterable' do
+        before do
+          resource.attributes[:foo][:filterable] = false
+        end
+
+        it 'raises helpful error' do
+          expect {
+            resource.filter :foo do |scope, dir|
+            end
+          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add filter attribute :foo, but the attribute was marked :filterable => false.')
+        end
+      end
+    end
+
+    context 'and the attribute does not exist' do
+      before do
+        _2 = employee2.id
+        resource.filter :foo, :string do |scope, value|
+          scope[:conditions][:id] = _2
+          scope
+        end
+        params[:filter] = { foo: 'bar' }
+      end
+
+      it 'works' do
+        expect(records.map(&:id)).to eq([employee2.id])
+      end
+
+      it 'adds an only: [:filterable] attribute' do
+        att = resource.attributes[:foo]
+        expect(att[:readable]).to eq(false)
+        expect(att[:writable]).to eq(false)
+        expect(att[:sortable]).to eq(false)
+        expect(att[:filterable]).to eq(true)
+        expect(att[:type]).to eq(:string)
+      end
+
+      context 'when no type given' do
+        before do
+          resource.attributes.delete(:foo)
+        end
+
+        it 'blows up' do
+          expect {
+            resource.filter :foo do
+            end
+          }.to raise_error(JsonapiCompliable::Errors::ImplicitFilterTypeMissing)
+        end
       end
     end
   end

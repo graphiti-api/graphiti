@@ -66,6 +66,10 @@ module JsonapiCompliable
       !!@writable
     end
 
+    def polymorphic_parent?
+      resource.polymorphic?
+    end
+
     def polymorphic_child?
       !!@polymorphic_child
     end
@@ -188,17 +192,21 @@ module JsonapiCompliable
       end
     end
 
-    def self.fire_hooks!(parent, objects, method)
-      return unless self.hooks
+    def fire_hooks!(parent, objects, method)
+      return unless self.class.hooks
 
-      hooks = self.hooks[:"after_#{method}"] + self.hooks[:after_save]
-      hooks.compact.each do |hook|
+      all = self.class.hooks[:"after_#{method}"] + self.class.hooks[:after_save]
+      all.compact.each do |hook|
         resource.instance_exec(parent, objects, &hook)
       end
     end
 
     def associate(parent, child)
       parent_resource.associate(parent, child, association_name, type)
+    end
+
+    def disassociate(parent, child)
+      parent_resource.disassociate(parent, child, association_name, type)
     end
 
     private
@@ -211,11 +219,6 @@ module JsonapiCompliable
           fire_assign(parents, results)
         }
       end
-    end
-
-
-    def disassociate(parent, child)
-      parent_resource.disassociate(parent, child, association_name, type)
     end
 
     def fire_assign_each(parent, children)

@@ -52,10 +52,6 @@ class ApplicationController < ActionController::Base
   include Rails.application.routes.url_helpers
   include JsonapiCompliable::Rails
 
-  jsonapi do
-    self.adapter = JsonapiCompliable::Adapters::ActiveRecord::Base.new
-  end
-
   prepend_before_action :fix_params!
 
   private

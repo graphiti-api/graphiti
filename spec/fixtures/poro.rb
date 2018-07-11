@@ -7,6 +7,7 @@ module PORO
             employees: [],
             positions: [],
             departments: [],
+            classifications: [],
             bios: [],
             team_memberships: [],
             teams: [],
@@ -27,6 +28,7 @@ module PORO
           employees: PORO::Employee,
           positions: PORO::Position,
           departments: PORO::Department,
+          classifications: PORO::Classification,
           bios: PORO::Bio,
           teams: PORO::Team,
           visas: PORO::Visa,
@@ -94,13 +96,19 @@ module PORO
   end
 
   class Base
+    include ActiveModel::Validations
     attr_accessor :id
 
     def self.create(attrs = {})
-      id = attrs[:id] || DB.data[type].length + 1
-      attrs = { id: id }.merge(attrs)
-      DB.data[type] << attrs
-      new(attrs)
+      if (record = new(attrs)).valid?
+        id = attrs[:id] || DB.data[type].length + 1
+        attrs.merge!(id: id)
+        record.id = id
+        DB.data[type] << attrs
+        record
+      else
+        record
+      end
     end
 
     def self.type
@@ -125,6 +133,8 @@ module PORO
       :positions,
       :bio,
       :teams,
+      :classification,
+      :classification_id,
       :credit_card,
       :credit_card_id,
       :cc_id,
@@ -144,6 +154,10 @@ module PORO
       :employee,
       :department_id,
       :department
+  end
+
+  class Classification < Base
+    attr_accessor :description
   end
 
   class Department < Base
@@ -224,6 +238,10 @@ module PORO
       "poro_minimum_#{attr}"
     end
 
+    def create(model, attributes)
+      model.create(attributes)
+    end
+
     def resolve(scope)
       ::PORO::DB.all(scope)
     end
@@ -264,6 +282,9 @@ module PORO
   end
 
   class PositionResource < ApplicationResource
+  end
+
+  class ClassificationResource < ApplicationResource
   end
 
   class DepartmentResource < ApplicationResource

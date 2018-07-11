@@ -32,4 +32,17 @@ RSpec.describe JsonapiCompliable::Sideload::PolymorphicBelongsTo do
       expect(instance.infer_foreign_key).to eq(:foo_id)
     end
   end
+
+  describe '#child_for_type' do
+    let(:child1) { double(resource: double(type: 'foos')) }
+    let(:child2) { double(resource: double(type: 'bars')) }
+
+    before do
+      instance.children = { foo: child1, bar: child2 }
+    end
+
+    it 'returns the child sideload that has a resource with the given type' do
+      expect(instance.child_for_type('bars')).to eq(child2)
+    end
+  end
 end

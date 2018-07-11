@@ -5,6 +5,7 @@ require 'active_support/concern'
 require 'active_support/time'
 
 require 'dry-types'
+require 'jsonapi_errorable'
 
 require 'jsonapi/serializable'
 # Temporary fix until fixed upstream
@@ -49,12 +50,14 @@ end
 
 require "jsonapi_compliable/version"
 require "jsonapi_compliable/configuration"
+require "jsonapi_compliable/context"
 require "jsonapi_compliable/errors"
 require "jsonapi_compliable/types"
 require "jsonapi_compliable/adapters/abstract"
 require "jsonapi_compliable/resource/sideloading"
 require "jsonapi_compliable/resource/configuration"
 require "jsonapi_compliable/resource/dsl"
+require "jsonapi_compliable/resource/interface"
 require "jsonapi_compliable/resource/polymorphism"
 require "jsonapi_compliable/sideload"
 require "jsonapi_compliable/sideload/has_many"
@@ -64,6 +67,7 @@ require "jsonapi_compliable/sideload/many_to_many"
 require "jsonapi_compliable/sideload/polymorphic_belongs_to"
 require "jsonapi_compliable/resource"
 require "jsonapi_compliable/resource_proxy"
+require "jsonapi_compliable/persistence_proxy"
 require "jsonapi_compliable/single_resource_proxy"
 require "jsonapi_compliable/query"
 require "jsonapi_compliable/scope"
@@ -102,6 +106,7 @@ end
 
 if defined?(Rails)
   require 'jsonapi_compliable/railtie'
+  require 'jsonapi_compliable/rails'
 end
 
 module JsonapiCompliable

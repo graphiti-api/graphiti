@@ -70,6 +70,12 @@ class JsonapiCompliable::Sideload::PolymorphicBelongsTo < JsonapiCompliable::Sid
     grouper.apply(self, parent_resource_class)
   end
 
+  def child_for_type(type)
+    children.values.find do |sideload|
+      sideload.resource.type == type
+    end
+  end
+
   def resolve(parents, query)
     parents.group_by(&grouper.column_name).each_pair do |group_name, group|
       next if group_name.nil?

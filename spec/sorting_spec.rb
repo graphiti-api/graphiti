@@ -116,19 +116,71 @@ RSpec.describe 'sorting' do
     end
   end
 
-  context 'when custom sorting for a specific attribute' do
-    before do
-      resource.attribute :foo, :string
-      resource.sort :foo do |scope, direction|
-        scope[:sort] ||= []
-        scope[:sort] << { id: :desc }
-        scope
+  context 'when custom sorting' do
+    context 'and the attribute exists' do
+      before do
+        resource.attribute :foo, :string
+        resource.sort :foo do |scope, direction|
+          scope[:sort] ||= []
+          scope[:sort] << { id: :desc }
+          scope
+        end
+      end
+
+      it 'is correctly applied' do
+        params[:sort] = 'foo'
+        expect(ids).to eq([2, 1])
+      end
+
+      context 'but it is not sortable' do
+        before do
+          resource.attributes[:foo][:sortable] = false
+        end
+
+        it 'raises helpful error' do
+          expect {
+            resource.sort :foo do |scope, dir|
+            end
+          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort attribute :foo, but the attribute was marked :sortable => false.')
+        end
       end
     end
 
-    it 'is correctly applied' do
-      params[:sort] = 'foo'
-      expect(ids).to eq([2,1])
+    context 'and the attribute does not exist' do
+      before do
+        resource.sort :foo, :string do |scope, dir|
+          scope[:sort] ||= []
+          scope[:sort] << { id: :desc }
+          scope
+        end
+        params[:sort] = 'foo'
+      end
+
+      it 'works' do
+        expect(ids).to eq([2, 1])
+      end
+
+      it 'adds an only: [:sortable] attribute' do
+        att = resource.attributes[:foo]
+        expect(att[:readable]).to eq(false)
+        expect(att[:writable]).to eq(false)
+        expect(att[:sortable]).to eq(true)
+        expect(att[:filterable]).to eq(false)
+        expect(att[:type]).to eq(:string)
+      end
+
+      context 'and type not given' do
+        before do
+          resource.attributes.delete(:foo)
+        end
+
+        it 'blows up' do
+          expect {
+            resource.sort :foo do
+            end
+          }.to raise_error(JsonapiCompliable::Errors::ImplicitSortTypeMissing)
+        end
+      end
     end
   end
 

@@ -16,10 +16,15 @@ module JsonapiCompliable
     def to_jsonapi
       notify do
         instance = JSONAPI::Serializable::Renderer.new
-        options[:fields] = proxy.query.fields
-        options[:expose][:extra_fields] = proxy.query.extra_fields
-        options[:include] = proxy.query.include_hash
-        options[:meta].merge!(stats: proxy.stats) unless proxy.stats.empty?
+
+        if proxy.is_a?(PersistenceProxy)
+          options[:include] = proxy.payload.include_directive
+        else
+          options[:fields] = proxy.query.fields
+          options[:expose][:extra_fields] = proxy.query.extra_fields
+          options[:include] = proxy.query.include_hash
+          options[:meta].merge!(stats: proxy.stats) unless proxy.stats.empty?
+        end
         instance.render(records, options).to_json
       end
     end

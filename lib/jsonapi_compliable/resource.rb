@@ -1,6 +1,7 @@
 module JsonapiCompliable
   class Resource
     include DSL
+    include Interface
     include Configuration
     include Sideloading
 
@@ -28,29 +29,25 @@ module JsonapiCompliable
       JsonapiCompliable.context[:namespace]
     end
 
-    # external facing; does not accept internal-specific options
-    def self.all(params = {}, base_scope = nil)
-      _all(params, {}, base_scope)
-    end
-
-    def self._all(params, opts, base_scope)
-      runner = Runner.new(self, params)
-      runner.proxy(base_scope, opts)
-    end
-
-    def self.find(params, base_scope = nil)
-      params[:filter] ||= {}
-      params[:filter].merge!(id: params.delete(:id))
-      runner = Runner.new(self, params)
-      runner.proxy(base_scope, single: true)
-    end
-
     def build_scope(base, query, opts = {})
       Scope.new(base, self, query, opts)
     end
 
     def base_scope
       adapter.base_scope(model)
+    end
+
+    def typecast(name, value, flag)
+      att = get_attr!(name, flag)
+      type = JsonapiCompliable::Types[att[:type]]
+      begin
+        flag = :read if flag == :readable
+        flag = :write if flag == :writable
+        flag = :params if [:sortable, :filterable].include?(flag)
+        type[flag][value]
+      rescue Exception => e
+        raise Errors::TypecastFailed.new(self, name, value, e)
+      end
     end
 
     def create(create_params)

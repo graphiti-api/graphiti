@@ -19,12 +19,11 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     module IntegrationHooks
       class ApplicationResource < JsonapiCompliable::Resource
-        use_adapter JsonapiCompliable::Adapters::ActiveRecord::Base
+        self.adapter = JsonapiCompliable::Adapters::ActiveRecord::Base.new
       end
 
       class DepartmentResource < ApplicationResource
-        type :departments
-        model Department
+        self.model = ::Department
 
         before_commit do |department|
           Callbacks.add(:department, department)
@@ -35,8 +34,9 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       class PositionResource < ApplicationResource
-        type :positions
-        model Position
+        self.model = ::Position
+
+        attribute :employee_id, :integer, only: [:writable]
 
         before_commit do |position|
           Callbacks.add(:position, position)
@@ -49,8 +49,9 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       class EmployeeResource < ApplicationResource
-        type :employees
-        model Employee
+        self.model = ::Employee
+
+        attribute :first_name, :string
 
         before_commit only: [:create] do |employee|
           Callbacks.add(:create, employee)
@@ -78,22 +79,20 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     controller(ApplicationController) do
-      jsonapi resource: IntegrationHooks::EmployeeResource
-
       def create
-        employee, success = jsonapi_create.to_a
+        employee = IntegrationHooks::EmployeeResource.build(params)
 
-        if success
-          render_jsonapi(employee, scope: false)
+        if employee.save
+          render jsonapi: employee
         else
           raise 'whoops'
         end
       end
 
       def update
-        employee, success = jsonapi_update.to_a
+        employee = IntegrationHooks::EmployeeResource.find(params)
 
-        if success
+        if employee.update_attributes
           render_jsonapi(employee, scope: false)
         else
           raise 'whoops'
@@ -101,10 +100,10 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       def destroy
-        employee, success = jsonapi_destroy.to_a
+        employee = IntegrationHooks::EmployeeResource.find(params)
 
-        if success
-          render_jsonapi(employee, scope: false)
+        if employee.destroy
+          render jsonapi: employee
         else
           raise 'whoops'
         end
@@ -141,7 +140,8 @@ if ENV["APPRAISAL_INITIALIZED"]
         let(:payload) do
           {
             data: {
-              type: 'employees'
+              type: 'employees',
+              attributes: { first_name: 'Jane' }
             }
           }
         end

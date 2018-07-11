@@ -81,12 +81,10 @@ RSpec.describe 'serialization' do
             PORO::Employee.create(age: 'foo')
           end
 
-          # Note ArgumentError not ConstraintError
-          # Unfortunate but not really our purview
           it 'raises error' do
             expect {
               render
-            }.to raise_error(ArgumentError)
+            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
           end
         end
       end
@@ -116,7 +114,6 @@ RSpec.describe 'serialization' do
           expect(attributes['age']).to eq(nil)
         end
 
-        # Unfortunate we don't get a better error class
         context 'when cannot coerce' do
           before do
             PORO::Employee.create(age: {})
@@ -125,7 +122,7 @@ RSpec.describe 'serialization' do
           it 'raises error' do
             expect {
               render
-            }.to raise_error(NoMethodError)
+            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
           end
         end
       end
@@ -161,7 +158,7 @@ RSpec.describe 'serialization' do
           it 'raises error' do
             expect {
               render
-            }.to raise_error(TypeError)
+            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
           end
         end
       end
@@ -197,7 +194,7 @@ RSpec.describe 'serialization' do
           it 'raises error' do
             expect {
               render
-            }.to raise_error(Dry::Types::ConstraintError)
+            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
           end
         end
       end
@@ -253,7 +250,7 @@ RSpec.describe 'serialization' do
           it 'raises error' do
             expect {
               render
-            }.to raise_error(Dry::Types::ConstraintError)
+            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
           end
         end
       end
@@ -337,7 +334,7 @@ RSpec.describe 'serialization' do
           it 'raises error' do
             expect {
               render
-            }.to raise_error(Dry::Types::ConstraintError)
+            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
           end
         end
       end
@@ -361,7 +358,7 @@ RSpec.describe 'serialization' do
           it 'raises error' do
             expect {
               render
-            }.to raise_error(Dry::Types::ConstraintError)
+            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
           end
         end
       end
@@ -390,7 +387,7 @@ RSpec.describe 'serialization' do
           PORO::Employee.create(age: 1)
           expect {
             render
-          }.to raise_error(Dry::Types::ConstraintError)
+          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
         end
 
         context 'when cannot coerce' do
@@ -401,7 +398,7 @@ RSpec.describe 'serialization' do
           it 'raises error' do
             expect {
               render
-            }.to raise_error(Dry::Types::ConstraintError)
+            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
           end
         end
       end
@@ -430,7 +427,7 @@ RSpec.describe 'serialization' do
           PORO::Employee.create(age: 1)
           expect {
             render
-          }.to raise_error(Dry::Types::ConstraintError)
+          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
         end
 
         context 'when cannot coerce' do
@@ -441,7 +438,7 @@ RSpec.describe 'serialization' do
           it 'raises error' do
             expect {
               render
-            }.to raise_error(Dry::Types::ConstraintError)
+            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
           end
         end
       end

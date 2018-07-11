@@ -60,9 +60,9 @@ module JsonapiCompliable
       def default_proc
         type_name = @attr[:type]
         _name = @name
+        _resource = @resource.new
         ->(_) {
-          type = JsonapiCompliable::Types[type_name]
-          type[:read][@object.send(_name)]
+          _resource.typecast(_name, @object.send(_name), :readable)
         }
       end
 

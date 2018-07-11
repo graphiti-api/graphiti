@@ -66,15 +66,15 @@ module JsonapiCompliable
     # return a single element instead of array
     def coerce_types(name, value)
       type_name = resource.all_attributes[name][:type]
-      type = Types[type_name][:params]
+      cast = ->(value) { @resource.typecast(name, value, :filterable) }
       if value.is_a?(Array)
         if type_name.to_s.starts_with?('array')
-          type[value]
+          cast.call(value)
         else
-          value.map { |v| type[v] }
+          value.map { |v| cast.call(v) }
         end
       else
-        type[value]
+        cast.call(value)
       end
     end
   end

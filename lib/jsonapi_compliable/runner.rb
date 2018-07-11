@@ -1,14 +1,11 @@
 module JsonapiCompliable
   class Runner
-    attr_reader :params, :verb
+    attr_reader :params
     include JsonapiCompliable::Base
 
-    jsonapi resource: JsonapiCompliable::Resource
-
-    def initialize(resource_class, params, verb: :get)
+    def initialize(resource_class, params)
       @resource_class = resource_class
       @params = params
-      @verb = verb
     end
 
     def jsonapi_resource

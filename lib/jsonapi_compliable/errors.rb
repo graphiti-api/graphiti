@@ -24,13 +24,15 @@ module JsonapiCompliable
           {
             sortable: 'sort on',
             filterable: 'filter on',
-            readable: 'read'
+            readable: 'read',
+            writable: 'write'
           }[@flag]
         else
           {
             sortable: 'add sort',
             filterable: 'add filter',
-            readable: 'read'
+            readable: 'read',
+            writable: 'write'
           }[@flag]
         end
       end
@@ -81,6 +83,63 @@ self.polymorphic = ['Subclass1Resource', 'Subclass2Resource']
 
       def initialize(validation_response)
         @validation_response = validation_response
+      end
+    end
+
+    class ImplicitFilterTypeMissing < Base
+      def initialize(resource_class, name)
+        @resource_class = resource_class
+        @name = name
+      end
+
+      def message
+        <<-MSG
+Tried to add filter-only attribute #{@name.inspect}, but type was missing!
+
+If you are adding a filter that does not have a corresponding attribute, you must pass a type:
+
+filter :name, :string do <--- like this
+  # ... code ...
+end
+        MSG
+      end
+    end
+
+    class ImplicitSortTypeMissing < Base
+      def initialize(resource_class, name)
+        @resource_class = resource_class
+        @name = name
+      end
+
+      def message
+        <<-MSG
+Tried to add sort-only attribute #{@name.inspect}, but type was missing!
+
+If you are adding a sort that does not have a corresponding attribute, you must pass a type:
+
+sort :name, :string do <--- like this
+  # ... code ...
+end
+        MSG
+      end
+    end
+
+    class TypecastFailed < Base
+      def initialize(resource, name, value, error)
+        @resource = resource
+        @name = name
+        @value = value
+        @error = error
+      end
+
+      def message
+        <<-MSG
+#{@resource.class}: Failed typecasting #{@name.inspect}! Given #{@value.inspect} but the following error was raised:
+
+#{@error.message}
+
+#{@error.backtrace.join("\n")}
+        MSG
       end
     end
 

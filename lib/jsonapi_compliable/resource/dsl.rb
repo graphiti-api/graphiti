@@ -4,13 +4,23 @@ module JsonapiCompliable
       extend ActiveSupport::Concern
 
       class_methods do
-        def filter(name, opts = {}, &blk)
-          get_attr!(name, :filterable)
-          aliases = [name, opts[:aliases]].flatten.compact
-          config[:filters][name.to_sym] = {
-            aliases: aliases,
-            proc: blk
-          }
+        def filter(name, *args, &blk)
+          opts = args.extract_options!
+
+          if get_attr(name, :filterable, raise_error: :only_unsupported)
+            aliases = [name, opts[:aliases]].flatten.compact
+            config[:filters][name.to_sym] = {
+              aliases: aliases,
+              proc: blk
+            }
+          else
+            if type = args[0]
+              attribute name, type, only: [:filterable]
+              filter(name, opts, &blk)
+            else
+              raise Errors::ImplicitFilterTypeMissing.new(self, name)
+            end
+          end
         end
 
         def sort_all(&blk)
@@ -21,9 +31,19 @@ module JsonapiCompliable
           end
         end
 
-        def sort(name, &blk)
-          get_attr!(name, :sortable)
-          config[:sorts][name] = blk
+        def sort(name, *args, &blk)
+          opts = args.extract_options!
+
+          if get_attr(name, :sortable, raise_error: :only_unsupported)
+            config[:sorts][name] = blk
+          else
+            if type = args[0]
+              attribute name, type, only: [:sortable]
+              sort(name, opts, &blk)
+            else
+              raise Errors::ImplicitSortTypeMissing.new(self, name)
+            end
+          end
         end
 
         def paginate(&blk)

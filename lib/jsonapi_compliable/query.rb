@@ -139,7 +139,7 @@ module JsonapiCompliable
 
         whitelist = nil
         if @resource.context
-          whitelist = @resource.context.sideload_whitelist
+          whitelist = @resource.context._sideload_whitelist
           whitelist = whitelist[@resource.context_namespace] if whitelist
         end
 

@@ -10,7 +10,7 @@ module JsonapiCompliable
 
       def initialize(resource, name, flag, request, raise_error)
         @resource = resource
-        @name = name
+        @name = name.to_sym
         @flag = flag
         @request = request
         @raise_error = raise_error
@@ -37,9 +37,10 @@ module JsonapiCompliable
       end
 
       def maybe_raise(opts = {})
-        if raise_error?
-          default = { request: request, exists: true }
-          raise error_class.new(resource, name, flag, default.merge(opts))
+        default = { request: request, exists: true }
+        opts = default.merge(opts)
+        if raise_error?(opts[:exists])
+          raise error_class.new(resource, name, flag, opts)
         else
           false
         end
@@ -71,8 +72,12 @@ module JsonapiCompliable
         !!attribute
       end
 
-      def raise_error?
-        !!raise_error
+      def raise_error?(exists)
+        if raise_error == :only_unsupported
+          exists ? true : false
+        else
+          !!raise_error
+        end
       end
 
       def request?

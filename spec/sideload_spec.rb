@@ -193,6 +193,32 @@ RSpec.describe JsonapiCompliable::Sideload do
     end
   end
 
+  describe '#disassociate' do
+    before do
+      opts[:type] = :has_many
+    end
+
+    it 'delegates to parent resource' do
+      parent, child = 'a', 'b'
+      expect(instance.parent_resource).to receive(:disassociate)
+        .with(parent, child, :foo, :has_many)
+      instance.disassociate(parent, child)
+    end
+
+    context 'when given the :as option' do
+      before do
+        opts[:as] = :bar
+      end
+
+      it 'is passed as the association name' do
+        parent, child = 'a', 'b'
+        expect(instance.parent_resource).to receive(:disassociate)
+          .with(parent, child, :bar, :has_many)
+        instance.disassociate(parent, child)
+      end
+    end
+  end
+
   describe '#assign' do
     context 'when a to-many relationship' do
       let(:instance) { JsonapiCompliable::Sideload::HasMany.new(:positions, opts) }

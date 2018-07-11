@@ -4,7 +4,7 @@ module JsonHelpers
   end
 
   def json_item
-    attrs = json['data']['attributes']
+    attrs = json['data']['attributes'] || {}
     attrs['id'] = json['data']['id']
     attrs['_jsonapi_type'] = json['data']['type']
     attrs

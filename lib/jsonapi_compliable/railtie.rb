@@ -13,14 +13,32 @@ module JsonapiCompliable
       if Mime[:jsonapi].nil? # rails 4
         Mime::Type.register('application/vnd.api+json', :jsonapi)
       end
-      register_renderer
+      register_renderers
     end
 
-    def register_renderer
+    def register_renderers
       ActiveSupport.on_load(:action_controller) do
-        ::ActionController::Renderers.add(:jsonapi) do |records, options|
+        ::ActionController::Renderers.add(:jsonapi) do |proxy, options|
           self.content_type ||= Mime[:jsonapi]
-          render_jsonapi(records, options)
+
+          opts = {}
+          if respond_to?(:default_jsonapi_render_options)
+            opts = default_jsonapi_render_options
+          end
+          proxy.to_jsonapi(options)
+        end
+      end
+
+      ActiveSupport.on_load(:action_controller) do
+        ::ActionController::Renderers.add(:jsonapi_errors) do |proxy, options|
+          self.content_type ||= Mime[:jsonapi]
+
+          validation = JsonapiErrorable::Serializers::Validation.new \
+            proxy.data, proxy.payload.relationships
+
+          render \
+            json: { errors: validation.errors },
+            status: :unprocessable_entity
         end
       end
     end

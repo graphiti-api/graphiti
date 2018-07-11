@@ -16,21 +16,25 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     module IntegrationHooks
       class ApplicationResource < JsonapiCompliable::Resource
-        use_adapter JsonapiCompliable::Adapters::ActiveRecord::Base
+        self.adapter = JsonapiCompliable::Adapters::ActiveRecord::Base.new
       end
 
       class BookResource < ApplicationResource
-        type :books
-        model Book
+        self.model = Legacy::Book
+        attribute :author_id, :integer, only: [:writable]
+        attribute :title, :string
       end
 
       class StateResource < ApplicationResource
-        type :states
-        model State
+        self.model = Legacy::State
+        attribute :name, :string
       end
 
       class AuthorResource < ApplicationResource
-        model Author
+        self.model = Legacy::Author
+
+        attribute :first_name, :string
+        attribute :last_name, :string
 
         has_many :books,
           resource: BookResource do
@@ -65,13 +69,11 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     controller(ApplicationController) do
-      jsonapi resource: IntegrationHooks::AuthorResource
-
       def create
-        author, success = jsonapi_create.to_a
+        author = IntegrationHooks::AuthorResource.build(params)
 
-        if success
-          render_jsonapi(author, scope: false)
+        if author.save
+          render jsonapi: author
         else
           raise 'whoops'
         end
@@ -101,9 +103,9 @@ if ENV["APPRAISAL_INITIALIZED"]
       JSON.parse(response.body)
     end
 
-    let(:update_book) { Book.create! }
-    let(:destroy_book) { Book.create! }
-    let(:disassociate_book) { Book.create! }
+    let(:update_book) { Legacy::Book.create! }
+    let(:destroy_book) { Legacy::Book.create! }
+    let(:disassociate_book) { Legacy::Book.create! }
 
     let(:book_data) { [] }
     let(:book_included) { [] }
@@ -146,11 +148,11 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         expect(Callbacks.fired.keys).to match_array([:after_create, :after_save])
         author, books = Callbacks.fired[:after_create]
-        expect(author).to be_a(Author)
+        expect(author).to be_a(Legacy::Author)
         expect(author.first_name).to eq('Stephen')
         expect(author.last_name).to eq('King')
 
-        expect(books).to all(be_a(Book))
+        expect(books).to all(be_a(Legacy::Book))
         expect(books.map(&:title)).to match_array(%w(one two))
       end
     end
@@ -167,7 +169,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(Callbacks.fired.keys)
           .to match_array([:after_update, :after_save])
         author, books = Callbacks.fired[:after_update]
-        expect(author).to be_a(Author)
+        expect(author).to be_a(Legacy::Author)
         expect(author.first_name).to eq('Stephen')
         expect(author.last_name).to eq('King')
 
@@ -186,12 +188,12 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         expect(Callbacks.fired.keys).to match_array([:after_destroy, :after_save])
         author, books = Callbacks.fired[:after_destroy]
-        expect(author).to be_a(Author)
+        expect(author).to be_a(Legacy::Author)
         expect(author.first_name).to eq('Stephen')
         expect(author.last_name).to eq('King')
 
         book = books[0]
-        expect(book).to be_a(Book)
+        expect(book).to be_a(Legacy::Book)
         expect(book.id).to eq(destroy_book.id)
         expect { book.reload }.to raise_error(ActiveRecord::RecordNotFound)
       end
@@ -207,12 +209,12 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         expect(Callbacks.fired.keys).to match_array([:after_disassociate, :after_save])
         author, books = Callbacks.fired[:after_disassociate]
-        expect(author).to be_a(Author)
+        expect(author).to be_a(Legacy::Author)
         expect(author.first_name).to eq('Stephen')
         expect(author.last_name).to eq('King')
 
         book = books[0]
-        expect(book).to be_a(Book)
+        expect(book).to be_a(Legacy::Book)
         expect(book.id).to eq(disassociate_book.id)
         expect(book.author_id).to be_nil
       end
@@ -230,10 +232,10 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(Callbacks.fired.keys).to match_array([:state_after_create])
         author, states = Callbacks.fired[:state_after_create]
         state = states[0]
-        expect(author).to be_a(Author)
+        expect(author).to be_a(Legacy::Author)
         expect(author.first_name).to eq('Stephen')
         expect(author.last_name).to eq('King')
-        expect(state).to be_a(State)
+        expect(state).to be_a(Legacy::State)
         expect(state.name).to eq('New York')
       end
     end

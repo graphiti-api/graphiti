@@ -446,22 +446,5 @@ if ENV['APPRAISAL_INITIALIZED']
         expect(json_includes('states').length).to eq(1)
       end
     end
-
-    context 'when overriding the resource' do
-      before do
-        controller.class_eval do
-          jsonapi resource: Legacy::AuthorResource do
-            paginate do |scope, current_page, per_page|
-              scope.limit(1)
-            end
-          end
-        end
-      end
-
-      it 'respects the override' do
-        get :index
-        expect(json_ids.length).to eq(1)
-      end
-    end
   end
 end

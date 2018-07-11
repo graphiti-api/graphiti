@@ -11,6 +11,10 @@ class JsonapiCompliable::Util::Persistence
     @attributes    = attributes
     @relationships = relationships
     @caller_model  = caller_model
+
+    @attributes.each_pair do |key, value|
+      @attributes[key] = @resource.typecast(key, value, :writable)
+    end
   end
 
   # Perform the actual save logic.
@@ -37,6 +41,7 @@ class JsonapiCompliable::Util::Persistence
     update_foreign_key_for_parents(parents)
 
     persisted = persist_object(@meta[:method], @attributes)
+    persisted.instance_variable_set(:@__serializer_klass, @resource.serializer)
     assign_temp_id(persisted, @meta[:temp_id])
 
     associate_parents(persisted, parents)
@@ -65,7 +70,7 @@ class JsonapiCompliable::Util::Persistence
   #
   # This is not the case for HABTM, whose "foreign key" is a join table
   def update_foreign_key(parent_object, attrs, x)
-    return if x[:sideload].type == :habtm
+    return if x[:sideload].type == :many_to_many
 
     if [:destroy, :disassociate].include?(x[:meta][:method])
       attrs[x[:foreign_key]] = nil
@@ -77,8 +82,8 @@ class JsonapiCompliable::Util::Persistence
   end
 
   def update_foreign_type(attrs, x, null: false)
-    grouping_field = x[:sideload].parent.grouping_field
-    attrs[grouping_field] = null ? nil : x[:sideload].name
+    grouping_field = x[:sideload].parent.grouper.column_name
+    attrs[grouping_field] = null ? nil : x[:sideload].group_name
   end
 
   def update_foreign_key_for_parents(parents)
@@ -94,9 +99,17 @@ class JsonapiCompliable::Util::Persistence
     parents.each do |x|
       if x[:object] && object
         if x[:meta][:method] == :disassociate
-          x[:sideload].disassociate(x[:object], object)
+          if x[:sideload].type == :belongs_to
+            x[:sideload].disassociate(object, x[:object])
+          else
+            x[:sideload].disassociate(x[:object], object)
+          end
         else
-          x[:sideload].associate(x[:object], object)
+          if x[:sideload].type == :belongs_to
+            x[:sideload].associate(object, x[:object])
+          else
+            x[:sideload].associate(x[:object], object)
+          end
         end
       end
     end
@@ -108,7 +121,7 @@ class JsonapiCompliable::Util::Persistence
         if x[:meta][:method] == :disassociate
           x[:sideload].disassociate(object, x[:object])
         elsif x[:meta][:method] == :destroy
-          if x[:sideload].type == :habtm
+          if x[:sideload].type == :many_to_many
             x[:sideload].disassociate(object, x[:object])
           end # otherwise, no need to disassociate destroyed objects
         else
@@ -133,6 +146,7 @@ class JsonapiCompliable::Util::Persistence
     [].tap do |processed|
       iterate(except: [:polymorphic_belongs_to, :belongs_to]) do |x|
         yield x
+
         x[:object] = x[:sideload].resource
           .persist_with_relationships(x[:meta], x[:attributes], x[:relationships], caller_model)
         processed << x

@@ -74,13 +74,22 @@ module JsonapiCompliable
           }
         end
 
+        # TODO: maybe move to sideload classes
+        # associate(parent, child) does fire in SL
+        # TODO: many-to-many << should only fire when persisting (?)
         def associate(parent, child, association_name, association_type)
-          parent.association(association_name).loaded!
+          association = parent.association(association_name)
+          association.loaded!
 
           if [:has_many, :many_to_many].include?(association_type)
-            parent.association(association_name).target |= [child]
+            if association_type == :many_to_many &&
+                !parent.send(association_name).exists?(child.id)
+              parent.send(association_name) << child
+            else
+              association.target |= [child]
+            end
           else
-            parent.association(association_name).target = child
+            association.target = child
           end
         end
 

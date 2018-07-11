@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
   # Pinning this version until backwards-incompatibility is addressed
   spec.add_dependency 'jsonapi-serializable', '~> 0.3.0'
   spec.add_dependency 'dry-types', '~> 0.13'
+  spec.add_dependency 'jsonapi_errorable', '~> 0.9'
 
   spec.add_development_dependency "activerecord", ['>= 4.1', '< 6']
   spec.add_development_dependency "kaminari", '~> 0.17'
@@ -27,4 +28,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "sqlite3"
   spec.add_development_dependency "database_cleaner"
+  spec.add_development_dependency "activemodel", ['>= 4.1', '< 6']
 end
