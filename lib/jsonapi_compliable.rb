@@ -1,6 +1,7 @@
 require 'json'
 require 'active_support/core_ext/string'
 require 'active_support/core_ext/class/attribute'
+require 'active_support/core_ext/hash/conversions' # to_xml
 require 'active_support/concern'
 require 'active_support/time'
 
@@ -73,6 +74,7 @@ require "jsonapi_compliable/query"
 require "jsonapi_compliable/scope"
 require "jsonapi_compliable/deserializer"
 require "jsonapi_compliable/renderer"
+require "jsonapi_compliable/hash_renderer"
 require "jsonapi_compliable/scoping/base"
 require "jsonapi_compliable/scoping/sort"
 require "jsonapi_compliable/scoping/paginate"

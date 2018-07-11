@@ -6,7 +6,7 @@ class JsonapiCompliable::Sideload::BelongsTo < JsonapiCompliable::Sideload
   def load_params(parents, query)
     query.to_hash.tap do |hash|
       hash[:filter] ||= {}
-      hash[:filter][primary_key] = parents.map(&foreign_key)
+      hash[:filter][primary_key] = ids_for_parents(parents)
     end
   end
 
@@ -16,6 +16,13 @@ class JsonapiCompliable::Sideload::BelongsTo < JsonapiCompliable::Sideload
 
   def associate(parent, child)
     parent_resource.associate(parent, child, association_name, type)
+  end
+
+  def ids_for_parents(parents)
+    parent_ids = parents.map(&foreign_key)
+    parent_ids.compact!
+    parent_ids.uniq!
+    parent_ids
   end
 
   def infer_foreign_key

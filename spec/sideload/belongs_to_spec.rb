@@ -75,6 +75,40 @@ RSpec.describe JsonapiCompliable::Sideload::BelongsTo do
     end
   end
 
+  describe '#ids_for_parents' do
+    let(:parent1) { double(employee_id: 11) }
+    let(:parent2) { double(employee_id: 22) }
+    let(:parents) { [parent1, parent2] }
+
+    subject(:ids) { instance.ids_for_parents(parents) }
+
+    it 'maps over the primary key' do
+      expect(ids).to eq([11, 22])
+    end
+
+    it 'does not return duplicates' do
+      parents << double(employee_id: 22)
+      expect(ids).to eq([11, 22])
+    end
+
+    it 'does not return nils' do
+      parents << double(employee_id: nil)
+      expect(ids).to eq([11, 22])
+    end
+
+    context 'with custom foreign key' do
+      let(:parents) { [double(foo: 44), double(foo: 55)] }
+
+      before do
+        opts[:foreign_key] = :foo
+      end
+
+      it 'still works' do
+        expect(ids).to eq([44, 55])
+      end
+    end
+  end
+
   describe 'infer_foreign_key' do
     let(:opts) { { resource: resource } }
     let(:resource) do

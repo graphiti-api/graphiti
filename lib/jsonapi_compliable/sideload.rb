@@ -209,6 +209,13 @@ module JsonapiCompliable
       parent_resource.disassociate(parent, child, association_name, type)
     end
 
+    def ids_for_parents(parents)
+      parent_ids = parents.map(&primary_key)
+      parent_ids.compact!
+      parent_ids.uniq!
+      parent_ids
+    end
+
     private
 
     def load_options(parents, query)
@@ -238,10 +245,16 @@ module JsonapiCompliable
     end
 
     def fire_scope(parents)
+      parent_ids = ids_for_parents(parents)
       if self.class.scope_proc
-        instance_exec(parents, &self.class.scope_proc)
+        instance_exec(parent_ids, parents, &self.class.scope_proc)
       else
-        scope(parents)
+        method = method(:scope)
+        if [2,-2].include?(method.arity)
+          scope(parent_ids, parents)
+        else
+          scope(parent_ids)
+        end
       end
     end
 

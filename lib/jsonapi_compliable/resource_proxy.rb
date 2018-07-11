@@ -38,6 +38,14 @@ module JsonapiCompliable
       Renderer.new(self, options).to_jsonapi
     end
 
+    def to_json(options = {})
+      Renderer.new(self, options).to_json
+    end
+
+    def to_xml(options = {})
+      Renderer.new(self, options).to_xml
+    end
+
     def to_a
       records = @scope.resolve
       if records.empty? && raise_on_missing?

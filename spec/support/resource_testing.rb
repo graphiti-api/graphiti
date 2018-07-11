@@ -14,16 +14,20 @@ RSpec.shared_context 'resource testing' do |parameter|
   #   render
   # end
   def render(runtime_options = {})
-    ctx = TestRunner.new(resource, params)
-    proxy = defined?(base_scope) ? ctx.proxy(base_scope) : ctx.proxy
-    response.body = proxy.to_jsonapi(runtime_options)
+    json = proxy.to_jsonapi(runtime_options)
+    response.body = json
     json
   end
 
+  def proxy
+    @proxy ||= begin
+      ctx = TestRunner.new(resource, params)
+      defined?(base_scope) ? ctx.proxy(base_scope) : ctx.proxy
+    end
+  end
+
   def records
-    ctx = TestRunner.new(resource, params)
-    proxy = defined?(base_scope) ? ctx.proxy(base_scope) : ctx.proxy
-    proxy.to_a
+    proxy.data
   end
 
   def response

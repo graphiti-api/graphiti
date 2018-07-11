@@ -8,8 +8,8 @@ module JsonapiCompliable
           resource_class.model.all
         end
 
-        def scope(parents)
-          base_scope.where(primary_key => parents.map(&foreign_key))
+        def scope(parent_ids)
+          base_scope.where(primary_key => parent_ids)
         end
       end
     end

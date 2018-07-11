@@ -163,16 +163,22 @@ RSpec.describe 'filtering' do
         assert_filter_value(false)
       end
 
-      it 'coerces integers' do
+      it 'coerces true integers' do
         params[:filter] = { foo: 1 }
         assert_filter_value(true)
+      end
+
+      it 'coerces false integers' do
         params[:filter] = { foo: 0 }
         assert_filter_value(false)
       end
 
-      it 'coerces string integers' do
+      it 'coerces string true integers' do
         params[:filter] = { foo: '1' }
         assert_filter_value(true)
+      end
+
+      it 'coerces string false integers' do
         params[:filter] = { foo: '0' }
         assert_filter_value(false)
       end

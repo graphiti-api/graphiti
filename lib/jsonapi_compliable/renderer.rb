@@ -14,22 +14,36 @@ module JsonapiCompliable
     end
 
     def to_jsonapi
+      render(JSONAPI::Renderer.new).to_json
+    end
+
+    def to_json
+      render(JsonapiCompliable::HashRenderer.new).to_json
+    end
+
+    def to_xml
+      render(JsonapiCompliable::HashRenderer.new).to_xml(root: :data)
+    end
+
+    private
+
+    def render(implementation)
       notify do
-        instance = JSONAPI::Serializable::Renderer.new
+        instance = JSONAPI::Serializable::Renderer.new(implementation)
 
         if proxy.is_a?(PersistenceProxy)
           options[:include] = proxy.payload.include_directive
         else
           options[:fields] = proxy.query.fields
+          options[:expose] ||= {}
           options[:expose][:extra_fields] = proxy.query.extra_fields
           options[:include] = proxy.query.include_hash
+          options[:meta] ||= {}
           options[:meta].merge!(stats: proxy.stats) unless proxy.stats.empty?
         end
-        instance.render(records, options).to_json
+        instance.render(records, options)
       end
     end
-
-    private
 
     # TODO: more generic notification pattern
     # Likely comes out of debugger work

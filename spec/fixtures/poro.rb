@@ -149,6 +149,7 @@ module PORO
 
   class Position < Base
     attr_accessor :title,
+      :rank,
       :employee_id,
       :e_id,
       :employee,
@@ -269,25 +270,39 @@ module PORO
   class ApplicationResource < JsonapiCompliable::Resource
     self.adapter = Adapter.new
     self.abstract_class = true
+
+    def base_scope
+      { type: self.model.name.demodulize.underscore.pluralize.to_sym }
+    end
   end
 
   class EmployeeResource < ApplicationResource
     self.serializer = PORO::EmployeeSerializer
-
     attribute :first_name, :string
     attribute :last_name, :string
-    attribute :age, :string
-
+    attribute :age, :integer
+    extra_attribute :worth, :integer do
+      100
+    end
+    allow_stat total: :count
     has_many :positions
   end
 
   class PositionResource < ApplicationResource
+    attribute :employee_id, :integer, only: [:filterable]
+    attribute :title, :string
+    attribute :rank, :integer
+    extra_attribute :score, :integer do
+      200
+    end
+    belongs_to :department
   end
 
   class ClassificationResource < ApplicationResource
   end
 
   class DepartmentResource < ApplicationResource
+    attribute :name, :string
   end
 
   class BioResource < ApplicationResource

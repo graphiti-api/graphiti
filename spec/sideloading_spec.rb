@@ -18,7 +18,7 @@ RSpec.describe 'sideloading' do
     end
 
     class PositionSideload < ::JsonapiCompliable::Sideload::HasMany
-      scope do |employees|
+      scope do |employee_ids|
         { type: :positions, sort: [{ id: :desc }] }
       end
     end
@@ -52,10 +52,10 @@ RSpec.describe 'sideloading' do
     before do
       resource.class_eval do
         allow_sideload :positions, type: :has_many do
-          scope do |employees|
+          scope do |employee_ids|
             {
               type: :positions,
-              conditions: { employee_id: employees.map(&:id) }
+              conditions: { employee_id: employee_ids }
             }
           end
 
@@ -83,16 +83,43 @@ RSpec.describe 'sideloading' do
         expect(ids_for('positions')).to eq([2, 1])
       end
     end
+
+    context 'and scope block with second argument' do
+      before do
+        resource.class_eval do
+          allow_sideload :positions, type: :has_many do
+            scope do |employee_ids, employees|
+              { type: :positions, employee_ids: employees.map(&:id) }
+            end
+
+            assign_each do |employee, positions|
+              positions.select { |p| p.employee_id == employee.id }
+            end
+          end
+        end
+        params[:include] = 'positions'
+      end
+
+      let!(:employee2) { PORO::Employee.create }
+      let!(:employees) { [employee, employee2] }
+
+      it 'correctly passes parents' do
+        expect(PORO::DB).to receive(:all).and_call_original
+        expect(PORO::DB).to receive(:all)
+          .with(hash_including(employee_ids: employees.map(&:id))) { [] }
+        render
+      end
+    end
   end
 
   context 'when using .assign instead of .assign_each' do
     before do
       resource.class_eval do
         allow_sideload :positions, type: :has_many do
-          scope do |employees|
+          scope do |employee_ids|
             {
               type: :positions,
-              conditions: { employee_id: employees.map(&:id) }
+              conditions: { employee_id: employee_ids }
             }
           end
 
@@ -117,10 +144,10 @@ RSpec.describe 'sideloading' do
     before do
       resource.class_eval do
         allow_sideload :positions, type: :has_many, resource: Sideloading::CustomPositionResource do
-          scope do |employees|
+          scope do |employee_ids|
             {
               type: :positions,
-              conditions: { employee_id: employees.map(&:id) }
+              conditions: { employee_id: employee_ids }
             }
           end
 
@@ -156,10 +183,10 @@ RSpec.describe 'sideloading' do
     before do
       resource.class_eval do
         has_many :positions do
-          scope do |employees|
+          scope do |employee_ids|
             {
               type: :positions,
-              conditions: { employee_id: employees.map(&:id) }
+              conditions: { employee_id: employee_ids }
             }
           end
         end
@@ -179,10 +206,10 @@ RSpec.describe 'sideloading' do
 
         resource.class_eval do
           has_many :positions, foreign_key: :e_id do
-            scope do |employees|
+            scope do |employee_ids|
               {
                 type: :positions,
-                conditions: { e_id: employees.map(&:id) }
+                conditions: { e_id: employee_ids }
               }
             end
           end
@@ -211,10 +238,10 @@ RSpec.describe 'sideloading' do
     before do
       resource.class_eval do
         belongs_to :employee do
-          scope do |positions|
+          scope do |employee_ids|
             {
               type: :employees,
-              conditions: { id: positions.map(&:employee_id) }
+              conditions: { id: employee_ids }
             }
           end
         end
@@ -233,10 +260,10 @@ RSpec.describe 'sideloading' do
     before do
       resource.class_eval do
         has_one :bio do
-          scope do |employees|
+          scope do |employee_ids|
             {
               type: :bios,
-              conditions: { employee_id: employees.map(&:id) }
+              conditions: { employee_id: employee_ids }
             }
           end
         end
@@ -255,7 +282,7 @@ RSpec.describe 'sideloading' do
       resource.class_eval do
         many_to_many :teams, foreign_key: { team_memberships: :employee_id } do
           # fake the logic to join tables etc
-          scope do |employees|
+          scope do |employee_ids|
             {
               type: :teams,
               conditions: { id: [1, 2] }
@@ -438,10 +465,10 @@ RSpec.describe 'sideloading' do
       end
       PORO::PositionResource.class_eval do
         belongs_to :department do
-          scope do |positions|
+          scope do |department_ids|
             {
               type: :departments,
-              conditions: { id: positions.map(&:department_id) }
+              conditions: { id: department_ids }
             }
           end
         end

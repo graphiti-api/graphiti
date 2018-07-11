@@ -6,7 +6,7 @@ class JsonapiCompliable::Sideload::HasMany < JsonapiCompliable::Sideload
   def load_params(parents, query)
     query.to_hash.tap do |hash|
       hash[:filter] ||= {}
-      hash[:filter][foreign_key] = parents.map(&primary_key)
+      hash[:filter][foreign_key] = ids_for_parents(parents)
     end
   end
 

@@ -11,11 +11,7 @@ module JsonapiCompliable
             .reflections[through.to_s].klass.table_name
         end
 
-        def scope(parents)
-          parent_ids = parents.map { |p| p.send(primary_key) }
-          parent_ids.uniq!
-          parent_ids.compact!
-
+        def scope(parent_ids)
           base_scope
             .includes(through)
             .where(through_table_name => { true_foreign_key => parent_ids })
