@@ -290,7 +290,7 @@ RSpec.describe JsonapiCompliable::Resource do
 
     before do
       klass.class_eval do
-        allow_stat :myattr do
+        stat :myattr do
           average { |scope, attr| 1 }
         end
       end
@@ -853,7 +853,7 @@ RSpec.describe JsonapiCompliable::Resource do
         self.adapter = PORO::Adapter.new
         self.model = PORO::Employee
 
-        allow_stat total: [:count]
+        stat total: [:count]
 
         def base_scope
           { type: :employees }
@@ -951,7 +951,7 @@ RSpec.describe JsonapiCompliable::Resource do
       context 'when passed a base scope' do
         before do
           expect(PORO::DB).to receive(:all).with({
-            conditions: { first_name: 'adsf', id: '1'},
+            conditions: { first_name: 'adsf', id: [1] },
             page: 1,
             per: 20
           }).and_call_original

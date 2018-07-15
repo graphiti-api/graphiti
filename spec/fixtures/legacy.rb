@@ -3,10 +3,14 @@ ActiveRecord::Schema.define(:version => 1) do
     t.boolean :active, default: true
     t.string :first_name
     t.string :last_name
+    t.integer :age
+    t.float :float_age
+    t.float :decimal_age
     t.string :dwelling_type
     t.integer :state_id
     t.integer :dwelling_id
     t.integer :organization_id
+    t.date :created_at_date
     t.timestamps
   end
 
@@ -249,9 +253,12 @@ module Legacy
 
   class AuthorResource < ApplicationResource
     attribute :first_name, :string
-
-    # todo autostats
-    allow_stat total: [:count]
+    attribute :age, :integer
+    attribute :float_age, :float
+    attribute :decimal_age, :decimal
+    attribute :active, :boolean
+    attribute :created_at, :datetime, only: [:filterable]
+    attribute :created_at_date, :date, only: [:filterable]
 
     has_many :books
     belongs_to :state

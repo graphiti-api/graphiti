@@ -19,7 +19,7 @@ RSpec.describe 'stats' do
     before do
       params[:stats] = { total: 'count' }
       resource.class_eval do
-        allow_stat total: :count
+        stat total: :count
       end
     end
 
@@ -46,7 +46,7 @@ RSpec.describe 'stats' do
 
       before do
         resource.class_eval do
-          allow_stat age: [:sum]
+          stat age: [:sum]
         end
       end
 
@@ -62,7 +62,7 @@ RSpec.describe 'stats' do
 
       before do
         resource.class_eval do
-          allow_stat age: [:average]
+          stat age: [:average]
         end
       end
 
@@ -78,7 +78,7 @@ RSpec.describe 'stats' do
 
       before do
         resource.class_eval do
-          allow_stat age: [:maximum]
+          stat age: [:maximum]
         end
       end
 
@@ -94,7 +94,7 @@ RSpec.describe 'stats' do
 
       before do
         resource.class_eval do
-          allow_stat age: [:minimum]
+          stat age: [:minimum]
         end
       end
 
@@ -110,7 +110,7 @@ RSpec.describe 'stats' do
 
       before do
         resource.class_eval do
-          allow_stat :age do
+          stat :age do
             second { |scope| 1337 }
           end
         end
@@ -131,8 +131,8 @@ RSpec.describe 'stats' do
 
     before do
       resource.class_eval do
-        allow_stat total: :count
-        allow_stat age: [:sum, :average]
+        stat total: :count
+        stat age: [:sum, :average]
       end
     end
 
@@ -145,14 +145,14 @@ RSpec.describe 'stats' do
     end
   end
 
-  context 'when passing symbol to allow_stat' do
+  context 'when passing symbol to stat' do
     before do
       params[:stats] = { age: 'sum' }
     end
 
     before do
       resource.class_eval do
-        allow_stat age: :sum
+        stat age: :sum
       end
     end
 
@@ -191,7 +191,7 @@ RSpec.describe 'stats' do
 
     before do
       resource.class_eval do
-        allow_stat :age do
+        stat :age do
           sum { |scope, attr| "overridden_#{attr}" }
         end
       end
@@ -212,7 +212,7 @@ RSpec.describe 'stats' do
 
     before do
       resource.class_eval do
-        allow_stat total: [:count]
+        stat total: [:count]
       end
     end
 

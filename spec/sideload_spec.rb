@@ -98,9 +98,8 @@ RSpec.describe JsonapiCompliable::Sideload do
   end
 
   describe '#base_scope' do
-    it 'falls back to the default' do
-      expect(instance).to receive(:default_base_scope) { 'foo' }
-      expect(instance.base_scope).to eq('foo')
+    it 'falls back to the resource default' do
+      expect(instance.base_scope).to eq(type: :positions)
     end
 
     context 'when passed in constructor' do
@@ -110,6 +109,16 @@ RSpec.describe JsonapiCompliable::Sideload do
 
       it 'is used' do
         expect(instance.base_scope).to eq('bar')
+      end
+
+      context 'as a proc' do
+        before do
+          opts[:base_scope] = -> { 'procd' }
+        end
+
+        it 'is executed' do
+          expect(instance.base_scope).to eq('procd')
+        end
       end
     end
   end
@@ -197,6 +206,33 @@ RSpec.describe JsonapiCompliable::Sideload do
 
       it 'still works' do
         expect(ids).to eq([44, 55])
+      end
+    end
+  end
+
+  #parent_resource.associate_all(parent, children, association_name, type)
+  describe '#associate_all' do
+    before do
+      opts[:type] = :has_many
+    end
+
+    it 'delegates to parent resource' do
+      parent, children = 'a', ['b', 'c']
+      expect(instance.parent_resource).to receive(:associate_all)
+        .with(parent, children, :foo, :has_many)
+      instance.associate_all(parent, children)
+    end
+
+    context 'when given the :as option' do
+      before do
+        opts[:as] = :bar
+      end
+
+      it 'is passed as the association name' do
+        parent, children = 'a', ['b', 'c']
+        expect(instance.parent_resource).to receive(:associate)
+          .with(parent, children, :bar, :has_many)
+        instance.associate(parent, children)
       end
     end
   end
@@ -404,7 +440,7 @@ RSpec.describe JsonapiCompliable::Sideload do
 
     it 'uses load params' do
       expect(resource_class).to receive(:_all)
-        .with({ foo: 'bar' }, anything, nil)
+        .with({ foo: 'bar' }, anything, { type: :positions })
       instance.load(parents, query)
     end
 
@@ -415,7 +451,7 @@ RSpec.describe JsonapiCompliable::Sideload do
         after_resolve: anything
       }
       expect(resource_class).to receive(:_all)
-        .with(anything, expected, nil)
+        .with(anything, expected, { type: :positions })
       instance.load(parents, query)
     end
 
@@ -439,7 +475,7 @@ RSpec.describe JsonapiCompliable::Sideload do
           b: query
         }
         expect(resource_class).to receive(:_all)
-          .with(expected, anything, nil)
+          .with(expected, anything, { type: :positions })
         instance.load(parents, query)
       end
     end

@@ -26,6 +26,10 @@ module JsonapiCompliable
   JSONAPI::Serializable::Resource.send(:include, SerializableHash)
 
   class HashRenderer
+    def initialize(resource)
+      @resource = resource
+    end
+
     def render(options)
       serializers = options[:data]
       opts = options.slice(:fields, :include)
@@ -39,11 +43,11 @@ module JsonapiCompliable
     def to_hash(serializers, opts)
       {}.tap do |hash|
         if serializers.is_a?(Array)
-          hash[serializers[0].jsonapi_type] = serializers.map do |s|
+          hash[@resource.type] = serializers.map do |s|
             s.to_hash(opts)
           end
         else
-          hash[serializers.jsonapi_type] = serializers.to_hash(opts)
+          hash[@resource.type] = serializers.to_hash(opts)
         end
       end
     end

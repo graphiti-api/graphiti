@@ -5,12 +5,20 @@ module JsonapiCompliable
       definition.constructor(&blk)
     end
 
-    DateTime = create(::DateTime) do |input|
+    WriteDateTime = create(::DateTime) do |input|
       if input.is_a?(::Date) || input.is_a?(::Time)
         input = ::DateTime.parse(input.to_s)
       end
       input = Dry::Types['json.date_time'][input]
       Dry::Types['strict.date_time'][input] if input
+    end
+
+    ReadDateTime = create(::DateTime) do |input|
+      if input.is_a?(::Date) || input.is_a?(::Time)
+        input = ::DateTime.parse(input.to_s)
+      end
+      input = Dry::Types['json.date_time'][input]
+      Dry::Types['strict.date_time'][input].iso8601 if input
     end
 
     PresentParamsDateTime = create(::DateTime) do |input|
@@ -67,6 +75,13 @@ module JsonapiCompliable
     def self.map
       @map ||= begin
         hash = {
+          integer_id: {
+            canonical_name: :integer,
+            params: Dry::Types['coercible.integer'],
+            read: Dry::Types['coercible.string'],
+            test: Dry::Types['strict.string'],
+            write: Dry::Types['coercible.integer']
+          },
           string: {
             params: Dry::Types['coercible.string'],
             read: Dry::Types['coercible.string'],
@@ -105,9 +120,9 @@ module JsonapiCompliable
           },
           datetime: {
             params: PresentParamsDateTime,
-            read: DateTime,
+            read: ReadDateTime,
             test: Dry::Types['strict.string'],
-            write: DateTime
+            write: WriteDateTime
           },
           hash: {
             params: PresentParamsHash,
@@ -123,9 +138,14 @@ module JsonapiCompliable
           }
         }
 
+        hash.each_pair do |k, v|
+          hash[k][:canonical_name] ||= k
+        end
+
         arrays = {}
         hash.each_pair do |name, map|
           arrays[:"array_of_#{name.to_s.pluralize}"] = {
+            canonical_name: name,
             params: Dry::Types['strict.array'].of(map[:params]),
             read: Dry::Types['strict.array'].of(map[:read]),
             test: Dry::Types['strict.array'].of(map[:test]),
@@ -151,6 +171,12 @@ module JsonapiCompliable
         }
       end
       map[key.to_sym] = value
+    end
+
+    def self.name_for(key)
+      key = key.to_sym
+      type = map[key]
+      type[:canonical_name]
     end
   end
 end

@@ -7,12 +7,13 @@ module JsonapiCompliable
         def filter(name, *args, &blk)
           opts = args.extract_options!
 
-          if get_attr(name, :filterable, raise_error: :only_unsupported)
+          if att = get_attr(name, :filterable, raise_error: :only_unsupported)
             aliases = [name, opts[:aliases]].flatten.compact
+            operators = FilterOperators.build(&blk)
             config[:filters][name.to_sym] = {
               aliases: aliases,
-              proc: blk
-            }
+              type: att[:type]
+            }.merge(operators.to_hash)
           else
             if type = args[0]
               attribute name, type, only: [:filterable]
@@ -50,7 +51,7 @@ module JsonapiCompliable
           config[:pagination] = blk
         end
 
-        def allow_stat(symbol_or_hash, &blk)
+        def stat(symbol_or_hash, &blk)
           dsl = Stats::DSL.new(adapter, symbol_or_hash)
           dsl.instance_eval(&blk) if blk
           config[:stats][dsl.name] = dsl

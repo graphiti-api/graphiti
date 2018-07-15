@@ -14,10 +14,6 @@ class JsonapiCompliable::Sideload::BelongsTo < JsonapiCompliable::Sideload
     children.find { |c| c.send(primary_key) == parent.send(foreign_key) }
   end
 
-  def associate(parent, child)
-    parent_resource.associate(parent, child, association_name, type)
-  end
-
   def ids_for_parents(parents)
     parent_ids = parents.map(&foreign_key)
     parent_ids.compact!

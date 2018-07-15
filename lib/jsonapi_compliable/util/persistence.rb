@@ -108,7 +108,11 @@ class JsonapiCompliable::Util::Persistence
           if x[:sideload].type == :belongs_to
             x[:sideload].associate(object, x[:object])
           else
-            x[:sideload].associate(x[:object], object)
+            if [:has_many, :many_to_many].include?(x[:sideload].type)
+              x[:sideload].associate_all(object, Array(x[:object]))
+            else
+              x[:sideload].associate(x[:object], object)
+            end
           end
         end
       end
@@ -125,7 +129,11 @@ class JsonapiCompliable::Util::Persistence
             x[:sideload].disassociate(object, x[:object])
           end # otherwise, no need to disassociate destroyed objects
         else
-          x[:sideload].associate(object, x[:object])
+          if [:has_many, :many_to_many].include?(x[:sideload].type)
+            x[:sideload].associate_all(object, Array(x[:object]))
+          else
+            x[:sideload].associate(object, x[:object])
+          end
         end
       end
     end

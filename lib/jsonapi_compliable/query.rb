@@ -1,8 +1,8 @@
 module JsonapiCompliable
   class Query
-    attr_reader :resource, :include_hash
+    attr_reader :resource, :include_hash, :association_name
 
-    def initialize(resource, params, association_name = nil, nested_include = nil)
+    def initialize(resource, params, association_name = nil, nested_include = nil, parents = [])
       @resource = resource
       @association_name = association_name
       @params = params
@@ -10,6 +10,7 @@ module JsonapiCompliable
       @params = @params.to_h if @params.respond_to?(:to_h)
       @params = @params.deep_symbolize_keys
       @include_param = nested_include || @params[:include]
+      @parents = parents
     end
 
     def association?
@@ -56,13 +57,18 @@ module JsonapiCompliable
           include_hash.each_pair do |key, sub_hash|
             sideload = @resource.class.sideload(key)
             if sideload
-              hash[key] = Query.new(sideload.resource, @params, key, sub_hash)
+              _parents = parents + [self]
+              hash[key] = Query.new(sideload.resource, @params, key, sub_hash, _parents)
             else
               handle_missing_sideload(key)
             end
           end
         end
       end
+    end
+
+    def parents
+      @parents ||= []
     end
 
     def fields
@@ -91,6 +97,10 @@ module JsonapiCompliable
               if @resource.get_attr!(filter_name, :filterable, request: true)
                 hash[filter_name] = filter_value
               end
+            elsif nested?(name)
+              name = name.to_s.split('.').last.to_sym
+              validate!(name, :filterable)
+              hash[name] = value
             elsif top_level? && validate!(name, :filterable)
               hash[name] = value
             end
@@ -165,13 +175,24 @@ module JsonapiCompliable
     private
 
     def validate!(name, flag)
+      return false if name.to_s.include?('.') # nested
+
       not_associated_name = !@resource.class.association_names.include?(name)
       not_associated_type = !@resource.class.association_types.include?(name)
+
       if not_associated_name && not_associated_type
         @resource.get_attr!(name, flag, request: true)
         return true
       end
       false
+    end
+
+    def nested?(name)
+      return false unless association?
+      split = name.to_s.split('.')
+      query_names = split[0..split.length-2].map(&:to_sym)
+      my_names = parents.map(&:association_name).compact + [association_name].compact
+      query_names == my_names
     end
 
     def legacy_nested?(name)

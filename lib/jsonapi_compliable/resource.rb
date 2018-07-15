@@ -62,6 +62,10 @@ module JsonapiCompliable
       adapter.destroy(model, id)
     end
 
+    def associate_all(parent, children, association_name, type)
+      adapter.associate_all(parent, children, association_name, type)
+    end
+
     def associate(parent, child, association_name, type)
       adapter.associate(parent, child, association_name, type)
     end

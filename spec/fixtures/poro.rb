@@ -217,6 +217,15 @@ module PORO
       scope[:conditions].merge!(name => value)
       scope
     end
+    alias :filter_integer_eq :filter
+    alias :filter_string_eq :filter
+    alias :filter_decimal_eq :filter
+    alias :filter_float_eq :filter
+    alias :filter_date_eq :filter
+    alias :filter_datetime_eq :filter
+    alias :filter_boolean_eq :filter
+    alias :filter_hash_eq :filter
+    alias :filter_array_eq :filter
 
     # No need for actual logic to fire
     def count(scope, attr)
@@ -284,7 +293,6 @@ module PORO
     extra_attribute :worth, :integer do
       100
     end
-    allow_stat total: :count
     has_many :positions
   end
 

@@ -84,8 +84,9 @@ module JsonapiCompliable
           default(klass, :relationships_writable_by_default, true)
 
           unless klass.config[:attributes][:id]
-            klass.attribute :id, :string
+            klass.attribute :id, :integer_id
           end
+          klass.stat total: [:count]
         end
       end
 

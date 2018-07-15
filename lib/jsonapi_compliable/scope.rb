@@ -1,6 +1,6 @@
 module JsonapiCompliable
   class Scope
-    attr_reader :object, :unpaginated_object
+    attr_accessor :object, :unpaginated_object
 
     def initialize(object, resource, query, opts = {})
       @object    = object

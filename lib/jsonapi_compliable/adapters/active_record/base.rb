@@ -2,9 +2,124 @@ module JsonapiCompliable
   module Adapters
     module ActiveRecord
       class Base < ::JsonapiCompliable::Adapters::Abstract
-        # (see Adapters::Abstract#filter)
-        def filter(scope, attribute, value)
-          scope.where(attribute => value)
+        def filter_string_eq(scope, attribute, value, is_not: false)
+          column = scope.klass.arel_table[attribute]
+          clause = column.lower.eq_any(value.map(&:downcase))
+          is_not ? scope.where.not(clause) : scope.where(clause)
+        end
+
+        def filter_string_eql(scope, attribute, value, is_not: false)
+          clause = { attribute => value }
+          is_not ? scope.where.not(clause) : scope.where(clause)
+        end
+
+        def filter_string_not_eq(scope, attribute, value)
+          filter_string_eq(scope, attribute, value, is_not: true)
+        end
+
+        def filter_string_not_eql(scope, attribute, value)
+          filter_string_eql(scope, attribute, value, is_not: true)
+        end
+
+        def filter_string_prefix(scope, attribute, value, is_not: false)
+          column = scope.klass.arel_table[attribute]
+          map = value.map { |v| "#{v}%" }
+          clause = column.lower.matches_any(map)
+          is_not ? scope.where.not(clause) : scope.where(clause)
+        end
+
+        def filter_string_not_prefix(scope, attribute, value)
+          filter_string_prefix(scope, attribute, value, is_not: true)
+        end
+
+        def filter_string_suffix(scope, attribute, value, is_not: false)
+          column = scope.klass.arel_table[attribute]
+          map = value.map { |v| "%#{v}" }
+          clause = column.lower.matches_any(map)
+          is_not ? scope.where.not(clause) : scope.where(clause)
+        end
+
+        def filter_string_not_suffix(scope, attribute, value)
+          filter_string_suffix(scope, attribute, value, is_not: true)
+        end
+
+        def filter_string_like(scope, attribute, value, is_not: false)
+          column = scope.klass.arel_table[attribute]
+          map = value.map { |v| "%#{v.downcase}%" }
+          clause = column.lower.matches_any(map)
+          is_not ? scope.where.not(clause) : scope.where(clause)
+        end
+
+        def filter_string_not_like(scope, attribute, value)
+          filter_string_like(scope, attribute, value, is_not: true)
+        end
+
+        def filter_integer_eq(scope, attribute, value, is_not: false)
+          clause = { attribute => value }
+          is_not ? scope.where.not(clause) : scope.where(clause)
+        end
+        alias :filter_float_eq :filter_integer_eq
+        alias :filter_decimal_eq :filter_integer_eq
+        alias :filter_date_eq :filter_integer_eq
+        alias :filter_boolean_eq :filter_integer_eq
+
+        def filter_integer_not_eq(scope, attribute, value)
+          filter_integer_eq(scope, attribute, value, is_not: true)
+        end
+        alias :filter_float_not_eq :filter_integer_not_eq
+        alias :filter_decimal_not_eq :filter_integer_not_eq
+        alias :filter_date_not_eq :filter_integer_not_eq
+
+        def filter_integer_gt(scope, attribute, value)
+          column = scope.klass.arel_table[attribute]
+          scope.where(column.gt_any(value))
+        end
+        alias :filter_float_gt :filter_integer_gt
+        alias :filter_decimal_gt :filter_integer_gt
+        alias :filter_datetime_gt :filter_integer_gt
+        alias :filter_date_gt :filter_integer_gt
+
+        def filter_integer_gte(scope, attribute, value)
+          column = scope.klass.arel_table[attribute]
+          scope.where(column.gteq_any(value))
+        end
+        alias :filter_float_gte :filter_integer_gte
+        alias :filter_decimal_gte :filter_integer_gte
+        alias :filter_datetime_gte :filter_integer_gte
+        alias :filter_date_gte :filter_integer_gte
+
+        def filter_integer_lt(scope, attribute, value)
+          column = scope.klass.arel_table[attribute]
+          scope.where(column.lt_any(value))
+        end
+        alias :filter_float_lt :filter_integer_lt
+        alias :filter_decimal_lt :filter_integer_lt
+        alias :filter_datetime_lt :filter_integer_lt
+        alias :filter_date_lt :filter_integer_lt
+
+        def filter_integer_lte(scope, attribute, value)
+          column = scope.klass.arel_table[attribute]
+          scope.where(column.lteq_any(value))
+        end
+        alias :filter_float_lte :filter_integer_lte
+        alias :filter_decimal_lte :filter_integer_lte
+        alias :filter_date_lte :filter_integer_lte
+
+        # Ensure fractional seconds don't matter
+        def filter_datetime_eq(scope, attribute, value, is_not: false)
+          ranges = value.map { |v| (v..v+1.second-0.00000001) }
+          clause = { attribute => ranges }
+          is_not ? scope.where.not(clause) : scope.where(clause)
+        end
+
+        def filter_datetime_not_eq(scope, attribute, value)
+          filter_datetime_eq(scope, attribute, value, is_not: true)
+        end
+
+        def filter_datetime_lte(scope, attribute, value)
+          value = value.map { |v| v + 1.second-0.00000001 }
+          column = scope.klass.arel_table[attribute]
+          scope.where(column.lteq_any(value))
         end
 
         def base_scope(model)
@@ -74,23 +189,25 @@ module JsonapiCompliable
           }
         end
 
-        # TODO: maybe move to sideload classes
-        # associate(parent, child) does fire in SL
-        # TODO: many-to-many << should only fire when persisting (?)
-        def associate(parent, child, association_name, association_type)
+        def associate_all(parent, children, association_name, association_type)
           association = parent.association(association_name)
           association.loaded!
 
-          if [:has_many, :many_to_many].include?(association_type)
+          children.each do |child|
             if association_type == :many_to_many &&
-                !parent.send(association_name).exists?(child.id)
+                !parent.send(association_name).exists?(child.id) &&
+                [:create, :update].include?(JsonapiCompliable.context[:namespace])
               parent.send(association_name) << child
             else
               association.target |= [child]
             end
-          else
-            association.target = child
           end
+        end
+
+        def associate(parent, child, association_name, association_type)
+          association = parent.association(association_name)
+          association.loaded!
+          association.target = child
         end
 
         # When a has_and_belongs_to_many relationship, we don't have a foreign

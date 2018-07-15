@@ -2,6 +2,20 @@ module JsonapiCompliable
   module Errors
     class Base < StandardError;end
 
+    class AdapterNotImplemented < Base
+      def initialize(adapter, attribute, method)
+        @adapter = adapter
+        @attribute = attribute
+        @method = method
+      end
+
+      def message
+        <<-MSG
+The adapter #{@adapter.class} does not implement method '#{@method}', which was requested for attribute '#{@attribute}'. Add this method to your adapter to support this filter operator.
+        MSG
+      end
+    end
+
     class AttributeError < Base
       attr_reader :resource,
         :name,

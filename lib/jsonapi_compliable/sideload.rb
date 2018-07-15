@@ -106,11 +106,12 @@ module JsonapiCompliable
       raise 'Override #load_params in subclass'
     end
 
-    def default_base_scope
-    end
-
     def base_scope
-      @base_scope || default_base_scope
+      if @base_scope
+        @base_scope.respond_to?(:call) ? @base_scope.call : @base_scope
+      else
+        resource.base_scope
+      end
     end
 
     def load(parents, query)
@@ -143,10 +144,8 @@ module JsonapiCompliable
       parents.each do |parent|
         relevant_children = fire_assign_each(parent, children)
         if relevant_children.is_a?(Array)
-          relevant_children.each do |child|
-            associated << child
-            associate(parent, child)
-          end
+          associated |= relevant_children
+          associate_all(parent, relevant_children)
         else
           associated << relevant_children
           associate(parent, relevant_children)
@@ -199,6 +198,10 @@ module JsonapiCompliable
       all.compact.each do |hook|
         resource.instance_exec(parent, objects, &hook)
       end
+    end
+
+    def associate_all(parent, children)
+      parent_resource.associate_all(parent, children, association_name, type)
     end
 
     def associate(parent, child)

@@ -20,7 +20,7 @@ RSpec.describe 'filtering' do
   end
 
   it 'scopes correctly' do
-    params[:filter] = { id: employee1.id }
+    params[:filter] = { id: { eq: employee1.id } }
     expect(records.map(&:id)).to eq([employee1.id])
   end
 
@@ -35,6 +35,17 @@ RSpec.describe 'filtering' do
       records
     end
 
+    context 'when integer_id' do
+      before do
+        resource.attribute :foo, :integer_id
+      end
+
+      it 'queries via integer' do
+        params[:filter] = { foo: '1' }
+        assert_filter_value([1])
+      end
+    end
+
     context 'when string' do
       before do
         resource.attribute :foo, :string
@@ -42,7 +53,7 @@ RSpec.describe 'filtering' do
 
       it 'coerces' do
         params[:filter] = { foo: 1 }
-        assert_filter_value('1')
+        assert_filter_value(['1'])
       end
     end
 
@@ -53,7 +64,7 @@ RSpec.describe 'filtering' do
 
       it 'coerces' do
         params[:filter] = { foo: '1' }
-        assert_filter_value(1)
+        assert_filter_value([1])
       end
 
       it 'does NOT allow nils' do
@@ -83,12 +94,12 @@ RSpec.describe 'filtering' do
 
       it 'coerces integers' do
         params[:filter] = { foo: 40 }
-        assert_filter_value(BigDecimal.new(40))
+        assert_filter_value([BigDecimal.new(40)])
       end
 
       it 'coerces strings' do
         params[:filter] = { foo: '40.01' }
-        assert_filter_value(BigDecimal('40.01'))
+        assert_filter_value([BigDecimal('40.01')])
       end
 
       it 'does NOT allow nils' do
@@ -119,12 +130,12 @@ RSpec.describe 'filtering' do
 
       it 'coerces strings' do
         params[:filter] = { foo: '40.01' }
-        assert_filter_value(40.01)
+        assert_filter_value([40.01])
       end
 
       it 'coerces integers' do
         params[:filter] = { foo: '40' }
-        assert_filter_value(40.0)
+        assert_filter_value([40.0])
       end
 
       it 'does NOT allow nils' do
@@ -155,32 +166,32 @@ RSpec.describe 'filtering' do
 
       it 'coerces string true' do
         params[:filter] = { foo: 'true' }
-        assert_filter_value(true)
+        assert_filter_value([true])
       end
 
       it 'coerces string false' do
         params[:filter] = { foo: 'false' }
-        assert_filter_value(false)
+        assert_filter_value([false])
       end
 
       it 'coerces true integers' do
         params[:filter] = { foo: 1 }
-        assert_filter_value(true)
+        assert_filter_value([true])
       end
 
       it 'coerces false integers' do
         params[:filter] = { foo: 0 }
-        assert_filter_value(false)
+        assert_filter_value([false])
       end
 
       it 'coerces string true integers' do
         params[:filter] = { foo: '1' }
-        assert_filter_value(true)
+        assert_filter_value([true])
       end
 
       it 'coerces string false integers' do
         params[:filter] = { foo: '0' }
-        assert_filter_value(false)
+        assert_filter_value([false])
       end
 
       it 'does NOT allow nils' do
@@ -210,12 +221,12 @@ RSpec.describe 'filtering' do
 
       it 'coerces Date to correct string format' do
         params[:filter] = { foo: '2018/01/06' }
-        assert_filter_value(Date.parse('2018-01-06'))
+        assert_filter_value([Date.parse('2018-01-06')])
       end
 
       it 'coerces Time to correct date string format' do
         params[:filter] = { foo: Time.now.iso8601 }
-        assert_filter_value(Date.today)
+        assert_filter_value([Date.today])
       end
 
       it 'does NOT allow nils' do
@@ -258,18 +269,18 @@ RSpec.describe 'filtering' do
       it 'coerces strings correctly' do
         params[:filter] = { foo: '2018-01-01 4:36pm PST' }
         time = Time.parse('2018-01-01 16:36:00.000000000 -0800')
-        assert_filter_value(time)
+        assert_filter_value([time])
       end
 
       it 'coerces iso8601 strings correctly' do
         time = Time.parse('2018-01-06 4:36pm PST')
         params[:filter] = { foo: time.iso8601 }
-        assert_filter_value(time)
+        assert_filter_value([time])
       end
 
       it 'coerces Date correctly' do
         params[:filter] = { foo: '2018-01-06' }
-        assert_filter_value(DateTime.parse('2018-01-06'))
+        assert_filter_value([DateTime.parse('2018-01-06')])
       end
 
       it 'does NOT allows nils' do
@@ -298,29 +309,31 @@ RSpec.describe 'filtering' do
       end
 
       it 'works' do
-        params[:filter] = { foo: { bar: 'baz' } }
-        assert_filter_value(bar: 'baz')
+        params[:filter] = { foo: { eq: { bar: 'baz' } } }
+        assert_filter_value([{ bar: 'baz' }])
       end
 
       context 'when stringified keys' do
         before do
           params[:filter] = {
             'foo' => {
-              'bar' => {
-                'baz' => 'blah'
+              'eq' => {
+                'bar' => {
+                  'baz' => 'blah'
+                }
               }
             }
           }
         end
 
         it 'converts to symbolized keys' do
-          assert_filter_value(bar: { baz: 'blah' })
+          assert_filter_value([{ bar: { baz: 'blah' } }])
         end
       end
 
       context 'when cannot coerce' do
         before do
-          params[:filter] = { foo: 'bar' }
+          params[:filter] = { foo: { eq: 'bar' } }
         end
 
         it 'raises error' do
@@ -413,7 +426,10 @@ RSpec.describe 'filtering' do
           .constructor { |input|
             'custom!'
           }
-        JsonapiCompliable::Types[:custom] = { params: type }
+        JsonapiCompliable::Types[:custom] = {
+          params: type,
+          canonical_name: :string
+        }
         resource.attribute :foo, :custom
       end
 
@@ -423,7 +439,7 @@ RSpec.describe 'filtering' do
 
       it 'works' do
         params[:filter] = { foo: '1' }
-        assert_filter_value('custom!')
+        assert_filter_value(['custom!'])
       end
     end
   end
@@ -433,9 +449,11 @@ RSpec.describe 'filtering' do
       before do
         _2 = employee2.id
         resource.attribute :foo, :string
-        resource.filter :foo do |scope, value|
-          scope[:conditions][:id] = _2
-          scope
+        resource.filter :foo do
+          eq do |scope, value|
+            scope[:conditions][:id] = _2
+            scope
+          end
         end
       end
 
@@ -451,7 +469,7 @@ RSpec.describe 'filtering' do
 
         it 'raises helpful error' do
           expect {
-            resource.filter :foo do |scope, dir|
+            resource.filter :foo do
             end
           }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add filter attribute :foo, but the attribute was marked :filterable => false.')
         end
@@ -461,9 +479,11 @@ RSpec.describe 'filtering' do
     context 'and the attribute does not exist' do
       before do
         _2 = employee2.id
-        resource.filter :foo, :string do |scope, value|
-          scope[:conditions][:id] = _2
-          scope
+        resource.filter :foo, :string do
+          eq do |scope, value|
+            scope[:conditions][:id] = _2
+            scope
+          end
         end
         params[:filter] = { foo: 'bar' }
       end
@@ -505,9 +525,11 @@ RSpec.describe 'filtering' do
 
     before do
       resource.attribute :foo, :boolean
-      resource.filter :foo do |scope, value, ctx|
-        scope[:conditions][:id] = ctx.runtime_id
-        scope
+      resource.filter :foo do
+        eq do |scope, value, ctx|
+          scope[:conditions][:id] = ctx.runtime_id
+          scope
+        end
       end
       params[:filter] = { foo: true }
     end
@@ -674,9 +696,12 @@ RSpec.describe 'filtering' do
       context 'and it is filterable' do
         before do
           resource.extra_attribute :foo, :string, filterable: true
-          resource.filter :foo do |scope, dir|
-            scope[:conditions] = { id: employee3.id }
-            scope
+          _3 = employee3.id
+          resource.filter :foo do
+            eq do |scope, value|
+              scope[:conditions] = { id: _3 }
+              scope
+            end
           end
         end
 

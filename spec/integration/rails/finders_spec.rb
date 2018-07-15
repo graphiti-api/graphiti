@@ -12,15 +12,31 @@ if ENV['APPRAISAL_INITIALIZED']
       end
     end
 
+    let(:one_day_ago) { 1.day.ago }
+    let(:two_days_ago) { 2.days.ago }
+    let(:one_day_from_now) { 1.day.from_now }
+
     let!(:author1) do
       Legacy::Author.create! first_name: 'Stephen',
+        age: 70,
+        active: true,
+        float_age: 70.03,
+        decimal_age: 70.033,
         state: state,
         organization: org1,
-        dwelling: house
+        dwelling: house,
+        created_at: one_day_ago,
+        created_at_date: one_day_ago.to_date
     end
     let!(:author2) do
       Legacy::Author.create! first_name: 'George',
-        dwelling: condo
+        age: 65,
+        active: false,
+        float_age: 70.01,
+        decimal_age: 70.011,
+        dwelling: condo,
+        created_at: two_days_ago,
+        created_at_date: two_days_ago.to_date
     end
     let!(:book1)   { Legacy::Book.create!(author: author1, genre: genre, title: 'The Shining') }
     let!(:book2)   { Legacy::Book.create!(author: author1, genre: genre, title: 'The Stand') }
@@ -79,6 +95,490 @@ if ENV['APPRAISAL_INITIALIZED']
       expect(json_included_types).to match_array(%w(books genres))
     end
 
+    describe 'filtering' do
+      subject(:ids) do
+        get :index, params: { filter: filter }
+        json_ids
+      end
+
+      let!(:author3) do
+        Legacy::Author.create! first_name: 'GeOrge',
+          age: 72,
+          active: true,
+          float_age: 70.05,
+          decimal_age: 70.055,
+          created_at: 1.day.from_now,
+          created_at_date: 1.day.from_now.to_date
+      end
+
+      context 'when an integer_id' do
+        let(:filter) { { id: value } }
+
+        context 'passed as an integer' do
+          let(:value) { { eq: author2.id } }
+
+          it 'works' do
+            expect(ids).to eq([author2.id])
+          end
+        end
+
+        context 'passed as a string' do
+          let(:value) { { eq: author2.id.to_s } }
+
+          it 'works' do
+            expect(ids).to eq([author2.id])
+          end
+        end
+      end
+
+      context 'when a string' do
+        let(:filter) { { first_name: value } }
+
+        context 'eq' do
+          let(:value) { { eq: 'george' } }
+
+          it 'executes case-insensitive search' do
+            expect(ids).to eq([author2.id, author3.id])
+          end
+        end
+
+        context 'nothing' do
+          let(:value) { 'george' }
+
+          it 'defaults to eq' do
+            expect(ids).to eq([author2.id, author3.id])
+          end
+        end
+
+        context 'eql' do
+          let(:value) { { eql: 'GeOrge' } }
+
+          it 'executes case-sensitive search' do
+            expect(ids).to eq([author3.id])
+          end
+        end
+
+        context '!eq' do
+          let(:value) { { :'!eq' => 'george' } }
+
+          it 'executes case-insensitive NOT search' do
+            expect(ids).to eq([author1.id])
+          end
+        end
+
+        context '!eql' do
+          let(:value) { { :'!eql' => 'GeOrge' } }
+
+          it 'executes case-sensitive search' do
+            expect(ids).to eq([author1.id, author2.id])
+          end
+        end
+
+        context 'prefix' do
+          let(:value) { { :prefix => 'GEO' } }
+
+          it 'executes case-insensitive prefix query' do
+            expect(ids).to eq([author2.id, author3.id])
+          end
+        end
+
+        context '!prefix' do
+          let(:value) { { :'!prefix' => 'Geo' } }
+
+          it 'executes case-insensitive prefix NOT query' do
+            expect(ids).to eq([author1.id])
+          end
+        end
+
+        context 'suffix' do
+          let(:value) { { suffix: 'orge' } }
+
+          it 'executes case-insensitive suffix query' do
+            expect(ids).to eq([author2.id, author3.id])
+          end
+        end
+
+        context '!suffix' do
+          let(:value) { { :'!suffix' => 'orge' } }
+
+          it 'executes case-insensitive suffix NOT query' do
+            expect(ids).to eq([author1.id])
+          end
+        end
+
+        context 'like' do
+          let(:value) { { like: 'org' } }
+
+          it 'executes case-insensitive like query' do
+            expect(ids).to eq([author2.id, author3.id])
+          end
+        end
+
+        context '!like' do
+          let(:value) { { :'!like' => 'org' } }
+
+          it 'executes case-insensitive NOT like query' do
+            expect(ids).to eq([author1.id])
+          end
+        end
+      end
+
+      context 'when an integer' do
+        let(:filter) { { age: value } }
+
+        context 'eq' do
+          let(:value) { { eq: 65 } }
+
+          it 'works' do
+            expect(ids).to eq([author2.id])
+          end
+        end
+
+        context '!eq' do
+          let(:value) { { :'!eq' => 65 } }
+
+          it 'works' do
+            expect(ids).to eq([author1.id, author3.id])
+          end
+        end
+
+        context 'nothing' do
+          let(:value) { 65 }
+
+          it 'defaults to eq' do
+            expect(ids).to eq([author2.id])
+          end
+        end
+
+        context 'gt' do
+          let(:value) { { gt: 70 } }
+
+          it 'works' do
+            expect(ids).to eq([author3.id])
+          end
+        end
+
+        context 'gte' do
+          let(:value) { { gte: 70 } }
+
+          it 'works' do
+            expect(ids).to eq([author1.id, author3.id])
+          end
+        end
+
+        context 'lt' do
+          let(:value) { { lt: 70 } }
+
+          it 'works' do
+            expect(ids).to eq([author2.id])
+          end
+        end
+
+        context 'lte' do
+          let(:value) { { lte: 70 } }
+
+          it 'works' do
+            expect(ids).to eq([author1.id, author2.id])
+          end
+        end
+      end
+
+      context 'when a decimal' do
+        let(:filter) { { decimal_age: value } }
+
+        context 'eq' do
+          let(:value) { { eq: 70.011.to_d } }
+
+          it 'works' do
+            expect(ids).to eq([author2.id])
+          end
+
+          context 'as a string' do
+            let(:value) { { eq: 70.011.to_d.to_s } }
+
+            it 'works' do
+              expect(ids).to eq([author2.id])
+            end
+          end
+        end
+
+        context '!eq' do
+          let(:value) { { :'!eq' => 70.011.to_d } }
+
+          it 'works' do
+            expect(ids).to eq([author1.id, author3.id])
+          end
+        end
+
+        context 'nothing' do
+          let(:value) { 70.011.to_d }
+
+          it 'defaults to eq' do
+            expect(ids).to eq([author2.id])
+          end
+        end
+
+        context 'gt' do
+          let(:value) { { gt: 70.033.to_d } }
+
+          it 'works' do
+            expect(ids).to eq([author3.id])
+          end
+        end
+
+        context 'gte' do
+          let(:value) { { gte: 70.033.to_d } }
+
+          it 'works' do
+            expect(ids).to eq([author1.id, author3.id])
+          end
+        end
+
+        context 'lt' do
+          let(:value) { { lt: 70.033.to_d } }
+
+          it 'works' do
+            expect(ids).to eq([author2.id])
+          end
+        end
+
+        context 'lte' do
+          let(:value) { { lte: 70.033.to_d } }
+
+          it 'works' do
+            expect(ids).to eq([author1.id, author2.id])
+          end
+        end
+      end
+
+      context 'when a float' do
+        let(:filter) { { float_age: value } }
+
+        context 'eq' do
+          let(:value) { { eq: 70.01 } }
+
+          it 'works' do
+            expect(ids).to eq([author2.id])
+          end
+        end
+
+        context '!eq' do
+          let(:value) { { :'!eq' => 70.01 } }
+
+          it 'works' do
+            expect(ids).to eq([author1.id, author3.id])
+          end
+        end
+
+        context 'nothing' do
+          let(:value) { 70.01 }
+
+          it 'defaults to eq' do
+            expect(ids).to eq([author2.id])
+          end
+        end
+
+        context 'gt' do
+          let(:value) { { gt: 70.03 } }
+
+          it 'works' do
+            expect(ids).to eq([author3.id])
+          end
+        end
+
+        context 'gte' do
+          let(:value) { { gte: 70.03 } }
+
+          it 'works' do
+            expect(ids).to eq([author1.id, author3.id])
+          end
+        end
+
+        context 'lt' do
+          let(:value) { { lt: 70.03 } }
+
+          it 'works' do
+            expect(ids).to eq([author2.id])
+          end
+        end
+
+        context 'lte' do
+          let(:value) { { lte: 70.03 } }
+
+          it 'works' do
+            expect(ids).to eq([author1.id, author2.id])
+          end
+        end
+      end
+
+      context 'when a date' do
+        let(:filter) { { created_at_date: value } }
+
+        context 'eq' do
+          let(:value) { { eq: two_days_ago.to_date.iso8601 } }
+
+          it 'works' do
+            expect(ids).to eq([author2.id])
+          end
+        end
+
+        context '!eq' do
+          let(:value) { { :'!eq' => two_days_ago.to_date.iso8601 } }
+
+          it 'works' do
+            expect(ids).to eq([author1.id, author3.id])
+          end
+        end
+
+        context 'nothing' do
+          let(:value) { two_days_ago.to_date.iso8601 }
+
+          it 'defaults to eq' do
+            expect(ids).to eq([author2.id])
+          end
+        end
+
+        context 'gt' do
+          let(:value) { { gt: one_day_ago.to_date.iso8601 } }
+
+          it 'works' do
+            expect(ids).to eq([author3.id])
+          end
+        end
+
+        context 'gte' do
+          let(:value) { { gte: one_day_ago.to_date.iso8601 } }
+
+          it 'works' do
+            expect(ids).to eq([author1.id, author3.id])
+          end
+        end
+
+        context 'lt' do
+          let(:value) { { lt: one_day_ago.to_date.iso8601 } }
+
+          it 'works' do
+            expect(ids).to eq([author2.id])
+          end
+        end
+
+        context 'lte' do
+          let(:value) { { lte: one_day_ago.to_date.iso8601 } }
+
+          it 'works' do
+            expect(ids).to eq([author1.id, author2.id])
+          end
+        end
+      end
+
+      context 'when a datetime' do
+        let(:filter) { { created_at: value } }
+
+        context 'eq' do
+          let(:value) { { eq: two_days_ago.iso8601 } }
+
+          it 'works' do
+            expect(ids).to eq([author2.id])
+          end
+        end
+
+        context '!eq' do
+          let(:value) { { :'!eq' => two_days_ago.iso8601 } }
+
+          it 'works' do
+            expect(ids).to eq([author1.id, author3.id])
+          end
+        end
+
+        context 'nothing' do
+          let(:value) { two_days_ago.iso8601 }
+
+          it 'defaults to eq' do
+            expect(ids).to eq([author2.id])
+          end
+        end
+
+        # Add a second to accomodate fractionals
+        context 'gt' do
+          let(:value) { { gt: (one_day_ago+1.second).iso8601 } }
+
+          it 'works' do
+            expect(ids).to eq([author3.id])
+          end
+        end
+
+        context 'gte' do
+          let(:value) { { gte: one_day_ago.iso8601 } }
+
+          it 'works' do
+            expect(ids).to eq([author1.id, author3.id])
+          end
+        end
+
+        context 'lt' do
+          let(:value) { { lt: one_day_ago.iso8601 } }
+
+          it 'works' do
+            expect(ids).to eq([author2.id])
+          end
+        end
+
+        context 'lte' do
+          let(:value) { { lte: one_day_ago.iso8601 } }
+
+          it 'works' do
+            expect(ids).to eq([author1.id, author2.id])
+          end
+        end
+      end
+
+      context 'when a boolean' do
+        let(:filter) { { active: value } }
+
+        context 'eq' do
+          context 'when true' do
+            let(:value) { { eq: true } }
+
+            it 'works' do
+              expect(ids).to eq([author1.id, author3.id])
+            end
+          end
+
+          context 'when false' do
+            let(:value) { { eq: false } }
+
+            it 'works' do
+              expect(ids).to eq([author2.id])
+            end
+          end
+
+          context 'when string true' do
+            let(:value) { { eq: 'true' } }
+
+            it 'works' do
+              expect(ids).to eq([author1.id, author3.id])
+            end
+          end
+
+          context 'when string false' do
+            let(:value) { { eq: 'false' } }
+
+            it 'works' do
+              expect(ids).to eq([author2.id])
+            end
+          end
+        end
+
+        context 'nothing' do
+          let(:value) { false }
+
+          it 'defaults to eq' do
+            expect(ids).to eq([author2.id])
+          end
+        end
+      end
+    end
+
     context 'when hitting #show' do
       subject(:make_request) do
         if Rails::VERSION::MAJOR >= 5
@@ -95,7 +595,13 @@ if ENV['APPRAISAL_INITIALIZED']
       it 'works' do
         make_request
         expect(json['data']['id']).to eq(author1.id.to_s)
-        expect(json['data']['attributes']).to eq({ 'first_name' => 'Stephen' })
+        expect(json['data']['attributes']).to eq({
+          'first_name' => 'Stephen',
+          'age' => 70,
+          'float_age' => 70.03,
+          'decimal_age' => '70.033',
+          'active' => true
+        })
         expect(json_included_types).to match_array(%w(books))
       end
 

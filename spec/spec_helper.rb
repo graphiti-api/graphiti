@@ -22,12 +22,14 @@ RSpec.configure do |config|
       example.run
     end
   end
+
+  if ENV["APPRAISAL_INITIALIZED"]
+    config.pattern = 'spec/integration/rails/**/*'
+  end
 end
 
 # We test rails through appraisal
 if ENV["APPRAISAL_INITIALIZED"]
-  # include folder
-
   require 'database_cleaner'
   require 'kaminari'
   require 'active_record'

@@ -77,6 +77,17 @@ RSpec.describe 'serialization' do
       expect(json['meta']).to eq('foo' => 'bar')
     end
 
+    context 'when non-standard resource type' do
+      before do
+        resource.type = :foos
+      end
+
+      it 'uses the resource type as the top-level key' do
+        json = JSON.parse(proxy.to_json)
+        expect(json.keys).to eq(%w(foos))
+      end
+    end
+
     context 'when sideloading' do
       it 'works' do
         expect(json[0]['positions']).to eq([

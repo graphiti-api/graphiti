@@ -639,7 +639,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
-    describe 'has_and_belongs_to_many nested relationship' do
+    describe 'many_to_many nested relationship' do
       let(:employee) { Employee.create!(first_name: 'Joe') }
       let(:prior_team) { Team.new(name: 'prior') }
       let(:disassociate_team) { Team.new(name: 'disassociate') }

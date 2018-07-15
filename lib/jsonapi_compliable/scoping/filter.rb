@@ -32,8 +32,8 @@ module JsonapiCompliable
         raise Errors::RequiredFilter.new(resource, missing_required_filters)
       end
 
-      each_filter do |filter, value|
-        @scope = filter_scope(filter, value)
+      each_filter do |filter, operator, value|
+        @scope = filter_scope(filter, operator, value)
       end
 
       @scope
@@ -41,40 +41,52 @@ module JsonapiCompliable
 
     private
 
-    # If there's custom logic, run it, otherwise run the default logic
-    # specified in the adapter.
-    def filter_scope(filter, value)
-      if custom_scope = filter.values.first[:proc]
+    def filter_scope(filter, operator, value)
+      operator = operator.to_s.gsub('!', 'not_').to_sym
+
+      if custom_scope = filter.values.first[operator]
         custom_scope.call(@scope, value, resource.context)
       else
-        resource.adapter.filter(@scope, filter.keys.first, value)
+        filter_via_adapter(filter, operator, value)
+      end
+    end
+
+    def filter_via_adapter(filter, operator, value)
+      type_name = Types.name_for(filter.values.first[:type])
+      method    = :"filter_#{type_name}_#{operator}"
+      attribute = filter.keys.first
+
+      if resource.adapter.respond_to?(method)
+        resource.adapter.send(method, @scope, attribute, value)
+      else
+        raise Errors::AdapterNotImplemented.new \
+          resource.adapter, attribute, method
       end
     end
 
     def each_filter
       filter_param.each_pair do |param_name, param_value|
-        param_name = param_name.to_sym
-        filter     = find_filter!(param_name)
-        value      = param_value
-        value      = value.split(',') if value.is_a?(String) && value.include?(',')
-        value      = coerce_types(param_name, value)
-        yield filter, value
+        filter = find_filter!(param_name)
+        param_value = { eq: param_value } unless param_value.is_a?(Hash)
+        value = param_value.values.first
+        operator = param_value.keys.first
+        value = param_value.values.first unless filter.values[0][:type] == :hash
+        value = value.split(',') if value.is_a?(String) && value.include?(',')
+        value = coerce_types(param_name.to_sym, value)
+        yield filter, operator, value
       end
     end
 
-    # NB - avoid Array(value) here since we might want to
-    # return a single element instead of array
     def coerce_types(name, value)
-      type_name = resource.all_attributes[name][:type]
-      cast = ->(value) { @resource.typecast(name, value, :filterable) }
-      if value.is_a?(Array)
-        if type_name.to_s.starts_with?('array')
-          cast.call(value)
-        else
-          value.map { |v| cast.call(v) }
-        end
+      type_name = @resource.all_attributes[name][:type]
+      is_array = type_name.to_s.starts_with?('array_of') ||
+        Types[type_name][:canonical_name] == :array
+
+      if is_array
+        @resource.typecast(name, value, :filterable)
       else
-        cast.call(value)
+        value = value.nil? || value.is_a?(Hash) ? [value] : Array(value)
+        value.map { |v| @resource.typecast(name, v, :filterable) }
       end
     end
   end

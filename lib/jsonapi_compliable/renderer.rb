@@ -18,11 +18,11 @@ module JsonapiCompliable
     end
 
     def to_json
-      render(JsonapiCompliable::HashRenderer.new).to_json
+      render(JsonapiCompliable::HashRenderer.new(@proxy.resource)).to_json
     end
 
     def to_xml
-      render(JsonapiCompliable::HashRenderer.new).to_xml(root: :data)
+      render(JsonapiCompliable::HashRenderer.new(@proxy.resource)).to_xml(root: :data)
     end
 
     private

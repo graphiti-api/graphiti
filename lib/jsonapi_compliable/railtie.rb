@@ -13,7 +13,25 @@ module JsonapiCompliable
       if Mime[:jsonapi].nil? # rails 4
         Mime::Type.register('application/vnd.api+json', :jsonapi)
       end
+      register_parameter_parser
       register_renderers
+    end
+
+    # from jsonapi-rails
+    PARSER = lambda do |body|
+      data = JSON.parse(body)
+      hash = { _jsonapi: data }
+
+      hash[:format] = :jsonapi
+      hash.with_indifferent_access
+    end
+
+    def register_parameter_parser
+      if ::Rails::VERSION::MAJOR >= 5
+        ActionDispatch::Request.parameter_parsers[:jsonapi] = PARSER
+      else
+        ActionDispatch::ParamsParser::DEFAULT_PARSERS[Mime[:jsonapi]] = PARSER
+      end
     end
 
     def register_renderers

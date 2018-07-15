@@ -16,6 +16,12 @@ module JsonapiCompliable
         end
       end
 
+      def associate_all(parent, children, association_name, type)
+        children.each do |c|
+          associate(parent, c, association_name, type)
+        end
+      end
+
       def associate(parent, child, association_name, type)
         child_resource = self.class.resource_for_model(parent)
         if child_resource.sideloads[association_name]

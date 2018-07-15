@@ -19,10 +19,6 @@ RSpec.describe JsonapiCompliable::Query do
     department_resource.attribute :description, :string
   end
 
-  xit 'by dot syntax' do
-
-  end
-
   describe '#to_hash' do
     subject(:hash) { instance.to_hash }
 
@@ -225,6 +221,63 @@ RSpec.describe JsonapiCompliable::Query do
 
         it 'parses correctly' do
           expect(hash).to eq(expected)
+        end
+
+        context 'with stringified keys' do
+          before do
+            params.deep_stringify_keys!
+          end
+
+          it 'parses correctly' do
+            expect(hash).to eq(expected)
+          end
+        end
+      end
+
+      context 'via relationship name dot syntax' do
+        before do
+          params[:filter] = { :'positions.title' => { eq: 'asdf' } }
+        end
+
+        let(:expected) do
+          {
+            include: {
+              positions: {
+                filter: { title: { eq: 'asdf' } },
+                include: {
+                  department: { }
+                }
+              }
+            }
+          }
+        end
+
+        it 'parses correctly' do
+          expect(hash).to eq(expected)
+        end
+
+        context 'when multiple levels' do
+          before do
+            params[:filter] = { :'positions.department.name' => { eq: 'asdf' } }
+          end
+
+          let(:expected) do
+            {
+              include: {
+                positions: {
+                  include: {
+                    department: {
+                      filter: { name: { eq: 'asdf' } }
+                    }
+                  }
+                }
+              }
+            }
+          end
+
+          it 'parses correctly' do
+            expect(hash).to eq(expected)
+          end
         end
 
         context 'with stringified keys' do

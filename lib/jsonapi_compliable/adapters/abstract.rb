@@ -76,17 +76,180 @@ module JsonapiCompliable
     # @see Adapters::ActiveRecordSideloading
     # @see Adapters::Null
     class Abstract
-      # @param scope The scope object we are chaining
-      # @param [Symbol] attribute The attribute name we are filtering
-      # @param value The corresponding query parameter value
-      # @return the scope
-      #
-      # @example ActiveRecord default
-      #   def filter(scope, attribute, value)
-      #     scope.where(attribute => value)
-      #   end
-      def filter(scope, attribute, value)
-        raise 'you must override #filter in an adapter subclass'
+      def filter_string_eq(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_string_eq)
+      end
+
+      def filter_string_eql(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_string_eql)
+      end
+
+      def filter_string_not_eq(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_string_not_eq)
+      end
+
+      def filter_string_not_eql(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_string_not_eql)
+      end
+
+      def filter_string_prefix(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_string_prefix)
+      end
+
+      def filter_string_not_prefix(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_string_not_prefix)
+      end
+
+      def filter_string_suffix(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_string_suffix)
+      end
+
+      def filter_string_not_suffix(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_string_not_suffix)
+      end
+
+      def filter_string_like(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_string_like)
+      end
+
+      def filter_string_not_like(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_string_not_like)
+      end
+
+      def filter_integer_eq(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_integer_eq)
+      end
+
+      def filter_integer_not_eq(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_integer_not_eq)
+      end
+
+      def filter_integer_gt(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_integer_gt)
+      end
+
+      def filter_integer_gte(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_integer_gte)
+      end
+
+      def filter_integer_lt(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_integer_lt)
+      end
+
+      def filter_integer_lte(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_integer_lte)
+      end
+
+      def filter_datetime_eq(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_datetime_eq)
+      end
+
+      def filter_datetime_not_eq(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_datetime_not_eq)
+      end
+
+      def filter_datetime_lte(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_datetime_lte)
+      end
+
+      def filter_float_eq(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_float_eq)
+      end
+
+      def filter_float_not_eq(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_float_not_eq)
+      end
+
+      def filter_float_gt(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_float_gt)
+      end
+
+      def filter_float_gte(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_float_gte)
+      end
+
+      def filter_float_lt(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_float_lt)
+      end
+
+      def filter_float_lte(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_float_lte)
+      end
+
+      def filter_decimal_eq(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_decimal_eq)
+      end
+
+      def filter_decimal_not_eq(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_decimal_not_eq)
+      end
+
+      def filter_decimal_gt(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_decimal_gt)
+      end
+
+      def filter_decimal_gte(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_decimal_gte)
+      end
+
+      def filter_decimal_lt(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_decimal_lt)
+      end
+
+      def filter_decimal_lte(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_decimal_lte)
+      end
+
+      def filter_datetime_eq(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_datetime_eq)
+      end
+
+      def filter_datetime_not_eq(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_datetime_not_eq)
+      end
+
+      def filter_datetime_gt(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_datetime_gt)
+      end
+
+      def filter_datetime_gte(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_datetime_gte)
+      end
+
+      def filter_datetime_lt(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_datetime_lt)
+      end
+
+      def filter_datetime_lte(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_datetime_lte)
+      end
+
+      def filter_date_eq(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_date_eq)
+      end
+
+      def filter_date_not_eq(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_date_not_eq)
+      end
+
+      def filter_date_gt(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_date_gt)
+      end
+
+      def filter_date_gte(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_date_gte)
+      end
+
+      def filter_date_lt(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_date_lt)
+      end
+
+      def filter_date_lte(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_date_lte)
+      end
+
+      def filter_boolean_eq(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_boolean_eq)
       end
 
       def base_scope(model)
@@ -213,6 +376,12 @@ module JsonapiCompliable
       # @return an array of Model instances
       def resolve(scope)
         scope
+      end
+
+      def associate_all(parent, children, association_name, association_type)
+        children.each do |c|
+          associate(parent, c, association_name, association_type)
+        end
       end
 
       # Probably want to override
