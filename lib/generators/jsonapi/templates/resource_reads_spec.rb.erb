@@ -1,0 +1,66 @@
+require 'rails_helper'
+
+RSpec.describe <%= resource_klass %>, type: :resource do
+  describe 'serialization' do
+    let!(:<%= file_name %>) { create(:<%= file_name %>) }
+
+    it 'works' do
+      render
+      data = jsonapi_data[0]
+      expect(data.id).to eq(<%= file_name %>.id)
+      expect(data.jsonapi_type).to eq('<%= file_name.pluralize %>')
+      <%- attributes.each do |a| -%>
+      <%- if [:created_at, :updated_at].include?(a.name.to_sym) -%>
+      expect(data.<%= a.name %>).to eq(datetime(<%= file_name %>.<%= a.name %>))
+      <%- else -%>
+      expect(data.<%= a.name %>).to eq(<%= file_name %>.<%= a.name %>)
+      <%- end -%>
+      <%- end -%>
+    end
+  end
+  <%- if actions?('index') -%>
+
+  describe 'filtering' do
+    let!(:<%= file_name %>1) { create(:<%= file_name %>) }
+    let!(:<%= file_name %>2) { create(:<%= file_name %>) }
+
+    context 'by id' do
+      before do
+        params[:filter] = { id: { eq: <%= file_name %>2.id } }
+      end
+
+      it 'works' do
+        render
+        expect(d.map(&:id)).to eq([<%= file_name %>2.id])
+      end
+    end
+  end
+
+  # single entity
+  # extra fields stub
+  # pagination
+
+  describe 'sorting' do
+    let!(:<%= file_name %>1) { create(:<%= file_name %>) }
+    let!(:<%= file_name %>2) { create(:<%= file_name %>) }
+
+    context 'by id descending' do
+      before do
+        params[:sort] = '-id'
+      end
+
+      it 'works' do
+        render
+        expect(d.map(&:id)).to eq([
+          <%= file_name %>2.id,
+          <%= file_name %>1.id
+        ])
+      end
+    end
+  end
+  <%- end -%>
+
+  describe 'sideloading' do
+    # ... your tests ...
+  end
+end

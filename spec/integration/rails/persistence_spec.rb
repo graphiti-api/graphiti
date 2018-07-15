@@ -1,6 +1,6 @@
 if ENV["APPRAISAL_INITIALIZED"]
   RSpec.describe 'persistence', type: :controller do
-    include JsonHelpers
+    include JsonapiSpecHelpers
 
     # todo ?include=foo
     controller(ApplicationController) do
@@ -80,8 +80,8 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       it 'responds with the persisted data' do
         do_post
-        expect(json_item['id']).to eq(Employee.first.id.to_s)
-        expect(json_item['first_name']).to eq('Joe')
+        expect(jsonapi_data['id']).to eq(Employee.first.id.to_s)
+        expect(jsonapi_data['first_name']).to eq('Joe')
       end
 
       context 'when validation error' do
@@ -121,8 +121,8 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       it 'responds with the persisted data' do
         do_put(employee.id)
-        expect(json_item['id']).to eq(employee.id.to_s)
-        expect(json_item['first_name']).to eq('Jane')
+        expect(jsonapi_data['id']).to eq(employee.id.to_s)
+        expect(jsonapi_data['first_name']).to eq('Jane')
       end
 
       context 'when there is a validation error' do
@@ -493,9 +493,9 @@ if ENV["APPRAISAL_INITIALIZED"]
       # NB - should only sideload updated position, not all positions
       it 'sideloads the objects in response' do
         do_put(employee.id)
-        expect(json_includes('positions').length).to eq(1)
-        expect(json_includes('positions')[0]['id']).to eq(position2.id.to_s)
-        expect(json_includes('departments').length).to eq(1)
+        expect(included('positions').length).to eq(1)
+        expect(included('positions')[0].id).to eq(position2.id)
+        expect(included('departments').length).to eq(1)
       end
     end
 

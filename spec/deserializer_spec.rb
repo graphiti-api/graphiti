@@ -129,7 +129,7 @@ RSpec.describe JsonapiCompliable::Deserializer do
     end
   end
 
-  describe '#include_directive' do
+  describe '#include_hash' do
     let(:payload) do
       {
         data: {
@@ -209,7 +209,7 @@ RSpec.describe JsonapiCompliable::Deserializer do
     end
 
     it 'should return the correct include graph, without disassociate/deletes' do
-      expect(instance.include_directive).to eq({
+      expect(instance.include_hash).to eq({
         positions: {
           department: {
             tags: {}

@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 RSpec.describe 'sorting' do
-  include JsonHelpers
   include_context 'resource testing'
   let(:resource) { Class.new(PORO::EmployeeResource) }
   let(:base_scope) { { type: :employees } }

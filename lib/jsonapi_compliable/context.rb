@@ -2,14 +2,15 @@ module JsonapiCompliable
   module Context
     extend ActiveSupport::Concern
 
-    included do
-      class_attribute :_sideload_whitelist
+    module Overrides
+      def sideload_whitelist=(val)
+        super(JSONAPI::IncludeDirective.new(val).to_hash)
+      end
     end
 
-    class_methods do
-      def sideload_whitelist(hash)
-        self._sideload_whitelist = JSONAPI::IncludeDirective.new(hash).to_hash
-      end
+    included do
+      class_attribute :sideload_whitelist
+      class << self;prepend Overrides;end
     end
   end
 end

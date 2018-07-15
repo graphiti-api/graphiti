@@ -28,10 +28,10 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     context 'when a sideload whitelist' do
       before do
-        controller.class.sideload_whitelist({
+        controller.class.sideload_whitelist = {
           index: [:books],
           show: { books: :genre }
-        })
+        }
       end
 
       it 'restricts what sideloads can be loaded' do

@@ -148,8 +148,8 @@ module JsonapiCompliable
         requested = include_directive.to_hash
 
         whitelist = nil
-        if @resource.context
-          whitelist = @resource.context._sideload_whitelist
+        if @resource.context && @resource.context.respond_to?(:sideload_whitelist)
+          whitelist = @resource.context.sideload_whitelist
           whitelist = whitelist[@resource.context_namespace] if whitelist
         end
 

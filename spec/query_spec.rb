@@ -47,6 +47,48 @@ RSpec.describe JsonapiCompliable::Query do
         end
       end
 
+      context 'when context has sideload whitelist' do
+        let(:ctx) do
+          OpenStruct.new(sideload_whitelist: { update: { positions: {} }})
+        end
+
+        around do |e|
+          JsonapiCompliable.with_context ctx, :update do
+            e.run
+          end
+        end
+
+        it 'removes invalid includes' do
+          expect(hash).to eq(include: { positions: {} })
+        end
+      end
+
+      context 'when context does not respond to #sideload_whitelist' do
+        before do
+          params[:include] = 'positions.department'
+        end
+
+        let(:ctx) { OpenStruct.new }
+
+        around do |e|
+          JsonapiCompliable.with_context ctx, :update do
+            e.run
+          end
+        end
+
+        it 'still works' do
+          expect(hash).to eq({
+            include: {
+              positions: {
+                include: {
+                  department: {}
+                }
+              }
+            }
+          })
+        end
+      end
+
       context 'when invalid' do
         before do
           params[:include] = 'foo'

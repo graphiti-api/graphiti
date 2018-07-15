@@ -54,10 +54,6 @@ class JsonapiCompliable::Deserializer
     @payload
   end
 
-  def action
-    JsonapiCompliable.context[:namespace]
-  end
-
   # @return [Hash] the raw :data value of the payload
   def data
     @payload[:data]
@@ -88,7 +84,7 @@ class JsonapiCompliable::Deserializer
   # +temp_id+: the +temp-id+, if specified
   #
   # @return [Hash]
-  def meta
+  def meta(action: :update)
     {
       type: data[:type],
       temp_id: data[:'temp-id'],
@@ -101,20 +97,11 @@ class JsonapiCompliable::Deserializer
     @relationships ||= process_relationships(raw_relationships)
   end
 
-  # Parses the +relationships+ recursively and builds an all-hash
-  # include directive like
-  #
-  #   { posts: { comments: {} } }
-  #
-  # Relationships that have been marked for destruction will NOT
-  # be part of the include directive.
-  #
-  # @return [Hash] the include directive
-  def include_directive(memo = {}, relationship_node = nil)
+  def include_hash(memo = {}, relationship_node = nil)
     relationship_node ||= relationships
 
     relationship_node.each_pair do |name, relationship_payload|
-      merge_include_directive(memo, name, relationship_payload)
+      merge_include_hash(memo, name, relationship_payload)
     end
 
     memo
@@ -122,12 +109,12 @@ class JsonapiCompliable::Deserializer
 
   private
 
-  def merge_include_directive(memo, name, relationship_payload)
+  def merge_include_hash(memo, name, relationship_payload)
     arrayified = [relationship_payload].flatten
     return if arrayified.all? { |rp| removed?(rp) }
 
     memo[name] ||= {}
-    deep_merge!(memo[name], sub_directives(memo[name], arrayified))
+    deep_merge!(memo[name], nested_include_hashes(memo[name], arrayified))
     memo
   end
 
@@ -140,11 +127,11 @@ class JsonapiCompliable::Deserializer
     [:disassociate, :destroy].include?(method)
   end
 
-  def sub_directives(memo, relationship_payloads)
+  def nested_include_hashes(memo, relationship_payloads)
     {}.tap do |subs|
       relationship_payloads.each do |rp|
-        sub_directive = include_directive(memo, rp[:relationships])
-        deep_merge!(subs, sub_directive)
+        nested = include_hash(memo, rp[:relationships])
+        deep_merge!(subs, nested)
       end
     end
   end

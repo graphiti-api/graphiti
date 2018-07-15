@@ -79,61 +79,51 @@ module JsonapiCompliable
             canonical_name: :integer,
             params: Dry::Types['coercible.integer'],
             read: Dry::Types['coercible.string'],
-            test: Dry::Types['strict.string'],
             write: Dry::Types['coercible.integer']
           },
           string: {
             params: Dry::Types['coercible.string'],
             read: Dry::Types['coercible.string'],
-            test: Dry::Types['strict.string'],
             write: Dry::Types['coercible.string']
           },
           integer: {
             params: PresentInteger,
             read: Integer,
-            test: Dry::Types['strict.integer'],
             write: Integer
           },
           decimal: {
             params: ParamDecimal,
             read: Dry::Types['json.decimal'],
-            test: Dry::Types['strict.string'],
             write: Dry::Types['json.decimal']
           },
           float: {
             params: Dry::Types['coercible.float'],
             read: Float,
-            test: Dry::Types['strict.float'],
             write: Float
           },
           boolean: {
             params: PresentBool,
             read: Bool,
-            test: Dry::Types['strict.bool'],
             write: Bool
           },
           date: {
             params: PresentDate,
             read: Date,
-            test: Dry::Types['strict.string'],
             write: Date
           },
           datetime: {
             params: PresentParamsDateTime,
             read: ReadDateTime,
-            test: Dry::Types['strict.string'],
             write: WriteDateTime
           },
           hash: {
             params: PresentParamsHash,
             read: Dry::Types['strict.hash'],
-            test: Dry::Types['strict.hash'],
             write: Dry::Types['strict.hash']
           },
           array: {
             params: Dry::Types['strict.array'],
             read: Dry::Types['strict.array'],
-            test: Dry::Types['strict.array'],
             write: Dry::Types['strict.array']
           }
         }

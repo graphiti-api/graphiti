@@ -22,7 +22,7 @@ class JsonapiCompliable::Util::ValidationResponse
   # Check to ensure no validation errors.
   # @return [Boolean] did the persistence call succeed?
   def success?
-    all_valid?(object, @deserialized_params.relationships)
+    all_valid?(object, relationships)
   end
 
   # @return [Array] the object and success state
@@ -38,6 +38,14 @@ class JsonapiCompliable::Util::ValidationResponse
   end
 
   private
+
+  def relationships
+    if @deserialized_params
+      @deserialized_params.relationships
+    else
+      {}
+    end
+  end
 
   def valid_object?(object)
     !object.respond_to?(:errors) ||

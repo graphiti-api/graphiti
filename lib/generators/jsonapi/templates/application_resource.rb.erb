@@ -10,5 +10,6 @@ class ApplicationResource < JsonapiCompliable::Resource
   # Subclasses can still override this default.
   # More on adapters: https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Adapters/Abstract.html
   <%- end -%>
-  use_adapter JsonapiCompliable::Adapters::ActiveRecord
+  self.abstract_class = true
+  self.adapter = JsonapiCompliable::Adapters::ActiveRecord::Base.new
 end

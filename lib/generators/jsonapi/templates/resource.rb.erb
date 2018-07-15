@@ -1,53 +1,11 @@
-<%- unless omit_comments? -%>
-# Define how to query and persist a given model.
-# Further Resource documentation: https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Resource.html
-<%- end -%>
 <% module_namespacing do -%>
 class <%= class_name %>Resource < ApplicationResource
-  <%- unless omit_comments? -%>
-  # Used for associating this resource with a given input.
-  # This should match the 'type' in the corresponding serializer.
+  <%- attributes.each do |a| -%>
+  <%- if [:created_at, :updated_at].include?(a.name.to_sym) -%>
+  attribute :<%= a.name %>, :<%= a.type %>, writable: false
+  <%- else -%>
+  attribute :<%= a.name %>, :<%= a.type %>
   <%- end -%>
-  type :<%= type %>
-  <%- unless omit_comments? -%>
-  # Associate to a Model object so we know how to persist.
-  <%- end -%>
-  model <%= model_klass %>
-  <%- unless omit_comments? -%>
-  # Customize your resource here. Some common examples:
-  #
-  # === Allow ?filter[name] query parameter ===
-  # allow_filter :name
-  #
-  # === Enable total count, when requested ===
-  # allow_stat total: [:count]
-  #
-  # === Allow sideloading/sideposting of relationships ===
-  # belongs_to :foo,
-  #   foreign_key: :foo_id,
-  #   resource: FooResource,
-  #   scope: -> { Foo.all }
-  #
-  # === Custom sorting logic ===
-  # sort do |scope, att, dir|
-  #   ... code ...
-  # end
-  #
-  # === Change default sort ===
-  # default_sort([{ title: :asc }])
-  #
-  # === Custom pagination logic ===
-  # paginate do |scope, current_page, per_page|
-  #   ... code ...
-  # end
-  #
-  # === Change default page size ===
-  # default_page_size(10)
-  #
-  # === Change how we resolve the scope ===
-  # def resolve(scope)
-  #   ... code ...
-  # end
   <%- end -%>
 end
 <% end -%>

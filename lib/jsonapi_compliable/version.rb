@@ -1,3 +1,3 @@
 module JsonapiCompliable
-  VERSION = "0.11.23"
+  VERSION = "1.0.alpha.1"
 end

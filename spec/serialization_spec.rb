@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 RSpec.describe 'serialization' do
-  include JsonHelpers
   include_context 'resource testing'
   let(:resource) do
     Class.new(PORO::ApplicationResource) do
@@ -11,7 +10,6 @@ RSpec.describe 'serialization' do
       end
     end
   end
-  let(:base_scope) { { type: :employees } }
 
   let(:attributes) { json['data'][0]['attributes'] }
 
@@ -375,10 +373,10 @@ RSpec.describe 'serialization' do
         end
 
         it 'applies basic to_json conversion of elements' do
-          time = Time.parse('01-06-2018 4:36pm')
+          time = Time.parse('01-06-2018 4:36pm PST')
           PORO::Employee.create(age: [time])
           render
-          expect(attributes['age']).to eq(["2018-06-01 16:36:00 -0400"])
+          expect(attributes['age']).to eq(["2018-06-01 16:36:00 -0800"])
         end
 
         # If we did Array(value), you'd get something incorrect

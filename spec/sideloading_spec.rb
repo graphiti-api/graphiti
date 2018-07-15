@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 RSpec.describe 'sideloading' do
-  include JsonHelpers
   include_context 'resource testing'
   let(:resource) do
     Class.new(PORO::EmployeeResource) do
@@ -69,7 +68,7 @@ RSpec.describe 'sideloading' do
     it 'works' do
       params[:include] = 'positions'
       render
-      expect(ids_for('positions')).to eq([1, 2])
+      expect(included('positions').map(&:id)).to eq([1, 2])
     end
 
     context 'and deep querying' do
@@ -80,7 +79,7 @@ RSpec.describe 'sideloading' do
 
       it 'works' do
         render
-        expect(ids_for('positions')).to eq([2, 1])
+        expect(included('positions').map(&:id)).to eq([2, 1])
       end
     end
 
@@ -136,7 +135,7 @@ RSpec.describe 'sideloading' do
 
     it 'works' do
       render
-      expect(ids_for('positions')).to eq([1, 2])
+      expect(included('positions').map(&:id)).to eq([1, 2])
     end
   end
 
@@ -161,7 +160,7 @@ RSpec.describe 'sideloading' do
 
     it 'works' do
       render
-      expect(ids_for('positions')).to eq([2, 1])
+      expect(included('positions').map(&:id)).to eq([2, 1])
     end
   end
 
@@ -175,7 +174,7 @@ RSpec.describe 'sideloading' do
 
     it 'works' do
       render
-      expect(ids_for('positions')).to eq([2, 1])
+      expect(included('positions').map(&:id)).to eq([2, 1])
     end
   end
 
@@ -196,7 +195,7 @@ RSpec.describe 'sideloading' do
 
     it 'works' do
       render
-      expect(ids_for('positions')).to eq([1, 2])
+      expect(included('positions').map(&:id)).to eq([1, 2])
     end
 
     context 'when custom foreign key given' do
@@ -219,7 +218,7 @@ RSpec.describe 'sideloading' do
 
       it 'is used' do
         render
-        expect(ids_for('positions')).to eq([1, 2])
+        expect(included('positions').map(&:id)).to eq([1, 2])
       end
     end
   end
@@ -251,7 +250,7 @@ RSpec.describe 'sideloading' do
 
     it 'works' do
       render
-      expect(ids_for('employees')).to eq([1])
+      expect(included('employees').map(&:id)).to eq([1])
     end
   end
 
@@ -273,7 +272,7 @@ RSpec.describe 'sideloading' do
 
     it 'works' do
       render
-      expect(ids_for('bios')).to eq([1])
+      expect(included('bios').map(&:id)).to eq([1])
     end
   end
 
@@ -295,7 +294,7 @@ RSpec.describe 'sideloading' do
 
     it 'works' do
       render
-      expect(ids_for('teams')).to eq([1, 2])
+      expect(included('teams').map(&:id)).to eq([1, 2])
     end
   end
 
@@ -317,10 +316,6 @@ RSpec.describe 'sideloading' do
       json['data'][index]['relationships']['credit_card']['data']
     end
 
-    def included(index)
-      json['included'][index]
-    end
-
     def assert_correct_response
       expect(credit_card(0)).to eq({
         'type' => 'visas', 'id' => '1'
@@ -328,12 +323,12 @@ RSpec.describe 'sideloading' do
       expect(credit_card(1)).to eq({
         'type' => 'mastercards', 'id' => '1'
       })
-      expect(included(0)['type']).to eq('visas')
-      expect(included(0)['relationships']).to eq({
+      expect(included[0].jsonapi_type).to eq('visas')
+      expect(included[0].relationships).to eq({
         'visa_rewards' => { 'meta' => { 'included' => false } }
       })
-      expect(included(1)['type']).to eq('mastercards')
-      expect(included(1)).to_not have_key('relationships')
+      expect(included[1].jsonapi_type).to eq('mastercards')
+      expect(included[1].relationships).to be_nil
     end
 
     context 'when defaults' do
@@ -454,7 +449,7 @@ RSpec.describe 'sideloading' do
 
     it 'is ignored for sideloads' do
       render
-      expect(ids_for('positions')).to match_array([1, 2])
+      expect(included('positions').map(&:id)).to match_array([1, 2])
     end
   end
 
@@ -478,8 +473,8 @@ RSpec.describe 'sideloading' do
 
     it 'works' do
       render
-      expect(ids_for('positions')).to match_array([1, 2])
-      expect(ids_for('departments')).to match_array([1, 2])
+      expect(included('positions').map(&:id)).to match_array([1, 2])
+      expect(included('departments').map(&:id)).to match_array([1, 2])
     end
   end
 
@@ -516,7 +511,7 @@ RSpec.describe 'sideloading' do
 
     it 'works' do
       render
-      expect(ids_for('positions')).to match_array([2])
+      expect(included('positions').map(&:id)).to match_array([2])
     end
   end
 
@@ -539,7 +534,7 @@ RSpec.describe 'sideloading' do
 
       it 'works' do
         render
-        expect(ids_for('positions')).to match_array([1, 2])
+        expect(included('positions').map(&:id)).to match_array([1, 2])
       end
 
       context 'and params customization' do
@@ -553,7 +548,7 @@ RSpec.describe 'sideloading' do
 
         it 'is respected' do
           render
-          expect(ids_for('positions')).to match_array([2])
+          expect(included('positions').map(&:id)).to match_array([2])
         end
       end
 
@@ -568,7 +563,7 @@ RSpec.describe 'sideloading' do
 
         it 'is respected' do
           render
-          expect(ids_for('positions')).to match_array([2])
+          expect(included('positions').map(&:id)).to match_array([2])
         end
       end
     end
@@ -594,7 +589,7 @@ RSpec.describe 'sideloading' do
 
       it 'works' do
         render
-        expect(ids_for('departments')).to match_array([1, 2])
+        expect(included('departments').map(&:id)).to match_array([1, 2])
       end
 
       context 'and params customization' do
@@ -608,7 +603,7 @@ RSpec.describe 'sideloading' do
 
         it 'is respected' do
           render
-          expect(ids_for('departments')).to match_array([2])
+          expect(included('departments').map(&:id)).to match_array([2])
         end
       end
 
@@ -623,7 +618,7 @@ RSpec.describe 'sideloading' do
 
         it 'is respected' do
           render
-          expect(ids_for('departments')).to match_array([2])
+          expect(included('departments').map(&:id)).to match_array([2])
         end
       end
     end
@@ -647,7 +642,7 @@ RSpec.describe 'sideloading' do
 
       it 'works' do
         render
-        expect(ids_for('bios')).to match_array([1])
+        expect(included('bios').map(&:id)).to match_array([1])
       end
 
       context 'and params customization' do
@@ -661,7 +656,7 @@ RSpec.describe 'sideloading' do
 
         it 'is respected' do
           render
-          expect(ids_for('bios')).to match_array([2])
+          expect(included('bios').map(&:id)).to match_array([2])
         end
       end
 
@@ -676,7 +671,7 @@ RSpec.describe 'sideloading' do
 
         it 'is respected' do
           render
-          expect(ids_for('bios')).to match_array([2])
+          expect(included('bios').map(&:id)).to match_array([2])
         end
       end
     end

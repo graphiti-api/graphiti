@@ -14,21 +14,17 @@ module JsonapiCompliable
         end
 
         def find(params, base_scope = nil)
+          id = params[:data].try(:[], :id) || params.delete(:id)
           params[:filter] ||= {}
-          params[:filter].merge!(id: params.delete(:id))
+          params[:filter].merge!(id: id)
 
           runner = Runner.new(self, params)
-          runner.proxy(base_scope, single: true)
+          runner.proxy(base_scope, single: true, raise_on_missing: true)
         end
 
-        def build(params)
+        def build(params, base_scope = nil)
           runner = Runner.new(self, params)
-          runner.build
-        end
-
-        def create(params)
-          runner = Runner.new(self, params)
-          runner.jsonapi_create
+          runner.proxy(base_scope, single: true, raise_on_missing: true)
         end
       end
     end

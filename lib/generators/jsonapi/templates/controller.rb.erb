@@ -1,96 +1,51 @@
 <% module_namespacing do -%>
 class <%= model_klass.name.pluralize %>Controller < ApplicationController
-  <%- unless omit_comments? -%>
-  # Mark this as a JSONAPI controller, associating with the given resource
-  <%- end -%>
-  jsonapi resource: <%= model_klass %>Resource
-
-  <%- if actions?('create', 'update') -%>
-  <%- unless omit_comments? -%>
-  # Reference a strong resource payload defined in
-  # config/initializers/strong_resources.rb
-  <%- end -%>
-  strong_resource :<%= file_name %>
-  <%- end -%>
-  <%- if actions?('create', 'update') -%>
-  <%- unless omit_comments? -%>
-  # Run strong parameter validation for these actions.
-  # Invalid keys will be dropped.
-  # Invalid value types will log or raise based on the configuration
-  # ActionController::Parameters.action_on_invalid_parameters
-  <%- end -%>
-  before_action :apply_strong_params, only: [:create, :update]
-
-  <%- end -%>
   <%- if actions?('index') -%>
-  <%- unless omit_comments? -%>
-  # Start with a base scope and pass to render_jsonapi
-  <%- end -%>
   def index
-    <%= file_name.pluralize %> = <%= model_klass %>.all
-    render_jsonapi(<%= file_name.pluralize %>)
+    <%= file_name.pluralize %> = <%= resource_klass %>.all(params)
+    respond_with(<%= file_name.pluralize %>)
   end
-
   <%- end -%>
   <%- if actions?('show') -%>
-  <%- unless omit_comments? -%>
-  # Call jsonapi_scope directly here so we can get behavior like
-  # sparse fieldsets and statistics.
-  <%- end -%>
-  def show
-    scope = jsonapi_scope(<%= model_klass %>.where(id: params[:id]))
-    instance = scope.resolve.first
-    raise JsonapiCompliable::Errors::RecordNotFound unless instance
-    render_jsonapi(instance, scope: false)
-  end
 
+  def show
+    <%= file_name %> = <%= resource_klass %>.find(params)
+    respond_with(<%= file_name.pluralize %>)
+  end
   <%- end -%>
   <%- if actions?('create') -%>
-  <%- unless omit_comments? -%>
-  # jsonapi_create will use the configured Resource (and adapter) to persist.
-  # This will handle nested relationships as well.
-  # On validation errors, render correct error JSON.
-  <%- end -%>
-  def create
-    <%= file_name %>, success = jsonapi_create.to_a
 
-    if success
-      render_jsonapi(<%= file_name %>, scope: false)
+  def create
+    <%= file_name %> = <%= resource_klass %>.build(params)
+
+    if <%= file_name %>.save
+      respond_with(<%= file_name %>)
     else
-      render_errors_for(<%= file_name %>)
+      render jsonapi_errors: <%= file_name %>
     end
   end
-
   <%- end -%>
   <%- if actions?('update') -%>
-  <%- unless omit_comments? -%>
-  # jsonapi_update will use the configured Resource (and adapter) to persist.
-  # This will handle nested relationships as well.
-  # On validation errors, render correct error JSON.
-  <%- end -%>
-  def update
-    <%= file_name %>, success = jsonapi_update.to_a
 
-    if success
-      render_jsonapi(<%= file_name %>, scope: false)
+  def update
+    <%= file_name %> = <%= resource_klass %>.find(params)
+
+    if <%= file_name %>.update_attributes
+      respond_with(<%= file_name %>)
     else
-      render_errors_for(<%= file_name %>)
+      render jsonapi_errors: <%= file_name %>
     end
   end
-
   <%- end -%>
   <%- if actions?('destroy') -%>
-  <%- unless omit_comments? -%>
-  # Renders 200 OK with empty meta
-  # http://jsonapi.org/format/#crud-deleting-responses-200
-  <%- end -%>
-  def destroy
-    <%= file_name %>, success = jsonapi_destroy.to_a
 
-    if success
+  def destroy
+    <%= file_name %> = <%= resource_klass %>.find(params)
+
+    if <%= file_name %>.destroy
       render json: { meta: {} }
     else
-      render_errors_for(<%= file_name %>)
+      render jsonapi_errors: <%= file_name %>
     end
   end
   <%- end -%>

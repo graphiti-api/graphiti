@@ -30,17 +30,12 @@ module JsonapiCompliable
     def render(implementation)
       notify do
         instance = JSONAPI::Serializable::Renderer.new(implementation)
-
-        if proxy.is_a?(PersistenceProxy)
-          options[:include] = proxy.payload.include_directive
-        else
-          options[:fields] = proxy.query.fields
-          options[:expose] ||= {}
-          options[:expose][:extra_fields] = proxy.query.extra_fields
-          options[:include] = proxy.query.include_hash
-          options[:meta] ||= {}
-          options[:meta].merge!(stats: proxy.stats) unless proxy.stats.empty?
-        end
+        options[:fields] = proxy.fields
+        options[:expose] ||= {}
+        options[:expose][:extra_fields] = proxy.extra_fields
+        options[:include] = proxy.include_hash
+        options[:meta] ||= {}
+        options[:meta].merge!(stats: proxy.stats) unless proxy.stats.empty?
         instance.render(records, options)
       end
     end

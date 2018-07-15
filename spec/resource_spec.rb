@@ -900,7 +900,7 @@ RSpec.describe JsonapiCompliable::Resource do
     describe '.find' do
       it 'takes the id param and applies as a filter, returning single record' do
         proxy = klass.find(id: employee2.id)
-        expect(proxy.to_a[0].id).to eq(employee2.id)
+        expect(proxy.data.id).to eq(employee2.id)
       end
 
       it 'supports other params as well' do
@@ -920,7 +920,7 @@ RSpec.describe JsonapiCompliable::Resource do
           id: employee2.id,
           extra_fields: { employees: 'foo' }
         })
-        expect(employees.to_a[0].id).to eq(3)
+        expect(employees.data.id).to eq(3)
       end
 
       context 'when stats' do

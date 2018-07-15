@@ -22,18 +22,10 @@ module Jsonapi
       end
 
       generate_controller
-      generate_serializer
       generate_application_resource unless application_resource_defined?
-      generate_spec_payload
-
-      if actions?('create', 'update')
-        generate_strong_resource
-      end
-
       generate_route
       generate_tests
       generate_resource
-      generate_swagger if docs_controller?
     end
 
     private
@@ -55,11 +47,6 @@ module Jsonapi
       template('controller.rb.erb', to)
     end
 
-    def generate_serializer
-      to = File.join('app/serializers', class_path, "serializable_#{file_name}.rb")
-      template('serializer.rb.erb', to)
-    end
-
     def generate_application_resource
       to = File.join('app/resources', class_path, "application_resource.rb")
       template('application_resource.rb.erb', to)
@@ -67,39 +54,6 @@ module Jsonapi
 
     def application_resource_defined?
       'ApplicationResource'.safe_constantize.present?
-    end
-
-    def docs_controller?
-      File.exists?('app/controllers/docs_controller.rb')
-    end
-
-    def generate_swagger
-      code = "  jsonapi_resource '/v1/#{type}'"
-      code << ", only: [#{actions.map { |a| ":#{a}" }.join(', ')}]" if actions.length < 5
-      code << "\n"
-      inject_into_file 'app/controllers/docs_controller.rb', before: /^end/ do
-        code
-      end
-    end
-
-    def generate_spec_payload
-      to = File.join('spec/payloads', class_path, "#{file_name}.rb")
-      template('payload.rb.erb', to)
-    end
-
-    def generate_strong_resource
-      code = "  strong_resource :#{file_name} do\n"
-      attributes.each do |a|
-        type = a.type
-        type = :string if type == :text
-        type = :number if [:float, :decimal].include?(type)
-        code << "    attribute :#{a.name}, :#{type}\n"
-      end
-      code << "  end\n"
-
-      inject_into_file 'config/initializers/strong_resources.rb', after: "StrongResources.configure do\n" do
-        code
-      end
     end
 
     def generate_route
@@ -112,40 +66,11 @@ module Jsonapi
     end
 
     def generate_tests
-      if actions?('index')
-        to = File.join "spec/api/v1/#{file_name.pluralize}",
-          class_path,
-          "index_spec.rb"
-        template('index_request_spec.rb.erb', to)
-      end
+      to = File.join("spec/resources/#{file_name}", class_path, "reads_spec.rb")
+      template('resource_reads_spec.rb.erb', to)
 
-      if actions?('show')
-        to = File.join "spec/api/v1/#{file_name.pluralize}",
-          class_path,
-          "show_spec.rb"
-        template('show_request_spec.rb.erb', to)
-      end
-
-      if actions?('create')
-        to = File.join "spec/api/v1/#{file_name.pluralize}",
-          class_path,
-          "create_spec.rb"
-        template('create_request_spec.rb.erb', to)
-      end
-
-      if actions?('update')
-        to = File.join "spec/api/v1/#{file_name.pluralize}",
-          class_path,
-          "update_spec.rb"
-        template('update_request_spec.rb.erb', to)
-      end
-
-      if actions?('destroy')
-        to = File.join "spec/api/v1/#{file_name.pluralize}",
-          class_path,
-          "destroy_spec.rb"
-        template('destroy_request_spec.rb.erb', to)
-      end
+      to = File.join("spec/resources/#{file_name}", class_path, "writes_spec.rb")
+      template('resource_writes_spec.rb.erb', to)
     end
 
     def generate_resource
@@ -189,6 +114,10 @@ module Jsonapi
 
     def model_klass
       class_name.safe_constantize
+    end
+
+    def resource_klass
+      "#{model_klass}Resource"
     end
 
     def type

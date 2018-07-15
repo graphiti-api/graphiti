@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 RSpec.describe 'polymorphic resource behavior' do
-  include JsonHelpers
   include_context 'resource testing'
 
   # Inheriting causes us to think this class is a polymorphic

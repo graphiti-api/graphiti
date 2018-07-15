@@ -4,10 +4,13 @@ module JsonapiCompliable
 
     attr_reader :resource, :query, :scope
 
-    def initialize(resource, scope, query, single: false, raise_on_missing: false)
+    def initialize(resource, scope, query, payload: nil, single: false, raise_on_missing: false)
       @resource = resource
       @scope = scope
       @query = query
+      @payload = payload
+      @single = single
+      @raise_on_missing = raise_on_missing
     end
 
     def single?
@@ -18,8 +21,8 @@ module JsonapiCompliable
       !!@raise_on_missing
     end
 
-    def data
-      to_a
+    def errors
+      data.errors
     end
 
     def [](val)
@@ -46,14 +49,17 @@ module JsonapiCompliable
       Renderer.new(self, options).to_xml
     end
 
-    def to_a
-      records = @scope.resolve
-      if records.empty? && raise_on_missing?
-        raise JsonapiCompliable::Errors::RecordNotFound
+    def data
+      @data ||= begin
+        records = @scope.resolve
+        if records.empty? && raise_on_missing?
+          raise JsonapiCompliable::Errors::RecordNotFound
+        end
+        records = records[0] if single?
+        records
       end
-      records = records[0] if single?
-      records
     end
+    alias :to_a :data
 
     def each(&blk)
       to_a.each(&blk)
@@ -61,6 +67,61 @@ module JsonapiCompliable
 
     def stats
       @stats ||= @scope.resolve_stats
+    end
+
+    def save(action: :create)
+      validator = persist do
+        @resource.persist_with_relationships \
+          @payload.meta(action: action),
+          @payload.attributes,
+          @payload.relationships
+      end
+      @data, success = validator.to_a
+      success
+    end
+
+    def destroy
+      validator = @resource.transaction do
+        model = @resource.destroy(@query.filters[:id])
+        model.instance_variable_set(:@__serializer_klass, @resource.serializer)
+        validator = ::JsonapiCompliable::Util::ValidationResponse.new \
+          model, @payload
+        validator.validate!
+        @resource.before_commit(model, :destroy)
+        validator
+      end
+      @data, success = validator.to_a
+      success
+    end
+
+    def update_attributes
+      save(action: :update)
+    end
+
+    def include_hash
+      @payload ? @payload.include_hash : @query.include_hash
+    end
+
+    def fields
+      query.fields
+    end
+
+    def extra_fields
+      query.extra_fields
+    end
+
+    private
+
+    def persist
+      @resource.transaction do
+        ::JsonapiCompliable::Util::Hooks.record do
+          model = yield
+          validator = ::JsonapiCompliable::Util::ValidationResponse.new \
+            model, @payload
+          validator.validate!
+          validator
+        end
+      end
     end
   end
 end

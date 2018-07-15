@@ -6,8 +6,8 @@ require 'jsonapi_compliable/version'
 Gem::Specification.new do |spec|
   spec.name          = "jsonapi_compliable"
   spec.version       = JsonapiCompliable::VERSION
-  spec.authors       = ["Lee Richmond", "Venkata Pasupuleti"]
-  spec.email         = ["richmolj@gmail.com", "spasupuleti4@bloomberg.net"]
+  spec.authors       = ["Lee Richmond"]
+  spec.email         = ["richmolj@gmail.com"]
 
   spec.summary       = %q{Easily build jsonapi.org-compatible APIs}
   spec.license       = "MIT"
@@ -29,4 +29,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "sqlite3"
   spec.add_development_dependency "database_cleaner"
   spec.add_development_dependency "activemodel", ['>= 4.1', '< 6']
+  spec.add_development_dependency "jsonapi_spec_helpers", '>= 1.0.alpha.1'
 end
