@@ -109,6 +109,7 @@ end
 if defined?(Rails)
   require 'jsonapi_compliable/railtie'
   require 'jsonapi_compliable/rails'
+  require 'jsonapi_compliable/responders'
 end
 
 module JsonapiCompliable

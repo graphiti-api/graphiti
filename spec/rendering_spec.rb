@@ -77,6 +77,14 @@ RSpec.describe 'serialization' do
       expect(json['meta']).to eq('foo' => 'bar')
     end
 
+    it 'does not blow up on nils' do
+      PORO::DB.data[:departments] = []
+      json = JSON.parse(proxy.to_json)
+      position = json['employees'][0]['positions'][0]
+      expect(position).to have_key('department')
+      expect(position['department']).to be_nil
+    end
+
     context 'when non-standard resource type' do
       before do
         resource.type = :foos

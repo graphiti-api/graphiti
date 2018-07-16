@@ -10,12 +10,14 @@ module JsonapiCompliable
         rels.each_with_object({}) do |(k, v), h|
           serializers = v.send(:resources)
           attrs[k] = if serializers.is_a?(Array)
-            serializers.map do |rr| # use private method to avoid array casting
-              rr.to_hash(fields: fields, include: include[k])
+              serializers.map do |rr| # use private method to avoid array casting
+                rr.to_hash(fields: fields, include: include[k])
+              end
+            elsif serializers.nil?
+              nil
+            else
+              serializers.to_hash(fields: fields, include: include[k])
             end
-          else
-            serializers.to_hash(fields: fields, include: include[k])
-          end
         end
 
         hash[:id] = jsonapi_id

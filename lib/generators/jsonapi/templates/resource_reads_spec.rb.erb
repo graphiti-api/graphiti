@@ -36,15 +36,11 @@ RSpec.describe <%= resource_klass %>, type: :resource do
     end
   end
 
-  # single entity
-  # extra fields stub
-  # pagination
-
   describe 'sorting' do
-    let!(:<%= file_name %>1) { create(:<%= file_name %>) }
-    let!(:<%= file_name %>2) { create(:<%= file_name %>) }
-
     context 'by id descending' do
+      let!(:<%= file_name %>1) { create(:<%= file_name %>) }
+      let!(:<%= file_name %>2) { create(:<%= file_name %>) }
+
       before do
         params[:sort] = '-id'
       end
