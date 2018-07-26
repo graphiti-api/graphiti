@@ -94,6 +94,14 @@ module Legacy
     has_many :author_hobbies
     has_many :hobbies, through: :author_hobbies
     has_one :bio
+
+    # This logic should not ever fire
+    has_many :special_books,
+      -> { where(id: 9999) },
+      class_name: 'Legacy::Book'
+    belongs_to :special_state,
+      -> { where(id: 9999) },
+      class_name: 'Legacy::State'
   end
 
   class Organization < ApplicationRecord
@@ -272,5 +280,27 @@ module Legacy
         on(:"Legacy::Condo")
       end
     end
+  end
+
+  class SearchAdapter < JsonapiCompliable::Adapters::Abstract
+    def base_scope(model)
+      model.all
+    end
+
+    def paginate(scope, a, b)
+      scope
+    end
+
+    def resolve(scope)
+      scope.to_a
+    end
+  end
+
+  class AuthorSearchResource < ApplicationResource
+    self.adapter = SearchAdapter.new
+    self.model = Legacy::Author
+
+    has_many :special_books, resource: Legacy::BookResource
+    belongs_to :special_state, resource: Legacy::StateResource
   end
 end

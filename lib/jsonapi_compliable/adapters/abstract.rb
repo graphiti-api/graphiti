@@ -379,17 +379,26 @@ module JsonapiCompliable
       end
 
       def associate_all(parent, children, association_name, association_type)
-        children.each do |c|
-          associate(parent, c, association_name, association_type)
+        if activerecord_associate?(parent, children[0], association_name)
+          activerecord_adapter.associate_all parent,
+            children, association_name, association_type
+        else
+          children.each do |c|
+            associate(parent, c, association_name, association_type)
+          end
         end
       end
 
-      # Probably want to override
       def associate(parent, child, association_name, association_type)
-        if [:has_many, :many_to_many].include?(association_type)
-          parent.send(:"#{association_name}") << child
+        if activerecord_associate?(parent, child, association_name)
+          activerecord_adapter.associate \
+            parent, child, association_name, association_type
         else
-          parent.send(:"#{association_name}=", child)
+          if [:has_many, :many_to_many].include?(association_type)
+            parent.send(:"#{association_name}") << child
+          else
+            parent.send(:"#{association_name}=", child)
+          end
         end
       end
 
@@ -487,6 +496,20 @@ module JsonapiCompliable
       #   end
       def destroy(model_class, id)
         raise 'you must override #destroy in an adapter subclass'
+      end
+
+      private
+
+      def activerecord_adapter
+        @activerecord_adapter ||=
+          ::JsonapiCompliable::Adapters::ActiveRecord::Base.new
+      end
+
+      def activerecord_associate?(parent, child, association_name)
+        defined?(::ActiveRecord) &&
+          parent.is_a?(::ActiveRecord::Base) &&
+          child.is_a?(::ActiveRecord::Base) &&
+          parent.class.reflect_on_association(association_name)
       end
     end
   end

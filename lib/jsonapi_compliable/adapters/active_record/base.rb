@@ -199,7 +199,9 @@ module JsonapiCompliable
                 [:create, :update].include?(JsonapiCompliable.context[:namespace])
               parent.send(association_name) << child
             else
-              association.target |= [child]
+              target = association.instance_variable_get(:@target)
+              target |= [child]
+              association.instance_variable_set(:@target, target)
             end
           end
         end
@@ -207,7 +209,7 @@ module JsonapiCompliable
         def associate(parent, child, association_name, association_type)
           association = parent.association(association_name)
           association.loaded!
-          association.target = child
+          association.instance_variable_set(:@target, child)
         end
 
         # When a has_and_belongs_to_many relationship, we don't have a foreign
