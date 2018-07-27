@@ -58,7 +58,6 @@ module JsonapiCompliable
       end
 
       def default_proc
-        type_name = @attr[:type]
         _name = @name
         _resource = @resource.new
         ->(_) {

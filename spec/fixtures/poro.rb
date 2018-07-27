@@ -258,15 +258,11 @@ module PORO
   end
 
   class EmployeeSerializer < JSONAPI::Serializable::Resource
-    is_admin = proc { |c| @context && @context.current_user == 'admin' }
-    attribute :salary, if: is_admin do
-      100_000
-    end
-
     extra_attribute :stack_ranking do
       rand(999)
     end
 
+    is_admin = proc { |c| @context && @context.current_user == 'admin' }
     extra_attribute :admin_stack_ranking, if: is_admin do
       rand(999)
     end
@@ -293,7 +289,14 @@ module PORO
     extra_attribute :worth, :integer do
       100
     end
+    attribute :salary, :integer, readable: :admin? do
+      100_000
+    end
     has_many :positions
+
+    def admin?
+      context && context.current_user == 'admin'
+    end
   end
 
   class PositionResource < ApplicationResource
