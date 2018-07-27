@@ -63,7 +63,7 @@ RSpec.describe JsonapiCompliable::Types do
       expect(types).to include(:array_of_datetimes)
       expect(types).to include(:array_of_dates)
       expect(types).to include(:array_of_floats)
-      expect(types).to include(:array_of_decimals)
+      expect(types).to include(:array_of_big_decimals)
       expect(types).to include(:array_of_booleans)
       expect(types).to include(:array_of_hashes)
       expect(types).to include(:array_of_arrays)

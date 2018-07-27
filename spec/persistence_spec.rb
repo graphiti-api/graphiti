@@ -136,7 +136,7 @@ RSpec.describe 'persistence' do
 
     context 'when decimal' do
       before do
-        klass.attribute :age, :decimal
+        klass.attribute :age, :big_decimal
       end
 
       it 'coerces integers' do

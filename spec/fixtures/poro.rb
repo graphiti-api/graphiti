@@ -219,7 +219,7 @@ module PORO
     end
     alias :filter_integer_eq :filter
     alias :filter_string_eq :filter
-    alias :filter_decimal_eq :filter
+    alias :filter_big_decimal_eq :filter
     alias :filter_float_eq :filter
     alias :filter_date_eq :filter
     alias :filter_datetime_eq :filter

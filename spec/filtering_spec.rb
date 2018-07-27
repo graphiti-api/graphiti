@@ -88,7 +88,7 @@ RSpec.describe 'filtering' do
 
     context 'when decimal' do
       before do
-        resource.attribute :foo, :decimal
+        resource.attribute :foo, :big_decimal
       end
 
       it 'coerces integers' do

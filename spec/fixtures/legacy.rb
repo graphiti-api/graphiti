@@ -263,7 +263,7 @@ module Legacy
     attribute :first_name, :string
     attribute :age, :integer
     attribute :float_age, :float
-    attribute :decimal_age, :decimal
+    attribute :decimal_age, :big_decimal
     attribute :active, :boolean
     attribute :created_at, :datetime, only: [:filterable]
     attribute :created_at_date, :date, only: [:filterable]

@@ -59,7 +59,7 @@ module JsonapiCompliable
           is_not ? scope.where.not(clause) : scope.where(clause)
         end
         alias :filter_float_eq :filter_integer_eq
-        alias :filter_decimal_eq :filter_integer_eq
+        alias :filter_big_decimal_eq :filter_integer_eq
         alias :filter_date_eq :filter_integer_eq
         alias :filter_boolean_eq :filter_integer_eq
 
@@ -67,7 +67,7 @@ module JsonapiCompliable
           filter_integer_eq(scope, attribute, value, is_not: true)
         end
         alias :filter_float_not_eq :filter_integer_not_eq
-        alias :filter_decimal_not_eq :filter_integer_not_eq
+        alias :filter_big_decimal_not_eq :filter_integer_not_eq
         alias :filter_date_not_eq :filter_integer_not_eq
 
         def filter_integer_gt(scope, attribute, value)
@@ -75,7 +75,7 @@ module JsonapiCompliable
           scope.where(column.gt_any(value))
         end
         alias :filter_float_gt :filter_integer_gt
-        alias :filter_decimal_gt :filter_integer_gt
+        alias :filter_big_decimal_gt :filter_integer_gt
         alias :filter_datetime_gt :filter_integer_gt
         alias :filter_date_gt :filter_integer_gt
 
@@ -84,7 +84,7 @@ module JsonapiCompliable
           scope.where(column.gteq_any(value))
         end
         alias :filter_float_gte :filter_integer_gte
-        alias :filter_decimal_gte :filter_integer_gte
+        alias :filter_big_decimal_gte :filter_integer_gte
         alias :filter_datetime_gte :filter_integer_gte
         alias :filter_date_gte :filter_integer_gte
 
@@ -93,7 +93,7 @@ module JsonapiCompliable
           scope.where(column.lt_any(value))
         end
         alias :filter_float_lt :filter_integer_lt
-        alias :filter_decimal_lt :filter_integer_lt
+        alias :filter_big_decimal_lt :filter_integer_lt
         alias :filter_datetime_lt :filter_integer_lt
         alias :filter_date_lt :filter_integer_lt
 
@@ -102,7 +102,7 @@ module JsonapiCompliable
           scope.where(column.lteq_any(value))
         end
         alias :filter_float_lte :filter_integer_lte
-        alias :filter_decimal_lte :filter_integer_lte
+        alias :filter_big_decimal_lte :filter_integer_lte
         alias :filter_date_lte :filter_integer_lte
 
         # Ensure fractional seconds don't matter

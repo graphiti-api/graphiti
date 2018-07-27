@@ -53,7 +53,7 @@ module JsonapiCompliable
     end
 
     # The Float() check here is to ensure we have a number
-    # Otherwise BigDecimal('foo') *will return a decima;*
+    # Otherwise BigDecimal('foo') *will return a decimal*
     ParamDecimal = create(::BigDecimal) do |input|
       Float(input)
       input = Dry::Types['coercible.decimal'][input]
@@ -91,7 +91,7 @@ module JsonapiCompliable
             read: Integer,
             write: Integer
           },
-          decimal: {
+          big_decimal: {
             params: ParamDecimal,
             read: Dry::Types['json.decimal'],
             write: Dry::Types['json.decimal']

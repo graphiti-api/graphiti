@@ -176,27 +176,27 @@ module JsonapiCompliable
         raise Errors::AdapterNotImplemented.new(self, attribute, :filter_float_lte)
       end
 
-      def filter_decimal_eq(scope, attribute, value)
+      def filter_big_decimal_eq(scope, attribute, value)
         raise Errors::AdapterNotImplemented.new(self, attribute, :filter_decimal_eq)
       end
 
-      def filter_decimal_not_eq(scope, attribute, value)
+      def filter_big_decimal_not_eq(scope, attribute, value)
         raise Errors::AdapterNotImplemented.new(self, attribute, :filter_decimal_not_eq)
       end
 
-      def filter_decimal_gt(scope, attribute, value)
+      def filter_big_decimal_gt(scope, attribute, value)
         raise Errors::AdapterNotImplemented.new(self, attribute, :filter_decimal_gt)
       end
 
-      def filter_decimal_gte(scope, attribute, value)
+      def filter_big_decimal_gte(scope, attribute, value)
         raise Errors::AdapterNotImplemented.new(self, attribute, :filter_decimal_gte)
       end
 
-      def filter_decimal_lt(scope, attribute, value)
+      def filter_big_decimal_lt(scope, attribute, value)
         raise Errors::AdapterNotImplemented.new(self, attribute, :filter_decimal_lt)
       end
 
-      def filter_decimal_lte(scope, attribute, value)
+      def filter_big_decimal_lte(scope, attribute, value)
         raise Errors::AdapterNotImplemented.new(self, attribute, :filter_decimal_lte)
       end
 

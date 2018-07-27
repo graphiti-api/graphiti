@@ -91,7 +91,7 @@ RSpec.describe 'serialization' do
       # the level of precision BigDecimal requires
       context 'when decimal' do
         before do
-          resource.attribute :age, :decimal
+          resource.attribute :age, :big_decimal
         end
 
         it 'coerces integers' do
