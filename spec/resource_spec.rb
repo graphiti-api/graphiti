@@ -44,7 +44,7 @@ RSpec.describe JsonapiCompliable::Resource do
       end
 
       it 'infers serializer and type' do
-        expect(klass.serializer.ancestors[3])
+        expect(klass.serializer.ancestors[4])
           .to eq(JSONAPI::Serializable::Resource)
         # This class has no name
         expect(klass.type).to eq(:undefined_jsonapi_type)
