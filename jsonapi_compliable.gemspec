@@ -21,6 +21,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'jsonapi-serializable', '~> 0.3.0'
   spec.add_dependency 'dry-types', '~> 0.13'
   spec.add_dependency 'jsonapi_errorable', '~> 0.9'
+  spec.add_dependency 'concurrent-ruby', '~> 1.0'
 
   spec.add_development_dependency "activerecord", ['>= 4.1', '< 6']
   spec.add_development_dependency "kaminari", '~> 0.17'

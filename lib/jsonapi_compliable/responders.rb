@@ -5,7 +5,7 @@ module JsonapiCompliable
 
     included do
       include ActionController::MimeResponds
-      respond_to :json, :jsonapi, :xml, :api_json
+      respond_to(*JsonapiCompliable.config.respond_to)
     end
 
     # Override to avoid location url generation (for now)

@@ -4,24 +4,18 @@ module JsonapiCompliable
     # @return [Boolean] Should we raise when the client requests a relationship not defined on the server?
     #   Defaults to true.
     attr_accessor :raise_on_missing_sideload
-    # @return [Boolean] Concurrently fetch sideloads? This is *experimental* and may be removed.
-    #   Defaults to false
-    attr_accessor :experimental_concurrency
+    # @return [Boolean] Concurrently fetch sideloads?
+    #   Defaults to false OR if classes are cached (Rails-only)
+    attr_accessor :concurrency
+
+    attr_accessor :respond_to
 
     # Set defaults
     # @api private
     def initialize
       @raise_on_missing_sideload = true
-      @experimental_concurrency = false
-    end
-
-    # @api private
-    def experimental_concurrency=(val)
-      if val && !defined?(Concurrent::Promise)
-        raise "You must add the concurrent-ruby gem to opt-in to experimental concurrency"
-      else
-        @experimental_concurrency = val
-      end
+      @concurrency = false
+      @respond_to = [:json, :jsonapi, :xml]
     end
   end
 end

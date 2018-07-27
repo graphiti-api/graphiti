@@ -54,7 +54,7 @@ module JsonapiCompliable
     def sideload(results)
       return if results == []
 
-      concurrent = ::JsonapiCompliable.config.experimental_concurrency
+      concurrent = ::JsonapiCompliable.config.concurrency
       promises = []
 
       @query.sideloads.each_pair do |name, q|

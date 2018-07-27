@@ -15,6 +15,7 @@ module JsonapiCompliable
       end
       register_parameter_parser
       register_renderers
+      establish_concurrency
     end
 
     # from jsonapi-rails
@@ -59,6 +60,12 @@ module JsonapiCompliable
             status: :unprocessable_entity
         end
       end
+    end
+
+    # Only run concurrently if our environment supports it
+    def establish_concurrency
+      JsonapiCompliable.config.concurrency = !::Rails.env.test? &&
+        ::Rails.application.config.cache_classes
     end
   end
 end

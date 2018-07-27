@@ -149,6 +149,15 @@ if ENV['APPRAISAL_INITIALIZED']
           end
         end
 
+        # test not_ alternative to !
+        context 'not_eq' do
+          let(:value) { { not_eq: 'george' } }
+
+          it 'executes case-insensitive NOT search' do
+            expect(ids).to eq([author1.id])
+          end
+        end
+
         context '!eql' do
           let(:value) { { :'!eql' => 'GeOrge' } }
 
