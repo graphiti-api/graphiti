@@ -21,10 +21,8 @@ module JsonapiCompliable
     # from jsonapi-rails
     PARSER = lambda do |body|
       data = JSON.parse(body)
-      hash = { _jsonapi: data }
-
-      hash[:format] = :jsonapi
-      hash.with_indifferent_access
+      data[:format] = :jsonapi
+      data.with_indifferent_access
     end
 
     def register_parameter_parser
@@ -44,7 +42,12 @@ module JsonapiCompliable
           if respond_to?(:default_jsonapi_render_options)
             opts = default_jsonapi_render_options
           end
-          proxy.to_jsonapi(options)
+
+          if proxy.is_a?(Hash) # for destroy
+            render(options.merge(json: proxy))
+          else
+            proxy.to_jsonapi(options)
+          end
         end
       end
 

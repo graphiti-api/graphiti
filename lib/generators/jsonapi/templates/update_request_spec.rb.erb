@@ -1,0 +1,34 @@
+require 'rails_helper'
+
+RSpec.describe "<%= type %>#update", type: :request do
+  subject(:make_request) do
+    jsonapi_put "/<%= api_namespace %>/v1/<%= type %>/#{<%= file_name %>.id}", payload
+  end
+
+  describe 'basic update' do
+    let!(:<%= file_name %>) { create(:<%= file_name %>) }
+
+    let(:payload) do
+      {
+        data: {
+          id: <%= file_name %>.id.to_s,
+          type: '<%= type %>',
+          attributes: {
+            # ... your attrs here
+          }
+        }
+      }
+    end
+
+    # Replace 'xit' with 'it' after adding attributes
+    xit 'updates the resource' do
+      expect(<%= resource_klass %>).to receive(:find).and_call_original
+      expect {
+        make_request
+      }.to change { <%= file_name %>.reload.attributes }
+      expect(response.status).to eq(200)
+
+      # ... assert updates attributes ...
+    end
+  end
+end

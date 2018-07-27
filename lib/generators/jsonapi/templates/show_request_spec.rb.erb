@@ -1,0 +1,21 @@
+require 'rails_helper'
+
+RSpec.describe "<%= file_name.pluralize %>#show", type: :request do
+  let(:params) { {} }
+
+  subject(:make_request) do
+    jsonapi_get "/<%= api_namespace %>/v1/<%= file_name.pluralize %>/#{<%= file_name %>.id}", params: params
+  end
+
+  describe 'basic fetch' do
+    let!(:<%= file_name %>) { create(:<%= file_name %>) }
+
+    it 'works' do
+      expect(<%= resource_klass %>).to receive(:find).and_call_original
+      make_request
+      expect(response.status).to eq(200)
+      expect(d.jsonapi_type).to eq('<%= file_name.pluralize %>')
+      expect(d.id).to eq(<%= file_name %>.id)
+    end
+  end
+end

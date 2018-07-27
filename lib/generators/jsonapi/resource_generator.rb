@@ -24,7 +24,8 @@ module Jsonapi
       generate_controller
       generate_application_resource unless application_resource_defined?
       generate_route
-      generate_tests
+      generate_resource_specs
+      generate_api_specs
       generate_resource
     end
 
@@ -40,6 +41,10 @@ module Jsonapi
 
     def omit_comments?
       @options['omit-comments']
+    end
+
+    def responders?
+      defined?(Responders)
     end
 
     def generate_controller
@@ -65,12 +70,49 @@ module Jsonapi
       end
     end
 
-    def generate_tests
+    def generate_resource_specs
       to = File.join("spec/resources/#{file_name}", class_path, "reads_spec.rb")
       template('resource_reads_spec.rb.erb', to)
 
       to = File.join("spec/resources/#{file_name}", class_path, "writes_spec.rb")
       template('resource_writes_spec.rb.erb', to)
+    end
+
+    def generate_api_specs
+      if actions?('index')
+        to = File.join "spec/api/v1/#{file_name.pluralize}",
+          class_path,
+          "index_spec.rb"
+        template('index_request_spec.rb.erb', to)
+      end
+
+      if actions?('show')
+        to = File.join "spec/api/v1/#{file_name.pluralize}",
+          class_path,
+          "show_spec.rb"
+        template('show_request_spec.rb.erb', to)
+      end
+
+      if actions?('create')
+        to = File.join "spec/api/v1/#{file_name.pluralize}",
+          class_path,
+          "create_spec.rb"
+        template('create_request_spec.rb.erb', to)
+      end
+
+      if actions?('update')
+        to = File.join "spec/api/v1/#{file_name.pluralize}",
+          class_path,
+          "update_spec.rb"
+        template('update_request_spec.rb.erb', to)
+      end
+
+      if actions?('destroy')
+        to = File.join "spec/api/v1/#{file_name.pluralize}",
+          class_path,
+          "destroy_spec.rb"
+        template('destroy_request_spec.rb.erb', to)
+      end
     end
 
     def generate_resource
