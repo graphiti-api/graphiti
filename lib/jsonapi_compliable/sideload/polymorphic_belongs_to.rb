@@ -13,10 +13,10 @@ class JsonapiCompliable::Sideload::PolymorphicBelongsTo < JsonapiCompliable::Sid
   end
 
   class Grouper
-    attr_reader :column_name
+    attr_reader :field_name
 
-    def initialize(column_name)
-      @column_name = column_name
+    def initialize(field_name)
+      @field_name = field_name
       @groups = []
     end
 
@@ -77,7 +77,7 @@ class JsonapiCompliable::Sideload::PolymorphicBelongsTo < JsonapiCompliable::Sid
   end
 
   def resolve(parents, query)
-    parents.group_by(&grouper.column_name).each_pair do |group_name, group|
+    parents.group_by(&grouper.field_name).each_pair do |group_name, group|
       next if group_name.nil?
 
       match = ->(name, sl) { sl.group_name == group_name.to_sym }

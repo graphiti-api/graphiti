@@ -43,15 +43,15 @@ module JsonapiCompliable
           filter_string_suffix(scope, attribute, value, is_not: true)
         end
 
-        def filter_string_like(scope, attribute, value, is_not: false)
+        def filter_string_match(scope, attribute, value, is_not: false)
           column = scope.klass.arel_table[attribute]
           map = value.map { |v| "%#{v.downcase}%" }
           clause = column.lower.matches_any(map)
           is_not ? scope.where.not(clause) : scope.where(clause)
         end
 
-        def filter_string_not_like(scope, attribute, value)
-          filter_string_like(scope, attribute, value, is_not: true)
+        def filter_string_not_match(scope, attribute, value)
+          filter_string_match(scope, attribute, value, is_not: true)
         end
 
         def filter_integer_eq(scope, attribute, value, is_not: false)

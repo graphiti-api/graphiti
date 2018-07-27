@@ -82,7 +82,7 @@ class JsonapiCompliable::Util::Persistence
   end
 
   def update_foreign_type(attrs, x, null: false)
-    grouping_field = x[:sideload].parent.grouper.column_name
+    grouping_field = x[:sideload].parent.grouper.field_name
     attrs[grouping_field] = null ? nil : x[:sideload].group_name
   end
 

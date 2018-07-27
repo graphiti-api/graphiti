@@ -36,11 +36,11 @@ module JsonapiCompliable
         scope
       end
 
-      def filter_string_like_eq(scope, attribute, value)
+      def filter_string_match_eq(scope, attribute, value)
         scope
       end
 
-      def filter_string_not_like_eq(scope, attribute, value)
+      def filter_string_not_match_eq(scope, attribute, value)
         scope
       end
 

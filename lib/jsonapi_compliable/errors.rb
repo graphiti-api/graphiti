@@ -195,12 +195,12 @@ Valid types are: #{JsonapiCompliable::Types.map.keys.inspect}
 
       def message
         <<-MSG
-#{@sideload.parent_resource}: Found record with #{@sideload.grouper.column_name.inspect} == #{@name.inspect}, which is not registered!
+#{@sideload.parent_resource}: Found record with #{@sideload.grouper.field_name.inspect} == #{@name.inspect}, which is not registered!
 
 Register the behavior of different types like so:
 
 polymorphic_belongs_to #{@sideload.name.inspect} do
-  group_by(#{@sideload.grouper.column_name.inspect}) do
+  group_by(#{@sideload.grouper.field_name.inspect}) do
     on(#{@name.to_sym.inspect}) <---- this is what's missing
     on(:foo).belongs_to :foo, resource: FooResource (long-hand example)
   end

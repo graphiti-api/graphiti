@@ -189,18 +189,18 @@ if ENV['APPRAISAL_INITIALIZED']
           end
         end
 
-        context 'like' do
-          let(:value) { { like: 'org' } }
+        context 'match' do
+          let(:value) { { match: 'org' } }
 
-          it 'executes case-insensitive like query' do
+          it 'executes case-insensitive match query' do
             expect(ids).to eq([author2.id, author3.id])
           end
         end
 
-        context '!like' do
-          let(:value) { { :'!like' => 'org' } }
+        context '!match' do
+          let(:value) { { :'!match' => 'org' } }
 
-          it 'executes case-insensitive NOT like query' do
+          it 'executes case-insensitive NOT match query' do
             expect(ids).to eq([author1.id])
           end
         end

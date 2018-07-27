@@ -108,12 +108,12 @@ module JsonapiCompliable
         raise Errors::AdapterNotImplemented.new(self, attribute, :filter_string_not_suffix)
       end
 
-      def filter_string_like(scope, attribute, value)
-        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_string_like)
+      def filter_string_match(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_string_match)
       end
 
-      def filter_string_not_like(scope, attribute, value)
-        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_string_not_like)
+      def filter_string_not_match(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_string_not_match)
       end
 
       def filter_integer_eq(scope, attribute, value)
