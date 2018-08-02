@@ -23,6 +23,22 @@ module JsonapiCompliable
         collection
       end
 
+      def self.include_removed?(new, old)
+        new = JSONAPI::IncludeDirective.new(new).to_hash
+        old = JSONAPI::IncludeDirective.new(old).to_hash
+
+        old.each_pair do |k, v|
+          if new[k]
+            if include_removed?(new[k], v)
+              return true
+            end
+          else
+            return true
+          end
+        end
+        false
+      end
+
       # Like ActiveSupport's #deep_merge
       # @return [Hash] the merged hash
       # @api private

@@ -9,8 +9,8 @@ module JsonapiCompliable
     attr_accessor :concurrency
 
     attr_accessor :respond_to
-
     attr_accessor :context_for_endpoint
+    attr_accessor :schema_path
 
     # Set defaults
     # @api private
@@ -18,6 +18,14 @@ module JsonapiCompliable
       @raise_on_missing_sideload = true
       @concurrency = false
       @respond_to = [:json, :jsonapi, :xml]
+
+      if defined?(::Rails)
+        @schema_path = "#{::Rails.root}/public/schema.json"
+      end
+    end
+
+    def schema_path
+      @schema_path ||= raise('No schema_path defined! Set JsonapiCompliable.config.schema_path to save your schema.')
     end
   end
 end

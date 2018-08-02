@@ -12,6 +12,36 @@ RSpec.describe JsonapiCompliable::Configuration do
     end
   end
 
+  describe '#schema_path' do
+    after do
+      JsonapiCompliable.config.schema_path = nil
+    end
+
+    it 'raises error when not set' do
+      expect {
+        JsonapiCompliable.config.schema_path
+      }.to raise_error(/No schema_path defined/)
+    end
+
+    it 'returns value when value set' do
+      JsonapiCompliable.config.schema_path = 'foo'
+      expect(JsonapiCompliable.config.schema_path).to eq('foo')
+    end
+
+    context 'when Rails is defined' do
+      before do
+        rails = double(root: '/foo/bar')
+        stub_const('::Rails', rails)
+        JsonapiCompliable.instance_variable_set(:@config, nil)
+      end
+
+      it 'defaults' do
+        expect(JsonapiCompliable.config.schema_path)
+          .to eq('/foo/bar/public/schema.json')
+      end
+    end
+  end
+
   describe '#respond_to' do
     include_context 'with config', :respond_to
 

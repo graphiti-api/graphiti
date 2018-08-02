@@ -1,6 +1,5 @@
 module JsonapiCompliable
   class Railtie < ::Rails::Railtie
-
     initializer "jsonapi_compliable.require_activerecord_adapter" do
       config.after_initialize do |app|
         ActiveSupport.on_load(:active_record) do

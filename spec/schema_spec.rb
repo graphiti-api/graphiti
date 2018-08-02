@@ -9,16 +9,16 @@ RSpec.describe JsonapiCompliable::Schema do
         resources: [
           {
             name: 'Schema::EmployeeResource',
-            type: :employees,
+            type: 'employees',
             attributes: {
               id: {
-                type: :integer_id,
+                type: 'integer_id',
                 readable: true,
                 writable: true,
                 sortable: true
               },
               first_name: {
-                type: :string,
+                type: 'string',
                 readable: true,
                 writable: true,
                 sortable: true
@@ -27,28 +27,28 @@ RSpec.describe JsonapiCompliable::Schema do
             },
             filters: {
               id: {
-                type: :integer_id,
-                operators: JsonapiCompliable::Adapters::Abstract.new.default_operators[:integer]
+                type: 'integer_id',
+                operators: JsonapiCompliable::Adapters::Abstract.new.default_operators[:integer].map(&:to_s)
               },
               first_name: {
-                type: :string,
-                operators: JsonapiCompliable::Adapters::Abstract.new.default_operators[:string]
+                type: 'string',
+                operators: JsonapiCompliable::Adapters::Abstract.new.default_operators[:string].map(&:to_s)
               },
               title: {
-                type: :string,
-                operators: JsonapiCompliable::Adapters::Abstract.new.default_operators[:string]
+                type: 'string',
+                operators: JsonapiCompliable::Adapters::Abstract.new.default_operators[:string].map(&:to_s)
               }
             },
             extra_attributes: {
               net_sales: {
-                type: :float,
+                type: 'float',
                 readable: true
               }
             },
             relationships: {
               positions: {
                 resource: 'Schema::PositionResource',
-                type: :has_many
+                type: 'has_many'
                 #writable: true,
                 #readable: true
               }
@@ -282,7 +282,7 @@ RSpec.describe JsonapiCompliable::Schema do
 
       it 'returns :guarded, not the runtime method' do
         expect(schema[:resources][0][:attributes][:first_name][:readable])
-          .to eq(:guarded)
+          .to eq('guarded')
       end
     end
 
@@ -311,6 +311,11 @@ RSpec.describe JsonapiCompliable::Schema do
         expect(schema[:resources][0][:filters][:first_name][:required])
           .to eq(true)
       end
+
+      it 'does NOT flag as guarded' do
+        expect(schema[:resources][0][:filters][:first_name])
+          .to_not have_key(:guard)
+      end
     end
 
     context 'when attribute supports subset of filter operators via :only' do
@@ -322,7 +327,7 @@ RSpec.describe JsonapiCompliable::Schema do
 
       it 'limits the list of operators for the filter' do
         expect(schema[:resources][0][:filters][:first_name][:operators])
-          .to eq([:eq, :prefix])
+          .to eq(%w(eq prefix))
       end
     end
 
@@ -336,12 +341,12 @@ RSpec.describe JsonapiCompliable::Schema do
       it 'limits the list of operators for the filter' do
         expect(schema[:resources][0][:filters][:first_name][:operators])
           .to eq([
-            :prefix,
-            :not_prefix,
-            :suffix,
-            :not_suffix,
-            :match,
-            :not_match
+            'prefix',
+            'not_prefix',
+            'suffix',
+            'not_suffix',
+            'match',
+            'not_match'
           ])
       end
     end
@@ -355,7 +360,7 @@ RSpec.describe JsonapiCompliable::Schema do
 
       it 'returns :guarded, not the runtime method' do
         expect(schema[:resources][0][:extra_attributes][:net_sales][:readable])
-          .to eq(:guarded)
+          .to eq('guarded')
       end
     end
 
@@ -496,7 +501,7 @@ RSpec.describe JsonapiCompliable::Schema do
 
       it 'associates the relationship with multiple resources' do
         expect(schema[:resources][0][:relationships][:dwelling]).to eq({
-          type: :polymorphic_belongs_to,
+          type: 'polymorphic_belongs_to',
           resources: ['Schema::HouseResource', 'Schema::CondoResource']
         })
       end
@@ -525,6 +530,119 @@ RSpec.describe JsonapiCompliable::Schema do
 
     context 'when enum' do
       xit 'lists variants' do
+      end
+    end
+  end
+
+  describe '.generate!' do
+    let(:new_schema) do
+      {}
+    end
+
+    let(:old_schema) do
+      {}.to_json
+    end
+
+    before do
+      allow(File).to receive(:write)
+      allow(File).to receive(:read).with('/schema/path/schema.json') { old_schema }
+      allow(File).to receive(:exists?)
+        .with('/schema/path/schema.json') { true }
+      allow(described_class).to receive(:generate) { new_schema }
+      allow(JsonapiCompliable.config)
+        .to receive(:schema_path) { '/schema/path/schema.json' }
+    end
+
+    it 'generates new schema' do
+      resources = ['a']
+      expect(described_class).to receive(:generate)
+        .with(resources) { new_schema }
+      described_class.generate!(resources)
+    end
+
+    context 'when prior schema does not exist' do
+      before do
+        allow(File).to receive(:exists?)
+          .with('/schema/path/schema.json') { false }
+      end
+
+      it 'does not diff' do
+        expect(JsonapiCompliable::SchemaDiff).to_not receive(:new)
+        described_class.generate!
+      end
+
+      it 'writes schema' do
+        expect(File).to receive(:write)
+          .with('/schema/path/schema.json', JSON.pretty_generate(new_schema))
+        described_class.generate!
+      end
+
+      it 'returns empty array' do
+        expect(described_class.generate!).to eq([])
+      end
+    end
+
+    context 'when prior schema exists' do
+      before do
+        allow(File).to receive(:exists?)
+          .with('/schema/path/schema.json') { true }
+      end
+
+      context 'when no backwards-incompatibilities' do
+        before do
+          expect_any_instance_of(JsonapiCompliable::SchemaDiff)
+            .to receive(:compare) { [] }
+        end
+
+        it 'writes file' do
+          expect(File).to receive(:write)
+            .with('/schema/path/schema.json', JSON.pretty_generate(new_schema))
+          described_class.generate!
+        end
+
+        it 'returns empty array' do
+          expect(described_class.generate!).to eq([])
+        end
+      end
+
+      context 'when backwards-incompatibilities' do
+        before do
+          allow_any_instance_of(JsonapiCompliable::SchemaDiff)
+            .to receive(:compare) { ['some diff error'] }
+        end
+
+        it 'returns the list' do
+          expect_any_instance_of(JsonapiCompliable::SchemaDiff)
+            .to receive(:compare) { ['some diff error'] }
+          expect(described_class.generate!).to eq(['some diff error'])
+        end
+
+        it 'does not write the file' do
+          expect(File).to_not receive(:write)
+          described_class.generate!
+        end
+
+        context 'but FORCE_SCHEMA set' do
+          around do |e|
+            begin
+              ENV['FORCE_SCHEMA'] = 'true'
+              e.run
+            ensure
+              ENV['FORCE_SCHEMA'] = nil
+            end
+          end
+
+          it 'writes the file'do
+            contents = JSON.pretty_generate(new_schema)
+            expect(File).to receive(:write)
+              .with('/schema/path/schema.json', contents)
+            described_class.generate!
+          end
+
+          it 'returns empty array' do
+            expect(described_class.generate!).to eq([])
+          end
+        end
       end
     end
   end

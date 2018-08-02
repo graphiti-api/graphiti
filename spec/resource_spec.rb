@@ -885,11 +885,8 @@ RSpec.describe JsonapiCompliable::Resource do
       end
     end
 
-    before do
-      klass.add_endpoint '/special_employees', [:index, :create]
-    end
-
     it 'lists primary and secondary endpoints' do
+      klass.add_endpoint '/special_employees', [:index, :create]
       expect(klass.endpoints.length).to eq(2)
       expect(klass.endpoints[0]).to eq({
         path: :"/employees",
@@ -901,8 +898,19 @@ RSpec.describe JsonapiCompliable::Resource do
       })
     end
 
+    context 'when no endpoints' do
+      before do
+        klass.endpoint = nil
+      end
+
+      it 'still works' do
+        expect(klass.endpoints).to eq([])
+      end
+    end
+
     context 'when an endpoint namespace' do
       before do
+        klass.add_endpoint '/special_employees', [:index, :create]
         klass.endpoint_namespace = '/my_api/v1'
       end
 

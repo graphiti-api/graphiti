@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require 'jsonapi_compliable/cli'
+
+JsonapiCompliable::CLI.start(ARGV)

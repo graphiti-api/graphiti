@@ -8,6 +8,18 @@ module JsonapiCompliable
       new(resources).generate
     end
 
+    def self.generate!(resources = nil)
+      schema = generate(resources)
+
+      if ENV['FORCE_SCHEMA'] != 'true' && File.exists?(JsonapiCompliable.config.schema_path)
+        old = JSON.parse(File.read(JsonapiCompliable.config.schema_path))
+        errors = JsonapiCompliable::SchemaDiff.new(old, schema).compare
+        return errors if errors.any?
+      end
+      File.write(JsonapiCompliable.config.schema_path, JSON.pretty_generate(schema))
+      []
+    end
+
     def initialize(resources)
       @resources = resources
     end
@@ -45,8 +57,10 @@ module JsonapiCompliable
               end
 
               actions[a] = { resource: r.name }
-              if whitelist = ctx.sideload_whitelist[a]
-                actions[a].merge!(sideload_whitelist: whitelist)
+              if whitelist = ctx.sideload_whitelist
+                if whitelist[a]
+                  actions[a].merge!(sideload_whitelist: whitelist[a])
+                end
               end
             end
 
@@ -67,7 +81,7 @@ module JsonapiCompliable
       @resources.map do |r|
         config = {
           name: r.name,
-          type: r.type,
+          type: r.type.to_s,
           attributes: attributes(r),
           extra_attributes: extra_attributes(r),
           filters: filters(r),
@@ -87,7 +101,7 @@ module JsonapiCompliable
         resource.attributes.each_pair do |name, config|
           if config.values_at(:readable, :writable, :sortable).any?
             attrs[name] = {
-              type:       config[:type],
+              type:       config[:type].to_s,
               readable:   flag(config[:readable]),
               writable:   flag(config[:writable]),
               sortable:   flag(config[:sortable])
@@ -101,7 +115,7 @@ module JsonapiCompliable
       {}.tap do |attrs|
         resource.extra_attributes.each_pair do |name, config|
           attrs[name] = {
-            type:     config[:type],
+            type:     config[:type].to_s,
             readable: flag(config[:readable])
           }
         end
@@ -110,7 +124,7 @@ module JsonapiCompliable
 
     def flag(value)value
       if value.is_a?(Symbol)
-        :guarded
+        'guarded'
       else
         !!value
       end
@@ -120,12 +134,17 @@ module JsonapiCompliable
       {}.tap do |f|
         resource.filters.each_pair do |name, config|
           config = {
-            type: config[:type],
-            operators: config[:operators].keys
+            type: config[:type].to_s,
+            operators: config[:operators].keys.map(&:to_s)
           }
           attr = resource.attributes[name]
-          config[:required] = true if attr[:filterable] == :required
-          config[:guard] = true if attr[:filterable].is_a?(Symbol)
+          if attr[:filterable].is_a?(Symbol)
+            if attr[:filterable] == :required
+              config[:required] = true
+            else
+              config[:guard] = true
+            end
+          end
           f[name] = config
         end
       end
@@ -134,7 +153,7 @@ module JsonapiCompliable
     def relationships(resource)
       {}.tap do |r|
         resource.sideloads.each_pair do |name, config|
-          schema = { type: config.type }
+          schema = { type: config.type.to_s }
           if config.type == :polymorphic_belongs_to
             schema[:resources] = config.children.values
               .map(&:resource).map(&:class).map(&:name)

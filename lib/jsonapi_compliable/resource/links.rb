@@ -34,7 +34,7 @@ module JsonapiCompliable
       end
 
       def endpoints
-        ([endpoint] + secondary_endpoints).map do |e|
+        ([endpoint] + secondary_endpoints).compact.map do |e|
           {
             path: [endpoint_namespace, e[:path]].join('').to_sym,
             actions: e[:actions]
