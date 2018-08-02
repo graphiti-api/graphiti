@@ -10,6 +10,7 @@ module JsonapiCompliable
 
     included do
       class_attribute :sideload_whitelist
+      self.sideload_whitelist = {}
       class << self;prepend Overrides;end
     end
   end

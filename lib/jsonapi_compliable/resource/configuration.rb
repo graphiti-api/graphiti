@@ -87,6 +87,7 @@ module JsonapiCompliable
             klass.attribute :id, :integer_id
           end
           klass.stat total: [:count]
+          JsonapiCompliable.resources << klass
         end
       end
 

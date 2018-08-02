@@ -17,8 +17,10 @@ require "jsonapi_compliable/configuration"
 require "jsonapi_compliable/context"
 require "jsonapi_compliable/errors"
 require "jsonapi_compliable/types"
+require "jsonapi_compliable/schema"
 require "jsonapi_compliable/adapters/abstract"
 require "jsonapi_compliable/resource/sideloading"
+require "jsonapi_compliable/resource/links"
 require "jsonapi_compliable/resource/configuration"
 require "jsonapi_compliable/resource/dsl"
 require "jsonapi_compliable/resource/interface"
@@ -115,6 +117,10 @@ module JsonapiCompliable
   # @see Configuration
   def self.configure
     yield config
+  end
+
+  def self.resources
+    @resources ||= []
   end
 end
 

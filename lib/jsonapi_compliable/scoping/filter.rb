@@ -44,7 +44,7 @@ module JsonapiCompliable
     def filter_scope(filter, operator, value)
       operator = operator.to_s.gsub('!', 'not_').to_sym
 
-      if custom_scope = filter.values.first[operator]
+      if custom_scope = filter.values[0][:operators][operator]
         custom_scope.call(@scope, value, resource.context)
       else
         filter_via_adapter(filter, operator, value)

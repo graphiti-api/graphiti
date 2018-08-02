@@ -30,6 +30,10 @@ RSpec.describe JsonapiCompliable::Resource do
         expect(klass.type).to be_nil
         expect(klass.model).to be_nil
       end
+
+      it 'adds to global list of resources' do
+        expect(JsonapiCompliable.resources).to include(klass)
+      end
     end
 
     describe 'a further descendant of ApplicationResource' do
@@ -810,6 +814,103 @@ RSpec.describe JsonapiCompliable::Resource do
           expect(klass.serializer.attribute_blocks[:foo].call)
             .to eq('serializer custom')
         end
+      end
+    end
+  end
+
+  describe '.endpoint' do
+    let(:klass) do
+      Class.new(JsonapiCompliable::Resource) do
+        def self.name;'EmployeeResource';end
+      end
+    end
+
+    it 'infers from name' do
+      expect(klass.endpoint).to eq({
+        path: :'/employees',
+        actions: [:index, :show, :create, :update, :destroy]
+      })
+    end
+
+    context 'when resource is namespaced' do
+      let(:klass) do
+        Class.new(JsonapiCompliable::Resource) do
+          def self.name;'PORO::EmployeeResource';end
+        end
+      end
+
+      it 'adds to path' do
+        expect(klass.endpoint).to eq({
+          path: :'/poro/employees',
+          actions: [:index, :show, :create, :update, :destroy]
+        })
+      end
+    end
+  end
+
+  describe '#endpoint' do
+    let(:klass) do
+      Class.new(JsonapiCompliable::Resource) do
+        def self.name;'EmployeeResource';end
+      end
+    end
+
+    it 'infers path from name' do
+      expect(instance.endpoint[:path]).to eq(:'/employees')
+    end
+
+    it 'defaults actions' do
+      expect(instance.endpoint[:actions]).to eq([
+        :index, :show, :create, :update, :destroy
+      ])
+    end
+
+    context 'when resource is namespaced' do
+      let(:klass) do
+        Class.new(JsonapiCompliable::Resource) do
+          def self.name;'PORO::EmployeeResource';end
+        end
+      end
+
+      it 'infers path from module + name' do
+        expect(instance.endpoint[:path]).to eq(:'/poro/employees')
+      end
+    end
+  end
+
+  describe '.endpoints' do
+    let(:klass) do
+      Class.new(JsonapiCompliable::Resource) do
+        def self.name;'EmployeeResource';end
+      end
+    end
+
+    before do
+      klass.add_endpoint '/special_employees', [:index, :create]
+    end
+
+    it 'lists primary and secondary endpoints' do
+      expect(klass.endpoints.length).to eq(2)
+      expect(klass.endpoints[0]).to eq({
+        path: :"/employees",
+        actions: [:index, :show, :create, :update, :destroy]
+      })
+      expect(klass.endpoints[1]).to eq({
+        path: :"/special_employees",
+        actions: [:index, :create]
+      })
+    end
+
+    context 'when an endpoint namespace' do
+      before do
+        klass.endpoint_namespace = '/my_api/v1'
+      end
+
+      it 'is prefixes in url' do
+        expect(klass.endpoints[0][:path])
+          .to eq(:'/my_api/v1/employees')
+        expect(klass.endpoints[1][:path])
+          .to eq(:'/my_api/v1/special_employees')
       end
     end
   end

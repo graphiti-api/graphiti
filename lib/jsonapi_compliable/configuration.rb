@@ -10,6 +10,8 @@ module JsonapiCompliable
 
     attr_accessor :respond_to
 
+    attr_accessor :context_for_endpoint
+
     # Set defaults
     # @api private
     def initialize

@@ -16,6 +16,7 @@ module JsonapiCompliable
       register_parameter_parser
       register_renderers
       establish_concurrency
+      configure_endpoint_lookup
     end
 
     # from jsonapi-rails
@@ -69,6 +70,25 @@ module JsonapiCompliable
     def establish_concurrency
       JsonapiCompliable.config.concurrency = !::Rails.env.test? &&
         ::Rails.application.config.cache_classes
+    end
+
+    def configure_endpoint_lookup
+      JsonapiCompliable.config.context_for_endpoint = ->(path, action) {
+        method = :GET
+        case action
+          when :show then path = "#{path}/1"
+          when :create then method = :POST
+          when :update
+            path = "#{path}/1"
+            method = :PUT
+          when :destroy
+            path = "#{path}/1"
+            method = :DELETE
+        end
+
+        route = Rails.application.routes.recognize_path(path, method: method) rescue nil
+        "#{route[:controller]}_controller".classify.safe_constantize if route
+      }
     end
   end
 end

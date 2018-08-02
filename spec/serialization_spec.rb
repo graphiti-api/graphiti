@@ -448,7 +448,13 @@ RSpec.describe 'serialization' do
             .constructor { |input|
               'custom!'
             }
-          JsonapiCompliable::Types[:custom] = { read: type }
+          JsonapiCompliable::Types[:custom] = {
+            read: type,
+            write: type,
+            params: type,
+            kind: 'scalar',
+            description: 'test'
+          }
           resource.attribute :age, :custom
         end
 

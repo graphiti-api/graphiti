@@ -76,6 +76,30 @@ module JsonapiCompliable
     # @see Adapters::ActiveRecordSideloading
     # @see Adapters::Null
     class Abstract
+      def default_operators
+        {
+          string: [
+            :eq,
+            :not_eq,
+            :eql,
+            :not_eql,
+            :prefix,
+            :not_prefix,
+            :suffix,
+            :not_suffix,
+            :match,
+            :not_match
+          ],
+          integer_id: numerical_operators,
+          integer: numerical_operators,
+          big_decimal: numerical_operators,
+          float: numerical_operators,
+          boolean: [:eq],
+          date: numerical_operators,
+          datetime: numerical_operators
+        }
+      end
+
       def filter_string_eq(scope, attribute, value)
         raise Errors::AdapterNotImplemented.new(self, attribute, :filter_string_eq)
       end
@@ -499,6 +523,10 @@ module JsonapiCompliable
       end
 
       private
+
+      def numerical_operators
+        [:eq, :not_eq, :gt, :gte, :lt, :lte]
+      end
 
       def activerecord_adapter
         @activerecord_adapter ||=

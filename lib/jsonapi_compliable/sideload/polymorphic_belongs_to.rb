@@ -23,12 +23,14 @@ class JsonapiCompliable::Sideload::PolymorphicBelongsTo < JsonapiCompliable::Sid
     def on(name, &blk)
       group = Group.new(name)
       @groups << group
-      group.belongs_to(name.to_s.underscore.to_sym)
       group
     end
 
     def apply(sideload, resource_class)
       @groups.each do |group|
+        if group.calls.empty?
+          group.belongs_to(group.name.to_s.underscore.to_sym)
+        end
         group.calls.each do |call|
           args = call[1]
           opts = args.extract_options!

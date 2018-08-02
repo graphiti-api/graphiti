@@ -427,7 +427,11 @@ RSpec.describe 'filtering' do
           }
         JsonapiCompliable::Types[:custom] = {
           params: type,
-          canonical_name: :string
+          canonical_name: :string,
+          read: type,
+          write: type,
+          kind: 'scalar',
+          description: 'test'
         }
         resource.attribute :foo, :custom
       end
@@ -459,6 +463,23 @@ RSpec.describe 'filtering' do
       it 'is correctly applied' do
         params[:filter] = { foo: 'bar' }
         expect(records.map(&:id)).to eq([employee2.id])
+      end
+
+      it 'adds a list of default operators' do
+        expect(resource.filters[:foo][:operators].keys).to eq([
+          :eq,
+          :not_eq,
+          :eql,
+          :not_eql,
+          :prefix,
+          :not_prefix,
+          :suffix,
+          :not_suffix,
+          :match,
+          :not_match
+        ])
+        expect(resource.filters[:foo][:operators][:eq]).to be_a(Proc)
+        expect(resource.filters[:foo][:operators][:suffix]).to be_nil
       end
 
       context 'but it is not filterable' do
@@ -510,6 +531,68 @@ RSpec.describe 'filtering' do
             resource.filter :foo do
             end
           }.to raise_error(JsonapiCompliable::Errors::ImplicitFilterTypeMissing)
+        end
+      end
+    end
+
+    context 'and given :only option' do
+      context 'and the attribute already exists' do
+        before do
+          resource.attribute :foo, :string
+          resource.filter :foo, only: [:eq] do
+            foo do
+            end
+          end
+        end
+
+        it 'limits available operators' do
+          expect(resource.filters[:foo][:operators].keys).to eq([:eq, :foo])
+        end
+      end
+
+      context 'and no attribute already exists' do
+        before do
+          resource.filter :foo, :string, only: [:eq] do
+            foo do
+            end
+          end
+        end
+
+        it 'limits available operators, adding custom ones' do
+          expect(resource.filters[:foo][:operators].keys).to eq([:eq, :foo])
+        end
+      end
+    end
+
+    context 'and given :except option' do
+      context 'and the attribute already exists' do
+        before do
+          resource.attribute :foo, :integer
+          resource.filter :foo, except: [:eq, :not_eq] do
+            foo do
+            end
+          end
+        end
+
+        it 'limits available operators' do
+          expect(resource.filters[:foo][:operators].keys).to eq([
+            :gt, :gte, :lt, :lte, :foo
+          ])
+        end
+      end
+
+      context 'and no attribute already exists' do
+        before do
+          resource.filter :foo, :integer, except: [:eq, :not_eq] do
+            foo do
+            end
+          end
+        end
+
+        it 'limits available operators, adding custom ones' do
+          expect(resource.filters[:foo][:operators].keys).to eq([
+            :gt, :gte, :lt, :lte, :foo
+          ])
         end
       end
     end

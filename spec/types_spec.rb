@@ -8,7 +8,14 @@ RSpec.describe JsonapiCompliable::Types do
   describe '.[]=' do
     context 'when key is string' do
       before do
-        described_class['string'] = 'foo'
+        described_class['string'] = {
+          params: 'foo',
+          read: 'foo',
+          test: 'foo',
+          write: 'foo',
+          kind: 'foo',
+          description: 'foo'
+        }
       end
 
       it 'works' do
@@ -16,27 +23,36 @@ RSpec.describe JsonapiCompliable::Types do
       end
     end
 
-    context 'when value is a hash' do
-      before do
-        described_class[:string] = { foo: 'bar' }
-      end
-
-      it 'works' do
-        expect(described_class[:string]).to eq(foo: 'bar')
+    context 'when value is not a hash' do
+      it 'raises error' do
+        expect {
+          described_class[:string] = 'foo'
+        }.to raise_error(JsonapiCompliable::Errors::InvalidType)
       end
     end
 
-    context 'when value is a type' do
-      before do
-        described_class[:string] = 'foo'
+    context 'when value is a hash' do
+      context 'with all required keys' do
+        it 'works' do
+          type = {
+            params: 'foo',
+            read: 'foo',
+            test: 'foo',
+            write: 'foo',
+            kind: 'foo',
+            description: 'foo'
+          }
+          described_class[:string] = type
+          expect(described_class[:string]).to eq(type)
+        end
       end
 
-      it 'assigns the type to all operations' do
-        expect(described_class[:string]).to eq({
-          read: 'foo',
-          params: 'foo',
-          test: 'foo'
-        })
+      context 'missing required keys' do
+        it 'raises error' do
+          expect {
+            described_class[:string] = { foo: 'bar' }
+          }.to raise_error(JsonapiCompliable::Errors::InvalidType)
+        end
       end
     end
   end
@@ -64,9 +80,6 @@ RSpec.describe JsonapiCompliable::Types do
       expect(types).to include(:array_of_dates)
       expect(types).to include(:array_of_floats)
       expect(types).to include(:array_of_big_decimals)
-      expect(types).to include(:array_of_booleans)
-      expect(types).to include(:array_of_hashes)
-      expect(types).to include(:array_of_arrays)
     end
   end
 

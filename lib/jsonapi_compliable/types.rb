@@ -72,6 +72,8 @@ module JsonapiCompliable
       Dry::Types['params.hash'][input].deep_symbolize_keys
     end
 
+    REQUIRED_KEYS = [:params, :read, :write, :kind, :description]
+
     def self.map
       @map ||= begin
         hash = {
@@ -79,52 +81,72 @@ module JsonapiCompliable
             canonical_name: :integer,
             params: Dry::Types['coercible.integer'],
             read: Dry::Types['coercible.string'],
-            write: Dry::Types['coercible.integer']
+            write: Dry::Types['coercible.integer'],
+            kind: 'scalar',
+            description: 'Base Type. Query/persist as integer, render as string.'
           },
           string: {
             params: Dry::Types['coercible.string'],
             read: Dry::Types['coercible.string'],
-            write: Dry::Types['coercible.string']
+            write: Dry::Types['coercible.string'],
+            kind: 'scalar',
+            description: 'Base Type.'
           },
           integer: {
             params: PresentInteger,
             read: Integer,
-            write: Integer
+            write: Integer,
+            kind: 'scalar',
+            description: 'Base Type.'
           },
           big_decimal: {
             params: ParamDecimal,
             read: Dry::Types['json.decimal'],
-            write: Dry::Types['json.decimal']
+            write: Dry::Types['json.decimal'],
+            kind: 'scalar',
+            description: 'Base Type.'
           },
           float: {
             params: Dry::Types['coercible.float'],
             read: Float,
-            write: Float
+            write: Float,
+            kind: 'scalar',
+            description: 'Base Type.'
           },
           boolean: {
             params: PresentBool,
             read: Bool,
-            write: Bool
+            write: Bool,
+            kind: 'scalar',
+            description: 'Base Type.'
           },
           date: {
             params: PresentDate,
             read: Date,
-            write: Date
+            write: Date,
+            kind: 'scalar',
+            description: 'Base Type.'
           },
           datetime: {
             params: PresentParamsDateTime,
             read: ReadDateTime,
-            write: WriteDateTime
+            write: WriteDateTime,
+            kind: 'scalar',
+            description: 'Base Type.'
           },
           hash: {
             params: PresentParamsHash,
             read: Dry::Types['strict.hash'],
-            write: Dry::Types['strict.hash']
+            write: Dry::Types['strict.hash'],
+            kind: 'record',
+            description: 'Base Type.'
           },
           array: {
             params: Dry::Types['strict.array'],
             read: Dry::Types['strict.array'],
-            write: Dry::Types['strict.array']
+            write: Dry::Types['strict.array'],
+            kind: 'array',
+            description: 'Base Type.'
           }
         }
 
@@ -134,12 +156,16 @@ module JsonapiCompliable
 
         arrays = {}
         hash.each_pair do |name, map|
+          next if [:boolean, :hash, :array].include?(name)
+
           arrays[:"array_of_#{name.to_s.pluralize}"] = {
             canonical_name: name,
             params: Dry::Types['strict.array'].of(map[:params]),
             read: Dry::Types['strict.array'].of(map[:read]),
             test: Dry::Types['strict.array'].of(map[:test]),
-            write: Dry::Types['strict.array'].of(map[:write])
+            write: Dry::Types['strict.array'].of(map[:write]),
+            kind: 'array',
+            description: 'Base Type.'
           }
         end
         hash.merge!(arrays)
@@ -153,12 +179,8 @@ module JsonapiCompliable
     end
 
     def self.[]=(key, value)
-      unless value.is_a?(Hash)
-        value = {
-          read: value,
-          params: value,
-          test: value
-        }
+      unless value.is_a?(Hash) && (REQUIRED_KEYS - value.keys).length.zero?
+        raise Errors::InvalidType.new(key, value)
       end
       map[key.to_sym] = value
     end

@@ -394,7 +394,13 @@ RSpec.describe 'persistence' do
           .constructor { |input|
             'custom!'
           }
-        JsonapiCompliable::Types[:custom] = { write: type }
+        JsonapiCompliable::Types[:custom] = {
+          write: type,
+          read: type,
+          params: type,
+          description: 'test',
+          kind: 'scalar'
+        }
         klass.attribute :age, :custom
       end
 

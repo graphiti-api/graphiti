@@ -4,6 +4,7 @@ module JsonapiCompliable
     include Interface
     include Configuration
     include Sideloading
+    include Links
 
     attr_reader :context
 

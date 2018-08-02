@@ -75,6 +75,34 @@ The adapter #{@adapter.class} does not implement method '#{@method}', which was 
       end
     end
 
+    class InvalidType < Base
+      def initialize(key, value)
+        @key = key
+        @value = value
+      end
+
+      def message
+        "Type must be a Hash with keys #{Types::REQUIRED_KEYS.inspect}"
+      end
+    end
+
+    class ResourceEndpointConflict < Base
+      def initialize(path, action, resource_a, resource_b)
+        @path = path
+        @action = action
+        @resource_a = resource_a
+        @resource_b = resource_b
+      end
+
+      def message
+        <<-MSG
+Both '#{@resource_a}' and '#{@resource_b}' are associated to endpoint #{@path}##{@action}!
+
+Only one resource can be associated to a given url/verb combination.
+        MSG
+      end
+    end
+
     class PolymorphicChildNotFound < Base
       def initialize(resource_class, model)
         @resource_class = resource_class

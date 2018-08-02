@@ -9,11 +9,12 @@ module JsonapiCompliable
 
           if att = get_attr(name, :filterable, raise_error: :only_unsupported)
             aliases = [name, opts[:aliases]].flatten.compact
-            operators = FilterOperators.build(&blk)
+            operators = FilterOperators.build(self, att[:type], opts, &blk)
             config[:filters][name.to_sym] = {
               aliases: aliases,
-              type: att[:type]
-            }.merge(operators.to_hash)
+              type: att[:type],
+              operators: operators.to_hash
+            }
           else
             if type = args[0]
               attribute name, type, only: [:filterable]
