@@ -85,7 +85,7 @@ module JsonapiCompliable
             method = :DELETE
         end
 
-        route = Rails.application.routes.recognize_path(path, method: method) rescue nil
+        route = ::Rails.application.routes.recognize_path(path, method: method) rescue nil
         "#{route[:controller]}_controller".classify.safe_constantize if route
       }
     end

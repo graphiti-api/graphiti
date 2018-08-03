@@ -74,7 +74,7 @@ module JsonapiCompliable
     end
 
     def context_for(path, action)
-      JsonapiCompliable.config.context_for_endpoint.call(path, action)
+      JsonapiCompliable.config.context_for_endpoint.call(path.to_s, action)
     end
 
     def generate_resources
