@@ -4,13 +4,13 @@ Dir[File.dirname(__FILE__) + "/support/**/*.rb"].each {|f| require f }
 require 'pry'
 
 require 'active_model'
-require 'jsonapi_spec_helpers/rspec'
+require 'graphiti_spec_helpers/rspec'
 require 'graphiti'
 require 'fixtures/poro'
 
 RSpec.configure do |config|
-  config.include JsonapiSpecHelpers::RSpec
-  config.include JsonapiSpecHelpers::Sugar
+  config.include GraphitiSpecHelpers::RSpec
+  config.include GraphitiSpecHelpers::Sugar
 
   config.after do
     PORO::DB.clear
