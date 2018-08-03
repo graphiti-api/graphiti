@@ -9,7 +9,7 @@ if ENV['APPRAISAL_INITIALIZED']
   #
   # This scenario is likely specific to ActiveRecord.
   RSpec.describe 'a non-ActiveRecord adapter that returns ActiveRecord models', type: :controller do
-    include JsonapiSpecHelpers
+    include GraphitiSpecHelpers
 
     controller(ApplicationController) do
       def index

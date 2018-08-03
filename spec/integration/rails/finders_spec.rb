@@ -1,6 +1,6 @@
 if ENV['APPRAISAL_INITIALIZED']
   RSpec.describe 'integrated resources and adapters', type: :controller do
-    include JsonapiSpecHelpers
+    include GraphitiSpecHelpers
 
     controller(ApplicationController) do
       def index

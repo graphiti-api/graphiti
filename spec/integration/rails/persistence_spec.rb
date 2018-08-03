@@ -1,6 +1,6 @@
 if ENV["APPRAISAL_INITIALIZED"]
   RSpec.describe 'persistence', type: :controller do
-    include JsonapiSpecHelpers
+    include GraphitiSpecHelpers
 
     # todo ?include=foo
     controller(ApplicationController) do
