@@ -17,4 +17,4 @@ deploy:
   gem: graphiti
   on:
     tags: true
-    repo: graphiti/graphiti
+    repo: graphiti-api/graphiti
