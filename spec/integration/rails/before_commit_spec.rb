@@ -17,6 +17,15 @@ if ENV["APPRAISAL_INITIALIZED"]
       $raise_on_before_commit = { employee: true }
     end
 
+    before do
+      allow(controller.request.env).to receive(:[])
+        .with(anything).and_call_original
+      allow(controller.request.env).to receive(:[])
+        .with('PATH_INFO') { path }
+    end
+
+    let(:path) { '/integration_hooks/employees' }
+
     module IntegrationHooks
       class ApplicationResource < JsonapiCompliable::Resource
         self.adapter = JsonapiCompliable::Adapters::ActiveRecord::Base.new

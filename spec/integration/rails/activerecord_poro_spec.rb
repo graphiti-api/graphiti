@@ -24,6 +24,15 @@ if ENV['APPRAISAL_INITIALIZED']
     let!(:book) { Legacy::Book.create!(title: 'Foo', author: author) }
     let!(:state) { Legacy::State.create!(name: 'Maine') }
 
+    before do
+      allow(controller.request.env).to receive(:[])
+        .with(anything).and_call_original
+      allow(controller.request.env).to receive(:[])
+        .with('PATH_INFO') { path }
+    end
+
+    let(:path) { '/legacy/author_searches' }
+
     it 'works' do
       get :index, params: { include: 'special_books' }
       expect(d[0].sideload(:special_books).map(&:id)).to eq([book.id])

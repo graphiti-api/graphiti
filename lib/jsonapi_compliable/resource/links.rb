@@ -2,6 +2,8 @@ module JsonapiCompliable
   module Links
     extend ActiveSupport::Concern
 
+    DEFAULT_ACTIONS = [:index, :show, :create, :update, :destroy].freeze
+
     module Overrides
       def endpoint
         if endpoint = super
@@ -24,12 +26,15 @@ module JsonapiCompliable
     class_methods do
       def infer_endpoint
         path = "/#{name.gsub('Resource', '').pluralize.underscore}"
-        actions = [:index, :show, :create, :update, :destroy]
-        { path: path.to_sym, actions: actions }
+        { path: path.to_sym, actions: DEFAULT_ACTIONS.dup }
+      end
+
+      def primary_endpoint(path, actions = DEFAULT_ACTIONS.dup)
+        self.endpoint = { path: path.to_sym, actions: actions }
       end
 
       # NB: avoid << b/c class_attribute
-      def add_endpoint(path, actions)
+      def secondary_endpoint(path, actions = DEFAULT_ACTIONS.dup)
         self.secondary_endpoints += [{ path: path.to_sym, actions: actions }]
       end
 
@@ -39,6 +44,18 @@ module JsonapiCompliable
             path: [endpoint_namespace, e[:path]].join('').to_sym,
             actions: e[:actions]
           }
+        end
+      end
+
+      def allow_request?(path, action)
+        endpoints.any? do |e|
+          if [:update, :show, :destroy].include?(context_namespace)
+            path = path.split('/')
+            path.pop
+            path = path.join('/')
+          end
+
+          e[:path].to_s == path && e[:actions].include?(context_namespace)
         end
       end
     end

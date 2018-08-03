@@ -99,6 +99,16 @@ if ENV["APPRAISAL_INITIALIZED"]
       }
     end
 
+    before do
+      allow(controller.request.env).to receive(:[])
+        .with(anything).and_call_original
+      allow(controller.request.env).to receive(:[])
+        .with('PATH_INFO') { path }
+    end
+
+    let(:path) { '/integration_hooks/authors' }
+
+
     def json
       JSON.parse(response.body)
     end

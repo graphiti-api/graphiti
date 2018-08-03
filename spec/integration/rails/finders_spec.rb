@@ -52,6 +52,15 @@ if ENV['APPRAISAL_INITIALIZED']
     let!(:house)   { Legacy::House.new(name: 'Cozy', state: state) }
     let!(:condo)   { Legacy::Condo.new(name: 'Modern') }
 
+    before do
+      allow(controller.request.env).to receive(:[])
+        .with(anything).and_call_original
+      allow(controller.request.env).to receive(:[])
+        .with('PATH_INFO') { path }
+    end
+
+    let(:path) { '/legacy/authors' }
+
     it 'allows basic sorting' do
       get :index, params: { sort: '-id' }
       expect(d.map(&:id)).to eq([author2.id, author1.id])
@@ -592,6 +601,7 @@ if ENV['APPRAISAL_INITIALIZED']
       end
 
       let(:id) { author1.id.to_s }
+      let(:path) { "/legacy/authors/#{id}" }
 
       it 'works' do
         make_request

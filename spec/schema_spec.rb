@@ -383,7 +383,7 @@ RSpec.describe JsonapiCompliable::Schema do
       let(:employee_search_resource) do
         Class.new(application_resource) do
           def self.name;'Schema::EmployeeSearchResource';end
-          self.endpoint = { path: :'/schema/employees', actions: [:index] }
+          primary_endpoint '/schema/employees', [:index]
         end
       end
 
@@ -414,7 +414,7 @@ RSpec.describe JsonapiCompliable::Schema do
 
     context 'when 1 resource, multiple endpoints' do
       before do
-        employee_resource.add_endpoint :'/special_employees', [:index]
+        employee_resource.secondary_endpoint '/special_employees', [:index]
       end
 
       it 'generates correctly' do

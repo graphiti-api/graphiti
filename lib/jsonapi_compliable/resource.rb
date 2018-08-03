@@ -22,12 +22,20 @@ module JsonapiCompliable
       end
     end
 
-    def context
+    def self.context
       JsonapiCompliable.context[:object]
     end
 
-    def context_namespace
+    def context
+      self.class.context
+    end
+
+    def self.context_namespace
       JsonapiCompliable.context[:namespace]
+    end
+
+    def context_namespace
+      self.class.context_namespace
     end
 
     def build_scope(base, query, opts = {})

@@ -18,6 +18,15 @@ if ENV["APPRAISAL_INITIALIZED"]
     let!(:book) { Legacy::Book.create!(title: 'The Shining', author: author, genre: genre) }
     let!(:genre) { Legacy::Genre.create!(name: 'Horror') }
 
+    before do
+      allow(controller.request.env).to receive(:[])
+        .with(anything).and_call_original
+      allow(controller.request.env).to receive(:[])
+        .with('PATH_INFO') { path }
+    end
+
+    let(:path) { '/legacy/authors' }
+
     context 'when no sideload whitelist' do
       it 'allows loading all relationships' do
         get :index, params: { include: 'books.genre' }

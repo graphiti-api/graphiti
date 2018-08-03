@@ -75,6 +75,30 @@ The adapter #{@adapter.class} does not implement method '#{@method}', which was 
       end
     end
 
+    class InvalidEndpoint < Base
+      def initialize(resource_class, path, action)
+        @resource_class = resource_class
+        @path = path
+        @action = action
+      end
+
+      def message
+        <<-MSG
+#{@resource_class.name} cannot be called directly from endpoint #{@path}##{@action}!
+
+Either set a primary endpoint for this resource:
+
+endpoint '/my/url', [:index, :show, :create]
+
+Or whitelist a secondary endpoint:
+
+secondary_endoint '/my_url', [:index, :update]
+
+The current endpoints allowed for this resource are: #{@resource_class.endpoints.inspect}
+        MSG
+      end
+    end
+
     class InvalidType < Base
       def initialize(key, value)
         @key = key

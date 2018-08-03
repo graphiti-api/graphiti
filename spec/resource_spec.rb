@@ -886,7 +886,7 @@ RSpec.describe JsonapiCompliable::Resource do
     end
 
     it 'lists primary and secondary endpoints' do
-      klass.add_endpoint '/special_employees', [:index, :create]
+      klass.secondary_endpoint '/special_employees', [:index, :create]
       expect(klass.endpoints.length).to eq(2)
       expect(klass.endpoints[0]).to eq({
         path: :"/employees",
@@ -910,7 +910,7 @@ RSpec.describe JsonapiCompliable::Resource do
 
     context 'when an endpoint namespace' do
       before do
-        klass.add_endpoint '/special_employees', [:index, :create]
+        klass.secondary_endpoint '/special_employees', [:index, :create]
         klass.endpoint_namespace = '/my_api/v1'
       end
 
@@ -981,6 +981,124 @@ RSpec.describe JsonapiCompliable::Resource do
         expect(employees.map(&:id)).to eq([employee2.id])
       end
 
+      context 'when running within a request context' do
+        before do
+          klass.class_eval do
+            def self.name;'QueryAllSpec::EmployeeResource';end
+          end
+        end
+
+        let(:request) do
+          double(env: {
+            'PATH_INFO' => '/api/v1/employees',
+            'REQUEST_METHOD' => 'GET'
+          })
+        end
+
+        let(:ctx) { double(request: request) }
+
+        context 'and the request matches the primary endpoint' do
+          before do
+            klass.primary_endpoint '/api/v1/employees', [:index, :show]
+          end
+
+          it 'works' do
+            JsonapiCompliable.with_context ctx, :index do
+              expect { klass.all }.to_not raise_error
+            end
+          end
+
+          it 'can sideload' do
+            JsonapiCompliable.with_context ctx, :index do
+              expect { klass.all(include: 'positions') }
+                .to_not raise_error
+            end
+          end
+
+          context 'that has an id' do
+            before do
+              request.env['PATH_INFO'] += '/123'
+            end
+
+            it 'works' do
+              JsonapiCompliable.with_context ctx, :show do
+                expect { klass.all }.to_not raise_error
+              end
+            end
+          end
+        end
+
+        context 'and the request matches a secondary endpoint' do
+          before do
+            klass.secondary_endpoint '/api/v1/employees'
+          end
+
+          it 'works' do
+            JsonapiCompliable.with_context ctx, :index do
+              expect { klass.all }.to_not raise_error
+            end
+          end
+        end
+
+        context 'and the path matches an endpoint, but not an action' do
+          before do
+            klass.primary_endpoint '/api/v1/employees', [:create]
+          end
+
+          it 'raises error' do
+            JsonapiCompliable.with_context ctx, :index do
+              expect {
+                klass.all
+              }.to raise_error(JsonapiCompliable::Errors::InvalidEndpoint, /QueryAllSpec::EmployeeResource cannot be called directly from endpoint \/api\/v1\/employees/)
+            end
+          end
+
+          context 'but the action list is modified' do
+            before do
+              klass.class_eval do
+                self.endpoint[:actions] << :index
+              end
+            end
+
+            it 'works' do
+              JsonapiCompliable.with_context ctx, :index do
+                expect {
+                  klass.all
+                }.to_not raise_error
+              end
+            end
+          end
+
+          context 'but .allow_request? is overridden' do
+            before do
+              klass.class_eval do
+                def self.allow_request?(path, action)
+                  true
+                end
+              end
+            end
+
+            it 'works' do
+              JsonapiCompliable.with_context ctx, :index do
+                expect {
+                  klass.all
+                }.to_not raise_error
+              end
+            end
+          end
+        end
+
+        context 'and the path does not match an endpoint' do
+          it 'raises error' do
+            JsonapiCompliable.with_context ctx, :index do
+              expect {
+                klass.all
+              }.to raise_error(JsonapiCompliable::Errors::InvalidEndpoint, /QueryAllSpec::EmployeeResource cannot be called directly from endpoint \/api\/v1\/employees/)
+            end
+          end
+        end
+      end
+
       context 'when stats' do
         it 'returns correct hash' do
           proxy = klass.all(stats: { total: 'count' })
@@ -1007,6 +1125,12 @@ RSpec.describe JsonapiCompliable::Resource do
     end
 
     describe '.find' do
+      before do
+        klass.class_eval do
+          def self.name;'QueryFindSpec::EmployeeResource';end
+        end
+      end
+
       it 'takes the id param and applies as a filter, returning single record' do
         proxy = klass.find(id: employee2.id)
         expect(proxy.data.id).to eq(employee2.id)
@@ -1030,6 +1154,41 @@ RSpec.describe JsonapiCompliable::Resource do
           extra_fields: { employees: 'foo' }
         })
         expect(employees.data.id).to eq(3)
+      end
+
+      context 'when running in request context' do
+        let(:request) do
+          double(env: {
+            'PATH_INFO' => "/api/v1/employees/#{employee2.id}",
+            'REQUEST_METHOD' => 'GET'
+          })
+        end
+
+        let(:ctx) { double(request: request) }
+
+        context 'and the path is not supported' do
+          it 'raises error' do
+            JsonapiCompliable.with_context ctx, :show do
+              expect {
+                klass.find({ id: employee2.id })
+              }.to raise_error(JsonapiCompliable::Errors::InvalidEndpoint, /QueryFindSpec::EmployeeResource cannot be called directly from endpoint \/api\/v1\/employees/)
+            end
+          end
+        end
+
+        context 'and the path is supported' do
+          before do
+            klass.primary_endpoint '/api/v1/employees'
+          end
+
+          it 'works' do
+            JsonapiCompliable.with_context ctx, :show do
+              expect {
+                klass.find({ id: employee2.id })
+              }.to_not raise_error
+            end
+          end
+        end
       end
 
       context 'when stats' do
@@ -1072,6 +1231,56 @@ RSpec.describe JsonapiCompliable::Resource do
               conditions: { first_name: 'adsf' }
             }).data
           }.to raise_error(JsonapiCompliable::Errors::RecordNotFound)
+        end
+      end
+    end
+  end
+
+  describe '.build' do
+    before do
+      klass.class_eval do
+        def self.name;'ResourceBuildSpec::EmployeeResource';end
+      end
+    end
+
+    context 'when running in request context' do
+      let(:request) do
+        double(env: {
+          'PATH_INFO' => '/api/v1/employees',
+          'REQUEST_METHOD' => 'GET'
+        })
+      end
+
+      let(:ctx) { double(request: request) }
+
+      context 'and the path is not supported' do
+        it 'raises error' do
+          JsonapiCompliable.with_context ctx, :create do
+            expect {
+              klass.build({})
+            }.to raise_error(JsonapiCompliable::Errors::InvalidEndpoint, /ResourceBuildSpec::EmployeeResource cannot be called directly from endpoint \/api\/v1\/employees/)
+          end
+        end
+      end
+
+      context 'and the path is supported' do
+        before do
+          klass.class_eval do
+            self.adapter = PORO::Adapter.new
+            primary_endpoint '/api/v1/employees'
+            self.model = PORO::Employee
+            def base_scope
+              {}
+            end
+          end
+        end
+
+        it 'works' do
+          JsonapiCompliable.with_context ctx, :create do
+            expect {
+              klass.build({})
+            }.to_not raise_error
+          end
         end
       end
     end

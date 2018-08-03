@@ -50,6 +50,15 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     before do
+      allow(controller.request.env).to receive(:[])
+        .with(anything).and_call_original
+      allow(controller.request.env).to receive(:[])
+        .with('PATH_INFO') { path }
+    end
+
+    let(:path) { '/employees' }
+
+    before do
       @request.headers['Accept'] = Mime[:json]
       @request.headers['Content-Type'] = Mime[:json].to_s
 
@@ -113,6 +122,8 @@ if ENV["APPRAISAL_INITIALIZED"]
         }
       end
 
+      let(:path) { "/employees/#{employee.id}" }
+
       it 'updates the data correctly' do
         expect {
           do_put(employee.id)
@@ -139,6 +150,8 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     describe 'basic destroy' do
       let!(:employee) { Employee.create!(first_name: 'Joe') }
+
+      let(:path) { "/employees/#{employee.id}" }
 
       before do
         allow_any_instance_of(Employee)
@@ -227,6 +240,8 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context 'on update' do
+          let(:path) { "/employees/#{employee.id}" }
+
           let(:payload) do
             {
               data: {
@@ -262,6 +277,8 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context 'on destroy' do
+          let(:path) { "/employees/#{employee.id}" }
+
           let(:payload) do
             {
               data: {
@@ -307,6 +324,8 @@ if ENV["APPRAISAL_INITIALIZED"]
               }
             }
           end
+
+          let(:path) { "/employees/#{employee.id}" }
 
           it 'can disassociate' do
             do_put(employee.id)
@@ -447,6 +466,8 @@ if ENV["APPRAISAL_INITIALIZED"]
       let!(:position2)  { Position.create!(title: 'original', department: department) }
       let!(:department) { Department.create!(name: 'original') }
 
+      let(:path) { "/employees/#{employee.id}" }
+
       let(:payload) do
         {
           data: {
@@ -537,6 +558,8 @@ if ENV["APPRAISAL_INITIALIZED"]
       context 'when disassociating' do
         let(:method) { 'disassociate' }
 
+        let(:path) { "/employees/#{employee.id}" }
+
         it 'belongs_to: updates the foreign key on child' do
           expect {
             do_put(employee.id)
@@ -563,6 +586,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       context 'when destroying' do
         let(:method) { 'destroy' }
+        let(:path) { "/employees/#{employee.id}" }
 
         it 'deletes the objects' do
           do_put(employee.id)
@@ -651,6 +675,8 @@ if ENV["APPRAISAL_INITIALIZED"]
         employee.teams << disassociate_team
         employee.teams << destroy_team
       end
+
+      let(:path) { "/employees/#{employee.id}" }
 
       let(:payload) do
         {
