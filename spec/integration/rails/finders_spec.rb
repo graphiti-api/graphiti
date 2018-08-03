@@ -622,7 +622,7 @@ if ENV['APPRAISAL_INITIALIZED']
         it 'raises not found error' do
           expect {
             make_request
-          }.to raise_error(JsonapiCompliable::Errors::RecordNotFound)
+          }.to raise_error(Graphiti::Errors::RecordNotFound)
         end
       end
     end
@@ -669,7 +669,7 @@ if ENV['APPRAISAL_INITIALIZED']
           it 'raises error' do
             expect {
               request
-            }.to raise_error(JsonapiCompliable::Errors::UnsupportedPagination)
+            }.to raise_error(Graphiti::Errors::UnsupportedPagination)
           end
         end
       end

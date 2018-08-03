@@ -82,7 +82,7 @@ RSpec.describe 'serialization' do
           it 'raises error' do
             expect {
               render
-            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+            }.to raise_error(Graphiti::Errors::TypecastFailed)
           end
         end
       end
@@ -120,7 +120,7 @@ RSpec.describe 'serialization' do
           it 'raises error' do
             expect {
               render
-            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+            }.to raise_error(Graphiti::Errors::TypecastFailed)
           end
         end
       end
@@ -156,7 +156,7 @@ RSpec.describe 'serialization' do
           it 'raises error' do
             expect {
               render
-            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+            }.to raise_error(Graphiti::Errors::TypecastFailed)
           end
         end
       end
@@ -192,7 +192,7 @@ RSpec.describe 'serialization' do
           it 'raises error' do
             expect {
               render
-            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+            }.to raise_error(Graphiti::Errors::TypecastFailed)
           end
         end
       end
@@ -248,7 +248,7 @@ RSpec.describe 'serialization' do
           it 'raises error' do
             expect {
               render
-            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+            }.to raise_error(Graphiti::Errors::TypecastFailed)
           end
         end
       end
@@ -332,7 +332,7 @@ RSpec.describe 'serialization' do
           it 'raises error' do
             expect {
               render
-            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+            }.to raise_error(Graphiti::Errors::TypecastFailed)
           end
         end
       end
@@ -356,7 +356,7 @@ RSpec.describe 'serialization' do
           it 'raises error' do
             expect {
               render
-            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+            }.to raise_error(Graphiti::Errors::TypecastFailed)
           end
         end
       end
@@ -385,7 +385,7 @@ RSpec.describe 'serialization' do
           PORO::Employee.create(age: 1)
           expect {
             render
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
 
         context 'when cannot coerce' do
@@ -396,7 +396,7 @@ RSpec.describe 'serialization' do
           it 'raises error' do
             expect {
               render
-            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+            }.to raise_error(Graphiti::Errors::TypecastFailed)
           end
         end
       end
@@ -425,7 +425,7 @@ RSpec.describe 'serialization' do
           PORO::Employee.create(age: 1)
           expect {
             render
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
 
         context 'when cannot coerce' do
@@ -436,7 +436,7 @@ RSpec.describe 'serialization' do
           it 'raises error' do
             expect {
               render
-            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+            }.to raise_error(Graphiti::Errors::TypecastFailed)
           end
         end
       end
@@ -448,7 +448,7 @@ RSpec.describe 'serialization' do
             .constructor { |input|
               'custom!'
             }
-          JsonapiCompliable::Types[:custom] = {
+          Graphiti::Types[:custom] = {
             read: type,
             write: type,
             params: type,
@@ -459,7 +459,7 @@ RSpec.describe 'serialization' do
         end
 
         after do
-          JsonapiCompliable::Types.map.delete(:custom)
+          Graphiti::Types.map.delete(:custom)
         end
 
         it 'works' do
@@ -637,7 +637,7 @@ RSpec.describe 'serialization' do
 
       context 'and the guard passes' do
         around do |e|
-          JsonapiCompliable.with_context(OpenStruct.new(admin: true)) do
+          Graphiti.with_context(OpenStruct.new(admin: true)) do
             e.run
           end
         end
@@ -650,7 +650,7 @@ RSpec.describe 'serialization' do
 
       context 'and the guard fails' do
         around do |e|
-          JsonapiCompliable.with_context(OpenStruct.new(admin: false)) do
+          Graphiti.with_context(OpenStruct.new(admin: false)) do
             e.run
           end
         end

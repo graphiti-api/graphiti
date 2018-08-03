@@ -30,7 +30,7 @@ RSpec.describe 'sorting' do
     it 'raises helpful error' do
       expect {
         ids
-      }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :asdf, but could not find an attribute with that name.')
+      }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :asdf, but could not find an attribute with that name.')
     end
 
     context 'but there is a corresponding extra attribute' do
@@ -42,7 +42,7 @@ RSpec.describe 'sorting' do
         it 'raises helpful error' do
           expect {
             ids
-          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :asdf, but the attribute was marked :sortable => false.')
+          }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :asdf, but the attribute was marked :sortable => false.')
         end
       end
 
@@ -71,7 +71,7 @@ RSpec.describe 'sorting' do
       params[:sort] = 'foo'
       expect {
         ids
-      }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :foo, but the attribute was marked :sortable => false.')
+      }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :foo, but the attribute was marked :sortable => false.')
     end
   end
 
@@ -90,7 +90,7 @@ RSpec.describe 'sorting' do
 
     context 'and the guard passes' do
       around do |e|
-        JsonapiCompliable.with_context(OpenStruct.new(admin: true)) do
+        Graphiti.with_context(OpenStruct.new(admin: true)) do
           e.run
         end
       end
@@ -102,7 +102,7 @@ RSpec.describe 'sorting' do
 
     context 'and the guard fails' do
       around do |e|
-        JsonapiCompliable.with_context(OpenStruct.new(admin: false)) do
+        Graphiti.with_context(OpenStruct.new(admin: false)) do
           e.run
         end
       end
@@ -110,7 +110,7 @@ RSpec.describe 'sorting' do
       it 'raises helpful error' do
         expect {
           ids
-        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :first_name, but the guard :admin? did not pass.')
+        }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :first_name, but the guard :admin? did not pass.')
       end
     end
   end
@@ -140,7 +140,7 @@ RSpec.describe 'sorting' do
           expect {
             resource.sort :foo do |scope, dir|
             end
-          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort attribute :foo, but the attribute was marked :sortable => false.')
+          }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort attribute :foo, but the attribute was marked :sortable => false.')
         end
       end
     end
@@ -177,7 +177,7 @@ RSpec.describe 'sorting' do
           expect {
             resource.sort :foo do
             end
-          }.to raise_error(JsonapiCompliable::Errors::ImplicitSortTypeMissing)
+          }.to raise_error(Graphiti::Errors::ImplicitSortTypeMissing)
         end
       end
     end
@@ -254,14 +254,14 @@ RSpec.describe 'sorting' do
 
         it 'works (desc)' do
           ctx = double(runtime_direction: :desc).as_null_object
-          JsonapiCompliable.with_context(ctx, {}) do
+          Graphiti.with_context(ctx, {}) do
             expect(ids).to eq([2,1])
           end
         end
 
         it 'works (asc)' do
           ctx = double(runtime_direction: :asc).as_null_object
-          JsonapiCompliable.with_context(ctx, {}) do
+          Graphiti.with_context(ctx, {}) do
             expect(ids).to eq([1,2])
           end
         end

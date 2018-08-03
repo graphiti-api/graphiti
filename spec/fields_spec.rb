@@ -31,7 +31,7 @@ RSpec.describe 'fields' do
       let(:ctx) { double(current_user: 'non-admin').as_null_object }
 
       it 'does not render the field' do
-        JsonapiCompliable.with_context ctx, {} do
+        Graphiti.with_context ctx, {} do
           render
           expect(attributes.keys).to_not include('salary')
         end
@@ -42,7 +42,7 @@ RSpec.describe 'fields' do
       let(:ctx) { double(current_user: 'admin').as_null_object }
 
       it 'renders the field' do
-        JsonapiCompliable.with_context ctx, {} do
+        Graphiti.with_context ctx, {} do
           render
           expect(attributes.keys).to include('salary')
         end

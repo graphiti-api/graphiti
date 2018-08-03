@@ -1,6 +1,0 @@
-require 'jsonapi_compliable/adapters/active_record/base'
-require 'jsonapi_compliable/adapters/active_record/inferrence'
-require 'jsonapi_compliable/adapters/active_record/has_many_sideload'
-require 'jsonapi_compliable/adapters/active_record/belongs_to_sideload'
-require 'jsonapi_compliable/adapters/active_record/has_one_sideload'
-require 'jsonapi_compliable/adapters/active_record/many_to_many_sideload'

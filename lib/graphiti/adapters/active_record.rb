@@ -1,0 +1,6 @@
+require 'graphiti/adapters/active_record/base'
+require 'graphiti/adapters/active_record/inferrence'
+require 'graphiti/adapters/active_record/has_many_sideload'
+require 'graphiti/adapters/active_record/belongs_to_sideload'
+require 'graphiti/adapters/active_record/has_one_sideload'
+require 'graphiti/adapters/active_record/many_to_many_sideload'

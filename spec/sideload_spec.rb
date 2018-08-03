@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe JsonapiCompliable::Sideload do
+RSpec.describe Graphiti::Sideload do
   let(:parent_resource_class) do
     Class.new(PORO::EmployeeResource) do
       def self.name;'PORO::EmployeeResource';end
@@ -82,7 +82,7 @@ RSpec.describe JsonapiCompliable::Sideload do
       it 'raises helpful error' do
         expect {
           instance.resource_class
-        }.to raise_error(JsonapiCompliable::Errors::ResourceNotFound)
+        }.to raise_error(Graphiti::Errors::ResourceNotFound)
       end
     end
 
@@ -150,7 +150,7 @@ RSpec.describe JsonapiCompliable::Sideload do
       end
 
       before do
-        opts[:parent_resource] = Class.new(JsonapiCompliable::Resource)
+        opts[:parent_resource] = Class.new(Graphiti::Resource)
         opts[:parent_resource].model = SideloadSpec::Employee
       end
 
@@ -166,7 +166,7 @@ RSpec.describe JsonapiCompliable::Sideload do
       end
 
       before do
-        opts[:parent_resource] = Class.new(JsonapiCompliable::Resource)
+        opts[:parent_resource] = Class.new(Graphiti::Resource)
         opts[:parent_resource].model = SideloadSpecEmployee
       end
 
@@ -291,7 +291,7 @@ RSpec.describe JsonapiCompliable::Sideload do
 
   describe '#assign' do
     context 'when a to-many relationship' do
-      let(:instance) { JsonapiCompliable::Sideload::HasMany.new(:positions, opts) }
+      let(:instance) { Graphiti::Sideload::HasMany.new(:positions, opts) }
 
       let(:employees) do
         [
@@ -335,7 +335,7 @@ RSpec.describe JsonapiCompliable::Sideload do
       end
 
       let(:parent_resource_class) { PORO::PositionResource }
-      let(:instance) { JsonapiCompliable::Sideload::BelongsTo.new(:department, opts) }
+      let(:instance) { Graphiti::Sideload::BelongsTo.new(:department, opts) }
 
       let(:positions) do
         [
@@ -421,7 +421,7 @@ RSpec.describe JsonapiCompliable::Sideload do
 
   describe '#load' do
     let(:params) { {} }
-    let(:query) { JsonapiCompliable::Query.new(instance.resource, params) }
+    let(:query) { Graphiti::Query.new(instance.resource, params) }
     let(:parents) { [double, double] }
     let(:results) { [double('result')] }
 

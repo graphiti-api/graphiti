@@ -15,8 +15,8 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     module IntegrationHooks
-      class ApplicationResource < JsonapiCompliable::Resource
-        self.adapter = JsonapiCompliable::Adapters::ActiveRecord::Base.new
+      class ApplicationResource < Graphiti::Resource
+        self.adapter = Graphiti::Adapters::ActiveRecord::Base.new
       end
 
       class BookResource < ApplicationResource

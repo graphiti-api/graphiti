@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe JsonapiCompliable::Types do
+RSpec.describe Graphiti::Types do
   after do
     described_class.instance_variable_set(:@map, nil)
   end
@@ -27,7 +27,7 @@ RSpec.describe JsonapiCompliable::Types do
       it 'raises error' do
         expect {
           described_class[:string] = 'foo'
-        }.to raise_error(JsonapiCompliable::Errors::InvalidType)
+        }.to raise_error(Graphiti::Errors::InvalidType)
       end
     end
 
@@ -51,7 +51,7 @@ RSpec.describe JsonapiCompliable::Types do
         it 'raises error' do
           expect {
             described_class[:string] = { foo: 'bar' }
-          }.to raise_error(JsonapiCompliable::Errors::InvalidType)
+          }.to raise_error(Graphiti::Errors::InvalidType)
         end
       end
     end

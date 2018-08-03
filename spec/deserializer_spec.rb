@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe JsonapiCompliable::Deserializer do
+RSpec.describe Graphiti::Deserializer do
   let(:payload) do
     {
       data: {

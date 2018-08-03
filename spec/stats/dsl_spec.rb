@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-RSpec.describe JsonapiCompliable::Stats::DSL do
+RSpec.describe Graphiti::Stats::DSL do
   let(:config)   { :myattr }
-  let(:adapter)  { JsonapiCompliable::Adapters::Null.new }
+  let(:adapter)  { Graphiti::Adapters::Null.new }
   let(:instance) { described_class.new(adapter, config) }
 
   describe '.new' do
@@ -52,7 +52,7 @@ RSpec.describe JsonapiCompliable::Stats::DSL do
     context 'when no calculation found' do
       it 'raises an error' do
         expect { instance.calculation(:foo) }
-          .to raise_error(JsonapiCompliable::Errors::StatNotFound, "No stat configured for calculation :foo on attribute :myattr")
+          .to raise_error(Graphiti::Errors::StatNotFound, "No stat configured for calculation :foo on attribute :myattr")
       end
     end
   end

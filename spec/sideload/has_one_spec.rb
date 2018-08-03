@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe JsonapiCompliable::Sideload::HasOne do
+RSpec.describe Graphiti::Sideload::HasOne do
   let(:parent_resource_class) { PORO::EmployeeResource }
   let(:opts) { { parent_resource: parent_resource_class } }
   let(:name) { :bio }

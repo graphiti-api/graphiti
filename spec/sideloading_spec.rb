@@ -16,7 +16,7 @@ RSpec.describe 'sideloading' do
       self.default_sort = [{ id: :desc }]
     end
 
-    class PositionSideload < ::JsonapiCompliable::Sideload::HasMany
+    class PositionSideload < ::Graphiti::Sideload::HasMany
       scope do |employee_ids|
         { type: :positions, sort: [{ id: :desc }] }
       end
@@ -349,7 +349,7 @@ RSpec.describe 'sideloading' do
       it 'does not register children on the resource, but the parent sideload' do
         expect(resource.sideloads).to_not have_key(:visa)
         expect(resource.sideloads[:credit_card].children[:visa])
-          .to be_a(JsonapiCompliable::Sideload::BelongsTo)
+          .to be_a(Graphiti::Sideload::BelongsTo)
       end
 
       it 'creates child sideloads correctly' do
@@ -372,7 +372,7 @@ RSpec.describe 'sideloading' do
     end
 
     context 'when custom class is specified' do
-      let(:custom) { Class.new(JsonapiCompliable::Sideload) }
+      let(:custom) { Class.new(Graphiti::Sideload) }
 
       it 'is used' do
         sl = resource.polymorphic_belongs_to :credit_card, class: custom
@@ -381,7 +381,7 @@ RSpec.describe 'sideloading' do
     end
 
     context 'when adapter class is specified' do
-      let(:custom) { Class.new(JsonapiCompliable::Sideload) }
+      let(:custom) { Class.new(Graphiti::Sideload) }
 
       it 'is used' do
         expect(resource.adapter).to receive(:sideloading_classes)
@@ -493,7 +493,7 @@ RSpec.describe 'sideloading' do
     it 'raises an error, because this is difficult/impossible' do
       expect {
         render
-      }.to raise_error(JsonapiCompliable::Errors::UnsupportedPagination)
+      }.to raise_error(Graphiti::Errors::UnsupportedPagination)
     end
   end
 

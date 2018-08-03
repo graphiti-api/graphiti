@@ -29,7 +29,7 @@ RSpec.describe 'pagination' do
     it 'raises an error' do
       expect {
         records
-      }.to raise_error(JsonapiCompliable::Errors::UnsupportedPageSize)
+      }.to raise_error(Graphiti::Errors::UnsupportedPageSize)
     end
   end
 
@@ -70,7 +70,7 @@ RSpec.describe 'pagination' do
 
       it 'works' do
         ctx = double(runtime_limit: 2).as_null_object
-        JsonapiCompliable.with_context(ctx, {}) do
+        Graphiti.with_context(ctx, {}) do
           expect(ids.length).to eq(2)
         end
       end

@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'jsonapi_compliable/cli'
+require 'graphiti/cli'
 
-JsonapiCompliable::CLI.start(ARGV)
+Graphiti::CLI.start(ARGV)

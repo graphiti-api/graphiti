@@ -27,8 +27,8 @@ if ENV["APPRAISAL_INITIALIZED"]
     let(:path) { '/integration_hooks/employees' }
 
     module IntegrationHooks
-      class ApplicationResource < JsonapiCompliable::Resource
-        self.adapter = JsonapiCompliable::Adapters::ActiveRecord::Base.new
+      class ApplicationResource < Graphiti::Resource
+        self.adapter = Graphiti::Adapters::ActiveRecord::Base.new
       end
 
       class DepartmentResource < ApplicationResource
@@ -156,7 +156,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         it 'fires after validations but before ending the transaction' do
-          expect_any_instance_of(JsonapiCompliable::Util::ValidationResponse)
+          expect_any_instance_of(Graphiti::Util::ValidationResponse)
             .to receive(:validate!)
           expect {
             post :create, params: payload
@@ -206,7 +206,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         it 'fires after validations but before ending the transaction' do
-          expect_any_instance_of(JsonapiCompliable::Util::ValidationResponse)
+          expect_any_instance_of(Graphiti::Util::ValidationResponse)
             .to receive(:validate!)
           post :create, params: payload
           expect(Callbacks.entities)

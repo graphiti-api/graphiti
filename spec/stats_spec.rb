@@ -237,7 +237,7 @@ RSpec.describe 'stats' do
       params[:stats] = { asdf: 'count' }
       expect {
         render
-      }.to raise_error(JsonapiCompliable::Errors::StatNotFound, "No stat configured for calculation :count on attribute :asdf")
+      }.to raise_error(Graphiti::Errors::StatNotFound, "No stat configured for calculation :count on attribute :asdf")
     end
   end
 end

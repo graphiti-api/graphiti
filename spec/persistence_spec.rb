@@ -21,7 +21,7 @@ RSpec.describe 'persistence' do
   end
 
   around do |e|
-    JsonapiCompliable.with_context({}, :create) do
+    Graphiti.with_context({}, :create) do
       e.run
     end
   end
@@ -42,7 +42,7 @@ RSpec.describe 'persistence' do
       employee = klass.build(payload)
       expect {
         employee.save
-      }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'PORO::EmployeeResource: Tried to write attribute :foo, but could not find an attribute with that name.')
+      }.to raise_error(Graphiti::Errors::AttributeError, 'PORO::EmployeeResource: Tried to write attribute :foo, but could not find an attribute with that name.')
     end
   end
 
@@ -56,7 +56,7 @@ RSpec.describe 'persistence' do
       employee = klass.build(payload)
       expect {
         employee.save
-      }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'PORO::EmployeeResource: Tried to write attribute :foo, but the attribute was marked :writable => false.')
+      }.to raise_error(Graphiti::Errors::AttributeError, 'PORO::EmployeeResource: Tried to write attribute :foo, but the attribute was marked :writable => false.')
     end
   end
 
@@ -70,7 +70,7 @@ RSpec.describe 'persistence' do
       employee = klass.build(payload)
       expect {
         employee.save
-      }.to raise_error(JsonapiCompliable::Errors::TypecastFailed, /Failed typecasting :foo! Given "bar" but the following error was raised/)
+      }.to raise_error(Graphiti::Errors::TypecastFailed, /Failed typecasting :foo! Given "bar" but the following error was raised/)
     end
 
     context 'and it can coerce' do
@@ -122,14 +122,14 @@ RSpec.describe 'persistence' do
       it 'does not coerce blank string to 0' do
         expect {
           save('')
-        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+        }.to raise_error(Graphiti::Errors::TypecastFailed)
       end
 
       context 'when cannot coerce' do
         it 'raises error' do
           expect {
             save({})
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -155,7 +155,7 @@ RSpec.describe 'persistence' do
         it 'raises error' do
           expect {
             save({})
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -181,7 +181,7 @@ RSpec.describe 'persistence' do
         it 'raises error' do
           expect {
             save({})
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -207,7 +207,7 @@ RSpec.describe 'persistence' do
         it 'raises error' do
           expect {
             save({})
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -245,7 +245,7 @@ RSpec.describe 'persistence' do
         it 'raises error' do
           expect {
             save({})
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -294,7 +294,7 @@ RSpec.describe 'persistence' do
         it 'raises error' do
           expect {
             save({})
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -317,7 +317,7 @@ RSpec.describe 'persistence' do
         it 'raises error' do
           expect {
             save([:foo, :bar])
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -334,20 +334,20 @@ RSpec.describe 'persistence' do
       it 'raises error on single values' do
         expect {
           save(:foo)
-        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+        }.to raise_error(Graphiti::Errors::TypecastFailed)
       end
 
       it 'does NOT allow nils' do
         expect {
           save(nil)
-        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+        }.to raise_error(Graphiti::Errors::TypecastFailed)
       end
 
       context 'when cannot coerce' do
         it 'raises error' do
           expect {
             save({})
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -369,20 +369,20 @@ RSpec.describe 'persistence' do
       it 'raises error on single values' do
         expect {
           save(1)
-        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+        }.to raise_error(Graphiti::Errors::TypecastFailed)
       end
 
       it 'raises error on nils' do
         expect {
           save(nil)
-        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+        }.to raise_error(Graphiti::Errors::TypecastFailed)
       end
 
       context 'when cannot coerce' do
         it 'raises error' do
           expect {
             save(nil)
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -394,7 +394,7 @@ RSpec.describe 'persistence' do
           .constructor { |input|
             'custom!'
           }
-        JsonapiCompliable::Types[:custom] = {
+        Graphiti::Types[:custom] = {
           write: type,
           read: type,
           params: type,
@@ -405,7 +405,7 @@ RSpec.describe 'persistence' do
       end
 
       after do
-        JsonapiCompliable::Types.map.delete(:custom)
+        Graphiti::Types.map.delete(:custom)
       end
 
       it 'works' do

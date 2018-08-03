@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-RSpec.describe JsonapiCompliable do
+RSpec.describe Graphiti do
   let(:klass) do
     Class.new do
       attr_accessor :params
-      include JsonapiCompliable::Base
+      include Graphiti::Base
 
       def jsonapi_resource
         PORO::EmployeeResource.new
@@ -51,8 +51,8 @@ RSpec.describe JsonapiCompliable do
       scope = double(resolve: 'resolved', resolve_stats: 'stats')
       expect(instance).to receive(:jsonapi_scope).with('foo', {}) { scope }
       proxy = instance.proxy('foo')
-      expect(proxy).to be_a(JsonapiCompliable::ResourceProxy)
-      expect(proxy.query).to be_a(JsonapiCompliable::Query)
+      expect(proxy).to be_a(Graphiti::ResourceProxy)
+      expect(proxy.query).to be_a(Graphiti::Query)
       expect(proxy.to_a).to eq('resolved')
       expect(proxy.stats).to eq('stats')
     end

@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-RSpec.describe JsonapiCompliable::Scope do
+RSpec.describe Graphiti::Scope do
   let(:object) { double.as_null_object }
   let(:params) { {} }
-  let(:query) { JsonapiCompliable::Query.new(resource, params) }
+  let(:query) { Graphiti::Query.new(resource, params) }
   let(:instance) { described_class.new(object, resource, query) }
 
   let(:resource) do

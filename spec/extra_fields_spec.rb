@@ -55,7 +55,7 @@ RSpec.describe 'extra_fields' do
 
     it 'works' do
       ctx = double(runtime_id: 789).as_null_object
-      JsonapiCompliable.with_context ctx, {} do
+      Graphiti.with_context ctx, {} do
         render
         expect(attributes['runtime_id']).to eq(789)
       end
@@ -70,7 +70,7 @@ RSpec.describe 'extra_fields' do
     context 'and the guard passes' do
       it 'renders the field' do
         ctx = double(current_user: 'admin').as_null_object
-        JsonapiCompliable.with_context ctx, {} do
+        Graphiti.with_context ctx, {} do
           render
           expect(attributes.keys).to include('admin_stack_ranking')
         end
@@ -80,7 +80,7 @@ RSpec.describe 'extra_fields' do
     context 'and the guard fails' do
       it 'does not render the field' do
         ctx = double(current_user: 'foo').as_null_object
-        JsonapiCompliable.with_context ctx, {} do
+        Graphiti.with_context ctx, {} do
           render
           expect(attributes.keys).to_not include('admin_stack_ranking')
         end

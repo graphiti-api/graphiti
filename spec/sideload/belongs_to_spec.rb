@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe JsonapiCompliable::Sideload::BelongsTo do
+RSpec.describe Graphiti::Sideload::BelongsTo do
   let(:parent_resource_class) { PORO::PositionResource }
   let(:resource_class) do
     Class.new(PORO::EmployeeResource) do
@@ -149,7 +149,7 @@ RSpec.describe JsonapiCompliable::Sideload::BelongsTo do
 
   describe '#load_params' do
     let(:params) { {} }
-    let(:query) { JsonapiCompliable::Query.new(instance.resource, params) }
+    let(:query) { Graphiti::Query.new(instance.resource, params) }
     let(:parents) { [double(bar_id: 7), double(bar_id: 8)] }
 
     before do

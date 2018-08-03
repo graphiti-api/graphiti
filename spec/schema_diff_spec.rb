@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-RSpec.describe JsonapiCompliable::SchemaDiff do
+RSpec.describe Graphiti::SchemaDiff do
   let(:application_resource) do
-    Class.new(JsonapiCompliable::Resource) do
+    Class.new(Graphiti::Resource) do
       self.abstract_class = true
     end
   end
@@ -27,19 +27,19 @@ RSpec.describe JsonapiCompliable::SchemaDiff do
 
   let(:test_context) do
     Class.new do
-      include JsonapiCompliable::Context
+      include Graphiti::Context
     end.new
   end
 
   before do
-    allow(JsonapiCompliable.config).to receive(:context_for_endpoint)
+    allow(Graphiti.config).to receive(:context_for_endpoint)
       .and_return(double(call: test_context))
   end
 
   let(:a_resources) { [resource_a] }
   let(:b_resources) { [resource_b] }
-  let(:a) { JsonapiCompliable::Schema.generate(a_resources) }
-  let(:b) { JsonapiCompliable::Schema.generate(b_resources) }
+  let(:a) { Graphiti::Schema.generate(a_resources) }
+  let(:b) { Graphiti::Schema.generate(b_resources) }
 
   RSpec.shared_examples 'changing attribute flag' do |flag|
     context 'from true to false' do
@@ -454,7 +454,7 @@ RSpec.describe JsonapiCompliable::SchemaDiff do
 
     context 'when type is added' do
       around do |e|
-        JsonapiCompliable::Types[:foo] = {
+        Graphiti::Types[:foo] = {
           read: '',
           write: '',
           params: '',
@@ -464,7 +464,7 @@ RSpec.describe JsonapiCompliable::SchemaDiff do
         begin
           e.run
         ensure
-          JsonapiCompliable::Types.map.delete(:foo)
+          Graphiti::Types.map.delete(:foo)
         end
       end
 
@@ -473,7 +473,7 @@ RSpec.describe JsonapiCompliable::SchemaDiff do
 
     context 'when type is removed' do
       before do
-        JsonapiCompliable::Types[:foo] = {
+        Graphiti::Types[:foo] = {
           read: '',
           write: '',
           params: '',
@@ -481,7 +481,7 @@ RSpec.describe JsonapiCompliable::SchemaDiff do
           description: ''
         }
         a
-        JsonapiCompliable::Types.map.delete(:foo)
+        Graphiti::Types.map.delete(:foo)
       end
 
       it 'returns error' do
@@ -493,7 +493,7 @@ RSpec.describe JsonapiCompliable::SchemaDiff do
 
     context 'when type changes kind' do
       before do
-        JsonapiCompliable::Types[:foo] = {
+        Graphiti::Types[:foo] = {
           read: '',
           write: '',
           params: '',
@@ -501,7 +501,7 @@ RSpec.describe JsonapiCompliable::SchemaDiff do
           description: ''
         }
         a
-        JsonapiCompliable::Types[:foo] = {
+        Graphiti::Types[:foo] = {
           read: '',
           write: '',
           params: '',
@@ -509,7 +509,7 @@ RSpec.describe JsonapiCompliable::SchemaDiff do
           description: ''
         }
         b
-        JsonapiCompliable::Types.map.delete(:foo)
+        Graphiti::Types.map.delete(:foo)
       end
 
       it 'returns error' do
@@ -532,7 +532,7 @@ RSpec.describe JsonapiCompliable::SchemaDiff do
 
     context 'when endpoint is removed' do
       let(:position_resource_no_endpoint) do
-        Class.new(JsonapiCompliable::Resource) do
+        Class.new(Graphiti::Resource) do
           def self.name;'SchemaDiff::PositionResource';end
           self.endpoint = nil
         end
@@ -552,7 +552,7 @@ RSpec.describe JsonapiCompliable::SchemaDiff do
 
     context 'when endpoint action is removed' do
       let(:position_resource_no_create) do
-        Class.new(JsonapiCompliable::Resource) do
+        Class.new(Graphiti::Resource) do
           def self.name;'SchemaDiff::PositionResource';end
           self.endpoint[:actions].delete(:create)
         end

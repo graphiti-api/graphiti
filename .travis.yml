@@ -14,7 +14,7 @@ gemfile:
 deploy:
   provider: rubygems
   api_key: $RUBYGEMS_API_KEY
-  gem: jsonapi_compliable
+  gem: graphiti
   on:
     tags: true
-    repo: jsonapi-suite/jsonapi_compliable
+    repo: graphiti/graphiti

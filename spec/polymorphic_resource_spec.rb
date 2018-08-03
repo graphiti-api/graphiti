@@ -29,7 +29,7 @@ RSpec.describe 'polymorphic resources' do
       it 'raises an error' do
         expect {
           instance.serializer_for(PORO::Employee.new)
-        }.to raise_error(JsonapiCompliable::Errors::PolymorphicChildNotFound)
+        }.to raise_error(Graphiti::Errors::PolymorphicChildNotFound)
       end
     end
   end

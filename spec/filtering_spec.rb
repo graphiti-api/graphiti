@@ -70,7 +70,7 @@ RSpec.describe 'filtering' do
         expect {
           params[:filter] = { foo: nil }
           records
-        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+        }.to raise_error(Graphiti::Errors::TypecastFailed)
       end
 
       context 'when cannot coerce' do
@@ -81,7 +81,7 @@ RSpec.describe 'filtering' do
         it 'raises error' do
           expect {
             records
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -105,7 +105,7 @@ RSpec.describe 'filtering' do
         expect {
           params[:filter] = { foo: nil }
           records
-        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+        }.to raise_error(Graphiti::Errors::TypecastFailed)
       end
 
       context 'when cannot coerce' do
@@ -117,7 +117,7 @@ RSpec.describe 'filtering' do
         it 'raises error' do
           expect {
             records
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -141,7 +141,7 @@ RSpec.describe 'filtering' do
         expect {
           params[:filter] = { foo: nil }
           records
-        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+        }.to raise_error(Graphiti::Errors::TypecastFailed)
       end
 
       context 'when cannot coerce' do
@@ -153,7 +153,7 @@ RSpec.describe 'filtering' do
         it 'raises error' do
           expect {
             records
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -197,7 +197,7 @@ RSpec.describe 'filtering' do
         expect {
           params[:filter] = { foo: nil }
           records
-        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+        }.to raise_error(Graphiti::Errors::TypecastFailed)
       end
 
       context 'when cannot coerce' do
@@ -208,7 +208,7 @@ RSpec.describe 'filtering' do
         it 'raises error' do
           expect {
             records
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -232,7 +232,7 @@ RSpec.describe 'filtering' do
         params[:filter] = { foo: nil }
         expect {
           records
-        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+        }.to raise_error(Graphiti::Errors::TypecastFailed)
       end
 
       context 'when only month' do
@@ -243,7 +243,7 @@ RSpec.describe 'filtering' do
         it 'raises error because that is not a date' do
           expect {
             records
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
 
@@ -255,7 +255,7 @@ RSpec.describe 'filtering' do
         it 'raises error' do
           expect {
             records
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -286,7 +286,7 @@ RSpec.describe 'filtering' do
         params[:filter] = { foo: nil }
         expect {
           records
-        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+        }.to raise_error(Graphiti::Errors::TypecastFailed)
       end
 
       context 'when cannot coerce' do
@@ -297,7 +297,7 @@ RSpec.describe 'filtering' do
         it 'raises error' do
           expect {
             records
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -338,7 +338,7 @@ RSpec.describe 'filtering' do
         it 'raises error' do
           expect {
             records
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -364,7 +364,7 @@ RSpec.describe 'filtering' do
         params[:filter] = { foo: 1 }
         expect {
           records
-        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+        }.to raise_error(Graphiti::Errors::TypecastFailed)
       end
 
       context 'when cannot coerce' do
@@ -375,7 +375,7 @@ RSpec.describe 'filtering' do
         it 'raises error' do
           expect {
             records
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -402,7 +402,7 @@ RSpec.describe 'filtering' do
         params[:filter] = { foo: 1 }
         expect {
           records
-        }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+        }.to raise_error(Graphiti::Errors::TypecastFailed)
       end
 
       context 'when cannot coerce' do
@@ -413,7 +413,7 @@ RSpec.describe 'filtering' do
         it 'raises error' do
           expect {
             render
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -425,7 +425,7 @@ RSpec.describe 'filtering' do
           .constructor { |input|
             'custom!'
           }
-        JsonapiCompliable::Types[:custom] = {
+        Graphiti::Types[:custom] = {
           params: type,
           canonical_name: :string,
           read: type,
@@ -437,7 +437,7 @@ RSpec.describe 'filtering' do
       end
 
       after do
-        JsonapiCompliable::Types.map.delete(:custom)
+        Graphiti::Types.map.delete(:custom)
       end
 
       it 'works' do
@@ -491,7 +491,7 @@ RSpec.describe 'filtering' do
           expect {
             resource.filter :foo do
             end
-          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add filter attribute :foo, but the attribute was marked :filterable => false.')
+          }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to add filter attribute :foo, but the attribute was marked :filterable => false.')
         end
       end
     end
@@ -530,7 +530,7 @@ RSpec.describe 'filtering' do
           expect {
             resource.filter :foo do
             end
-          }.to raise_error(JsonapiCompliable::Errors::ImplicitFilterTypeMissing)
+          }.to raise_error(Graphiti::Errors::ImplicitFilterTypeMissing)
         end
       end
     end
@@ -600,7 +600,7 @@ RSpec.describe 'filtering' do
 
   context 'when filtering based on calling context' do
     around do |e|
-      JsonapiCompliable.with_context(OpenStruct.new(runtime_id: employee3.id)) do
+      Graphiti.with_context(OpenStruct.new(runtime_id: employee3.id)) do
         e.run
       end
     end
@@ -744,7 +744,7 @@ RSpec.describe 'filtering' do
 
       it 'works' do
         ctx = double(runtime_id: employee3.id).as_null_object
-        JsonapiCompliable.with_context(ctx, {}) do
+        Graphiti.with_context(ctx, {}) do
           expect(records.map(&:id)).to eq([employee3.id])
         end
       end
@@ -759,7 +759,7 @@ RSpec.describe 'filtering' do
     it 'raises helpful error' do
       expect {
         records
-      }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :foo, but could not find an attribute with that name.')
+      }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :foo, but could not find an attribute with that name.')
     end
 
     context 'but there is a corresponding extra attribute' do
@@ -771,7 +771,7 @@ RSpec.describe 'filtering' do
         it 'raises helpful error' do
           expect {
             records
-          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :foo, but the attribute was marked :filterable => false.')
+          }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :foo, but the attribute was marked :filterable => false.')
         end
       end
 
@@ -808,7 +808,7 @@ RSpec.describe 'filtering' do
 
     context 'and the guard passes' do
       around do |e|
-        JsonapiCompliable.with_context(OpenStruct.new(admin: true)) do
+        Graphiti.with_context(OpenStruct.new(admin: true)) do
           e.run
         end
       end
@@ -820,7 +820,7 @@ RSpec.describe 'filtering' do
 
     context 'and the guard fails' do
       around do |e|
-        JsonapiCompliable.with_context(OpenStruct.new(admin: false)) do
+        Graphiti.with_context(OpenStruct.new(admin: false)) do
           e.run
         end
       end
@@ -828,7 +828,7 @@ RSpec.describe 'filtering' do
       it 'raises helpful error' do
         expect {
           records
-        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :first_name, but the guard :admin? did not pass.')
+        }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :first_name, but the guard :admin? did not pass.')
       end
     end
   end
@@ -852,7 +852,7 @@ RSpec.describe 'filtering' do
       it 'raises error' do
         expect {
           records
-        }.to raise_error(JsonapiCompliable::Errors::RequiredFilter)
+        }.to raise_error(Graphiti::Errors::RequiredFilter)
       end
     end
   end

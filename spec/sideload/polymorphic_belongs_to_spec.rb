@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe JsonapiCompliable::Sideload::PolymorphicBelongsTo do
+RSpec.describe Graphiti::Sideload::PolymorphicBelongsTo do
   let(:klass) { Class.new(described_class) }
   let(:parent_resource_class) do
     Class.new(PORO::EmployeeResource) do

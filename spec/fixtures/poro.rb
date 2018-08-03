@@ -197,7 +197,7 @@ module PORO
     attr_accessor :visa_id, :points
   end
 
-  class Adapter < JsonapiCompliable::Adapters::Null
+  class Adapter < Graphiti::Adapters::Null
     def order(scope, att, dir)
       scope[:sort] ||= []
       scope[:sort] << { att => dir }
@@ -272,7 +272,7 @@ module PORO
     end
   end
 
-  class ApplicationResource < JsonapiCompliable::Resource
+  class ApplicationResource < Graphiti::Resource
     self.adapter = Adapter.new
     self.abstract_class = true
 

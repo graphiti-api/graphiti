@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe JsonapiCompliable::Util::Hash do
+RSpec.describe Graphiti::Util::Hash do
   describe '.keys' do
     it 'recursively collects keys' do
       hash = { foo: { bar: {} }, baz: {} }

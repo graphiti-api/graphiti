@@ -154,8 +154,8 @@ module Legacy
   class LegacyApplicationSerializer < JSONAPI::Serializable::Resource
   end
 
-  class ApplicationResource < JsonapiCompliable::Resource
-    self.adapter = JsonapiCompliable::Adapters::ActiveRecord::Base.new
+  class ApplicationResource < Graphiti::Resource
+    self.adapter = Graphiti::Adapters::ActiveRecord::Base.new
     self.abstract_class = true
   end
 
@@ -282,7 +282,7 @@ module Legacy
     end
   end
 
-  class SearchAdapter < JsonapiCompliable::Adapters::Abstract
+  class SearchAdapter < Graphiti::Adapters::Abstract
     def base_scope(model)
       model.all
     end

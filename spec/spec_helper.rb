@@ -5,7 +5,7 @@ require 'pry'
 
 require 'active_model'
 require 'jsonapi_spec_helpers/rspec'
-require 'jsonapi_compliable'
+require 'graphiti'
 require 'fixtures/poro'
 
 RSpec.configure do |config|
@@ -40,7 +40,7 @@ if ENV["APPRAISAL_INITIALIZED"]
   require 'database_cleaner'
   require 'kaminari'
   require 'active_record'
-  require 'jsonapi_compliable/adapters/active_record'
+  require 'graphiti/adapters/active_record'
   require 'rails_spec_helper'
   ActiveRecord::Migration.verbose = false
   ActiveRecord::Base.establish_connection adapter: 'sqlite3',

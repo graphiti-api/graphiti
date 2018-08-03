@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe JsonapiCompliable::Util::IncludeParams do
+RSpec.describe Graphiti::Util::IncludeParams do
   describe '.scrub' do
     let(:requested) do
       { foo: { bar: { baz: {} }, blah: {}, blah2: {} } }

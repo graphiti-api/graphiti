@@ -125,8 +125,8 @@ end
 class Salary < ApplicationRecord
 end
 
-class ApplicationResource < JsonapiCompliable::Resource
-  self.adapter = JsonapiCompliable::Adapters::ActiveRecord::Base.new
+class ApplicationResource < Graphiti::Resource
+  self.adapter = Graphiti::Adapters::ActiveRecord::Base.new
   self.abstract_class = true
 end
 

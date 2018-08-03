@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe JsonapiCompliable::Util::FieldParams do
+RSpec.describe Graphiti::Util::FieldParams do
   describe '.parse' do
     it 'collects and normalizes the payload' do
       parsed = described_class.parse({

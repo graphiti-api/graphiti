@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe JsonapiCompliable::Stats::Payload do
+RSpec.describe Graphiti::Stats::Payload do
   let(:dsl)      { double }
   let(:query)    { double(stats: { attr1: [:count, :average], attr2: [:maximum] }) }
   let(:scope)    { double.as_null_object }

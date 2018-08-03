@@ -8,8 +8,8 @@
 require 'bundler/setup' unless defined?(Bundler)
 require 'rails'
 require 'action_controller'
-require 'jsonapi_compliable/rails'
-require 'jsonapi_compliable/railtie'
+require 'graphiti/rails'
+require 'graphiti/railtie'
 
 module BasicRailsApp
   module_function
@@ -50,7 +50,7 @@ end
 
 class ApplicationController < ActionController::Base
   include Rails.application.routes.url_helpers
-  include JsonapiCompliable::Rails
+  include Graphiti::Rails
 
   prepend_before_action :fix_params!
 

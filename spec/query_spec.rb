@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe JsonapiCompliable::Query do
+RSpec.describe Graphiti::Query do
   let(:employee_resource) { Class.new(PORO::EmployeeResource) }
   let(:position_resource) { Class.new(PORO::PositionResource) }
   let(:department_resource) { Class.new(PORO::DepartmentResource) }
@@ -53,7 +53,7 @@ RSpec.describe JsonapiCompliable::Query do
         end
 
         around do |e|
-          JsonapiCompliable.with_context ctx, :update do
+          Graphiti.with_context ctx, :update do
             e.run
           end
         end
@@ -71,7 +71,7 @@ RSpec.describe JsonapiCompliable::Query do
         let(:ctx) { OpenStruct.new }
 
         around do |e|
-          JsonapiCompliable.with_context ctx, :update do
+          Graphiti.with_context ctx, :update do
             e.run
           end
         end
@@ -97,13 +97,13 @@ RSpec.describe JsonapiCompliable::Query do
         it 'raises error' do
           expect {
             hash
-          }.to raise_error(JsonapiCompliable::Errors::InvalidInclude)
+          }.to raise_error(Graphiti::Errors::InvalidInclude)
         end
 
         context 'but the config says not to raise' do
           before do
             params[:include] = 'foo,positions'
-            JsonapiCompliable.config.raise_on_missing_sideload = false
+            Graphiti.config.raise_on_missing_sideload = false
           end
 
           it 'does not raise' do
@@ -125,7 +125,7 @@ RSpec.describe JsonapiCompliable::Query do
         it 'raises error' do
           expect {
             hash
-          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :asdf, but could not find an attribute with that name.')
+          }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :asdf, but could not find an attribute with that name.')
         end
 
         context 'on an association' do
@@ -137,7 +137,7 @@ RSpec.describe JsonapiCompliable::Query do
             it 'raises error' do
               expect {
                 hash
-              }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :via_type, but could not find an attribute with that name.')
+              }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :via_type, but could not find an attribute with that name.')
             end
           end
 
@@ -149,7 +149,7 @@ RSpec.describe JsonapiCompliable::Query do
             it 'raises error' do
               expect {
                 hash
-              }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :via_name, but could not find an attribute with that name.')
+              }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :via_name, but could not find an attribute with that name.')
             end
           end
         end
@@ -164,7 +164,7 @@ RSpec.describe JsonapiCompliable::Query do
         it 'raises error' do
           expect {
             hash
-          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :asdf, but the attribute was marked :filterable => false.')
+          }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :asdf, but the attribute was marked :filterable => false.')
         end
 
         context 'on an association' do
@@ -176,7 +176,7 @@ RSpec.describe JsonapiCompliable::Query do
             it 'raises error' do
               expect {
                 hash
-              }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :via_type, but could not find an attribute with that name.')
+              }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :via_type, but could not find an attribute with that name.')
             end
           end
 
@@ -189,7 +189,7 @@ RSpec.describe JsonapiCompliable::Query do
             it 'raises error' do
               expect {
                 hash
-              }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :via_name, but the attribute was marked :filterable => false.')
+              }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :via_name, but the attribute was marked :filterable => false.')
             end
           end
         end
@@ -343,7 +343,7 @@ RSpec.describe JsonapiCompliable::Query do
         it 'raises error' do
           expect {
             hash
-          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :asdf, but could not find an attribute with that name.')
+          }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :asdf, but could not find an attribute with that name.')
         end
 
         context 'on association' do
@@ -355,7 +355,7 @@ RSpec.describe JsonapiCompliable::Query do
             it 'raises error' do
               expect {
                 hash
-              }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :by_type, but could not find an attribute with that name.')
+              }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :by_type, but could not find an attribute with that name.')
             end
           end
 
@@ -367,7 +367,7 @@ RSpec.describe JsonapiCompliable::Query do
             it 'raises error' do
               expect {
                 hash
-              }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :by_name, but could not find an attribute with that name.')
+              }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :by_name, but could not find an attribute with that name.')
             end
           end
         end
@@ -382,7 +382,7 @@ RSpec.describe JsonapiCompliable::Query do
         it 'raises error' do
           expect {
             hash
-          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :foo, but the attribute was marked :sortable => false.')
+          }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :foo, but the attribute was marked :sortable => false.')
         end
 
         context 'on association' do
@@ -395,7 +395,7 @@ RSpec.describe JsonapiCompliable::Query do
             it 'raises error' do
               expect {
                 hash
-              }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :by_type, but the attribute was marked :sortable => false.')
+              }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :by_type, but the attribute was marked :sortable => false.')
             end
           end
 
@@ -408,7 +408,7 @@ RSpec.describe JsonapiCompliable::Query do
             it 'raises error' do
               expect {
                 hash
-              }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :by_name, but the attribute was marked :sortable => false.')
+              }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :by_name, but the attribute was marked :sortable => false.')
             end
           end
         end
@@ -579,7 +579,7 @@ RSpec.describe JsonapiCompliable::Query do
         it 'raises error' do
           #expect {
             hash
-          #}.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to read attribute :asdf, but could not find an attribute with that name.')
+          #}.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to read attribute :asdf, but could not find an attribute with that name.')
         end
       end
 
@@ -592,7 +592,7 @@ RSpec.describe JsonapiCompliable::Query do
         xit 'raises error' do
           expect {
             hash
-          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to read attribute :first_name, but the attribute was marked :readable => false.')
+          }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to read attribute :first_name, but the attribute was marked :readable => false.')
         end
       end
 
@@ -643,7 +643,7 @@ RSpec.describe JsonapiCompliable::Query do
         xit 'raises error' do
           expect {
             hash
-          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to read attribute :asdf, but could not find an attribute with that name.')
+          }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to read attribute :asdf, but could not find an attribute with that name.')
         end
       end
 
@@ -656,7 +656,7 @@ RSpec.describe JsonapiCompliable::Query do
         xit 'raises error' do
           expect {
             hash
-          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to read attribute :first_name, but the attribute was marked :readable => false.')
+          }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to read attribute :first_name, but the attribute was marked :readable => false.')
         end
       end
 

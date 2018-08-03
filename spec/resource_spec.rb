@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe JsonapiCompliable::Resource do
+RSpec.describe Graphiti::Resource do
   let(:klass) { Class.new(described_class) }
   let(:instance) { klass.new }
 
@@ -14,7 +14,7 @@ RSpec.describe JsonapiCompliable::Resource do
 
       it 'sets defaults' do
         expect(klass.adapter.class.ancestors[0])
-          .to eq(JsonapiCompliable::Adapters::Abstract)
+          .to eq(Graphiti::Adapters::Abstract)
         expect(klass.default_sort).to eq([])
         expect(klass.default_page_size).to eq(20)
         expect(klass.attributes_readable_by_default).to eq(true)
@@ -32,7 +32,7 @@ RSpec.describe JsonapiCompliable::Resource do
       end
 
       it 'adds to global list of resources' do
-        expect(JsonapiCompliable.resources).to include(klass)
+        expect(Graphiti.resources).to include(klass)
       end
     end
 
@@ -56,7 +56,7 @@ RSpec.describe JsonapiCompliable::Resource do
 
       it 'inherits defaults' do
         expect(klass.adapter.class.ancestors[0])
-          .to eq(JsonapiCompliable::Adapters::Abstract)
+          .to eq(Graphiti::Adapters::Abstract)
         expect(klass.default_sort).to eq([])
         expect(klass.default_page_size).to eq(20)
         expect(klass.attributes_readable_by_default).to eq(true)
@@ -85,7 +85,7 @@ RSpec.describe JsonapiCompliable::Resource do
         it 'raises helpful error' do
           expect {
             klass.model
-          }.to raise_error(JsonapiCompliable::Errors::ModelNotFound)
+          }.to raise_error(Graphiti::Errors::ModelNotFound)
         end
       end
 
@@ -315,14 +315,14 @@ RSpec.describe JsonapiCompliable::Resource do
     context 'when no corresponding attribute' do
       it 'raises error' do
         expect { instance.stat(:foo, 'average') }
-          .to raise_error(JsonapiCompliable::Errors::StatNotFound, "No stat configured for calculation 'average' on attribute :foo")
+          .to raise_error(Graphiti::Errors::StatNotFound, "No stat configured for calculation 'average' on attribute :foo")
       end
     end
 
     context 'when no corresponding calculation' do
       it 'raises error' do
         expect { instance.stat('myattr', :median) }
-          .to raise_error(JsonapiCompliable::Errors::StatNotFound, "No stat configured for calculation :median on attribute :myattr")
+          .to raise_error(Graphiti::Errors::StatNotFound, "No stat configured for calculation :median on attribute :myattr")
       end
     end
   end
@@ -340,7 +340,7 @@ RSpec.describe JsonapiCompliable::Resource do
 
     context 'when an error' do
       around do |e|
-        JsonapiCompliable.with_context('orig', 'orig namespace') do
+        Graphiti.with_context('orig', 'orig namespace') do
           e.run
         end
       end
@@ -377,14 +377,14 @@ RSpec.describe JsonapiCompliable::Resource do
 
   describe '#adapter' do
     it 'defaults' do
-      expect(instance.adapter.class).to eq(JsonapiCompliable::Adapters::Abstract)
+      expect(instance.adapter.class).to eq(Graphiti::Adapters::Abstract)
     end
   end
 
   describe '.allow_sideload' do
     it 'uses Sideload as default class' do
       sideload = klass.allow_sideload :comments
-      expect(sideload.class.ancestors[1]).to eq(JsonapiCompliable::Sideload)
+      expect(sideload.class.ancestors[1]).to eq(Graphiti::Sideload)
     end
 
     it 'assigns parent resource as self' do
@@ -416,9 +416,9 @@ RSpec.describe JsonapiCompliable::Resource do
     context 'when passed explicit :class' do
       it 'is used' do
         sideload = klass.allow_sideload :comments,
-          class: JsonapiCompliable::Sideload::HasMany
+          class: Graphiti::Sideload::HasMany
         expect(sideload.class.ancestors[1])
-          .to eq(JsonapiCompliable::Sideload::HasMany)
+          .to eq(Graphiti::Sideload::HasMany)
       end
     end
   end
@@ -689,7 +689,7 @@ RSpec.describe JsonapiCompliable::Resource do
           klass.class_eval do
             attribute :foo, :asdf
           end
-        }.to raise_error(JsonapiCompliable::Errors::TypeNotFound)
+        }.to raise_error(Graphiti::Errors::TypeNotFound)
       end
     end
 
@@ -820,7 +820,7 @@ RSpec.describe JsonapiCompliable::Resource do
 
   describe '.endpoint' do
     let(:klass) do
-      Class.new(JsonapiCompliable::Resource) do
+      Class.new(Graphiti::Resource) do
         def self.name;'EmployeeResource';end
       end
     end
@@ -834,7 +834,7 @@ RSpec.describe JsonapiCompliable::Resource do
 
     context 'when resource is namespaced' do
       let(:klass) do
-        Class.new(JsonapiCompliable::Resource) do
+        Class.new(Graphiti::Resource) do
           def self.name;'PORO::EmployeeResource';end
         end
       end
@@ -850,7 +850,7 @@ RSpec.describe JsonapiCompliable::Resource do
 
   describe '#endpoint' do
     let(:klass) do
-      Class.new(JsonapiCompliable::Resource) do
+      Class.new(Graphiti::Resource) do
         def self.name;'EmployeeResource';end
       end
     end
@@ -867,7 +867,7 @@ RSpec.describe JsonapiCompliable::Resource do
 
     context 'when resource is namespaced' do
       let(:klass) do
-        Class.new(JsonapiCompliable::Resource) do
+        Class.new(Graphiti::Resource) do
           def self.name;'PORO::EmployeeResource';end
         end
       end
@@ -880,7 +880,7 @@ RSpec.describe JsonapiCompliable::Resource do
 
   describe '.endpoints' do
     let(:klass) do
-      Class.new(JsonapiCompliable::Resource) do
+      Class.new(Graphiti::Resource) do
         def self.name;'EmployeeResource';end
       end
     end
@@ -925,7 +925,7 @@ RSpec.describe JsonapiCompliable::Resource do
 
   describe '#base_scope' do
     let(:adapter) do
-      Class.new(JsonapiCompliable::Adapters::Null) do
+      Class.new(Graphiti::Adapters::Null) do
         def base_scope(model)
           'foo'
         end
@@ -977,7 +977,7 @@ RSpec.describe JsonapiCompliable::Resource do
     describe '.all' do
       it 'executes the request correctly, returning proxy' do
         employees = klass.all(filter: { id: employee2.id })
-        expect(employees).to be_a(JsonapiCompliable::ResourceProxy)
+        expect(employees).to be_a(Graphiti::ResourceProxy)
         expect(employees.map(&:id)).to eq([employee2.id])
       end
 
@@ -1003,13 +1003,13 @@ RSpec.describe JsonapiCompliable::Resource do
           end
 
           it 'works' do
-            JsonapiCompliable.with_context ctx, :index do
+            Graphiti.with_context ctx, :index do
               expect { klass.all }.to_not raise_error
             end
           end
 
           it 'can sideload' do
-            JsonapiCompliable.with_context ctx, :index do
+            Graphiti.with_context ctx, :index do
               expect { klass.all(include: 'positions') }
                 .to_not raise_error
             end
@@ -1021,7 +1021,7 @@ RSpec.describe JsonapiCompliable::Resource do
             end
 
             it 'works' do
-              JsonapiCompliable.with_context ctx, :show do
+              Graphiti.with_context ctx, :show do
                 expect { klass.all }.to_not raise_error
               end
             end
@@ -1034,7 +1034,7 @@ RSpec.describe JsonapiCompliable::Resource do
           end
 
           it 'works' do
-            JsonapiCompliable.with_context ctx, :index do
+            Graphiti.with_context ctx, :index do
               expect { klass.all }.to_not raise_error
             end
           end
@@ -1046,10 +1046,10 @@ RSpec.describe JsonapiCompliable::Resource do
           end
 
           it 'raises error' do
-            JsonapiCompliable.with_context ctx, :index do
+            Graphiti.with_context ctx, :index do
               expect {
                 klass.all
-              }.to raise_error(JsonapiCompliable::Errors::InvalidEndpoint, /QueryAllSpec::EmployeeResource cannot be called directly from endpoint \/api\/v1\/employees/)
+              }.to raise_error(Graphiti::Errors::InvalidEndpoint, /QueryAllSpec::EmployeeResource cannot be called directly from endpoint \/api\/v1\/employees/)
             end
           end
 
@@ -1061,7 +1061,7 @@ RSpec.describe JsonapiCompliable::Resource do
             end
 
             it 'works' do
-              JsonapiCompliable.with_context ctx, :index do
+              Graphiti.with_context ctx, :index do
                 expect {
                   klass.all
                 }.to_not raise_error
@@ -1079,7 +1079,7 @@ RSpec.describe JsonapiCompliable::Resource do
             end
 
             it 'works' do
-              JsonapiCompliable.with_context ctx, :index do
+              Graphiti.with_context ctx, :index do
                 expect {
                   klass.all
                 }.to_not raise_error
@@ -1090,10 +1090,10 @@ RSpec.describe JsonapiCompliable::Resource do
 
         context 'and the path does not match an endpoint' do
           it 'raises error' do
-            JsonapiCompliable.with_context ctx, :index do
+            Graphiti.with_context ctx, :index do
               expect {
                 klass.all
-              }.to raise_error(JsonapiCompliable::Errors::InvalidEndpoint, /QueryAllSpec::EmployeeResource cannot be called directly from endpoint \/api\/v1\/employees/)
+              }.to raise_error(Graphiti::Errors::InvalidEndpoint, /QueryAllSpec::EmployeeResource cannot be called directly from endpoint \/api\/v1\/employees/)
             end
           end
         end
@@ -1168,10 +1168,10 @@ RSpec.describe JsonapiCompliable::Resource do
 
         context 'and the path is not supported' do
           it 'raises error' do
-            JsonapiCompliable.with_context ctx, :show do
+            Graphiti.with_context ctx, :show do
               expect {
                 klass.find({ id: employee2.id })
-              }.to raise_error(JsonapiCompliable::Errors::InvalidEndpoint, /QueryFindSpec::EmployeeResource cannot be called directly from endpoint \/api\/v1\/employees/)
+              }.to raise_error(Graphiti::Errors::InvalidEndpoint, /QueryFindSpec::EmployeeResource cannot be called directly from endpoint \/api\/v1\/employees/)
             end
           end
         end
@@ -1182,7 +1182,7 @@ RSpec.describe JsonapiCompliable::Resource do
           end
 
           it 'works' do
-            JsonapiCompliable.with_context ctx, :show do
+            Graphiti.with_context ctx, :show do
               expect {
                 klass.find({ id: employee2.id })
               }.to_not raise_error
@@ -1212,7 +1212,7 @@ RSpec.describe JsonapiCompliable::Resource do
         it 'raises helpful error' do
           expect {
             klass.find(id: 9999).data
-          }.to raise_error(JsonapiCompliable::Errors::RecordNotFound)
+          }.to raise_error(Graphiti::Errors::RecordNotFound)
         end
       end
 
@@ -1230,7 +1230,7 @@ RSpec.describe JsonapiCompliable::Resource do
             klass.find({ id: employee1.id }, {
               conditions: { first_name: 'adsf' }
             }).data
-          }.to raise_error(JsonapiCompliable::Errors::RecordNotFound)
+          }.to raise_error(Graphiti::Errors::RecordNotFound)
         end
       end
     end
@@ -1255,10 +1255,10 @@ RSpec.describe JsonapiCompliable::Resource do
 
       context 'and the path is not supported' do
         it 'raises error' do
-          JsonapiCompliable.with_context ctx, :create do
+          Graphiti.with_context ctx, :create do
             expect {
               klass.build({})
-            }.to raise_error(JsonapiCompliable::Errors::InvalidEndpoint, /ResourceBuildSpec::EmployeeResource cannot be called directly from endpoint \/api\/v1\/employees/)
+            }.to raise_error(Graphiti::Errors::InvalidEndpoint, /ResourceBuildSpec::EmployeeResource cannot be called directly from endpoint \/api\/v1\/employees/)
           end
         end
       end
@@ -1276,7 +1276,7 @@ RSpec.describe JsonapiCompliable::Resource do
         end
 
         it 'works' do
-          JsonapiCompliable.with_context ctx, :create do
+          Graphiti.with_context ctx, :create do
             expect {
               klass.build({})
             }.to_not raise_error
@@ -1334,7 +1334,7 @@ RSpec.describe JsonapiCompliable::Resource do
       it 'raises helpful error' do
         expect {
           instance.get_attr!(:foo, :sortable)
-        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort attribute :foo, but could not find an attribute with that name.')
+        }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort attribute :foo, but could not find an attribute with that name.')
       end
     end
 
@@ -1346,7 +1346,7 @@ RSpec.describe JsonapiCompliable::Resource do
       it 'raises helpful error' do
         expect {
           instance.get_attr!(:foo, :sortable)
-        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort attribute :foo, but the attribute was marked :sortable => false.')
+        }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort attribute :foo, but the attribute was marked :sortable => false.')
       end
     end
 
@@ -1372,7 +1372,7 @@ RSpec.describe JsonapiCompliable::Resource do
       it 'raises helpful error' do
         expect {
           instance.get_attr!(:foo, :sortable, request: true)
-        }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :foo, but the guard :admin? did not pass.')
+        }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :foo, but the guard :admin? did not pass.')
       end
     end
 
@@ -1401,7 +1401,7 @@ RSpec.describe JsonapiCompliable::Resource do
 
       context 'and the attribute exists' do
         it 'works' do
-          expect(JsonapiCompliable::Types[:integer])
+          expect(Graphiti::Types[:integer])
             .to receive(:[]).with(:read).and_call_original
           expect(typecast).to eq(1)
         end
@@ -1412,7 +1412,7 @@ RSpec.describe JsonapiCompliable::Resource do
           it 'raises helpful error' do
             expect {
               typecast
-            }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+            }.to raise_error(Graphiti::Errors::TypecastFailed)
           end
         end
 
@@ -1424,7 +1424,7 @@ RSpec.describe JsonapiCompliable::Resource do
           it 'raises helpful error' do
             expect {
               typecast
-            }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to read attribute :foo, but the attribute was marked :readable => false.')
+            }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to read attribute :foo, but the attribute was marked :readable => false.')
           end
         end
       end
@@ -1437,7 +1437,7 @@ RSpec.describe JsonapiCompliable::Resource do
         it 'raises helpful error' do
           expect {
             typecast
-          }.to raise_error(JsonapiCompliable::Errors::AttributeError, 'AnonymousResourceClass: Tried to read attribute :foo, but could not find an attribute with that name.')
+          }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to read attribute :foo, but could not find an attribute with that name.')
         end
       end
     end
@@ -1446,7 +1446,7 @@ RSpec.describe JsonapiCompliable::Resource do
       let(:flag) { :writable }
 
       it 'works' do
-        expect(JsonapiCompliable::Types[:integer])
+        expect(Graphiti::Types[:integer])
           .to receive(:[]).with(:write).and_call_original
         expect(typecast).to eq(1)
       end
@@ -1457,7 +1457,7 @@ RSpec.describe JsonapiCompliable::Resource do
         it 'raises helpful error' do
           expect {
             typecast
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -1466,7 +1466,7 @@ RSpec.describe JsonapiCompliable::Resource do
       let(:flag) { :sortable }
 
       it 'works' do
-        expect(JsonapiCompliable::Types[:integer])
+        expect(Graphiti::Types[:integer])
           .to receive(:[]).with(:params).and_call_original
         expect(typecast).to eq(1)
       end
@@ -1477,7 +1477,7 @@ RSpec.describe JsonapiCompliable::Resource do
         it 'raises helpful error' do
           expect {
             typecast
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -1486,7 +1486,7 @@ RSpec.describe JsonapiCompliable::Resource do
       let(:flag) { :filterable }
 
       it 'works' do
-        expect(JsonapiCompliable::Types[:integer])
+        expect(Graphiti::Types[:integer])
           .to receive(:[]).with(:params).and_call_original
         expect(typecast).to eq(1)
       end
@@ -1497,7 +1497,7 @@ RSpec.describe JsonapiCompliable::Resource do
         it 'raises helpful error' do
           expect {
             typecast
-          }.to raise_error(JsonapiCompliable::Errors::TypecastFailed)
+          }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
     end
@@ -1506,7 +1506,7 @@ RSpec.describe JsonapiCompliable::Resource do
   describe '#around_scoping' do
     before do
       klass.class_eval do
-        self.adapter = JsonapiCompliable::Adapters::Null.new
+        self.adapter = Graphiti::Adapters::Null.new
         attr_accessor :scope
 
         attribute :foo, :string
@@ -1534,8 +1534,8 @@ RSpec.describe JsonapiCompliable::Resource do
 
     it 'modifies scope' do
       ctx = OpenStruct.new
-      JsonapiCompliable.with_context(ctx) do
-        runner = JsonapiCompliable::Runner.new(klass, {})
+      Graphiti.with_context(ctx) do
+        runner = Graphiti::Runner.new(klass, {})
         proxy = runner.proxy(start: true)
         expect(ctx.before).to eq(start: true)
         expect(ctx.middle).to eq(start: true, before: true)

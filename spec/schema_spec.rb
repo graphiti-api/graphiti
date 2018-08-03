@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe JsonapiCompliable::Schema do
+RSpec.describe Graphiti::Schema do
   describe '.generate' do
     subject(:schema) { described_class.generate(resources) }
 
@@ -28,15 +28,15 @@ RSpec.describe JsonapiCompliable::Schema do
             filters: {
               id: {
                 type: 'integer_id',
-                operators: JsonapiCompliable::Adapters::Abstract.new.default_operators[:integer].map(&:to_s)
+                operators: Graphiti::Adapters::Abstract.new.default_operators[:integer].map(&:to_s)
               },
               first_name: {
                 type: 'string',
-                operators: JsonapiCompliable::Adapters::Abstract.new.default_operators[:string].map(&:to_s)
+                operators: Graphiti::Adapters::Abstract.new.default_operators[:string].map(&:to_s)
               },
               title: {
                 type: 'string',
-                operators: JsonapiCompliable::Adapters::Abstract.new.default_operators[:string].map(&:to_s)
+                operators: Graphiti::Adapters::Abstract.new.default_operators[:string].map(&:to_s)
               }
             },
             extra_attributes: {
@@ -140,7 +140,7 @@ RSpec.describe JsonapiCompliable::Schema do
     end
 
     let(:application_resource) do
-      Class.new(JsonapiCompliable::Resource) do
+      Class.new(Graphiti::Resource) do
         self.endpoint_namespace = '/api/v1'
       end
     end
@@ -176,18 +176,18 @@ RSpec.describe JsonapiCompliable::Schema do
 
     let(:test_context) do
       Class.new do
-        include JsonapiCompliable::Context
+        include Graphiti::Context
       end
     end
 
     around do |e|
-      JsonapiCompliable.config.context_for_endpoint = ->(path, action) {
+      Graphiti.config.context_for_endpoint = ->(path, action) {
         test_context
       }
       begin
         e.run
       ensure
-        JsonapiCompliable.config.context_for_endpoint = nil
+        Graphiti.config.context_for_endpoint = nil
       end
     end
 
@@ -207,15 +207,15 @@ RSpec.describe JsonapiCompliable::Schema do
       subject(:schema) { described_class.generate }
 
       around do |e|
-        JsonapiCompliable.instance_variable_set(:@resources, [position_resource])
+        Graphiti.instance_variable_set(:@resources, [position_resource])
         begin
           e.run
         ensure
-          JsonapiCompliable.instance_variable_set(:@resources, [])
+          Graphiti.instance_variable_set(:@resources, [])
         end
       end
 
-      it 'grabs all non-abstract descendants of JsonapiCompliable::Resource' do
+      it 'grabs all non-abstract descendants of Graphiti::Resource' do
         expect(schema[:resources].length).to eq(1)
         expect(schema[:resources][0][:name]).to eq('Schema::PositionResource')
       end
@@ -407,7 +407,7 @@ RSpec.describe JsonapiCompliable::Schema do
         it 'raises error' do
           expect {
             schema
-          }.to raise_error(JsonapiCompliable::Errors::ResourceEndpointConflict)
+          }.to raise_error(Graphiti::Errors::ResourceEndpointConflict)
         end
       end
     end
@@ -447,13 +447,13 @@ RSpec.describe JsonapiCompliable::Schema do
 
     context 'when context not found for a specific endpoint action' do
       around do |e|
-        JsonapiCompliable.config.context_for_endpoint = ->(path, action) {
+        Graphiti.config.context_for_endpoint = ->(path, action) {
           test_context if [:show, :create].include?(action)
         }
         begin
           e.run
         ensure
-          JsonapiCompliable.config.context_for_endpoint = nil
+          Graphiti.config.context_for_endpoint = nil
         end
       end
 
@@ -549,7 +549,7 @@ RSpec.describe JsonapiCompliable::Schema do
       allow(File).to receive(:exists?)
         .with('/schema/path/schema.json') { true }
       allow(described_class).to receive(:generate) { new_schema }
-      allow(JsonapiCompliable.config)
+      allow(Graphiti.config)
         .to receive(:schema_path) { '/schema/path/schema.json' }
     end
 
@@ -567,7 +567,7 @@ RSpec.describe JsonapiCompliable::Schema do
       end
 
       it 'does not diff' do
-        expect(JsonapiCompliable::SchemaDiff).to_not receive(:new)
+        expect(Graphiti::SchemaDiff).to_not receive(:new)
         described_class.generate!
       end
 
@@ -590,7 +590,7 @@ RSpec.describe JsonapiCompliable::Schema do
 
       context 'when no backwards-incompatibilities' do
         before do
-          expect_any_instance_of(JsonapiCompliable::SchemaDiff)
+          expect_any_instance_of(Graphiti::SchemaDiff)
             .to receive(:compare) { [] }
         end
 
@@ -607,12 +607,12 @@ RSpec.describe JsonapiCompliable::Schema do
 
       context 'when backwards-incompatibilities' do
         before do
-          allow_any_instance_of(JsonapiCompliable::SchemaDiff)
+          allow_any_instance_of(Graphiti::SchemaDiff)
             .to receive(:compare) { ['some diff error'] }
         end
 
         it 'returns the list' do
-          expect_any_instance_of(JsonapiCompliable::SchemaDiff)
+          expect_any_instance_of(Graphiti::SchemaDiff)
             .to receive(:compare) { ['some diff error'] }
           expect(described_class.generate!).to eq(['some diff error'])
         end
