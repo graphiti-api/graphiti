@@ -2,7 +2,6 @@
 
 source "https://rubygems.org"
 
-gem "jsonapi_spec_helpers", :path => "/Users/lrichmond1/code/jsonapi_spec_helpers"
 gem "rails", "~> 4.1"
 gem "jsonapi-rails", "~> 0.3.1", :require => "jsonapi/rails"
 gem "rspec-rails"
