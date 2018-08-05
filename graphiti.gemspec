@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   # Pinning this version until backwards-incompatibility is addressed
   spec.add_dependency 'jsonapi-serializable', '~> 0.3.0'
   spec.add_dependency 'dry-types', '~> 0.13'
-  spec.add_dependency 'jsonapi_errorable', '~> 0.9'
+  spec.add_dependency 'graphiti_errors', '~> 1.0.alpha.2'
   spec.add_dependency 'concurrent-ruby', '~> 1.0'
 
   spec.add_development_dependency "activerecord", ['>= 4.1', '< 6']
