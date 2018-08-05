@@ -7,7 +7,7 @@ require 'active_support/concern'
 require 'active_support/time'
 
 require 'dry-types'
-require 'jsonapi_errorable'
+require 'graphiti_errors'
 
 require 'jsonapi/serializable'
 

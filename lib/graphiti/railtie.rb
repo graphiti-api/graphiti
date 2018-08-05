@@ -55,7 +55,7 @@ module Graphiti
         ::ActionController::Renderers.add(:jsonapi_errors) do |proxy, options|
           self.content_type ||= Mime[:jsonapi]
 
-          validation = JsonapiErrorable::Serializers::Validation.new \
+          validation = GraphitiErrors::Serializers::Validation.new \
             proxy.data, proxy.payload.relationships
 
           render \
