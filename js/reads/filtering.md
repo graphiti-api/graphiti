@@ -56,9 +56,8 @@ Post.where({ status_or: ['draft', 'review'] })
 
 // AND these two values (default)
 Post.where({ status: ['draft', 'review'] })
-
-// with special characters
 {%raw %}
+// with special characters
 Post.where({ title: '{{ Penn & Teller }}' })
 {% endraw %}
 {% endhighlight %}
