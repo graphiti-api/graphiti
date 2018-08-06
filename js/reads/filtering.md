@@ -58,7 +58,9 @@ Post.where({ status_or: ['draft', 'review'] })
 Post.where({ status: ['draft', 'review'] })
 
 // with special characters
+{%raw %}
 Post.where({ title: '{{ Penn & Teller }}' })
+{% endraw %}
 {% endhighlight %}
 
 <div class="clearfix">
