@@ -52,13 +52,13 @@ Post.where({ id_lte: 5 }).all()
 Post.where({ title_prefix: "foo" }).all()
 
 // OR these two values
-Post.where({ status_or: ['draft', 'review'] })
+Post.where({ status_or: ['draft', 'review'] }).all()
 
 // AND these two values (default)
-Post.where({ status: ['draft', 'review'] })
+Post.where({ status: ['draft', 'review'] }).all()
 {%raw %}
 // with special characters
-Post.where({ title: '{{ Penn & Teller }}' })
+Post.where({ title: '{{ Penn & Teller }}' }).all()
 {% endraw %}
 {% endhighlight %}
 
