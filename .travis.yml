@@ -10,11 +10,3 @@ install: bundle install --retry=3 --jobs=3
 gemfile:
   - gemfiles/rails_4.gemfile
   - gemfiles/rails_5.gemfile
-
-deploy:
-  provider: rubygems
-  api_key: $RUBYGEMS_API_KEY
-  gem: graphiti
-  on:
-    tags: true
-    repo: graphiti-api/graphiti
