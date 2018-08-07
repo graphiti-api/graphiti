@@ -11,6 +11,7 @@ module Graphiti
     attr_accessor :respond_to
     attr_accessor :context_for_endpoint
     attr_accessor :schema_path
+    attr_accessor :links_on_demand
 
     # Set defaults
     # @api private
@@ -18,6 +19,7 @@ module Graphiti
       @raise_on_missing_sideload = true
       @concurrency = false
       @respond_to = [:json, :jsonapi, :xml]
+      @links_on_demand = false
 
       if defined?(::Rails)
         @schema_path = "#{::Rails.root}/public/schema.json"

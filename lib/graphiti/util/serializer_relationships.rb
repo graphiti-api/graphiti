@@ -42,11 +42,13 @@ module Graphiti
           validate_link! unless @sideload.link_proc
           sl = @sideload
           proc do
-            link(:related) do
-              if prc = sl.link_proc
-                prc.call(@object)
-              else
-                ::Graphiti::Util::Link.new(sl, @object).generate
+            if @proxy.query.links?
+              link(:related) do
+                if prc = sl.link_proc
+                  prc.call(@object)
+                else
+                  ::Graphiti::Util::Link.new(sl, @object).generate
+                end
               end
             end
           end

@@ -786,4 +786,44 @@ RSpec.describe Graphiti::Query do
       end
     end
   end
+
+  describe '#links?' do
+    subject { instance.links? }
+
+    it { is_expected.to eq(true) }
+
+    context 'when links_on_demand' do
+      around do |e|
+        original = Graphiti.config.links_on_demand
+        begin
+          Graphiti.config.links_on_demand = true
+          e.run
+        ensure
+          Graphiti.config.links_on_demand = original
+        end
+      end
+
+      context 'and requested' do
+        context 'as string' do
+          before do
+            params[:links] = 'true'
+          end
+
+          it { is_expected.to eq(true) }
+        end
+
+        context 'as boolean' do
+          before do
+            params[:links] = 'true'
+          end
+
+          it { is_expected.to eq(true) }
+        end
+      end
+
+      context 'and not requested in url' do
+        it { is_expected.to eq(false) }
+      end
+    end
+  end
 end

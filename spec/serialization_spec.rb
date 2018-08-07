@@ -746,7 +746,7 @@ RSpec.describe 'serialization' do
       Graphiti.config.context_for_endpoint = nil
     end
 
-    context 'when not enabled by default' do
+    context 'when not autolinked by default' do
       before do
         resource.autolink = false
       end
@@ -780,7 +780,40 @@ RSpec.describe 'serialization' do
       end
     end
 
-    context 'when enabled by default' do
+    context 'when only linking if requested' do
+      around do |e|
+        resource.autolink = true
+        params[:include] = 'positions'
+        resource.has_many :positions
+        original = Graphiti.config.links_on_demand
+        begin
+          Graphiti.config.links_on_demand = true
+          e.run
+        ensure
+          Graphiti.config.links_on_demand = original
+        end
+      end
+
+      context 'and not requested in url' do
+        it 'does not render links' do
+          render
+          expect(positions).to_not have_key('links')
+        end
+      end
+
+      context 'and requested in url' do
+        before do
+          params[:links] = true
+        end
+
+        it 'does render links' do
+          render
+          expect(positions).to have_key('links')
+        end
+      end
+    end
+
+    context 'when autolinked by default' do
       before do
         resource.autolink = true
       end

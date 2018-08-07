@@ -33,6 +33,7 @@ module Graphiti
         options[:fields] = proxy.fields
         options[:expose] ||= {}
         options[:expose][:extra_fields] = proxy.extra_fields
+        options[:expose][:proxy] = proxy
         options[:include] = proxy.include_hash
         options[:meta] ||= {}
         options[:meta].merge!(stats: proxy.stats) unless proxy.stats.empty?
