@@ -293,6 +293,7 @@ module PORO
       100_000
     end
     has_many :positions
+    many_to_many :teams, foreign_key: { employee_teams: :employee_id }
 
     def admin?
       context && context.current_user == 'admin'
@@ -320,6 +321,7 @@ module PORO
   end
 
   class TeamResource < ApplicationResource
+    belongs_to_many :employees, as: :teams
   end
 
   class CreditCardResource < ApplicationResource

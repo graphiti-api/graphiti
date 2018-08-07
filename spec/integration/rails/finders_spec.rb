@@ -873,6 +873,9 @@ if ENV['APPRAISAL_INITIALIZED']
           Legacy::AuthorResource.class_eval do
             many_to_many :hobbies
           end
+          Legacy::HobbyResource.class_eval do
+            belongs_to_many :authors, as: :hobbies
+          end
         end
 
         after do

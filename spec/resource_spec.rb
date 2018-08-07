@@ -261,13 +261,13 @@ RSpec.describe Graphiti::Resource do
       context 'when sideloading' do
         let(:klass1) do
           Class.new(app_resource) do
-            allow_sideload :foo
+            allow_sideload :foo, type: :has_many
           end
         end
 
         let(:klass2) do
           Class.new(klass1) do
-            allow_sideload :bar
+            allow_sideload :bar, type: :belongs_to
           end
         end
 
@@ -383,17 +383,17 @@ RSpec.describe Graphiti::Resource do
 
   describe '.allow_sideload' do
     it 'uses Sideload as default class' do
-      sideload = klass.allow_sideload :comments
+      sideload = klass.allow_sideload :comments, type: :has_many
       expect(sideload.class.ancestors[1]).to eq(Graphiti::Sideload)
     end
 
     it 'assigns parent resource as self' do
-      sideload = klass.allow_sideload :comments
+      sideload = klass.allow_sideload :comments, type: :has_many
       expect(sideload.parent_resource_class).to eq(klass)
     end
 
     it 'adds to the list of sideloads' do
-      sideload = klass.allow_sideload :comments
+      sideload = klass.allow_sideload :comments, type: :has_many
       expect(klass.sideloads[:comments]).to eq(sideload)
     end
 
@@ -404,7 +404,7 @@ RSpec.describe Graphiti::Resource do
 
     context 'when passed a block' do
       it 'is processed' do
-        sideload = klass.allow_sideload :comments do
+        sideload = klass.allow_sideload :comments, type: :has_many do
           scope do |parents|
             'foo'
           end
@@ -828,8 +828,38 @@ RSpec.describe Graphiti::Resource do
     it 'infers from name' do
       expect(klass.endpoint).to eq({
         path: :'/employees',
+        full_path: :'/employees',
+        url: :'/employees',
         actions: [:index, :show, :create, :update, :destroy]
       })
+    end
+
+    context 'when resource has base url' do
+      before do
+        klass.base_url = 'http://example.com'
+      end
+
+      it 'is applied to url' do
+        expect(klass.endpoint[:url]).to eq(:'http://example.com/employees')
+      end
+
+      it 'is NOT applied to full_path' do
+        expect(klass.endpoint[:full_path]).to eq(:'/employees')
+      end
+    end
+
+    context 'when resource has endpoint namespace' do
+      before do
+        klass.endpoint_namespace = '/api/v1'
+      end
+
+      it 'is applied to full_path' do
+        expect(klass.endpoint[:full_path]).to eq(:'/api/v1/employees')
+      end
+
+      it 'is applied to url' do
+        expect(klass.endpoint[:url]).to eq(:'/api/v1/employees')
+      end
     end
 
     context 'when resource is namespaced' do
@@ -842,6 +872,8 @@ RSpec.describe Graphiti::Resource do
       it 'adds to path' do
         expect(klass.endpoint).to eq({
           path: :'/poro/employees',
+          full_path: :'/poro/employees',
+          url: :'/poro/employees',
           actions: [:index, :show, :create, :update, :destroy]
         })
       end
@@ -890,10 +922,14 @@ RSpec.describe Graphiti::Resource do
       expect(klass.endpoints.length).to eq(2)
       expect(klass.endpoints[0]).to eq({
         path: :"/employees",
+        full_path: :"/employees",
+        url: :"/employees",
         actions: [:index, :show, :create, :update, :destroy]
       })
       expect(klass.endpoints[1]).to eq({
         path: :"/special_employees",
+        full_path: :"/special_employees",
+        url: :"/special_employees",
         actions: [:index, :create]
       })
     end
@@ -905,20 +941,6 @@ RSpec.describe Graphiti::Resource do
 
       it 'still works' do
         expect(klass.endpoints).to eq([])
-      end
-    end
-
-    context 'when an endpoint namespace' do
-      before do
-        klass.secondary_endpoint '/special_employees', [:index, :create]
-        klass.endpoint_namespace = '/my_api/v1'
-      end
-
-      it 'is prefixes in url' do
-        expect(klass.endpoints[0][:path])
-          .to eq(:'/my_api/v1/employees')
-        expect(klass.endpoints[1][:path])
-          .to eq(:'/my_api/v1/special_employees')
       end
     end
   end
@@ -1009,6 +1031,7 @@ RSpec.describe Graphiti::Resource do
           end
 
           it 'can sideload' do
+            klass.has_many :positions, resource: PORO::PositionResource
             Graphiti.with_context ctx, :index do
               expect { klass.all(include: 'positions') }
                 .to_not raise_error

@@ -23,11 +23,7 @@ module Graphiti
         end
 
         def apply_sideloads_to_serializer
-          config[:sideloads].each_pair do |name, sideload|
-            if serializer.relationship_blocks[name].nil? && sideload.readable?
-              serializer.relationship(name)
-            end
-          end
+          Util::SerializerRelationships.new(self, config[:sideloads]).apply
         end
 
         def has_many(name, opts = {}, &blk)
@@ -59,6 +55,18 @@ module Graphiti
           opts[:class] ||= adapter.sideloading_classes[:polymorphic_belongs_to]
           opts[:class] ||= ::Graphiti::Sideload::PolymorphicBelongsTo
           allow_sideload(name, opts, &blk)
+        end
+
+        def belongs_to_many(name, resource: nil, as:, &blk)
+          resource = resource ||= Util::Class.infer_resource_class(self, name)
+          sideload = resource.sideload(as)
+
+          _adapter = adapter
+          filter sideload.true_foreign_key, resource.attributes[:id][:type] do
+            eq do |scope, value|
+              _adapter.belongs_to_many_filter(sideload, scope, value)
+            end
+          end
         end
 
         def sideload(name)

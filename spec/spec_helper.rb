@@ -6,6 +6,8 @@ require 'pry'
 require 'active_model'
 require 'graphiti_spec_helpers/rspec'
 require 'graphiti'
+# Avoiding loading classes before we're ready
+Graphiti::Resource.autolink = false
 require 'fixtures/poro'
 
 RSpec.configure do |config|
@@ -35,6 +37,11 @@ if ENV["APPRAISAL_INITIALIZED"]
     if config.instance_variable_get(:@files_or_directories_to_run) == ['spec']
       config.pattern = 'spec/integration/rails/**/*_spec.rb'
     end
+  end
+
+  # Avoid checking, because Rails is defined but we dont have autoloading
+  Graphiti::Sideload.class_eval do
+    def check!;end
   end
 
   require 'database_cleaner'

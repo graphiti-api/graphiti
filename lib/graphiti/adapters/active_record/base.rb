@@ -189,6 +189,14 @@ module Graphiti
           }
         end
 
+        def belongs_to_many_filter(sideload, scope, value)
+          scope
+            .includes(sideload.through_relationship_name)
+            .where(sideload.through_table_name => {
+              sideload.true_foreign_key => value
+            })
+        end
+
         def associate_all(parent, children, association_name, association_type)
           association = parent.association(association_name)
           association.loaded!

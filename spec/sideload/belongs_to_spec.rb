@@ -161,7 +161,7 @@ RSpec.describe Graphiti::Sideload::BelongsTo do
     it 'adds primary key filter' do
       params = instance.load_params(parents, query)
       expect(params).to eq({
-        filter: { foo_id: [7, 8] }
+        filter: { foo_id: '7,8' }
       })
     end
 
@@ -170,7 +170,7 @@ RSpec.describe Graphiti::Sideload::BelongsTo do
       params.merge!(filter: { a: 'b' }, sort: '-id')
       result = instance.load_params(parents, query)
       expect(result).to eq({
-        filter: { foo_id: [7, 8], a: 'b' },
+        filter: { foo_id: '7,8', a: 'b' },
         sort: [{ id: :desc }]
       })
     end

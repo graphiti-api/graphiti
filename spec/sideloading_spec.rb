@@ -523,6 +523,8 @@ RSpec.describe 'sideloading' do
         def base_scope
           { type: :positions }
         end
+
+        def self.name;'PORO::PositionResource';end
       end
     end
 
@@ -535,6 +537,36 @@ RSpec.describe 'sideloading' do
       it 'works' do
         render
         expect(included('positions').map(&:id)).to match_array([1, 2])
+      end
+
+      context 'but the associated resource does not have the required filter' do
+        before do
+          resource.config[:sideloads] = {}
+          position_resource.config[:filters].delete(:employee_id)
+        end
+
+        context 'when Rails is defined' do
+          before do
+            stub_const('Rails', double)
+          end
+
+          it 'raises error' do
+            expect {
+              resource.has_many :positions, resource: position_resource
+            }.to raise_error(Graphiti::Errors::MissingSideloadFilter, /Expecting filter :employee_id on PORO::PositionResource/)
+          end
+        end
+
+        context 'when Rails is not defined' do
+          context 'but manual check runs' do
+            it 'raises error' do
+              resource.has_many :positions, resource: position_resource
+              expect {
+                resource.sideload(:positions).check!
+              }.to raise_error(Graphiti::Errors::MissingSideloadFilter, /Expecting filter :employee_id on PORO::PositionResource/)
+            end
+          end
+        end
       end
 
       context 'and params customization' do
@@ -579,6 +611,8 @@ RSpec.describe 'sideloading' do
           def base_scope
             { type: :departments }
           end
+
+          def self.name;'PORO::DepartmentResource';end
         end
       end
 
@@ -590,6 +624,39 @@ RSpec.describe 'sideloading' do
       it 'works' do
         render
         expect(included('departments').map(&:id)).to match_array([1, 2])
+      end
+
+      context 'but the associated resource does not have the required filter' do
+        before do
+          position_resource.config[:sideloads] = {}
+        end
+
+        context 'when Rails is defined' do
+          before do
+            stub_const('Rails', double)
+          end
+
+          it 'raises error' do
+            expect {
+              resource.belongs_to :department,
+                resource: department_resource,
+                primary_key: :foo_id
+            }.to raise_error(Graphiti::Errors::MissingSideloadFilter, /Expecting filter :foo_id on PORO::DepartmentResource/)
+          end
+        end
+
+        context 'when Rails is not defined' do
+          context 'but manual check runs' do
+            it 'raises error' do
+              resource.belongs_to :department,
+                resource: department_resource,
+                primary_key: :foo_id
+              expect {
+                resource.sideload(:department).check!
+              }.to raise_error(Graphiti::Errors::MissingSideloadFilter, /Expecting filter :foo_id on PORO::DepartmentResource/)
+            end
+          end
+        end
       end
 
       context 'and params customization' do
@@ -632,6 +699,8 @@ RSpec.describe 'sideloading' do
           def base_scope
             { type: :bios }
           end
+
+          def self.name;'PORO::BioResource';end
         end
       end
 
@@ -643,6 +712,36 @@ RSpec.describe 'sideloading' do
       it 'works' do
         render
         expect(included('bios').map(&:id)).to match_array([1])
+      end
+
+      context 'but the associated resource does not have the required filter' do
+        before do
+          resource.config[:sideloads] = {}
+          bio_resource.filters.delete(:employee_id)
+        end
+
+        context 'when Rails is defined' do
+          before do
+            stub_const('Rails', double)
+          end
+
+          it 'raises error' do
+            expect {
+              resource.has_one :bio, resource: bio_resource
+            }.to raise_error(Graphiti::Errors::MissingSideloadFilter, /Expecting filter :employee_id on PORO::BioResource/)
+          end
+        end
+
+        context 'when Rails is not defined' do
+          context 'but manual check runs' do
+            it 'raises error' do
+              resource.has_one :bio, resource: bio_resource
+              expect {
+                resource.sideload(:bio).check!
+              }.to raise_error(Graphiti::Errors::MissingSideloadFilter, /Expecting filter :employee_id on PORO::BioResource/)
+            end
+          end
+        end
       end
 
       context 'and params customization' do
@@ -672,6 +771,121 @@ RSpec.describe 'sideloading' do
         it 'is respected' do
           render
           expect(included('bios').map(&:id)).to match_array([2])
+        end
+      end
+    end
+
+    context 'via many_to_many' do
+      let(:team_resource) do
+        _resource = resource
+        Class.new(PORO::TeamResource) do
+          self.model = PORO::Team
+          belongs_to_many :employees, as: :teams, resource: _resource
+
+          def base_scope
+            { type: :teams }
+          end
+
+          def self.name;'PORO::TeamResource';end
+        end
+      end
+
+      before do
+        resource.many_to_many :teams, resource: team_resource
+        params[:include] = 'teams'
+      end
+
+      context 'but the associated resource does not have the required filter' do
+        before do
+          resource.config[:sideloads] = {}
+          team_resource.filters.delete(:employee_id)
+        end
+
+        context 'when Rails is defined' do
+          before do
+            stub_const('Rails', double)
+          end
+
+          it 'raises error' do
+            expect {
+              resource.many_to_many :teams,
+                resource: team_resource,
+                foreign_key: { employee_teams: :employee_id }
+            }.to raise_error(Graphiti::Errors::MissingSideloadFilter, /Expecting filter :employee_id on PORO::TeamResource/)
+          end
+        end
+
+        context 'when Rails is not defined' do
+          context 'but manual check runs' do
+            it 'raises error' do
+              resource.many_to_many :teams,
+                resource: team_resource,
+                foreign_key: { employee_teams: :employee_id }
+              expect {
+                resource.sideload(:teams).check!
+              }.to raise_error(Graphiti::Errors::MissingSideloadFilter, /Expecting filter :employee_id on PORO::TeamResource/)
+            end
+          end
+        end
+      end
+    end
+
+    context 'via polymorphic_belongs_to' do
+      let(:visa_resource) do
+        Class.new(PORO::VisaResource) do
+          self.model = PORO::Visa
+
+          def base_scope
+            { type: :visas }
+          end
+
+          def self.name;'PORO::VisaResource';end
+        end
+      end
+
+      before do
+        define_relationship
+        params[:include] = 'credit_card'
+      end
+
+      def define_relationship
+        _visa_resource = visa_resource
+        resource.polymorphic_belongs_to :credit_card do
+          group_by(:credit_card_type) do
+            on(:Visa).belongs_to :visa,
+              resource: _visa_resource,
+              primary_key: :foo_id
+          end
+        end
+      end
+
+      context 'but the associated resource does not have the required filter' do
+        before do
+          resource.config[:sideloads] = {}
+          visa_resource.filters.delete(:employee_id)
+        end
+
+        context 'when Rails is defined' do
+          before do
+            stub_const('Rails', double)
+          end
+
+          it 'raises error' do
+            expect {
+              define_relationship
+            }.to raise_error(/Expecting filter :foo_id on PORO::VisaResource./)
+          end
+        end
+
+        context 'when Rails is not defined' do
+          context 'but manual check runs' do
+            it 'raises error' do
+              define_relationship
+              expect {
+                resource.sideload(:credit_card).children[:visa].check!
+              }.to raise_error(/Expecting filter :foo_id on PORO::VisaResource./)
+            end
+          end
         end
       end
     end

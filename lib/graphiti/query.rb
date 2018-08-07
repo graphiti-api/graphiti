@@ -21,6 +21,14 @@ module Graphiti
       not association?
     end
 
+    def links?
+      if Graphiti.config.links_on_demand
+        [true, 'true'].include?(@params[:links])
+      else
+        true
+      end
+    end
+
     def to_hash
       {}.tap do |hash|
         hash[:filter] = filters unless filters.empty?
