@@ -29,8 +29,8 @@ RSpec.describe 'serialization' do
     end
 
     it 'has all readable sideloads of the resource' do
-      resource.allow_sideload :foobles
-      resource.allow_sideload :barble
+      resource.allow_sideload :foobles, type: :has_many
+      resource.allow_sideload :barble, type: :belongs_to
       expect(resource.serializer.relationship_blocks.keys)
         .to eq([:foobles, :barble])
     end
@@ -727,6 +727,265 @@ RSpec.describe 'serialization' do
         render
         expect(json['data'][0]['attributes']['first_name'])
           .to eq('im extra, serialized')
+      end
+    end
+  end
+
+  describe 'links' do
+    let!(:employee) { PORO::Employee.create }
+
+    def positions
+      json['data'][0]['relationships']['positions']
+    end
+
+    around do |e|
+      Graphiti.config.context_for_endpoint = ->(path, action) {
+        double('test context')
+      }
+      e.run
+      Graphiti.config.context_for_endpoint = nil
+    end
+
+    context 'when not enabled by default' do
+      before do
+        resource.autolink = false
+      end
+
+      it 'does not generate links by default' do
+        resource.has_many :positions
+        render
+        expect(positions).to_not have_key('links')
+      end
+
+      it 'does generate links when link: true passed' do
+        resource.has_many :positions, link: true
+        render
+        expect(positions).to have_key('links')
+      end
+
+      context 'when manually linking' do
+        before do
+          resource.has_many :positions do
+            link do |employee|
+              "/special/positions?blah=#{employee.id}"
+            end
+          end
+        end
+
+        it 'generates link' do
+          render
+          expect(positions['links']['related'])
+            .to eq('/special/positions?blah=1')
+        end
+      end
+    end
+
+    context 'when enabled by default' do
+      before do
+        resource.autolink = true
+      end
+
+      context 'and a has_many relationship' do
+        it 'links correctly' do
+          resource.has_many :positions
+          render
+          expect(positions['links']['related'])
+            .to eq('/poro/positions?filter[employee_id]=1')
+        end
+
+        context 'opting-out of linking' do
+          before do
+            resource.has_many :positions, link: false
+          end
+
+          it 'does not link' do
+            render
+            expect(positions).to_not have_key('links')
+          end
+        end
+
+        context 'with custom params' do
+          before do
+            resource.has_many :positions do
+              params do |hash|
+                hash[:sort] = '-id'
+              end
+            end
+          end
+
+          it 'links correctly' do
+            render
+            expect(positions['links']['related'])
+              .to eq('/poro/positions?filter[employee_id]=1&sort=-id')
+          end
+        end
+
+        context 'with runtime params' do
+          xit 'links correctly' do
+
+          end
+        end
+
+        context 'that does not have an index endpoint' do
+          before do
+            Graphiti.config.context_for_endpoint = ->(path, action) {
+              action == :index ? nil : double
+            }
+          end
+
+          it 'raises error' do
+            expect {
+              resource.has_many :positions
+            }.to raise_error(Graphiti::Errors::InvalidLink, /Make sure the endpoint \"\/poro\/positions\" exists/)
+          end
+        end
+
+        context 'that does not have a context_for_endpoint config' do
+          before do
+            Graphiti.config.context_for_endpoint = nil
+          end
+
+          it 'raises error' do
+            expect {
+              resource.has_many :positions
+            }.to raise_error(Graphiti::Errors::Unlinkable, /Graphiti.config.context_for_endpoint/)
+          end
+        end
+      end
+
+      context 'and a polymorphic_belongs_to relationship' do
+        let(:mastercard_resource) do
+          Class.new(PORO::MastercardResource) do
+            def self.name;'PORO::MastercardResource';end
+            primary_endpoint '/poro/mastercards'
+          end
+        end
+
+        before do
+          employee.update_attributes \
+            credit_card_type: 'Mastercard',
+            credit_card_id: 789
+        end
+
+        def define_relationship
+          _mastercard_resource = mastercard_resource
+          resource.polymorphic_belongs_to :credit_card do
+            group_by(:credit_card_type) do
+              on(:Visa).belongs_to :visa
+              on(:Mastercard).belongs_to :mastercard,
+                resource: _mastercard_resource
+            end
+          end
+        end
+
+        it 'works' do
+          define_relationship
+          render
+          credit_card = json['data'][0]['relationships']['credit_card']
+          expect(credit_card['links']['related'])
+            .to eq('/poro/mastercards/789')
+        end
+
+        context 'but one child does not have an endpoint' do
+          before do
+            mastercard_resource.endpoint = nil
+          end
+
+          it 'does not link' do
+            define_relationship
+            render
+            credit_card = json['data'][0]['relationships']['credit_card']
+            expect(credit_card).to_not have_key('links')
+          end
+        end
+      end
+
+      context 'and a many_to_many relationship' do
+        let(:team_resource) do
+          Class.new(PORO::TeamResource) do
+            def self.name;'PORO::TeamResource';end
+          end
+        end
+
+        def define_relationship
+          resource.many_to_many :teams,
+            resource: team_resource,
+            foreign_key: { employee_teams: :employee_id }
+        end
+
+        it 'works' do
+          define_relationship
+          render
+          expect(json['data'][0]['relationships']['teams']['links']['related'])
+            .to eq('/poro/teams?filter[employee_id]=1')
+        end
+      end
+
+      context 'and a has_one relationship' do
+        before do
+          resource.has_one :bio
+        end
+
+        it 'links to index endpoint' do
+          render
+          expect(json['data'][0]['relationships']['bio']['links']['related'])
+            .to eq("/poro/bios?filter[employee_id]=#{employee.id}")
+        end
+      end
+
+      context 'and a belongs_to relationship' do
+        let!(:employee) { PORO::Employee.create(classification_id: 789) }
+
+        def classification
+          json['data'][0]['relationships']['classification']
+        end
+
+        it 'links correctly' do
+          resource.belongs_to :classification
+          render
+          expect(classification['links']['related'])
+            .to eq('/poro/classifications/789')
+        end
+
+        context 'that has custom params' do
+          before do
+            resource.belongs_to :classification do
+              params do |hash|
+                hash[:fields] = { classifications: 'title' }
+              end
+            end
+          end
+
+          it 'merges the params into the link' do
+            render
+            expect(classification['links']['related'])
+              .to eq('/poro/classifications/789?fields[classifications]=title')
+          end
+        end
+
+        # ie fields
+        xit 'runtime options' do
+        end
+
+        context 'that does not have a show endpoint' do
+          before do
+            Graphiti.config.context_for_endpoint = ->(path, action) {
+              action == :show ? nil : double
+            }
+          end
+
+          it 'raises error' do
+            expect {
+              resource.belongs_to :classification
+            }.to raise_error(Graphiti::Errors::InvalidLink, /Make sure the endpoint \"\/poro\/classifications\" exists/)
+          end
+        end
+
+        context 'with runtime params' do
+          xit 'links correctly' do
+
+          end
+        end
       end
     end
   end

@@ -59,7 +59,7 @@ RSpec.describe Graphiti::Sideload::HasMany do
     it 'adds primary key filter' do
       params = instance.load_params(parents, query)
       expect(params).to eq({
-        filter: { bar_id: [8, 9] }
+        filter: { bar_id: '8,9' }
       })
     end
 
@@ -68,7 +68,7 @@ RSpec.describe Graphiti::Sideload::HasMany do
       params.merge!(filter: { a: 'b' }, sort: '-id')
       result = instance.load_params(parents, query)
       expect(result).to eq({
-        filter: { bar_id: [8, 9], a: 'b' },
+        filter: { bar_id: '8,9', a: 'b' },
         sort: [{ id: :desc }]
       })
     end

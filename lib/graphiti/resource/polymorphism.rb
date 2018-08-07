@@ -34,6 +34,7 @@ module Graphiti
         def inherited(klass)
           klass.type = nil
           klass.model = klass.infer_model
+          klass.endpoint = klass.infer_endpoint
           klass.polymorphic_child = true
           super
         end

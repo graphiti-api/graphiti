@@ -15,8 +15,13 @@ module Graphiti
     end
 
     included do
-      class_attribute :endpoint, :endpoint_namespace, :secondary_endpoints
+      class_attribute :endpoint,
+        :base_url,
+        :endpoint_namespace,
+        :secondary_endpoints,
+        :autolink
       self.secondary_endpoints = []
+      self.autolink = true
 
       class << self
         prepend Overrides
@@ -25,26 +30,40 @@ module Graphiti
 
     class_methods do
       def infer_endpoint
-        path = "/#{name.gsub('Resource', '').pluralize.underscore}"
-        { path: path.to_sym, actions: DEFAULT_ACTIONS.dup }
+        return unless name
+
+        path = "/#{name.gsub('Resource', '').pluralize.underscore}".to_sym
+        {
+          path: path,
+          full_path: full_path_for(path),
+          url: url_for(path),
+          actions: DEFAULT_ACTIONS.dup
+        }
       end
 
       def primary_endpoint(path, actions = DEFAULT_ACTIONS.dup)
-        self.endpoint = { path: path.to_sym, actions: actions }
+        path = path.to_sym
+        self.endpoint = {
+          path: path,
+          full_path: full_path_for(path),
+          url: url_for(path),
+          actions: actions
+        }
       end
 
       # NB: avoid << b/c class_attribute
       def secondary_endpoint(path, actions = DEFAULT_ACTIONS.dup)
-        self.secondary_endpoints += [{ path: path.to_sym, actions: actions }]
+        path = path.to_sym
+        self.secondary_endpoints += [{
+          path: path,
+          full_path: full_path_for(path),
+          url: url_for(path),
+          actions: actions
+        }]
       end
 
       def endpoints
-        ([endpoint] + secondary_endpoints).compact.map do |e|
-          {
-            path: [endpoint_namespace, e[:path]].join('').to_sym,
-            actions: e[:actions]
-          }
-        end
+        ([endpoint] + secondary_endpoints).compact
       end
 
       def allow_request?(path, action)
@@ -55,8 +74,18 @@ module Graphiti
             path = path.join('/')
           end
 
-          e[:path].to_s == path && e[:actions].include?(context_namespace)
+          e[:full_path].to_s == path && e[:actions].include?(context_namespace)
         end
+      end
+
+      private
+
+      def full_path_for(path)
+        [endpoint_namespace, path].join('').to_sym
+      end
+
+      def url_for(path)
+        [base_url, full_path_for(path)].join('').to_sym
       end
     end
   end

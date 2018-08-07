@@ -16,6 +16,40 @@ The adapter #{@adapter.class} does not implement method '#{@method}', which was 
       end
     end
 
+    class InvalidLink < Base
+      def initialize(resource_class, sideload)
+        @resource_class = resource_class
+        @sideload = sideload
+      end
+
+      def message
+        <<-MSG
+#{@resource_class.name}: Cannot link to sideload #{@sideload.name.inspect}!
+
+Make sure the endpoint "#{@sideload.resource.endpoint[:full_path]}" exists, or customize the endpoint for #{@sideload.resource.class.name}.
+
+If you do not wish to generate a link, pass link: false or set self.relationship_links_by_default = false.
+        MSG
+      end
+    end
+
+    class Unlinkable < Base
+      def initialize(resource_class, sideload)
+        @resource_class = resource_class
+        @sideload = sideload
+      end
+
+      def message
+        <<-MSG
+#{@resource_class.name}: Tried to link sideload #{@sideload.name.inspect}, but cannot generate links!
+
+Graphiti.config.context_for_endpoint must be set to enable link generation:
+
+Graphiti.config.context_for_endpoint = ->(path, action) { ... }
+        MSG
+      end
+    end
+
     class AttributeError < Base
       attr_reader :resource,
         :name,
@@ -261,15 +295,31 @@ end
       end
     end
 
+    class MissingSideloadFilter < Base
+      def initialize(resource_class, sideload, filter)
+        @resource_class = resource_class
+        @sideload = sideload
+        @filter = filter
+      end
+
+      def message
+        <<-MSG
+#{@resource_class.name}: sideload #{@sideload.name.inspect} is associated with resource #{@sideload.resource.class.name}, but it does not have corresponding filter.
+
+Expecting filter #{@filter.inspect} on #{@sideload.resource.class.name}.
+        MSG
+      end
+    end
+
     class ResourceNotFound < Base
-      def initialize(resource, sideload_name)
-        @resource = resource
+      def initialize(resource_class, sideload_name)
+        @resource_class = resource_class
         @sideload_name = sideload_name
       end
 
       def message
         <<-MSG
-Could not find resource class for sideload '#{@sideload_name}' on Resource '#{@resource.class.name}'!
+Could not find resource class for sideload '#{@sideload_name}' on Resource '#{@resource_class.name}'!
 
 If this follows a non-standard naming convention, use the :resource option to pass it directly:
 

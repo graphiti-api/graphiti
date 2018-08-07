@@ -402,6 +402,10 @@ module Graphiti
         scope
       end
 
+      def belongs_to_many_filter(sideload, scope, value)
+        raise 'You must implement #belongs_to_many_filter in an adapter subclass'
+      end
+
       def associate_all(parent, children, association_name, association_type)
         if activerecord_associate?(parent, children[0], association_name)
           activerecord_adapter.associate_all parent,

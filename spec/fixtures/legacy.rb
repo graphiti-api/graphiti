@@ -213,16 +213,6 @@ module Legacy
     end
   end
 
-  class HobbyResource < ApplicationResource
-    attribute :name, :string
-    attribute :description, :string do
-      'hobby desc'
-    end
-    extra_attribute :reason, :string do
-      'hobby reason'
-    end
-  end
-
   class HouseResource < ApplicationResource
     attribute :name, :string
 
@@ -279,6 +269,18 @@ module Legacy
         on(:"Legacy::House")
         on(:"Legacy::Condo")
       end
+    end
+  end
+
+  class HobbyResource < ApplicationResource
+    belongs_to_many :authors, as: :hobbies
+
+    attribute :name, :string
+    attribute :description, :string do
+      'hobby desc'
+    end
+    extra_attribute :reason, :string do
+      'hobby reason'
     end
   end
 

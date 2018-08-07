@@ -462,17 +462,15 @@ RSpec.describe Graphiti::Sideload do
 
     context 'when params customization' do
       before do
-        instance.class.params do |hash, parents, query|
+        instance.class.params do |hash, parents|
           hash[:a] = parents
-          hash[:b] = query
         end
       end
 
       it 'is respected' do
         expected = {
           foo: 'bar',
-          a: parents,
-          b: query
+          a: parents
         }
         expect(resource_class).to receive(:_all)
           .with(expected, anything, { type: :positions })

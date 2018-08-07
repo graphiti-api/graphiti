@@ -59,6 +59,9 @@ require "graphiti/util/sideload"
 require "graphiti/util/hooks"
 require "graphiti/util/attribute_check"
 require "graphiti/util/serializer_attributes"
+require "graphiti/util/serializer_relationships"
+require "graphiti/util/class"
+require "graphiti/util/link"
 
 require 'graphiti/adapters/null'
 
@@ -122,6 +125,12 @@ module Graphiti
 
   def self.resources
     @resources ||= []
+  end
+
+  def self.check!
+    resources.each do |resource|
+      resource.sideloads.values.each(&:check!)
+    end
   end
 end
 

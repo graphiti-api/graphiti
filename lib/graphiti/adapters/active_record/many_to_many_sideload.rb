@@ -2,20 +2,13 @@ module Graphiti
   module Adapters
     module ActiveRecord
       class ManyToManySideload < Sideload::ManyToMany
-        def default_base_scope
-          resource_class.model.all
-        end
-
         def through_table_name
           @through_table_name ||= parent_resource_class.model
             .reflections[through.to_s].klass.table_name
         end
 
-        def scope(parent_ids)
-          base_scope
-            .includes(through)
-            .where(through_table_name => { true_foreign_key => parent_ids })
-            .distinct
+        def through_relationship_name
+          foreign_key.keys.first
         end
 
         def infer_foreign_key

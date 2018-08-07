@@ -9,13 +9,15 @@ module Graphiti
       :foreign_key,
       :primary_key,
       :parent,
-      :group_name
+      :group_name,
+      :link
 
     class_attribute :scope_proc,
       :assign_proc,
       :assign_each_proc,
       :params_proc,
-      :pre_load_proc
+      :pre_load_proc,
+      :link_proc
 
     def initialize(name, opts)
       @name                  = name
@@ -28,6 +30,7 @@ module Graphiti
       @readable              = opts[:readable]
       @writable              = opts[:writable]
       @as                    = opts[:as]
+      @link                  = opts[:link]
 
       # polymorphic-specific
       @group_name            = opts[:group_name]
@@ -36,6 +39,8 @@ module Graphiti
       if polymorphic_child?
         parent.resource.polymorphic << resource_class
       end
+
+      check! if defined?(::Rails)
     end
 
     def self.scope(&blk)
@@ -58,12 +63,46 @@ module Graphiti
       self.pre_load_proc = blk
     end
 
+    def self.link(&blk)
+      self.link_proc = blk
+    end
+
+    def check!
+      case type
+      when :has_many, :has_one
+        unless resource.filters[foreign_key]
+          raise Errors::MissingSideloadFilter.new parent_resource_class,
+            self, foreign_key
+        end
+      when :belongs_to
+        unless resource.filters[primary_key]
+          raise Errors::MissingSideloadFilter.new parent_resource_class,
+            self, primary_key
+        end
+      when :many_to_many
+        unless resource.filters[true_foreign_key]
+          raise Errors::MissingSideloadFilter.new parent_resource_class,
+            self, true_foreign_key
+        end
+      end
+    end
+
     def readable?
       !!@readable
     end
 
     def writable?
       !!@writable
+    end
+
+    def link?
+      return true if link_proc
+
+      if @link.nil?
+        !!@parent_resource_class.autolink
+      else
+        !!@link
+      end
     end
 
     def polymorphic_parent?
@@ -116,7 +155,7 @@ module Graphiti
 
     def load(parents, query)
       params = load_params(parents, query)
-      params_proc.call(params, parents, query) if params_proc
+      params_proc.call(params, parents) if params_proc
       opts = load_options(parents, query)
       proxy = resource.class._all(params, opts, base_scope)
       pre_load_proc.call(proxy) if pre_load_proc
@@ -157,8 +196,7 @@ module Graphiti
     end
 
     def resolve(parents, query)
-      # legacy / custom / many-to-many
-      if self.class.scope_proc || type == :many_to_many
+      if self.class.scope_proc
         sideload_scope = fire_scope(parents)
         sideload_scope = Scope.new sideload_scope,
           resource,
@@ -261,21 +299,12 @@ module Graphiti
       end
     end
 
-    def namespace_for(klass)
-      namespace = klass.name
-      split = namespace.split('::')
-      split[0,split.length-1].join('::')
+    def infer_resource_class
+      Util::Class.infer_resource_class(parent_resource.class, name)
     end
 
-    def infer_resource_class
-      namespace = namespace_for(parent_resource.class)
-      inferred_name = "#{name.to_s.singularize.classify}Resource"
-      klass = "#{namespace}::#{inferred_name}".safe_constantize
-      klass ||= inferred_name.safe_constantize
-      unless klass
-        raise Errors::ResourceNotFound.new(parent_resource, name)
-      end
-      klass
+    def namespace_for(klass)
+      Util::Class.namespace_for(klass)
     end
   end
 end

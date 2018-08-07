@@ -514,6 +514,7 @@ RSpec.describe Graphiti::Schema do
 
       before do
         stub_const('Rails', rails)
+        allow_any_instance_of(Graphiti::Sideload).to receive(:check!)
       end
 
       it 'eager loads classes' do

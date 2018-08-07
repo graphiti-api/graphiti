@@ -48,12 +48,12 @@ module Graphiti
           r.endpoints.each do |e|
             actions = {}
             e[:actions].each do |a|
-              next unless ctx = context_for(e[:path], a)
+              next unless ctx = context_for(e[:full_path], a)
 
-              existing = endpoints[e[:path]]
+              existing = endpoints[e[:full_path]]
               if existing && config = existing[:actions][a]
                 raise Errors::ResourceEndpointConflict.new \
-                  e[:path], a, r.name, config[:resource]
+                  e[:full_path], a, r.name, config[:resource]
               end
 
               actions[a] = { resource: r.name }
@@ -65,8 +65,8 @@ module Graphiti
             end
 
             unless actions.empty?
-              endpoints[e[:path]] ||= { actions: {} }
-              endpoints[e[:path]][:actions].merge!(actions)
+              endpoints[e[:full_path]] ||= { actions: {} }
+              endpoints[e[:full_path]][:actions].merge!(actions)
             end
           end
         end
