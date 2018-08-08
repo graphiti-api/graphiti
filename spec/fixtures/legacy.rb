@@ -155,7 +155,7 @@ module Legacy
   end
 
   class ApplicationResource < Graphiti::Resource
-    self.adapter = Graphiti::Adapters::ActiveRecord::Base.new
+    self.adapter = Graphiti::Adapters::ActiveRecord::Base
     self.abstract_class = true
   end
 
@@ -299,7 +299,7 @@ module Legacy
   end
 
   class AuthorSearchResource < ApplicationResource
-    self.adapter = SearchAdapter.new
+    self.adapter = SearchAdapter
     self.model = Legacy::Author
 
     has_many :special_books, resource: Legacy::BookResource

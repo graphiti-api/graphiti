@@ -10,9 +10,17 @@ module Graphiti
           if att = get_attr(name, :filterable, raise_error: :only_unsupported)
             aliases = [name, opts[:aliases]].flatten.compact
             operators = FilterOperators.build(self, att[:type], opts, &blk)
+
+            if Graphiti::Types[att[:type]][:canonical_name] == :boolean
+              opts[:single] = true
+            end
+
             config[:filters][name.to_sym] = {
               aliases: aliases,
               type: att[:type],
+              allow: opts[:allow],
+              reject: opts[:reject],
+              single: !!opts[:single],
               operators: operators.to_hash
             }
           else
@@ -53,7 +61,7 @@ module Graphiti
         end
 
         def stat(symbol_or_hash, &blk)
-          dsl = Stats::DSL.new(adapter, symbol_or_hash)
+          dsl = Stats::DSL.new(new.adapter, symbol_or_hash)
           dsl.instance_eval(&blk) if blk
           config[:stats][dsl.name] = dsl
         end

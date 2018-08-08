@@ -61,10 +61,10 @@ module Graphiti
           resource = resource ||= Util::Class.infer_resource_class(self, name)
           sideload = resource.sideload(as)
 
-          _adapter = adapter
+          _resource = resource
           filter sideload.true_foreign_key, resource.attributes[:id][:type] do
             eq do |scope, value|
-              _adapter.belongs_to_many_filter(sideload, scope, value)
+              _resource.new.adapter.belongs_to_many_filter(sideload, scope, value)
             end
           end
         end

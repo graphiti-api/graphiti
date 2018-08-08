@@ -68,6 +68,7 @@ module Graphiti
     end
 
     def check!
+      return if scope_proc
       case type
       when :has_many, :has_one
         unless resource.filters[foreign_key]

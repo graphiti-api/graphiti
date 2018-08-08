@@ -94,6 +94,28 @@ module Graphiti
           next
         end
 
+        if new_filter[:single] && !old_filter[:single]
+          @errors << "#{old_resource[:name]}: filter #{name.inspect} became singular."
+        end
+
+        if new_filter[:allow] != old_filter[:allow]
+          new = new_filter[:allow] || []
+          old = old_filter[:allow] || []
+          diff = new - old
+          if diff.length > 0
+            @errors << "#{old_resource[:name]}: filter #{name.inspect} whitelist went from #{old.inspect} to #{new.inspect}."
+          end
+        end
+
+        if new_filter[:reject] != old_filter[:reject]
+          new = new_filter[:reject] || []
+          old = old_filter[:reject] || []
+          diff = new - old
+          if diff.length > 0
+            @errors << "#{old_resource[:name]}: filter #{name.inspect} blacklist went from #{old.inspect} to #{new.inspect}."
+          end
+        end
+
         if (diff = old_filter[:operators] - new_filter[:operators]).length > 0
           diff.each do |op|
             @errors << "#{old_resource[:name]}: filter #{name.inspect} removed operator #{op.inspect}."

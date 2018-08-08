@@ -126,7 +126,7 @@ class Salary < ApplicationRecord
 end
 
 class ApplicationResource < Graphiti::Resource
-  self.adapter = Graphiti::Adapters::ActiveRecord::Base.new
+  self.adapter = Graphiti::Adapters::ActiveRecord::Base
   self.abstract_class = true
 end
 

@@ -72,7 +72,28 @@ module Graphiti
         operator = param_value.keys.first
         value = param_value.values.first unless filter.values[0][:type] == :hash
         value = value.split(',') if value.is_a?(String) && value.include?(',')
+
+        if filter.values[0][:single] && value.is_a?(Array)
+          raise Errors::SingularFilter.new(resource, filter, value)
+        end
+
         value = coerce_types(param_name.to_sym, value)
+
+        value.each do |v|
+          if allow = filter.values[0][:allow]
+            unless allow.include?(v)
+              raise Errors::InvalidFilterValue.new(resource, filter, value)
+            end
+          end
+
+          if reject = filter.values[0][:reject]
+            if reject.include?(v)
+              raise Errors::InvalidFilterValue.new(resource, filter, value)
+            end
+          end
+        end
+
+        value = value[0] if filter.values[0][:single]
         yield filter, operator, value
       end
     end

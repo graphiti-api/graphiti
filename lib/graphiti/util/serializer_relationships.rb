@@ -44,11 +44,7 @@ module Graphiti
           proc do
             if @proxy.query.links?
               link(:related) do
-                if prc = sl.link_proc
-                  prc.call(@object)
-                else
-                  ::Graphiti::Util::Link.new(sl, @object).generate
-                end
+                ::Graphiti::Util::Link.new(sl, @object).generate
               end
             end
           end
@@ -75,7 +71,7 @@ module Graphiti
         action = sideload.type == :belongs_to ? :show : :index
         prc = Graphiti.config.context_for_endpoint
         unless prc.call(sideload.resource.endpoint[:full_path], action)
-          raise Errors::InvalidLink.new(@resource_class, sideload)
+          raise Errors::InvalidLink.new(@resource_class, sideload, action)
         end
       end
 

@@ -16,19 +16,55 @@ The adapter #{@adapter.class} does not implement method '#{@method}', which was 
       end
     end
 
+    class InvalidFilterValue < Base
+      def initialize(resource, filter, value)
+        @resource = resource
+        @filter = filter
+        @value = value
+      end
+
+      def message
+        allow = @filter.values[0][:allow]
+        reject = @filter.values[0][:reject]
+        msg = <<-MSG
+#{@resource.class.name}: tried to filter on #{@filter.keys[0].inspect}, but passed invalid value #{@value.inspect}.
+        MSG
+        msg << "\nWhitelist: #{allow.inspect}" if allow
+        msg << "\nBlacklist: #{reject.inspect}" if reject
+        msg
+      end
+    end
+
     class InvalidLink < Base
-      def initialize(resource_class, sideload)
+      def initialize(resource_class, sideload, action)
         @resource_class = resource_class
         @sideload = sideload
+        @action = action
       end
 
       def message
         <<-MSG
 #{@resource_class.name}: Cannot link to sideload #{@sideload.name.inspect}!
 
-Make sure the endpoint "#{@sideload.resource.endpoint[:full_path]}" exists, or customize the endpoint for #{@sideload.resource.class.name}.
+Make sure the endpoint "#{@sideload.resource.endpoint[:full_path]}" exists with action #{@action.inspect}, or customize the endpoint for #{@sideload.resource.class.name}.
 
 If you do not wish to generate a link, pass link: false or set self.relationship_links_by_default = false.
+        MSG
+      end
+    end
+
+    class SingularFilter < Base
+      def initialize(resource, filter, value)
+        @resource = resource
+        @filter = filter
+        @value = value
+      end
+
+      def message
+        <<-MSG
+#{@resource.class.name}: passed multiple values to filter #{@filter.keys[0].inspect}, which was marked single: true.
+
+Value was: #{@value.inspect}
         MSG
       end
     end

@@ -66,10 +66,11 @@ module Graphiti
       end
 
       def wrap_proc(inner)
-        type_name = @attr[:type]
+        _resource = @resource.new
+        _name = @name
         ->(serializer_instance = nil) {
-          type = Graphiti::Types[type_name]
-          type[:read][serializer_instance.instance_eval(&inner)]
+           value = serializer_instance.instance_eval(&inner)
+          _resource.typecast(_name, value, :readable)
         }
       end
 

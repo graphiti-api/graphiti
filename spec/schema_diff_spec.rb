@@ -353,6 +353,116 @@ RSpec.describe Graphiti::SchemaDiff do
       end
     end
 
+    context 'when filter goes single: true to single: false' do
+      before do
+        resource_b.filter :foo, :string
+        resource_a.filter :foo, :string, single: true
+      end
+
+      it { is_expected.to eq([]) }
+    end
+
+    context 'when filter goes single: false to single: true' do
+      before do
+        resource_b.filter :foo, :string, single: true
+        resource_a.filter :foo, :string
+      end
+
+      it 'returns error' do
+        expect(diff).to eq([
+          'SchemaDiff::EmployeeResource: filter :foo became singular.'
+        ])
+      end
+    end
+
+    context 'when filter adds to whitelist' do
+      before do
+        resource_b.filter :foo, :string, allow: ['foo', 'bar']
+        resource_a.filter :foo, :string, allow: ['foo']
+      end
+
+      it 'returns error' do
+        expect(diff).to eq([
+          'SchemaDiff::EmployeeResource: filter :foo whitelist went from ["foo"] to ["foo", "bar"].'
+        ])
+      end
+    end
+
+    context 'when filter removes from whitelist' do
+      before do
+        resource_b.filter :foo, :string, allow: ['foo']
+        resource_a.filter :foo, :string, allow: ['foo', 'bar']
+      end
+
+      it { is_expected.to eq([]) }
+    end
+
+    context 'when filter removes whitelist' do
+      before do
+        resource_b.filter :foo, :string
+        resource_a.filter :foo, :string, allow: ['foo']
+      end
+
+      it { is_expected.to eq([]) }
+    end
+
+    context 'when filter adds whitelist' do
+      before do
+        resource_b.filter :foo, :string, allow: ['foo']
+        resource_a.filter :foo, :string
+      end
+
+      it 'returns error' do
+        expect(diff).to eq([
+          'SchemaDiff::EmployeeResource: filter :foo whitelist went from [] to ["foo"].'
+        ])
+      end
+    end
+
+    context 'when filter adds to blacklist' do
+      before do
+        resource_b.filter :foo, :string, reject: ['foo', 'bar']
+        resource_a.filter :foo, :string, reject: ['foo']
+      end
+
+      it 'returns error' do
+        expect(diff).to eq([
+          'SchemaDiff::EmployeeResource: filter :foo blacklist went from ["foo"] to ["foo", "bar"].'
+        ])
+      end
+    end
+
+    context 'when filter removes from blacklist' do
+      before do
+        resource_b.filter :foo, :string, reject: ['foo']
+        resource_a.filter :foo, :string, reject: ['foo', 'bar']
+      end
+
+      it { is_expected.to eq([]) }
+    end
+
+    context 'when filter removes blacklist' do
+      before do
+        resource_b.filter :foo, :string
+        resource_a.filter :foo, :string, reject: ['foo']
+      end
+
+      it { is_expected.to eq([]) }
+    end
+
+    context 'when filter adds blacklist' do
+      before do
+        resource_b.filter :foo, :string, reject: ['foo']
+        resource_a.filter :foo, :string
+      end
+
+      it 'returns error' do
+        expect(diff).to eq([
+          'SchemaDiff::EmployeeResource: filter :foo blacklist went from [] to ["foo"].'
+        ])
+      end
+    end
+
     context 'when filter goes :required to not' do
       before do
         resource_b.filter :foo, :string
@@ -398,8 +508,6 @@ RSpec.describe Graphiti::SchemaDiff do
     end
 
     context 'when relationship is added' do
-
-
       before do
         resource_b.has_many :positions, resource: position_resource
       end

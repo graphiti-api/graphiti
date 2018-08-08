@@ -14,14 +14,33 @@ module Graphiti
       end
 
       def generate
-        if params.empty?
-          path
-        else
-          "#{path}?#{URI.unescape(params.to_query)}"
-        end
+        on_demand_links(raw_url)
       end
 
       private
+
+      def raw_url
+        if @sideload.link_proc
+          @sideload.link_proc.call(@model)
+        else
+          if params.empty?
+            path
+          else
+            "#{path}?#{URI.unescape(params.to_query)}"
+          end
+        end
+      end
+
+      def on_demand_links(url)
+        return url unless Graphiti.config.links_on_demand
+
+        if url.include?('?')
+          url << '&links=true'
+        else
+          url << '?links=true'
+        end
+        url
+      end
 
       def params
         @params ||= {}.tap do |params|

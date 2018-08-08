@@ -2,8 +2,9 @@ require 'spec_helper'
 
 RSpec.describe Graphiti::Stats::DSL do
   let(:config)   { :myattr }
-  let(:adapter)  { Graphiti::Adapters::Null.new }
+  let(:adapter)  { Graphiti::Adapters::Null.new(resource.new) }
   let(:instance) { described_class.new(adapter, config) }
+  let!(:resource) { Class.new(Graphiti::Resource) }
 
   describe '.new' do
     it 'sets name' do

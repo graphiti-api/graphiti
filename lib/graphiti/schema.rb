@@ -132,11 +132,15 @@ module Graphiti
 
     def filters(resource)
       {}.tap do |f|
-        resource.filters.each_pair do |name, config|
+        resource.filters.each_pair do |name, filter|
           config = {
-            type: config[:type].to_s,
-            operators: config[:operators].keys.map(&:to_s)
+            type: filter[:type].to_s,
+            operators: filter[:operators].keys.map(&:to_s)
           }
+          config[:single] = true if filter[:single]
+          config[:allow] = filter[:allow] if filter[:allow]
+          config[:reject] = filter[:reject] if filter[:reject]
+
           attr = resource.attributes[name]
           if attr[:filterable].is_a?(Symbol)
             if attr[:filterable] == :required

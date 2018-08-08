@@ -381,7 +381,7 @@ RSpec.describe 'persistence' do
       context 'when cannot coerce' do
         it 'raises error' do
           expect {
-            save(nil)
+            save({})
           }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
