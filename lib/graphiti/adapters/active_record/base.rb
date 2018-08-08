@@ -2,6 +2,24 @@ module Graphiti
   module Adapters
     module ActiveRecord
       class Base < ::Graphiti::Adapters::Abstract
+        def filter_eq(scope, attribute, value)
+          scope.where(attribute => value)
+        end
+        alias :filter_integer_eq :filter_eq
+        alias :filter_float_eq :filter_eq
+        alias :filter_big_decimal_eq :filter_eq
+        alias :filter_date_eq :filter_eq
+        alias :filter_boolean_eq :filter_eq
+
+        def filter_not_eq(scope, attribute, value)
+          scope.where.not(attribute => value)
+        end
+        alias :filter_integer_not_eq :filter_not_eq
+        alias :filter_float_not_eq :filter_not_eq
+        alias :filter_big_decimal_not_eq :filter_not_eq
+        alias :filter_date_not_eq :filter_not_eq
+        alias :filter_boolean_not_eq :filter_not_eq
+
         def filter_string_eq(scope, attribute, value, is_not: false)
           column = scope.klass.arel_table[attribute]
           clause = column.lower.eq_any(value.map(&:downcase))
@@ -54,56 +72,44 @@ module Graphiti
           filter_string_match(scope, attribute, value, is_not: true)
         end
 
-        def filter_integer_eq(scope, attribute, value, is_not: false)
-          clause = { attribute => value }
-          is_not ? scope.where.not(clause) : scope.where(clause)
-        end
-        alias :filter_float_eq :filter_integer_eq
-        alias :filter_big_decimal_eq :filter_integer_eq
-        alias :filter_date_eq :filter_integer_eq
-        alias :filter_boolean_eq :filter_integer_eq
-
-        def filter_integer_not_eq(scope, attribute, value)
-          filter_integer_eq(scope, attribute, value, is_not: true)
-        end
-        alias :filter_float_not_eq :filter_integer_not_eq
-        alias :filter_big_decimal_not_eq :filter_integer_not_eq
-        alias :filter_date_not_eq :filter_integer_not_eq
-
-        def filter_integer_gt(scope, attribute, value)
+        def filter_gt(scope, attribute, value)
           column = scope.klass.arel_table[attribute]
           scope.where(column.gt_any(value))
         end
-        alias :filter_float_gt :filter_integer_gt
-        alias :filter_big_decimal_gt :filter_integer_gt
-        alias :filter_datetime_gt :filter_integer_gt
-        alias :filter_date_gt :filter_integer_gt
+        alias :filter_integer_gt :filter_gt
+        alias :filter_float_gt :filter_gt
+        alias :filter_big_decimal_gt :filter_gt
+        alias :filter_datetime_gt :filter_gt
+        alias :filter_date_gt :filter_gt
 
-        def filter_integer_gte(scope, attribute, value)
+        def filter_gte(scope, attribute, value)
           column = scope.klass.arel_table[attribute]
           scope.where(column.gteq_any(value))
         end
-        alias :filter_float_gte :filter_integer_gte
-        alias :filter_big_decimal_gte :filter_integer_gte
-        alias :filter_datetime_gte :filter_integer_gte
-        alias :filter_date_gte :filter_integer_gte
+        alias :filter_integer_gte :filter_gte
+        alias :filter_float_gte :filter_gte
+        alias :filter_big_decimal_gte :filter_gte
+        alias :filter_datetime_gte :filter_gte
+        alias :filter_date_gte :filter_gte
 
-        def filter_integer_lt(scope, attribute, value)
+        def filter_lt(scope, attribute, value)
           column = scope.klass.arel_table[attribute]
           scope.where(column.lt_any(value))
         end
-        alias :filter_float_lt :filter_integer_lt
-        alias :filter_big_decimal_lt :filter_integer_lt
-        alias :filter_datetime_lt :filter_integer_lt
-        alias :filter_date_lt :filter_integer_lt
+        alias :filter_integer_lt :filter_lt
+        alias :filter_float_lt :filter_lt
+        alias :filter_big_decimal_lt :filter_lt
+        alias :filter_datetime_lt :filter_lt
+        alias :filter_date_lt :filter_lt
 
-        def filter_integer_lte(scope, attribute, value)
+        def filter_lte(scope, attribute, value)
           column = scope.klass.arel_table[attribute]
           scope.where(column.lteq_any(value))
         end
-        alias :filter_float_lte :filter_integer_lte
-        alias :filter_big_decimal_lte :filter_integer_lte
-        alias :filter_date_lte :filter_integer_lte
+        alias :filter_integer_lte :filter_lte
+        alias :filter_float_lte :filter_lte
+        alias :filter_big_decimal_lte :filter_lte
+        alias :filter_date_lte :filter_lte
 
         # Ensure fractional seconds don't matter
         def filter_datetime_eq(scope, attribute, value, is_not: false)
@@ -180,7 +186,7 @@ module Graphiti
           end
         end
 
-        def sideloading_classes
+        def self.sideloading_classes
           {
             has_many: HasManySideload,
             has_one: HasOneSideload,
@@ -198,26 +204,34 @@ module Graphiti
         end
 
         def associate_all(parent, children, association_name, association_type)
-          association = parent.association(association_name)
-          association.loaded!
+          if activerecord_associate?(parent, children[0], association_name)
+            association = parent.association(association_name)
+            association.loaded!
 
-          children.each do |child|
-            if association_type == :many_to_many &&
-                !parent.send(association_name).exists?(child.id) &&
-                [:create, :update].include?(Graphiti.context[:namespace])
-              parent.send(association_name) << child
-            else
-              target = association.instance_variable_get(:@target)
-              target |= [child]
-              association.instance_variable_set(:@target, target)
+            children.each do |child|
+              if association_type == :many_to_many &&
+                  !parent.send(association_name).exists?(child.id) &&
+                  [:create, :update].include?(Graphiti.context[:namespace])
+                parent.send(association_name) << child
+              else
+                target = association.instance_variable_get(:@target)
+                target |= [child]
+                association.instance_variable_set(:@target, target)
+              end
             end
+          else
+            super
           end
         end
 
         def associate(parent, child, association_name, association_type)
-          association = parent.association(association_name)
-          association.loaded!
-          association.instance_variable_set(:@target, child)
+          if activerecord_associate?(parent, child, association_name)
+            association = parent.association(association_name)
+            association.loaded!
+            association.instance_variable_set(:@target, child)
+          else
+            super
+          end
         end
 
         # When a has_and_belongs_to_many relationship, we don't have a foreign

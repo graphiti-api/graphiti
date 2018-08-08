@@ -44,8 +44,8 @@ module Graphiti
           attr_writer :config
         end
 
-        class_attribute :adapter,
-          :model,
+        class_attribute :adapter, instance_reader: false
+        class_attribute :model,
           :type,
           :polymorphic,
           :polymorphic_child,
@@ -66,7 +66,7 @@ module Graphiti
         def self.inherited(klass)
           super
           klass.config = Util::Hash.deep_dup(config)
-          klass.adapter ||= Adapters::Abstract.new
+          klass.adapter ||= Adapters::Abstract
           klass.default_sort ||= []
           klass.default_page_size ||= 20
           # re-assigning causes a new Class.new
@@ -198,6 +198,10 @@ module Graphiti
 
       def get_attr(name, flag, request: false, raise_error: false)
         Util::AttributeCheck.run(self, name, flag, request, raise_error)
+      end
+
+      def adapter
+        @adapter ||= self.class.adapter.new(self)
       end
 
       def filters

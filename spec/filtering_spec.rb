@@ -2,7 +2,11 @@ require 'spec_helper'
 
 RSpec.describe 'filtering' do
   include_context 'resource testing'
-  let(:resource) { Class.new(PORO::EmployeeResource) }
+  let(:resource) do
+    Class.new(PORO::EmployeeResource) do
+      def self.name;'PORO::EmployeeResource';end
+    end
+  end
   let(:base_scope) { { type: :employees, conditions: {} } }
 
   let!(:employee1) do
@@ -21,6 +25,191 @@ RSpec.describe 'filtering' do
   it 'scopes correctly' do
     params[:filter] = { id: { eq: employee1.id } }
     expect(records.map(&:id)).to eq([employee1.id])
+  end
+
+  context 'when only allowing single values' do
+    before do
+      resource.filter :first_name, :string, single: true do
+        eq do |scope, value|
+          scope[:conditions].merge!(first_name: value)
+          scope
+        end
+      end
+    end
+
+    it 'rejects multiples' do
+      params[:filter] = { first_name: { eq: 'William,Harold' } }
+      expect {
+        records
+      }.to raise_error(Graphiti::Errors::SingularFilter, /passed multiple values to filter :first_name/)
+    end
+
+    it 'allows singles' do
+      params[:filter] = { first_name: { eq: 'William' } }
+      expect(records.map(&:id)).to eq([employee3.id])
+    end
+
+    it 'yields a singular value' do
+      expect(PORO::DB).to receive(:all)
+        .with(hash_including(conditions: { first_name: 'William' }))
+        .and_call_original
+      params[:filter] = { first_name: { eq: 'William' } }
+      expect(records.map(&:id)).to eq([employee3.id])
+    end
+
+    context 'and whitelisting inputs' do
+      before do
+        resource.config[:filters] = {}
+        resource.filter :first_name, :string, single: true, allow: ['William'] do
+          eq do |scope, value|
+            scope[:conditions].merge!(first_name: value)
+            scope
+          end
+        end
+      end
+
+      it 'rejects values not in the whitelist' do
+        params[:filter] = { first_name: { eq: 'Harold' } }
+        expect {
+          records
+        }.to raise_error( Graphiti::Errors::InvalidFilterValue, /Whitelist: \[\"William\"\]/)
+      end
+
+      it 'accepts values in the whitelist' do
+        params[:filter] = { first_name: { eq: 'William' } }
+        expect(records.map(&:id)).to eq([employee3.id])
+      end
+    end
+
+    context 'and blacklisting inputs' do
+      before do
+        resource.config[:filters] = {}
+        resource.filter :first_name, :string, single: true, reject: ['Harold'] do
+          eq do |scope, value|
+            scope[:conditions].merge!(first_name: value)
+            scope
+          end
+        end
+      end
+
+      it 'rejects values in the blacklist' do
+        params[:filter] = { first_name: { eq: 'Harold' } }
+        expect {
+          records
+        }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Blacklist: \[\"Harold\"\]/)
+      end
+
+      it 'accepts values not in the blacklist' do
+        params[:filter] = { first_name: { eq: 'William' } }
+        expect(records.map(&:id)).to eq([employee3.id])
+      end
+    end
+  end
+
+  context 'when whitelisting inputs' do
+    before do
+      resource.config[:filters] = {}
+      resource.filter :first_name, :string, allow: ['William', 'Agatha'] do
+        eq do |scope, value|
+          scope[:conditions].merge!(first_name: value)
+          scope
+        end
+      end
+    end
+
+    it 'rejects values not in the whitelist' do
+      params[:filter] = { first_name: { eq: 'Harold' } }
+      expect {
+        records
+      }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Whitelist: \["William", "Agatha"\]/)
+    end
+
+    it 'accepts values in the whitelist' do
+      params[:filter] = { first_name: { eq: 'William' } }
+      expect(records.map(&:id)).to eq([employee3.id])
+    end
+
+    context 'and passed an array' do
+      context 'where one value is not whitelisted' do
+        before do
+          params[:filter] = { first_name: { eq: ['Harold', 'William'] } }
+        end
+
+        it 'raises error' do
+          expect {
+            records
+          }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Whitelist: \["William", "Agatha"\]/)
+        end
+      end
+
+      context 'where all values are in whitelist' do
+        before do
+          params[:filter] = { first_name: { eq: ['Agatha', 'William'] } }
+        end
+
+        it 'works' do
+          expect(records.map(&:id)).to eq([employee2.id, employee3.id])
+        end
+      end
+    end
+  end
+
+  context 'when blacklisting inputs' do
+    before do
+      resource.config[:filters] = {}
+      resource.filter :first_name, :string, reject: ['Harold'] do
+        eq do |scope, value|
+          scope[:conditions].merge!(first_name: value)
+          scope
+        end
+      end
+    end
+
+    it 'rejects values in the blacklist' do
+      params[:filter] = { first_name: { eq: 'Harold' } }
+      expect {
+        records
+      }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Blacklist: \[\"Harold\"\]/)
+    end
+
+    it 'accepts values not in the blacklist' do
+      params[:filter] = { first_name: { eq: 'William' } }
+      expect(records.map(&:id)).to eq([employee3.id])
+    end
+
+    context 'and passed an array' do
+      context 'where one value is in the blacklist' do
+        before do
+          params[:filter] = { first_name: { eq: ['Harold', 'William'] } }
+        end
+
+        it 'raises error' do
+          expect {
+            records
+          }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Blacklist: \["Harold"\]/)
+        end
+      end
+
+      context 'where no values are in the blacklist' do
+        before do
+          params[:filter] = { first_name: { eq: ['Agatha', 'William'] } }
+        end
+
+        it 'works' do
+          expect(records.map(&:id)).to eq([employee2.id, employee3.id])
+        end
+      end
+    end
+  end
+
+  context 'when boolean filter' do
+    before do
+      resource.filter :active, :boolean
+    end
+
+    it 'is single by default' do
+      expect(resource.filters[:active][:single]).to eq(true)
+    end
   end
 
   # NB: even though query params are always strings, I'd like to
@@ -66,11 +255,9 @@ RSpec.describe 'filtering' do
         assert_filter_value([1])
       end
 
-      it 'does NOT allow nils' do
-        expect {
-          params[:filter] = { foo: nil }
-          records
-        }.to raise_error(Graphiti::Errors::TypecastFailed)
+      it 'allows nils' do
+        params[:filter] = { foo: nil }
+        assert_filter_value([nil])
       end
 
       context 'when cannot coerce' do
@@ -101,11 +288,9 @@ RSpec.describe 'filtering' do
         assert_filter_value([BigDecimal('40.01')])
       end
 
-      it 'does NOT allow nils' do
-        expect {
-          params[:filter] = { foo: nil }
-          records
-        }.to raise_error(Graphiti::Errors::TypecastFailed)
+      it 'allows nils' do
+        params[:filter] = { foo: nil }
+        assert_filter_value([nil])
       end
 
       context 'when cannot coerce' do
@@ -137,11 +322,9 @@ RSpec.describe 'filtering' do
         assert_filter_value([40.0])
       end
 
-      it 'does NOT allow nils' do
-        expect {
-          params[:filter] = { foo: nil }
-          records
-        }.to raise_error(Graphiti::Errors::TypecastFailed)
+      it 'allows nils' do
+        params[:filter] = { foo: nil }
+        assert_filter_value([nil])
       end
 
       context 'when cannot coerce' do
@@ -165,39 +348,37 @@ RSpec.describe 'filtering' do
 
       it 'coerces string true' do
         params[:filter] = { foo: 'true' }
-        assert_filter_value([true])
+        assert_filter_value(true)
       end
 
       it 'coerces string false' do
         params[:filter] = { foo: 'false' }
-        assert_filter_value([false])
+        assert_filter_value(false)
       end
 
       it 'coerces true integers' do
         params[:filter] = { foo: 1 }
-        assert_filter_value([true])
+        assert_filter_value(true)
       end
 
       it 'coerces false integers' do
         params[:filter] = { foo: 0 }
-        assert_filter_value([false])
+        assert_filter_value(false)
       end
 
       it 'coerces string true integers' do
         params[:filter] = { foo: '1' }
-        assert_filter_value([true])
+        assert_filter_value(true)
       end
 
       it 'coerces string false integers' do
         params[:filter] = { foo: '0' }
-        assert_filter_value([false])
+        assert_filter_value(false)
       end
 
-      it 'does NOT allow nils' do
-        expect {
-          params[:filter] = { foo: nil }
-          records
-        }.to raise_error(Graphiti::Errors::TypecastFailed)
+      it 'allows nils' do
+        params[:filter] = { foo: nil }
+        assert_filter_value(nil)
       end
 
       context 'when cannot coerce' do
@@ -228,11 +409,9 @@ RSpec.describe 'filtering' do
         assert_filter_value([Date.today])
       end
 
-      it 'does NOT allow nils' do
+      it 'allows nils' do
         params[:filter] = { foo: nil }
-        expect {
-          records
-        }.to raise_error(Graphiti::Errors::TypecastFailed)
+        assert_filter_value([nil])
       end
 
       context 'when only month' do
@@ -282,11 +461,9 @@ RSpec.describe 'filtering' do
         assert_filter_value([DateTime.parse('2018-01-06')])
       end
 
-      it 'does NOT allows nils' do
+      it 'allows nils' do
         params[:filter] = { foo: nil }
-        expect {
-          records
-        }.to raise_error(Graphiti::Errors::TypecastFailed)
+        assert_filter_value([nil])
       end
 
       context 'when cannot coerce' do
@@ -407,7 +584,7 @@ RSpec.describe 'filtering' do
 
       context 'when cannot coerce' do
         before do
-          params[:filter] = { foo: {} }
+          params[:filter] = { foo: '' }
         end
 
         it 'raises error' do
@@ -491,7 +668,7 @@ RSpec.describe 'filtering' do
           expect {
             resource.filter :foo do
             end
-          }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to add filter attribute :foo, but the attribute was marked :filterable => false.')
+          }.to raise_error(Graphiti::Errors::AttributeError, 'PORO::EmployeeResource: Tried to add filter attribute :foo, but the attribute was marked :filterable => false.')
         end
       end
     end
@@ -651,17 +828,6 @@ RSpec.describe 'filtering' do
       expect(ids.length).to eq(3)
       expect(ids).to_not include(employee2.id)
     end
-
-    context 'and multiple are passed' do
-      before do
-        params[:filter] = { active: 'true,false' }
-      end
-
-      it 'still works' do
-        ids = records.map(&:id)
-        expect(ids.length).to eq(4)
-      end
-    end
   end
 
   context 'when filter is an integer' do
@@ -759,7 +925,7 @@ RSpec.describe 'filtering' do
     it 'raises helpful error' do
       expect {
         records
-      }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :foo, but could not find an attribute with that name.')
+      }.to raise_error(Graphiti::Errors::AttributeError, 'PORO::EmployeeResource: Tried to filter on attribute :foo, but could not find an attribute with that name.')
     end
 
     context 'but there is a corresponding extra attribute' do
@@ -771,7 +937,7 @@ RSpec.describe 'filtering' do
         it 'raises helpful error' do
           expect {
             records
-          }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :foo, but the attribute was marked :filterable => false.')
+          }.to raise_error(Graphiti::Errors::AttributeError, 'PORO::EmployeeResource: Tried to filter on attribute :foo, but the attribute was marked :filterable => false.')
         end
       end
 
@@ -828,7 +994,7 @@ RSpec.describe 'filtering' do
       it 'raises helpful error' do
         expect {
           records
-        }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to filter on attribute :first_name, but the guard :admin? did not pass.')
+        }.to raise_error(Graphiti::Errors::AttributeError, 'PORO::EmployeeResource: Tried to filter on attribute :first_name, but the guard :admin? did not pass.')
       end
     end
   end

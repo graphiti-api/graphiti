@@ -28,15 +28,15 @@ RSpec.describe Graphiti::Schema do
             filters: {
               id: {
                 type: 'integer_id',
-                operators: Graphiti::Adapters::Abstract.new.default_operators[:integer].map(&:to_s)
+                operators: Graphiti::Adapters::Abstract.default_operators[:integer].map(&:to_s)
               },
               first_name: {
                 type: 'string',
-                operators: Graphiti::Adapters::Abstract.new.default_operators[:string].map(&:to_s)
+                operators: Graphiti::Adapters::Abstract.default_operators[:string].map(&:to_s)
               },
               title: {
                 type: 'string',
-                operators: Graphiti::Adapters::Abstract.new.default_operators[:string].map(&:to_s)
+                operators: Graphiti::Adapters::Abstract.default_operators[:string].map(&:to_s)
               }
             },
             extra_attributes: {
@@ -348,6 +348,45 @@ RSpec.describe Graphiti::Schema do
             'match',
             'not_match'
           ])
+      end
+    end
+
+    context 'when the filter is singular' do
+      before do
+        employee_resource.class_eval do
+          filter :first_name, single: true
+        end
+      end
+
+      it 'is marked as such' do
+        expect(schema[:resources][0][:filters][:first_name][:single])
+          .to eq(true)
+      end
+    end
+
+    context 'when the filter has a whitelist' do
+      before do
+        employee_resource.class_eval do
+          filter :first_name, allow: ['foo']
+        end
+      end
+
+      it 'is marked as such' do
+        expect(schema[:resources][0][:filters][:first_name][:allow])
+          .to eq(['foo'])
+      end
+    end
+
+    context 'when the filter has a blacklist' do
+      before do
+        employee_resource.class_eval do
+          filter :first_name, reject: ['bar']
+        end
+      end
+
+      it 'is marked as such' do
+        expect(schema[:resources][0][:filters][:first_name][:reject])
+          .to eq(['bar'])
       end
     end
 

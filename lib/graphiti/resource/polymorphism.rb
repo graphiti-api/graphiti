@@ -25,7 +25,7 @@ module Graphiti
       def associate(parent, child, association_name, type)
         child_resource = self.class.resource_for_model(parent)
         if child_resource.sideloads[association_name]
-          child_resource.adapter
+          child_resource.new.adapter
             .associate(parent, child, association_name, type)
         end
       end

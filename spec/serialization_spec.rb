@@ -777,6 +777,25 @@ RSpec.describe 'serialization' do
           expect(positions['links']['related'])
             .to eq('/special/positions?blah=1')
         end
+
+        context 'when links_on_demand' do
+          around do |e|
+            original = Graphiti.config.links_on_demand
+            begin
+              Graphiti.config.links_on_demand = true
+              e.run
+            ensure
+              Graphiti.config.links_on_demand = original
+            end
+          end
+
+          it 'adds links=true to url' do
+            params[:links] = true
+            render
+            expect(positions['links']['related'])
+              .to eq('/special/positions?blah=1&links=true')
+          end
+        end
       end
     end
 
@@ -809,6 +828,12 @@ RSpec.describe 'serialization' do
         it 'does render links' do
           render
           expect(positions).to have_key('links')
+        end
+
+        it 'appends ?links=true to link' do
+          render
+          expect(positions['links']['related'])
+            .to eq('/poro/positions?filter[employee_id]=1&links=true')
         end
       end
     end
@@ -869,7 +894,7 @@ RSpec.describe 'serialization' do
           it 'raises error' do
             expect {
               resource.has_many :positions
-            }.to raise_error(Graphiti::Errors::InvalidLink, /Make sure the endpoint \"\/poro\/positions\" exists/)
+            }.to raise_error(Graphiti::Errors::InvalidLink, /Make sure the endpoint \"\/poro\/positions\" exists with action :index/)
           end
         end
 
@@ -1010,7 +1035,7 @@ RSpec.describe 'serialization' do
           it 'raises error' do
             expect {
               resource.belongs_to :classification
-            }.to raise_error(Graphiti::Errors::InvalidLink, /Make sure the endpoint \"\/poro\/classifications\" exists/)
+            }.to raise_error(Graphiti::Errors::InvalidLink, /Make sure the endpoint \"\/poro\/classifications\" exists with action :show/)
           end
         end
 

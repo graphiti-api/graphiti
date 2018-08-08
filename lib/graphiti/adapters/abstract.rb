@@ -1,82 +1,27 @@
 module Graphiti
   module Adapters
-    # Adapters DRY up common resource logic.
-    #
-    # For instance, there's no reason to write ActiveRecord logic like this in
-    # every Resource:
-    #
-    #   allow_filter :title do |scope, value|
-    #     scope.where(title: value)
-    #   end
-    #
-    #   sort do |scope, att, dir|
-    #     scope.order(att => dir)
-    #   end
-    #
-    #   paginate do |scope, current_page, per_page|
-    #     scope.page(current_page).per(per_page)
-    #   end
-    #
-    # This logic can be re-used through an *Adapter*:
-    #
-    #   use_adapter Graphiti::Adapters::ActiveRecord
-    #   allow_filter :title
-    #
-    # Adapters are pretty simple to write. The corresponding code for the above
-    # ActiveRecord adapter, which should look pretty familiar:
-    #
-    #   class Graphiti::Adapters::ActiveRecord
-    #     def filter(scope, attribute, value)
-    #       scope.where(attribute => value)
-    #     end
-    #
-    #     def order(scope, attribute, direction)
-    #       scope.order(attribute => direction)
-    #     end
-    #
-    #     def paginate(scope, current_page, per_page)
-    #       scope.page(current_page).per(per_page)
-    #     end
-    #   end
-    #
-    # An adapter can have a corresponding +sideloading_module+. This module
-    # gets mixed in to a Sideload. In other words, *Resource* is to
-    # *Adapter* as *Sideload* is to *Adapter#sideloading_module*. Use this
-    # module to define DSL methods that wrap #allow_sideload:
-    #
-    #   class MyAdapter < Graphiti::Adapters::Abstract
-    #     # ... code ...
-    #     def sideloading_module
-    #       MySideloadingAdapter
-    #     end
-    #   end
-    #
-    #   module MySideloadingAdapter
-    #     def belongs_to(association_name)
-    #       allow_sideload association_name do
-    #         # ... code ...
-    #       end
-    #     end
-    #   end
-    #
-    #   # And now in your Resource:
-    #   class MyResource < ApplicationResource
-    #     # ... code ...
-    #     use_adapter MyAdapter
-    #
-    #     belongs_to :my_association
-    #   end
-    #
-    # If you need the adapter to do *nothing*, because perhaps the API you
-    # are hitting does not support sorting,
-    # use +Graphiti::Adapters::Null+.
-    #
-    # @see Resource.use_adapter
-    # @see Adapters::ActiveRecord
-    # @see Adapters::ActiveRecordSideloading
-    # @see Adapters::Null
     class Abstract
-      def default_operators
+      attr_reader :resource
+
+      def initialize(resource)
+        @resource = resource
+      end
+
+      # You want to override this!
+      # Map of association_type => sideload_class
+      # e.g.
+      # { has_many: Adapters::ActiveRecord::HasManySideload }
+      def self.sideloading_classes
+        {
+          has_many: ::Graphiti::Sideload::HasMany,
+          belongs_to: ::Graphiti::Sideload::BelongsTo,
+          has_one: ::Graphiti::Sideload::HasOne,
+          many_to_many: ::Graphiti::Sideload::ManyToMany,
+          polymorphic_belongs_to: ::Graphiti::Sideload::PolymorphicBelongsTo
+        }
+      end
+
+      def self.default_operators
         {
           string: [
             :eq,
@@ -423,7 +368,11 @@ module Graphiti
             parent, child, association_name, association_type
         else
           if [:has_many, :many_to_many].include?(association_type)
-            parent.send(:"#{association_name}") << child
+            if parent.send(:"#{association_name}").nil?
+              parent.send(:"#{association_name}=", [child])
+            else
+              parent.send(:"#{association_name}") << child
+            end
           else
             parent.send(:"#{association_name}=", child)
           end
@@ -470,20 +419,6 @@ module Graphiti
         raise 'you must override #disassociate in an adapter subclass'
       end
 
-      # You want to override this!
-      # Map of association_type => sideload_class
-      # e.g.
-      # { has_many: Adapters::ActiveRecord::HasManySideload }
-      def sideloading_classes
-        {
-          has_many: ::Graphiti::Sideload::HasMany,
-          belongs_to: ::Graphiti::Sideload::BelongsTo,
-          has_one: ::Graphiti::Sideload::HasOne,
-          many_to_many: ::Graphiti::Sideload::ManyToMany,
-          polymorphic_belongs_to: ::Graphiti::Sideload::PolymorphicBelongsTo
-        }
-      end
-
       # @param [Class] model_class The configured model class (see Resource.model)
       # @param [Hash] create_params Attributes + id
       # @return the model instance just created
@@ -528,13 +463,13 @@ module Graphiti
 
       private
 
-      def numerical_operators
+      def self.numerical_operators
         [:eq, :not_eq, :gt, :gte, :lt, :lte]
       end
 
       def activerecord_adapter
         @activerecord_adapter ||=
-          ::Graphiti::Adapters::ActiveRecord::Base.new
+          ::Graphiti::Adapters::ActiveRecord::Base.new(resource)
       end
 
       def activerecord_associate?(parent, child, association_name)

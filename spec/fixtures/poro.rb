@@ -273,7 +273,7 @@ module PORO
   end
 
   class ApplicationResource < Graphiti::Resource
-    self.adapter = Adapter.new
+    self.adapter = Adapter
     self.abstract_class = true
 
     def base_scope

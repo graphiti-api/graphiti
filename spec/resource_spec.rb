@@ -13,7 +13,7 @@ RSpec.describe Graphiti::Resource do
       end
 
       it 'sets defaults' do
-        expect(klass.adapter.class.ancestors[0])
+        expect(klass.adapter.ancestors[0])
           .to eq(Graphiti::Adapters::Abstract)
         expect(klass.default_sort).to eq([])
         expect(klass.default_page_size).to eq(20)
@@ -55,7 +55,7 @@ RSpec.describe Graphiti::Resource do
       end
 
       it 'inherits defaults' do
-        expect(klass.adapter.class.ancestors[0])
+        expect(klass.adapter.ancestors[0])
           .to eq(Graphiti::Adapters::Abstract)
         expect(klass.default_sort).to eq([])
         expect(klass.default_page_size).to eq(20)
@@ -92,7 +92,7 @@ RSpec.describe Graphiti::Resource do
       context 'when overriding defaults' do
         let(:klass) do
           Class.new(app_resource) do
-            self.adapter = PORO::Adapter.new
+            self.adapter = PORO::Adapter
             self.default_sort = [{ name: :asc }]
             self.default_page_size = 4
             self.attributes_readable_by_default = false
@@ -105,7 +105,7 @@ RSpec.describe Graphiti::Resource do
         end
 
         it 'works' do
-          expect(klass.adapter.class).to eq(PORO::Adapter)
+          expect(klass.adapter).to eq(PORO::Adapter)
           expect(klass.default_sort).to eq([{ name: :asc }])
           expect(klass.default_page_size).to eq(4)
           expect(klass.attributes_readable_by_default).to eq(false)
@@ -233,7 +233,7 @@ RSpec.describe Graphiti::Resource do
       context 'when the superclass overrode defaults' do
         let(:klass1) do
           Class.new(app_resource) do
-            self.adapter = PORO::Adapter.new
+            self.adapter = PORO::Adapter
             self.default_sort = [{ name: :asc }]
             self.default_page_size = 4
             self.attributes_readable_by_default = false
@@ -246,7 +246,7 @@ RSpec.describe Graphiti::Resource do
         end
 
         it 'carries them over to the subclass' do
-          expect(klass2.adapter.class).to eq(PORO::Adapter)
+          expect(klass2.adapter).to eq(PORO::Adapter)
           expect(klass2.default_sort).to eq([{ name: :asc }])
           expect(klass2.default_page_size).to eq(4)
           expect(klass2.attributes_readable_by_default).to eq(false)
@@ -956,7 +956,7 @@ RSpec.describe Graphiti::Resource do
 
     before do
       klass.model = PORO::Employee
-      klass.adapter = adapter.new
+      klass.adapter = adapter
     end
 
     it 'delegates to the adapter' do
@@ -981,7 +981,7 @@ RSpec.describe Graphiti::Resource do
   describe 'query methods' do
     before do
       klass.class_eval do
-        self.adapter = PORO::Adapter.new
+        self.adapter = PORO::Adapter
         self.model = PORO::Employee
 
         stat total: [:count]
@@ -1289,7 +1289,7 @@ RSpec.describe Graphiti::Resource do
       context 'and the path is supported' do
         before do
           klass.class_eval do
-            self.adapter = PORO::Adapter.new
+            self.adapter = PORO::Adapter
             primary_endpoint '/api/v1/employees'
             self.model = PORO::Employee
             def base_scope
@@ -1429,6 +1429,16 @@ RSpec.describe Graphiti::Resource do
           expect(typecast).to eq(1)
         end
 
+        context 'but it is nil' do
+          let(:value) { nil }
+
+          it 'does not go through coercion' do
+            expect(Graphiti::Types[:integer])
+              .to_not receive(:[]).with(:read)
+            expect(typecast).to be_nil
+          end
+        end
+
         context 'when coercion fails' do
           let(:value) { {} }
 
@@ -1529,7 +1539,7 @@ RSpec.describe Graphiti::Resource do
   describe '#around_scoping' do
     before do
       klass.class_eval do
-        self.adapter = Graphiti::Adapters::Null.new
+        self.adapter = Graphiti::Adapters::Null
         attr_accessor :scope
 
         attribute :foo, :string
