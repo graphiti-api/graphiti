@@ -24,8 +24,8 @@ module Graphiti
     end
 
     def required_attributes
-      resource.attributes.map do |k, v|
-        k if v[:filterable] == :required
+      resource.filters.map do |k, v|
+        k if v[:required]
       end.compact
     end
 

@@ -770,6 +770,19 @@ if ENV['APPRAISAL_INITIALIZED']
         expect(bio).to_not have_key('picture')
       end
 
+      context 'when no records found' do
+        before do
+          Legacy::Bio.delete_all
+        end
+
+        it 'still uses the activerecord adapter, not the PORO adapter' do
+          expect_any_instance_of(Legacy::Author).to_not receive(:bio=)
+          get :index, params: { include: 'bio' }
+          expect(json['data'][0]['relationships']['bio']['data'])
+            .to be_nil
+        end
+      end
+
       # Model/Resource has has_one, but it's just a subset of a has_many
       context 'when multiple records (faux-has_one)' do
         let!(:bio2) { Legacy::Bio.create!(author: author1, picture: 'imgur', description: 'author bio') }

@@ -475,7 +475,6 @@ module Graphiti
       def activerecord_associate?(parent, child, association_name)
         defined?(::ActiveRecord) &&
           parent.is_a?(::ActiveRecord::Base) &&
-          child.is_a?(::ActiveRecord::Base) &&
           parent.class.reflect_on_association(association_name)
       end
     end

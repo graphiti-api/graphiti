@@ -960,7 +960,7 @@ RSpec.describe 'filtering' do
     end
   end
 
-  context 'when filter is guarded' do
+  context 'when filter is guarded via .attribute' do
     before do
       resource.class_eval do
         attribute :first_name, :string, filterable: :admin?
@@ -999,9 +999,35 @@ RSpec.describe 'filtering' do
     end
   end
 
-  context 'when filter is required' do
+  context 'when filter is required on .attribute' do
     before do
       resource.attribute :first_name, :string, filterable: :required
+    end
+
+    context 'and given in the request' do
+      before do
+        params[:filter] = { first_name: 'Agatha' }
+      end
+
+      it 'works' do
+        expect(records.map(&:id)).to eq([employee2.id])
+      end
+    end
+
+    context 'but not given in request' do
+      it 'raises error' do
+        expect {
+          records
+        }.to raise_error(Graphiti::Errors::RequiredFilter)
+      end
+    end
+  end
+
+  context 'when filter is required on .filter' do
+    before do
+      resource.config[:filters] = {}
+      resource.config[:attributes] = {}
+      resource.filter :first_name, :string, required: true
     end
 
     context 'and given in the request' do
