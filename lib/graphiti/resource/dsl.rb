@@ -15,12 +15,14 @@ module Graphiti
               opts[:single] = true
             end
 
+            required = att[:filterable] == :required || !!opts[:required]
             config[:filters][name.to_sym] = {
               aliases: aliases,
               type: att[:type],
               allow: opts[:allow],
               reject: opts[:reject],
               single: !!opts[:single],
+              required: required,
               operators: operators.to_hash
             }
           else
