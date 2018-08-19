@@ -66,6 +66,7 @@ module Graphiti
             sideload = @resource.class.sideload(key)
             if sideload
               _parents = parents + [self]
+              sub_hash = sub_hash[:include] if sub_hash.has_key?(:include)
               hash[key] = Query.new(sideload.resource, @params, key, sub_hash, _parents)
             else
               handle_missing_sideload(key)
@@ -163,6 +164,8 @@ module Graphiti
 
         whitelist ? Util::IncludeParams.scrub(requested, whitelist) : requested
       end
+
+      @include_hash
     end
 
     def stats
@@ -185,8 +188,8 @@ module Graphiti
     def validate!(name, flag)
       return false if name.to_s.include?('.') # nested
 
-      not_associated_name = !@resource.class.association_names.include?(name)
-      not_associated_type = !@resource.class.association_types.include?(name)
+      not_associated_name = !@resource.class.sideloads.keys.include?(name)
+      not_associated_type = !@resource.class.sideloads.values.map(&:resource).map(&:type).include?(name)
 
       if not_associated_name && not_associated_type
         @resource.get_attr!(name, flag, request: true)

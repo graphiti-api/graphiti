@@ -39,8 +39,6 @@ module Graphiti
       if polymorphic_child?
         parent.resource.polymorphic << resource_class
       end
-
-      check! if defined?(::Rails)
     end
 
     def self.scope(&blk)
@@ -67,25 +65,8 @@ module Graphiti
       self.link_proc = blk
     end
 
-    def check!
-      return if scope_proc
-      case type
-      when :has_many, :has_one
-        unless resource.filters[foreign_key]
-          raise Errors::MissingSideloadFilter.new parent_resource_class,
-            self, foreign_key
-        end
-      when :belongs_to
-        unless resource.filters[primary_key]
-          raise Errors::MissingSideloadFilter.new parent_resource_class,
-            self, primary_key
-        end
-      when :many_to_many
-        unless resource.filters[true_foreign_key]
-          raise Errors::MissingSideloadFilter.new parent_resource_class,
-            self, true_foreign_key
-        end
-      end
+    def errors
+      @errors ||= []
     end
 
     def readable?

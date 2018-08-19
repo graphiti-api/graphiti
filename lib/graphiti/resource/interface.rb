@@ -5,7 +5,7 @@ module Graphiti
 
       class_methods do
         def all(params = {}, base_scope = nil)
-          validate!
+          validate!(params)
           _all(params, {}, base_scope)
         end
 
@@ -16,27 +16,27 @@ module Graphiti
         end
 
         def find(params, base_scope = nil)
-          validate!
+          validate!(params)
           id = params[:data].try(:[], :id) || params.delete(:id)
           params[:filter] ||= {}
-          params[:filter].merge!(id: id)
+          params[:filter].merge!(id: id) if id
 
           runner = Runner.new(self, params)
           runner.proxy(base_scope, single: true, raise_on_missing: true)
         end
 
         def build(params, base_scope = nil)
-          validate!
+          validate!(params)
           runner = Runner.new(self, params)
           runner.proxy(base_scope, single: true, raise_on_missing: true)
         end
 
         private
 
-        def validate!
+        def validate!(params)
           if context && context.respond_to?(:request)
             path = context.request.env['PATH_INFO']
-            unless allow_request?(path, context_namespace)
+            unless allow_request?(path, params, context_namespace)
               raise Errors::InvalidEndpoint.new(self, path, context_namespace)
             end
           end

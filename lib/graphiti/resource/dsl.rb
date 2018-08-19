@@ -109,6 +109,14 @@ module Graphiti
           apply_extra_attributes_to_serializer
         end
 
+        def on_extra_attribute(name, &blk)
+          if config[:extra_attributes][name]
+            config[:extra_attributes][name][:hook] = blk
+          else
+            raise Errors::ExtraAttributeNotFound.new(self, name)
+          end
+        end
+
         def all_attributes
           attributes.merge(extra_attributes)
         end

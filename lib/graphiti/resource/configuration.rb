@@ -87,7 +87,6 @@ module Graphiti
             klass.attribute :id, :integer_id
           end
           klass.stat total: [:count]
-          Graphiti.resources << klass
         end
       end
 

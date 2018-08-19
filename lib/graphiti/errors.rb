@@ -16,6 +16,19 @@ The adapter #{@adapter.class} does not implement method '#{@method}', which was 
       end
     end
 
+    class ExtraAttributeNotFound < Base
+      def initialize(resource_class, name)
+        @resource_class = resource_class
+        @name = name
+      end
+
+      def message
+        <<-MSG
+#{@resource_class.name}: called .on_extra_attribute #{@name.inspect}, but extra attribute #{@name.inspect} does not exist!
+        MSG
+      end
+    end
+
     class InvalidFilterValue < Base
       def initialize(resource, filter, value)
         @resource = resource
@@ -158,7 +171,7 @@ Graphiti.config.context_for_endpoint = ->(path, action) { ... }
 
 Either set a primary endpoint for this resource:
 
-endpoint '/my/url', [:index, :show, :create]
+primary_endpoint '/my/url', [:index, :show, :create]
 
 Or whitelist a secondary endpoint:
 

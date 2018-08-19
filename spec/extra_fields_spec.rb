@@ -2,7 +2,11 @@ require 'spec_helper'
 
 RSpec.describe 'extra_fields' do
   include_context 'resource testing'
-  let(:resource) { Class.new(PORO::EmployeeResource) }
+  let(:resource) do
+    Class.new(PORO::EmployeeResource) do
+      def self.name;'PORO::EmployeeResource';end
+    end
+  end
   let(:base_scope) { { type: :employees } }
 
   let!(:employee) { PORO::Employee.create }
@@ -24,27 +28,33 @@ RSpec.describe 'extra_fields' do
   end
 
   context 'when altering scope based on extra attrs' do
-    before do
-      resource.class_eval do
-        extra_attribute :net_worth, :integer do
+    context 'when the extra attr exists' do
+      before do
+        resource.extra_attribute :net_worth, :integer do
           100_000
         end
 
-        def around_scoping(scope, query_hash)
-          if query_hash[:extra_fields][type].include?(:net_worth)
-            scope = { foo: 'bar' }
-          end
-          yield scope
+        resource.on_extra_attribute :net_worth do |scope|
+          { foo: 'bar' }
         end
+      end
+
+      it 'modifies the scope' do
+        params[:extra_fields] = { employees: 'net_worth' }
+        expect(PORO::DB)
+          .to receive(:all).with(hash_including(foo: 'bar'))
+          .and_return([])
+        render
       end
     end
 
-    it 'modifies the scope' do
-      params[:extra_fields] = { employees: 'net_worth' }
-      expect(PORO::DB)
-        .to receive(:all).with(hash_including(foo: 'bar'))
-        .and_return([])
-      render
+    context 'when the extra attr does not exist' do
+      it 'raises error' do
+        expect {
+          resource.on_extra_attribute :net_worth do |scope|
+          end
+        }.to raise_error(Graphiti::Errors::ExtraAttributeNotFound, /PORO::EmployeeResource: called .on_extra_attribute :net_worth, but extra attribute :net_worth does not exist!/)
+      end
     end
   end
 

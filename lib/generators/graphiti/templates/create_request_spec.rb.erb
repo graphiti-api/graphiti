@@ -18,11 +18,11 @@ RSpec.describe "<%= type %>#create", type: :request do
     end
 
     it 'works' do
-      expect(<%= resource_klass %>).to receive(:build).and_call_original
+      expect(<%= resource_class %>).to receive(:build).and_call_original
       expect {
         make_request
-      }.to change { <%= model_klass %>.count }.by(1)
-      <%= file_name %> = <%= model_klass %>.last
+      }.to change { <%= model_class %>.count }.by(1)
+      <%= var %> = <%= model_class %>.last
       # assert on properties
       expect(response.status).to eq(201)
     end

@@ -1,14 +1,14 @@
 require 'rails_helper'
 
-RSpec.describe <%= resource_klass %>, type: :resource do
+RSpec.describe <%= resource_class %>, type: :resource do
   describe 'serialization' do
-    let!(:<%= file_name %>) { create(:<%= file_name %>) }
+    let!(:<%= var %>) { create(:<%= var %>) }
 
     it 'works' do
       render
       data = jsonapi_data[0]
-      expect(data.id).to eq(<%= file_name %>.id)
-      expect(data.jsonapi_type).to eq('<%= file_name.pluralize %>')
+      expect(data.id).to eq(<%= var %>.id)
+      expect(data.jsonapi_type).to eq('<%= type %>')
       <%- attributes.each do |a| -%>
       <%- if [:created_at, :updated_at].include?(a.name.to_sym) -%>
       expect(data.<%= a.name %>).to eq(datetime(<%= file_name %>.<%= a.name %>))
@@ -21,25 +21,25 @@ RSpec.describe <%= resource_klass %>, type: :resource do
   <%- if actions?('index') -%>
 
   describe 'filtering' do
-    let!(:<%= file_name %>1) { create(:<%= file_name %>) }
-    let!(:<%= file_name %>2) { create(:<%= file_name %>) }
+    let!(:<%= var %>1) { create(:<%= var %>) }
+    let!(:<%= var %>2) { create(:<%= var %>) }
 
     context 'by id' do
       before do
-        params[:filter] = { id: { eq: <%= file_name %>2.id } }
+        params[:filter] = { id: { eq: <%= var %>2.id } }
       end
 
       it 'works' do
         render
-        expect(d.map(&:id)).to eq([<%= file_name %>2.id])
+        expect(d.map(&:id)).to eq([<%= var %>2.id])
       end
     end
   end
 
   describe 'sorting' do
     context 'by id descending' do
-      let!(:<%= file_name %>1) { create(:<%= file_name %>) }
-      let!(:<%= file_name %>2) { create(:<%= file_name %>) }
+      let!(:<%= var %>1) { create(:<%= var %>) }
+      let!(:<%= var %>2) { create(:<%= var %>) }
 
       before do
         params[:sort] = '-id'
@@ -48,8 +48,8 @@ RSpec.describe <%= resource_klass %>, type: :resource do
       it 'works' do
         render
         expect(d.map(&:id)).to eq([
-          <%= file_name %>2.id,
-          <%= file_name %>1.id
+          <%= var %>2.id,
+          <%= var %>1.id
         ])
       end
     end
