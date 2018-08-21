@@ -24,7 +24,9 @@ module Graphiti
         new_resource = @new[:resources].find { |n| n[:name] == r[:name] }
         compare_resource(r, new_resource) do
           compare_attributes(r, new_resource)
+          compare_defaults(r, new_resource)
           compare_extra_attributes(r, new_resource)
+          compare_sorts(r, new_resource)
           compare_filters(r, new_resource)
           compare_relationships(r, new_resource)
         end
@@ -54,10 +56,45 @@ module Graphiti
       end
     end
 
+    def compare_defaults(old_resource, new_resource)
+      if new_resource[:default_sort] && !old_resource[:default_sort]
+        @errors << "#{old_resource[:name]}: default sort added."
+      end
+
+      if old_resource[:default_sort] && !new_resource[:default_sort]
+        @errors << "#{old_resource[:name]}: default sort removed."
+      end
+
+      if new_resource[:default_sort] && old_resource[:default_sort]
+        if new_resource[:default_sort] != old_resource[:default_sort]
+          @errors << "#{old_resource[:name]}: default sort changed from #{old_resource[:default_sort].inspect} to #{new_resource[:default_sort].inspect}."
+        end
+      end
+
+      if new_resource[:default_page_size] && !old_resource[:default_page_size]
+        @errors << "#{old_resource[:name]}: default page size added."
+      end
+
+      if old_resource[:default_page_size] && !new_resource[:default_page_size]
+        @errors << "#{old_resource[:name]}: default page size removed."
+      end
+
+      if old_resource[:default_page_size] && new_resource[:default_page_size]
+        if old_resource[:default_page_size] != new_resource[:default_page_size]
+          @errors << "#{old_resource[:name]}: default page size changed from #{old_resource[:default_page_size]} to #{new_resource[:default_page_size]}."
+        end
+      end
+    end
+
     def compare_relationships(old_resource, new_resource)
       old_resource[:relationships].each_pair do |name, old_rel|
         unless new_rel = new_resource[:relationships][name]
           @errors << "#{old_resource[:name]}: relationship #{name.inspect} was removed."
+          next
+        end
+
+        if new_rel[:single] && !old_rel[:single]
+          @errors << "#{old_resource[:name]}: relationship #{name.inspect} became single: true."
           next
         end
 
@@ -82,6 +119,29 @@ module Graphiti
       end
     end
 
+    def compare_sorts(old_resource, new_resource)
+      old_resource[:sorts].each_pair do |name, old_sort|
+        unless new_sort = new_resource[:sorts][name]
+          @errors << "#{old_resource[:name]}: sort #{name.inspect} was removed."
+          next
+        end
+
+        if new_sort[:guard] && !old_sort[:guard]
+          @errors << "#{old_resource[:name]}: sort #{name.inspect} became guarded."
+        end
+
+        if new_sort[:only] && !old_sort[:only]
+          @errors << "#{old_resource[:name]}: sort #{name.inspect} now limited to only #{new_sort[:only].inspect}."
+        end
+
+        if new_sort[:only] && old_sort[:only]
+          if new_sort[:only] != old_sort[:only]
+            @errors << "#{old_resource[:name]}: sort #{name.inspect} was limited to only #{old_sort[:only].inspect}, now limited to only #{new_sort[:only].inspect}."
+          end
+        end
+      end
+    end
+
     def compare_filters(old_resource, new_resource)
       old_resource[:filters].each_pair do |name, old_filter|
         unless new_filter = new_resource[:filters][name]
@@ -96,6 +156,16 @@ module Graphiti
 
         if new_filter[:single] && !old_filter[:single]
           @errors << "#{old_resource[:name]}: filter #{name.inspect} became singular."
+        end
+
+        if new_filter[:dependencies] && !old_filter[:dependencies]
+          @errors << "#{old_resource[:name]}: filter #{name.inspect} added dependencies #{new_filter[:dependencies].inspect}."
+        end
+
+        if new_filter[:dependencies] && old_filter[:dependencies]
+          if new_filter[:dependencies] != old_filter[:dependenices]
+            @errors << "#{old_resource[:name]}: filter #{name.inspect} changed dependencies from #{old_filter[:dependencies].inspect} to #{new_filter[:dependencies].inspect}."
+          end
         end
 
         if new_filter[:allow] != old_filter[:allow]
@@ -182,7 +252,7 @@ module Graphiti
         @errors << "#{resource_name}: #{prefix} #{att_name.inspect} changed type from #{old_att[:type].inspect} to #{new_att[:type].inspect}."
       end
 
-      [:readable, :writable, :sortable].each do |flag|
+      [:readable, :writable].each do |flag|
         if [true, 'guarded'].include?(old_att[flag]) && new_att[flag] == false
           @errors << "#{resource_name}: #{prefix} #{att_name.inspect} changed flag #{flag.inspect} from #{old_att[flag].inspect} to #{new_att[flag].inspect}."
         end

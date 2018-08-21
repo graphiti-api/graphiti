@@ -126,12 +126,6 @@ module Graphiti
   def self.resources
     @resources ||= []
   end
-
-  def self.check!
-    resources.each do |resource|
-      resource.sideloads.values.each(&:check!)
-    end
-  end
 end
 
 require "graphiti/runner"

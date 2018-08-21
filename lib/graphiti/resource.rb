@@ -9,11 +9,25 @@ module Graphiti
     attr_reader :context
 
     def around_scoping(scope, query_hash)
+      extra_fields = query_hash[:extra_fields] || {}
+      extra_fields = extra_fields[type] || []
+      extra_fields.each do |name|
+        if config = self.class.config[:extra_attributes][name]
+          scope = instance_exec(scope, &config[:hook]) if config[:hook]
+        end
+      end
+
       yield scope
     end
 
     def serializer_for(model)
       serializer
+    end
+
+    def decorate_record(record)
+      serializer = serializer_for(record)
+      record.instance_variable_set(:@__graphiti_serializer, serializer)
+      record.instance_variable_set(:@__graphiti_resource, self)
     end
 
     def with_context(object, namespace = nil)

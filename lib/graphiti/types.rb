@@ -40,7 +40,7 @@ module Graphiti
 
     Bool = create(nil) do |input|
       input = Dry::Types['params.bool'][input]
-      Dry::Types['strict.bool'][input] if input
+      Dry::Types['strict.bool'][input] unless input.nil?
     end
 
     PresentBool = create(nil) do |input|

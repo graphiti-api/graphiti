@@ -1,63 +1,63 @@
 require 'rails_helper'
 
-RSpec.describe <%= resource_klass %>, type: :resource do
+RSpec.describe <%= resource_class %>, type: :resource do
   describe 'creating' do
     let(:payload) do
       {
         data: {
-          type: '<%= file_name.pluralize %>',
+          type: '<%= type %>',
           attributes: { }
         }
       }
     end
 
     let(:instance) do
-      <%= resource_klass %>.build(payload)
+      <%= resource_class %>.build(payload)
     end
 
     it 'works' do
       expect {
         expect(instance.save).to eq(true)
-      }.to change { <%= model_klass %>.count }.by(1)
+      }.to change { <%= model_class %>.count }.by(1)
     end
   end
 
   describe 'updating' do
-    let!(:<%= file_name %>) { create(:<%= file_name %>) }
+    let!(:<%= var %>) { create(:<%= var %>) }
 
     let(:payload) do
       {
         data: {
-          id: <%= file_name %>.id.to_s,
-          type: '<%= file_name.pluralize %>',
+          id: <%= var %>.id.to_s,
+          type: '<%= type %>',
           attributes: { } # Todo!
         }
       }
     end
 
     let(:instance) do
-      <%= resource_klass %>.find(payload)
+      <%= resource_class %>.find(payload)
     end
 
     xit 'works (add some attributes and enable this spec)' do
       expect {
         expect(instance.update_attributes).to eq(true)
-      }.to change { <%= file_name %>.reload.updated_at }
+      }.to change { <%= var %>.reload.updated_at }
       # and change { instance.foo }.to('bar') <- example
     end
   end
 
   describe 'destroying' do
-    let!(:<%= file_name %>) { create(:<%= file_name %>) }
+    let!(:<%= var %>) { create(:<%= var %>) }
 
     let(:instance) do
-      <%= resource_klass %>.find(id: <%= file_name %>.id)
+      <%= resource_class %>.find(id: <%= var %>.id)
     end
 
     it 'works' do
       expect {
         expect(instance.destroy).to eq(true)
-      }.to change { <%= model_klass %>.count }.by(-1)
+      }.to change { <%= model_class %>.count }.by(-1)
     end
   end
 end

@@ -2,16 +2,16 @@ require 'rails_helper'
 
 RSpec.describe "<%= type %>#update", type: :request do
   subject(:make_request) do
-    jsonapi_put "/<%= api_namespace %>/v1/<%= type %>/#{<%= file_name %>.id}", payload
+    jsonapi_put "/<%= api_namespace %>/v1/<%= type %>/#{<%= var %>.id}", payload
   end
 
   describe 'basic update' do
-    let!(:<%= file_name %>) { create(:<%= file_name %>) }
+    let!(:<%= var %>) { create(:<%= var %>) }
 
     let(:payload) do
       {
         data: {
-          id: <%= file_name %>.id.to_s,
+          id: <%= var %>.id.to_s,
           type: '<%= type %>',
           attributes: {
             # ... your attrs here
@@ -22,10 +22,10 @@ RSpec.describe "<%= type %>#update", type: :request do
 
     # Replace 'xit' with 'it' after adding attributes
     xit 'updates the resource' do
-      expect(<%= resource_klass %>).to receive(:find).and_call_original
+      expect(<%= resource_class %>).to receive(:find).and_call_original
       expect {
         make_request
-      }.to change { <%= file_name %>.reload.attributes }
+      }.to change { <%= var %>.reload.attributes }
       expect(response.status).to eq(200)
 
       # ... assert updates attributes ...

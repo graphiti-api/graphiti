@@ -1,6 +1,6 @@
 module Graphiti
   class Query
-    attr_reader :resource, :include_hash, :association_name
+    attr_reader :resource, :include_hash, :association_name, :params
 
     def initialize(resource, params, association_name = nil, nested_include = nil, parents = [])
       @resource = resource
@@ -29,17 +29,17 @@ module Graphiti
       end
     end
 
-    def to_hash
-      {}.tap do |hash|
-        hash[:filter] = filters unless filters.empty?
-        hash[:sort] = sorts unless sorts.empty?
-        hash[:page] = pagination unless pagination.empty?
+    def hash
+      @hash ||= {}.tap do |h|
+        h[:filter] = filters unless filters.empty?
+        h[:sort] = sorts unless sorts.empty?
+        h[:page] = pagination unless pagination.empty?
         unless association?
-          hash[:fields] = fields unless fields.empty?
-          hash[:extra_fields] = extra_fields unless extra_fields.empty?
+          h[:fields] = fields unless fields.empty?
+          h[:extra_fields] = extra_fields unless extra_fields.empty?
         end
-        hash[:stats] = stats unless stats.empty?
-        hash[:include] = sideload_hash unless sideload_hash.empty?
+        h[:stats] = stats unless stats.empty?
+        h[:include] = sideload_hash unless sideload_hash.empty?
       end
     end
 
@@ -53,7 +53,7 @@ module Graphiti
       @sideload_hash = begin
         {}.tap do |hash|
           sideloads.each_pair do |key, value|
-            hash[key] = sideloads[key].to_hash
+            hash[key] = sideloads[key].hash
           end
         end
       end
@@ -66,6 +66,7 @@ module Graphiti
             sideload = @resource.class.sideload(key)
             if sideload
               _parents = parents + [self]
+              sub_hash = sub_hash[:include] if sub_hash.has_key?(:include)
               hash[key] = Query.new(sideload.resource, @params, key, sub_hash, _parents)
             else
               handle_missing_sideload(key)
@@ -163,6 +164,8 @@ module Graphiti
 
         whitelist ? Util::IncludeParams.scrub(requested, whitelist) : requested
       end
+
+      @include_hash
     end
 
     def stats
@@ -182,17 +185,25 @@ module Graphiti
 
     private
 
+    # Try to find on this resource
+    # If not there, follow the legacy logic of scalling all other
+    # resource names/types
+    # TODO: Eventually, remove the legacy logic
     def validate!(name, flag)
       return false if name.to_s.include?('.') # nested
 
-      not_associated_name = !@resource.class.association_names.include?(name)
-      not_associated_type = !@resource.class.association_types.include?(name)
+      if att = @resource.get_attr(name, flag, request: true)
+        return att
+      else
+        not_associated_name = !@resource.class.association_names.include?(name)
+        not_associated_type = !@resource.class.association_types.include?(name)
 
-      if not_associated_name && not_associated_type
-        @resource.get_attr!(name, flag, request: true)
-        return true
+        if not_associated_name && not_associated_type
+          @resource.get_attr!(name, flag, request: true)
+          return true
+        end
+        false
       end
-      false
     end
 
     def nested?(name)

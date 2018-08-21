@@ -20,17 +20,32 @@ module Graphiti
     end
 
     def missing_required_filters
-      required_attributes - filter_param.keys
+      required_filters - filter_param.keys
     end
 
-    def required_attributes
+    def required_filters
       resource.filters.map do |k, v|
         k if v[:required]
       end.compact
     end
 
-    def required_filters_provided?
-      missing_required_filters.empty?
+    def missing_dependent_filters
+      [].tap do |arr|
+        filter_param.each_pair do |key, value|
+          if df = dependent_filters[key]
+            missing = df[:dependencies] - filter_param.keys
+            unless missing.length.zero?
+              arr << { filter: df, missing: missing }
+            end
+          end
+        end
+      end
+    end
+
+    def dependent_filters
+      resource.filters.select do |k, v|
+        v[:dependencies].present?
+      end
     end
   end
 end

@@ -31,6 +31,7 @@ module Graphiti
       @writable              = opts[:writable]
       @as                    = opts[:as]
       @link                  = opts[:link]
+      @single                = opts[:single]
 
       # polymorphic-specific
       @group_name            = opts[:group_name]
@@ -39,8 +40,6 @@ module Graphiti
       if polymorphic_child?
         parent.resource.polymorphic << resource_class
       end
-
-      check! if defined?(::Rails)
     end
 
     def self.scope(&blk)
@@ -67,25 +66,8 @@ module Graphiti
       self.link_proc = blk
     end
 
-    def check!
-      return if scope_proc
-      case type
-      when :has_many, :has_one
-        unless resource.filters[foreign_key]
-          raise Errors::MissingSideloadFilter.new parent_resource_class,
-            self, foreign_key
-        end
-      when :belongs_to
-        unless resource.filters[primary_key]
-          raise Errors::MissingSideloadFilter.new parent_resource_class,
-            self, primary_key
-        end
-      when :many_to_many
-        unless resource.filters[true_foreign_key]
-          raise Errors::MissingSideloadFilter.new parent_resource_class,
-            self, true_foreign_key
-        end
-      end
+    def errors
+      @errors ||= []
     end
 
     def readable?
@@ -94,6 +76,10 @@ module Graphiti
 
     def writable?
       !!@writable
+    end
+
+    def single?
+      !!@single
     end
 
     def link?
@@ -159,7 +145,7 @@ module Graphiti
       params_proc.call(params, parents) if params_proc
       opts = load_options(parents, query)
       proxy = resource.class._all(params, opts, base_scope)
-      pre_load_proc.call(proxy) if pre_load_proc
+      pre_load_proc.call(proxy, parents) if pre_load_proc
       proxy.to_a
     end
 
@@ -197,6 +183,10 @@ module Graphiti
     end
 
     def resolve(parents, query)
+      if single? && parents.length > 1
+        raise Errors::SingularSideload.new(self, parents.length)
+      end
+
       if self.class.scope_proc
         sideload_scope = fire_scope(parents)
         sideload_scope = Scope.new sideload_scope,
@@ -264,6 +254,7 @@ module Graphiti
       {}.tap do |opts|
         opts[:default_paginate] = false
         opts[:sideload_parent_length] = parents.length
+        opts[:query] = query
         opts[:after_resolve] = ->(results) {
           fire_assign(parents, results)
         }

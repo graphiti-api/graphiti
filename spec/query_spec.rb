@@ -19,8 +19,8 @@ RSpec.describe Graphiti::Query do
     department_resource.attribute :description, :string
   end
 
-  describe '#to_hash' do
-    subject(:hash) { instance.to_hash }
+  describe '#hash' do
+    subject(:hash) { instance.hash }
 
     before do
       params[:include] = 'positions.department'

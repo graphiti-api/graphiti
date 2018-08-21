@@ -448,6 +448,7 @@ RSpec.describe Graphiti::Sideload do
       expected = {
         default_paginate: false,
         sideload_parent_length: 2,
+        query: anything,
         after_resolve: anything
       }
       expect(resource_class).to receive(:_all)
@@ -482,16 +483,20 @@ RSpec.describe Graphiti::Sideload do
       let(:parents) { [] }
 
       before do
-        allow(instance).to receive(:load_params) { { sort: '-id' } }
+        params[:sort] = '-id'
         allow(resource_class).to receive(:_all).and_call_original
-        instance.class.pre_load do |proxy|
+        instance.class.pre_load do |proxy, parents|
           proxy.scope.object[:modified] = true
+          proxy.scope.object[:parents] = parents
         end
       end
 
       it 'is respected' do
         expect(PORO::DB).to receive(:all).with({
-          type: :positions, modified: true, sort: [{ id: :desc }]
+          type: :positions,
+          modified: true,
+          sort: [{ id: :desc }],
+          parents: []
         }).and_return([])
         instance.load(parents, query)
       end

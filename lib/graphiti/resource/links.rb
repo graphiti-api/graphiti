@@ -19,9 +19,11 @@ module Graphiti
         :base_url,
         :endpoint_namespace,
         :secondary_endpoints,
-        :autolink
+        :autolink,
+        :validate_endpoints
       self.secondary_endpoints = []
       self.autolink = true
+      self.validate_endpoints = true
 
       class << self
         prepend Overrides
@@ -66,9 +68,10 @@ module Graphiti
         ([endpoint] + secondary_endpoints).compact
       end
 
-      def allow_request?(path, action)
+      def allow_request?(path, params, action)
         endpoints.any? do |e|
-          if [:update, :show, :destroy].include?(context_namespace)
+          has_id = params[:id] || params[:data].try(:[], :id)
+          if [:update, :show, :destroy].include?(context_namespace) && has_id
             path = path.split('/')
             path.pop
             path = path.join('/')

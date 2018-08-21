@@ -84,9 +84,18 @@ module Graphiti
           type: r.type.to_s,
           attributes: attributes(r),
           extra_attributes: extra_attributes(r),
+          sorts: sorts(r),
           filters: filters(r),
           relationships: relationships(r)
         }
+
+        if r.default_sort
+          config[:default_sort] = r.default_sort
+        end
+
+        if r.default_page_size
+          config[:default_page_size] = r.default_page_size
+        end
 
         if r.polymorphic?
           config.merge!(polymorphic: true, children: r.children.map(&:name))
@@ -99,12 +108,11 @@ module Graphiti
     def attributes(resource)
       {}.tap do |attrs|
         resource.attributes.each_pair do |name, config|
-          if config.values_at(:readable, :writable, :sortable).any?
+          if config.values_at(:readable, :writable).any?
             attrs[name] = {
               type:       config[:type].to_s,
               readable:   flag(config[:readable]),
-              writable:   flag(config[:writable]),
-              sortable:   flag(config[:sortable])
+              writable:   flag(config[:writable])
             }
           end
         end
@@ -130,6 +138,20 @@ module Graphiti
       end
     end
 
+    def sorts(resource)
+      {}.tap do |s|
+        resource.sorts.each_pair do |name, sort|
+          config = {}
+          config[:only] = sort[:only] if sort[:only]
+          attr = resource.attributes[name]
+          if attr[:sortable].is_a?(Symbol)
+            config[:guard] = true
+          end
+          s[name] = config
+        end
+      end
+    end
+
     def filters(resource)
       {}.tap do |f|
         resource.filters.each_pair do |name, filter|
@@ -137,9 +159,11 @@ module Graphiti
             type: filter[:type].to_s,
             operators: filter[:operators].keys.map(&:to_s)
           }
+
           config[:single] = true if filter[:single]
-          config[:allow] = filter[:allow] if filter[:allow]
-          config[:reject] = filter[:reject] if filter[:reject]
+          config[:allow] = filter[:allow].map(&:to_s) if filter[:allow]
+          config[:reject] = filter[:reject].map(&:to_s) if filter[:reject]
+          config[:dependencies] = filter[:dependencies].map(&:to_s) if filter[:dependencies]
 
           attr = resource.attributes[name]
           if attr[:filterable].is_a?(Symbol)
@@ -163,6 +187,10 @@ module Graphiti
               .map(&:resource).map(&:class).map(&:name)
           else
             schema[:resource] = config.resource.class.name
+          end
+
+          if config.single?
+            schema[:single] = true
           end
 
           r[name] = schema

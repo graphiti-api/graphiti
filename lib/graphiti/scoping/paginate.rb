@@ -23,14 +23,14 @@ module Graphiti
   # We should use the default unless the user has customized.
   # @see Resource.paginate
   class Scoping::Paginate < Scoping::Base
-    MAX_PAGE_SIZE = 1_000
+    DEFAULT_PAGE_SIZE = 20
 
     # Apply the pagination logic. Raise error if over the max page size.
     # @return the scope object we are chaining/modifying
     def apply
-      if size > MAX_PAGE_SIZE
+      if size > resource.max_page_size
         raise Graphiti::Errors::UnsupportedPageSize
-          .new(size, MAX_PAGE_SIZE)
+          .new(size, resource.max_page_size)
       elsif requested? && @opts[:sideload_parent_length].to_i > 1
         raise Graphiti::Errors::UnsupportedPagination
       else
@@ -81,7 +81,7 @@ module Graphiti
     end
 
     def size
-      (page_param[:size] || resource.default_page_size).to_i
+      (page_param[:size] || resource.default_page_size || DEFAULT_PAGE_SIZE).to_i
     end
   end
 end

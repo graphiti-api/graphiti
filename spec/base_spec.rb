@@ -48,12 +48,12 @@ RSpec.describe Graphiti do
 
   describe '#proxy' do
     it 'returns a proxy with access to records, stats, and query' do
-      scope = double(resolve: 'resolved', resolve_stats: 'stats')
+      scope = double(resolve: ['resolved'], resolve_stats: 'stats')
       expect(instance).to receive(:jsonapi_scope).with('foo', {}) { scope }
       proxy = instance.proxy('foo')
       expect(proxy).to be_a(Graphiti::ResourceProxy)
       expect(proxy.query).to be_a(Graphiti::Query)
-      expect(proxy.to_a).to eq('resolved')
+      expect(proxy.to_a).to eq(['resolved'])
       expect(proxy.stats).to eq('stats')
     end
   end

@@ -15,8 +15,8 @@ RSpec.describe Graphiti::Resource do
       it 'sets defaults' do
         expect(klass.adapter.ancestors[0])
           .to eq(Graphiti::Adapters::Abstract)
-        expect(klass.default_sort).to eq([])
-        expect(klass.default_page_size).to eq(20)
+        expect(klass.default_sort).to be_nil
+        expect(klass.default_page_size).to be_nil
         expect(klass.attributes_readable_by_default).to eq(true)
         expect(klass.attributes_writable_by_default).to eq(true)
         expect(klass.attributes_sortable_by_default).to eq(true)
@@ -57,8 +57,8 @@ RSpec.describe Graphiti::Resource do
       it 'inherits defaults' do
         expect(klass.adapter.ancestors[0])
           .to eq(Graphiti::Adapters::Abstract)
-        expect(klass.default_sort).to eq([])
-        expect(klass.default_page_size).to eq(20)
+        expect(klass.default_sort).to be_nil
+        expect(klass.default_page_size).to be_nil
         expect(klass.attributes_readable_by_default).to eq(true)
         expect(klass.attributes_writable_by_default).to eq(true)
         expect(klass.attributes_sortable_by_default).to eq(true)
@@ -359,13 +359,19 @@ RSpec.describe Graphiti::Resource do
 
   describe '#default_sort' do
     it 'defaults' do
-      expect(instance.default_sort).to eq([])
+      expect(instance.default_sort).to be_nil
     end
   end
 
   describe '#default_page_size' do
     it 'defaults' do
-      expect(instance.default_page_size).to eq(20)
+      expect(instance.default_page_size).to be_nil
+    end
+  end
+
+  describe '#max_page_size' do
+    it 'defaults' do
+      expect(instance.max_page_size).to eq(1_000)
     end
   end
 
@@ -1038,14 +1044,27 @@ RSpec.describe Graphiti::Resource do
             end
           end
 
-          context 'that has an id' do
+          context 'that is a show route with an id' do
             before do
               request.env['PATH_INFO'] += '/123'
             end
 
             it 'works' do
               Graphiti.with_context ctx, :show do
-                expect { klass.all }.to_not raise_error
+                expect { klass.find(id: 123) }.to_not raise_error
+              end
+            end
+          end
+
+          # singular resources
+          context 'that is a show route without an id' do
+            before do
+              request.env['PATH_INFO'] += ''
+            end
+
+            it 'works' do
+              Graphiti.with_context ctx, :show do
+                expect { klass.find }.to_not raise_error
               end
             end
           end
@@ -1095,7 +1114,7 @@ RSpec.describe Graphiti::Resource do
           context 'but .allow_request? is overridden' do
             before do
               klass.class_eval do
-                def self.allow_request?(path, action)
+                def self.allow_request?(path, params, action)
                   true
                 end
               end
@@ -1117,6 +1136,26 @@ RSpec.describe Graphiti::Resource do
               expect {
                 klass.all
               }.to raise_error(Graphiti::Errors::InvalidEndpoint, /QueryAllSpec::EmployeeResource cannot be called directly from endpoint \/api\/v1\/employees/)
+            end
+          end
+
+          context 'but endpoint checks are turned off' do
+            around do |e|
+              orig = klass.validate_endpoints
+              begin
+                klass.validate_endpoints = false
+                e.run
+              ensure
+                klass.validate_endpoints = orig
+              end
+            end
+
+            it 'allows the request' do
+              Graphiti.with_context ctx, :index do
+                expect {
+                  klass.all
+                }.to_not raise_error
+              end
             end
           end
         end

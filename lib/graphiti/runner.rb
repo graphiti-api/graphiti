@@ -3,9 +3,10 @@ module Graphiti
     attr_reader :params
     include Graphiti::Base
 
-    def initialize(resource_class, params)
+    def initialize(resource_class, params, query = nil)
       @resource_class = resource_class
       @params = params
+      @query = query
     end
 
     def jsonapi_resource

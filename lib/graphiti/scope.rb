@@ -8,13 +8,13 @@ module Graphiti
       @query     = query
       @opts      = opts
 
-      @object = @resource.around_scoping(@object, query_hash) do |scope|
+      @object = @resource.around_scoping(@object, @query.hash) do |scope|
         apply_scoping(scope, opts)
       end
     end
 
     def resolve_stats
-      if query_hash[:stats]
+      if @query.hash[:stats]
         Stats::Payload.new(@resource, @query, @unpaginated_object).generate
       else
         {}
@@ -36,18 +36,13 @@ module Graphiti
       end
     end
 
-    def query_hash
-      @query_hash ||= @query.to_hash
-    end
-
     private
 
     # Used to ensure the resource's serializer is used
     # Not one derived through the usual jsonapi-rb logic
     def assign_serializer(records)
       records.each do |r|
-        serializer = @resource.serializer_for(r)
-        r.instance_variable_set(:@__serializer_klass, serializer)
+        @resource.decorate_record(r)
       end
     end
 
@@ -91,7 +86,7 @@ module Graphiti
     end
 
     def add_scoping(key, scoping_class, opts, default = {})
-      @object = scoping_class.new(@resource, query_hash, @object, opts).apply
+      @object = scoping_class.new(@resource, @query.hash, @object, opts).apply
       @unpaginated_object = @object unless key == :paginate
     end
   end

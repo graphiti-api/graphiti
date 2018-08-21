@@ -13,7 +13,9 @@ module PORO
             teams: [],
             visas: [],
             mastercards: [],
-            visa_rewards: []
+            visa_rewards: [],
+            books: [],
+            states: []
           }
       end
 
@@ -33,7 +35,9 @@ module PORO
           teams: PORO::Team,
           visas: PORO::Visa,
           mastercards: PORO::Mastercard,
-          visa_rewards: PORO::VisaReward
+          visa_rewards: PORO::VisaReward,
+          books: PORO::Book,
+          states: PORO::State
         }
       end
 
@@ -195,6 +199,14 @@ module PORO
 
   class VisaReward < Base
     attr_accessor :visa_id, :points
+  end
+
+  class Book < Base
+    attr_accessor :title, :author_id
+  end
+
+  class State < Base
+    attr_accessor :name
   end
 
   class Adapter < Graphiti::Adapters::Null
