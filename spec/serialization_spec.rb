@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe 'serialization' do
   include_context 'resource testing'
+
   let(:resource) do
     Class.new(PORO::ApplicationResource) do
       self.type = :employees
@@ -41,6 +42,81 @@ RSpec.describe 'serialization' do
       render
       expect(json['data'][0]['type']).to eq('employees')
       expect(json['data'][0]['attributes']).to eq('first_name' => 'John')
+    end
+
+    describe 'helper functions' do
+      let(:app_serializer) do
+        Class.new(JSONAPI::Serializable::Resource) do
+          def my_method
+            'bar!'
+          end
+        end
+      end
+
+      before do
+        allow(PORO::ApplicationResource).to receive(:name) { class_name }
+        PORO::Employee.create
+      end
+
+      def define_resource
+        resource.class_eval do
+          attribute :foo, :string do
+            my_method
+          end
+
+          private
+
+          def my_method
+            'foo!'
+          end
+        end
+      end
+
+      let(:class_name) { 'PORO::EmployeeResource' }
+
+      it 'can call methods on the resource' do
+        define_resource
+        render
+        expect(d[0].foo).to eq('foo!')
+      end
+
+      context 'when application serializer defined' do
+        context 'in a namespace' do
+          before do
+            stub_const('PORO::ApplicationSerializer', app_serializer)
+            define_resource
+          end
+
+          it 'can call methods on the namespaced ApplicationSerializer' do
+            render
+            expect(d[0].foo).to eq('bar!')
+          end
+        end
+
+        context 'not in a namespace' do
+          let(:class_name) { 'EmployeeResource' }
+
+          before do
+            stub_const('ApplicationSerializer', app_serializer)
+            define_resource
+          end
+
+          it 'can call methods on ApplicationSerializer' do
+            render
+            expect(d[0].foo).to eq('bar!')
+          end
+        end
+
+        context 'but not a descendent of JSONAPI::Serializable::Resource' do
+          let(:app_serializer) { double.as_null_object }
+
+          it 'cannot call methods on ApplicationSerializer' do
+            define_resource
+            render
+            expect(d[0].foo).to eq('foo!')
+          end
+        end
+      end
     end
 
     describe 'types' do
@@ -182,6 +258,14 @@ RSpec.describe 'serialization' do
           PORO::Employee.create(age: nil)
           render
           expect(attributes['age']).to eq(nil)
+        end
+
+        context 'when false' do
+          it 'renders false, not nil' do
+            PORO::Employee.create(age: false)
+            render
+            expect(attributes['age']).to eq(false)
+          end
         end
 
         context 'when cannot coerce' do

@@ -14,16 +14,17 @@ RSpec.describe Graphiti::Schema do
               id: {
                 type: 'integer_id',
                 readable: true,
-                writable: true,
-                sortable: true
+                writable: true
               },
               first_name: {
                 type: 'string',
                 readable: true,
-                writable: true,
-                sortable: true
-                #description: 'todo'
+                writable: true
               }
+            },
+            sorts: {
+              id: { },
+              first_name: { }
             },
             filters: {
               id: {
@@ -250,13 +251,13 @@ RSpec.describe Graphiti::Schema do
     context 'when attribute is not sortable' do
       before do
         employee_resource.class_eval do
-          attribute :first_name, :string, sortable: false
+          attribute :foo, :string, sortable: false
         end
       end
 
-      it 'is reflected in the schema' do
-        expect(schema[:resources][0][:attributes][:first_name][:sortable])
-          .to eq(false)
+      it 'is not in the schema' do
+        expect(schema[:resources][0][:attributes]).to have_key(:foo)
+        expect(schema[:resources][0][:sorts]).to_not have_key(:foo)
       end
     end
 
@@ -283,6 +284,17 @@ RSpec.describe Graphiti::Schema do
       it 'returns :guarded, not the runtime method' do
         expect(schema[:resources][0][:attributes][:first_name][:readable])
           .to eq('guarded')
+      end
+    end
+
+    context 'when attribute is only sortable in one direction' do
+      before do
+        employee_resource.sort :foo, :string, only: :asc
+      end
+
+      it 'is reflected in the schema' do
+        expect(schema[:resources][0][:sorts][:foo][:only])
+          .to eq(:asc)
       end
     end
 
@@ -367,7 +379,7 @@ RSpec.describe Graphiti::Schema do
     context 'when the filter has a whitelist' do
       before do
         employee_resource.class_eval do
-          filter :first_name, allow: ['foo']
+          filter :first_name, allow: [:foo]
         end
       end
 
@@ -380,13 +392,24 @@ RSpec.describe Graphiti::Schema do
     context 'when the filter has a blacklist' do
       before do
         employee_resource.class_eval do
-          filter :first_name, reject: ['bar']
+          filter :first_name, reject: [:bar]
         end
       end
 
       it 'is marked as such' do
         expect(schema[:resources][0][:filters][:first_name][:reject])
           .to eq(['bar'])
+      end
+    end
+
+    context 'when the filter has dependencies' do
+      before do
+        employee_resource.filter :first_name, :string, dependent: [:foo]
+      end
+
+      it 'reflects them in the schema' do
+        expect(schema[:resources][0][:filters][:first_name][:dependencies])
+          .to eq(['foo'])
       end
     end
 
@@ -400,6 +423,40 @@ RSpec.describe Graphiti::Schema do
       it 'returns :guarded, not the runtime method' do
         expect(schema[:resources][0][:extra_attributes][:net_sales][:readable])
           .to eq('guarded')
+      end
+    end
+
+    context 'when a default sort' do
+      before do
+        employee_resource.default_sort = [{ foo: :asc }]
+      end
+
+      it 'is present in the resource schema' do
+        expect(schema[:resources][0][:default_sort])
+          .to eq([{ foo: :asc }])
+      end
+    end
+
+    context 'when a default page size' do
+      before do
+        employee_resource.default_page_size = 10
+      end
+
+      it 'is present in the resource schema' do
+        expect(schema[:resources][0][:default_page_size]).to eq(10)
+      end
+    end
+
+    context 'when sideload is single: true' do
+      before do
+        employee_resource.has_many :positions,
+          single: true,
+          resource: position_resource
+      end
+
+      it 'is reflected in the schema' do
+        expect(schema[:resources][0][:relationships][:positions][:single])
+          .to eq(true)
       end
     end
 

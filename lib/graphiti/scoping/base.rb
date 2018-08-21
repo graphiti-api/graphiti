@@ -6,7 +6,7 @@ module Graphiti
     # a default if not part of the user request.
     #
     # @attr_reader [Resource] resource The corresponding Resource instance
-    # @attr_reader [Hash] query_hash the Query#to_hash node relevant to the current resource
+    # @attr_reader [Hash] query_hash the Query#hash node relevant to the current resource
     #
     # @see Scoping::DefaultFilter
     # @see Scoping::ExtraFields
@@ -15,7 +15,7 @@ module Graphiti
     # @see Scoping::Sort
     # @see Scope#initialize
     # @see Scope#query_hash
-    # @see Query#to_hash
+    # @see Query#hash
     class Base
       attr_reader :resource, :query_hash
 

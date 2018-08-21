@@ -2,7 +2,11 @@ require 'spec_helper'
 
 RSpec.describe 'sorting' do
   include_context 'resource testing'
-  let(:resource) { Class.new(PORO::EmployeeResource) }
+  let(:resource) do
+    Class.new(PORO::EmployeeResource) do
+      def self.name;'PORO::EmployeeResource';end
+    end
+  end
   let(:base_scope) { { type: :employees } }
 
   subject(:ids) { records.map(&:id) }
@@ -30,7 +34,7 @@ RSpec.describe 'sorting' do
     it 'raises helpful error' do
       expect {
         ids
-      }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :asdf, but could not find an attribute with that name.')
+      }.to raise_error(Graphiti::Errors::AttributeError, 'PORO::EmployeeResource: Tried to sort on attribute :asdf, but could not find an attribute with that name.')
     end
 
     context 'but there is a corresponding extra attribute' do
@@ -42,7 +46,7 @@ RSpec.describe 'sorting' do
         it 'raises helpful error' do
           expect {
             ids
-          }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :asdf, but the attribute was marked :sortable => false.')
+          }.to raise_error(Graphiti::Errors::AttributeError, 'PORO::EmployeeResource: Tried to sort on attribute :asdf, but the attribute was marked :sortable => false.')
         end
       end
 
@@ -71,7 +75,49 @@ RSpec.describe 'sorting' do
       params[:sort] = 'foo'
       expect {
         ids
-      }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :foo, but the attribute was marked :sortable => false.')
+      }.to raise_error(Graphiti::Errors::AttributeError, 'PORO::EmployeeResource: Tried to sort on attribute :foo, but the attribute was marked :sortable => false.')
+    end
+  end
+
+  context 'when sort supports only one direction' do
+    context 'via attribute' do
+
+    end
+
+    context 'via custom sort' do
+      before do
+        resource.sort :foo, :string, only: :asc do |scope|
+          scope
+        end
+      end
+
+      it 'marks the sort as such' do
+        expect(resource.sorts[:foo][:only]).to eq(:asc)
+      end
+
+      context 'and supported sort is passed' do
+        before do
+          params[:sort] = 'foo'
+        end
+
+        it 'works' do
+          expect {
+            render
+          }.to_not raise_error
+        end
+      end
+
+      context 'and unsupported sort is passed' do
+        before do
+          params[:sort] = '-foo'
+        end
+
+        it 'raises error' do
+          expect {
+            render
+          }.to raise_error(Graphiti::Errors::UnsupportedSort, /PORO::EmployeeResource: tried to sort on attribute :foo, but passed :desc when only :asc is supported./)
+        end
+      end
     end
   end
 
@@ -110,7 +156,7 @@ RSpec.describe 'sorting' do
       it 'raises helpful error' do
         expect {
           ids
-        }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to sort on attribute :first_name, but the guard :admin? did not pass.')
+        }.to raise_error(Graphiti::Errors::AttributeError, 'PORO::EmployeeResource: Tried to sort on attribute :first_name, but the guard :admin? did not pass.')
       end
     end
   end
@@ -140,7 +186,7 @@ RSpec.describe 'sorting' do
           expect {
             resource.sort :foo do |scope, dir|
             end
-          }.to raise_error(Graphiti::Errors::AttributeError, 'AnonymousResourceClass: Tried to add sort attribute :foo, but the attribute was marked :sortable => false.')
+          }.to raise_error(Graphiti::Errors::AttributeError, 'PORO::EmployeeResource: Tried to add sort attribute :foo, but the attribute was marked :sortable => false.')
         end
       end
     end

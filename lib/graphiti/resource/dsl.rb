@@ -18,10 +18,12 @@ module Graphiti
             required = att[:filterable] == :required || !!opts[:required]
             config[:filters][name.to_sym] = {
               aliases: aliases,
+              name: name.to_sym,
               type: att[:type],
               allow: opts[:allow],
               reject: opts[:reject],
               single: !!opts[:single],
+              dependencies: opts[:dependent],
               required: required,
               operators: operators.to_hash
             }
@@ -47,7 +49,9 @@ module Graphiti
           opts = args.extract_options!
 
           if get_attr(name, :sortable, raise_error: :only_unsupported)
-            config[:sorts][name] = blk
+            config[:sorts][name] = {
+              proc: blk
+            }.merge(opts.slice(:only))
           else
             if type = args[0]
               attribute name, type, only: [:sortable]
@@ -91,7 +95,8 @@ module Graphiti
           options[:proc] = blk
           config[:attributes][name] = options
           apply_attributes_to_serializer
-          filter(name) if options[:filterable]
+          options[:filterable] ? filter(name) : config[:filters].delete(name)
+          options[:sortable] ? sort(name) : config[:sorts].delete(name)
         end
 
         def extra_attribute(name, type, options = {}, &blk)

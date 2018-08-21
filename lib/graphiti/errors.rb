@@ -16,6 +16,40 @@ The adapter #{@adapter.class} does not implement method '#{@method}', which was 
       end
     end
 
+    class SingularSideload < Base
+      def initialize(sideload, parent_length)
+        @sideload = sideload
+        @parent_length = parent_length
+      end
+
+      def message
+        <<-MSG
+#{@sideload.parent_resource.class.name}: tried to sideload #{@sideload.name.inspect}, but more than one #{@sideload.parent_resource.model.name} was passed!
+
+This is because you marked the sideload #{@sideload.name.inspect} with single: true
+
+You might have done this because the sideload can only be loaded from a :show endpoint, and :index would be too expensive.
+
+Remove the single: true option to bypass this error.
+        MSG
+      end
+    end
+
+    class UnsupportedSort < Base
+      def initialize(resource, attribute, whitelist, direction)
+        @resource = resource
+        @attribute = attribute
+        @whitelist = whitelist
+        @direction = direction
+      end
+
+      def message
+        <<-MSG
+#{@resource.class.name}: tried to sort on attribute #{@attribute.inspect}, but passed #{@direction.inspect} when only #{@whitelist.inspect} is supported.
+        MSG
+      end
+    end
+
     class ExtraAttributeNotFound < Base
       def initialize(resource_class, name)
         @resource_class = resource_class
@@ -360,15 +394,33 @@ Expecting filter #{@filter.inspect} on #{@sideload.resource.class.name}.
       end
     end
 
+    class MissingDependentFilter < Base
+      def initialize(resource, filters)
+        @resource = resource
+        @filters = filters
+      end
+
+      def message
+        msg = "#{@resource.class.name}: The following filters had dependencies that were not passed:"
+        @filters.each do |f|
+          msg << "\n#{f[:filter][:name].inspect} - dependent on #{f[:filter][:dependencies].inspect}, but #{f[:missing].inspect} not passed."
+        end
+        msg
+      end
+    end
+
     class ResourceNotFound < Base
-      def initialize(resource_class, sideload_name)
+      def initialize(resource_class, sideload_name, tried)
         @resource_class = resource_class
         @sideload_name = sideload_name
+        @tried = tried
       end
 
       def message
         <<-MSG
 Could not find resource class for sideload '#{@sideload_name}' on Resource '#{@resource_class.name}'!
+
+Tried to find classes: #{@tried.join(', ')}
 
 If this follows a non-standard naming convention, use the :resource option to pass it directly:
 
@@ -408,13 +460,13 @@ Consider using a named relationship instead, e.g. 'has_one :top_comment'
     end
 
     class InvalidInclude < Base
-      def initialize(relationship, parent_resource)
+      def initialize(resource_class, relationship)
+        @resource_class = resource_class
         @relationship = relationship
-        @parent_resource = parent_resource
       end
 
       def message
-        "The requested included relationship \"#{@relationship}\" is not supported on resource \"#{@parent_resource}\""
+"#{@resource_class.name}: The requested included relationship \"#{@relationship}\" is not supported."
       end
     end
 

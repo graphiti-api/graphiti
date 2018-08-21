@@ -3,6 +3,8 @@ module Graphiti
     module Configuration
       extend ActiveSupport::Concern
 
+      DEFAULT_MAX_PAGE_SIZE = 1_000
+
       module Overrides
         def serializer=(val)
           if val
@@ -52,6 +54,7 @@ module Graphiti
           :serializer,
           :default_page_size,
           :default_sort,
+          :max_page_size,
           :attributes_readable_by_default,
           :attributes_writable_by_default,
           :attributes_sortable_by_default,
@@ -67,13 +70,12 @@ module Graphiti
           super
           klass.config = Util::Hash.deep_dup(config)
           klass.adapter ||= Adapters::Abstract
-          klass.default_sort ||= []
-          klass.default_page_size ||= 20
+          klass.max_page_size ||= DEFAULT_MAX_PAGE_SIZE
           # re-assigning causes a new Class.new
           if klass.serializer
             klass.serializer = klass.serializer
           else
-            klass.serializer = JSONAPI::Serializable::Resource
+            klass.serializer = klass.infer_serializer_superclass
           end
           klass.type ||= klass.infer_type
           default(klass, :attributes_readable_by_default, true)
@@ -87,6 +89,7 @@ module Graphiti
             klass.attribute :id, :integer_id
           end
           klass.stat total: [:count]
+          Graphiti.resources << klass
         end
       end
 
@@ -127,6 +130,23 @@ module Graphiti
 
         def infer_model
           name.gsub('Resource', '').safe_constantize if name
+        end
+
+        # @api private
+        def infer_serializer_superclass
+          serializer_class = JSONAPI::Serializable::Resource
+          namespace = Util::Class.namespace_for(self)
+          app_serializer = "#{namespace}::ApplicationSerializer"
+            .safe_constantize
+          app_serializer ||= "ApplicationSerializer".safe_constantize
+
+          if app_serializer
+            if app_serializer.ancestors.include?(serializer_class)
+              serializer_class = app_serializer
+            end
+          end
+
+          serializer_class
         end
 
         def default(object, attr, value)

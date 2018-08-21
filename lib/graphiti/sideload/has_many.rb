@@ -4,7 +4,7 @@ class Graphiti::Sideload::HasMany < Graphiti::Sideload
   end
 
   def load_params(parents, query)
-    query.to_hash.tap do |hash|
+    query.hash.tap do |hash|
       hash[:filter] ||= {}
       hash[:filter].merge!(base_filter(parents))
     end

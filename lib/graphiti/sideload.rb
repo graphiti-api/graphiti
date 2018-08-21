@@ -31,6 +31,7 @@ module Graphiti
       @writable              = opts[:writable]
       @as                    = opts[:as]
       @link                  = opts[:link]
+      @single                = opts[:single]
 
       # polymorphic-specific
       @group_name            = opts[:group_name]
@@ -75,6 +76,10 @@ module Graphiti
 
     def writable?
       !!@writable
+    end
+
+    def single?
+      !!@single
     end
 
     def link?
@@ -140,7 +145,7 @@ module Graphiti
       params_proc.call(params, parents) if params_proc
       opts = load_options(parents, query)
       proxy = resource.class._all(params, opts, base_scope)
-      pre_load_proc.call(proxy) if pre_load_proc
+      pre_load_proc.call(proxy, parents) if pre_load_proc
       proxy.to_a
     end
 
@@ -178,6 +183,10 @@ module Graphiti
     end
 
     def resolve(parents, query)
+      if single? && parents.length > 1
+        raise Errors::SingularSideload.new(self, parents.length)
+      end
+
       if self.class.scope_proc
         sideload_scope = fire_scope(parents)
         sideload_scope = Scope.new sideload_scope,
@@ -245,6 +254,7 @@ module Graphiti
       {}.tap do |opts|
         opts[:default_paginate] = false
         opts[:sideload_parent_length] = parents.length
+        opts[:query] = query
         opts[:after_resolve] = ->(results) {
           fire_assign(parents, results)
         }

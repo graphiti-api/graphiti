@@ -71,12 +71,6 @@ module Graphiti
       opts = {}
       opts[:actions] = @options[:actions] if @options[:actions]
       invoke 'graphiti:resource_test', [resource_klass], opts
-
-      #to = File.join("spec/resources/#{file_name}", class_path, "reads_spec.rb")
-      #template('resource_reads_spec.rb.erb', to)
-
-      #to = File.join("spec/resources/#{file_name}", class_path, "writes_spec.rb")
-      #template('resource_writes_spec.rb.erb', to)
     end
 
     def generate_api_specs

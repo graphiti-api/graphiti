@@ -57,7 +57,7 @@ RSpec.describe <%= resource_class %>, type: :resource do
     it 'works' do
       expect {
         expect(instance.destroy).to eq(true)
-      }.to change { <%= model_klass %>.count }.by(-1)
+      }.to change { <%= model_class %>.count }.by(-1)
     end
   end
 end

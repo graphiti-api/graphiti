@@ -7,8 +7,9 @@ module Graphiti
     # To ensure we always render with the *resource* serializer
     module RendererOverrides
       def _build(object, exposures, klass)
-        klass = object.instance_variable_get(:@__serializer_klass)
-        klass.new(exposures.merge(object: object))
+        resource = object.instance_variable_get(:@__graphiti_resource)
+        klass = object.instance_variable_get(:@__graphiti_serializer)
+        klass.new(exposures.merge(object: object, resource: resource))
       end
     end
 
@@ -21,12 +22,14 @@ module Graphiti
             nil
           elsif resources.respond_to?(:to_ary)
             Array(resources).map do |obj|
-              klass = obj.instance_variable_get(:@__serializer_klass)
-              klass.new(@_exposures.merge(object: obj))
+              klass = obj.instance_variable_get(:@__graphiti_serializer)
+              resource = obj.instance_variable_get(:@__graphiti_resource)
+              klass.new(@_exposures.merge(object: obj, resource: resource))
             end
           else
-            klass = resources.instance_variable_get(:@__serializer_klass)
-            klass.new(@_exposures.merge(object: resources))
+            klass = resources.instance_variable_get(:@__graphiti_serializer)
+            resource = resources.instance_variable_get(:@__graphiti_resource)
+            klass.new(@_exposures.merge(object: resources, resource: resource))
           end
         end
       end
@@ -37,6 +40,15 @@ module Graphiti
     module ResourceOverrides
       def requested_relationships(fields)
         @_relationships
+      end
+
+      # Allow access to resource methods
+      def method_missing(id, *args, &blk)
+        if @resource.respond_to?(id, true)
+          @resource.send(id, *args, &blk)
+        else
+          super
+        end
       end
     end
 

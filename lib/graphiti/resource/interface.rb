@@ -11,11 +11,11 @@ module Graphiti
 
         # @api private
         def _all(params, opts, base_scope)
-          runner = Runner.new(self, params)
+          runner = Runner.new(self, params, opts.delete(:query))
           runner.proxy(base_scope, opts)
         end
 
-        def find(params, base_scope = nil)
+        def find(params = {}, base_scope = nil)
           validate!(params)
           id = params[:data].try(:[], :id) || params.delete(:id)
           params[:filter] ||= {}
@@ -34,6 +34,8 @@ module Graphiti
         private
 
         def validate!(params)
+          return unless validate_endpoints?
+
           if context && context.respond_to?(:request)
             path = context.request.env['PATH_INFO']
             unless allow_request?(path, params, context_namespace)

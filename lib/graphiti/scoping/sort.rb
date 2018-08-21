@@ -22,10 +22,16 @@ module Graphiti
     # @return the scope we are chaining/modifying
     def apply_standard_scope
       each_sort do |attribute, direction|
-        if sort = resource.sorts[attribute]
-          @scope = sort.call(@scope, direction)
+        sort = resource.sorts[attribute]
+        if sort[:only] && sort[:only] != direction
+          raise Errors::UnsupportedSort.new resource,
+            attribute, sort[:only], direction
         else
-          @scope = resource.adapter.order(@scope, attribute, direction)
+          if sort[:proc]
+            @scope = sort[:proc].call(@scope, direction)
+          else
+            @scope = resource.adapter.order(@scope, attribute, direction)
+          end
         end
       end
       @scope
@@ -54,11 +60,26 @@ module Graphiti
     def sort_param
       @sort_param ||= begin
         if query_hash[:sort].blank?
-          resource.default_sort
+          resource.default_sort || []
         else
-          query_hash[:sort]
+          normalize(query_hash[:sort])
         end
       end
+    end
+
+    def normalize(sort)
+      return sort if sort.is_a?(Array)
+      sorts = sort.split(',')
+      sorts.map do |s|
+        sort_hash(s)
+      end
+    end
+
+    def sort_hash(attr)
+      value = attr[0] == '-' ? :desc : :asc
+      key   = attr.sub('-', '').to_sym
+
+      { key => value }
     end
   end
 end

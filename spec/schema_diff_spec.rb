@@ -137,7 +137,70 @@ RSpec.describe Graphiti::SchemaDiff do
     end
 
     context 'when attribute changes sortable' do
-      include_examples 'changing attribute flag', :sortable
+      context 'from true to false' do
+        before do
+          resource_b.attribute :first_name, :string, sortable: false
+        end
+
+        it 'returns error' do
+          expect(diff).to eq([
+            "SchemaDiff::EmployeeResource: sort :first_name was removed."
+          ])
+        end
+      end
+
+      context 'from false to true' do
+        before do
+          resource_a.attribute :first_name, :string, sortable: false
+          resource_b.attribute :first_name, :string, sortable: true
+        end
+
+        it { is_expected.to eq([]) }
+      end
+
+      context 'from true to :guarded' do
+        before do
+          resource_a.attribute :first_name, :string, sortable: true
+          resource_b.attribute :first_name, :string, sortable: :admin?
+        end
+
+        it 'returns error' do
+          expect(diff).to eq([
+            "SchemaDiff::EmployeeResource: sort :first_name became guarded."
+          ])
+        end
+      end
+
+      context 'from false to :guarded' do
+        before do
+          resource_a.attribute :first_name, :string, sortable: false
+          resource_b.attribute :first_name, :string, sortable: :admin?
+        end
+
+        it { is_expected.to eq([]) }
+      end
+
+      context 'from :guarded to true' do
+        before do
+          resource_a.attribute :first_name, :string, sortable: :admin?
+          resource_b.attribute :first_name, :string, sortable: true
+        end
+
+        it { is_expected.to eq([]) }
+      end
+
+      context 'from :guarded to false' do
+        before do
+          resource_a.attribute :first_name, :string, sortable: :admin?
+          resource_b.attribute :first_name, :string, sortable: false
+        end
+
+        it 'returns error' do
+          expect(diff).to eq([
+            "SchemaDiff::EmployeeResource: sort :first_name was removed."
+          ])
+        end
+      end
     end
 
     context 'when attribute is added' do
@@ -157,6 +220,7 @@ RSpec.describe Graphiti::SchemaDiff do
       it 'returns error' do
         expect(diff).to eq([
           "SchemaDiff::EmployeeResource: attribute :foo was removed.",
+          "SchemaDiff::EmployeeResource: sort :foo was removed.",
           "SchemaDiff::EmployeeResource: filter :foo was removed."
         ])
       end
@@ -287,6 +351,138 @@ RSpec.describe Graphiti::SchemaDiff do
       it 'returns error' do
         expect(diff).to eq([
           'SchemaDiff::EmployeeResource: extra attribute :foo changed flag :readable from "guarded" to false.'
+        ])
+      end
+    end
+
+    context 'when custom sort is added' do
+      before do
+        resource_b.sort :foo, :string
+      end
+
+      it { is_expected.to eq([]) }
+    end
+
+    context 'when custom sort is removed' do
+      before do
+        resource_a.sort :foo, :string
+        resource_b.config[:sorts].delete(:foo)
+      end
+
+      it 'returns error' do
+        expect(diff).to eq([
+          'SchemaDiff::EmployeeResource: sort :foo was removed.'
+        ])
+      end
+    end
+
+    context 'when custom sort adds :only' do
+      before do
+        resource_a.sort :foo, :string
+        resource_b.sort :foo, :string, only: :asc
+      end
+
+      it 'returns error' do
+        expect(diff).to eq([
+          'SchemaDiff::EmployeeResource: sort :foo now limited to only :asc.'
+        ])
+      end
+    end
+
+    context 'when custom sort removes :only' do
+      before do
+        resource_a.sort :foo, :string, only: :asc
+        resource_b.sort :foo, :string
+      end
+
+      it { is_expected.to eq([]) }
+    end
+
+    context 'when custom sort changes :only' do
+      before do
+        resource_a.sort :foo, :string, only: :asc
+        resource_b.sort :foo, :string, only: :desc
+      end
+
+      it 'returns error' do
+        expect(diff).to eq([
+          'SchemaDiff::EmployeeResource: sort :foo was limited to only :asc, now limited to only :desc.'
+        ])
+      end
+    end
+
+    context 'when default sort is added' do
+      before do
+        resource_b.default_sort = [{ foo: :asc }]
+      end
+
+      it 'returns error' do
+        expect(diff).to eq([
+          'SchemaDiff::EmployeeResource: default sort added.'
+        ])
+      end
+    end
+
+    context 'when default sort is removed' do
+      before do
+        resource_a.default_sort = [{ foo: :asc }]
+        resource_b.default_sort = nil
+      end
+
+      it 'returns error' do
+        expect(diff).to eq([
+          'SchemaDiff::EmployeeResource: default sort removed.'
+        ])
+      end
+    end
+
+    context 'when default sort is changed' do
+      before do
+        resource_a.default_sort = [{ foo: :asc }]
+        resource_b.default_sort = [{ foo: :desc }]
+      end
+
+      it 'returns error' do
+        expect(diff).to eq([
+          'SchemaDiff::EmployeeResource: default sort changed from [{:foo=>:asc}] to [{:foo=>:desc}].'
+        ])
+      end
+    end
+
+    context 'when default page size is added' do
+      before do
+        resource_b.default_page_size = 10
+      end
+
+      it 'returns error' do
+        expect(diff).to eq([
+          'SchemaDiff::EmployeeResource: default page size added.'
+        ])
+      end
+    end
+
+    context 'when default page size is removed' do
+      before do
+        resource_a.default_page_size = 30
+        resource_b.default_page_size = nil
+      end
+
+      it 'returns error' do
+        expect(diff).to eq([
+          'SchemaDiff::EmployeeResource: default page size removed.'
+        ])
+      end
+    end
+
+    context 'when default page size changes' do
+      before do
+        resource_a.default_page_size = 30
+        resource_b.default_page_size = 10
+      end
+
+      it 'returns error' do
+        expect(diff).to eq([
+          'SchemaDiff::EmployeeResource: default page size changed from 30 to 10.'
         ])
       end
     end
@@ -507,6 +703,41 @@ RSpec.describe Graphiti::SchemaDiff do
       it { is_expected.to eq([]) }
     end
 
+    context 'when filter adds dependencies' do
+      before do
+        resource_a.filter :foo, :string
+        resource_b.filter :foo, :string, dependent: [:foo]
+      end
+
+      it 'returns error' do
+        expect(diff).to eq([
+          'SchemaDiff::EmployeeResource: filter :foo added dependencies ["foo"].'
+        ])
+      end
+    end
+
+    context 'when filter removes dependencies' do
+      before do
+        resource_a.filter :foo, :string, dependent: [:foo]
+        resource_b.filter :foo, :string
+      end
+
+      it { is_expected.to eq([]) }
+    end
+
+    context 'when filter changes dependencies'do
+      before do
+        resource_a.filter :foo, :string, dependent: [:foo]
+        resource_b.filter :foo, :string, dependent: [:bar]
+      end
+
+      it 'returns error' do
+        expect(diff).to eq([
+          'SchemaDiff::EmployeeResource: filter :foo changed dependencies from ["foo"] to ["bar"].'
+        ])
+      end
+    end
+
     context 'when relationship is added' do
       before do
         resource_b.has_many :positions, resource: position_resource
@@ -526,6 +757,34 @@ RSpec.describe Graphiti::SchemaDiff do
           'SchemaDiff::EmployeeResource: relationship :positions was removed.'
         ])
       end
+    end
+
+    context 'when relationship changes to single: true' do
+      before do
+        resource_a.has_many :positions,
+          resource: position_resource
+        resource_b.has_many :positions,
+          single: true,
+          resource: position_resource
+      end
+
+      it 'returns error' do
+        expect(diff).to eq([
+          'SchemaDiff::EmployeeResource: relationship :positions became single: true.'
+        ])
+      end
+    end
+
+    context 'when relationship removes single: true' do
+      before do
+        resource_a.has_many :positions,
+          single: true,
+          resource: position_resource
+        resource_b.has_many :positions,
+          resource: position_resource
+      end
+
+      it { is_expected.to eq([]) }
     end
 
     context 'when relationship changes resource' do

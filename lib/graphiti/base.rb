@@ -11,7 +11,7 @@ module Graphiti
     end
 
     def query_hash
-      @query_hash ||= query.to_hash
+      @query_hash ||= query.hash
     end
 
     def wrap_context

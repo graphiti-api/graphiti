@@ -122,6 +122,10 @@ module Graphiti
   def self.configure
     yield config
   end
+
+  def self.resources
+    @resources ||= []
+  end
 end
 
 require "graphiti/runner"

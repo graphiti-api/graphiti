@@ -8,6 +8,7 @@ module Graphiti
     source_root File.expand_path('../templates', __FILE__)
 
     argument :resource, type: :string
+    argument :attributes, type: :array, default: [], banner: "field[:type][:index] field[:type][:index]"
     class_option :'actions',
       type: :array,
       default: nil,
@@ -31,12 +32,12 @@ module Graphiti
 
     def generate_resource_specs
       if actions?('create', 'update', 'destroy')
-        to = "spec/resource/#{var}/writes_spec.rb.rb"
+        to = "spec/resources/#{var}/writes_spec.rb.rb"
         template('resource_writes_spec.rb.erb', to)
       end
 
       if actions?('index', 'show')
-        to = "spec/resource/#{var}/reads_spec.rb.rb"
+        to = "spec/resources/#{var}/reads_spec.rb.rb"
         template('resource_reads_spec.rb.erb', to)
       end
     end

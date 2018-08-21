@@ -27,6 +27,95 @@ RSpec.describe 'filtering' do
     expect(records.map(&:id)).to eq([employee1.id])
   end
 
+  context 'when filtering associations' do
+    context 'one level' do
+      let!(:pos1) do
+        PORO::Position.create title: 'foo',
+          employee_id: employee1.id
+      end
+      let!(:pos2) do
+        PORO::Position.create title: 'bar',
+          employee_id: employee1.id
+      end
+
+      before do
+        params[:filter] = {
+          id: employee1.id,
+          :'positions.title' => 'bar'
+        }
+        params[:include] = 'positions'
+      end
+
+      it 'works' do
+        render
+        sl = d[0].sideload(:positions)
+        expect(sl.map(&:id)).to eq([pos2.id])
+      end
+    end
+
+    context 'multiple levels' do
+      let!(:department1) { PORO::Department.create(name: 'foo') }
+      let!(:department2) { PORO::Department.create(name: 'bar') }
+      let!(:pos1) do
+        PORO::Position.create department_id: department1.id,
+          employee_id: employee1.id
+      end
+      let!(:pos2) do
+        PORO::Position.create department_id: department2.id,
+          employee_id: employee1.id
+      end
+
+      before do
+        params[:filter] = {
+          id: employee1.id,
+          :'positions.department.name' => 'bar'
+        }
+        params[:include] = 'positions.department'
+      end
+
+      it 'works' do
+        render
+        positions = d[0].sideload(:positions)
+        expect(positions[0].sideload(:department)).to be_nil
+        expect(positions[1].sideload(:department).id).to eq(department2.id)
+      end
+
+      context 'with customized sort params' do
+        before do
+          resource.has_many :positions do
+            params do |hash|
+              hash[:sort] = '-id'
+            end
+          end
+        end
+
+        it 'works' do
+          render
+          positions = d[0].sideload(:positions)
+          expect(positions[0].sideload(:department).id).to eq(department2.id)
+          expect(positions[1].sideload(:department)).to be_nil
+        end
+      end
+
+      context 'with customized filter params' do
+        before do
+          resource.has_many :positions do
+            params do |hash|
+              hash[:filter][:id] = 2
+            end
+          end
+        end
+
+        it 'works' do
+          render
+          positions = d[0].sideload(:positions)
+          expect(positions.map(&:id)).to eq([2])
+          expect(positions[0].sideload(:department).id).to eq(department2.id)
+        end
+      end
+    end
+  end
+
   context 'when only allowing single values' do
     before do
       resource.filter :first_name, :string, single: true do
@@ -198,6 +287,72 @@ RSpec.describe 'filtering' do
         it 'works' do
           expect(records.map(&:id)).to eq([employee2.id, employee3.id])
         end
+      end
+    end
+  end
+
+  context 'when attribute already defined' do
+    before do
+      resource.attribute :foo, :string
+    end
+
+    context 'and single: true passed' do
+      before do
+        resource.filter :foo, single: true
+      end
+
+      it 'is applied' do
+        expect(resource.filters[:foo][:single]).to eq(true)
+      end
+    end
+  end
+
+  context 'when dependent filter' do
+    before do
+      resource.filter :baz, :string
+      resource.filter :bar, :string, dependent: [:foo]
+      resource.filter :foo, :string, dependent: [:bar, :baz]
+    end
+
+    context 'when dependencies also passed' do
+      before do
+        params[:filter] = {
+          foo: 'a',
+          bar: 'b',
+          baz: 'c'
+        }
+      end
+
+      it 'works' do
+        expect {
+          records
+        }.to_not raise_error
+      end
+    end
+
+    context 'when dependencies not passed' do
+      before do
+        params[:filter] = { foo: 'a' }
+      end
+
+      it 'raises error' do
+        expect {
+          records
+        }.to raise_error(Graphiti::Errors::MissingDependentFilter)
+      end
+    end
+
+    context 'when querying on something unrelated' do
+      before do
+        resource.filter :another, :string do
+          eq { |scope| scope }
+        end
+      end
+
+      it 'does not raise error' do
+        expect {
+          records
+        }.to_not raise_error
       end
     end
   end

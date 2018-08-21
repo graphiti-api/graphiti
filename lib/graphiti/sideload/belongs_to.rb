@@ -4,14 +4,23 @@ class Graphiti::Sideload::BelongsTo < Graphiti::Sideload
   end
 
   def load_params(parents, query)
-    query.to_hash.tap do |hash|
+    query.hash.tap do |hash|
       hash[:filter] ||= {}
       hash[:filter].merge!(base_filter(parents))
     end
   end
 
+  def load(parents, query)
+    if ids_for_parents(parents).empty?
+      []
+    else
+      super
+    end
+  end
+
   def base_filter(parents)
-    { primary_key => ids_for_parents(parents).join(',') }
+    parent_ids = ids_for_parents(parents)
+    { primary_key => parent_ids.join(',') }
   end
 
   def assign_each(parent, children)

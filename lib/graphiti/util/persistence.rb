@@ -41,7 +41,7 @@ class Graphiti::Util::Persistence
     update_foreign_key_for_parents(parents)
 
     persisted = persist_object(@meta[:method], @attributes)
-    persisted.instance_variable_set(:@__serializer_klass, @resource.serializer)
+    @resource.decorate_record(persisted)
     assign_temp_id(persisted, @meta[:temp_id])
 
     associate_parents(persisted, parents)

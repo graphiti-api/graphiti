@@ -32,6 +32,11 @@ module Graphiti
         raise Errors::RequiredFilter.new(resource, missing_required_filters)
       end
 
+      if missing_dependent_filters.any?
+        raise Errors::MissingDependentFilter.new \
+          resource, missing_dependent_filters
+      end
+
       each_filter do |filter, operator, value|
         @scope = filter_scope(filter, operator, value)
       end
