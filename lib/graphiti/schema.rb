@@ -90,7 +90,10 @@ module Graphiti
         }
 
         if r.default_sort
-          config[:default_sort] = r.default_sort
+          default_sort = r.default_sort.map do |s|
+            { s.keys.first.to_s => s.values.first.to_s }
+          end
+          config[:default_sort] = default_sort
         end
 
         if r.default_page_size

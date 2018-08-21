@@ -444,7 +444,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it 'returns error' do
         expect(diff).to eq([
-          'SchemaDiff::EmployeeResource: default sort changed from [{:foo=>:asc}] to [{:foo=>:desc}].'
+          'SchemaDiff::EmployeeResource: default sort changed from [{:foo=>"asc"}] to [{:foo=>"desc"}].'
         ])
       end
     end

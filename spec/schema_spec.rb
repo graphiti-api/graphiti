@@ -433,7 +433,7 @@ RSpec.describe Graphiti::Schema do
 
       it 'is present in the resource schema' do
         expect(schema[:resources][0][:default_sort])
-          .to eq([{ foo: :asc }])
+          .to eq([{ 'foo' => 'asc' }])
       end
     end
 

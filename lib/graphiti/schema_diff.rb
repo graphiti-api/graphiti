@@ -163,7 +163,7 @@ module Graphiti
         end
 
         if new_filter[:dependencies] && old_filter[:dependencies]
-          if new_filter[:dependencies] != old_filter[:dependenices]
+          if new_filter[:dependencies] != old_filter[:dependencies]
             @errors << "#{old_resource[:name]}: filter #{name.inspect} changed dependencies from #{old_filter[:dependencies].inspect} to #{new_filter[:dependencies].inspect}."
           end
         end
