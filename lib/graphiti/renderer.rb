@@ -14,22 +14,31 @@ module Graphiti
     end
 
     def to_jsonapi
-      render(JSONAPI::Renderer.new).to_json
+      render(self.class.jsonapi_renderer).to_json
     end
 
     def to_json
-      render(Graphiti::HashRenderer.new(@proxy.resource)).to_json
+      render(self.class.hash_renderer(@proxy)).to_json
     end
 
     def to_xml
-      render(Graphiti::HashRenderer.new(@proxy.resource)).to_xml(root: :data)
+      render(self.class.hash_renderer(@proxy)).to_xml(root: :data)
+    end
+
+    def self.jsonapi_renderer
+      @jsonapi_renderer ||= JSONAPI::Serializable::Renderer
+        .new(JSONAPI::Renderer.new)
+    end
+
+    def self.hash_renderer(proxy)
+      implementation = Graphiti::HashRenderer.new(proxy.resource)
+      JSONAPI::Serializable::Renderer.new(implementation)
     end
 
     private
 
-    def render(implementation)
+    def render(renderer)
       notify do
-        instance = JSONAPI::Serializable::Renderer.new(implementation)
         options[:fields] = proxy.fields
         options[:expose] ||= {}
         options[:expose][:extra_fields] = proxy.extra_fields
@@ -37,7 +46,7 @@ module Graphiti
         options[:include] = proxy.include_hash
         options[:meta] ||= {}
         options[:meta].merge!(stats: proxy.stats) unless proxy.stats.empty?
-        instance.render(records, options)
+        renderer.render(records, options)
       end
     end
 

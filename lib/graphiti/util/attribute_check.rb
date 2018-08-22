@@ -56,6 +56,10 @@ module Graphiti
           attribute[flag] != :required
       end
 
+      def cache?
+        !!@cache
+      end
+
       def error_class
         Errors::AttributeError
       end
@@ -64,8 +68,15 @@ module Graphiti
         attribute[flag] != false
       end
 
+      # If running in a request context, we've already loaded everything
+      # and there's no reason to perform logic, so go through attriubte cache
+      # Otherwise, this is a performance hit during typecasting
       def attribute
-        resource.all_attributes[name]
+        @attribute ||= if request?
+          resource.class.attribute_cache[name]
+        else
+          resource.all_attributes[name]
+        end
       end
 
       def attribute?
