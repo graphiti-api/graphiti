@@ -185,6 +185,10 @@ module Graphiti
           attributes.merge(extra_attributes)
         end
 
+        def attribute_cache
+          @attribute_cache ||= all_attributes
+        end
+
         def sideloads
           config[:sideloads]
         end

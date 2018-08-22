@@ -61,7 +61,7 @@ module Graphiti
     end
 
     def typecast(name, value, flag)
-      att = get_attr!(name, flag)
+      att = get_attr!(name, flag, request: true)
       type = Graphiti::Types[att[:type]]
       return if value.nil? && type[:kind] != 'array'
       begin
