@@ -62,12 +62,11 @@ require "graphiti/util/serializer_attributes"
 require "graphiti/util/serializer_relationships"
 require "graphiti/util/class"
 require "graphiti/util/link"
-
 require 'graphiti/adapters/null'
-
 require "graphiti/extensions/extra_attribute"
 require "graphiti/extensions/boolean_attribute"
 require "graphiti/extensions/temp_id"
+require "graphiti/serializer"
 
 if defined?(ActiveRecord)
   require 'graphiti/adapters/active_record'

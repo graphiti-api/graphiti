@@ -17,7 +17,7 @@ RSpec.describe 'serialization' do
   context 'when serializer is automatically generated' do
     it 'generates a serializer class' do
       expect(resource.serializer.ancestors)
-        .to include(JSONAPI::Serializable::Resource)
+        .to include(Graphiti::Serializer)
     end
 
     it 'has same type as resource' do
@@ -46,7 +46,7 @@ RSpec.describe 'serialization' do
 
     describe 'helper functions' do
       let(:app_serializer) do
-        Class.new(JSONAPI::Serializable::Resource) do
+        Class.new(Graphiti::Serializer) do
           def my_method
             'bar!'
           end
@@ -107,7 +107,7 @@ RSpec.describe 'serialization' do
           end
         end
 
-        context 'but not a descendent of JSONAPI::Serializable::Resource' do
+        context 'but not a descendent of Graphiti::Serializer' do
           let(:app_serializer) { double.as_null_object }
 
           it 'cannot call methods on ApplicationSerializer' do
@@ -653,7 +653,7 @@ RSpec.describe 'serialization' do
 
     context 'when the resource has a different serializer than the model' do
       let(:serializer) do
-        Class.new(JSONAPI::Serializable::Resource) do
+        Class.new(Graphiti::Serializer) do
           attribute :first_name do
             'override'
           end
@@ -750,7 +750,7 @@ RSpec.describe 'serialization' do
   context 'when serializer is explicitly assigned' do
     it 'generates a serializer class' do
       expect(resource.serializer.ancestors)
-        .to include(JSONAPI::Serializable::Resource)
+        .to include(Graphiti::Serializer)
     end
 
     it 'has same type as resource' do

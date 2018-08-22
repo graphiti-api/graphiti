@@ -24,7 +24,7 @@ module Graphiti
     #     end
     #   end
     #
-    #   class SerializablePerson < JSONAPI::Serializable::Resource
+    #   class SerializablePerson < Graphiti::Serializer
     #     # ... code ...
     #     extra_attribute :net_worth do
     #       @object.assets.sum(&:value)
@@ -56,15 +56,4 @@ module Graphiti
       end
     end
   end
-end
-
-JSONAPI::Serializable::Resource.class_eval do
-  def self.inherited(klass)
-    super
-    klass.class_eval do
-      extend JSONAPI::Serializable::Resource::ConditionalFields
-    end
-  end
-
-  include Graphiti::Extensions::ExtraAttribute
 end

@@ -134,7 +134,7 @@ module Graphiti
 
         # @api private
         def infer_serializer_superclass
-          serializer_class = JSONAPI::Serializable::Resource
+          serializer_class = ::Graphiti::Serializer
           namespace = Util::Class.namespace_for(self)
           app_serializer = "#{namespace}::ApplicationSerializer"
             .safe_constantize

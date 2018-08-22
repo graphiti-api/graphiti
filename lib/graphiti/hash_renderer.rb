@@ -25,7 +25,6 @@ module Graphiti
       end
     end
   end
-  JSONAPI::Serializable::Resource.send(:include, SerializableHash)
 
   class HashRenderer
     def initialize(resource)

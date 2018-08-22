@@ -27,7 +27,3 @@ module Graphiti
     end
   end
 end
-
-JSONAPI::Serializable::Resource.class_eval do
-  include Graphiti::Extensions::BooleanAttribute
-end
