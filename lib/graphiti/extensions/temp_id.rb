@@ -20,7 +20,3 @@ module Graphiti
     end
   end
 end
-
-JSONAPI::Serializable::Resource.class_eval do
-  prepend Graphiti::SerializableTempId
-end

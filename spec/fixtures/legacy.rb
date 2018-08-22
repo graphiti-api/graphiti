@@ -151,7 +151,7 @@ module Legacy
     #has_many :tags
   end
 
-  class LegacyApplicationSerializer < JSONAPI::Serializable::Resource
+  class LegacyApplicationSerializer < Graphiti::Serializer
   end
 
   class ApplicationResource < Graphiti::Resource

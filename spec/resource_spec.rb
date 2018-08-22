@@ -48,8 +48,8 @@ RSpec.describe Graphiti::Resource do
       end
 
       it 'infers serializer and type' do
-        expect(klass.serializer.ancestors[4])
-          .to eq(JSONAPI::Serializable::Resource)
+        expect(klass.serializer.ancestors[3])
+          .to eq(Graphiti::Serializer)
         # This class has no name
         expect(klass.type).to eq(:undefined_jsonapi_type)
       end
@@ -451,7 +451,7 @@ RSpec.describe Graphiti::Resource do
 
   describe '.serializer=' do
     let(:serializer) do
-      Class.new(JSONAPI::Serializable::Resource)
+      Class.new(Graphiti::Serializer)
     end
 
     it 'assigns the serializer class' do
@@ -745,7 +745,7 @@ RSpec.describe Graphiti::Resource do
 
     context 'when readable' do
       let(:serializer) do
-        Class.new(JSONAPI::Serializable::Resource)
+        Class.new(Graphiti::Serializer)
       end
 
       before do

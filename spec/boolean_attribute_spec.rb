@@ -2,8 +2,8 @@ require 'spec_helper'
 
 RSpec.describe '.boolean_attribute' do
   let(:klass) do
-    Class.new(JSONAPI::Serializable::Resource) do
-      type 'authors'
+    Class.new(Graphiti::Serializer) do
+      type :authors
 
       boolean_attribute :celebrity?
     end

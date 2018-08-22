@@ -269,7 +269,7 @@ module PORO
     end
   end
 
-  class EmployeeSerializer < JSONAPI::Serializable::Resource
+  class EmployeeSerializer < Graphiti::Serializer
     extra_attribute :stack_ranking do
       rand(999)
     end
@@ -381,6 +381,6 @@ module PORO
     end
   end
 
-  class ApplicationSerializer < JSONAPI::Serializable::Resource
+  class ApplicationSerializer < Graphiti::Serializer
   end
 end
