@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Graphiti</title>
+  <meta name="description" content="A stylish alternative to GraphQL">
+
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="http://localhost:4000" class="navbar-brand">JSONAPI Suite</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/ruby">Docs</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/js/home">Javascript Client</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <h1 id="statistics">Statistics</h1>
+
+<p>Imagine a grid listing records. What if we want “X total records”,
+above that grid, or “average cost” elsewhere in our UI?</p>
+
+<p>These calculations are supported via <code class="highlighter-rouge">allow_stat</code>:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="n">allow_stat</span> <span class="ss">total: </span><span class="p">[</span><span class="ss">:count</span><span class="p">]</span></code></pre></figure>
+
+<p>A GET to <code class="highlighter-rouge">/api/employees?stats[total]=count</code> would return:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="p">{</span>
+  <span class="ss">data: </span><span class="p">[.</span><span class="nf">.</span><span class="o">.</span><span class="p">],</span>
+  <span class="ss">meta: </span><span class="p">{</span>
+    <span class="ss">stats: </span><span class="p">{</span>
+      <span class="ss">total: </span><span class="p">{</span>
+        <span class="ss">count: </span><span class="mi">100</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>A few ‘default calculations’ are provided: <code class="highlighter-rouge">count</code>, <code class="highlighter-rouge">sum</code>, <code class="highlighter-rouge">average</code>,
+<code class="highlighter-rouge">maximum</code> and <code class="highlighter-rouge">minimum</code>. These will work out-of-the-box with <code class="highlighter-rouge">ActiveRecord</code>.
+Alternatively, override these calculation functions:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">allow_stat</span> <span class="ss">:salary</span> <span class="k">do</span>
+  <span class="n">average</span> <span class="p">{</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="kp">attr</span><span class="o">|</span> <span class="n">scope</span><span class="p">.</span><span class="nf">average</span><span class="p">(</span><span class="kp">attr</span><span class="p">)</span> <span class="p">}</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Or support your own custom calculations:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">allow_stat</span> <span class="ss">salary: </span><span class="p">[</span><span class="ss">:average</span><span class="p">]</span> <span class="k">do</span>
+  <span class="n">standard_deviation</span> <span class="p">{</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="kp">attr</span><span class="o">|</span> <span class="p">.</span><span class="nf">.</span><span class="o">.</span> <span class="p">}</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Multiple stats are supported with one request:</p>
+
+<blockquote>
+  <p>GET /api/employees?stats[salary]=average,maximum&amp;stats[total]=count</p>
+</blockquote>
+
+<p>If you want <strong>only</strong> stats, and no records (for performance), simple pass page size 0:</p>
+
+<blockquote>
+  <p>GET /api/employees?stats[salary]=average&amp;page[size]=0</p>
+</blockquote>
+
+<p><br />
+<br /></p>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/concepts">Concepts</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Resources</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Contact us</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

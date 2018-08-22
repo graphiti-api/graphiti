@@ -1,0 +1,79 @@
+require 'spec_helper'
+
+RSpec.describe 'pagination' do
+  include_context 'resource testing'
+  let(:resource) { Class.new(PORO::EmployeeResource) }
+  let(:base_scope) { { type: :employees } }
+
+  subject(:ids) { records.map(&:id) }
+
+  before do
+    PORO::Employee.create
+    PORO::Employee.create
+    PORO::Employee.create
+    PORO::Employee.create
+  end
+
+  it 'applies default pagination' do
+    resource.class_eval do
+      self.default_page_size = 2
+    end
+    expect(ids.length).to eq(2)
+  end
+
+  context 'when requested size > 1000' do
+    before do
+      params[:page] = { size: 1_001 }
+    end
+
+    it 'raises an error' do
+      expect {
+        records
+      }.to raise_error(Graphiti::Errors::UnsupportedPageSize)
+    end
+  end
+
+  it 'limits by size, offsets by number' do
+    params[:page] = { number: 2, size: 2 }
+    expect(ids).to eq([3, 4])
+  end
+
+  # for metadata
+  context 'with page size 0' do
+    it 'should return empty array' do
+      params[:page] = { size: 0 }
+      expect(ids).to eq([])
+    end
+  end
+
+  context 'when a custom pagination function is given' do
+    before do
+      resource.class_eval do
+        paginate do |scope, page, per_page|
+          scope.merge!(page: 1, per: 0)
+        end
+      end
+    end
+
+    it 'uses the custom pagination function' do
+      expect(ids).to eq([])
+    end
+
+    context 'and it accesses runtime context' do
+      before do
+        resource.class_eval do
+          paginate do |scope, page, per_page, ctx|
+            scope.merge!(page: 1, per: ctx.runtime_limit)
+          end
+        end
+      end
+
+      it 'works' do
+        ctx = double(runtime_limit: 2).as_null_object
+        Graphiti.with_context(ctx, {}) do
+          expect(ids.length).to eq(2)
+        end
+      end
+    end
+  end
+end

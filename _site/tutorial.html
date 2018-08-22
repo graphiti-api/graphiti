@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Graphiti</title>
+  <meta name="description" content="A stylish alternative to GraphQL">
+
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="http://localhost:4000" class="navbar-brand">JSONAPI Suite</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/ruby">Docs</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/js/home">Javascript Client</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <h1 id="tutorial">Tutorial</h1>
+
+<h5 id="walking-through-customization-and-real-world-scenarios">Walking Through Customization and Real-World Scenarios</h5>
+
+<p>In this section, we’ll build an employee directory application.
+If you’re looking for a brief overview, head to the
+<a href="http://localhost:4000/quickstart">Quickstart</a>
+instead.</p>
+
+<p><img src="http://localhost:4000/assets/img/employee_directory.gif" alt="employee_directory" /></p>
+
+<p>If you get lost, you can view the code on Github:</p>
+
+<ul>
+  <li><a href="https://github.com/jsonapi-suite/employee_directory">Server</a></li>
+  <li><a href="https://github.com/jsonapi-suite/employee-directory">Client</a></li>
+</ul>
+
+<p><em>Note: each of these repos has a separate branch for step one,
+step two, etc. View the latest branch for final code, or follow along
+step-by-step</em></p>
+
+<p>The intent is to illustrate a variety of real-world use cases:</p>
+
+<ul>
+  <li>Turning 3 database tables into one cohesive search grid.</li>
+  <li>Customizing SQL queries.</li>
+  <li>Ability to filter, sort, and paginate data.</li>
+  <li>Total count</li>
+  <li>Custom Serialization</li>
+  <li>Nested CRUD of relationships, including validation errors.</li>
+</ul>
+
+<p><em>Note: to better understand the underlying code, we’ll be avoiding use
+of generators. Head to the <a href="http://localhost:4000/quickstart">Quickstart</a> for a guide on how
+to automate much of the legwork here.</em></p>
+
+<h1 id="reads"><a name="reads" href="#reads">Reads</a></h1>
+<h2 id="setup"><a name="reads-setup" href="#reads-setup">Setup</a></h2>
+
+<p>We’ll be creating an API for an Employee Directory. An <code class="highlighter-rouge">Employee</code> has many <code class="highlighter-rouge">Position</code>s (one of which is the <em>current</em> position), and a <code class="highlighter-rouge">Position</code> belongs to a <code class="highlighter-rouge">Department</code>.</p>
+
+<p>Let’s start with a basic foundation: an index endpoint (list multiple
+entities) and a show (single entity) endpoint for an Employee model.</p>
+
+<p>Code:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/employees_controller.rb</span>
+<span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">jsonapi</span> <span class="ss">resource: </span><span class="no">EmployeeResource</span>
+
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="n">render_jsonapi</span><span class="p">(</span><span class="no">Employee</span><span class="p">.</span><span class="nf">all</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">show</span>
+    <span class="n">scope</span> <span class="o">=</span> <span class="n">jsonapi_scope</span><span class="p">(</span><span class="no">Employee</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">id: </span><span class="n">params</span><span class="p">[</span><span class="ss">:id</span><span class="p">]))</span>
+    <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">scope</span><span class="p">.</span><span class="nf">resolve</span><span class="p">.</span><span class="nf">first</span><span class="p">,</span> <span class="ss">scope: </span><span class="kp">false</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+<span class="k">end</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/serializers/serializable_employee.rb</span>
+<span class="k">class</span> <span class="nc">SerializableEmployee</span> <span class="o">&lt;</span> <span class="no">JSONAPI</span><span class="o">::</span><span class="no">Serializable</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="n">type</span> <span class="ss">:employees</span>
+
+  <span class="n">attribute</span> <span class="ss">:first_name</span>
+  <span class="n">attribute</span> <span class="ss">:last_name</span>
+  <span class="n">attribute</span> <span class="ss">:age</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Tests:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># spec/api/v1/employees/index_spec.rb</span>
+<span class="no">RSpec</span><span class="p">.</span><span class="nf">describe</span> <span class="s1">'v1/employees#index'</span><span class="p">,</span> <span class="ss">type: :request</span> <span class="k">do</span>
+  <span class="n">let!</span><span class="p">(</span><span class="ss">:employee1</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:employee</span><span class="p">)</span> <span class="p">}</span>
+  <span class="n">let!</span><span class="p">(</span><span class="ss">:employee2</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:employee</span><span class="p">)</span> <span class="p">}</span>
+
+  <span class="n">it</span> <span class="s1">'lists employees'</span> <span class="k">do</span>
+    <span class="n">get</span> <span class="s1">'/api/v1/employees'</span>
+    <span class="n">expect</span><span class="p">(</span><span class="n">json_ids</span><span class="p">(</span><span class="kp">true</span><span class="p">)).</span><span class="nf">to</span> <span class="n">eq</span><span class="p">([</span><span class="n">employee1</span><span class="p">.</span><span class="nf">id</span><span class="p">,</span> <span class="n">employee2</span><span class="p">.</span><span class="nf">id</span><span class="p">])</span>
+    <span class="n">assert_payload</span><span class="p">(</span><span class="ss">:employee</span><span class="p">,</span> <span class="n">employee1</span><span class="p">,</span> <span class="n">json_items</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># spec/api/v1/employees/show_spec.rb</span>
+<span class="no">RSpec</span><span class="p">.</span><span class="nf">describe</span> <span class="s1">'v1/employees#show'</span><span class="p">,</span> <span class="ss">type: :request</span> <span class="k">do</span>
+  <span class="n">let!</span><span class="p">(</span><span class="ss">:employee</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:employee</span><span class="p">)</span> <span class="p">}</span>
+
+  <span class="n">it</span> <span class="s1">'returns relevant employee'</span> <span class="k">do</span>
+    <span class="n">get</span> <span class="s2">"/api/v1/employees/</span><span class="si">#{</span><span class="n">employee</span><span class="p">.</span><span class="nf">id</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">assert_payload</span><span class="p">(</span><span class="ss">:employee</span><span class="p">,</span> <span class="n">employee</span><span class="p">,</span> <span class="n">json_item</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>A note on testing: these are full-stack <a href="https://github.com/rspec/rspec-rails#request-specs">request specs</a>. We seed the database using <a href="https://github.com/thoughtbot/factory_girl">factory_girl</a>, randomizing data with <a href="https://github.com/stympy/faker">faker</a>, then assert on the resulting JSON using <a href="https://jsonapi-suite.github.io/jsonapi_spec_helpers">spec helpers</a>.</p>
+
+<p>You won’t have to write <em>all</em> the tests you see here, some are simply for demonstrating the functionality.</p>
+
+<h2 id="filtering"><a name="filtering" href="#filtering">Filtering</a></h2>
+
+<p>One line of code allows simple <code class="highlighter-rouge">WHERE</code> clauses. If the user tried to filter on something not whitelisted here, an error would be raised.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/master...step_1_add_filter">View the Diff on Github</a></p>
+
+<h2 id="custom-filtering"><a name="custom-filtering" href="#custom-filtering">Custom Filtering</a></h2>
+
+<p>Sometimes <code class="highlighter-rouge">WHERE</code> clauses are more complex, such as prefix queries. Here we’ll query all employees whose age is greater than or equal to a given number.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_1_add_filter...step_2_add_custom_filter">View the Diff on Github</a></p>
+
+<h2 id="sorting"><a name="sorting" href="#sorting">Sorting</a></h2>
+
+<p>Sorting comes for free, but here’s a test for it. Decide as a team if we <em>actually</em> need to write a spec here, or if it’s considered tested within the libraries.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_2_add_custom_filter...step_3_basic_sorting">View the Diff on Github</a></p>
+
+<h2 id="custom-sorting"><a name="custom-sorting" href="#custom-sorting">Custom Sorting</a></h2>
+
+<p>Sometimes we need more than a simple <code class="highlighter-rouge">ORDER BY</code> clause, for example maybe we need to join on another table. In this example, we switch from Postgres’s default case-sensitive query to a case in-sensitive one…but only for the <code class="highlighter-rouge">first_name</code> field.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_3_basic_sorting...step_4_custom_sorting">View the Diff on Github</a></p>
+
+<h2 id="pagination"><a name="pagination" href="#pagination">Pagination</a></h2>
+
+<p>Pagination also comes for free, so once again we’ll have to decide if writing a spec like this is worth the bother.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_4_custom_sorting...step_5_pagination">View the Diff on Github</a></p>
+
+<h2 id="custom-pagination"><a name="custom-pagination" href="#custom-pagination">Custom Pagination</a></h2>
+
+<p>By default we use the <a href="https://github.com/kaminari/kaminari">Kaminari</a> library for pagination. This shows how we could instead sub-out Kaminari and replace it with <a href="https://github.com/mislav/will_paginate">will_paginate</a></p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_5_pagination...step_6_custom_pagination">View the Diff on Github</a></p>
+
+<h2 id="statistics"><a name="statistics" href="#statistics">Statistics</a></h2>
+
+<p>For default statistics, (<code class="highlighter-rouge">count</code>, <code class="highlighter-rouge">sum</code>, <code class="highlighter-rouge">average</code>, <code class="highlighter-rouge">maximum</code> and <code class="highlighter-rouge">minimum</code>), simply specify the field and statistic.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_6_custom_pagination...step_7_stats">View the Diff on Github</a></p>
+
+<h2 id="custom-statistics"><a name="custom-statistics" href="#custom-statistics">Custom Statistics</a></h2>
+
+<p>Here we add a <code class="highlighter-rouge">median</code> statistic to show non-standard custom statistic usage.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_7_stats...step_8_custom_stats">View the Diff on Github</a></p>
+
+<h2 id="custom-serialization"><a name="custom-serialization" href="#custom-serialization">Custom Serialization</a></h2>
+
+<p>Let’s say we wanted the employee’s age to serialize <code class="highlighter-rouge">Thirty-Two</code> instead of <code class="highlighter-rouge">32</code> in JSON. Here we use a library to get the friendly-word doppleganger, and change the test to recognize this custom logic.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/master...custom-serialization">View the Diff on Github</a></p>
+
+<h2 id="has-many-association"><a name="has-many-association" href="#has-many-association">Has-Many Association</a></h2>
+
+<p>Get employees and their positions in one call.</p>
+
+<p><img src="http://localhost:4000//assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/master...step_9_has_many">View the Diff on Github</a></p>
+
+<h2 id="belongs-to-association"><a name="belongs-to" href="#belongs-to">Belongs-To Association</a></h2>
+
+<p>Get employees, positions, and the department for those positions in one call:</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_9_has_many...step_10_belongs_to">View the Diff on Github</a></p>
+
+<h2 id="many-to-many"><a name="many-to-many" href="#many-to-many">Many-to-Many</a></h2>
+
+<p>In this example an <code class="highlighter-rouge">Employee</code> has many <code class="highlighter-rouge">Team</code>s and a <code class="highlighter-rouge">Team</code> has many <code class="highlighter-rouge">Employee</code>s.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_13_error_handling...many-to-many">View the Diff on Github</a></p>
+
+<h2 id="resource-re-use"><a name="resource-reuse" href="#resource-reuse">Resource Re-Use</a></h2>
+
+<p>In prior steps we created <code class="highlighter-rouge">PositionResource</code> and <code class="highlighter-rouge">DepartmentResource</code>. These objects may have custom sort logic, filter whitelists, etc - this configuration can be re-used if we need to add <code class="highlighter-rouge">/api/v1/positions</code> and <code class="highlighter-rouge">/api/v1/departments</code> endpoints.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_10_belongs_to...step_11_resource_reuse">View the Diff on Github</a></p>
+
+<h2 id="filtersortpaginate-associations"><a name="fsp-associations" href="#fsp-associations">Filter/Sort/Paginate Associations</a></h2>
+
+<p>This comes for free. As long as the associated <code class="highlighter-rouge">Resource</code> knows how to do something, we can re-use that logic.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_11_resource_reuse...step_12_fsp_associations">View the Diff on Github</a></p>
+
+<h2 id="error-handling"><a name="error-handling" href="#error-handling">Error Handling</a></h2>
+
+<p>In this example we add global error handling, so any random error will return a <a href="http://jsonapi.org/format/#errors">JSONAPI-compatible error response</a>. Then we customize that response for a specific scenario (the requested employee does not exist).</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_12_fsp_associations...step_13_error_handling">View the Diff on Github</a></p>
+
+<h1 id="writes"><a name="writes" href="#writes">Writes</a></h1>
+
+<h2 id="basic-create"><a name="basic-create" href="#basic-create">Basic Create</a></h2>
+
+<p>Basic example without validations or strong parameters.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/bump_gemfile_for_writes...step_14_create">View the Diff on Github</a></p>
+
+<h2 id="validations"><a name="validations" href="#validations">Validations</a></h2>
+
+<p>Validations are basic, vanilla Rails code. When there is a validation error, we return a jsonapi-compatible error respone.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_14_create...step_15_validations">View the Diff on Github</a></p>
+
+<h2 id="strong-resources"><a name="strong-resources" href="#strong-resources">Strong Resources</a></h2>
+
+<p>The biggest problem with <code class="highlighter-rouge">strong_parameters</code> is that we might want to create an employee from the <code class="highlighter-rouge">/employees</code> endpoint, or we might want to create a position with an employee at the same time from <code class="highlighter-rouge">/positions</code>. Maintaining the same strong parameter hash across a number of places is difficult.</p>
+
+<p>Instead we use <code class="highlighter-rouge">strong_resources</code> to define the parameter template <em>once</em>, and re-use. This has the added benefit of being built on top of <a href="https://github.com/zendesk/stronger_parameters">stronger_parameters</a>, which gives us type checking and coercion.</p>
+
+<p>Note: <code class="highlighter-rouge">strong_resources</code> requires Rails.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_15_validations...step_16_strong_resources">View the Diff on Github</a></p>
+
+<h2 id="basic-update"><a name="basic-update" href="#basic-update">Basic Update</a></h2>
+
+<p>Looks very similar to <code class="highlighter-rouge">create</code>.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_16_strong_resources...step_17_basic_update">View the Diff on Github</a></p>
+
+<h2 id="basic-destroy"><a name="basic-destroy" href="#basic-destroy">Basic Destroy</a></h2>
+
+<p>More or less basic Rails.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_17_basic_update...step_18_basic_destroy">View the Diff on Github</a></p>
+
+<h2 id="customizing-persistence"><a name="customizing-persistence" href="#customizing-persistence">Customizing Persistence</a></h2>
+
+<p>So far we’ve shown <code class="highlighter-rouge">ActiveRecord</code>. What if we wanted to use a different ORM, or ElasticSearch? What if we wanted ‘side effects’ such as “send a confirmation email after creating the user”?</p>
+
+<p>This code shows how to customize <code class="highlighter-rouge">create/update/destroy</code>. In this example we’re simply logging the action, but you could do whatever you want here as long as you return an instance of the object. Just like with reads, if any of this code becomes duplicative across <code class="highlighter-rouge">Resource</code> objects you could move it into a common <code class="highlighter-rouge">Adapter</code>.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_18_basic_destroy...step_19_custom_persistence">View the Diff on Github</a></p>
+
+<h2 id="association-writes"><a name="association-writes" href="#association-writes">Association Writes</a></h2>
+
+<h3 id="nested-creates"><a name="nested-creates" href="#nested-creates">Nested Creates</a></h3>
+
+<p>Think Rails’ <code class="highlighter-rouge">accepts_nested_attributes_for</code>, but not coupled to Rails or ActiveRecord. Here we create an <code class="highlighter-rouge">Employee</code>, a <code class="highlighter-rouge">Position</code> for the employee, and a <code class="highlighter-rouge">Department</code> for the position in one call. This is helpful when dealing with nested forms!</p>
+
+<p>Once again, note how our <code class="highlighter-rouge">strong_resources</code> can be shared across controllers.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_19_custom_persistence...step_20_association_create">View the Diff on Github</a></p>
+
+<h3 id="nested-updates"><a name="nested-updates" href="#nested-updates">Nested Updates</a></h3>
+
+<p>We got this for free, here’s a spec!</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_20_association_create...step_21_association_update">View the Diff on Github</a></p>
+
+<h3 id="nested-destroys"><a name="nested-destroys" href="#nested-destroys">Nested Destroys</a></h3>
+
+<p>We get this for free, though we have to explicitly tell <code class="highlighter-rouge">strong_resources</code> that destroys are allowed from this endpoint.</p>
+
+<p>Note destroy will do two things: delete the object, and make the foreign key on the corresponding child in the payload <code class="highlighter-rouge">null</code>.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_21_association_update...step_22_association_destroy">View the Diff on Github</a></p>
+
+<h3 id="disassociations"><a name="disassociations" href="#disassociations">Disassociations</a></h3>
+
+<p><code class="highlighter-rouge">destroy</code> actually deletes objects, what if we want to simply disassociate the objects by making the foreign key <code class="highlighter-rouge">null</code>? We get this for free, too.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee_directory/compare/step_22_association_destroy...step_23_disassociation">View the Diff on Github</a></p>
+
+<h3 id="usage-without-activerecord"><a name="usage-without-activerecord" href="#usage-without-activerecord">Usage without ActiveRecord</a></h3>
+
+<p>Let’s say the departments come from a service call. Here’s the change to
+the <code class="highlighter-rouge">/departments</code> endpoint.</p>
+
+<p>Make the model a PORO:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/models/position.rb</span>
+
+<span class="c1"># belongs_to :department, optional: true</span>
+<span class="kp">attr_accessor</span> <span class="ss">:department</span></code></pre></figure>
+
+<p>Use <code class="highlighter-rouge"><span class="p">{}</span></code> as our base scope instead of <code class="highlighter-rouge">ActiveRecord::Relation</code>:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/departments_controller.rb</span>
+<span class="k">def</span> <span class="nf">index</span>
+  <span class="c1"># render_jsonapi(Department.all)</span>
+  <span class="n">render_jsonapi</span><span class="p">({})</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Customize <code class="highlighter-rouge">resolve</code> for the new hash-based scope:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/department_resource.rb</span>
+<span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">Null</span>
+
+<span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+  <span class="no">Department</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
+<p><code class="highlighter-rouge">Department.where</code> is our contract for resolving the scope. The underlying <code class="highlighter-rouge">Department</code> code could use an HTTP client, alternate datastore, what-have-you.</p>
+
+<p>Let’s also change our code for sideloading departments at <code class="highlighter-rouge">/api/v1/employees?include=departments</code>:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/position_resource.rb</span>
+
+<span class="c1"># belongs_to :department,</span>
+<span class="c1">#   scope: -&gt; { Department.all },</span>
+<span class="c1">#   foreign_key: :department_id,</span>
+<span class="c1">#   resource: DepartmentResource</span>
+
+<span class="n">allow_sideload</span> <span class="ss">:department</span><span class="p">,</span> <span class="ss">resource: </span><span class="no">DepartmentResource</span> <span class="k">do</span>
+  <span class="n">scope</span> <span class="k">do</span> <span class="o">|</span><span class="n">employees</span><span class="o">|</span>
+    <span class="no">Department</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">employee_id: </span><span class="n">employees</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:id</span><span class="p">))</span>
+  <span class="k">end</span>
+
+  <span class="n">assign</span> <span class="k">do</span> <span class="o">|</span><span class="n">employees</span><span class="p">,</span> <span class="n">departments</span><span class="o">|</span>
+    <span class="n">employees</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span>
+      <span class="n">e</span><span class="p">.</span><span class="nf">department</span> <span class="o">=</span> <span class="n">departments</span><span class="p">.</span><span class="nf">find</span> <span class="p">{</span> <span class="o">|</span><span class="n">d</span><span class="o">|</span> <span class="n">d</span><span class="p">.</span><span class="nf">employee_id</span> <span class="o">==</span> <span class="n">e</span><span class="p">.</span><span class="nf">id</span> <span class="p">}</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>As you can see, we’re delving into a lower-level DSL to customize. You
+probably want to package up these changes into an <a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Adapters/Abstract.html">Adapter</a>. The <code class="highlighter-rouge">ActiveRecord</code> adapter is simple packaging up similar low-level defaults. Your app may require an <code class="highlighter-rouge">HTTPAdapter</code> or <code class="highlighter-rouge">ServiceAdapter</code>, or you can make one-off customizations as shown above.</p>
+
+<h1 id="elasticsearch"><a name="elasticsearch" href="#elasticsearch">ElasticSearch</a></h1>
+
+<p>Similar to a service call, here’s how we might incorporate the elasticsearch <a href="https://github.com/richmolj/trample">trample</a> gem.</p>
+
+<p>Make our base scope an instance of our Trample client:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/employees_controller.rb</span>
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="c1"># render_jsonapi(Employee.all)</span>
+    <span class="n">render_jsonapi</span><span class="p">(</span><span class="no">Search</span><span class="o">::</span><span class="no">Employee</span><span class="p">.</span><span class="nf">new</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Customize the resource using the Trample Client API:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="n">use_adapter</span> <span class="no">JsonapiCompliable</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">Null</span>
+
+<span class="n">allow_filter</span> <span class="ss">:first_name</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">condition</span><span class="p">(</span><span class="ss">:first_name</span><span class="p">).</span><span class="nf">eq</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">allow_filter</span> <span class="ss">:first_name_prefix</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">condition</span><span class="p">(</span><span class="ss">:first_name</span><span class="p">).</span><span class="nf">starts_with</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">query!</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">results</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Once again, you probably want to package these changes into an <a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Adapters/Abstract.html">Adapter</a>.</p>
+
+<h1 id="client-side"><a name="client-side" href="#client-side">Client-Side</a></h1>
+
+<h2 id="jsorm"><a name="jsorm" href="#jsorm">JSORM</a></h2>
+
+<p>There are number of <a href="http://jsonapi.org/implementations/">jsonapi clients</a> in a variety of languages. Here we’ll be using <a href="/js/home">JSORM</a> - an ActiveRecord-style ORM that can be used from Node or the browser. It’s been custom-built to work with JSONAPI Suite enhancements.</p>
+
+<p>This will fetch an employee with id 123, their last 3 positions where the title starts with ‘dev’, and the departments for those positions.</p>
+
+<p>We’ll use typescript for this example, though we could use vanilla JS just as well. First define our models (additional client-side business logic can go in these classes):</p>
+
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="k">import</span> <span class="p">{</span> <span class="nx">JSORMBase</span><span class="p">,</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">Attr</span><span class="p">,</span> <span class="nx">HasMany</span><span class="p">,</span> <span class="nx">BelongsTo</span> <span class="p">}</span> <span class="k">from</span> <span class="s2">"jsorm"</span>
+
+<span class="err">@</span><span class="nx">Model</span><span class="p">()</span>
+<span class="kr">class</span> <span class="nx">ApplicationRecord</span> <span class="k">extends</span> <span class="nx">JSORMBase</span> <span class="p">{</span>
+  <span class="k">static</span> <span class="nx">baseUrl</span> <span class="o">=</span> <span class="s2">"http://localhost:3000"</span>
+  <span class="k">static</span> <span class="nx">apiNamespace</span> <span class="o">=</span> <span class="s2">"/api/v1"</span>
+<span class="p">}</span>
+
+<span class="err">@</span><span class="nx">Model</span><span class="p">()</span>
+<span class="kr">class</span> <span class="nx">Employee</span> <span class="k">extends</span> <span class="nx">ApplicationRecord</span> <span class="p">{</span>
+  <span class="k">static</span> <span class="nx">jsonapiType</span> <span class="o">=</span> <span class="s2">"people"</span>
+
+  <span class="err">@</span><span class="nx">Attr</span><span class="p">()</span> <span class="nx">firstName</span><span class="err">:</span> <span class="kr">string</span>
+  <span class="err">@</span><span class="nx">Attr</span><span class="p">()</span> <span class="nx">lastName</span><span class="err">:</span> <span class="kr">string</span>
+  <span class="err">@</span><span class="nx">Attr</span><span class="p">()</span> <span class="nx">age</span><span class="err">:</span> <span class="kr">number</span>
+
+  <span class="err">@</span><span class="nx">HasMany</span><span class="p">()</span> <span class="nx">positions</span><span class="err">:</span> <span class="nx">Position</span><span class="p">[]</span>
+<span class="p">}</span>
+
+<span class="err">@</span><span class="nx">Model</span><span class="p">()</span>
+<span class="kr">class</span> <span class="nx">Position</span> <span class="k">extends</span> <span class="nx">ApplicationRecord</span> <span class="p">{</span>
+  <span class="k">static</span> <span class="nx">jsonapiType</span> <span class="o">=</span> <span class="s2">"positions"</span>
+
+  <span class="err">@</span><span class="nx">Attr</span><span class="p">()</span> <span class="nx">title</span><span class="err">:</span> <span class="kr">string</span>
+
+  <span class="err">@</span><span class="nx">BelongsTo</span><span class="p">()</span> <span class="nx">department</span><span class="err">:</span> <span class="nx">Department</span><span class="p">[]</span>
+<span class="p">}</span>
+
+<span class="err">@</span><span class="nx">Model</span><span class="p">()</span>
+<span class="kr">class</span> <span class="nx">Department</span> <span class="k">extends</span> <span class="nx">ApplicationRecord</span> <span class="p">{</span>
+  <span class="k">static</span> <span class="nx">jsonapiType</span> <span class="o">=</span> <span class="s2">"departments"</span>
+
+  <span class="err">@</span><span class="nx">Attr</span><span class="p">()</span> <span class="nx">name</span><span class="err">:</span> <span class="kr">string</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>Now fetch the data in one call:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">positionScope</span> <span class="o">=</span> <span class="nx">Position</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">({</span> <span class="na">title_prefix</span><span class="p">:</span> <span class="s2">"dev"</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">order</span><span class="p">({</span> <span class="na">created_at</span><span class="p">:</span> <span class="s2">"desc"</span> <span class="p">})</span>
+
+<span class="kd">let</span> <span class="nx">scope</span> <span class="o">=</span> <span class="nx">Employee</span>
+  <span class="p">.</span><span class="nx">includes</span><span class="p">({</span> <span class="na">positions</span><span class="p">:</span> <span class="s2">"department"</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">merge</span><span class="p">({</span> <span class="na">positions</span><span class="p">:</span> <span class="nx">positionScope</span> <span class="p">})</span>
+
+<span class="kd">let</span> <span class="nx">employee</span> <span class="o">=</span> <span class="p">(</span><span class="nx">await</span> <span class="nx">scope</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="mi">123</span><span class="p">)).</span><span class="nx">data</span>
+<span class="c1">// access data like so in HTML:</span>
+<span class="c1">// employee.positions[0].department.name</span>
+<span class="p">}</span></code></pre></figure>
+
+<p><a href="/js/home">Read the JSORM documentation here</a></p>
+
+<h2 id="vuejs-sample-application"><a name="vue" href="#vue">VueJS Sample Application</a></h2>
+
+<p><img style="width: 100%" src="http://localhost:4000/assets/img/vue_logo.png" alt="vue" /></p>
+
+<p><strong>JSORM can be used with the client-side framework of your choice</strong>. To give an example of real-world usage, we’ve created a demo application using
+<a href="https://vuejs.org/">VueJS</a>. Vue is lightweight and provides the
+bare-bones we need to illustrate JSONAPI and JSORM in action.</p>
+
+<p>This will point to a <a href="https://github.com/jsonapi-suite/employee_directory/tree/prepare_clientside">slightly-tweaked branch</a> of the server-side API
+above.</p>
+
+<p>Let’s create our app.</p>
+
+<h3 id="step-0-setup">Step 0: Setup</h3>
+
+<p>We’ve started with a basic Vue app configured with Webpack. None of this
+is JSONAPI-specific, just boilerplate to get started quickly.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/tree/step_0_setup">View the Branch on Github</a></p>
+
+<h3 id="step-1-models">Step 1: Models</h3>
+
+<p>We’ll start by defining our models, which should look very familiar if
+you’ve worked with <code class="highlighter-rouge">ActiveRecord</code>. Again, see the <a href="/js/home">JSORM
+documentation</a> if any of this looks confusing to you.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_0_setup...step_1_models">View the Diff on Github</a></p>
+
+<h3 id="step-2-data-grid">Step 2: Data Grid</h3>
+
+<p>We’ll add a simple data grid to our page listing all <code class="highlighter-rouge">Employee</code>s. This
+will turn into a search grid, but for now we’re simply loading employees
+via <code class="highlighter-rouge">Employee.all()</code></p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_1_models...step_2_data_grid">View the Diff on Github</a></p>
+
+<h3 id="step-3-adding-relationships">Step 3: Adding Relationships</h3>
+
+<p>Here we’ve added a <code class="highlighter-rouge">currentPosition</code> relationship to avoid fetching
+excess data from the server. When the page loads we fetch the
+employees, current positions for those employees, and the departments for those positions.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_2_data_grid...step_3_includes">View the Diff on Github</a></p>
+
+<h3 id="step-4-filtering">Step 4: Filtering</h3>
+
+<p>Here we’ve added a bit of state to the page, <code class="highlighter-rouge">query</code>, which will be
+bound to the form inputs. We pass <code class="highlighter-rouge">query</code> to <code class="highlighter-rouge">Employee.where</code> to
+successfully query employees by first and last name.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_3_includes...step_4_filtering">View the Diff on Github</a></p>
+
+<h3 id="step-5-sorting">Step 5: Sorting</h3>
+
+<p>Just like with filters, we add a bit of state to our page to track
+sorting parameters. When the user clicks a table header, we’ll update
+that state and pass it to our query.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_4_filtering...step_5_sorting">View the Diff on Github</a></p>
+
+<h3 id="step-6-stats">Step 6: Stats</h3>
+
+<p>A JSORM promise returns a <code class="highlighter-rouge">response</code> object with a <code class="highlighter-rouge">data</code> key - the
+model instance(s) we’ve been referencing so far. It also returns a
+<code class="highlighter-rouge">meta</code> key that reflects the <a href="http://jsonapi.org/format/#document-meta">meta</a> section of the JSONAPI response.</p>
+
+<p>Here we’ll request the total count of employees in our query to the
+server, grab that total count from <code class="highlighter-rouge">meta</code>, and bind it to the page as
+<code class="highlighter-rouge">totalCount</code></p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_5_sorting...step_6_stats">View the Diff on Github</a></p>
+
+<h3 id="step-7-pagination">Step 7: Pagination</h3>
+
+<p>Building on what we’ve already done, we can apply a similar pattern for
+pagination. We add the <code class="highlighter-rouge">currentPage</code> state and alter it when the user
+clicks pagination links. We use <code class="highlighter-rouge">currentPage</code> and <code class="highlighter-rouge">totalCount</code> to figure
+out if we should display previous/next page links.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_6_stats...step_7_pagination">View the Diff on Github</a></p>
+
+<h3 id="step-8-basic-form-setup">Step 8: Basic Form Setup</h3>
+
+<p>We’ll be adding a form to create and update employees. This step just
+adds the relevant HTML and Vue code to get set up, before involving
+JSORM.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_7_pagination...step_8_basic_form_setup">View the Diff on Github</a></p>
+
+<h3 id="step-9-dropdowns">Step 9: Dropdowns</h3>
+
+<p>Our form will submit employees, positions and departments in a single
+request. We associate a position to an existing department through a
+<code class="highlighter-rouge">select</code> dropdown. To populate that dropdown, we fetch all departments
+from the server and bind it to the <code class="highlighter-rouge">select</code>.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_8_basic_form_setup...step_9_dropdown">View the Diff on Github</a></p>
+
+<h3 id="step-10-nested-createupdate">Step 10: Nested Create/Update</h3>
+
+<p>This step simply binds our instantiated models to the form. When the
+form is submitted, we save everything in a single one-line request.</p>
+
+<p>After the form submission, we could edit the form and submit again -
+JSORM will know to <code class="highlighter-rouge">PATCH</code> an update to the appropriate URL
+automatically.</p>
+
+<p>Note we could also edit our search to immediately reflect the new
+data…but this is more Vue-specific than anything to do with JSORM, so
+we’ll hold off until the last step.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_9_dropdown...step_10_nested_create">View the Diff on Github</a></p>
+
+<h3 id="step-11-validations">Step 11: Validations</h3>
+
+<p>Our server-side code will automatically handle validation errors and
+give us a well-formatted response. JSORM will read that response and
+automatically apply <code class="highlighter-rouge">error</code> objects to our model instances. Here we
+display simple error messages without involving any JS code.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_10_nested_create...step_11_validations">View the Diff on Github</a></p>
+
+<h3 id="step-12-nested-destroy">Step 12: Nested Destroy</h3>
+
+<p>This step adds buttons to our form that will add and remove positions
+for a given employee. To add, we simply <code class="highlighter-rouge">push</code> a new <code class="highlighter-rouge">Employee</code> onto the
+relationship array. To remove, we set <code class="highlighter-rouge">isMarkedForDestruction = true</code>,
+which allows for “unsaved deleted records”. This follows a similar
+pattern to one introduced in Ember Data, <a href="https://www.emberjs.com/blog/2015/09/02/ember-data-2-0-released.html#toc_unsaved-deleted-records">explained here</a>.</p>
+
+<p>Note that if we wanted to <strong>disassociate</strong> the position rather than
+<strong>destroying</strong> the underlying record, we could use
+<code class="highlighter-rouge">position.isMarkedForDisassociation = true</code>.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_10_nested_create...step_11_validations">View the Diff on Github</a></p>
+
+<h3 id="step-13-vuejs-wrap-up">Step 13: VueJS Wrap-up</h3>
+
+<p>Our final step adds some Vue-specific functionality - we add an
+<code class="highlighter-rouge">EventBus</code> to allow selecting an employee from the grid and binding it
+to the form, and refresh the search grid after each form submission.</p>
+
+<p><img src="http://localhost:4000/assets/img/GitHub-Mark-32px.png" alt="github" />
+<a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_12_nested_destroy...step_13_vue">View the Diff on Github</a></p>
+
+<p><br />
+<br /></p>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/concepts">Concepts</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Resources</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Contact us</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

@@ -1,0 +1,162 @@
+.status-page {
+  margin-top: 40px;
+  margin-bottom: 130px;
+
+  .header {
+    text-align: center;
+
+    h3 {
+      font-size: 22px;
+      color: #444;
+      line-height: 25px;
+      font-weight: 500;
+      margin-bottom: 7px;
+    }
+
+    p {
+      font-size: 16px;
+      font-weight: 400;
+      color: #888;
+    }
+  }
+
+  .current-status {
+    background: #F7F8FB;
+    border: 1px solid #EAEDF7;
+    border-radius: 8px;
+    box-shadow: inset rgba(100, 100, 100, 0.25) 0 1px 1px;
+    padding: 20px 30px;
+    margin: 0 auto;
+    margin-top: 35px;
+
+    .updated {
+      float: right;
+      color: #616A72;
+      font-size: 13px;
+
+      @media(max-width: 767px) {
+        float: none;
+        text-align: center;
+        display: block;
+        margin-bottom: 20px;
+      }
+    }
+
+    .status {
+      font-size: 18px;
+      font-weight: 500;
+
+      .color {
+        width: 15px;
+        height: 15px;         
+        border-radius: 50px;
+        float: left;
+        position: relative;
+        top: 5px;
+        margin-right: 20px;
+
+        &.green {
+          background: #96cb4c;
+          border: 1px solid #8BC43D;
+          box-shadow: 0px 0px 7px 2px #B3E074, inset 0px 2px 1px -1px rgba(255, 255, 255, 0.8);
+        }
+
+        &.yellow {
+          background: #F0D775;
+          border: 1px solid #E0CC7E;
+          box-shadow: 0px 0px 7px 2px #F0D775, inset 0px 2px 1px -1px rgba(255, 255, 255, 0.8);
+        }
+
+        &.red {
+          background: #F56B65;
+          border: 1px solid #FC7D77;
+          box-shadow: 0px 0px 7px 2px #FF9B96, inset 0px 2px 1px -1px rgba(255, 255, 255, 0.8);
+        }
+      }
+    }
+
+    .help {
+      margin-top: 7px;
+      margin-left: 35px;
+    }
+  }
+
+  .modules {
+    margin-top: 40px;
+    border-radius: 5px;
+
+    >.list-group .list-group-item {
+      padding: 13px 15px;
+
+      &:first-child {
+        border-top: 0px;
+        border-top-right-radius: 5px;
+        border-top-left-radius: 5px;
+      }
+
+      .status {
+        float: right;
+        color: #0F9B0F;
+        font-size: 13px;
+        font-weight: 500;
+
+        &.down {
+          color: #D88C1B;
+        }
+      }
+    }
+  }
+
+  .messages {
+    margin-top: 35px;
+
+    h3 {
+      font-size: 18px;
+      color: #444;
+      margin-bottom: 25px;
+    }
+
+    .date {
+      margin-bottom: 25px;
+
+      .day {
+        font-size: 13px;
+        font-weight: bold;
+        color: #454545;
+        padding-bottom: 6px;
+        margin-bottom: 6px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .ok {
+        color: #0F9B0F;
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      .issues {
+        color: #D88C1B;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 18px;
+      }
+
+      .update {
+        color: #333;
+        font-size: 13px;
+
+        strong {
+          font-size: 13px;
+          font-weight: bold;
+          color: #454545;
+          min-width: 93px;
+          display: inline-block;
+        }
+      }
+    }
+  }
+
+  .full-history {
+    margin-top: 50px;
+  }
+}

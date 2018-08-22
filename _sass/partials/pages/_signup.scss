@@ -1,0 +1,167 @@
+.session-page {
+  min-height: 100vh;
+  background-attachment: fixed !important;
+  background: #5E7A9B;
+  background: -webkit-linear-gradient(top, #355069 0, #5E7A9B 100%);
+  background: -moz-linear-gradient(top, #355069 0, #5E7A9B 100%);
+  background: -o-linear-gradient(top, #355069 0, #5E7A9B 100%);
+  background: linear-gradient(top, #355069 0, #5E7A9B 100%);
+
+  .header {
+    .logo {
+      margin-top: 40px;
+      text-align: center;
+      
+      a {
+        color: #fff;
+        font-size: 31px;
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
+        
+        @include transition(color .25s linear);
+        
+        &:hover {
+          text-decoration: none;
+          color: #bbb;
+        }
+      }
+    }
+
+    h4 {
+      color: #fff;
+      text-align: center;
+      font-size: 25px;
+      font-weight: 400;
+      margin-top: 45px;
+      margin-bottom: 5px;
+    }
+
+    p {
+      color: #fff;
+      text-align: center;
+    }
+  }
+  
+  .wrapper {
+    margin: 0 auto;
+    width: 51%;
+    margin-top: 25px;
+    background: #fff;
+    padding: 15px 50px 25px 50px;
+    border-radius: 5px;
+    border-top: 6px solid #6ED5E4;
+
+    @media(max-width: 991px) {
+      width: 67%;
+    }
+
+    @media(max-width: 767px) {
+      width: 100%;
+    }
+
+    .formy {
+      margin-top: 22px;
+
+      .form-group {
+        label {
+          color: #46515F;
+        }
+      }
+
+      .checkbox {
+        label {
+          color: #666;
+          font-size: 13px;
+        }
+
+        input {
+          position: relative;
+          top: -1px;
+        }
+      }
+
+      .submit {
+        text-align: center;
+
+        .button-clear {
+          margin-top: 35px;
+          display: inline-block;
+        }
+      }
+
+      .info {
+        float: right;
+        width: 67%;
+
+        .good-company {
+          strong {
+            font-size: 15px;
+            font-weight: 500;
+          }
+
+          p {
+            color: #858585;
+            margin-top: 9px;
+          }
+        }
+
+        .testimonial {
+          margin-top: 40px;
+
+          .quote {
+            font-style: italic;
+            font-size: 13px;
+            color: #555;
+            line-height: 20px;
+          }
+
+          .author {
+            margin-top: 20px;
+
+            .pic {
+              width: 55px;
+              height: 55px;
+              border-radius: 50px;
+              float: left;
+              position: relative;
+              top: -6px;
+              margin-right: 18px;
+            }
+
+            .name {
+              color: #3C92C5;
+              line-height: 23px;
+              font-weight: 500;
+            }
+
+            .company {
+              font-size: 14px;
+              color: #909090;
+              line-height: 23px;
+              font-weight: 400;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .already-account {
+    text-align: center;
+    color: #fff;
+    margin-top: 25px;
+    margin-bottom: 70px;
+    font-size: 13px;
+    font-weight: 500;
+
+    a {
+      color: #fff;
+      text-decoration: underline;
+    }
+
+    .popover-content {
+      color: #000;
+      font-size: 17px;
+      font-weight: 400;
+    }
+  }
+}

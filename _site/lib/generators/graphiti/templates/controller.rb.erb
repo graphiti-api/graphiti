@@ -1,0 +1,61 @@
+<% module_namespacing do -%>
+class <%= model_klass.name.pluralize %>Controller < ApplicationController
+  <%- if actions?('index') -%>
+  def index
+    <%= file_name.pluralize %> = <%= resource_klass %>.all(params)
+    <%- if responders? -%>
+    respond_with(<%= file_name.pluralize %>)
+    <%- else -%>
+    render jsonapi: <%= file_name.pluralize %>
+    <%- end -%>
+  end
+  <%- end -%>
+  <%- if actions?('show') -%>
+
+  def show
+    <%= file_name %> = <%= resource_klass %>.find(params)
+    <%- if responders? -%>
+    respond_with(<%= file_name %>)
+    <%- else -%>
+    render jsonapi: <%= file_name %>
+    <%- end -%>
+  end
+  <%- end -%>
+  <%- if actions?('create') -%>
+
+  def create
+    <%= file_name %> = <%= resource_klass %>.build(params)
+
+    if <%= file_name %>.save
+      render jsonapi: <%= file_name %>, status: 201
+    else
+      render jsonapi_errors: <%= file_name %>
+    end
+  end
+  <%- end -%>
+  <%- if actions?('update') -%>
+
+  def update
+    <%= file_name %> = <%= resource_klass %>.find(params)
+
+    if <%= file_name %>.update_attributes
+      render jsonapi: <%= file_name %>
+    else
+      render jsonapi_errors: <%= file_name %>
+    end
+  end
+  <%- end -%>
+  <%- if actions?('destroy') -%>
+
+  def destroy
+    <%= file_name %> = <%= resource_klass %>.find(params)
+
+    if <%= file_name %>.destroy
+      render jsonapi: { meta: {} }, status: 200
+    else
+      render jsonapi_errors: <%= file_name %>
+    end
+  end
+  <%- end -%>
+end
+<% end -%>

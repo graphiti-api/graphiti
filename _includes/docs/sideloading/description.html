@@ -1,0 +1,58 @@
+<p>
+  You're probably already familiar with the concept of "sideloading", documented in
+  the
+  <a target="_blank" href="http://jsonapi.org/format/#fetching-includes">
+    "Inclusion of Related Resources"
+  </a>
+  section of the JSONPI spec.
+</p>
+
+<p>
+  If using an
+  <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Adapters/Abstract.html">
+    Adapter
+  </a>, such as the default
+  <code class="highlighter-rouge">ActiveRecord</code> adapter,
+  you can do this with simple
+  <code class="highlighter-rouge">has_many</code>-style macros.
+</p>
+
+<p>
+  If not using an adapter, or to implement a one-off customization,
+  you can drop down to the lower-level
+  <code class="highlighter-rouge">allow_sideload</code> DSL. Adapter
+  macros are simply wrapping this DSL.
+</p>
+
+<p>
+  <code class="highlighter-rouge">allow_sideload</code> specifies two simple
+  configuration options:
+  <ul>
+    <li>
+      <strong>scope</strong>: specifies how to build a scope that satisifes the
+      association.
+    </li>
+    <li>
+      <strong>assign</strong>: specifies how to associate the resulting records with
+      their parent association.
+    </li>
+  </ul>
+
+  <p>
+    You can see the default
+    <code class="highlighter-rouge">ActiveRecord</code> implementation on the right.
+  </p>
+</p>
+
+<p>
+  See also:
+
+  <ul>
+    <li>
+      <a href="{{site.github.url}}/how-to-use-without-activerecord">Use Alternate ORMs</a>
+    </li>
+    <li>
+      <a href="{{site.github.url}}/how-to-build-an-adapter">Build an Adapter</a>
+    </li>
+  </ul>
+</p>

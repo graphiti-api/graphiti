@@ -1,0 +1,177 @@
+.contact-us-map {
+  position: relative;
+  top: -20px;
+  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.35);
+
+  #map {
+    height: 450px;
+    width: 100%;
+  }
+
+  #directions {
+    position: absolute;
+    top: 50px;
+    left: 13%;
+    text-align: center;
+    width: 300px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 5px;
+    box-shadow: 0px 4px 15px 0px rgba(0, 0, 0, 0.2);
+    padding: 30px 20px 30px 20px;
+
+    @media(max-width: 767px) {
+      display: none;
+    }
+
+    p {
+      font-size: 19px;
+      color: #333;
+      margin-bottom: 15px;
+    }
+
+    button {
+      margin-top: 15px;
+    }
+  }
+}
+
+.contact-us-info {
+  margin-top: 50px;
+
+  .message {
+    h3 {
+      color: #444;
+      font-size: 24px;
+      font-weight: 500;
+    }
+
+    p {
+      font-size: 15px;
+      font-weight: 400;
+      color: #777;
+    }
+
+    form {
+      margin-top: 35px;
+      width: 80%;
+
+      @media(max-width: 767px) {
+        width: 100%;
+      }
+      
+      input[type="text"],
+      input[type="email"] {
+        width: 70%;
+
+        @media(max-width: 767px) {
+          width: 100%;
+        }
+      }
+
+      label {
+        color: #555;
+        font-weight: 500;
+        margin-bottom: 7px;
+      }
+
+      .button {
+        margin-top: 20px;
+      }
+
+      /* error messages from jquery validate */
+      label.error {
+        position: relative !important;
+        display: inline-block !important;
+        margin-top: -2px !important;
+        margin-bottom: -8px !important;
+        color: #fff !important;
+        font-weight: normal !important;
+        font-size: 15px !important;
+        padding: 5px 7px !important;
+        background: #4B9FCF !important;
+        border-radius: 4px !important;
+        
+        &.valid {
+          display: none !important;
+        }
+        
+        &:after {
+          bottom: 100%;
+          border: solid transparent;
+          content: " ";
+          height: 0;
+          width: 0;
+          position: absolute;
+          pointer-events: none;
+          border-bottom-color: #4B9FCF;
+          border-width: 5px;
+          left: 30px;
+          margin-left: -5px;
+        }
+      }
+    }
+  }
+
+  .contact {
+    @media(max-width: 991px) {
+      margin-top: 50px;
+    }
+
+    .address {
+      margin-bottom: 30px;
+    }
+
+    h3 {
+      color: #444;
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    p {
+      font-size: 15px;
+      font-weight: 400;
+      color: #777;
+    }
+
+    .online-support {
+      background: #f8fdfe;
+      border: 1px solid #bee1f3;
+      margin-top: 40px;
+      border-radius: 6px;
+      padding: 20px 22px 18px 22px;
+      width: 70%;
+
+      strong {
+        font-weight: 500;
+        color: #333;
+        font-size: 15px;
+      }
+
+      p {
+        color: #1f95d0;
+        margin-top: 14px;
+        line-height: 18px;
+      }
+    }
+
+    .social {
+      margin-top: 25px;
+
+      a {
+        border: 0px;
+
+        @include transition(all 0.2s linear);
+        
+        &.tw {
+          position: relative;
+          top: 2px;
+        }
+
+        &:hover {
+          opacity: 0.8;
+          filter: alpha(opacity=80);
+        }
+      }       
+    }
+  }
+}

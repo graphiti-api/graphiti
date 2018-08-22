@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Graphiti</title>
+  <meta name="description" content="A stylish alternative to GraphQL">
+
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="http://localhost:4000" class="navbar-brand">JSONAPI Suite</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/ruby">Docs</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/js/home">Javascript Client</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <h1>
+  JSORM
+  <small>the isomorphic, framework-agnostic Javascript ORM</small>
+</h1>
+
+<div class="js-toc col-md-3">
+  <ul>
+    <li><a href="http://localhost:4000/js/home">Home</a></li>
+    <li><a href="http://localhost:4000/js/introduction">Introduction</a></li>
+    <li><a href="http://localhost:4000/js/installation">Installation</a>
+      <ul>
+        <li><a href="http://localhost:4000/js/installation#defining-models">Defining Models</a></li>
+        <li><a href="http://localhost:4000/js/installation#connecting-to-the-api">Connecting to the API</a></li>
+        <li><a href="http://localhost:4000/js/installation#defining-attributes">Defining Attributes</a></li>
+        <li><a href="http://localhost:4000/js/installation#defining-relationships">Defining Relationships</a></li>
+      </ul>
+    </li>
+    <li><a href="http://localhost:4000/js/reads">Reads</a>
+      <ul>
+        <li><a href="http://localhost:4000/js/reads/sorting">Sorting</a></li>
+        <li><a href="http://localhost:4000/js/reads/pagination">Pagination</a></li>
+        <li><a href="http://localhost:4000/js/reads/filtering">Filtering</a></li>
+        <li><a href="http://localhost:4000/js/reads/fieldsets">Fieldsets</a></li>
+        <li><a href="http://localhost:4000/js/reads/statistics">Statistics</a></li>
+        <li><a href="http://localhost:4000/js/reads/includes">Includes</a></li>
+        <li><a href="http://localhost:4000/js/reads/nested-queries">Nested Queries</a></li>
+      </ul>
+    </li>
+    <li><a href="http://localhost:4000/js/writes">Writes</a>
+      <ul>
+        <li><a href="http://localhost:4000/js/writes/validations">Validations</a></li>
+        <li><a href="http://localhost:4000/js/writes/dirty-tracking">Dirty Tracking</a></li>
+        <li><a href="http://localhost:4000/js/writes/nested">Nested Writes</a></li>
+      </ul>
+    </li>
+    <li><a href="http://localhost:4000/js/middleware">Middleware</a></li>
+    <li><a href="http://localhost:4000/js/authentication">Authentication</a></li>
+    <li><a href="http://localhost:4000/js/state-syncing">State Syncing</a></li>
+    <li><a href="http://localhost:4000/js/ddau">Data Down, Actions Up</a></li>
+  </ul>
+</div>
+
+<div class="col-md-8 col-md-offset-1">
+  <blockquote>
+    <p><strong>Start here</strong>: <a href="http://localhost:4000/js/introduction">Why JSORM?</a></p>
+  </blockquote>
+
+  <div class="tabs">
+    <div class="tab typescript">
+      <span>Typescript</span>
+    </div>
+    <div class="tab javascript">
+      <span>Javascript</span>
+    </div>
+  </div>
+  <div class="code-tabs">
+
+    <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="c1">// JSORM is like "ActiveRecord in Javascript". It can:</span>
+<span class="c1">//</span>
+<span class="c1">// * Deeply nest reads and writes</span>
+<span class="c1">// * Automatically handle validation errors</span>
+<span class="c1">// * Replace *ux patterns</span>
+<span class="c1">// * ...and much more!</span>
+
+<span class="c1">// define models</span>
+<span class="err">@</span><span class="nx">Model</span><span class="p">()</span>
+<span class="kr">class</span> <span class="nx">ApplicationRecord</span> <span class="k">extends</span> <span class="nx">JSORMBase</span> <span class="p">{</span>
+  <span class="k">static</span> <span class="nx">baseUrl</span> <span class="o">=</span> <span class="s2">"http://my-api.com"</span>
+  <span class="k">static</span> <span class="nx">apiNamespace</span> <span class="o">=</span> <span class="s2">"/api/v1"</span>
+<span class="p">}</span>
+
+<span class="err">@</span><span class="nx">Model</span><span class="p">()</span>
+<span class="kr">class</span> <span class="nx">Person</span> <span class="k">extends</span> <span class="nx">ApplicationRecord</span> <span class="p">{</span>
+  <span class="k">static</span> <span class="nx">jsonapiType</span> <span class="o">=</span> <span class="s2">"people"</span>
+
+  <span class="err">@</span><span class="nx">Attr</span><span class="p">()</span> <span class="nx">firstName</span><span class="err">:</span> <span class="kr">string</span>
+  <span class="err">@</span><span class="nx">Attr</span><span class="p">()</span> <span class="nx">lastName</span><span class="err">:</span> <span class="kr">string</span>
+
+  <span class="nx">get</span> <span class="nx">fullName</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">firstName</span><span class="p">}</span> <span class="nx">$</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">lastName</span><span class="p">}</span><span class="err">`</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// execute queries</span>
+<span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">({</span> <span class="na">first_name</span><span class="p">:</span> <span class="s1">'John'</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">order</span><span class="p">({</span> <span class="na">created_at</span><span class="p">:</span> <span class="s1">'desc'</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">per</span><span class="p">(</span><span class="mi">10</span><span class="p">).</span><span class="nx">page</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">includes</span><span class="p">({</span> <span class="na">jobs</span><span class="p">:</span> <span class="s1">'company'</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">({</span> <span class="na">people</span><span class="p">:</span> <span class="p">[</span><span class="s1">'first_name'</span><span class="p">,</span> <span class="s1">'last_name'</span><span class="p">]</span> <span class="p">})</span>
+
+<span class="c1">// persist data</span>
+<span class="kd">let</span> <span class="nx">person</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Person</span><span class="p">({</span> <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jane'</span> <span class="p">})</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
+    </code></pre></figure>
+
+    <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// JSORM is like "ActiveRecord in Javascript". It can:</span>
+<span class="c1">//</span>
+<span class="c1">// * Deeply nest reads and writes</span>
+<span class="c1">// * Automatically handle validation errors</span>
+<span class="c1">// * Replace *ux patterns</span>
+<span class="c1">// * ...and much more!</span>
+
+<span class="kd">var</span> <span class="nx">jsorm</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'jsorm'</span><span class="p">)</span>
+
+<span class="c1">// define models</span>
+<span class="kr">const</span> <span class="nx">ApplicationRecord</span> <span class="o">=</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">JSORMBase</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="na">static</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">baseUrl</span><span class="p">:</span> <span class="s1">'http://my-api.com'</span><span class="p">,</span>
+    <span class="na">apiNamespace</span><span class="p">:</span> <span class="s1">'/api/v1'</span>
+  <span class="p">}</span>
+<span class="p">})</span>
+
+<span class="kr">const</span> <span class="nx">Person</span> <span class="o">=</span> <span class="nx">ApplicationRecord</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="na">attrs</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">attr</span><span class="p">(),</span>
+    <span class="na">lastName</span><span class="p">:</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">attr</span><span class="p">()</span>
+  <span class="p">},</span>
+  <span class="na">methods</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">fullName</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">firstName</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">lastName</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">})</span>
+
+<span class="c1">// execute queries</span>
+<span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">({</span> <span class="na">first_name</span><span class="p">:</span> <span class="s1">'John'</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">order</span><span class="p">({</span> <span class="na">created_at</span><span class="p">:</span> <span class="s1">'desc'</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">per</span><span class="p">(</span><span class="mi">10</span><span class="p">).</span><span class="nx">page</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">includes</span><span class="p">({</span> <span class="na">jobs</span><span class="p">:</span> <span class="s1">'company'</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">({</span> <span class="na">people</span><span class="p">:</span> <span class="p">[</span><span class="s1">'first_name'</span><span class="p">,</span> <span class="s1">'last_name'</span><span class="p">]</span> <span class="p">})</span>
+
+<span class="c1">// persist data</span>
+<span class="kd">var</span> <span class="nx">person</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Person</span><span class="p">({</span> <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jane'</span> <span class="p">})</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
+    </code></pre></figure>
+
+  </div>
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/concepts">Concepts</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Resources</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Contact us</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

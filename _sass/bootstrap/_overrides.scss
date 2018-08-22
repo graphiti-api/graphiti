@@ -1,0 +1,25 @@
+@media (min-width: 1200px) {
+  .container {
+    width: 970px;
+  }
+}
+
+a {
+  color: #459CE7;
+}
+
+.pagination>.active {
+  >a,
+  >span, 
+  >a:hover, 
+  >span:hover, 
+  >a:focus, 
+  >span:focus { 
+    background-color: #5585B3;
+    border-color: #4477A3;
+  }
+}
+.pagination>li>a, 
+.pagination>li>span {
+  @include transition(all 0.25s linear);
+}

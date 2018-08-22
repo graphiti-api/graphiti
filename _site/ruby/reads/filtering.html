@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Graphiti</title>
+  <meta name="description" content="A stylish alternative to GraphQL">
+
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="http://localhost:4000" class="navbar-brand">JSONAPI Suite</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/ruby">Docs</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/js/home">Javascript Client</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="ruby-toc col-md-3">
+  <ul>
+    <li><a href="http://localhost:4000/ruby/installation">Installation</a></li>
+    <li><a href="http://localhost:4000/ruby/resources">Understanding Resources</a></li>
+    <li>Reads
+      <ul>
+        <li><a href="http://localhost:4000/ruby/reads/basic-reads">Basic Reads</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/sorting">Sorting</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/pagination">Pagination</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/filtering">Filtering</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/fieldsets">Fieldsets</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/statistics">Statistics</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/activerecord-associations">ActiveRecord Associations</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/nested">Querying Relationships</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/serializers">Serializers</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/default-behavior">Default Behavior</a></li>
+      </ul>
+    </li>
+    <li>Writes
+      <ul>
+        <li><a href="http://localhost:4000/ruby/writes/basic-writes">Basic Writes</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/validations">Validations</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/strong-resources">Strong Resources</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/nested-writes">Nested Writes</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/side-effects">Side Effects</a></li>
+      </ul>
+    </li>
+    <li><a href="http://localhost:4000/ruby/alternate-datastores">Alternate Datastores</a>
+      <ul>
+        <li><a href="http://localhost:4000/ruby/alternate-datastores/elasticsearch">ElasticSearch</a></li>
+        <li><a href="http://localhost:4000/ruby/alternate-datastores/http">HTTP Services</a></li>
+        <li><a href="http://localhost:4000/ruby/alternate-datastores/adapters">Adapters</a></li>
+      </ul>
+    </li>
+    <li><a href="http://localhost:4000/ruby/scoping-to-current-user">Scoping to Current User</a></li>
+    <li><a href="http://localhost:4000/ruby/backwards-compatibility">Backwards Compatibility</a></li>
+    <li><a href="http://localhost:4000/ruby/swagger">Swagger</a></li>
+    <li><a href="http://localhost:4000/ruby/testing">Integration Testing</a></li>
+    <li><a href="http://localhost:4000/ruby/error-handling">Error Handling</a></li>
+  </ul>
+</div>
+
+<div class="col-md-8 col-md-offset-1">
+  <h3 id="filtering">Filtering</h3>
+
+  <blockquote>
+    <p><a href="http://jsonapi.org/format/#fetching-filtering">View the JSONAPI specification</a></p>
+  </blockquote>
+
+  <blockquote>
+    <p><a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Resource.html#allow_filter-class_method">View the YARD Documentation</a></p>
+  </blockquote>
+
+  <blockquote>
+    <p>View the Sample App: <a href="https://github.com/jsonapi-suite/employee_directory/commit/cf501dd95f8d4211973092a673a9a449bf467a46">Server1</a> |  <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_1_add_filter...step_2_add_custom_filter">Server2</a> |  <a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_3_includes...step_4_filtering">Client</a></p>
+  </blockquote>
+
+  <blockquote>
+    <p><a href="http://localhost:4000/js/reads/filtering">View the JS Documentation</a></p>
+  </blockquote>
+
+  <p>Filters are usually one-liners, with the logic delegated to an <a href="http://localhost:4000/ruby/alternate-datastores/adapters">Adapter</a>.</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">allow_filter</span> <span class="ss">:title</span></code></pre></figure>
+
+  <p>You can view <code class="highlighter-rouge">allow_filter</code> like a whitelist. We wouldn’t want to
+automatically support filters - otherwise sneaky users might filter our
+<code class="highlighter-rouge">Employee</code>s to only those making a certain salary. Hence the whitelist.</p>
+
+  <p>To customize a filter:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">allow_filter</span> <span class="ss">:title</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">title: </span><span class="n">value</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>A real-life example might be a prefix query:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">allow_filter</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">([</span><span class="s2">"title LIKE ?"</span><span class="p">,</span> <span class="s2">"</span><span class="si">#{</span><span class="n">value</span><span class="si">}</span><span class="s2">%"</span><span class="p">])</span>
+<span class="k">end</span></code></pre></figure>
+
+  <h4 id="filtering-relationships">Filtering Relationships</h4>
+
+  <p>Prefix the filter parameter with the relevant <a href="http://jsonapi.org/format/#document-resource-identifier-objects">JSONAPI Type</a> like so:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash">/blogs?include<span class="o">=</span>posts&amp;filter[posts][title]<span class="o">=</span>foo</code></pre></figure>
+
+  <h4 id="default-filters">Default Filters</h4>
+
+  <blockquote>
+    <p><a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Scoping/DefaultFilter.html">View the YARD Documentation</a></p>
+  </blockquote>
+
+  <p>You may want your scope to be filtered any time it is accessed - Perhaps
+you only want to show <code class="highlighter-rouge">active</code> posts by default:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">default_filter</span> <span class="ss">:active</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Default filters can be overridden if there is a corresponding
+<code class="highlighter-rouge">allow_filter</code>. Given a <code class="highlighter-rouge">Resource</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">allow_filter</span> <span class="ss">:active</span>
+
+<span class="n">default_filter</span> <span class="ss">:active</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>And the following requests:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash">/posts
+/posts?filter[active]<span class="o">=</span><span class="nb">false</span></code></pre></figure>
+
+  <p>The first will display only active posts, the second will display only
+inactive posts.</p>
+
+  <h4 id="filter-conventions">Filter Conventions</h4>
+
+  <p>There are some common naming conventions for supporting more complex filters:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># greater than</span>
+<span class="n">allow_filter</span> <span class="ss">:id_gt</span>
+
+<span class="c1"># greater than or equal to</span>
+<span class="n">allow_filter</span> <span class="ss">:id_gte</span>
+
+<span class="c1"># less than</span>
+<span class="n">allow_filter</span> <span class="ss">:id_lt</span>
+
+<span class="c1"># less than or equal to</span>
+<span class="n">allow_filter</span> <span class="ss">:id_lte</span>
+
+<span class="c1"># prefix queries</span>
+<span class="n">allow_filter</span> <span class="ss">:title_prefix</span>
+
+<span class="c1"># OR queries</span>
+<span class="n">allow_filter</span> <span class="ss">:active_or</span> <span class="c1"># true or false</span></code></pre></figure>
+
+  <blockquote>
+    <p>NOTE: <strong>AND</strong> queries are supported by default - just pass a
+comma-delimited list of values.</p>
+  </blockquote>
+
+  <h4 id="filter-guards">Filter Guards</h4>
+
+  <p>You can conditionally allow filters based on runtime context.
+Let’s say only managers should be allowed to filter employees by salary:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">allow_filter</span> <span class="ss">:salary</span><span class="p">,</span> <span class="ss">if: :manager?</span>
+
+<span class="k">def</span> <span class="nf">manager?</span>
+  <span class="n">current_user</span><span class="p">.</span><span class="nf">role</span> <span class="o">==</span> <span class="s1">'manager'</span>
+<span class="k">end</span></code></pre></figure>
+
+  <h4 id="filter-aliases">Filter Aliases</h4>
+
+  <p>Aliases mostly come into play when supporting backwards
+compatibility. Let’s say we originally called the filter <code class="highlighter-rouge">fname</code> then
+later wanted the more-expressive <code class="highlighter-rouge">first_name</code>. An alias allows is to
+keep a one-liner with the correct naming, while still responding correctly
+to <code class="highlighter-rouge">fname</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">allow_filter</span> <span class="ss">:first_name</span><span class="p">,</span> <span class="ss">aliases: </span><span class="p">[</span><span class="ss">:fname</span><span class="p">]</span></code></pre></figure>
+
+  <h4 id="accessing-runtime-context">Accessing Runtime Context</h4>
+
+  <p><code class="highlighter-rouge">allow_filter</code> can access runtime context (in Rails, the controller) as
+the last argument:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">allow_filter</span> <span class="ss">:my_siblings</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">context</span><span class="o">|</span>
+  <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="kp">true</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">family_id: </span><span class="n">context</span><span class="p">.</span><span class="nf">current_user</span><span class="p">.</span><span class="nf">family_id</span><span class="p">)</span>
+  <span class="k">else</span>
+    <span class="n">scope</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/concepts">Concepts</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Resources</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Contact us</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

@@ -1,0 +1,65 @@
+.btn-shadow {
+  border: 0;
+  font-weight: 600;
+  color: #fff;
+  display: inline-block;
+  box-shadow: rgba(23, 43, 99, 0.24) 0 7px 28px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 13px;
+  padding: 12px 23px;
+  text-shadow: 1px 1px rgba(0, 0, 0, 0.09);
+  border-radius: 4px;
+
+  @include transition(all .2s);
+
+  &:hover,
+  &:focus {
+    color: #fff;
+    text-decoration: none;
+  }
+
+  &:active {
+    box-shadow: rgba(23, 43, 99, 0.24) 0 7px 28px, inset 0 2px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  /* sizes */
+
+  &.btn-shadow-sm {
+    font-size: 11px;
+    padding: 7px 14px;
+  }
+
+  &.btn-shadow-lg {
+    font-size: 14px;
+    padding: 16px 31px;
+  }
+
+  /* colors */
+
+  &.btn-shadow-default {
+    background: #fff;
+    color: #444;
+    text-shadow: none;
+  }
+
+  &.btn-shadow-primary {
+    background: linear-gradient(#2083fe, #1d7bf0);
+  }
+
+  &.btn-shadow-dark {
+    background: #2C394D;
+  }
+
+  &.btn-shadow-info {
+    background: #42B1E2;
+  }
+
+  &.btn-shadow-warning {
+    background: #E2B477;
+  }
+
+  &.btn-shadow-success {
+    background: #0ad6bc;
+  }
+}

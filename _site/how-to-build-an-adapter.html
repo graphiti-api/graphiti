@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Graphiti</title>
+  <meta name="description" content="A stylish alternative to GraphQL">
+
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="http://localhost:4000" class="navbar-brand">JSONAPI Suite</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/ruby">Docs</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/js/home">Javascript Client</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <h1 id="building-an-adapter">Building an Adapter</h1>
+
+<p>If you find yourself repeatedly making customizations to a group of
+<code class="highlighter-rouge">Resource</code>s and seek DRYer code, package those customizations into an
+<code class="highlighter-rouge">Adapter</code>. Here we’ll be starting from a previous how-to, <a href="how-to-use-without-activerecord">How to Use
+Alternate ORMs</a>.</p>
+
+<p>You can follow along with the below code snippets, or <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_23_disassociation...elasticsearch_adapter">view the diff on
+github</a>.</p>
+
+<p>Adapters are simpler than you might think. It’s little more than
+copy-pasting those low-level customizations into a common class.</p>
+
+<p>Start by creating <code class="highlighter-rouge">lib/elasticsearch_adapter.rb</code>. Cut/past the sorting,
+pagination, and <code class="highlighter-rouge">#resolve</code> overrides from <code class="highlighter-rouge">EmployeeResource</code> into the adapter,
+turning into <code class="highlighter-rouge">def</code> methods along the way:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># lib/elasticsearch_adapter.rb</span>
+<span class="k">class</span> <span class="nc">ElasticsearchAdapter</span>
+  <span class="k">def</span> <span class="nf">paginate</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">current_page</span><span class="p">,</span> <span class="n">per_page</span><span class="p">)</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">metadata</span><span class="p">.</span><span class="nf">pagination</span><span class="p">.</span><span class="nf">current_page</span> <span class="o">=</span> <span class="n">current_page</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">metadata</span><span class="p">.</span><span class="nf">pagination</span><span class="p">.</span><span class="nf">per_page</span> <span class="o">=</span> <span class="n">per_page</span>
+    <span class="n">scope</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">order</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">att</span><span class="p">,</span> <span class="n">dir</span><span class="p">)</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">metadata</span><span class="p">.</span><span class="nf">sort</span> <span class="o">=</span> <span class="p">[{</span><span class="ss">att: </span><span class="n">att</span><span class="p">,</span> <span class="ss">dir: </span><span class="n">dir</span><span class="p">}]</span>
+    <span class="n">scope</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">query!</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">results</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Ensure our adapter gets loaded:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># config/initializers/jsonapi.rb</span>
+<span class="nb">require</span> <span class="s1">'elasticsearch_adapter'</span></code></pre></figure>
+
+<p>And switch to that adapter in <code class="highlighter-rouge">EmployeeResource</code>:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">use_adapter</span> <span class="no">ElasticsearchAdapter</span></code></pre></figure>
+
+<p>Bounce your server. You can still hit the <code class="highlighter-rouge">/api/v1/employees</code> endpoint
+with the same sort and paginate functionality, but the code has been
+moved to an adapter.</p>
+
+<p>Let’s ensure our users can filter as well:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">att</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">condition</span><span class="p">(</span><span class="n">att</span><span class="p">).</span><span class="nf">eq</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>For all the methods and functionality an adapter supports, see the
+<a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Adapters/Abstract.html">Adapter documenation</a>.</p>
+
+<p>We probably also want <code class="highlighter-rouge">has_many</code>-style macros to avoid writing similar
+<code class="highlighter-rouge">allow_sideload</code> code time after time. Start by specifying where this
+functionality is defined, and add a <code class="highlighter-rouge">has_many</code> macro:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Sideloading</span>
+  <span class="k">def</span> <span class="nf">has_many</span><span class="p">(</span><span class="n">association_name</span><span class="p">,</span>
+               <span class="n">scope</span><span class="p">:,</span>
+               <span class="n">resource</span><span class="p">:,</span>
+               <span class="n">foreign_key</span><span class="p">:,</span>
+               <span class="ss">primary_key: :id</span><span class="p">,</span>
+               <span class="o">&amp;</span><span class="n">blk</span><span class="p">)</span>
+    <span class="c1"># our code will go here</span>
+    <span class="nb">instance_eval</span><span class="p">(</span><span class="o">&amp;</span><span class="n">blk</span><span class="p">)</span> <span class="k">if</span> <span class="n">blk</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">sideloading_module</span>
+  <span class="no">Sideloading</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>The <code class="highlighter-rouge">instance_eval</code> is there so we can always drop down to a lower-level
+customization in our <code class="highlighter-rouge">Resource</code>.</p>
+
+<p>We can basically cut/paste our existing sideload code and rewrite it as
+variables:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">scope</span> <span class="k">do</span> <span class="o">|</span><span class="n">parents</span><span class="o">|</span>
+  <span class="n">parent_ids</span> <span class="o">=</span> <span class="n">parents</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="nb">p</span><span class="o">|</span> <span class="nb">p</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="n">primary_key</span><span class="p">)</span> <span class="p">}</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">call</span><span class="p">.</span><span class="nf">condition</span><span class="p">(</span><span class="n">foreign_key</span><span class="p">).</span><span class="nf">or</span><span class="p">(</span><span class="n">parent_ids</span><span class="p">.</span><span class="nf">uniq</span><span class="p">.</span><span class="nf">compact</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">assign</span> <span class="k">do</span> <span class="o">|</span><span class="n">parents</span><span class="p">,</span> <span class="n">children</span><span class="o">|</span>
+  <span class="n">parents</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="nb">p</span><span class="o">|</span>
+    <span class="n">relevant_children</span> <span class="o">=</span> <span class="n">children</span><span class="p">.</span><span class="nf">select</span> <span class="k">do</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span>
+      <span class="n">c</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="n">foreign_key</span><span class="p">)</span> <span class="o">==</span> <span class="nb">p</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="n">primary_key</span><span class="p">)</span>
+    <span class="k">end</span>
+    <span class="nb">p</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="ss">:"</span><span class="si">#{</span><span class="n">association_name</span><span class="si">}</span><span class="ss">="</span><span class="p">,</span> <span class="n">relevant_children</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>You can now remove any customizations from your <code class="highlighter-rouge">Resource</code> classes. You
+can continue to build the adapter, adding <code class="highlighter-rouge">belongs_to</code>, statistics, and
+more. <a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Adapters/Abstract.html">View the adapter documentation for the full API</a>.</p>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/concepts">Concepts</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Resources</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Contact us</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

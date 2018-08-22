@@ -1,0 +1,306 @@
+#docs {
+
+	#guide {
+		background: #F4F8FA;
+		border-right: 1px solid #DADFE5;
+		left: 0;
+		top: 0;
+		position: fixed;
+		overflow: hidden;
+		overflow-y: auto;
+		width: 210px;
+		z-index: 25;
+		height: 100%;
+
+		.logo {
+			margin-top: 0;
+			font-size: 29px;
+
+			a {
+				color: #000;
+				font-family: $myriad;
+				padding: 20px 0 15px 23px;
+				display: block;
+				border-bottom: 1px solid #D6DCE0;
+				box-shadow: 0px 1px #FFF;
+				@include transition(color .15s linear);
+
+				&:hover {
+					color: #858585;
+					text-decoration: none;
+				}
+			}
+		}
+
+		.menu {
+			> li {
+
+				&.active {
+					> .nav {
+						display: block;
+					}
+
+					> a {
+						background: #DEEAF1;
+					}
+				}
+
+				a {
+					color: #3391C9;
+					font-weight: 500;
+					font-size: 13px;
+					padding: 10px 15px 10px 25px;
+
+					@include transition(all .15s linear);
+
+					&:hover {
+						background: #DEEAF1;
+					}
+				}
+
+				> .nav {
+					margin-bottom: 7px;
+					display: none;
+
+					li {
+						a {
+							font-weight: 400;
+							color: #48A0D6;
+							padding: 6px 15px 5px 35px;
+						}
+					}
+				}
+			}
+		}
+	}
+
+
+	#api-docs {
+		background: #FFF;
+		margin-left: 210px !important;
+		min-width: 750px;
+
+		#methods {
+			background: #292E33;
+			position: relative;
+			margin-left: 50%;
+
+			.languages {
+				position: fixed;
+				top: 0;
+				width: 100%;
+				padding: 5px 0 5px 20px;
+				background: #3B4249;
+				box-shadow: 2px 1px 3px #000;
+				z-index: 999;
+
+				.language {
+					display: inline-block;
+					color: #C0CEDD;
+					padding: 5px 15px;
+					font-size: 13px;
+
+					&.selected {
+						color: #fff;
+					}
+				}
+			}
+
+			.method {
+
+				/*&:nth-child(2) {*/
+					/*.method-section {*/
+						/*.method-description {*/
+							/*padding-top: 0px;*/
+							/*border-top: 0px;*/
+						/*}*/
+
+						/*.method-example {*/
+							/*padding-top: 35px;*/
+							/*border-top: 0;*/
+							/*box-shadow: none;*/
+						/*}*/
+					/*}*/
+				/*}*/
+
+				&:last-child {
+					.method-section {
+						padding-bottom: 70px;
+					}
+				}
+
+				.method-section {
+					margin-left: -100%;
+					position: relative;
+					padding-top: 50px;
+
+					.method-description {
+						width: 50%;
+						float: left;
+						padding: 0 30px;
+						border-top: 1px solid #E5E7EB;
+						padding-top: 40px;
+
+						h3 {
+							font-size: 21px;
+							margin-top: 0;
+							margin-bottom: 20px;
+						}
+
+						p {
+							font-size: 13px;
+							color: #666;
+							line-height: 21px;
+							margin-bottom: 20px;
+						}
+
+						.info {
+							margin-top: 45px;
+							margin-bottom: 40px;
+							
+							h4 {
+								font-size: 14px;
+								border-bottom: 1px solid #E4E4E4;
+								padding-bottom: 15px;
+							}
+
+							.field {
+								margin-top: 17px;
+								font-size: 13px;
+
+								.key {
+									width: 40%;
+									float: left;
+									text-align: right;
+									padding-right: 10px;
+									font-weight: bold;
+									color: #333;
+								}
+								
+								.desc {
+									width: 60%;
+									float: right;
+									padding-left: 10px;
+									color: #555;
+									line-height: 21px;
+
+									strong {
+										display: block;
+										color: #333;
+										margin-bottom: 5px;
+									}
+								}
+							}
+						}
+					}
+
+					.method-example {
+						margin-left: 50%;
+						width: 50%;
+						padding: 0px 30px 0;
+						border-top: 1px solid #000;
+						box-shadow: inset 0px 1px rgba(255, 255, 255, 0.17);
+						color: #fff;
+
+						pre {
+							background: none;
+							border: none;
+							margin: 0;
+							padding: 20px;
+
+							code {
+								background: none;
+								font-family: Monaco, Consolas, Menlo;
+								font-size: 14px;
+
+								&.always-visible {
+									display: block !important;
+								}
+
+								&.ruby {
+									display: block;
+								}
+
+								color: #DAE4F2;
+
+								/*> * {*/
+									/*color: #DAE4F2;*/
+									/*line-height: 20px;*/
+								/*}*/
+							}
+
+							.ruby {
+								/*color: #DAE4F2;*/
+
+								/*> * {*/
+									/*color: #DAE4F2;*/
+									/*line-height: 20px;*/
+								/*}*/
+
+								/*[class*=keyword] {*/
+									/*color: #9AB4DB;*/
+								/*}*/
+								/*[class*=string] {*/
+									/*color: #DAD0C6;*/
+								/*}*/
+								/*[class*=comment] {*/
+									/*color: #B4B4B4;*/
+								/*}*/
+								/*[class*=constant] {*/
+									/*color: #FFDF9D;*/
+								/*}*/
+								/*[class*=symbol] {*/
+									/*color: #9ECBEE;*/
+								/*}*/
+							}
+							.python {
+								color: #DAE4F2;
+
+								> * {
+									color: #DAE4F2;
+									line-height: 20px;
+								}
+
+								[class*=keyword] {
+									color: #9AB4DB;
+								}
+								[class*=string] {
+									color: #DAD0C6;
+								}
+								[class*=comment] {
+									color: #B4B4B4;
+								}
+								[class*=class] {
+									color: #FFDF9D;
+								}
+								[class*=params] {
+									color: #9ECBEE;
+								}
+							}
+							.php {
+								color: #DAE4F2;
+
+								> * {
+									color: #DAE4F2;
+									line-height: 20px;
+								}
+
+								[class*=keyword] {
+									color: #9AB4DB;
+								}
+								[class*=string] {
+									color: #DAD0C6;
+								}
+								[class*=comment] {
+									color: #B4B4B4;
+								}
+							}
+						}
+					}	
+				}
+			}
+		}
+	}
+}
+
+

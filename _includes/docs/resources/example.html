@@ -1,0 +1,31 @@
+{% highlight ruby %}
+class PostResource < ApplicationResource
+  # Use default logic (specified in adapter)
+  # when no block passed
+  allow_filter :active
+
+  allow_filter :title_prefix do |scope, value|
+    # Example:
+    # scope.where(["title LIKE ?", "#{value}%"])
+  end
+
+  sort do |scope, att, dir|
+    # Example:
+    # scope.order(att => dir)
+  end
+
+  paginate do |scope, current_page, per_page|
+    # Example:
+    # scope.per(per_page).page(current_page)
+  end
+
+  # Example: let's say we're hitting an HTTP
+  # service instead of ActiveRecord. Maybe our
+  # scope is a big hash we build up, and now
+  # we need to use a client to take that hash and
+  # execute the HTTP request.
+  def resolve(scope)
+    MyHTTPClient.request(scope)
+  end
+end
+{% endhighlight %}

@@ -1,0 +1,33 @@
+<p>
+  <a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Resource.html">Resources</a> are where you define how to query and persist a given <code class="highlighter-rouge">Model</code>.
+  We'll wire-up the JSONAPI contract for you, so you can customize hooks rather
+  than spend your time parsing query parameters.
+</p>
+
+<p>
+To the right, you'll see potential overrides of default behavior. Our defaults are based on <code class="highlighter-rouge">ActiveRecord</code>
+  and Rails conventions - so customizations like this are often not required.
+</p>
+
+<p>
+  If you find yourself writing the same customizations over and over again, DRY them up by writing an
+  <a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Adapters/Abstract.html">Adapter</a>.
+</p>
+
+<p>
+  See also:
+  <ul>
+    <li>
+      <a href="{{site.github.url}}/how-to-use-without-activerecord">How to use alternate ORMs</a>
+    </li>
+    <li>
+      <a href="{{site.github.url}}/how-to-build-an-adapter">How to build an Adapter</a>
+    </li>
+    <li>
+      <a href="{{site.github.url}}/how-to-add-defaults">How to add default behavior</a>
+    </li>
+    <li>
+      <a href="{{site.github.url}}/how-to-cause-side-effects">How to cause side-effects</a>
+    </li>
+  </ul>
+</p>

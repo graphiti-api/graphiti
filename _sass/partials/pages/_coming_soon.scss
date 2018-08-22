@@ -1,0 +1,275 @@
+.coming-soon-page {
+  border-top: 5px solid #4DB2E7;
+  height: 100vh;
+  background: #fff;
+  background: -moz-radial-gradient(center, ellipse cover, #fff 0%, #F4F9FF 100%);
+  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #fff), color-stop(100%, #F4F9FF));
+  background: -webkit-radial-gradient(center, ellipse cover, #fff 0%, #F4F9FF 100%);
+  background: -o-radial-gradient(center, ellipse cover, #fff 0%, #F4F9FF 100%);
+  background: -ms-radial-gradient(center, ellipse cover, #fff 0%, #F4F9FF 100%);
+  background: radial-gradient(ellipse at center, #fff 0%, #F4F9FF 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#fff', endColorstr = '#F4F9FF', GradientType = 1);    
+
+  &.dark {
+    border-top: 5px solid #DAEEF8;
+    background: #4D576D !important;
+
+    .info {
+      a {
+        color: #fff;
+      }
+
+      h3 {
+        color: #fff;
+        font-weight: 300;
+      }
+    }
+
+    #countdown {
+      #clock {
+        .flip-clock-divider {
+          .flip-clock-label {
+            color: #fff;
+          }
+        }
+      }
+    }
+
+    form {
+      .button {
+        display: inline-block;
+        vertical-align: middle;
+        zoom: 1;
+        color: #fff;
+        padding: 9px 27px;
+        border: 2px solid #fff;
+        border-radius: 4px;
+        font-size: 15px;
+        font-weight: 400;
+        background: rgba(0, 0, 0, 0.08);
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+        box-shadow: none;
+
+        @include transition(all 0.2s linear);
+
+        &:hover {
+          text-decoration: none;
+          color: #ddd;
+          border-color: #ddd;
+        }
+      }
+    }
+
+    .social {
+      .ion {
+        span {
+          color: #AEDCFF;
+        }
+      }
+    }
+  }
+
+  .skins-nav {
+    opacity: 1;
+    @include transition(left .3s);
+    position: fixed;
+    left: -40px;
+    top: 135px;
+    font-size: 13px;
+    z-index: 9999;
+
+    &:hover {
+      left: 0px;
+    }
+
+    a {
+      display: block;
+      color: #FFF;
+      text-decoration: none;
+      padding-right: 30px;
+      height: 37px;
+      border-radius: 0 4px 4px 0;
+      margin-bottom: 3px;
+      @include transition(all .5s);
+      text-align: right;
+      position: relative;
+      box-shadow: inset 0 1px rgba(255, 255, 255, 0.21);
+
+      &.light {
+        background: #9BD4F5;
+      }
+
+      &.dark {
+        background: #444;
+      }
+
+      &.active {
+        .ion {
+          display: block;
+        }
+      }
+
+      .text {
+        white-space: nowrap;
+        display: block;
+        width: 85px;
+        position: relative;
+        top: 9px;
+        @include transition(width .2s);
+      }
+
+      .ion {
+        position: absolute;
+        top: 11px;
+        right: 8px;
+        display: none;
+      }
+    }
+  }
+
+  .info {
+    margin-top: 60px;
+    text-align: center;
+    color: #fff;
+
+    a {
+      color: #5F5F5F;
+      text-decoration: none;
+      font-family: $myriad;
+      font-size: 46px;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+    h3 {
+      text-align: center;
+      color: #4DB2E7;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 400;
+      font-size: 18px;
+      margin-top: 25px;
+    }
+  }
+
+  #countdown {
+    margin-top: 35px;
+
+    #clock {
+      width: 100%;
+      margin: 0 auto;
+
+      @media(min-width: 992px) {
+        width: 47%;
+      }
+
+      @media(max-width: 991px) {
+        max-width: 142px;
+
+        ul {
+          margin-bottom: 50px;
+        }
+
+        .flip-clock-divider {
+          height: inherit;
+          display: block;
+
+          &:before, 
+          &:after {
+            display: table;
+            content: "";
+          }
+
+          &.minutes,
+          &.seconds {
+            .flip-clock-label { 
+              right: -74px !important;
+            }
+          }
+
+          .flip-clock-label {
+            bottom: -8.5em !important;
+          }
+        }
+      }
+
+      .flip-clock-divider {
+
+        &.minutes,
+        &.seconds {
+          .flip-clock-label { 
+            right: -102px;
+          }
+        }
+
+        .flip-clock-label {
+          color: #555;
+          bottom: -1.5em;
+          top: inherit;
+          right: -92px;
+          font-size: 15px;
+        }
+
+        .flip-clock-dot {
+          display: none;
+        }
+      }
+    }
+  }
+
+  form {
+    margin-top: 110px;
+    text-align: center;
+
+    @media(max-width: 767px) {
+      margin-top: 70px;
+    }
+
+    input[type="email"] {
+      width: 250px;
+      height: 43px;
+
+      @media(max-width: 767px) {
+        margin: 0 auto;
+      }
+    }
+
+    .button {
+      @include background-gradient(#38BAFF, #37ADEB);
+      padding: 10px 19px;
+      font-size: 15px;
+      font-weight: 500;
+      border: 1px solid #54AEF5;
+    }
+  }
+
+  .social {
+    margin-top: 100px;
+    text-align: center;
+    margin-bottom: 20px;
+
+    .ion {
+      font-size: 34px;
+      margin: 0 10px;
+      display: inline-block;
+
+      span {
+        color: #9DBDD6;
+      }
+
+      .ion-social-twitter {
+      }
+
+      .ion-social-facebook {
+        font-size: 25px;
+      }
+    }
+
+    .tm {
+      margin-top: 15px;
+      color: #B1B9C4;
+    }
+  }
+}

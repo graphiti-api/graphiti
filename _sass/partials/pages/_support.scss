@@ -1,0 +1,128 @@
+.support-header {
+  margin-top: -20px;
+  background: #F4F7FA;
+  border-bottom: 1px solid #DCE4EC;
+  padding: 50px 0px;
+
+  @media(max-width: 767px) {
+    padding: 30px 0px;
+    text-align: center;
+  }
+
+  h2, p {
+    text-shadow: 1px 1px 1px #fff;
+  }
+
+  h2 {
+    @media(max-width: 767px) {
+      font-size: 27px;
+    }
+
+    .entypo-lifebuoy {
+      position: absolute;
+      left: -25px;
+      top: 22px;
+      font-size: 29px;
+      color: #7AA3C5;
+
+      @media(max-width: 767px) {
+        position: relative;
+        left: 0px;
+      }
+    }
+  }
+
+  p {
+    font-size: 17px;
+    color: #5A5A5A;
+
+    @media(max-width: 767px) {
+      font-size: 15px;
+    }
+  }
+
+  form {
+    margin-top: 30px;
+
+    .input-group {
+      &:before {
+        display: inline-block;
+        font-family: FontAwesome;
+        font-style: normal;
+        font-weight: normal;
+        line-height: 1;
+        content: "\f002";
+        position: absolute;
+        top: 14px;
+        left: 13px;
+        font-size: 20px;
+        z-index: 99;
+        color: rgb(208, 218, 228);
+      }
+    }
+
+    .form-control {
+      height: 50px;
+      font-size: 17px;
+      line-height: 20px;
+      padding-left: 42px;
+
+      @include placeholder {
+        color: #BCC8D6;
+        font-size: 17px;
+        font-weight: 300;
+      }
+    }
+
+    .input-group-btn {
+      .btn {
+        padding: 14px 18px;
+      }
+    }
+  }
+}
+
+.support-topics {
+  margin-top: 40px;
+
+  h4 {
+    font-weight: 400;
+    margin-bottom: 50px;
+    font-size: 25px;
+  }
+
+  .topic {
+    margin-bottom: 45px;
+
+    @media(max-width: 767px) {
+      text-align: center;   
+    }
+
+    .icon {
+      display: block;
+      font-size: 45px;
+      color: #70CBF5;
+    }
+
+    a {
+      color: #454545;
+      text-decoration: none;
+      @include transition(all 0.2s linear);
+
+      strong {
+        display: block;
+        margin-top: 15px;
+        font-size: 16px;
+      }
+
+      &:hover {
+        color: #5CB9E4;
+      }
+    }
+
+    p {
+      margin-top: 17px;
+      color: #838383;
+    }
+  }
+}

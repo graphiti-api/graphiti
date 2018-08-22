@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Graphiti</title>
+  <meta name="description" content="A stylish alternative to GraphQL">
+
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="http://localhost:4000" class="navbar-brand">JSONAPI Suite</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/ruby">Docs</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/js/home">Javascript Client</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="ruby-toc col-md-3">
+  <ul>
+    <li><a href="http://localhost:4000/ruby/installation">Installation</a></li>
+    <li><a href="http://localhost:4000/ruby/resources">Understanding Resources</a></li>
+    <li>Reads
+      <ul>
+        <li><a href="http://localhost:4000/ruby/reads/basic-reads">Basic Reads</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/sorting">Sorting</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/pagination">Pagination</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/filtering">Filtering</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/fieldsets">Fieldsets</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/statistics">Statistics</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/activerecord-associations">ActiveRecord Associations</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/nested">Querying Relationships</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/serializers">Serializers</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/default-behavior">Default Behavior</a></li>
+      </ul>
+    </li>
+    <li>Writes
+      <ul>
+        <li><a href="http://localhost:4000/ruby/writes/basic-writes">Basic Writes</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/validations">Validations</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/strong-resources">Strong Resources</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/nested-writes">Nested Writes</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/side-effects">Side Effects</a></li>
+      </ul>
+    </li>
+    <li><a href="http://localhost:4000/ruby/alternate-datastores">Alternate Datastores</a>
+      <ul>
+        <li><a href="http://localhost:4000/ruby/alternate-datastores/elasticsearch">ElasticSearch</a></li>
+        <li><a href="http://localhost:4000/ruby/alternate-datastores/http">HTTP Services</a></li>
+        <li><a href="http://localhost:4000/ruby/alternate-datastores/adapters">Adapters</a></li>
+      </ul>
+    </li>
+    <li><a href="http://localhost:4000/ruby/scoping-to-current-user">Scoping to Current User</a></li>
+    <li><a href="http://localhost:4000/ruby/backwards-compatibility">Backwards Compatibility</a></li>
+    <li><a href="http://localhost:4000/ruby/swagger">Swagger</a></li>
+    <li><a href="http://localhost:4000/ruby/testing">Integration Testing</a></li>
+    <li><a href="http://localhost:4000/ruby/error-handling">Error Handling</a></li>
+  </ul>
+</div>
+
+<div class="col-md-8 col-md-offset-1">
+  <h3 id="validations">Validations</h3>
+
+  <blockquote>
+    <p><a href="http://jsonapi.org/format/#errors">View the JSONAPI Errors Spec</a></p>
+  </blockquote>
+
+  <blockquote>
+    <p>View the Sample App: <a href="https://github.com/jsonapi-suite/employee_directory/compare/step_14_create...step_15_validations">Server</a>  |  <a href="https://github.com/jsonapi-suite/employee-directory-vue/compare/step_10_nested_create...step_11_validations">Client</a></p>
+  </blockquote>
+
+  <blockquote>
+    <p><a href="http://localhost:4000/js/writes/validations">View the JS Documentation</a></p>
+  </blockquote>
+
+  <p>Validation errors are handled automatically for any models adhering to
+the <a href="http://api.rubyonrails.org/classes/ActiveModel/Validations.html">ActiveModel::Validations API</a>.</p>
+
+  <p>After we’ve run the persistence logic - but before we close the
+transaction - we check <code class="highlighter-rouge">model.errors</code>. If errors are present anywhere in
+the graph, we rollback the transaction and return a JSONAPI-compliant <a href="http://jsonapi.org/format/#errors">Error response</a>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="p">[</span>
+  <span class="p">{</span>
+    <span class="ss">code: </span><span class="s2">"unprocessable_entity"</span><span class="p">,</span>
+    <span class="ss">detail: </span><span class="s2">"Name can't be blank"</span><span class="p">,</span>
+    <span class="ss">meta: </span><span class="p">{</span>
+      <span class="ss">attribute: </span><span class="s2">"name"</span><span class="p">,</span>
+      <span class="ss">message: </span><span class="s2">"can't be blank"</span>
+    <span class="p">},</span>
+    <span class="ss">source: </span><span class="p">{</span>
+      <span class="ss">pointer: </span><span class="s2">"/data/attributes/name"</span>
+    <span class="p">},</span>
+    <span class="ss">status: </span><span class="s2">"422"</span><span class="p">,</span>
+    <span class="ss">title: </span><span class="s2">"Validation Error"</span>
+  <span class="p">}</span>
+<span class="p">]</span></code></pre></figure>
+
+  <p>This is true for nested write operations as well. Let’s say we were
+saving an <code class="highlighter-rouge">Employee</code> and their <code class="highlighter-rouge">Position</code>s in a single request, but one
+of the positions had a validation error on a missing <code class="highlighter-rouge">title</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="p">[</span>
+  <span class="p">{</span>
+    <span class="ss">code:  </span><span class="s1">'unprocessable_entity'</span><span class="p">,</span>
+    <span class="ss">status: </span><span class="s1">'422'</span><span class="p">,</span>
+    <span class="ss">title: </span><span class="s1">'Validation Error'</span><span class="p">,</span>
+    <span class="ss">detail: </span><span class="s2">"Title can't be blank"</span><span class="p">,</span>
+    <span class="ss">source: </span><span class="p">{</span> <span class="ss">pointer: </span><span class="s1">'/data/attributes/title'</span> <span class="p">},</span>
+    <span class="ss">meta: </span><span class="p">{</span>
+      <span class="ss">relationship: </span><span class="p">{</span>
+        <span class="ss">attribute: :title</span><span class="p">,</span>
+        <span class="ss">message: </span><span class="s2">"can't be blank"</span><span class="p">,</span>
+        <span class="ss">code: :blank</span><span class="p">,</span>
+        <span class="ss">name: :positions</span><span class="p">,</span>
+        <span class="ss">id: </span><span class="s1">'123'</span><span class="p">,</span>
+        <span class="ss">type: </span><span class="s1">'positions'</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">]</span></code></pre></figure>
+
+  <p>This is enough information for a client to apply errors to the relevant
+objects. In JSORM’s case, you’d see:</p>
+
+  <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="kd">let</span> <span class="nx">success</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">employee</span><span class="p">.</span><span class="nx">save</span><span class="p">({</span> <span class="na">with</span><span class="p">:</span> <span class="s2">"positions"</span> <span class="p">})</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">employee</span><span class="p">.</span><span class="nx">errors</span><span class="p">)</span> <span class="c1">// # {}</span>
+<span class="kd">let</span> <span class="nx">position</span> <span class="o">=</span> <span class="nx">employee</span><span class="p">.</span><span class="nx">positions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">position</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nx">title</span><span class="p">.</span><span class="nx">message</span><span class="p">)</span> <span class="c1">// # "Can't be blank"</span></code></pre></figure>
+
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/concepts">Concepts</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Resources</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Contact us</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

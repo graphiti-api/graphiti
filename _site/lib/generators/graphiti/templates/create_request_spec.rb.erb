@@ -1,0 +1,30 @@
+require 'rails_helper'
+
+RSpec.describe "<%= type %>#create", type: :request do
+  subject(:make_request) do
+    jsonapi_post "/<%= api_namespace %>/v1/<%= type %>", payload
+  end
+
+  describe 'basic create' do
+    let(:payload) do
+      {
+        data: {
+          type: '<%= type %>',
+          attributes: {
+            # ... your attrs here
+          }
+        }
+      }
+    end
+
+    it 'works' do
+      expect(<%= resource_class %>).to receive(:build).and_call_original
+      expect {
+        make_request
+      }.to change { <%= model_class %>.count }.by(1)
+      <%= var %> = <%= model_class %>.last
+      # assert on properties
+      expect(response.status).to eq(201)
+    end
+  end
+end

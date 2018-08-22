@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Graphiti</title>
+  <meta name="description" content="A stylish alternative to GraphQL">
+
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="http://localhost:4000" class="navbar-brand">JSONAPI Suite</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/ruby">Docs</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/js/home">Javascript Client</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <h1 id="side-effects">Side Effects</h1>
+
+<p>Side effects scenarios come up often. What if we want to send an email
+notification every time a <code class="highlighter-rouge">Comment</code> is created?</p>
+
+<p>It’s important to note that there are three overall categories of side effects,
+and each requires a different solution:</p>
+
+<ul>
+  <li>Side effects internal to the <code class="highlighter-rouge">Model</code>: For example, setting a
+<code class="highlighter-rouge">published_at</code> attribute.</li>
+  <li>Side effects that should only occur on a specific request: For
+example, only send an email update if we’re creating a <code class="highlighter-rouge">Post</code> for the
+first time, at the <code class="highlighter-rouge">/posts</code> endpoint.</li>
+  <li>Side effects that should occur on every <em>type</em> of request: For
+example, send an email notification every time a <code class="highlighter-rouge">Comment</code> is created -
+but not updated - whether it was created at the <code class="highlighter-rouge">/comments</code> endpoint or sideposted at the
+<code class="highlighter-rouge">/posts</code> endpoint.</li>
+</ul>
+
+<h4 id="internal-side-effects">Internal Side-Effects</h4>
+
+<p>For the first scenario, it’s OK to use <code class="highlighter-rouge">ActiveRecord</code> callbacks (or the
+equivalent functionality in a different ORM):</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/models/user.rb</span>
+<span class="k">class</span> <span class="nc">Post</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">before_save</span> <span class="ss">:set_published_at</span><span class="p">,</span>
+    <span class="ss">on: :update</span><span class="p">,</span>
+    <span class="ss">if: :publishing?</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">set_published_at</span>
+    <span class="nb">self</span><span class="p">.</span><span class="nf">published_at</span> <span class="o">=</span> <span class="no">Time</span><span class="p">.</span><span class="nf">now</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">publishing?</span>
+    <span class="n">status_changed?</span> <span class="o">&amp;&amp;</span> <span class="n">status</span> <span class="o">==</span> <span class="s1">'published'</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<h4 id="side-effects-on-specific-action">Side-Effects on Specific Action</h4>
+
+<p>Just like you would with vanilla Rails, use the controller. Here we’ll
+only send an email to our subscribers when the <code class="highlighter-rouge">Post</code> is first created.
+Keep in mind we could also “sidepost” <code class="highlighter-rouge">Post</code> objects at the <code class="highlighter-rouge">/blogs</code>
+endpoint, but this will only fire at the <code class="highlighter-rouge">/posts</code> endpoint.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">PostsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="k">def</span> <span class="nf">create</span>
+    <span class="n">post</span><span class="p">,</span> <span class="n">success</span> <span class="o">=</span> <span class="n">jsonapi_create</span><span class="p">.</span><span class="nf">to_a</span>
+
+    <span class="k">if</span> <span class="n">success</span>
+      <span class="no">PostMailer</span><span class="p">.</span><span class="nf">published_email</span><span class="p">.</span><span class="nf">deliver_later</span>
+      <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">post</span><span class="p">,</span> <span class="ss">scope: </span><span class="kp">false</span><span class="p">)</span>
+    <span class="k">else</span>
+      <span class="n">render_errors_for</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<h4 id="side-effects-on-every-request-of-a-given-type">Side-Effects on Every Request of a Given Type</h4>
+
+<p>Let’s add some special logging every time we create a <code class="highlighter-rouge">Post</code>. Note this
+will fire <em>every</em> time we create a <code class="highlighter-rouge">Post</code> - whether we create it at the
+<code class="highlighter-rouge">/posts</code> endpoint or “sidepost” at the <code class="highlighter-rouge">/blogs</code> endpoint.</p>
+
+<p>We <strong>do not</strong> need to worry about this side-effect in our model specs,
+or rake tasks, as the functionality is only relevant to the API.</p>
+
+<p>Edit your <code class="highlighter-rouge">Resource</code>:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/post_resource.rb</span>
+<span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+  <span class="no">Rails</span><span class="p">.</span><span class="nf">logger</span><span class="p">.</span><span class="nf">info</span> <span class="s2">"Post begin created by </span><span class="si">#{</span><span class="n">context</span><span class="p">.</span><span class="nf">current_user</span><span class="p">.</span><span class="nf">email</span><span class="si">}</span><span class="s2">..."</span>
+  <span class="k">super</span>
+  <span class="no">Rails</span><span class="p">.</span><span class="nf">logger</span><span class="p">.</span><span class="nf">info</span> <span class="s2">"Success!"</span>
+<span class="k">end</span></code></pre></figure>
+
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/concepts">Concepts</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Resources</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Contact us</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

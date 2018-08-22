@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Graphiti</title>
+  <meta name="description" content="A stylish alternative to GraphQL">
+
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="http://localhost:4000" class="navbar-brand">JSONAPI Suite</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/ruby">Docs</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/js/home">Javascript Client</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="ruby-toc col-md-3">
+  <ul>
+    <li><a href="http://localhost:4000/ruby/installation">Installation</a></li>
+    <li><a href="http://localhost:4000/ruby/resources">Understanding Resources</a></li>
+    <li>Reads
+      <ul>
+        <li><a href="http://localhost:4000/ruby/reads/basic-reads">Basic Reads</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/sorting">Sorting</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/pagination">Pagination</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/filtering">Filtering</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/fieldsets">Fieldsets</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/statistics">Statistics</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/activerecord-associations">ActiveRecord Associations</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/nested">Querying Relationships</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/serializers">Serializers</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/default-behavior">Default Behavior</a></li>
+      </ul>
+    </li>
+    <li>Writes
+      <ul>
+        <li><a href="http://localhost:4000/ruby/writes/basic-writes">Basic Writes</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/validations">Validations</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/strong-resources">Strong Resources</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/nested-writes">Nested Writes</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/side-effects">Side Effects</a></li>
+      </ul>
+    </li>
+    <li><a href="http://localhost:4000/ruby/alternate-datastores">Alternate Datastores</a>
+      <ul>
+        <li><a href="http://localhost:4000/ruby/alternate-datastores/elasticsearch">ElasticSearch</a></li>
+        <li><a href="http://localhost:4000/ruby/alternate-datastores/http">HTTP Services</a></li>
+        <li><a href="http://localhost:4000/ruby/alternate-datastores/adapters">Adapters</a></li>
+      </ul>
+    </li>
+    <li><a href="http://localhost:4000/ruby/scoping-to-current-user">Scoping to Current User</a></li>
+    <li><a href="http://localhost:4000/ruby/backwards-compatibility">Backwards Compatibility</a></li>
+    <li><a href="http://localhost:4000/ruby/swagger">Swagger</a></li>
+    <li><a href="http://localhost:4000/ruby/testing">Integration Testing</a></li>
+    <li><a href="http://localhost:4000/ruby/error-handling">Error Handling</a></li>
+  </ul>
+</div>
+
+<div class="col-md-8 col-md-offset-1">
+  <h3 id="activerecord-associations">ActiveRecord Associations</h3>
+
+  <blockquote>
+    <p><a href="https://github.com/jsonapi-suite/employee_directory/compare/step_9_associations...step_12_fsp_associations">View the Sample App</a></p>
+  </blockquote>
+
+  <blockquote>
+    <p><a href="http://localhost:4000/ruby/reads/nested}}">Understanding Nested Queries</a></p>
+  </blockquote>
+
+  <p>JSONAPI Suite comes with an <code class="highlighter-rouge">ActiveRecord</code> adapter. Though other
+adapters can mimic this same interface, here’s what you’ll get
+out-of-the-box. The SQL here is roughly the same as using <a href="http://guides.rubyonrails.org/active_record_querying.html#eager-loading-associations">#includes</a>.</p>
+
+  <blockquote>
+    <p>Note: make sure to whitelist associations in your <a href="http://localhost:4000/ruby/reads/serializers">serializers</a> or nothing will render!</p>
+  </blockquote>
+
+  <h4 id="hasmany">has_many</h4>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash">/posts?include<span class="o">=</span>comments</code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/post_resource.rb</span>
+<span class="n">has_many</span> <span class="ss">:comments</span><span class="p">,</span>
+  <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Comment</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+  <span class="ss">resource: </span><span class="no">CommentResource</span><span class="p">,</span>
+  <span class="ss">foreign_key: :post_id</span></code></pre></figure>
+
+  <h4 id="belongsto">belongs_to</h4>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash">/comments?include<span class="o">=</span>posts</code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/comment_resource.rb</span>
+<span class="n">belongs_to</span> <span class="ss">:post</span><span class="p">,</span>
+  <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Post</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+  <span class="ss">resource: </span><span class="no">PostResource</span><span class="p">,</span>
+  <span class="ss">foreign_key: :post_id</span></code></pre></figure>
+
+  <h4 id="hasone">has_one</h4>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash">/posts?include<span class="o">=</span>detail</code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/post_resource.rb</span>
+<span class="n">has_one</span> <span class="ss">:detail</span><span class="p">,</span>
+  <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">PostDetail</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+  <span class="ss">resource: </span><span class="no">PostDetailResource</span><span class="p">,</span>
+  <span class="ss">foreign_key: :post_id</span></code></pre></figure>
+
+  <h4 id="hasandbelongstomany">has_and_belongs_to_many</h4>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash">/posts?include<span class="o">=</span>tags</code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/post_resource.rb</span>
+<span class="n">has_and_belongs_to_many</span> <span class="ss">:tags</span><span class="p">,</span>
+  <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Tag</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+  <span class="ss">resource: </span><span class="no">TagResource</span><span class="p">,</span>
+  <span class="ss">foreign_key: </span><span class="p">{</span> <span class="ss">taggings: :tag_id</span> <span class="p">}</span></code></pre></figure>
+
+  <p>The only difference here is the foreign_key - we’re passing a hash instead of a symbol. <code class="highlighter-rouge">taggings</code> is our join table, and <code class="highlighter-rouge">tag_id</code> is the true foreign key.</p>
+
+  <p>This will work, and for simple many-to-many relationships you can move on. But what if we want to add the property <code class="highlighter-rouge">primary</code>, a boolean, to the <code class="highlighter-rouge">taggings</code> table? Since we hid this relationship from the API, how will clients access it?</p>
+
+  <p>As this is metadata about the relationship it should go on the meta section of the corresponding relationship object. While supporting such an approach is on the JSONAPI Suite roadmap, we haven’t done so yet.</p>
+
+  <p>For now, it might be best to simply expose the intermediate table to the API. Using a client like <a href="http://localhost:4000/js/home">JSORM</a>, the overhead of this approach is minimal.</p>
+
+  <h4 id="polymorphicbelongsto">polymorphic_belongs_to</h4>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/models/employee.rb</span>
+<span class="n">belongs_to</span> <span class="ss">:workspace</span><span class="p">,</span> <span class="ss">polymorphic: </span><span class="kp">true</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/models/workspace.rb</span>
+<span class="n">has_many</span> <span class="ss">:employees</span><span class="p">,</span> <span class="ss">as: :workspace</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="n">polymorphic_belongs_to</span> <span class="ss">:workspace</span><span class="p">,</span>
+  <span class="ss">group_by: :workspace_type</span><span class="p">,</span>
+  <span class="ss">groups: </span><span class="p">{</span>
+    <span class="s1">'Office'</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Office</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+      <span class="ss">resource: </span><span class="no">OfficeResource</span><span class="p">,</span>
+      <span class="ss">foreign_key: :workspace_id</span>
+    <span class="p">},</span>
+    <span class="s1">'HomeOffice'</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">HomeOffice</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+      <span class="ss">resource: </span><span class="no">HomeOfficeResource</span><span class="p">,</span>
+      <span class="ss">foreign_key: :workspace_id</span>
+    <span class="p">}</span>
+  <span class="p">}</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash">/employees?include<span class="o">=</span>workspace</code></pre></figure>
+
+  <p>Here an <code class="highlighter-rouge">Employee</code> belongs to a <code class="highlighter-rouge">Workspace</code>. <code class="highlighter-rouge">Workspace</code>s have
+different <code class="highlighter-rouge">type</code>s - <code class="highlighter-rouge">HomeOffice</code>, <code class="highlighter-rouge">Office</code>, <code class="highlighter-rouge">CoworkingSpace</code>, etc. The
+<code class="highlighter-rouge">employees</code> table has <code class="highlighter-rouge">workspace_id</code> and <code class="highlighter-rouge">workspace_type</code> columns
+to support this relationship.</p>
+
+  <p>We may need to query each <code class="highlighter-rouge">workspace_type</code> differently - perhaps
+they live in separate tables (<code class="highlighter-rouge">home_offices</code>, <code class="highlighter-rouge">coworking_spaces</code>, etc). So, when fetching the relationship, we’ll need to group our <code class="highlighter-rouge">Employees</code> by <code class="highlighter-rouge">workspace_type</code> and query differently for each group:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="n">polymorphic_belongs_to</span> <span class="ss">:workspace</span><span class="p">,</span>
+  <span class="ss">group_by: :workspace_type</span><span class="p">,</span>
+  <span class="ss">groups: </span><span class="p">{</span>
+    <span class="s1">'Office'</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Office</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+      <span class="ss">resource: </span><span class="no">OfficeResource</span><span class="p">,</span>
+      <span class="ss">foreign_key: :workspace_id</span>
+    <span class="p">},</span>
+    <span class="s1">'HomeOffice'</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">HomeOffice</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+      <span class="ss">resource: </span><span class="no">HomeOfficeResource</span><span class="p">,</span>
+      <span class="ss">foreign_key: :workspace_id</span>
+    <span class="p">}</span>
+  <span class="p">}</span></code></pre></figure>
+
+  <p>Let’s say our API was returning 10 <code class="highlighter-rouge">Employees</code>, sideloading their corresponding <code class="highlighter-rouge">Workspace</code>. The underlying code would:</p>
+
+  <ul>
+    <li>Fetch the employees</li>
+    <li>Group the employees by the given key: <code class="highlighter-rouge">employees.group_by { |e|
+e.workspace_type }</code></li>
+    <li>Use the <code class="highlighter-rouge">Office</code> configuration for all <code class="highlighter-rouge">Employee</code>s where
+<code class="highlighter-rouge">workspace_type</code> is <code class="highlighter-rouge">Office</code>, and use the <code class="highlighter-rouge">HomeOffice</code> configuration
+for all <code class="highlighter-rouge">Employee</code>s where <code class="highlighter-rouge">workspace_type</code> is <code class="highlighter-rouge">HomeOffice</code>, and so
+forth.</li>
+  </ul>
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/concepts">Concepts</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Resources</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Contact us</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

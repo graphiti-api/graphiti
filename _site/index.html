@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Graphiti</title>
+  <meta name="description" content="A stylish alternative to GraphQL">
+
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="home">
+  <a class="btn btn-primary skip-intro" href="http://localhost:4000/quickstart">Skip Intro &raquo;</a>
+
+  <div class="start p">
+    <a class="l bold mag" href="http://localhost:4000/ruby">JSONAPI SUITE</a>
+    is a collection of
+    <span class="s bold">ruby libraries</span>
+    that facilitate the
+    <a href="jsonapi.org" class="s">jsonapi.org</a>
+    specification.
+  </div>
+
+  <div class="p unfamiliar">
+    If you're
+    <span class="s">unfamiliar</span>
+    with
+    <span class="bold">JSONAPI</span>,
+    think
+
+    <div class="yehuda quote">"RESTful GraphQL created by Yehuda Katz"</div>
+  </div>
+
+  <div class="p">
+    Here's a simple Suite app:
+  </div>
+
+<span class="sample">
+  
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># controllers/posts_controller.rb</span>
+<span class="k">class</span> <span class="nc">PostsController</span>
+  <span class="n">jsonapi</span> <span class="ss">resource: </span><span class="no">PostResource</span>
+
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="n">posts</span> <span class="o">=</span> <span class="no">Post</span><span class="p">.</span><span class="nf">all</span>
+    <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">posts</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+  </code></pre></figure>
+
+
+  
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># resources/post_resource.rb</span>
+<span class="k">class</span> <span class="nc">PostResource</span>
+  <span class="n">type</span> <span class="ss">:posts</span>
+  <span class="n">model</span> <span class="no">Post</span>
+
+  <span class="n">allow_filter</span> <span class="ss">:title</span>
+  <span class="n">allow_stat</span> <span class="ss">total: </span><span class="p">[</span><span class="ss">:count</span><span class="p">]</span>
+<span class="k">end</span>
+  </code></pre></figure>
+
+
+  
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># serializers/serializable_posts.rb</span>
+<span class="k">class</span> <span class="nc">SerializablePosts</span>
+  <span class="n">type</span> <span class="ss">:posts</span>
+
+  <span class="n">attribute</span> <span class="ss">:title</span>
+  <span class="n">attribute</span> <span class="ss">:created_at</span>
+  <span class="n">attribute</span> <span class="ss">:updated_at</span>
+<span class="k">end</span>
+  </code></pre></figure>
+
+  </span>
+
+  <div class="p">
+    This API now supports
+    <a class="s bold" href="http://jsonapi.org/format/#fetching-sparse-fieldsets">Sparse Fieldsets</a>,
+    <a class="s bold" href="http://jsonapi.org/format/#fetching-sorting">Sorting</a>,
+    <a class="s bold" href="http://jsonapi.org/format/#fetching-pagination">Pagination</a>,
+    <span class="s bold">statistics</span>, and
+    <a class="s bold" href="http://jsonapi.org/format/#fetching-filtering">Filtering</a>.
+
+    Though we're using
+    <code class="highlighter-rouge">ActiveRecord</code>
+    in these examples, the same patterns
+    apply to
+    <span class="m bold underline">ANY ORM or DATASTORE</span>
+    including
+    <span class="s bold">HTTP calls</span>.
+    Blend SQL and NoSQL in a
+    <span class="s bold">single</span>
+    request.
+  </div>
+
+  <div class="p">
+    Let's access the API using our
+    <a class="s bold" href="https://jsonapi-suite.github.io/jsonapi_suite/js/home">Javascript Client</a>,
+    which you can think of as
+    <div class="quote">
+      "<code class="highlighter-rouge">ActiveRecord</code> in the browser"
+    </div>
+  </div>
+
+  <span class="sample">
+  
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="k">await</span> <span class="nx">Post</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">({</span> <span class="na">title</span><span class="p">:</span> <span class="s2">"Hello!"</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">order</span><span class="p">({</span> <span class="na">created_at</span><span class="p">:</span> <span class="s2">"desc"</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">per</span><span class="p">(</span><span class="mi">10</span><span class="p">).</span><span class="nx">page</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">stats</span><span class="p">({</span> <span class="na">total</span><span class="p">:</span> <span class="s2">"count"</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">fields</span><span class="p">([</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">"byline"</span><span class="p">])</span>
+  </code></pre></figure>
+
+  </span>
+
+  
+  
+  
+  
+  
+
+  <div class="p">
+    <span class="m bold">Associations</span> are simple and customizable:
+
+    <span class="sample">
+  
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/post_resource.rb</span>
+<span class="n">has_many</span> <span class="ss">:comments</span><span class="p">,</span>
+  <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Comment</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+  <span class="ss">resource: </span><span class="no">CommentResource</span><span class="p">,</span>
+  <span class="ss">foreign_key: :post_id</span>
+  </code></pre></figure>
+
+
+  
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="c1">// In your JS app</span>
+<span class="nx">Post</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="s2">"comments"</span><span class="p">)</span>
+  </code></pre></figure>
+
+    </span>
+  </div>
+
+  <div class="p">
+    Associations are
+    <span class="bold">deep queryable</span>. In other words,
+    you could fetch the Post and only its
+    <code class="highlighter-rouge">active</code> comments,
+    sorted by
+    <code class="highlighter-rouge">created_at</code> descending.
+    This applies to your
+    <span class="s mag bold">entire graph of data.</span>
+    The server-side code would be nothing more than:
+  </div>
+
+  <span class="sample">
+  
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">allow_filter</span> <span class="ss">:active</span>
+  </code></pre></figure>
+
+  </span>
+
+  <div class="p">
+    At this point, You may be thinking:
+
+    <div>
+      <span class="lg italic quote">
+        "Is this just a bunch of incomprehensible ruby magic
+      </span>
+      <span class="quote">😬
+      <span class="lg italic quote">
+      ?"
+      </span>
+    </div>
+
+    <div>
+      <span class="m bold underline">No.</span>
+    </div>
+
+    We're simply parsing the request, removing boilerplate, and supplying
+    <span class="s bold mag">sensible defaults</span> because we believe in
+    <span class="s bold">convention over configuration</span>.
+  </div>
+
+  <div class="p">
+    Let's make our filter a prefix query:
+  </div>
+
+  <span class="sample s">
+  
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">allow_filter</span> <span class="ss">:title_prefix</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">([</span><span class="s2">"title LIKE ?"</span><span class="p">,</span> <span class="s2">"</span><span class="si">#{</span><span class="n">value</span><span class="si">}</span><span class="s2">%"</span><span class="p">])</span>
+<span class="k">end</span>
+  </code></pre></figure>
+
+  </span>
+
+  <div class="p">
+    From filtering to pagination, these are all just
+    <span class="s mag">customizable lambdas</span>.
+    You have
+    <span class="m bold">complete control</span>
+    of the query.
+  </div>
+
+  <div class="p">
+    Just as you can
+    <span class="m bold mag">Query</span>
+    the full graph of data, you can also
+    <span class="m bold mag">Persist</span>
+    the full graph of data in a
+    <span class="underline">single request</span>:
+  </div>
+
+  <span class="sample s">
+  
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="nx">post</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Post</span><span class="p">({</span> <span class="na">title</span><span class="p">:</span> <span class="s2">"JSONAPI Rocks!"</span> <span class="p">})</span>
+<span class="nx">comment</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Comment</span><span class="p">({</span> <span class="na">body</span><span class="p">:</span> <span class="s2">"I agree!"</span> <span class="p">})</span>
+<span class="nx">post</span><span class="p">.</span><span class="nx">comments</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">comment</span><span class="p">)</span>
+<span class="nx">post</span><span class="p">.</span><span class="nx">save</span><span class="p">({</span> <span class="na">with</span><span class="p">:</span> <span class="s2">"comments"</span> <span class="p">})</span>
+  </code></pre></figure>
+
+  </span>
+
+  <div class="p">
+    All of this is easily validated with
+    <span class="m bold">end-to-end</span>
+    <span class="m bold">integration test patterns</span>
+    that ensure
+    <span class="s mag">backwards-compatibility</span>:
+  </div>
+
+  <span class="sample s">
+  
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">let</span><span class="p">(</span><span class="ss">:post1</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:post</span><span class="p">,</span> <span class="ss">title: </span><span class="s2">"Hello"</span><span class="p">)</span> <span class="p">}</span>
+<span class="n">let</span><span class="p">(</span><span class="ss">:post2</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:post</span><span class="p">,</span> <span class="ss">title: </span><span class="s2">"Hiya"</span><span class="p">)</span> <span class="p">}</span>
+
+<span class="n">it</span> <span class="s2">"filters correctly"</span> <span class="k">do</span>
+  <span class="n">jsonapi_get</span> <span class="s1">'/api/v1/posts'</span><span class="p">,</span> <span class="ss">params: </span><span class="p">{</span>
+    <span class="ss">filter: </span><span class="p">{</span> <span class="ss">title_prefix: </span><span class="s1">'He'</span> <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="n">expect</span><span class="p">(</span><span class="n">json_ids</span><span class="p">(</span><span class="kp">true</span><span class="p">)).</span><span class="nf">to</span> <span class="n">eq</span><span class="p">([</span><span class="n">post1</span><span class="p">.</span><span class="nf">id</span><span class="p">])</span>
+  <span class="n">assert_payload</span><span class="p">(</span><span class="ss">:post</span><span class="p">,</span> <span class="n">post1</span><span class="p">,</span> <span class="n">json_items</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">end</span>
+  </code></pre></figure>
+
+  </span>
+
+  <div class="p">
+    ...and
+    <span class="mag s bold">automatically documented</span>
+    in <span class="bold">Swagger</span>:
+  </div>
+
+  <div class="p">
+    <img width="100%" src="https://user-images.githubusercontent.com/55264/28526490-af7ce5a8-7055-11e7-88bf-1ce5ead32dd7.png">
+  </div>
+
+  <div class="p">
+    There's
+    <span class="m bold">so much more</span>
+    to talk about. To get your feet wet, check out
+    our
+    <a class="m bold" href="http://localhost:4000/quickstart">Quickstart</a>,
+    or step-by-step
+    <a class="m bold" href="http://localhost:4000/tutorial">Tutorial</a>.
+    We also have
+    <span class="m bold">comprehensive documentation</span>
+    on the
+    <a class="m bold" href="http://localhost:4000/ruby">Server</a>
+    and on the
+    <a class="m bold" href="http://localhost:4000/js/home">Client</a>.
+    Join our
+    <a target="_blank" class="m bold" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+    to ask questions or say hi - we'd
+    love to meet you and hear what you think ❤️
+  </div>
+</div>
+
+      </div>
+    </main>
+  </body>
+</html>

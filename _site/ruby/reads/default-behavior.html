@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Graphiti</title>
+  <meta name="description" content="A stylish alternative to GraphQL">
+
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="http://localhost:4000" class="navbar-brand">JSONAPI Suite</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/ruby">Docs</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/js/home">Javascript Client</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="ruby-toc col-md-3">
+  <ul>
+    <li><a href="http://localhost:4000/ruby/installation">Installation</a></li>
+    <li><a href="http://localhost:4000/ruby/resources">Understanding Resources</a></li>
+    <li>Reads
+      <ul>
+        <li><a href="http://localhost:4000/ruby/reads/basic-reads">Basic Reads</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/sorting">Sorting</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/pagination">Pagination</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/filtering">Filtering</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/fieldsets">Fieldsets</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/statistics">Statistics</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/activerecord-associations">ActiveRecord Associations</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/nested">Querying Relationships</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/serializers">Serializers</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/default-behavior">Default Behavior</a></li>
+      </ul>
+    </li>
+    <li>Writes
+      <ul>
+        <li><a href="http://localhost:4000/ruby/writes/basic-writes">Basic Writes</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/validations">Validations</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/strong-resources">Strong Resources</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/nested-writes">Nested Writes</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/side-effects">Side Effects</a></li>
+      </ul>
+    </li>
+    <li><a href="http://localhost:4000/ruby/alternate-datastores">Alternate Datastores</a>
+      <ul>
+        <li><a href="http://localhost:4000/ruby/alternate-datastores/elasticsearch">ElasticSearch</a></li>
+        <li><a href="http://localhost:4000/ruby/alternate-datastores/http">HTTP Services</a></li>
+        <li><a href="http://localhost:4000/ruby/alternate-datastores/adapters">Adapters</a></li>
+      </ul>
+    </li>
+    <li><a href="http://localhost:4000/ruby/scoping-to-current-user">Scoping to Current User</a></li>
+    <li><a href="http://localhost:4000/ruby/backwards-compatibility">Backwards Compatibility</a></li>
+    <li><a href="http://localhost:4000/ruby/swagger">Swagger</a></li>
+    <li><a href="http://localhost:4000/ruby/testing">Integration Testing</a></li>
+    <li><a href="http://localhost:4000/ruby/error-handling">Error Handling</a></li>
+  </ul>
+</div>
+
+<div class="col-md-8 col-md-offset-1">
+  <h3 id="default-behavior">Default Behavior</h3>
+
+  <p>You may need to change the default behavior or your API - perhaps you
+want a default of 10 per page instead of 20. JSONAPI Suite provides
+facilities that enable <strong><em>defaults</em></strong> that can be <strong><em>overridden</em></strong> - 10 per
+page, unless elsewise specified by the user.</p>
+
+  <p>You can see these defaults in the <a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Resource.html">Resource documentation</a>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">default_filter</span> <span class="ss">:active</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">default_page_size</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">default_sort</span><span class="p">([{</span> <span class="ss">created_at: :desc</span> <span class="p">}])</span></code></pre></figure>
+
+  <p>These can all be overriden by the user. In other words, hitting
+<code class="highlighter-rouge">/posts</code> will only show active <code class="highlighter-rouge">Post</code>s, hitting
+<code class="highlighter-rouge">/posts?filter[active]=false</code> will show inactive <code class="highlighter-rouge">Post</code>s. The same applies
+for sorting and pagination.</p>
+
+  <p>A common pattern is for default filters to apply for all users, but
+allow overrides for administrators. You can use the <code class="highlighter-rouge">:if</code> option to
+restrict the override:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/post_resource.rb</span>
+<span class="n">allow_filter</span> <span class="ss">:active</span><span class="p">,</span> <span class="ss">if: :admin?</span>
+
+<span class="c1"># app/controllers/posts_controller.rb</span>
+<span class="k">def</span> <span class="nf">admin?</span>
+  <span class="n">current_user</span><span class="p">.</span><span class="nf">admin?</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Now the default behavior is to view only active <code class="highlighter-rouge">Post</code>s, but
+<em>administrators</em> can override this default.</p>
+
+  <p>You also have access to the context (in Rails, the controller) as the
+last argument to <code class="highlighter-rouge">default_filter</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">default_filter</span> <span class="ss">:by_user</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">context</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">user_id: </span><span class="n">context</span><span class="p">.</span><span class="nf">current_user</span><span class="p">.</span><span class="nf">id</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/concepts">Concepts</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Resources</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Contact us</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

@@ -1,0 +1,81 @@
+@mixin font-smoothing {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@mixin font-smoothing-none {
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
+@mixin transition($transitions) {
+  -webkit-transition: $transitions;
+    -moz-transition: $transitions;
+    -ms-transition: $transitions;
+    -o-transition: $transitions;
+    transition: $transitions;
+}
+
+/* this mixin makes possible to add transition to a specific vendor, example: */
+/* -webkit-transition: -webkit-transform 0.5s linear; */
+@mixin transitionPrefix($property, $values) {
+  -webkit-transition: -webkit-#{$property} #{$values};
+    -moz-transition: -moz-#{$property} #{$values};
+    -ms-transition: -ms-#{$property} #{$values};
+    -o-transition: -o-#{$property} #{$values};
+    transition: #{$property} #{$values};  
+}
+
+@mixin background-gradient($from, $to) {
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, $from), color-stop(100%,  $to));
+  background: -webkit-linear-gradient($from, $to);
+  background: -moz-linear-gradient($from, $to);
+  background: -o-linear-gradient($from, $to);
+  background: linear-gradient($from, $to);
+}
+
+@mixin transform ($transforms) {
+  -moz-transform: $transforms;
+  -o-transform: $transforms;
+  -ms-transform: $transforms;
+  -webkit-transform: $transforms;
+  transform: $transforms;
+}
+
+@mixin placeholder {
+  &::-webkit-input-placeholder {@content}
+  &:-moz-placeholder           {@content}
+  &::-moz-placeholder          {@content}
+  &:-ms-input-placeholder      {@content}  
+}
+
+@mixin animation($animations) {
+  -webkit-animation: $animations;
+  -moz-animation: $animations;
+  -o-animation: $animations;
+  -ms-animation: $animations;
+  animation: $animations;
+}
+
+@mixin animationDelay($value) {
+  -webkit-animation-delay: $value;
+  -moz-animation-delay: $value;
+  -o-animation-delay: $value;
+  -ms-animation-delay: $value;
+  animation-delay: $value;
+}
+
+@mixin keyFrame($name) {
+  @-webkit-keyframes $name{
+    @content
+  }
+  @-moz-keyframes $name{
+    @content
+  }
+  @-o-keyframes $name{
+    @content
+  }
+  @keyframes $name{
+    @content
+  }
+}

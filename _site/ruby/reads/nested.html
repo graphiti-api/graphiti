@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Graphiti</title>
+  <meta name="description" content="A stylish alternative to GraphQL">
+
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="http://localhost:4000" class="navbar-brand">JSONAPI Suite</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/ruby">Docs</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/js/home">Javascript Client</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="ruby-toc col-md-3">
+  <ul>
+    <li><a href="http://localhost:4000/ruby/installation">Installation</a></li>
+    <li><a href="http://localhost:4000/ruby/resources">Understanding Resources</a></li>
+    <li>Reads
+      <ul>
+        <li><a href="http://localhost:4000/ruby/reads/basic-reads">Basic Reads</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/sorting">Sorting</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/pagination">Pagination</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/filtering">Filtering</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/fieldsets">Fieldsets</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/statistics">Statistics</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/activerecord-associations">ActiveRecord Associations</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/nested">Querying Relationships</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/serializers">Serializers</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/default-behavior">Default Behavior</a></li>
+      </ul>
+    </li>
+    <li>Writes
+      <ul>
+        <li><a href="http://localhost:4000/ruby/writes/basic-writes">Basic Writes</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/validations">Validations</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/strong-resources">Strong Resources</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/nested-writes">Nested Writes</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/side-effects">Side Effects</a></li>
+      </ul>
+    </li>
+    <li><a href="http://localhost:4000/ruby/alternate-datastores">Alternate Datastores</a>
+      <ul>
+        <li><a href="http://localhost:4000/ruby/alternate-datastores/elasticsearch">ElasticSearch</a></li>
+        <li><a href="http://localhost:4000/ruby/alternate-datastores/http">HTTP Services</a></li>
+        <li><a href="http://localhost:4000/ruby/alternate-datastores/adapters">Adapters</a></li>
+      </ul>
+    </li>
+    <li><a href="http://localhost:4000/ruby/scoping-to-current-user">Scoping to Current User</a></li>
+    <li><a href="http://localhost:4000/ruby/backwards-compatibility">Backwards Compatibility</a></li>
+    <li><a href="http://localhost:4000/ruby/swagger">Swagger</a></li>
+    <li><a href="http://localhost:4000/ruby/testing">Integration Testing</a></li>
+    <li><a href="http://localhost:4000/ruby/error-handling">Error Handling</a></li>
+  </ul>
+</div>
+
+<div class="col-md-8 col-md-offset-1">
+  <h3 id="relationships-and-nested-queries">Relationships and Nested Queries</h3>
+
+  <blockquote>
+    <p><a href="http://jsonapi.org/format/#fetching-includes">View the JSONAPI Specification</a></p>
+  </blockquote>
+
+  <blockquote>
+    <p><a href="https://github.com/jsonapi-suite/employee_directory/compare/step_9_associations...step_12_fsp_associations">View the Sample App</a></p>
+  </blockquote>
+
+  <blockquote>
+    <p><a href="http://localhost:4000/js/reads/nested-queries">View the JS Documentation</a></p>
+  </blockquote>
+
+  <p>Let’s say we want to fetch a <code class="highlighter-rouge">Post</code> and all of its <code class="highlighter-rouge">Comment</code>s:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash">/posts?include<span class="o">=</span>comments</code></pre></figure>
+
+  <p>Using the default <code class="highlighter-rouge">ActiveRecord</code> Adapter, we would add this code to our
+<code class="highlighter-rouge">PostResource</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/post_resource.rb</span>
+<span class="n">has_many</span> <span class="ss">:comments</span><span class="p">,</span>
+  <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Comment</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+  <span class="ss">resource: </span><span class="no">CommentResource</span><span class="p">,</span>
+  <span class="ss">foreign_key: :post_id</span></code></pre></figure>
+
+  <blockquote>
+    <p>Note: we’d have to whitelist <code class="highlighter-rouge">comments</code> in our <a href="http://localhost:4000/ruby/reads/serializers">serializer</a> as well.</p>
+  </blockquote>
+
+  <p>To understand this code, we first have to realize that this is a Macro -
+code that is generating lower-level code for the purposes of removing
+boilerplate. Let’s understand the lower-level DSL before breaking
+down the macro.</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">allow_sideload</span> <span class="ss">:comments</span><span class="p">,</span> <span class="ss">resource: </span><span class="no">CommentResource</span> <span class="k">do</span>
+  <span class="n">scope</span> <span class="k">do</span> <span class="o">|</span><span class="n">posts</span><span class="o">|</span>
+    <span class="c1"># ... code ...</span>
+  <span class="k">end</span>
+
+  <span class="n">assign</span> <span class="k">do</span> <span class="o">|</span><span class="n">posts</span><span class="p">,</span> <span class="n">comments</span><span class="o">|</span>
+    <span class="c1"># ... code ...</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>This is the lower-level <code class="highlighter-rouge">allow_sideload</code> DSL. There are four things
+going on. To begin with:</p>
+
+  <ul>
+    <li>We’ve whitelisted <code class="highlighter-rouge">comments</code>. Without this, the request would raise
+the error <code class="highlighter-rouge">JsonapiCompliable::Errors::InvalidInclude</code>. This ensures
+clients can’t arbitrarily pull back data that could introduce performance
+problems or security risks.</li>
+    <li>We’ve said, “when retrieving comments, re-use the logic defined in
+<code class="highlighter-rouge">CommentResource</code>”. This way all the filter, sorting, etc query logic
+at the <code class="highlighter-rouge">/comments</code> endpoint can be reused when sideloading comments from
+the <code class="highlighter-rouge">/posts?include=comments</code> endpoint.</li>
+  </ul>
+
+  <p>That brings us to the <code class="highlighter-rouge">scope</code> and <code class="highlighter-rouge">assign</code> hooks. When querying a
+relationship, we need to answer two questions:</p>
+
+  <ul>
+    <li>Given a list of parents (<code class="highlighter-rouge">post</code>s), how should we scope the request for
+children (<code class="highlighter-rouge">comment</code>s)? This is the <code class="highlighter-rouge">scope</code> block. In a relational
+database, we’d usually scope based on foreign and primary keys.</li>
+    <li>Given a list of parents (<code class="highlighter-rouge">post</code>s) and a list of children (<code class="highlighter-rouge">comment</code>s),
+how do you want to assign these objects together? This is the <code class="highlighter-rouge">assign</code>
+block. In a relational database, we’d usually compare foreign and
+primary keys.</li>
+  </ul>
+
+  <p>In other words, the code would look similar to this for <code class="highlighter-rouge">ActiveRecord</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">scope</span> <span class="k">do</span> <span class="o">|</span><span class="n">posts</span><span class="o">|</span>
+  <span class="no">Comment</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">post_id: </span><span class="n">posts</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:id</span><span class="p">))</span>
+<span class="k">end</span>
+
+<span class="n">assign</span> <span class="k">do</span> <span class="o">|</span><span class="n">posts</span><span class="p">,</span> <span class="n">comments</span><span class="o">|</span>
+  <span class="n">posts</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">post</span><span class="o">|</span>
+    <span class="n">post</span><span class="p">.</span><span class="nf">comments</span> <span class="o">=</span> <span class="n">comments</span><span class="p">.</span><span class="nf">select</span> <span class="p">{</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span> <span class="n">c</span><span class="p">.</span><span class="nf">post_id</span> <span class="o">==</span> <span class="n">post</span><span class="p">.</span><span class="nf">id</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Note that <code class="highlighter-rouge">scope</code> hasn’t actually fired a query - we take the result of
+this block and pass it to <code class="highlighter-rouge">CommentResource</code> so that further query logic
+(filtering, sorting, etc) can be applied and re-used across endpoints.</p>
+
+  <p>Of course, the code above would be very tedious to write by hand every
+time. That’s why we have Macros like <code class="highlighter-rouge">has_many</code>, <code class="highlighter-rouge">belongs_to</code> etc -
+configure only the parts you need, and avoid the boilerplate:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/post_resource.rb</span>
+<span class="n">has_many</span> <span class="ss">:comments</span><span class="p">,</span>
+  <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Comment</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+  <span class="ss">resource: </span><span class="no">CommentResource</span><span class="p">,</span>
+  <span class="ss">foreign_key: :post_id</span>
+  <span class="c1"># primary_key defaults to 'id'</span></code></pre></figure>
+
+  <p>Given the above options, we can auto-generate <code class="highlighter-rouge">allow_sideload</code> code. You
+can always write <code class="highlighter-rouge">allow_sideload</code> directly if you have highly customized
+logic. You can also pass a block to the macros to customize:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/post_resource.rb</span>
+<span class="n">has_many</span> <span class="ss">:comments</span><span class="p">,</span>
+  <span class="ss">scope: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Comment</span><span class="p">.</span><span class="nf">all</span> <span class="p">},</span>
+  <span class="ss">resource: </span><span class="no">CommentResource</span><span class="p">,</span>
+  <span class="ss">foreign_key: :post_id</span> <span class="k">do</span>
+    <span class="n">assign</span> <span class="k">do</span> <span class="o">|</span><span class="n">posts</span><span class="p">,</span> <span class="n">comments</span><span class="o">|</span>
+      <span class="c1"># some custom code to associate these objects</span>
+      <span class="no">Post</span><span class="p">.</span><span class="nf">associate</span><span class="p">(</span><span class="n">posts</span><span class="p">,</span> <span class="n">comments</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span></code></pre></figure>
+
+  <p>Again, nested queries come for free. This code allows for nested queries
+like “give me the post, and its <code class="highlighter-rouge">active</code> comments”:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash">/posts/1?include<span class="o">=</span>comments&amp;filter[comments][active]<span class="o">=</span><span class="nb">true</span></code></pre></figure>
+
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/concepts">Concepts</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Resources</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Contact us</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

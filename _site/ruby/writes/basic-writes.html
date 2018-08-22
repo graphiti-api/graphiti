@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Graphiti</title>
+  <meta name="description" content="A stylish alternative to GraphQL">
+
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="http://localhost:4000" class="navbar-brand">JSONAPI Suite</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/ruby">Docs</a>
+        </li>
+        <li>
+          <a class="nav-link" href="http://localhost:4000/js/home">Javascript Client</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="ruby-toc col-md-3">
+  <ul>
+    <li><a href="http://localhost:4000/ruby/installation">Installation</a></li>
+    <li><a href="http://localhost:4000/ruby/resources">Understanding Resources</a></li>
+    <li>Reads
+      <ul>
+        <li><a href="http://localhost:4000/ruby/reads/basic-reads">Basic Reads</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/sorting">Sorting</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/pagination">Pagination</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/filtering">Filtering</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/fieldsets">Fieldsets</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/statistics">Statistics</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/activerecord-associations">ActiveRecord Associations</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/nested">Querying Relationships</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/serializers">Serializers</a></li>
+        <li><a href="http://localhost:4000/ruby/reads/default-behavior">Default Behavior</a></li>
+      </ul>
+    </li>
+    <li>Writes
+      <ul>
+        <li><a href="http://localhost:4000/ruby/writes/basic-writes">Basic Writes</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/validations">Validations</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/strong-resources">Strong Resources</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/nested-writes">Nested Writes</a></li>
+        <li><a href="http://localhost:4000/ruby/writes/side-effects">Side Effects</a></li>
+      </ul>
+    </li>
+    <li><a href="http://localhost:4000/ruby/alternate-datastores">Alternate Datastores</a>
+      <ul>
+        <li><a href="http://localhost:4000/ruby/alternate-datastores/elasticsearch">ElasticSearch</a></li>
+        <li><a href="http://localhost:4000/ruby/alternate-datastores/http">HTTP Services</a></li>
+        <li><a href="http://localhost:4000/ruby/alternate-datastores/adapters">Adapters</a></li>
+      </ul>
+    </li>
+    <li><a href="http://localhost:4000/ruby/scoping-to-current-user">Scoping to Current User</a></li>
+    <li><a href="http://localhost:4000/ruby/backwards-compatibility">Backwards Compatibility</a></li>
+    <li><a href="http://localhost:4000/ruby/swagger">Swagger</a></li>
+    <li><a href="http://localhost:4000/ruby/testing">Integration Testing</a></li>
+    <li><a href="http://localhost:4000/ruby/error-handling">Error Handling</a></li>
+  </ul>
+</div>
+
+<div class="col-md-8 col-md-offset-1">
+  <h3 id="basic-writes">Basic Writes</h3>
+
+  <p>Here’s the code for a JSONAPI endpoint that supports creating,
+updating, and deleting resources, complete with validation errors. Keep in mind a small modification will
+enable <strong>nested</strong> creates/updates/deletes/disassociations as well.</p>
+
+  <p>We’ll be adding on to the code from the <a href="http://localhost:4000/ruby/reads/basic-reads">Basic
+Reads</a> section.</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># config/routes.rb</span>
+<span class="n">resources</span> <span class="ss">:posts</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:create</span><span class="p">,</span> <span class="ss">:update</span><span class="p">,</span> <span class="ss">:destroy</span><span class="p">]</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># config/initializers/strong_resources.rb</span>
+<span class="no">StrongResources</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span>
+  <span class="n">strong_resource</span> <span class="ss">:post</span> <span class="k">do</span>
+    <span class="n">attribute</span> <span class="ss">title: :string</span>
+    <span class="n">attribute</span> <span class="ss">body: :string</span>
+    <span class="n">attribute</span> <span class="ss">rating: :integer</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/posts_controller.rb</span>
+
+<span class="n">strong_resource</span> <span class="ss">:employee</span>
+
+<span class="n">before_action</span> <span class="ss">:apply_strong_params</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:create</span><span class="p">,</span> <span class="ss">:update</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">create</span>
+  <span class="n">post</span><span class="p">,</span> <span class="n">success</span> <span class="o">=</span> <span class="n">jsonapi_create</span><span class="p">.</span><span class="nf">to_a</span>
+
+  <span class="k">if</span> <span class="n">success</span>
+    <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">post</span><span class="p">,</span> <span class="ss">scope: </span><span class="kp">false</span><span class="p">)</span>
+  <span class="k">else</span>
+    <span class="n">render_errors_for</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">update</span>
+  <span class="n">post</span><span class="p">,</span> <span class="n">success</span> <span class="o">=</span> <span class="n">jsonapi_update</span><span class="p">.</span><span class="nf">to_a</span>
+
+  <span class="k">if</span> <span class="n">success</span>
+    <span class="n">render_jsonapi</span><span class="p">(</span><span class="n">post</span><span class="p">,</span> <span class="ss">scope: </span><span class="kp">false</span><span class="p">)</span>
+  <span class="k">else</span>
+    <span class="n">render_errors_for</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">destroy</span>
+  <span class="n">post</span><span class="p">,</span> <span class="n">success</span> <span class="o">=</span> <span class="n">jsonapi_destroy</span><span class="p">.</span><span class="nf">to_a</span>
+
+  <span class="k">if</span> <span class="n">success</span>
+    <span class="n">render</span> <span class="ss">json: </span><span class="p">{</span> <span class="ss">meta: </span><span class="p">{}</span> <span class="p">}</span>
+  <span class="k">else</span>
+    <span class="n">render_errors_for</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>You’ll see these controller methods all look very similar. Let’s walk
+through what’s going on.</p>
+
+  <ul>
+    <li><code class="highlighter-rouge">jsonapi_create/update/destroy</code>
+      <ul>
+        <li>Parses the incoming request (including nested associations) and
+delegates logic to the correct <code class="highlighter-rouge">Resource</code> classes.</li>
+        <li>Wraps everything in a transaction.</li>
+        <li>Handles validation errors.</li>
+      </ul>
+    </li>
+    <li><code class="highlighter-rouge">post, success</code>
+      <ul>
+        <li><code class="highlighter-rouge">post</code> is our model instance. Keep in mind, this may be an
+unpersisted instance if our request had validation errors.</li>
+        <li><code class="highlighter-rouge">success</code> is a boolean indicating if the transaction was successful.
+Mostly used to determine if we had validation errors.</li>
+      </ul>
+    </li>
+    <li><code class="highlighter-rouge">render_jsonapi</code> is explained in <a href="http://localhost:4000/ruby/reads/basic-reads">Basic
+Reads</a></li>
+    <li><code class="highlighter-rouge">render_errors_for</code> collects any validation errors and formats them
+into a <a href="http://jsonapi.org/format/#errors">JSONAPI-compliant errors object</a>. This includes nested validation errors.</li>
+    <li><code class="highlighter-rouge">render json: { meta: {} }</code> (destroy only)
+      <ul>
+        <li>Satisfied the <a href="http://jsonapi.org/format/#crud-deleting-responses-200">JSONAPI specification</a> for deletes.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <p>We’ll expand on these topics in the rest of the “Writes” section.</p>
+
+  <h4 id="delegating-logic-to-resources">Delegating Logic to Resources</h4>
+
+  <p>With read operations, we supply hooks, essentially asking the developer
+“<em>How do you want to modify the scope when a sort parameter comes in? How
+about when the <code class="highlighter-rouge">title</code> filter comes in?</em>”.</p>
+
+  <p>The same logic applies to write operations - but instead of “<em>how do you
+want to modify the scope?</em>” the question is “<strong><em>how do you want to persist
+this data</em></strong>”?</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+  <span class="nb">puts</span> <span class="n">attributes</span> <span class="c1"># { title: "Some Post" }</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>In <code class="highlighter-rouge">ActiveRecord</code>’s case, you can imagine the defaults look something
+like this:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+  <span class="n">post</span> <span class="o">=</span> <span class="no">Post</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+  <span class="n">post</span><span class="p">.</span><span class="nf">save</span>
+  <span class="n">post</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+  <span class="n">post</span> <span class="o">=</span> <span class="no">Post</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">attributes</span><span class="p">.</span><span class="nf">delete</span><span class="p">(</span><span class="ss">:id</span><span class="p">))</span>
+  <span class="n">post</span><span class="p">.</span><span class="nf">update_attributes</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+  <span class="n">post</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+  <span class="n">post</span> <span class="o">=</span> <span class="no">Post</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+  <span class="n">post</span><span class="p">.</span><span class="nf">destroy</span>
+  <span class="n">post</span>
+<span class="k">end</span></code></pre></figure>
+
+  <blockquote>
+    <p>Note: create/update/destroy <strong>must always</strong> return the model instance</p>
+  </blockquote>
+
+  <p>Similar to read operations, we package this logic into an
+<a href="http://localhost:4000/ruby/alternate-datastores/adapters">Adapter</a> to
+DRY-up the boilerplate.</p>
+
+  <p>For additional documentation:</p>
+
+  <ul>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Resource.html#create-instance_method">#create</a></li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Resource.html#update-instance_method">#update</a></li>
+    <li><a href="https://jsonapi-suite.github.io/jsonapi_compliable/JsonapiCompliable/Resource.html#destroy-instance_method">#destroy</a></li>
+  </ul>
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="http://localhost:4000/concepts">Concepts</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Resources</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Contact us</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

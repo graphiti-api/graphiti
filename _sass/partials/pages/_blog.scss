@@ -1,0 +1,235 @@
+.blog-posts {
+  margin-top: 60px;
+
+  .post {
+    margin-bottom: 90px;
+
+    .pic {
+      border: 0px;
+
+      &:hover {
+        img {
+          opacity: 0.9;
+          filter: alpha(opacity=90);
+        }
+      }
+
+      img {
+        opacity: 1;
+        filter: alpha(opacity=100);
+        @include transition(all 0.25s linear);
+
+        @media(max-width: 991px) {
+          margin: 0 auto;
+        }
+      }
+    }
+
+    .video {
+      @media(min-width: 992px) {
+        max-width: 635px;
+      }
+
+      /* make video fluid for responsiveness */
+      .iframe-wrapper {
+        position: relative;
+        padding-bottom: 56%;
+        height: 0;
+
+        iframe {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+
+    .title {
+      font-family: $myriad;
+      font-size: 28px;
+      font-weight: 600;
+      margin-top: 33px;
+
+      @media(max-width: 991px) {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      @media(max-width: 767px) {
+        font-size: 23px;
+      }
+
+      a {
+        color: #111;
+
+        @include transition(color 0.15s linear);
+
+        &:hover {
+          text-decoration: none;
+          color: #428bca;
+        }
+      }
+    }
+
+    .author {
+      color: #888;
+      margin-top: 4px;
+      position: relative;
+
+      .avatar {
+        max-width: 60px;
+        border-radius: 50px;
+        position: absolute;
+        left: -75px;
+        top: -15px;
+        border: 1px solid #e0e0e0;
+      }
+    }
+
+    .intro {
+      font-family: $sourceSans;
+      margin-top: 18px;
+      font-size: 16px;
+      line-height: 27px;
+      color: #4d4d4d;
+      
+      @media(min-width: 992px) {
+        width: 90%;
+      }
+    }
+
+    .continue-reading {
+      font-family: $sourceSans;
+      font-size: 15px;
+      display: inline-block;
+      margin-top: 8px;
+      @include transition(color 0.25s linear);
+    }
+  }
+
+  .pages {
+    @media(max-width: 991px) {
+      text-align: center;
+    }
+  }
+
+  .sidebar {
+    @media(max-width: 991px) {
+      margin-top: 70px;
+      text-align: center;
+    }
+
+    .search {
+      margin-bottom: 40px;
+
+      form {
+        position: relative;
+        left: -20px;
+      }
+
+      .icomoon-search {
+        font-size: 16px;
+        color: #B9B9B9;
+        position: relative;
+        left: 25px;
+        top: 1px;
+
+        @include transition(all 0.25s linear);
+
+        &.active {
+          color: #555;
+        }
+      }
+
+      input {
+        border: 0px;
+        border-bottom: 1px solid #DFDFDF;
+        padding-left: 30px;
+        padding-bottom: 6px;
+        @include transition(all 0.25s linear);
+        color: #777;
+        font-weight: 300;
+
+        @media(max-width: 991px) {
+          width: 95%;
+        }
+        
+        &:focus {
+          border-bottom-color: #888;
+        }
+
+        @include placeholder {
+            color: #a5a5a5;
+          font-weight: 300;
+          font-size: 13px;
+        }
+      }
+    }
+
+    .updates {
+      padding: 17px;
+      box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
+
+      @media(min-width: 992px) {
+        width: 85%;
+      }
+
+      strong {
+        color: #444;
+      }
+
+      .fa-rss {
+        color: #428bca;
+        font-size: 16px;
+        position: relative;
+        margin-left: 5px;
+      }
+
+      p {
+        font-size: 13px;
+        margin-top: 9px;
+        color: #777;
+        margin-bottom: 5px;
+      }
+    }
+
+    .follow-tw {
+      margin-top: 20px;
+
+      img {
+        cursor: pointer;
+      }
+    }
+
+    .best-hits {
+      margin-top: 35px;
+      padding-left: 5px;
+
+      @media(max-width: 991px) {
+        margin-top: 40px;
+      }
+
+      strong {
+        font-weight: 500;
+        color: #444;
+        margin-bottom: 15px;
+        font-size: 15px;
+        display: block;
+      }
+
+      a {
+        font-size: 13px;
+        display: inline-block;
+        margin-bottom: 5px;
+
+        @media(max-width: 991px) {
+          display: block;
+          margin-bottom: 10px;
+        }
+      }
+    }
+  }
+}
