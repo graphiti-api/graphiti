@@ -6,6 +6,7 @@ module Graphiti
       class_methods do
         def filter(name, *args, &blk)
           opts = args.extract_options!
+          type_override = args[0]
 
           if att = get_attr(name, :filterable, raise_error: :only_unsupported)
             aliases = [name, opts[:aliases]].flatten.compact
@@ -19,9 +20,9 @@ module Graphiti
             config[:filters][name.to_sym] = {
               aliases: aliases,
               name: name.to_sym,
-              type: att[:type],
+              type: type_override || att[:type],
               allow: opts[:allow],
-              reject: opts[:reject],
+              deny: opts[:deny],
               single: !!opts[:single],
               dependencies: opts[:dependent],
               required: required,

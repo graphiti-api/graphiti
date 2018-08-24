@@ -57,9 +57,9 @@ module Graphiti
               end
 
               actions[a] = { resource: r.name }
-              if whitelist = ctx.sideload_whitelist
-                if whitelist[a]
-                  actions[a].merge!(sideload_whitelist: whitelist[a])
+              if allowlist = ctx.sideload_allowlist
+                if allowlist[a]
+                  actions[a].merge!(sideload_allowlist: allowlist[a])
                 end
               end
             end
@@ -165,7 +165,7 @@ module Graphiti
 
           config[:single] = true if filter[:single]
           config[:allow] = filter[:allow].map(&:to_s) if filter[:allow]
-          config[:reject] = filter[:reject].map(&:to_s) if filter[:reject]
+          config[:deny] = filter[:deny].map(&:to_s) if filter[:deny]
           config[:dependencies] = filter[:dependencies].map(&:to_s) if filter[:dependencies]
 
           attr = resource.attributes[name]

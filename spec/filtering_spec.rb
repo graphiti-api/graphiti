@@ -27,6 +27,137 @@ RSpec.describe 'filtering' do
     expect(records.map(&:id)).to eq([employee1.id])
   end
 
+  context 'when filter is type hash' do
+    before do
+      resource.filter :by_json, :hash do
+        eq do |scope, value|
+          ids = value.map { |v| v['id'] }
+          scope[:conditions].merge!(id: ids)
+          scope
+        end
+      end
+      params[:filter] = { by_json: '{ "id": 2 }' }
+    end
+
+    it 'works' do
+      expect(records.map(&:id)).to eq([employee2.id])
+    end
+
+    context 'and an array of json objects passed' do
+      before do
+        params[:filter] = { by_json: '{ "id": 2 },{ "id": 3 }' }
+      end
+
+      it 'works' do
+        expect(records.map(&:id)).to eq([employee2.id, employee3.id])
+      end
+    end
+  end
+
+  context 'when filter is a {{string}} with a comma' do
+    before do
+      params[:filter] = { first_name: '{{foo,bar}}' }
+      employee2.update_attributes(first_name: 'foo,bar')
+    end
+
+    it 'does not convert to array' do
+      expect(records.map(&:id)).to eq([employee2.id])
+    end
+
+    context 'when an array of escaped/non-escaped strings' do
+      before do
+        params[:filter] = { first_name: '{{foo,bar}},Stephen,{{Harold}}' }
+      end
+
+      it 'works correctly' do
+        expect(records.map(&:id)).to eq([
+          employee1.id,
+          employee2.id,
+          employee4.id
+        ])
+      end
+    end
+
+    context 'when an escaped string contains quoted strings' do
+      before do
+        params[:filter] = { first_name: '{{foo "bar"}},baz' }
+        employee2.update_attributes(first_name: 'foo "bar"')
+        employee3.update_attributes(first_name: 'baz')
+      end
+
+      it 'works correctly' do
+        expect(records.map(&:id)).to eq([employee2.id, employee3.id])
+      end
+    end
+  end
+
+  context 'when filter is a {{string}} without a comma' do
+    before do
+      params[:filter] = { first_name: '{{foo}}' }
+      employee2.update_attributes(first_name: 'foo')
+    end
+
+    it 'does not convert to array' do
+      expect(records.map(&:id)).to eq([employee2.id])
+    end
+
+    context 'when an escaped string contains quoted strings' do
+      before do
+        params[:filter] = { first_name: '{{"foo"}}' }
+        employee2.update_attributes(first_name: '"foo"')
+      end
+
+      it 'works correctly' do
+        expect(records.map(&:id)).to eq([employee2.id])
+      end
+    end
+  end
+
+  # Legacy Compat
+  context 'when filter value is {{{escaped json string}}}' do
+    before do
+      params[:filter] = { by_json: '{{{ "id": 2 }}}' }
+    end
+
+    context 'and type is hash' do
+      before do
+        resource.filter :by_json, :hash do
+          eq do |scope, value|
+            scope[:conditions].merge!(id: value[0]['id'])
+            scope
+          end
+        end
+      end
+
+      it 'works' do
+        expect(records.map(&:id)).to eq([employee2.id])
+      end
+    end
+  end
+
+  context 'when filter overrides attribute type' do
+    before do
+      resource.attribute :foo, :string
+      resource.filter :foo, :integer
+    end
+
+    it 'does not change attribute type' do
+      expect(resource.attributes[:foo][:type]).to eq(:string)
+    end
+
+    it 'does change type on filter' do
+      expect(resource.filters[:foo][:type]).to eq(:integer)
+    end
+
+    it 'queries correctly' do
+      expect(PORO::DB).to receive(:all).with(
+        hash_including(conditions: { foo: [1] })
+      ).and_return([])
+      params[:filter] = { foo: '1' }
+      records
+    end
+  end
+
   context 'when filtering associations' do
     context 'one level' do
       let!(:pos1) do
@@ -146,7 +277,7 @@ RSpec.describe 'filtering' do
       expect(records.map(&:id)).to eq([employee3.id])
     end
 
-    context 'and whitelisting inputs' do
+    context 'and allowlisting inputs' do
       before do
         resource.config[:filters] = {}
         resource.filter :first_name, :string, single: true, allow: ['William'] do
@@ -157,23 +288,23 @@ RSpec.describe 'filtering' do
         end
       end
 
-      it 'rejects values not in the whitelist' do
+      it 'rejects values not in the allowlist' do
         params[:filter] = { first_name: { eq: 'Harold' } }
         expect {
           records
-        }.to raise_error( Graphiti::Errors::InvalidFilterValue, /Whitelist: \[\"William\"\]/)
+        }.to raise_error( Graphiti::Errors::InvalidFilterValue, /Allowlist: \[\"William\"\]/)
       end
 
-      it 'accepts values in the whitelist' do
+      it 'accepts values in the allowlist' do
         params[:filter] = { first_name: { eq: 'William' } }
         expect(records.map(&:id)).to eq([employee3.id])
       end
     end
 
-    context 'and blacklisting inputs' do
+    context 'and denylisting inputs' do
       before do
         resource.config[:filters] = {}
-        resource.filter :first_name, :string, single: true, reject: ['Harold'] do
+        resource.filter :first_name, :string, single: true, deny: ['Harold'] do
           eq do |scope, value|
             scope[:conditions].merge!(first_name: value)
             scope
@@ -181,21 +312,21 @@ RSpec.describe 'filtering' do
         end
       end
 
-      it 'rejects values in the blacklist' do
+      it 'rejects values in the denylist' do
         params[:filter] = { first_name: { eq: 'Harold' } }
         expect {
           records
-        }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Blacklist: \[\"Harold\"\]/)
+        }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Denylist: \[\"Harold\"\]/)
       end
 
-      it 'accepts values not in the blacklist' do
+      it 'accepts values not in the denylist' do
         params[:filter] = { first_name: { eq: 'William' } }
         expect(records.map(&:id)).to eq([employee3.id])
       end
     end
   end
 
-  context 'when whitelisting inputs' do
+  context 'when allowlisting inputs' do
     before do
       resource.config[:filters] = {}
       resource.filter :first_name, :string, allow: ['William', 'Agatha'] do
@@ -206,20 +337,20 @@ RSpec.describe 'filtering' do
       end
     end
 
-    it 'rejects values not in the whitelist' do
+    it 'rejects values not in the allowlist' do
       params[:filter] = { first_name: { eq: 'Harold' } }
       expect {
         records
-      }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Whitelist: \["William", "Agatha"\]/)
+      }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Allowlist: \["William", "Agatha"\]/)
     end
 
-    it 'accepts values in the whitelist' do
+    it 'accepts values in the allowlist' do
       params[:filter] = { first_name: { eq: 'William' } }
       expect(records.map(&:id)).to eq([employee3.id])
     end
 
     context 'and passed an array' do
-      context 'where one value is not whitelisted' do
+      context 'where one value is not allowlisted' do
         before do
           params[:filter] = { first_name: { eq: ['Harold', 'William'] } }
         end
@@ -227,11 +358,11 @@ RSpec.describe 'filtering' do
         it 'raises error' do
           expect {
             records
-          }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Whitelist: \["William", "Agatha"\]/)
+          }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Allowlist: \["William", "Agatha"\]/)
         end
       end
 
-      context 'where all values are in whitelist' do
+      context 'where all values are in allowlist' do
         before do
           params[:filter] = { first_name: { eq: ['Agatha', 'William'] } }
         end
@@ -243,10 +374,10 @@ RSpec.describe 'filtering' do
     end
   end
 
-  context 'when blacklisting inputs' do
+  context 'when denylisting inputs' do
     before do
       resource.config[:filters] = {}
-      resource.filter :first_name, :string, reject: ['Harold'] do
+      resource.filter :first_name, :string, deny: ['Harold'] do
         eq do |scope, value|
           scope[:conditions].merge!(first_name: value)
           scope
@@ -254,20 +385,20 @@ RSpec.describe 'filtering' do
       end
     end
 
-    it 'rejects values in the blacklist' do
+    it 'rejects values in the denylist' do
       params[:filter] = { first_name: { eq: 'Harold' } }
       expect {
         records
-      }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Blacklist: \[\"Harold\"\]/)
+      }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Denylist: \[\"Harold\"\]/)
     end
 
-    it 'accepts values not in the blacklist' do
+    it 'accepts values not in the denylist' do
       params[:filter] = { first_name: { eq: 'William' } }
       expect(records.map(&:id)).to eq([employee3.id])
     end
 
     context 'and passed an array' do
-      context 'where one value is in the blacklist' do
+      context 'where one value is in the denylist' do
         before do
           params[:filter] = { first_name: { eq: ['Harold', 'William'] } }
         end
@@ -275,11 +406,11 @@ RSpec.describe 'filtering' do
         it 'raises error' do
           expect {
             records
-          }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Blacklist: \["Harold"\]/)
+          }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Denylist: \["Harold"\]/)
         end
       end
 
-      context 'where no values are in the blacklist' do
+      context 'where no values are in the denylist' do
         before do
           params[:filter] = { first_name: { eq: ['Agatha', 'William'] } }
         end
@@ -397,6 +528,40 @@ RSpec.describe 'filtering' do
       it 'coerces' do
         params[:filter] = { foo: 1 }
         assert_filter_value(['1'])
+      end
+
+      context 'and passed json array' do
+        context 'with non-strings' do
+          before do
+            params[:filter] = { foo: '[1,2,3]' }
+          end
+
+          it 'coerces to strings' do
+            assert_filter_value(['1', '2', '3'])
+          end
+        end
+
+        context 'with valid json' do
+          before do
+            params[:filter] = { foo: '["1","2","3"]' }
+          end
+
+          it 'works' do
+            assert_filter_value(['1', '2', '3'])
+          end
+        end
+
+        context 'with invalid json' do
+          before do
+            params[:filter] = { foo: '[foo]' }
+          end
+
+          it 'works' do
+            expect {
+              records
+            }.to raise_error(Graphiti::Errors::InvalidJSONArray)
+          end
+        end
       end
     end
 
@@ -644,6 +809,13 @@ RSpec.describe 'filtering' do
         assert_filter_value([{ bar: 'baz' }])
       end
 
+      context 'and passing without eq' do
+        it 'works' do
+          params[:filter] = { foo: { bar: 'baz' } }
+          assert_filter_value([{ bar: 'baz' }])
+        end
+      end
+
       context 'when stringified keys' do
         before do
           params[:filter] = {
@@ -690,6 +862,21 @@ RSpec.describe 'filtering' do
         assert_filter_value(['1', '2'])
       end
 
+      it 'works for strings with brackets' do
+        params[:filter] = { foo: '[1,2]' }
+        assert_filter_value([1, 2])
+      end
+
+      it 'works for bracketed strings with quotes' do
+        params[:filter] = { foo: '["1","2"]' }
+        assert_filter_value(%w(1 2))
+      end
+
+      it 'works for array of arrays' do
+        params[:filter] = { foo: '[1,2],[3,4]' }
+        assert_filter_value([[1, 2], [3, 4]])
+      end
+
       # If we did Array(value), you'd get something incorrect
       # for hashes
       it 'raises error on single values' do
@@ -697,6 +884,18 @@ RSpec.describe 'filtering' do
         expect {
           records
         }.to raise_error(Graphiti::Errors::TypecastFailed)
+      end
+
+      context 'when passed invalid array json' do
+        before do
+          params[:filter] = { foo: '[|]' }
+        end
+
+        it 'raises error' do
+          expect {
+            records
+          }.to raise_error(Graphiti::Errors::InvalidJSONArray)
+        end
       end
 
       context 'when cannot coerce' do
@@ -739,7 +938,7 @@ RSpec.describe 'filtering' do
 
       context 'when cannot coerce' do
         before do
-          params[:filter] = { foo: '' }
+          params[:filter] = { foo: {} }
         end
 
         it 'raises error' do

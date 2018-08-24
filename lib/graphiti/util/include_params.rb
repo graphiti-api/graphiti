@@ -9,7 +9,7 @@ module Graphiti
         #
         # But our resource had this code:
         #
-        #   sideload_whitelist({ index: [:comments] })
+        #   sideload_allowlist({ index: [:comments] })
         #
         # We should drop the 'author' sideload from the request.
         #

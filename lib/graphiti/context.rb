@@ -3,14 +3,14 @@ module Graphiti
     extend ActiveSupport::Concern
 
     module Overrides
-      def sideload_whitelist=(val)
+      def sideload_allowlist=(val)
         super(JSONAPI::IncludeDirective.new(val).to_hash)
       end
     end
 
     included do
-      class_attribute :sideload_whitelist
-      self.sideload_whitelist = {}
+      class_attribute :sideload_allowlist
+      self.sideload_allowlist = {}
       class << self;prepend Overrides;end
     end
   end

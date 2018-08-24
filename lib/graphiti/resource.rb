@@ -62,7 +62,11 @@ module Graphiti
 
     def typecast(name, value, flag)
       att = get_attr!(name, flag, request: true)
-      type = Graphiti::Types[att[:type]]
+      type_name = att[:type]
+      if flag == :filterable
+        type_name = filters[name][:type]
+      end
+      type = Graphiti::Types[type_name]
       return if value.nil? && type[:kind] != 'array'
       begin
         flag = :read if flag == :readable

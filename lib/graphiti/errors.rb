@@ -36,16 +36,16 @@ Remove the single: true option to bypass this error.
     end
 
     class UnsupportedSort < Base
-      def initialize(resource, attribute, whitelist, direction)
+      def initialize(resource, attribute, allowlist, direction)
         @resource = resource
         @attribute = attribute
-        @whitelist = whitelist
+        @allowlist = allowlist
         @direction = direction
       end
 
       def message
         <<-MSG
-#{@resource.class.name}: tried to sort on attribute #{@attribute.inspect}, but passed #{@direction.inspect} when only #{@whitelist.inspect} is supported.
+#{@resource.class.name}: tried to sort on attribute #{@attribute.inspect}, but passed #{@direction.inspect} when only #{@allowlist.inspect} is supported.
         MSG
       end
     end
@@ -72,12 +72,12 @@ Remove the single: true option to bypass this error.
 
       def message
         allow = @filter.values[0][:allow]
-        reject = @filter.values[0][:reject]
+        deny = @filter.values[0][:deny]
         msg = <<-MSG
 #{@resource.class.name}: tried to filter on #{@filter.keys[0].inspect}, but passed invalid value #{@value.inspect}.
         MSG
-        msg << "\nWhitelist: #{allow.inspect}" if allow
-        msg << "\nBlacklist: #{reject.inspect}" if reject
+        msg << "\nAllowlist: #{allow.inspect}" if allow
+        msg << "\nDenylist: #{deny.inspect}" if deny
         msg
       end
     end
@@ -189,6 +189,19 @@ Graphiti.config.context_for_endpoint = ->(path, action) { ... }
           msg << ", but could not find an attribute with that name."
         end
         msg
+      end
+    end
+
+    class InvalidJSONArray < Base
+      def initialize(resource, value)
+        @resource = resource
+        @value = value
+      end
+
+      def message
+        <<-MSG
+#{@resource.class.name}: passed filter with value #{@value.inspect}, and failed attempting to parse as JSON array.
+        MSG
       end
     end
 

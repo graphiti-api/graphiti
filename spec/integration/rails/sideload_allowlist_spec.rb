@@ -1,5 +1,5 @@
 if ENV["APPRAISAL_INITIALIZED"]
-  RSpec.describe 'sideload whitelist', type: :controller do
+  RSpec.describe 'sideload allowlist', type: :controller do
     controller(ApplicationController) do
       def index
         render jsonapi: Legacy::AuthorResource.all(params)
@@ -27,7 +27,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     let(:path) { '/legacy/authors' }
 
-    context 'when no sideload whitelist' do
+    context 'when no sideload allowlist' do
       it 'allows loading all relationships' do
         get :index, params: { include: 'books.genre' }
         expect(json_includes('books')).to_not be_blank
@@ -35,9 +35,9 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
-    context 'when a sideload whitelist' do
+    context 'when a sideload allowlist' do
       before do
-        controller.class.sideload_whitelist = {
+        controller.class.sideload_allowlist = {
           index: [:books],
           show: { books: :genre }
         }

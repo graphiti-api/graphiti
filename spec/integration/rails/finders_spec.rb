@@ -71,7 +71,7 @@ if ENV['APPRAISAL_INITIALIZED']
       expect(d.map(&:id)).to eq([author2.id])
     end
 
-    it 'allows whitelisted filters (and other configs)' do
+    it 'allows allowlisted filters (and other configs)' do
       get :index, params: { filter: { first_name: 'George' } }
       expect(d.map(&:id)).to eq([author2.id])
     end

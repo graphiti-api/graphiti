@@ -442,7 +442,7 @@ RSpec.describe Graphiti::Resource do
         .to match_array([:positions, :department])
     end
 
-    context 'when no whitelist' do
+    context 'when no allowlist' do
       it 'defaults to empty array' do
         expect(klass.association_names).to eq([])
       end
@@ -1561,6 +1561,18 @@ RSpec.describe Graphiti::Resource do
         expect(Graphiti::Types[:integer])
           .to receive(:[]).with(:params).and_call_original
         expect(typecast).to eq(1)
+      end
+
+      context 'and filter overrides type' do
+        before do
+          klass.filter :foo, :string
+        end
+
+        it 'uses the filter type' do
+          expect(Graphiti::Types[:string])
+            .to receive(:[]).with(:params).and_call_original
+          expect(typecast).to eq('1')
+        end
       end
 
       context 'when coercion fails' do
