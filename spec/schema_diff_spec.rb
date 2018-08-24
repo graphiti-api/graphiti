@@ -571,7 +571,7 @@ RSpec.describe Graphiti::SchemaDiff do
       end
     end
 
-    context 'when filter adds to whitelist' do
+    context 'when filter adds to allowlist' do
       before do
         resource_b.filter :foo, :string, allow: ['foo', 'bar']
         resource_a.filter :foo, :string, allow: ['foo']
@@ -579,12 +579,12 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it 'returns error' do
         expect(diff).to eq([
-          'SchemaDiff::EmployeeResource: filter :foo whitelist went from ["foo"] to ["foo", "bar"].'
+          'SchemaDiff::EmployeeResource: filter :foo allowlist went from ["foo"] to ["foo", "bar"].'
         ])
       end
     end
 
-    context 'when filter removes from whitelist' do
+    context 'when filter removes from allowlist' do
       before do
         resource_b.filter :foo, :string, allow: ['foo']
         resource_a.filter :foo, :string, allow: ['foo', 'bar']
@@ -593,7 +593,7 @@ RSpec.describe Graphiti::SchemaDiff do
       it { is_expected.to eq([]) }
     end
 
-    context 'when filter removes whitelist' do
+    context 'when filter removes allowlist' do
       before do
         resource_b.filter :foo, :string
         resource_a.filter :foo, :string, allow: ['foo']
@@ -602,7 +602,7 @@ RSpec.describe Graphiti::SchemaDiff do
       it { is_expected.to eq([]) }
     end
 
-    context 'when filter adds whitelist' do
+    context 'when filter adds allowlist' do
       before do
         resource_b.filter :foo, :string, allow: ['foo']
         resource_a.filter :foo, :string
@@ -610,51 +610,51 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it 'returns error' do
         expect(diff).to eq([
-          'SchemaDiff::EmployeeResource: filter :foo whitelist went from [] to ["foo"].'
+          'SchemaDiff::EmployeeResource: filter :foo allowlist went from [] to ["foo"].'
         ])
       end
     end
 
-    context 'when filter adds to blacklist' do
+    context 'when filter adds to denylist' do
       before do
-        resource_b.filter :foo, :string, reject: ['foo', 'bar']
-        resource_a.filter :foo, :string, reject: ['foo']
+        resource_b.filter :foo, :string, deny: ['foo', 'bar']
+        resource_a.filter :foo, :string, deny: ['foo']
       end
 
       it 'returns error' do
         expect(diff).to eq([
-          'SchemaDiff::EmployeeResource: filter :foo blacklist went from ["foo"] to ["foo", "bar"].'
+          'SchemaDiff::EmployeeResource: filter :foo denylist went from ["foo"] to ["foo", "bar"].'
         ])
       end
     end
 
-    context 'when filter removes from blacklist' do
+    context 'when filter removes from denylist' do
       before do
-        resource_b.filter :foo, :string, reject: ['foo']
-        resource_a.filter :foo, :string, reject: ['foo', 'bar']
+        resource_b.filter :foo, :string, deny: ['foo']
+        resource_a.filter :foo, :string, deny: ['foo', 'bar']
       end
 
       it { is_expected.to eq([]) }
     end
 
-    context 'when filter removes blacklist' do
+    context 'when filter removes denylist' do
       before do
         resource_b.filter :foo, :string
-        resource_a.filter :foo, :string, reject: ['foo']
+        resource_a.filter :foo, :string, deny: ['foo']
       end
 
       it { is_expected.to eq([]) }
     end
 
-    context 'when filter adds blacklist' do
+    context 'when filter adds denylist' do
       before do
-        resource_b.filter :foo, :string, reject: ['foo']
+        resource_b.filter :foo, :string, deny: ['foo']
         resource_a.filter :foo, :string
       end
 
       it 'returns error' do
         expect(diff).to eq([
-          'SchemaDiff::EmployeeResource: filter :foo blacklist went from [] to ["foo"].'
+          'SchemaDiff::EmployeeResource: filter :foo denylist went from [] to ["foo"].'
         ])
       end
     end
@@ -937,41 +937,41 @@ RSpec.describe Graphiti::SchemaDiff do
       end
     end
 
-    context 'when an endpoint action sideload whitelist is added' do
+    context 'when an endpoint action sideload allowlist is added' do
       before do
         a
-        test_context.sideload_whitelist = { index: [:positions] }
+        test_context.sideload_allowlist = { index: [:positions] }
       end
 
       it 'returns error' do
         expect(diff).to eq([
-          'Endpoint "/schema_diff/employees" added sideload whitelist.'
+          'Endpoint "/schema_diff/employees" added sideload allowlist.'
         ])
       end
     end
 
-    context 'when an endpoint action sideload whitelist is removed' do
+    context 'when an endpoint action sideload allowlist is removed' do
       before do
-        test_context.sideload_whitelist = { index: [:positions] }
+        test_context.sideload_allowlist = { index: [:positions] }
         a
-        test_context.sideload_whitelist = nil
+        test_context.sideload_allowlist = nil
       end
 
       it 'returns true' do
-        expect(a[:endpoints].values[0][:actions][:index][:sideload_whitelist])
+        expect(a[:endpoints].values[0][:actions][:index][:sideload_allowlist])
           .to eq([:positions])
         expect(diff).to eq([])
       end
     end
 
-    context 'when an endpoint action sideload whitelist changes' do
+    context 'when an endpoint action sideload allowlist changes' do
       context 'with an addition' do
         before do
-          test_context.sideload_whitelist = {
+          test_context.sideload_allowlist = {
             index: [:positions]
           }
           a
-          test_context.sideload_whitelist = { index: { positions: :department } }
+          test_context.sideload_allowlist = { index: { positions: :department } }
         end
 
         it { is_expected.to eq([]) }
@@ -979,25 +979,25 @@ RSpec.describe Graphiti::SchemaDiff do
 
       context 'with a removal' do
         before do
-          test_context.sideload_whitelist = {
+          test_context.sideload_allowlist = {
             index: [
               { positions: :department },
               :same
             ]
           }
           a
-          test_context.sideload_whitelist = { index: [:positions, :same] }
+          test_context.sideload_allowlist = { index: [:positions, :same] }
         end
 
         it 'returns error' do
           expect(diff).to eq([
-            'Endpoint "/schema_diff/employees" had incompatible sideload whitelist. Was [{:positions=>:department}, :same], now [:positions, :same].'
+            'Endpoint "/schema_diff/employees" had incompatible sideload allowlist. Was [{:positions=>:department}, :same], now [:positions, :same].'
           ])
         end
       end
     end
 
-    context 'when an endpoint action write attribute whitelist changes' do
+    context 'when an endpoint action write attribute allowlist changes' do
       xit 'todo' do
       end
     end

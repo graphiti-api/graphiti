@@ -69,7 +69,8 @@ module Graphiti
     end
 
     PresentParamsHash = create(::Hash) do |input|
-      Dry::Types['params.hash'][input].deep_symbolize_keys
+      input = JSON.parse(input) if input.is_a?(String)
+      Dry::Types['params.hash'][input]
     end
 
     REQUIRED_KEYS = [:params, :read, :write, :kind, :description]

@@ -47,9 +47,9 @@ RSpec.describe Graphiti::Query do
         end
       end
 
-      context 'when context has sideload whitelist' do
+      context 'when context has sideload allowlist' do
         let(:ctx) do
-          OpenStruct.new(sideload_whitelist: { update: { positions: {} }})
+          OpenStruct.new(sideload_allowlist: { update: { positions: {} }})
         end
 
         around do |e|
@@ -63,7 +63,7 @@ RSpec.describe Graphiti::Query do
         end
       end
 
-      context 'when context does not respond to #sideload_whitelist' do
+      context 'when context does not respond to #sideload_allowlist' do
         before do
           params[:include] = 'positions.department'
         end

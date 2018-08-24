@@ -156,13 +156,13 @@ module Graphiti
       @include_hash ||= begin
         requested = include_directive.to_hash
 
-        whitelist = nil
-        if @resource.context && @resource.context.respond_to?(:sideload_whitelist)
-          whitelist = @resource.context.sideload_whitelist
-          whitelist = whitelist[@resource.context_namespace] if whitelist
+        allowlist = nil
+        if @resource.context && @resource.context.respond_to?(:sideload_allowlist)
+          allowlist = @resource.context.sideload_allowlist
+          allowlist = allowlist[@resource.context_namespace] if allowlist
         end
 
-        whitelist ? Util::IncludeParams.scrub(requested, whitelist) : requested
+        allowlist ? Util::IncludeParams.scrub(requested, allowlist) : requested
       end
 
       @include_hash

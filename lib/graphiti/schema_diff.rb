@@ -173,16 +173,16 @@ module Graphiti
           old = old_filter[:allow] || []
           diff = new - old
           if diff.length > 0
-            @errors << "#{old_resource[:name]}: filter #{name.inspect} whitelist went from #{old.inspect} to #{new.inspect}."
+            @errors << "#{old_resource[:name]}: filter #{name.inspect} allowlist went from #{old.inspect} to #{new.inspect}."
           end
         end
 
-        if new_filter[:reject] != old_filter[:reject]
-          new = new_filter[:reject] || []
-          old = old_filter[:reject] || []
+        if new_filter[:deny] != old_filter[:deny]
+          new = new_filter[:deny] || []
+          old = old_filter[:deny] || []
           diff = new - old
           if diff.length > 0
-            @errors << "#{old_resource[:name]}: filter #{name.inspect} blacklist went from #{old.inspect} to #{new.inspect}."
+            @errors << "#{old_resource[:name]}: filter #{name.inspect} denylist went from #{old.inspect} to #{new.inspect}."
           end
         end
 
@@ -215,16 +215,16 @@ module Graphiti
             next
           end
 
-          if new_action[:sideload_whitelist] && !old_action[:sideload_whitelist]
-            @errors << "Endpoint \"#{path}\" added sideload whitelist."
+          if new_action[:sideload_allowlist] && !old_action[:sideload_allowlist]
+            @errors << "Endpoint \"#{path}\" added sideload allowlist."
           end
 
-          if new_action[:sideload_whitelist]
-            if new_action[:sideload_whitelist] != old_action[:sideload_whitelist]
+          if new_action[:sideload_allowlist]
+            if new_action[:sideload_allowlist] != old_action[:sideload_allowlist]
               removal = Util::Hash.include_removed? \
-                new_action[:sideload_whitelist], old_action[:sideload_whitelist]
+                new_action[:sideload_allowlist], old_action[:sideload_allowlist]
               if removal
-                @errors << "Endpoint \"#{path}\" had incompatible sideload whitelist. Was #{old_action[:sideload_whitelist].inspect}, now #{new_action[:sideload_whitelist].inspect}."
+                @errors << "Endpoint \"#{path}\" had incompatible sideload allowlist. Was #{old_action[:sideload_allowlist].inspect}, now #{new_action[:sideload_allowlist].inspect}."
               end
             end
           end

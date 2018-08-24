@@ -298,6 +298,19 @@ RSpec.describe Graphiti::Schema do
       end
     end
 
+    context 'when filter overrides type' do
+      before do
+        employee_resource.filter :first_name, :integer
+      end
+
+      it 'is reflected in the schema' do
+        expect(schema[:resources][0][:attributes][:first_name][:type])
+          .to eq('string')
+        expect(schema[:resources][0][:filters][:first_name][:type])
+          .to eq('integer')
+      end
+    end
+
     context 'when the filter is guarded' do
       before do
         employee_resource.class_eval do
@@ -376,7 +389,7 @@ RSpec.describe Graphiti::Schema do
       end
     end
 
-    context 'when the filter has a whitelist' do
+    context 'when the filter has a allowlist' do
       before do
         employee_resource.class_eval do
           filter :first_name, allow: [:foo]
@@ -389,15 +402,15 @@ RSpec.describe Graphiti::Schema do
       end
     end
 
-    context 'when the filter has a blacklist' do
+    context 'when the filter has a denylist' do
       before do
         employee_resource.class_eval do
-          filter :first_name, reject: [:bar]
+          filter :first_name, deny: [:bar]
         end
       end
 
       it 'is marked as such' do
-        expect(schema[:resources][0][:filters][:first_name][:reject])
+        expect(schema[:resources][0][:filters][:first_name][:deny])
           .to eq(['bar'])
       end
     end
@@ -460,16 +473,16 @@ RSpec.describe Graphiti::Schema do
       end
     end
 
-    context 'when sideload whitelist' do
+    context 'when sideload allowlist' do
       before do
-        test_context.sideload_whitelist = {
+        test_context.sideload_allowlist = {
           index: { positions: 'department' }
         }
       end
 
       it 'is reflected in the schema' do
         endpoint = schema[:endpoints][:"/api/v1/schema/employees"]
-        expect(endpoint[:actions][:index][:sideload_whitelist]).to eq({
+        expect(endpoint[:actions][:index][:sideload_allowlist]).to eq({
           positions: { department: {} }
         })
       end
