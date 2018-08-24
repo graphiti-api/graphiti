@@ -57,20 +57,34 @@ module Graphiti
         end
       end
 
+      def typecast(type)
+        _resource = @resource
+        _name = @name
+        _type = type
+        ->(value) {
+          begin
+            _type[value] unless value.nil?
+          rescue Exception => e
+            raise Errors::TypecastFailed.new(_resource, _name, value, e)
+          end
+        }
+      end
+
       def default_proc
         _name = @name
         _resource = @resource.new
+        _typecast = typecast(Graphiti::Types[@attr[:type]][:read])
         ->(_) {
-          _resource.typecast(_name, @object.send(_name), :readable)
+          _typecast.call(@object.send(_name))
         }
       end
 
       def wrap_proc(inner)
         _resource = @resource.new
         _name = @name
+        _typecast = typecast(Graphiti::Types[@attr[:type]][:read])
         ->(serializer_instance = nil) {
-           value = serializer_instance.instance_eval(&inner)
-          _resource.typecast(_name, value, :readable)
+          _typecast.call(serializer_instance.instance_eval(&inner))
         }
       end
 
