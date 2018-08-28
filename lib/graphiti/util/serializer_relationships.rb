@@ -38,19 +38,38 @@ module Graphiti
       private
 
       def block
-        if link?
+        if _link = link?
           validate_link! unless @sideload.link_proc
-          sl = @sideload
-          proc do
+        end
+
+        _sl = @sideload
+        _data_proc = data_proc
+        proc do
+          data { instance_eval(&_data_proc) }
+
+          if _link
             if @proxy.query.links?
               link(:related) do
-                ::Graphiti::Util::Link.new(sl, @object).generate
+                ::Graphiti::Util::Link.new(_sl, @object).generate
               end
             end
           end
-        else
-          proc { }
         end
+      end
+
+      def data_proc
+        _sl = @sideload
+        ->(_) {
+          if records = @object.public_send(_sl.name)
+            if records.respond_to?(:to_ary)
+              records.each { |r| _sl.resource.decorate_record(r) }
+            else
+              _sl.resource.decorate_record(records)
+            end
+
+            records
+          end
+        }
       end
 
       def validate_link!

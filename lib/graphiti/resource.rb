@@ -25,9 +25,11 @@ module Graphiti
     end
 
     def decorate_record(record)
-      serializer = serializer_for(record)
-      record.instance_variable_set(:@__graphiti_serializer, serializer)
-      record.instance_variable_set(:@__graphiti_resource, self)
+      unless record.instance_variable_get(:@__graphiti_serializer)
+        serializer = serializer_for(record)
+        record.instance_variable_set(:@__graphiti_serializer, serializer)
+        record.instance_variable_set(:@__graphiti_resource, self)
+      end
     end
 
     def with_context(object, namespace = nil)

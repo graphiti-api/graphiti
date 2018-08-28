@@ -35,25 +35,6 @@ module Graphiti
       end
     end
 
-    # Temporary fix until fixed upstream
-    # https://github.com/jsonapi-rb/jsonapi-serializable/pull/102
-    module ResourceOverrides
-      def requested_relationships(fields)
-        @_relationships
-      end
-
-      # Allow access to resource methods
-      def method_missing(id, *args, &blk)
-        if @resource.respond_to?(id, true)
-          @resource.send(id, *args, &blk)
-        else
-          super
-        end
-      end
-    end
-
-    JSONAPI::Serializable::Resource
-      .send(:prepend, ResourceOverrides)
     JSONAPI::Serializable::Relationship
       .send(:prepend, RelationshipOverrides)
     JSONAPI::Serializable::Renderer

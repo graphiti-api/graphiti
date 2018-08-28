@@ -135,6 +135,7 @@ module PORO
       :age,
       :active,
       :positions,
+      :current_position,
       :bio,
       :teams,
       :classification,
