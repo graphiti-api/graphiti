@@ -173,13 +173,11 @@ module Graphiti
           associated |= relevant_children
           associate_all(parent, relevant_children)
         else
-          associated << relevant_children
+          associated << relevant_children if relevant_children
           associate(parent, relevant_children)
         end
       end
-      (children - associated).each do |unassigned|
-        children.delete(unassigned)
-      end
+      children.replace(associated)
     end
 
     def resolve(parents, query)
