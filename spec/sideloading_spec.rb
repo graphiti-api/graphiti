@@ -733,6 +733,69 @@ RSpec.describe 'sideloading' do
     end
   end
 
+  describe 'sideloading the same entity twice' do
+    let(:department_resource) do
+      Class.new(PORO::DepartmentResource) do
+        def base_scope
+          { type: :departments }
+        end
+
+        def self.name;'PORO::DepartmentResource';end
+      end
+    end
+
+    let(:position_resource) do
+      Class.new(PORO::PositionResource) do
+        attribute :employee_id, :integer, only: [:filterable]
+
+        def base_scope
+          { type: :positions }
+        end
+
+        def self.name;'PORO::PositionResource';end
+      end
+    end
+
+    before do
+      PORO::Position.class_eval do
+        def department
+          @department ||= PORO::Department.new(PORO::DB.data[:departments][0])
+        end
+      end
+
+      resource.has_one :current_position, resource: position_resource
+      resource.has_many :positions, resource: position_resource
+      position_resource.belongs_to :department, resource: department_resource
+      params[:include] = 'current_position.department,positions'
+    end
+
+    it 'only appears once in the payload' do
+      render
+      included = json['included']
+      pos1 = included.select do |i|
+        i['type'] == 'positions' && i['id'] == position1.id.to_s
+      end
+      expect(pos1.length).to eq(1)
+    end
+
+    it 'has all correct assocations' do
+      render
+      sl = d[0].sideload(:current_position)
+      expect(sl.id).to eq(1)
+      expect(sl.jsonapi_type).to eq('positions')
+      expect(sl.sideload(:department)).to be_present
+    end
+
+    # This will fetch a department that will not have a @__graphiti_serializer
+    # assigned, because it wasn't part of the query plan. This should not cause
+    # an error; we should drop the data
+    it 'does not try to calculate sideloads twice' do
+      expect {
+        render
+      }.to_not raise_error
+    end
+  end
+
   context 'when a required filter on the sideloaded resource' do
     xit 'should maybe raise, not sure yet. that is why this spec is spending' do
     end
