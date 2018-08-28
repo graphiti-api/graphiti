@@ -20,14 +20,27 @@ module Graphiti
           if @serializer.attribute_blocks[@name].nil?
             @serializer.send(_method, @name, serializer_options, &proc)
           else
-            inner = @serializer.attribute_blocks.delete(@name)
-            wrapped = wrap_proc(inner)
-            @serializer.send(_method, @name, serializer_options, &wrapped)
+            unless @serializer.send(applied_method).include?(@name)
+              inner = @serializer.attribute_blocks.delete(@name)
+              wrapped = wrap_proc(inner)
+              @serializer.send(_method, @name, serializer_options, &wrapped)
+            end
           end
         end
+
+        existing = @serializer.send(applied_method)
+        @serializer.send(:"#{applied_method}=", [@name] | existing)
       end
 
       private
+
+      def applied_method
+        if extra?
+          :extra_attributes_applied_via_resource
+        else
+          :attributes_applied_via_resource
+        end
+      end
 
       def _method
         extra? ? :extra_attribute : :attribute

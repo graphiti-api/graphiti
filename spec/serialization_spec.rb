@@ -586,44 +586,44 @@ RSpec.describe 'serialization' do
 
       context 'when an extra attribute' do
         before do
-          resource.extra_attribute :first_name, :integer
-          params[:extra_fields] = { employees: 'first_name' }
+          params[:extra_fields] = { employees: 'salary' }
         end
 
         it 'still goes through type coercion' do
-          PORO::Employee.create(first_name: '40')
+          resource.extra_attribute :salary, :integer
+          PORO::Employee.create(salary: '40')
           render
-          expect(attributes['first_name']).to eq(40)
+          expect(attributes['salary']).to eq(40)
         end
 
         context 'with a custom block' do
           before do
-            resource.extra_attribute :first_name, :integer do
+            resource.extra_attribute :salary, :integer do
               '100'
             end
           end
 
           it 'still goes through type coercion' do
-            PORO::Employee.create(first_name: '40')
+            PORO::Employee.create(salary: '40')
             render
-            expect(attributes['first_name']).to eq(100)
+            expect(attributes['salary']).to eq(100)
           end
         end
 
         context 'with a custom block *via the serializer*' do
           before do
             resource.serializer.class_eval do
-              attribute :first_name do
+              attribute :salary do
                 '200'
               end
             end
-            resource.extra_attribute :first_name, :integer
+            resource.extra_attribute :salary, :integer
           end
 
           it 'still goes through coercion' do
-            PORO::Employee.create(first_name: '40')
+            PORO::Employee.create(salary: '40')
             render
-            expect(attributes['first_name']).to eq(200)
+            expect(attributes['salary']).to eq(200)
           end
         end
       end
