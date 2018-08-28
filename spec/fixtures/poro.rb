@@ -143,7 +143,8 @@ module PORO
       :credit_card,
       :credit_card_id,
       :cc_id,
-      :credit_card_type
+      :credit_card_type,
+      :salary
 
     def initialize(*)
       super
