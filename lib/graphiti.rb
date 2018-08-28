@@ -1,6 +1,7 @@
 require 'json'
 require 'forwardable'
 require 'active_support/core_ext/string'
+require 'active_support/core_ext/enumerable'
 require 'active_support/core_ext/class/attribute'
 require 'active_support/core_ext/hash/conversions' # to_xml
 require 'active_support/concern'

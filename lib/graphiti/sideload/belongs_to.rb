@@ -24,7 +24,8 @@ class Graphiti::Sideload::BelongsTo < Graphiti::Sideload
   end
 
   def assign_each(parent, children)
-    children.find { |c| c.send(primary_key) == parent.send(foreign_key) }
+    children_hash = children.index_by(&primary_key)
+    children_hash[parent.send(foreign_key)]
   end
 
   def ids_for_parents(parents)

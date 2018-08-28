@@ -15,6 +15,7 @@ class Graphiti::Sideload::HasMany < Graphiti::Sideload
   end
 
   def assign_each(parent, children)
-    children.select { |c| c.send(foreign_key) == parent.send(primary_key) }
+    children_hash = children.group_by(&foreign_key)
+    children_hash[parent.send(primary_key)] || []
   end
 end
