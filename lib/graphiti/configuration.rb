@@ -12,6 +12,7 @@ module Graphiti
     attr_accessor :context_for_endpoint
     attr_accessor :schema_path
     attr_accessor :links_on_demand
+    attr_accessor :typecast_reads
 
     # Set defaults
     # @api private
@@ -20,6 +21,7 @@ module Graphiti
       @concurrency = false
       @respond_to = [:json, :jsonapi, :xml]
       @links_on_demand = false
+      @typecast_reads = true
 
       if defined?(::Rails)
         @schema_path = "#{::Rails.root}/public/schema.json"

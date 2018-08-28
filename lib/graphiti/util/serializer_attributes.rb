@@ -75,7 +75,12 @@ module Graphiti
         _resource = @resource.new
         _typecast = typecast(Graphiti::Types[@attr[:type]][:read])
         ->(_) {
-          _typecast.call(@object.send(_name))
+          val = @object.send(_name)
+          if Graphiti.config.typecast_reads
+            _typecast.call(val)
+          else
+            val
+          end
         }
       end
 
@@ -84,7 +89,12 @@ module Graphiti
         _name = @name
         _typecast = typecast(Graphiti::Types[@attr[:type]][:read])
         ->(serializer_instance = nil) {
-          _typecast.call(serializer_instance.instance_eval(&inner))
+          val = serializer_instance.instance_eval(&inner)
+          if Graphiti.config.typecast_reads
+            _typecast.call(val)
+          else
+            val
+          end
         }
       end
 
