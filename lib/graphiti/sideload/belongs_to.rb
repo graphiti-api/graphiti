@@ -23,11 +23,6 @@ class Graphiti::Sideload::BelongsTo < Graphiti::Sideload
     { primary_key => parent_ids.join(',') }
   end
 
-  def assign_each(parent, children)
-    children_hash = children.index_by(&primary_key)
-    children_hash[parent.send(foreign_key)]
-  end
-
   def ids_for_parents(parents)
     parent_ids = parents.map(&foreign_key)
     parent_ids.compact!
@@ -44,5 +39,15 @@ class Graphiti::Sideload::BelongsTo < Graphiti::Sideload
       model_name = model.name.gsub("#{namespace}::", '')
       :"#{model_name.underscore}_id"
     end
+  end
+
+  private
+
+  def child_map(children)
+    children.index_by(&primary_key)
+  end
+
+  def children_for(parent, map)
+    map[parent.send(foreign_key)]
   end
 end

@@ -14,8 +14,13 @@ class Graphiti::Sideload::HasMany < Graphiti::Sideload
     { foreign_key => ids_for_parents(parents).join(',') }
   end
 
-  def assign_each(parent, children)
-    children_hash = children.group_by(&foreign_key)
-    children_hash[parent.send(primary_key)] || []
+  private
+
+  def child_map(children)
+    children.group_by(&foreign_key)
+  end
+
+  def children_for(parent, map)
+    map[parent.send(primary_key)] || []
   end
 end

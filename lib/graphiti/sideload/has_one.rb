@@ -3,9 +3,9 @@ class Graphiti::Sideload::HasOne < Graphiti::Sideload::HasMany
     :has_one
   end
 
-  def assign_each(parent, children)
-    children_hash = children.group_by(&foreign_key)
-    result = children_hash[parent.send(primary_key)] || []
-    result[0]
+  private
+
+  def children_for(parent, map)
+    super[0]
   end
 end
