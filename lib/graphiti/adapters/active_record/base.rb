@@ -214,9 +214,7 @@ module Graphiti
                   [:create, :update].include?(Graphiti.context[:namespace])
                 parent.send(association_name) << child
               else
-                target = association.instance_variable_get(:@target)
-                target |= [child]
-                association.instance_variable_set(:@target, target)
+                association.add_to_target(child, :skip_callbacks)
               end
             end
           else
