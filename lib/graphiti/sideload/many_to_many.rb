@@ -19,6 +19,10 @@ class Graphiti::Sideload::ManyToMany < Graphiti::Sideload::HasMany
     raise 'You must explicitly pass :foreign_key for many-to-many relationships, or override in subclass to return a hash.'
   end
 
+  def performant_assign?
+    false
+  end
+
   def assign_each(parent, children)
     children.select do |c|
       match = ->(ct) { ct.send(true_foreign_key) == parent.send(primary_key) }

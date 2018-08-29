@@ -14,6 +14,7 @@ RSpec.describe Graphiti::Sideload do
   end
   let(:opts) do
     {
+      type: :has_many,
       parent_resource: parent_resource_class,
       resource: resource_class
     }
@@ -124,6 +125,10 @@ RSpec.describe Graphiti::Sideload do
   end
 
   describe '#type' do
+    before do
+      opts.delete(:type)
+    end
+
     it 'raises helpful error for subclass' do
       expect { instance.type }.to raise_error(/Override/)
     end
@@ -313,20 +318,6 @@ RSpec.describe Graphiti::Sideload do
         expect(employees[0].positions).to eq(positions[0..1])
         expect(employees[1].positions).to eq([positions.last])
       end
-
-      context 'when there are unassigned children' do
-        let(:other) { PORO::Position.new(id: 999, employee_id: 999) }
-
-        before do
-          positions << other
-        end
-
-        it 'removes them from the child array, so that subsequent sideloads are not affected' do
-          expect(positions.include?(other)).to eq(true)
-          instance.assign(employees, positions)
-          expect(positions.include?(other)).to eq(false)
-        end
-      end
     end
 
     context 'when a to-one relationship' do
@@ -355,20 +346,6 @@ RSpec.describe Graphiti::Sideload do
         instance.assign(positions, departments)
         expect(positions[0].department).to eq(departments[0])
         expect(positions[1].department).to eq(departments[1])
-      end
-
-      context 'when there are unassigned children' do
-        let(:other) { PORO::Department.new }
-
-        before do
-          departments << other
-        end
-
-        it 'removes them from the child array, so that subsequent sideloads are not affected' do
-          expect(departments.include?(other)).to eq(true)
-          instance.assign(positions, departments)
-          expect(departments.include?(other)).to eq(false)
-        end
       end
     end
   end
@@ -485,6 +462,7 @@ RSpec.describe Graphiti::Sideload do
       before do
         params[:sort] = '-id'
         allow(resource_class).to receive(:_all).and_call_original
+        allow(instance).to receive(:performant_assign?) { false }
         instance.class.pre_load do |proxy, parents|
           proxy.scope.object[:modified] = true
           proxy.scope.object[:parents] = parents

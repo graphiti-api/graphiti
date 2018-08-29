@@ -166,18 +166,28 @@ module Graphiti
     end
 
     def assign(parents, children)
-      associated = []
+      track_associated = type == :has_one
+      associated = [] if track_associated
+      if performant_assign?
+        map = child_map(children)
+      end
+
       parents.each do |parent|
-        relevant_children = fire_assign_each(parent, children)
-        if relevant_children.is_a?(Array)
-          associated |= relevant_children
-          associate_all(parent, relevant_children)
+        if performant_assign?
+          relevant_children = children_for(parent, map) || []
         else
-          associated << relevant_children if relevant_children
+          relevant_children = fire_assign_each(parent, children)
+        end
+
+        if relevant_children.is_a?(Array)
+            associated |= relevant_children if track_associated
+            associate_all(parent, relevant_children)
+        else
+          associated << relevant_children if track_associated && relevant_children
           associate(parent, relevant_children)
         end
       end
-      children.replace(associated)
+      children.replace(associated) if track_associated
     end
 
     def resolve(parents, query)
@@ -244,6 +254,10 @@ module Graphiti
       parent_ids.compact!
       parent_ids.uniq!
       parent_ids
+    end
+
+    def performant_assign?
+      !self.class.assign_each_proc
     end
 
     private
