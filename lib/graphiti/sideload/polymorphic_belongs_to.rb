@@ -87,7 +87,7 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
         query = remove_invalid_sideloads(sideload.resource, query)
         sideload.resolve(group, query)
       else
-        err = ::Graphiti::Errors::PolymorphicChildNotFound
+        err = ::Graphiti::Errors::PolymorphicSideloadChildNotFound
         raise err.new(self, group_name)
       end
     end
