@@ -37,7 +37,7 @@ RSpec.describe 'polymorphic resource behavior' do
         it 'raises helpful error' do
           expect {
             resource.all.to_a
-          }.to raise_error(Graphiti::Errors::PolymorphicChildNotFound)
+          }.to raise_error(Graphiti::Errors::PolymorphicResourceChildNotFound)
         end
       end
     end

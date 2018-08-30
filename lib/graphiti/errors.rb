@@ -257,7 +257,7 @@ Only one resource can be associated to a given url/verb combination.
       end
     end
 
-    class PolymorphicChildNotFound < Base
+    class PolymorphicResourceChildNotFound < Base
       def initialize(resource_class, model)
         @resource_class = resource_class
         @model = model
@@ -265,10 +265,11 @@ Only one resource can be associated to a given url/verb combination.
 
       def message
         <<-MSG
-#{@resource_class}: Tried to find subclass with model #{@model.class}, but nothing found!
+#{@resource_class}: Tried to find Resource subclass with model #{@model.class}, but nothing found!
 
 Make sure all your child classes are assigned and associated to the right models:
 
+# One of these should be assocated to model #{@model.class}:
 self.polymorphic = ['Subclass1Resource', 'Subclass2Resource']
         MSG
       end
@@ -369,7 +370,7 @@ Valid types are: #{Graphiti::Types.map.keys.inspect}
       end
     end
 
-    class PolymorphicChildNotFound < Base
+    class PolymorphicSideloadChildNotFound < Base
       def initialize(sideload, name)
         @sideload = sideload
         @name = name
