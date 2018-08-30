@@ -3,14 +3,8 @@ if ENV['APPRAISAL_INITIALIZED']
     include GraphitiSpecHelpers
 
     module ARToPORO
-      class Author < Legacy::ApplicationRecord
-        self.table_name = :authors
-
-        attr_accessor :books, :state
-      end
-
       class AuthorResource < Legacy::ApplicationResource
-        self.model = ::ARToPORO::Author
+        self.model = Legacy::Author
         has_many :books
         belongs_to :state
       end
@@ -34,7 +28,7 @@ if ENV['APPRAISAL_INITIALIZED']
       end
     end
 
-    let!(:author) { ARToPORO::Author.create!(state_id: state.id) }
+    let!(:author) { Legacy::Author.create!(state_id: state.id) }
     let!(:book) { PORO::Book.create(title: 'Foo', author_id: author.id) }
     let!(:state) { PORO::State.create(name: 'Alabama') }
 
