@@ -66,7 +66,15 @@ module Graphiti
     end
 
     def stats
-      @stats ||= @scope.resolve_stats
+      @stats ||= if @query.hash[:stats]
+        payload = Stats::Payload.new @resource,
+          @query,
+          @scope.unpaginated_object,
+          data
+        payload.generate
+      else
+        {}
+      end
     end
 
     def save(action: :create)

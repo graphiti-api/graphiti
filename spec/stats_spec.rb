@@ -131,7 +131,7 @@ RSpec.describe 'stats' do
         before do
           resource.class_eval do
             stat :age do
-              second { |scope, _, context| context.my_stat }
+              second { |_, _, context| context.my_stat }
             end
           end
         end
@@ -140,6 +140,35 @@ RSpec.describe 'stats' do
           Graphiti.with_context(ctx) { render }
           expect(json['meta']['stats'])
             .to eq({ 'age' => { 'second' => 1338 } })
+        end
+      end
+
+      context 'that resolves from response data' do
+        class Results < SimpleDelegator
+          attr_accessor :meta
+
+          def initialize(array, meta:)
+            super(array)
+            @meta = meta
+          end
+        end
+
+        before do
+          resource.class_eval do
+            stat :age do
+              second { |_, _, _, data| data.meta }
+            end
+
+            def resolve(scope)
+              Results.new(super, meta: 'from meta!')
+            end
+          end
+        end
+
+        it 'works' do
+          render
+          expect(json['meta']['stats'])
+            .to eq({ 'age' => { 'second' => 'from meta!' } })
         end
       end
     end

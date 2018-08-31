@@ -14,10 +14,11 @@ module Graphiti
     #     meta: { stats: { total: { count: 100 } } }
     #   }
     class Payload
-      def initialize(resource, query, scope)
+      def initialize(resource, query, scope, data)
         @resource   = resource
         @query      = query
         @scope      = scope
+        @data       = data
       end
 
       # Generate the payload for +{ meta: { stats: { ... } } }+
@@ -31,7 +32,9 @@ module Graphiti
 
             each_calculation(name, calculation) do |calc, function|
               args = [@scope, name]
-              args << @resource.context if function.arity == 3
+              args << @resource.context if function.arity >= 3
+              args << @data if function.arity == 4
+
               stats[name][calc] = function.call(*args)
             end
           end

@@ -13,14 +13,6 @@ module Graphiti
       end
     end
 
-    def resolve_stats
-      if @query.hash[:stats]
-        Stats::Payload.new(@resource, @query, @unpaginated_object).generate
-      else
-        {}
-      end
-    end
-
     def resolve
       if @query.zero_results?
         []
