@@ -120,6 +120,28 @@ RSpec.describe 'stats' do
         expect(json['meta']['stats'])
           .to eq({ 'age' => { 'second' => 1337 } })
       end
+
+      context 'that requires access to context' do
+        let(:ctx) do
+          double 'stat context',
+            current_user: double.as_null_object,
+            my_stat: 1338
+        end
+
+        before do
+          resource.class_eval do
+            stat :age do
+              second { |scope, _, context| context.my_stat }
+            end
+          end
+        end
+
+        it 'works' do
+          Graphiti.with_context(ctx) { render }
+          expect(json['meta']['stats'])
+            .to eq({ 'age' => { 'second' => 1338 } })
+        end
+      end
     end
   end
 

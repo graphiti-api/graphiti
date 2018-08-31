@@ -30,7 +30,9 @@ module Graphiti
             stats[name] = {}
 
             each_calculation(name, calculation) do |calc, function|
-              stats[name][calc] = function.call(@scope, name)
+              args = [@scope, name]
+              args << @resource.context if function.arity == 3
+              stats[name][calc] = function.call(*args)
             end
           end
         end
