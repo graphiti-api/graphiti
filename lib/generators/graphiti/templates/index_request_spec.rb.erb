@@ -4,7 +4,7 @@ RSpec.describe "<%= type %>#index", type: :request do
   let(:params) { {} }
 
   subject(:make_request) do
-    jsonapi_get "/<%= api_namespace %>/v1/<%= type %>", params: params
+    jsonapi_get "<%= api_namespace %>/<%= type %>", params: params
   end
 
   describe 'basic fetch' do

@@ -16,7 +16,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     module IntegrationHooks
       class ApplicationResource < Graphiti::Resource
-        self.adapter = Graphiti::Adapters::ActiveRecord::Base
+        self.adapter = Graphiti::Adapters::ActiveRecord
       end
 
       class BookResource < ApplicationResource

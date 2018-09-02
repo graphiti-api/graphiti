@@ -469,7 +469,7 @@ module Graphiti
 
       def activerecord_adapter
         @activerecord_adapter ||=
-          ::Graphiti::Adapters::ActiveRecord::Base.new(resource)
+          ::Graphiti::Adapters::ActiveRecord.new(resource)
       end
 
       def activerecord_associate?(parent, child, association_name)

@@ -1,17 +1,11 @@
-module Graphiti
-  module Adapters
-    module ActiveRecord # todo change
-      class HasManySideload < Sideload::HasMany
-        include Inferrence
+class Graphiti::Adapters::ActiveRecord::HasManySideload < Graphiti::Sideload::HasMany
+  include Graphiti::Adapters::ActiveRecord::Inferrence
 
-        def default_base_scope
-          resource_class.model.all
-        end
+  def default_base_scope
+    resource_class.model.all
+  end
 
-        def scope(parent_ids)
-          base_scope.where(foreign_key => parent_ids)
-        end
-      end
-    end
+  def scope(parent_ids)
+    base_scope.where(foreign_key => parent_ids)
   end
 end
