@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "<%= type %>#destroy", type: :request do
   subject(:make_request) do
-    jsonapi_delete "/<%= api_namespace %>/v1/<%= type %>/#{<%= var %>.id}"
+    jsonapi_delete "<%= api_namespace %>/<%= type %>/#{<%= var %>.id}"
   end
 
   describe 'basic destroy' do

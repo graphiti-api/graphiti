@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "<%= type %>#update", type: :request do
   subject(:make_request) do
-    jsonapi_put "/<%= api_namespace %>/v1/<%= type %>/#{<%= var %>.id}", payload
+    jsonapi_put "<%= api_namespace %>/<%= type %>/#{<%= var %>.id}", payload
   end
 
   describe 'basic update' do
