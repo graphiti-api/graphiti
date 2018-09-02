@@ -9,6 +9,6 @@ class ApplicationResource < Graphiti::Resource
   # Subclasses can still override this default.
   <%- end -%>
   self.abstract_class = true
-  self.adapter = Graphiti::Adapters::ActiveRecord::Base
+  self.adapter = Graphiti::Adapters::ActiveRecord
   self.endpoint_namespace = '<%= api_namespace %>'
 end
