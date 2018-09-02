@@ -43,7 +43,7 @@ RSpec.describe <%= resource_class %>, type: :resource do
       expect {
         expect(instance.update_attributes).to eq(true)
       }.to change { <%= var %>.reload.updated_at }
-      # and change { instance.foo }.to('bar') <- example
+      # .and change { <%= var %>.foo }.to('bar') <- example
     end
   end
 

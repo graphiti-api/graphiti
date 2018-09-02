@@ -37,20 +37,36 @@ RSpec.describe <%= resource_class %>, type: :resource do
   end
 
   describe 'sorting' do
-    context 'by id descending' do
+    describe 'by id' do
       let!(:<%= var %>1) { create(:<%= var %>) }
       let!(:<%= var %>2) { create(:<%= var %>) }
 
-      before do
-        params[:sort] = '-id'
+      context 'when ascending' do
+        before do
+          params[:sort] = 'id'
+        end
+
+        it 'works' do
+          render
+          expect(d.map(&:id)).to eq([
+            <%= var %>1.id,
+            <%= var %>2.id
+          ])
+        end
       end
 
-      it 'works' do
-        render
-        expect(d.map(&:id)).to eq([
-          <%= var %>2.id,
-          <%= var %>1.id
-        ])
+      context 'when descending' do
+        before do
+          params[:sort] = '-id'
+        end
+
+        it 'works' do
+          render
+          expect(d.map(&:id)).to eq([
+            <%= var %>2.id,
+            <%= var %>1.id
+          ])
+        end
       end
     end
   end
