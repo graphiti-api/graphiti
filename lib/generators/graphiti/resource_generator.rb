@@ -59,10 +59,10 @@ module Graphiti
     end
 
     def generate_route
-      code = "      resources :#{type}"
+      code = "    resources :#{type}"
       code << ", only: [#{actions.map { |a| ":#{a}" }.join(', ')}]" if actions.length < 5
       code << "\n"
-      inject_into_file 'config/routes.rb', after: "scope path: '/v1' do\n" do
+      inject_into_file 'config/routes.rb', after: /ApplicationResource.*$\n/ do
         code
       end
     end

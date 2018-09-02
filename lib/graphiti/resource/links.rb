@@ -69,6 +69,8 @@ module Graphiti
       end
 
       def allow_request?(path, params, action)
+        path = path.split('.')[0]
+
         endpoints.any? do |e|
           has_id = params[:id] || params[:data].try(:[], :id)
           if [:update, :show, :destroy].include?(context_namespace) && has_id
@@ -76,7 +78,6 @@ module Graphiti
             path.pop
             path = path.join('/')
           end
-
           e[:full_path].to_s == path && e[:actions].include?(context_namespace)
         end
       end

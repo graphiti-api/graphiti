@@ -1016,9 +1016,11 @@ RSpec.describe Graphiti::Resource do
           end
         end
 
+        let(:path) { '/api/v1/employees' }
+
         let(:request) do
           double(env: {
-            'PATH_INFO' => '/api/v1/employees',
+            'PATH_INFO' => path,
             'REQUEST_METHOD' => 'GET'
           })
         end
@@ -1041,6 +1043,16 @@ RSpec.describe Graphiti::Resource do
             Graphiti.with_context ctx, :index do
               expect { klass.all(include: 'positions') }
                 .to_not raise_error
+            end
+          end
+
+          context 'with an explicit mime type' do
+            let!(:path) { '/api/v1/employees.json' }
+
+            it 'still works' do
+              Graphiti.with_context ctx, :index do
+                expect { klass.all }.to_not raise_error
+              end
             end
           end
 
