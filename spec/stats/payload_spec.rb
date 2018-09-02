@@ -4,7 +4,8 @@ RSpec.describe Graphiti::Stats::Payload do
   let(:dsl)      { double }
   let(:query)    { double(stats: { attr1: [:count, :average], attr2: [:maximum] }) }
   let(:scope)    { double.as_null_object }
-  let(:instance) { described_class.new(dsl, query, scope) }
+  let(:data)     { double.as_null_object }
+  let(:instance) { described_class.new(dsl, query, scope, data) }
 
   describe '#generate' do
     subject { instance.generate }
