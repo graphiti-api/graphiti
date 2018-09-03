@@ -236,7 +236,7 @@ module Graphiti
     def handle_missing_sideload(name)
       if Graphiti.config.raise_on_missing_sideload
         raise Graphiti::Errors::InvalidInclude
-          .new(name, @resource.type)
+          .new(@resource, name)
       end
     end
 

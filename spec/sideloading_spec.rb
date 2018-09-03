@@ -408,7 +408,13 @@ RSpec.describe 'sideloading' do
     end
 
     context 'when custom class is specified' do
-      let(:custom) { Class.new(Graphiti::Sideload) }
+      let(:custom) do
+        Class.new(Graphiti::Sideload) do
+          def type
+            :belongs_to
+          end
+        end
+      end
 
       it 'is used' do
         sl = resource.polymorphic_belongs_to :credit_card, class: custom
@@ -417,7 +423,13 @@ RSpec.describe 'sideloading' do
     end
 
     context 'when adapter class is specified' do
-      let(:custom) { Class.new(Graphiti::Sideload) }
+      let(:custom) do
+        Class.new(Graphiti::Sideload) do
+          def type
+            :belongs_to
+          end
+        end
+      end
 
       it 'is used' do
         expect(resource.adapter).to receive(:sideloading_classes)

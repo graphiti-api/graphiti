@@ -674,7 +674,7 @@ RSpec.describe 'serialization' do
 
     context 'when a sideload is not readable' do
       before do
-        resource.allow_sideload :hidden, readable: false
+        resource.allow_sideload :hidden, readable: false, type: :has_many
       end
 
       it 'is not applied to the serializer' do

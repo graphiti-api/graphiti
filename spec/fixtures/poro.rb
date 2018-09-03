@@ -295,6 +295,9 @@ module PORO
     end
   end
 
+  class TeamResource < ApplicationResource
+  end
+
   class EmployeeResource < ApplicationResource
     self.serializer = PORO::EmployeeSerializer
     attribute :first_name, :string
@@ -332,10 +335,6 @@ module PORO
   end
 
   class BioResource < ApplicationResource
-  end
-
-  class TeamResource < ApplicationResource
-    belongs_to_many :employees, as: :teams
   end
 
   class CreditCardResource < ApplicationResource

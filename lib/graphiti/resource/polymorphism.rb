@@ -16,17 +16,19 @@ module Graphiti
         end
       end
 
-      def associate_all(parent, children, association_name, type)
-        children.each do |c|
-          associate(parent, c, association_name, type)
-        end
+      def associate_all(*args)
+        _associate(:associate_all, *args)
       end
 
-      def associate(parent, child, association_name, type)
+      def associate(*args)
+        _associate(:associate, *args)
+      end
+
+      def _associate(meth, parent, other, association_name, type)
         child_resource = self.class.resource_for_model(parent)
         if child_resource.sideloads[association_name]
           child_resource.new.adapter
-            .associate(parent, child, association_name, type)
+            .send(meth, parent, other, association_name, type)
         end
       end
 
@@ -55,10 +57,19 @@ module Graphiti
           end
         end
 
+        def resource_for_type(type)
+          resource = children.find { |c| c.type == type }
+          if resource.nil?
+            raise Errors::PolymorphicResourceChildNotFound.new(self, type: type)
+          else
+            resource
+          end
+        end
+
         def resource_for_model(model)
           resource = children.find { |c| model.is_a?(c.model) }
           if resource.nil?
-            raise Errors::PolymorphicResourceChildNotFound.new(self, model)
+            raise Errors::PolymorphicResourceChildNotFound.new(self, model: model)
           else
             resource
           end

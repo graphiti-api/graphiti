@@ -258,12 +258,28 @@ Only one resource can be associated to a given url/verb combination.
     end
 
     class PolymorphicResourceChildNotFound < Base
-      def initialize(resource_class, model)
+      def initialize(resource_class, type: nil, model: nil)
         @resource_class = resource_class
         @model = model
+        @type = type
       end
 
       def message
+        @model ? model_message : type_message
+      end
+
+      def model_message
+        <<-MSG
+#{@resource_class}: Tried to find Resource subclass with model #{@model.class}, but nothing found!
+
+Make sure all your child classes are assigned and associated to the right models:
+
+# One of these should be assocated to model #{@model.class}:
+self.polymorphic = ['Subclass1Resource', 'Subclass2Resource']
+        MSG
+      end
+
+      def type_message
         <<-MSG
 #{@resource_class}: Tried to find Resource subclass with model #{@model.class}, but nothing found!
 
@@ -474,13 +490,13 @@ Consider using a named relationship instead, e.g. 'has_one :top_comment'
     end
 
     class InvalidInclude < Base
-      def initialize(resource_class, relationship)
-        @resource_class = resource_class
+      def initialize(resource, relationship)
+        @resource = resource
         @relationship = relationship
       end
 
       def message
-"#{@resource_class.name}: The requested included relationship \"#{@relationship}\" is not supported."
+"#{@resource.class.name}: The requested included relationship \"#{@relationship}\" is not supported."
       end
     end
 

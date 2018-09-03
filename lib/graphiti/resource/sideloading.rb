@@ -57,15 +57,15 @@ module Graphiti
           allow_sideload(name, opts, &blk)
         end
 
-        def belongs_to_many(name, resource: nil, as:, &blk)
-          resource = resource ||= Util::Class.infer_resource_class(self, name)
-          sideload = resource.sideload(as)
-
-          _resource = resource
-          filter sideload.true_foreign_key, resource.attributes[:id][:type] do
-            eq do |scope, value|
-              _resource.new.adapter.belongs_to_many_filter(sideload, scope, value)
+        def polymorphic_has_many(name, opts = {}, as:, &blk)
+          opts[:foreign_key] ||= :"#{as}_id"
+          _model = model
+          has_many name, opts do
+            params do |hash|
+              hash[:filter][:"#{as}_type"] = _model.name
             end
+
+            instance_eval(&blk) if block_given?
           end
         end
 
