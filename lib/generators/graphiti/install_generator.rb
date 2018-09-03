@@ -27,7 +27,7 @@ module Graphiti
       end
 
       inject_into_file 'config/application.rb', after: "Rails::Application\n" do
-"routes.default_url_options[:host] = ENV.fetch('HOST', 'http://localhost:3000')"
+"    routes.default_url_options[:host] = ENV.fetch('HOST', 'http://localhost:3000')\n"
       end
 
       insert_into_file "config/routes.rb", :after => "Rails.application.routes.draw do\n" do
