@@ -27,8 +27,6 @@ RSpec.describe "<%= type %>#update", type: :request do
         make_request
       }.to change { <%= var %>.reload.attributes }
       expect(response.status).to eq(200)
-
-      # ... assert updates attributes ...
     end
   end
 end
