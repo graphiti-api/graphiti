@@ -22,7 +22,6 @@ RSpec.describe "<%= type %>#create", type: :request do
       expect {
         make_request
       }.to change { <%= model_class %>.count }.by(1)
-      <%= var %> = <%= model_class %>.last
       expect(response.status).to eq(201)
     end
   end
