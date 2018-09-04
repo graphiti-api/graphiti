@@ -41,12 +41,17 @@ module Graphiti
     def sideload(results)
       return if results == []
 
-      concurrent = ::Graphiti.config.concurrency
+      concurrent = true#::Graphiti.config.concurrency
       promises = []
 
       @query.sideloads.each_pair do |name, q|
         sideload = @resource.class.sideload(name)
-        resolve_sideload = -> { sideload.resolve(results, q) }
+        resolve_sideload = -> {
+          sideload.resolve(results, q)
+          if concurrent && defined?(ActiveRecord)
+            ActiveRecord::Base.clear_active_connections!
+          end
+        }
         if concurrent
           promises << Concurrent::Promise.execute(&resolve_sideload)
         else
