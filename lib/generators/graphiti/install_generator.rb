@@ -30,6 +30,10 @@ module Graphiti
 "    routes.default_url_options[:host] = ENV.fetch('HOST', 'http://localhost:3000')\n"
       end
 
+      inject_into_file 'spec/rails_helper.rb', after: /RSpec.configure.+^end$/m do
+"\n\nGraphitiSpecHelpers::RSpec.schema!"
+      end
+
       insert_into_file "config/routes.rb", :after => "Rails.application.routes.draw do\n" do
         <<-STR
   scope path: ApplicationResource.endpoint_namespace, defaults: { format: :jsonapi } do
