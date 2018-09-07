@@ -9,7 +9,7 @@
   <title>Graphiti</title>
   <meta name="description" content="A stylish alternative to GraphQL">
 
-  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
+  <link rel="stylesheet" href="https://graphiti-api.github.io/graphiti/assets/main.css?ref=wh4t3v45">
   <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
 
   <!-- javascript -->
@@ -31,24 +31,24 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a href="http://localhost:4000" class="navbar-brand">JSONAPI Suite</a>
+      <a href="https://graphiti-api.github.io/graphiti" class="navbar-brand">Graphiti</a>
     </div>
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
       <ul class="nav navbar-nav">
         <li>
-          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
         </li>
         <li>
-          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
         </li>
         <li>
-          <a class="nav-link" href="http://localhost:4000/concepts">Concepts</a>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/concepts">Concepts</a>
         </li>
         <li>
-          <a class="nav-link" href="http://localhost:4000/ruby">Docs</a>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/ruby">Docs</a>
         </li>
         <li>
-          <a class="nav-link" href="http://localhost:4000/js/home">Javascript Client</a>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/js/home">Javascript Client</a>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
@@ -76,7 +76,7 @@ sensible defaults to get started quickly.</p>
 
 <p>Let’s start with a classic Rails blog. We’ll use a <a href="http://guides.rubyonrails.org/rails_application_templates.html">template</a> to handle some of the boilerplate. Just run this command and accept all the defaults for now:</p>
 
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>rails new blog --api -m https://raw.githubusercontent.com/jsonapi-suite/rails_template/master/all.rb</code></pre></figure>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>rails new blog --api -m https://raw.githubusercontent.com/graphiti-api/graphiti_rails_template/master/all.rb</code></pre></figure>
 
 <p>Feel free to run <code class="highlighter-rouge">git diff</code> if you’re interested in the
 particulars; this is mostly just installing gems and including modules.</p>
@@ -99,36 +99,7 @@ first, let’s define our model:</p>
 <p>Now we can use the built-in generator to define our <code class="highlighter-rouge">Resource</code>,
 controller, and specs:</p>
 
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>bundle <span class="nb">exec </span>rails g jsonapi:resource Post title:string active:boolean</code></pre></figure>
-
-<p>You’ll see a number of files created. If you open each one, you’ll see
-comments explaining what’s going on. Head over to the
-<a href="http://localhost:4000/tutorial">tutorial</a> for a more in-depth understanding. For now, let’s
-focus on two key concepts you’ll see over and over again: inputs (via
-<a href="https://jsonapi-suite.github.io/strong_resources/">strong_resources</a>),
-and outputs (via <a href="http://jsonapi-rb.org">jsonapi-rb</a>).</p>
-
-<p>Our <strong>API Inputs</strong> are defined in
-<code class="highlighter-rouge">config/initializers/strong_resources.rb</code>. You can think of these as
-<a href="http://api.rubyonrails.org/v5.0/classes/ActionController/StrongParameters.html">strong parameter</a> templates.</p>
-
-<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># config/initializers/strong_resources.rb</span>
-<span class="n">strong_resource</span> <span class="ss">:post</span> <span class="k">do</span>
-  <span class="n">attribute</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:string</span>
-  <span class="n">attribute</span> <span class="ss">:active</span><span class="p">,</span> <span class="ss">:boolean</span>
-<span class="k">end</span></code></pre></figure>
-
-<p>Our <strong>API Outputs</strong> are defined in
-<code class="highlighter-rouge">app/serializers/serializable_post.rb</code>. The DSL is very similar to
-<a href="https://github.com/rails-api/active_model_serializers">active_model_serializers</a> and full documentation can be found at <a href="http://jsonapi-rb.org">jsonapi-rb.org</a>:</p>
-
-<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/serializers/serializable_post.rb</span>
-<span class="k">class</span> <span class="nc">SerializablePost</span> <span class="o">&lt;</span> <span class="no">JSONAPI</span><span class="o">::</span><span class="no">Serializable</span><span class="o">::</span><span class="no">Resource</span>
-  <span class="n">type</span> <span class="ss">:posts</span>
-
-  <span class="n">attribute</span> <span class="ss">:title</span>
-  <span class="n">attribute</span> <span class="ss">:active</span>
-<span class="k">end</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>bundle <span class="nb">exec </span>rails g graphiti:resource Post title:string active:boolean</code></pre></figure>
 
 <p>Now run your app!:</p>
 
@@ -223,7 +194,7 @@ well as a polyfill for <code class="highlighter-rouge">fetch</code>:</p>
 
 <p>This should be pretty straightforward if you’re familiar with
 <code class="highlighter-rouge">ActiveRecord</code>. We define <code class="highlighter-rouge">Model</code> objects, putting configuration on
-class attributes. We instatiating instances of those Models, and call
+class attributes. We instatiate instances of those Models, and call
 <code class="highlighter-rouge">save()</code> to persist. For more information, see the <a href="https://jsonapi-suite.github.io/jsorm/">JSORM Documentation</a>.</p>
 
 <p>Run the script:</p>
@@ -233,7 +204,7 @@ class attributes. We instatiating instances of those Models, and call
 <p>Now load <code class="highlighter-rouge">http://localhost:3000/api/v1/posts</code>. You should have 3 <code class="highlighter-rouge">Post</code>s in
 your database!</p>
 
-<p><img src="http://localhost:4000/assets/img/3_posts_json.png" alt="3_posts" /></p>
+<p><img src="https://graphiti-api.github.io/graphiti/assets/img/3_posts_json.png" alt="3_posts" /></p>
 
 <h1 id="querying"><a name="querying" href="#querying">Querying</a></h1>
 
@@ -353,7 +324,7 @@ the total count of all posts”.</li>
   <li>
     <p>This is rendered in the <code class="highlighter-rouge">meta</code> section of the response:</p>
 
-    <p><img src="http://localhost:4000/assets/img/meta_total_count.png" alt="meta_total_count" /></p>
+    <p><img src="https://graphiti-api.github.io/graphiti/assets/img/meta_total_count.png" alt="meta_total_count" /></p>
   </li>
   <li><strong>Error Handling</strong>:
     <ul>
@@ -372,7 +343,7 @@ the total count of all posts”.</li>
   <li>
     <p>View the default payload:</p>
 
-    <p><img src="http://localhost:4000/assets/img/error_payload.png" alt="error_payload" /></p>
+    <p><img src="https://graphiti-api.github.io/graphiti/assets/img/error_payload.png" alt="error_payload" /></p>
   </li>
   <li>
     <p>Different errors can be customized with different response codes,
@@ -545,7 +516,7 @@ altogether?</p>
 <p>These are important topics that JSONAPI Suite was built to address. To
 learn more about advanced usage and customization, we suggest following
 the <a href="/tutorial">tutorial</a>. There are also a number of how-tos on this
-site, a good one to start with is  <a href="http://localhost:4000/how-to-use-without-activerecord">How
+site, a good one to start with is  <a href="https://graphiti-api.github.io/graphiti/how-to-use-without-activerecord">How
 to Use without ActiveRecord</a></p>
 
 <p>For additional documentation, view the <a href="https://jsonapi-suite.github.io/jsonapi_compliable/">YARD Docs</a>.</p>
@@ -692,7 +663,7 @@ relationships), as well as schemas for request/responses:</p>
 <p><img style="width: 100%" src="https://user-images.githubusercontent.com/55264/28526490-af7ce5a8-7055-11e7-88bf-1ce5ead32dd7.png" /></p>
 
 <p>Our generator set up some boilerplate to enable this functionality, you
-can learn more at: <a href="http://localhost:4000/how-to-autodocument">How
+can learn more at: <a href="https://graphiti-api.github.io/graphiti/how-to-autodocument">How
 to Autodocument with Swagger</a></p>
 
 <p><br />
@@ -709,13 +680,13 @@ to Autodocument with Swagger</a></p>
         <h3>Overview</h3>
         <ul>
           <li>
-            <a href="http://localhost:4000/quickstart">Quickstart</a>
+            <a href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
           </li>
           <li>
-            <a href="http://localhost:4000/tutorial">Tutorial</a>
+            <a href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
           </li>
           <li>
-            <a href="http://localhost:4000/concepts">Concepts</a>
+            <a href="https://graphiti-api.github.io/graphiti/concepts">Concepts</a>
           </li>
         </ul>
       </div>

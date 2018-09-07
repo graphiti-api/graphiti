@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Graphiti</title>
+  <meta name="description" content="A stylish alternative to GraphQL">
+
+  <link rel="stylesheet" href="https://graphiti-api.github.io/graphiti/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="https://graphiti-api.github.io/graphiti" class="navbar-brand">Graphiti</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/ruby">Docs</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/js/home">Javascript Client</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <h1 id="tutorial">Tutorial</h1>
+
+<h3 id="step-1-basic-resource">Step 1: Basic Resource</h3>
+
+<p>We’ll be working with a single database table, <code class="highlighter-rouge">employees</code>:</p>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>id</th>
+      <th>first_name</th>
+      <th>last_name</th>
+      <th>age</th>
+      <th>created_at</th>
+      <th>updated_at</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Homer</td>
+      <td>Simpson</td>
+      <td>39</td>
+      <td>2018-09-04 18:06:56</td>
+      <td>2018-09-04 18:06:56</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Waylon</td>
+      <td>Smithers</td>
+      <td>65</td>
+      <td>2018-09-04 18:06:56</td>
+      <td>2018-09-04 18:06:56</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Monty</td>
+      <td>Burns</td>
+      <td>123</td>
+      <td>2018-09-04 18:06:56</td>
+      <td>2018-09-04 18:06:56</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="rails">Rails</h4>
+
+<p>Use the built-in generator to create the database table
+and corresponding <code class="highlighter-rouge">ActiveRecord</code> model:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>bin/rails g model Employee first_name:string last_name:string age:integer
+<span class="gp">$ </span>bin/rails db:migrate</code></pre></figure>
+
+<p>Now let’s seed some random development data, using <a href="https://github.com/stympy/faker">Faker</a> (which was installed in <a href="/tutorial/step_0">Step 0</a>):</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># db/seeds.rb</span>
+<span class="no">Employee</span><span class="p">.</span><span class="nf">delete_all</span> <span class="c1"># Ensure the DB is cleaned each run</span>
+
+<span class="mi">100</span><span class="p">.</span><span class="nf">times</span> <span class="k">do</span>
+  <span class="no">Employee</span><span class="p">.</span><span class="nf">create!</span> <span class="ss">first_name: </span><span class="no">Faker</span><span class="o">::</span><span class="no">Name</span><span class="p">.</span><span class="nf">first_name</span><span class="p">,</span>
+    <span class="ss">last_name: </span><span class="no">Faker</span><span class="o">::</span><span class="no">Name</span><span class="p">.</span><span class="nf">last_name</span><span class="p">,</span>
+    <span class="ss">age: </span><span class="nb">rand</span><span class="p">(</span><span class="mi">20</span><span class="p">.</span><span class="nf">.</span><span class="mi">80</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Run this seed file with</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>bin/rails db:seed</code></pre></figure>
+
+<h4 id="graphiti">Graphiti</h4>
+
+<p>Just like Rails, Graphiti has built-in generators. Let’s generate
+the corresponding Resource for our <code class="highlighter-rouge">Employee</code> model:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>bin/rails g graphiti:resource Employee first_name:string last_name:string age:integer created_at:datetime updated_at:datetime</code></pre></figure>
+
+<p>This generated a few things, but for now let’s focus on
+<code class="highlighter-rouge">EmployeeResource</code>:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="n">attribute</span> <span class="ss">:first_name</span><span class="p">,</span> <span class="ss">:string</span>
+  <span class="n">attribute</span> <span class="ss">:last_name</span><span class="p">,</span> <span class="ss">:string</span>
+  <span class="n">attribute</span> <span class="ss">:age</span><span class="p">,</span> <span class="ss">:integer</span>
+  <span class="n">attribute</span> <span class="ss">:created_at</span><span class="p">,</span> <span class="ss">:datetime</span><span class="p">,</span> <span class="ss">writable: </span><span class="kp">false</span>
+  <span class="n">attribute</span> <span class="ss">:updated_at</span><span class="p">,</span> <span class="ss">:datetime</span><span class="p">,</span> <span class="ss">writable: </span><span class="kp">false</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>This code defined the <a href="https://restful-api-design.readthedocs.io/en/latest/resources.html">RESTful Resource</a> we want our API to expose. Let’s run our server and see what it does:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>bin/rails s</code></pre></figure>
+
+<p>Visit <code class="highlighter-rouge">localhost:3000/api/v1/employees</code>. You should see a <a href="http://jsonapi.org">JSONAPI Response</a>:</p>
+
+<p><br /></p>
+
+<p><img src="https://user-images.githubusercontent.com/55264/45096386-710a3700-b0ee-11e8-8586-a7e342cca274.png" alt="jsonapi" /></p>
+
+<p><br /></p>
+
+<p>If you find the payload a little intimidating, add <code class="highlighter-rouge">.json</code> to the URL for a more traditional response:</p>
+
+<p><br /></p>
+
+<p><img src="https://user-images.githubusercontent.com/55264/45051465-2509b480-b052-11e8-9be4-3424ca611289.png" alt="json" /></p>
+
+<p><br /></p>
+
+<p>There’s <code class="highlighter-rouge">.xml</code>, too:</p>
+
+<p><br /></p>
+
+<p><img src="https://user-images.githubusercontent.com/55264/45051468-263ae180-b052-11e8-9a1d-b91e1caa1bbf.png" alt="xml" /></p>
+
+<p><br /></p>
+
+<p>These are all different <strong>renderings</strong> of the same <code class="highlighter-rouge">EmployeeResource</code>.</p>
+
+<p><code class="highlighter-rouge">Resources</code> are comprised of <code class="highlighter-rouge">Attribute</code>s:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="n">attribute</span> <span class="ss">:first_name</span><span class="p">,</span> <span class="ss">:string</span></code></pre></figure>
+
+<p>Each attribute defines behavior for:</p>
+
+<ul>
+  <li>Reading (display)</li>
+  <li>Writing</li>
+  <li>Sorting</li>
+  <li>Filtering</li>
+  <li>Fieldsets</li>
+</ul>
+
+<p>Let’s start with simple display, turning <code class="highlighter-rouge">first_name</code> into all capital
+letters:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="n">attribute</span> <span class="ss">:first_name</span> <span class="k">do</span>
+  <span class="c1"># @object is your model instance</span>
+  <span class="vi">@object</span><span class="p">.</span><span class="nf">first_name</span><span class="p">.</span><span class="nf">upcase</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Which gives us:</p>
+
+<p><img src="https://user-images.githubusercontent.com/55264/45098021-25598c80-b0f2-11e8-965e-c245f91899ce.png" alt="" /></p>
+
+<p><br /></p>
+
+<p>This is the most important thing to understand about Resources: they are
+just a collection of defaults, all of which can be overridden. In other
+words:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">attribute</span> <span class="ss">:first_name</span>
+
+<span class="c1"># is the same as</span>
+
+<span class="n">attribute</span> <span class="ss">:first_name</span> <span class="k">do</span>
+  <span class="vi">@object</span><span class="p">.</span><span class="nf">first_name</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>We’ll go into further Resource customizations over the course of this
+tutorial. For now, let’s just verify our out-of-the-box defaults:</p>
+
+<ul>
+  <li>Sort by <code class="highlighter-rouge">first_name</code> ascending: <code class="highlighter-rouge">http://localhost:3000/api/v1/employees?sort=first_name</code></li>
+  <li>Sort by <code class="highlighter-rouge">first_name</code> descending: <code class="highlighter-rouge">http://localhost:3000/api/v1/employees?sort=-first_name</code></li>
+  <li>Return only <code class="highlighter-rouge">age</code> and <code class="highlighter-rouge">created_at</code> in the response: <code class="highlighter-rouge">http://localhost:3000/api/v1/employees?fields[employees]=age,created_at</code></li>
+  <li>Filter on <code class="highlighter-rouge">first_name</code>:
+    <ul>
+      <li>Case-insensitive: <code class="highlighter-rouge">http://localhost:3000/api/v1/employees?filter[first_name]=bob</code></li>
+      <li>Case-sensitive: <code class="highlighter-rouge">http://locahost:3000/api/v1/employees?filter[first_name][eql]=Bob</code></li>
+      <li>Prefix: <code class="highlighter-rouge">http://localhost:3000/api/v1/employees?filter[first_name][prefix]=b</code></li>
+      <li>Suffix: <code class="highlighter-rouge">http://localhost:3000/api/v1/employees?filter[first_name][suffix]=ob</code></li>
+      <li>Contains: <code class="highlighter-rouge">http://localhost:3000/api/v1/employees?filter[first_name][match]=o</code></li>
+    </ul>
+  </li>
+  <li>Filter on <code class="highlighter-rouge">age</code>:
+    <ul>
+      <li>Equal: <code class="highlighter-rouge">http://localhost:3000/api/v1/employees?filter[age]=39</code></li>
+      <li>Greater Than: <code class="highlighter-rouge">http://localhost:3000/api/v1/employees?filter[age][gt]=39</code></li>
+      <li>Greater Than or Equal To: <code class="highlighter-rouge">http://localhost:3000/api/v1/employees?filter[age][gte]=39</code></li>
+      <li>Less Than: <code class="highlighter-rouge">http://localhost:3000/api/v1/employees?filter[age][lt]=65</code></li>
+      <li>Less Than or Equal To: <code class="highlighter-rouge">http://localhost:3000/api/v1/employees?filter[age][lte]=65</code></li>
+    </ul>
+  </li>
+  <li>Paginate
+    <ul>
+      <li>10 per page: <code class="highlighter-rouge">http://localhost:3000/api/v1/employees?page[size]=10</code></li>
+      <li>5 per page, third page:
+<code class="highlighter-rouge">http://localhost:3000/api/v1/employees?page[number]=3</code></li>
+    </ul>
+  </li>
+</ul>
+
+<!--TODO: Resource Concept Doc-->
+<!--TODO: Attribute Concept Doc-->
+<!--TODO: Endpoint Concept Doc-->
+<!--TODO: Spec Concept Doc-->
+
+<p>Write operations are easiest to verify with integration tests, which
+were created when we generated our Resource. Let’s take a look at the
+test for creating <code class="highlighter-rouge">Employee</code>s:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># spec/api/v1/employees/create_spec.rb</span>
+
+<span class="no">RSpec</span><span class="p">.</span><span class="nf">describe</span> <span class="s2">"employees#create"</span><span class="p">,</span> <span class="ss">type: :request</span> <span class="k">do</span>
+  <span class="n">subject</span><span class="p">(</span><span class="ss">:make_request</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">jsonapi_post</span> <span class="s2">"/api/v1/employees"</span><span class="p">,</span> <span class="n">payload</span>
+  <span class="k">end</span>
+
+  <span class="n">describe</span> <span class="s1">'basic create'</span> <span class="k">do</span>
+    <span class="n">let</span><span class="p">(</span><span class="ss">:payload</span><span class="p">)</span> <span class="k">do</span>
+      <span class="p">{</span>
+        <span class="ss">data: </span><span class="p">{</span>
+          <span class="ss">type: </span><span class="s1">'employees'</span><span class="p">,</span>
+          <span class="ss">attributes: </span><span class="p">{</span>
+            <span class="c1"># ... your attrs here</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="k">end</span>
+
+    <span class="n">it</span> <span class="s1">'works'</span> <span class="k">do</span>
+      <span class="n">expect</span><span class="p">(</span><span class="no">EmployeeResource</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:build</span><span class="p">).</span><span class="nf">and_call_original</span>
+      <span class="n">expect</span> <span class="p">{</span>
+        <span class="n">make_request</span>
+      <span class="p">}.</span><span class="nf">to</span> <span class="n">change</span> <span class="p">{</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">count</span> <span class="p">}.</span><span class="nf">by</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+      <span class="n">expect</span><span class="p">(</span><span class="n">response</span><span class="p">.</span><span class="nf">status</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span><span class="p">(</span><span class="mi">201</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<!--TODO API SPEC VS RESOURCE SPEC-->
+
+<p>This is an <strong>API Spec</strong>, which tests high-level end-to-end functionality. We
+know that if our API receives a POST with the given payload, an
+<code class="highlighter-rouge">Employee</code> will be created and a <code class="highlighter-rouge">201</code> response code will be returned.</p>
+
+<p>API specs are high-level - often they won’t be changed past this initial
+boilerplate. For testing <em>logic</em>, use a <strong>Resource Spec</strong>. These
+integration tests hit the database and run logic, but operate without a
+specific request or response:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># spec/api/v1/employees/create_spec.rb</span>
+<span class="no">RSpec</span><span class="p">.</span><span class="nf">describe</span> <span class="no">EmployeeResource</span><span class="p">,</span> <span class="ss">type: :resource</span> <span class="k">do</span>
+  <span class="n">describe</span> <span class="s1">'creating'</span> <span class="k">do</span>
+    <span class="n">let</span><span class="p">(</span><span class="ss">:payload</span><span class="p">)</span> <span class="k">do</span>
+      <span class="p">{</span>
+        <span class="ss">data: </span><span class="p">{</span>
+          <span class="ss">type: </span><span class="s1">'employees'</span><span class="p">,</span>
+          <span class="ss">attributes: </span><span class="p">{</span>
+            <span class="ss">first_name: </span><span class="s1">'Jane'</span>
+            <span class="ss">last_name: </span><span class="s1">'Doe'</span>
+            <span class="ss">age: </span><span class="mi">30</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="k">end</span>
+
+    <span class="n">let</span><span class="p">(</span><span class="ss">:instance</span><span class="p">)</span> <span class="k">do</span>
+      <span class="no">EmployeeResource</span><span class="p">.</span><span class="nf">build</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="n">it</span> <span class="s1">'works'</span> <span class="k">do</span>
+      <span class="n">expect</span> <span class="p">{</span>
+        <span class="n">expect</span><span class="p">(</span><span class="n">instance</span><span class="p">.</span><span class="nf">save</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span><span class="p">(</span><span class="kp">true</span><span class="p">)</span>
+      <span class="p">}.</span><span class="nf">to</span> <span class="n">change</span> <span class="p">{</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">count</span> <span class="p">}.</span><span class="nf">by</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+      <span class="n">employee</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">last</span>
+      <span class="n">expect</span><span class="p">(</span><span class="n">employee</span><span class="p">.</span><span class="nf">first_name</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span><span class="p">(</span><span class="s1">'Jane'</span><span class="p">)</span>
+      <span class="n">expect</span><span class="p">(</span><span class="n">employee</span><span class="p">.</span><span class="nf">last_name</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span><span class="p">(</span><span class="s1">'Doe'</span><span class="p">)</span>
+      <span class="n">expect</span><span class="p">(</span><span class="n">employee</span><span class="p">.</span><span class="nf">age</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<!--TODO: ENDPOINT VERSUS RESOURCE-->
+
+<p>In other words: API specs test Endpoints (request, response, middleware,
+etc), Resource specs test only the Resource (actual application logic).</p>
+
+<p>Before we run these specs, we need to edit our <a href="https://github.com/thoughtbot/factory_bot">factories</a> to ensure
+dynamic, randomized data. Let’s change this:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># spec/factories/employee.rb</span>
+
+<span class="no">FactoryBot</span><span class="p">.</span><span class="nf">define</span> <span class="k">do</span>
+  <span class="n">factory</span> <span class="ss">:employee</span> <span class="k">do</span>
+    <span class="n">first_name</span> <span class="s2">"MyString"</span>
+    <span class="n">last_name</span> <span class="s2">"MyString"</span>
+    <span class="n">age</span> <span class="mi">1</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>To</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># spec/factories/employee.rb</span>
+
+<span class="no">FactoryBot</span><span class="p">.</span><span class="nf">define</span> <span class="k">do</span>
+  <span class="n">factory</span> <span class="ss">:employee</span> <span class="k">do</span>
+    <span class="n">first_name</span> <span class="p">{</span> <span class="no">Faker</span><span class="o">::</span><span class="no">Name</span><span class="p">.</span><span class="nf">first_name</span> <span class="p">}</span>
+    <span class="n">last_name</span> <span class="p">{</span> <span class="no">Faker</span><span class="o">::</span><span class="no">Name</span><span class="p">.</span><span class="nf">last_name</span> <span class="p">}</span>
+    <span class="n">age</span> <span class="p">{</span> <span class="nb">rand</span><span class="p">(</span><span class="mi">20</span><span class="o">.</span><span class="mi">80</span><span class="p">)</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Now undo the changes to <code class="highlighter-rouge">first_name</code>, and run the generated specs:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>bin/rspec</code></pre></figure>
+
+<p>You’ll see 11 tests pass, with 3 pending. One of the pending specs was
+autogenerated by rails - you can delete <code class="highlighter-rouge">spec/models/employee_spec.rb</code>
+for now.</p>
+
+<p>That leaves us with two “update” specs. These are marked pending so you
+can manage the data yourself. Follow the comments in these specs to add
+attributes and get them passing.</p>
+
+<!--TODO TESTING GUIDE-->
+
+<div class="clearfix">
+  <h2 id="next">
+    <a href="/tutorial/step_2">
+      NEXT:
+      <small>Step 2: Has Many</small>
+      &raquo;
+    </a>
+  </h2>
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="https://graphiti-api.github.io/graphiti/concepts">Concepts</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Resources</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Contact us</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

@@ -75,8 +75,8 @@
 
 body {
   background: #414B5B;
-  font-size: 15px;
-  line-height: 1.5;
+  font-size: 17px;
+  line-height: 1.7;
 
   .page-content {
     background: white;
@@ -122,9 +122,16 @@ h3, h4, h5 {
   }
 }
 
-h4 {
-  margin-top: 40px;
+h5 {
+  font-size: 17px;
+  margin-top: 30px;
   border-bottom: 1px solid #f0f0f0;
+}
+
+h4 {
+  color: black;
+  margin-top: 40px;
+  border-bottom: 1px solid darken(#f0f0f0, 10%);
 }
 
 .main-footer {
@@ -191,6 +198,15 @@ img[alt=github] {
   margin-right: 5px;
   width: 20px;
   height: 20px;
+}
+
+.toc {
+  font-size: 15px;
+  line-height: 1.8;
+
+  > ul {
+    padding-left: 10px;
+  }
 }
 
 .js-toc, .ruby-toc, blockquote {
@@ -327,6 +343,9 @@ img[alt=glimmer_logo] {
   $comment: #9c9c9c;
   $yellow: #e6eb9d;
   $blue: #a2dcff;
+
+  margin-top: 2rem;
+  margin-bottom: 2rem;
 
   pre {
     code {

@@ -31,8 +31,8 @@ exclude:
   - Gemfile.lock
 
 github:
-  url: 'http://localhost:4000'
-  #url: 'https://jsonapi-suite.github.io/jsonapi_suite'
+  #url: 'http://localhost:4000'
+  url: 'https://graphiti-api.github.io/graphiti'
 defaults:
   - scope:
       path: "assets/img"

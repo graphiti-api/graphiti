@@ -19,7 +19,7 @@ sensible defaults to get started quickly.
 Let's start with a classic Rails blog. We'll use a [template](http://guides.rubyonrails.org/rails_application_templates.html) to handle some of the boilerplate. Just run this command and accept all the defaults for now:
 
 {% highlight bash %}
-$ rails new blog --api -m https://raw.githubusercontent.com/jsonapi-suite/rails_template/master/all.rb
+$ rails new blog --api -m https://raw.githubusercontent.com/graphiti-api/graphiti_rails_template/master/all.rb
 {% endhighlight %}
 
 Feel free to run `git diff` if you're interested in the
@@ -44,40 +44,7 @@ Now we can use the built-in generator to define our `Resource`,
 controller, and specs:
 
 {% highlight bash %}
-$ bundle exec rails g jsonapi:resource Post title:string active:boolean
-{% endhighlight %}
-
-You'll see a number of files created. If you open each one, you'll see
-comments explaining what's going on. Head over to the
-[tutorial]({{site.github.url}}/tutorial) for a more in-depth understanding. For now, let's
-focus on two key concepts you'll see over and over again: inputs (via
-[strong_resources](https://jsonapi-suite.github.io/strong_resources/)),
-and outputs (via [jsonapi-rb](http://jsonapi-rb.org)).
-
-Our **API Inputs** are defined in
-`config/initializers/strong_resources.rb`. You can think of these as
-[strong parameter](http://api.rubyonrails.org/v5.0/classes/ActionController/StrongParameters.html) templates.
-
-{% highlight ruby %}
-# config/initializers/strong_resources.rb
-strong_resource :post do
-  attribute :title, :string
-  attribute :active, :boolean
-end
-{% endhighlight %}
-
-Our **API Outputs** are defined in
-`app/serializers/serializable_post.rb`. The DSL is very similar to
-[active_model_serializers](https://github.com/rails-api/active_model_serializers) and full documentation can be found at [jsonapi-rb.org](http://jsonapi-rb.org):
-
-{% highlight ruby %}
-# app/serializers/serializable_post.rb
-class SerializablePost < JSONAPI::Serializable::Resource
-  type :posts
-
-  attribute :title
-  attribute :active
-end
+$ bundle exec rails g graphiti:resource Post title:string active:boolean
 {% endhighlight %}
 
 Now run your app!:
@@ -185,7 +152,7 @@ post1.save().then(() => {
 
 This should be pretty straightforward if you're familiar with
 `ActiveRecord`. We define `Model` objects, putting configuration on
-class attributes. We instatiating instances of those Models, and call
+class attributes. We instatiate instances of those Models, and call
 `save()` to persist. For more information, see the [JSORM Documentation](https://jsonapi-suite.github.io/jsorm/).
 
 Run the script:

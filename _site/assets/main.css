@@ -12134,8 +12134,8 @@ html.portfolio-page {
 
 body {
   background: #414B5B;
-  font-size: 15px;
-  line-height: 1.5; }
+  font-size: 17px;
+  line-height: 1.7; }
   body .page-content {
     background: white; }
 
@@ -12164,9 +12164,15 @@ h3, h4, h5 {
     color: #727272;
     text-decoration: none; }
 
-h4 {
-  margin-top: 40px;
+h5 {
+  font-size: 17px;
+  margin-top: 30px;
   border-bottom: 1px solid #f0f0f0; }
+
+h4 {
+  color: black;
+  margin-top: 40px;
+  border-bottom: 1px solid #d7d7d7; }
 
 .main-footer {
   margin-top: 0; }
@@ -12212,6 +12218,12 @@ img[alt=github] {
   margin-right: 5px;
   width: 20px;
   height: 20px; }
+
+.toc {
+  font-size: 15px;
+  line-height: 1.8; }
+  .toc > ul {
+    padding-left: 10px; }
 
 .js-toc, .ruby-toc, blockquote {
   background: #f7f8fb;
@@ -12298,65 +12310,68 @@ img[alt=glimmer_logo] {
       border-radius: 5px 5px 0 0;
       border-bottom: 0; }
 
-.highlight pre code {
-  font-size: 14px;
-  line-height: 1.5; }
-.highlight .language-ruby .n {
-  color: white; }
-.highlight .language-ruby .c1 {
-  color: #9c9c9c; }
-.highlight .language-ruby .ss {
-  color: #a2dcff;
-  font-weight: 600; }
-.highlight .language-ruby .k, .highlight .language-ruby .kp {
-  color: #ff8080; }
-.highlight .language-ruby .p {
-  color: white; }
-.highlight .language-ruby .nc, .highlight .language-ruby .no {
-  color: #e6eb9d;
-  font-weight: 600; }
-.highlight .language-ruby .o, .highlight .language-ruby .si, .highlight .language-ruby .nf {
-  color: white; }
-.highlight .language-ruby .s1, .highlight .language-ruby .s2 {
-  color: lightgreen;
-  font-weight: 600; }
-.highlight .language-ruby .vi, .highlight .language-ruby .mi, .highlight .language-ruby .nb {
-  color: #ff99e6;
-  font-weight: 600; }
-.highlight .language-typescript .kd, .highlight .language-javascript .kd {
-  color: #edf2f9;
-  font-weight: 600; }
-.highlight .language-typescript .o, .highlight .language-javascript .o {
-  color: #edf2f9; }
-.highlight .language-typescript .p, .highlight .language-javascript .p {
-  color: #edf2f9; }
-.highlight .language-typescript .nx, .highlight .language-typescript .nd, .highlight .language-javascript .nx, .highlight .language-javascript .nd {
-  color: #a2dcff;
-  font-weight: 600; }
-.highlight .language-typescript .nb, .highlight .language-javascript .nb {
-  color: white; }
-.highlight .language-typescript .kc, .highlight .language-javascript .kc {
-  color: #e6eb9d; }
-.highlight .language-typescript .kr, .highlight .language-javascript .kr {
-  color: #00e6e6; }
-.highlight .language-typescript .c1, .highlight .language-javascript .c1 {
-  color: #9c9c9c; }
-.highlight .language-typescript .k, .highlight .language-javascript .k {
-  color: #ff66d9; }
-.highlight .language-typescript .err, .highlight .language-javascript .err {
-  font-weight: 600;
-  color: #e6eb9d; }
-.highlight .language-typescript .na, .highlight .language-typescript .nl, .highlight .language-javascript .na, .highlight .language-javascript .nl {
-  color: #ff66d9; }
-.highlight .language-typescript .s1, .highlight .language-typescript .s2, .highlight .language-javascript .s1, .highlight .language-javascript .s2 {
-  color: lightgreen;
-  font-weight: 600; }
-.highlight .language-typescript .mi, .highlight .language-javascript .mi {
-  color: #e6eb9d; }
-.highlight .language-bash {
-  color: white; }
-.highlight .language-javascript .k {
-  color: #e6eb9d !important; }
+.highlight {
+  margin-top: 2rem;
+  margin-bottom: 2rem; }
+  .highlight pre code {
+    font-size: 14px;
+    line-height: 1.5; }
+  .highlight .language-ruby .n {
+    color: white; }
+  .highlight .language-ruby .c1 {
+    color: #9c9c9c; }
+  .highlight .language-ruby .ss {
+    color: #a2dcff;
+    font-weight: 600; }
+  .highlight .language-ruby .k, .highlight .language-ruby .kp {
+    color: #ff8080; }
+  .highlight .language-ruby .p {
+    color: white; }
+  .highlight .language-ruby .nc, .highlight .language-ruby .no {
+    color: #e6eb9d;
+    font-weight: 600; }
+  .highlight .language-ruby .o, .highlight .language-ruby .si, .highlight .language-ruby .nf {
+    color: white; }
+  .highlight .language-ruby .s1, .highlight .language-ruby .s2 {
+    color: lightgreen;
+    font-weight: 600; }
+  .highlight .language-ruby .vi, .highlight .language-ruby .mi, .highlight .language-ruby .nb {
+    color: #ff99e6;
+    font-weight: 600; }
+  .highlight .language-typescript .kd, .highlight .language-javascript .kd {
+    color: #edf2f9;
+    font-weight: 600; }
+  .highlight .language-typescript .o, .highlight .language-javascript .o {
+    color: #edf2f9; }
+  .highlight .language-typescript .p, .highlight .language-javascript .p {
+    color: #edf2f9; }
+  .highlight .language-typescript .nx, .highlight .language-typescript .nd, .highlight .language-javascript .nx, .highlight .language-javascript .nd {
+    color: #a2dcff;
+    font-weight: 600; }
+  .highlight .language-typescript .nb, .highlight .language-javascript .nb {
+    color: white; }
+  .highlight .language-typescript .kc, .highlight .language-javascript .kc {
+    color: #e6eb9d; }
+  .highlight .language-typescript .kr, .highlight .language-javascript .kr {
+    color: #00e6e6; }
+  .highlight .language-typescript .c1, .highlight .language-javascript .c1 {
+    color: #9c9c9c; }
+  .highlight .language-typescript .k, .highlight .language-javascript .k {
+    color: #ff66d9; }
+  .highlight .language-typescript .err, .highlight .language-javascript .err {
+    font-weight: 600;
+    color: #e6eb9d; }
+  .highlight .language-typescript .na, .highlight .language-typescript .nl, .highlight .language-javascript .na, .highlight .language-javascript .nl {
+    color: #ff66d9; }
+  .highlight .language-typescript .s1, .highlight .language-typescript .s2, .highlight .language-javascript .s1, .highlight .language-javascript .s2 {
+    color: lightgreen;
+    font-weight: 600; }
+  .highlight .language-typescript .mi, .highlight .language-javascript .mi {
+    color: #e6eb9d; }
+  .highlight .language-bash {
+    color: white; }
+  .highlight .language-javascript .k {
+    color: #e6eb9d !important; }
 
 body {
   background-color: white; }

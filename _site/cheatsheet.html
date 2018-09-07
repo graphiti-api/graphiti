@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Graphiti</title>
+  <meta name="description" content="A stylish alternative to GraphQL">
+
+  <link rel="stylesheet" href="https://graphiti-api.github.io/graphiti/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="https://graphiti-api.github.io/graphiti" class="navbar-brand">Graphiti</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/concepts">Concepts</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/ruby">Docs</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/js/home">Javascript Client</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <h1 id="resource-cheatsheet">Resource Cheatsheet</h1>
+
+<p>This is an expanded version of what’s “under the hood” of a default
+Resource:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">model</span> <span class="o">=</span> <span class="no">Employee</span>
+
+  <span class="c1"># JSONAPI type</span>
+  <span class="c1"># http://jsonapi.org/format/#document-resource-identifier-objects</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">type</span> <span class="o">=</span> <span class="ss">:employees</span>
+
+  <span class="c1"># Expanded version</span>
+  <span class="n">attribute</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:string</span><span class="p">,</span>
+    <span class="ss">readable: </span><span class="nb">self</span><span class="p">.</span><span class="nf">attributes_sortable_by_default</span><span class="p">,</span>
+    <span class="ss">writable: </span><span class="nb">self</span><span class="p">.</span><span class="nf">attributes_sortable_by_default</span><span class="p">,</span>
+    <span class="ss">sortable: </span><span class="nb">self</span><span class="p">.</span><span class="nf">attributes_sortable_by_default</span><span class="p">,</span>
+    <span class="ss">filterable: </span><span class="nb">self</span><span class="p">.</span><span class="nf">attributes_sortable_by_default</span>
+
+  <span class="c1"># Alter display</span>
+  <span class="c1"># @object is your model instance</span>
+  <span class="n">attribute</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:string</span> <span class="k">do</span>
+    <span class="vi">@object</span><span class="p">.</span><span class="nf">name</span><span class="p">.</span><span class="nf">upcase</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Default nil</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">default_sort</span> <span class="o">=</span> <span class="p">[{</span> <span class="ss">name: :desc</span> <span class="p">}]</span>
+  <span class="c1"># Default 10</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">default_per_page</span> <span class="o">=</span> <span class="mi">10</span>
+
+  <span class="c1"># Custom sort</span>
+  <span class="c1"># sort :name, :string if no attribute defined</span>
+  <span class="n">sort</span> <span class="ss">:name</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">dir</span><span class="o">|</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">order</span><span class="p">(</span><span class="ss">name: </span><span class="n">dir</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Custom Filter</span>
+  <span class="c1"># filter :name, :string if no attribute defined</span>
+  <span class="n">filter</span> <span class="ss">:name</span> <span class="k">do</span>
+    <span class="c1"># All of the operators here have not_ equivalents, e.q. not_eq</span>
+    <span class="c1"># imagine ".where.not" instead of ".where"</span>
+
+    <span class="n">eq</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+      <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="s2">"lower(name) IN ?"</span><span class="p">,</span> <span class="n">value</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:downcase</span><span class="p">))</span>
+    <span class="k">end</span>
+
+    <span class="n">eql</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+      <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">name: </span><span class="n">value</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="n">prefix</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+      <span class="n">value</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">v</span><span class="o">|</span>
+        <span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="s1">'lower(name) LIKE ?'</span><span class="p">,</span> <span class="s2">"</span><span class="si">#{</span><span class="n">v</span><span class="p">.</span><span class="nf">downcase</span><span class="si">}</span><span class="s2">%"</span><span class="p">)</span>
+      <span class="k">end</span>
+      <span class="n">scope</span>
+    <span class="k">end</span>
+
+    <span class="n">suffix</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+      <span class="n">value</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">v</span><span class="o">|</span>
+        <span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="s1">'lower(name) LIKE ?'</span><span class="p">,</span> <span class="s2">"%</span><span class="si">#{</span><span class="n">v</span><span class="p">.</span><span class="nf">downcase</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+      <span class="k">end</span>
+      <span class="n">scope</span>
+    <span class="k">end</span>
+
+    <span class="n">match</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+      <span class="n">value</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">v</span><span class="o">|</span>
+        <span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="s1">'lower(name) LIKE ?'</span><span class="p">,</span> <span class="s2">"%</span><span class="si">#{</span><span class="n">v</span><span class="p">.</span><span class="nf">downcase</span><span class="si">}</span><span class="s2">%"</span><span class="p">)</span>
+      <span class="k">end</span>
+      <span class="n">scope</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Operators for integer, float, datetime, etc</span>
+  <span class="n">filter</span> <span class="ss">:age</span><span class="p">,</span> <span class="ss">:integer</span> <span class="k">do</span>
+    <span class="n">eq</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+      <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">age: </span><span class="n">value</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="n">gt</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+      <span class="n">value</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">v</span><span class="o">|</span>
+        <span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="s1">'age &gt; ?'</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+      <span class="k">end</span>
+      <span class="n">scope</span>
+    <span class="k">end</span>
+
+    <span class="n">gte</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+      <span class="n">value</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">v</span><span class="o">|</span>
+        <span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="s1">'age &gt;= ?'</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+      <span class="k">end</span>
+      <span class="n">scope</span>
+    <span class="k">end</span>
+
+    <span class="n">lt</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+      <span class="n">value</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">v</span><span class="o">|</span>
+        <span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="s1">'age &lt; ?'</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+      <span class="k">end</span>
+      <span class="n">scope</span>
+    <span class="k">end</span>
+
+    <span class="n">lte</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+      <span class="n">value</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">v</span><span class="o">|</span>
+        <span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="s1">'age &lt;= ?'</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+      <span class="k">end</span>
+      <span class="n">scope</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Must execute query and return an array of Model instances</span>
+  <span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">to_a</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="n">employee</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="n">employee</span><span class="p">.</span><span class="nf">save</span>
+    <span class="n">employee</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="n">employee</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="ss">id: </span><span class="n">attributes</span><span class="p">.</span><span class="nf">delete</span><span class="p">(</span><span class="ss">:id</span><span class="p">))</span>
+    <span class="n">employee</span><span class="p">.</span><span class="nf">update_attributes</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="n">employee</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+    <span class="n">employee</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="ss">id: </span><span class="n">attributes</span><span class="p">.</span><span class="nf">delete</span><span class="p">(</span><span class="ss">:id</span><span class="p">))</span>
+    <span class="n">employee</span><span class="p">.</span><span class="nf">destroy</span>
+    <span class="n">employee</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="https://graphiti-api.github.io/graphiti/concepts">Concepts</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Resources</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Contact us</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>
