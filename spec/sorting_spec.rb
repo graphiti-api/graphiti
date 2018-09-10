@@ -26,6 +26,18 @@ RSpec.describe 'sorting' do
     expect(ids).to eq([2,1])
   end
 
+  context 'when *default* sorting on unknown attribute' do
+    before do
+      resource.default_sort = [{ asdf: :asc }]
+    end
+
+    it 'raises helpful error' do
+      expect {
+        ids
+      }.to raise_error(Graphiti::Errors::AttributeError, 'PORO::EmployeeResource: Tried to sort on attribute :asdf, but could not find an attribute with that name.')
+    end
+  end
+
   context 'when sorting on an unknown attribute' do
     before do
       params[:sort] = 'asdf'
