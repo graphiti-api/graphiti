@@ -41,7 +41,7 @@ module Graphiti
     def sideload(results)
       return if results == []
 
-      concurrent = true#::Graphiti.config.concurrency
+      concurrent = Graphiti.config.concurrency
       promises = []
 
       @query.sideloads.each_pair do |name, q|
