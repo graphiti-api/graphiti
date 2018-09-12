@@ -52,7 +52,7 @@ The same way a `Model` is an abstraction around a database table, a
 ***querying***, ***persisting***, and ***serializing*** data.
 
 > For a condensed view of the Resource interface, see the
-> [cheatsheet](/cheatsheet).
+> [cheatsheet]({{site.github.url}}/cheatsheet).
 
 ## 2 Attributes
 

@@ -1089,7 +1089,7 @@ unit test can be deferred until the use case actually arises.
 
 ## 9 Generators
 
-The [Resource generator](/guides/concepts/resources#generators) will create both Resource and API tests for you.
+The [Resource generator]({{site.github.url}}/guides/concepts/resources#generators) will create both Resource and API tests for you.
 Use these as templates to implement your tests.
 
 You can also run

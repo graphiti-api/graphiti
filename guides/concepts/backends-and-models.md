@@ -125,7 +125,7 @@ In other words, ActiveRecord is **combines** a Backend and Model.
 Opinions on this [vary](https://blog.lelonek.me/why-is-your-rails-application-still-coupled-to-activerecord-efe34d657c91),
 but Graphiti supports either approach: we can separate data and business layers, or
 combine them. See the ActiveRecord doppleganger of the above at our
-[Resource cheatsheet](/cheatsheet).
+[Resource cheatsheet]({{site.github.url}}/cheatsheet).
 
 ### 1.2 Model Requirements
 

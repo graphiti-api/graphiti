@@ -21,7 +21,7 @@ What is Graphiti?
 
 <br />
 
-The key concept here is a **Resource**. [Resources](/guides/concepts/resources) sit between a Request and a Backend, defining how to ***query***, ***persist***, and ***serialize*** data. They are accessible through **[Endpoints](/guides/concepts/endpoints)**, which customize Resource behavior based on context.
+The key concept here is a **Resource**. [Resources]({{site.github.url}}/guides/concepts/resources) sit between a Request and a Backend, defining how to ***query***, ***persist***, and ***serialize*** data. They are accessible through **[Endpoints](/guides/concepts/endpoints)**, which customize Resource behavior based on context.
 
 <br />
 
@@ -147,6 +147,6 @@ end
 
 <br />
 
-We can now fetch Posts and Comments in a single request - ***including*** sorting the comments, filtering, fieldsets and everything else a [Resource](/guides/concepts/resources) supports.
+We can now fetch Posts and Comments in a single request - ***including*** sorting the comments, filtering, fieldsets and everything else a [Resource]({{site.github.url}}/guides/concepts/resources) supports.
 
 <br />

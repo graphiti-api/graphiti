@@ -10,29 +10,29 @@ understand the concepts behind Graphiti.
 
 If you just want to get a feel for Graphiti code and all the
 functionality that comes out-of-the box, head to the
-[Quickstart](/quickstart). If you want a birds-eye view of Graphiti's
+[Quickstart]({{site.github.url}}/quickstart). If you want a birds-eye view of Graphiti's
 moving pieces, check out [The Lifecycle of a Graphiti
-Request](/guides/overview/lifecycle). Or to understand Resources,
+Request]({{site.github.url}}/guides/overview#lifecycle-of-a-graphiti-request)). Or to understand Resources,
 Graphiti's core concept, see the [Resource
-API](/guides/concepts/resources).
+API]({{site.github.url}}/guides/concepts/resources).
 
 But ideally, read everything 🙂
 
   * ## Overview: What is Graphiti?
     * Guiding Principles
-    * [Lifecycle of a Graphiti Request](/guides/overview#lifecycle-of-a-graphiti-request)
+    * [Lifecycle of a Graphiti Request]({{site.github.url}}/guides/overview#lifecycle-of-a-graphiti-request)
   * ## Getting Started
     * Installation
     * Quickstart
     * What's Next?
     * Feedback
   * ## Concepts
-    * [Resources](/guides/concepts/resources)
-    * [Endpoints](/guides/concepts/endpoints)
-    * [Backends and Models](/guides/backends-and-models)
-    * [Links](/guides/concepts/links)
+    * [Resources]({{site.github.url}}/guides/concepts/resources)
+    * [Endpoints]({{site.github.url}}/guides/concepts/endpoints)
+    * [Backends and Models]({{site.github.url}}/guides/concepts/backends-and-models)
+    * [Links]({{site.github.url}}/guides/concepts/links)
     * Error Handling
-    * [Testing](/guides/concepts/testing)
+    * [Testing]({{site.github.url}}/guides/concepts/testing)
     * Schema
     * The JSONAPI Specification
     * Rails Integration

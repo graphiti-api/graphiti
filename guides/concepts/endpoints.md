@@ -24,7 +24,7 @@ Endpoints
 ## 1 Overview
 
 **Endpoints** expose and customize
-[Resources](/guides/concepts/resources).
+[Resources]({{site.github.url}}/guides/concepts/resources).
 
 It's important to remember that Resources themselves can operate
 completely independently of a request or response:
@@ -58,7 +58,7 @@ Rails, an Endpoint is the combination of a Route and Controller.
 
 Often, you won't need to customize Endpoints - especially if you're
 using our [Rails Resource
-generator](/guides/concepts/resources#generators). Endpoint logic mostly
+generator]({{site.github.url}}/guides/concepts/resources#generators). Endpoint logic mostly
 concerns:
 
 * Caching
@@ -103,14 +103,14 @@ end
 {% endhighlight %}
 
 This gives us [#sideload_allowlist](#sideload-allowlist) and sets the
-[context](/guides/concepts/resources#context).
+[context]({{site.github.url}}/guides/concepts/resources#context).
 
 ## 2 Customizing Resources
 
 ### Scope Overrides
 
 One common use case for endpoints is customizing the Resource
-[base scope](/guides/concepts/resources#basescope). This causes a new
+[base scope]({{site.github.url}}/guides/concepts/resources#basescope). This causes a new
 "starting point" for query building.
 
 Consider the endpoints `/posts` (basic CRUD) and `/top_posts`. Though
@@ -142,7 +142,7 @@ those positions in a single request. But is it really valid to *also* pull down
 all the hardware, as well as all the historical data on the cost of that hardware,
 in a single request? Allowing the entire graph to be pulled down in a single request can cause excessive load on our
 servers (and this is probably a better fit for lazy-loading via
-[Links](/guides/concepts/links)).
+[Links]({{site.github.url}}/guides/concepts/links)).
 
 Let's instead say that if we're entering the graph at `/employees`, the
 furthest we can go is Department:
@@ -212,4 +212,4 @@ TODO
 ## 4 Testing
 
 If you have custom Endpoint logic, we suggest testing using an [API
-Test](/guides/concepts/testing#api-tests).
+Test]({{site.github.url}}/guides/concepts/testing#api-tests).

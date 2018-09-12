@@ -1,7 +1,8 @@
 PATH
   remote: ..
   specs:
-    graphiti (1.0.alpha.19)
+    graphiti (1.0.alpha.23)
+      activesupport (>= 4.1, < 6)
       concurrent-ruby (~> 1.0)
       dry-types (~> 0.13)
       graphiti_errors (~> 1.0.alpha.2)

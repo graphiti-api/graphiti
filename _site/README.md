@@ -10,8 +10,7 @@ $ bundle install --binstubs
 $ bin/jekyll serve
 ```
 
-To add a how-to, edit `_data/how-tos`, and add a corresponding markdown
-file. See the existing how-tos for reference.
+Comment/Uncomment `github.url` in `_config.yml`
 
 Always make sure files are compiled before pushing. You can do this with
 `jekyll serve` or `jekyll build`
