@@ -261,6 +261,16 @@ module Graphiti
       !self.class.assign_each_proc
     end
 
+    # @api private
+    def resource_class_loaded?
+      begin
+        resource_class
+        true
+      rescue Graphiti::Errors::ResourceNotFound
+        false
+      end
+    end
+
     private
 
     def apply_belongs_to_many_filter

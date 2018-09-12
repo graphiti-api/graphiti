@@ -126,6 +126,18 @@ module Graphiti
   def self.resources
     @resources ||= []
   end
+
+  # When we add a sideload, we need to do configuration, such as
+  # adding the relationship to the Resource's serializer.
+  # However, the sideload's Resource class may not be loaded yet.
+  # This is not a problem with Rails autoloading, but is a problem
+  # outside Rails.
+  # In these cases, load every Resource class then call Graphiti.setup!
+  def self.setup!
+    resources.each do |r|
+      r.apply_sideloads_to_serializer
+    end
+  end
 end
 
 require "graphiti/runner"
