@@ -48,3 +48,6 @@ But ideally, read everything 🙂
     * [Plain Ruby](https://github.com/graphiti-api/plain_ruby_example)
   * ## Contributing
     * Roadmap
+
+ <br />
+ <br />
