@@ -103,7 +103,7 @@ module Graphiti
           @sideload.link? &&
             @sideload.children.values.all? { |c| !c.resource.endpoint.nil? }
         else
-          @sideload.link? && @sideload.resource.endpoint
+          !!(@sideload.link? && @sideload.resource.endpoint)
         end
       end
     end

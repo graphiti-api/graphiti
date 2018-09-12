@@ -9,6 +9,13 @@ module Graphiti
     end
 
     initializer 'graphiti.init' do
+      if ::Rails.application.config.eager_load
+        config.after_initialize do |app|
+          ::Rails.application.reload_routes!
+          Graphiti.setup!
+        end
+      end
+
       if Mime[:jsonapi].nil? # rails 4
         Mime::Type.register('application/vnd.api+json', :jsonapi)
       end

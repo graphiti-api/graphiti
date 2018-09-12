@@ -17,7 +17,7 @@ module Graphiti
             parent.children[name] = sideload
           else
             config[:sideloads][name] = sideload
-            apply_sideloads_to_serializer if sideload.resource_class_loaded?
+            apply_sideloads_to_serializer if rails_autoloading?
           end
           sideload
         end
@@ -103,6 +103,10 @@ module Graphiti
           end
 
           memo
+        end
+
+        def rails_autoloading?
+          defined?(::Rails) && !::Rails.application.config.eager_load
         end
       end
     end
