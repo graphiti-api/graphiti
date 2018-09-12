@@ -16,6 +16,8 @@ Request]({{site.github.url}}/guides/overview#lifecycle-of-a-graphiti-request)). 
 Graphiti's core concept, see the [Resource
 API]({{site.github.url}}/guides/concepts/resources).
 
+Or to dive into code, check out our sample apps in [Rails](https://github.com/graphiti-api/employee_directory), [Sinatra](https://github.com/graphiti-api/sinatra_example) and [Plain Ruby](https://github.com/graphiti-api/plain_ruby_example).
+
 But ideally, read everything 🙂
 
   * ## Overview: What is Graphiti?
