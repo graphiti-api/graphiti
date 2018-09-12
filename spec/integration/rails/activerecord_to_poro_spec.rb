@@ -19,6 +19,8 @@ if ENV['APPRAISAL_INITIALIZED']
         self.model = PORO::State
         attribute :name, :string
       end
+
+      Graphiti.setup!
     end
 
     controller(ApplicationController) do

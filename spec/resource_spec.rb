@@ -259,16 +259,20 @@ RSpec.describe Graphiti::Resource do
       end
 
       context 'when sideloading' do
+        let(:some_resource) do
+          Class.new(Graphiti::Resource)
+        end
+
         let(:klass1) do
-          Class.new(app_resource) do
-            allow_sideload :foo, type: :has_many
-          end
+          klass = Class.new(app_resource)
+          klass.allow_sideload :foo, type: :has_many, resource: some_resource
+          klass
         end
 
         let(:klass2) do
-          Class.new(klass1) do
-            allow_sideload :bar, type: :belongs_to
-          end
+          klass = Class.new(klass1)
+          klass.allow_sideload :bar, type: :belongs_to, resource: some_resource
+          klass
         end
 
         it 'inherits sideloads from the parent' do

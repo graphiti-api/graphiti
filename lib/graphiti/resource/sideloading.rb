@@ -17,7 +17,7 @@ module Graphiti
             parent.children[name] = sideload
           else
             config[:sideloads][name] = sideload
-            apply_sideloads_to_serializer
+            apply_sideloads_to_serializer if sideload.resource_class_loaded?
           end
           sideload
         end

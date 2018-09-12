@@ -30,8 +30,9 @@ RSpec.describe 'serialization' do
     end
 
     it 'has all readable sideloads of the resource' do
-      resource.allow_sideload :foobles, type: :has_many
-      resource.allow_sideload :barble, type: :belongs_to
+      other = Class.new(Graphiti::Resource)
+      resource.allow_sideload :foobles, type: :has_many, resource: other
+      resource.allow_sideload :barble, type: :belongs_to, resource: other
       expect(resource.serializer.relationship_blocks.keys)
         .to eq([:foobles, :barble])
     end
@@ -975,10 +976,28 @@ RSpec.describe 'serialization' do
             }
           end
 
-          it 'raises error' do
-            expect {
-              resource.has_many :positions
-            }.to raise_error(Graphiti::Errors::InvalidLink, /Make sure the endpoint \"\/poro\/positions\" exists with action :index/)
+          context 'when validating endpoints' do
+            before do
+              resource.validate_endpoints = true
+            end
+
+            it 'raises error' do
+              expect {
+                resource.has_many :positions
+              }.to raise_error(Graphiti::Errors::InvalidLink, /Make sure the endpoint \"\/poro\/positions\" exists with action :index/)
+            end
+          end
+
+          context 'when not validating endpoints' do
+            before do
+              resource.validate_endpoints = false
+            end
+
+            it 'does not raise error' do
+              expect {
+                resource.has_many :positions
+              }.to_not raise_error
+            end
           end
         end
 
@@ -987,10 +1006,28 @@ RSpec.describe 'serialization' do
             Graphiti.config.context_for_endpoint = nil
           end
 
-          it 'raises error' do
-            expect {
-              resource.has_many :positions
-            }.to raise_error(Graphiti::Errors::Unlinkable, /Graphiti.config.context_for_endpoint/)
+          context 'when validating endpoints' do
+            before do
+              resource.validate_endpoints = true
+            end
+
+            it 'raises error' do
+              expect {
+                resource.has_many :positions
+              }.to raise_error(Graphiti::Errors::Unlinkable, /Graphiti.config.context_for_endpoint/)
+            end
+          end
+
+          context 'when not validating endpoints' do
+            before do
+              resource.validate_endpoints = false
+            end
+
+            it 'does not raise error' do
+              expect {
+                resource.has_many :positions
+              }.to_not raise_error
+            end
           end
         end
       end
@@ -1116,10 +1153,28 @@ RSpec.describe 'serialization' do
             }
           end
 
-          it 'raises error' do
-            expect {
-              resource.belongs_to :classification
-            }.to raise_error(Graphiti::Errors::InvalidLink, /Make sure the endpoint \"\/poro\/classifications\" exists with action :show/)
+          context 'when validating endpoints' do
+            before do
+              resource.validate_endpoints = true
+            end
+
+            it 'raises error' do
+              expect {
+                resource.belongs_to :classification
+              }.to raise_error(Graphiti::Errors::InvalidLink, /Make sure the endpoint \"\/poro\/classifications\" exists with action :show/)
+            end
+          end
+
+          context 'when not validating endpoints' do
+            before do
+              resource.validate_endpoints = false
+            end
+
+            it 'does not raise error' do
+              expect {
+                resource.belongs_to :classification
+              }.to_not raise_error
+            end
           end
         end
 

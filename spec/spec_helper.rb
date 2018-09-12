@@ -9,6 +9,7 @@ require 'graphiti'
 # Avoiding loading classes before we're ready
 Graphiti::Resource.autolink = false
 require 'fixtures/poro'
+Graphiti.setup!
 
 RSpec.configure do |config|
   config.include GraphitiSpecHelpers::RSpec

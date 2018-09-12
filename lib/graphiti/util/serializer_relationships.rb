@@ -39,7 +39,9 @@ module Graphiti
 
       def block
         if _link = link?
-          validate_link! unless @sideload.link_proc
+          if @resource_class.validate_endpoints?
+            validate_link! unless @sideload.link_proc
+          end
         end
 
         _sl = @sideload
