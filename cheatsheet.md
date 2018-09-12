@@ -111,6 +111,13 @@ class EmployeeResource < ApplicationRecord
     end
   end
 
+  # Will be passed to sort, filter, etc
+  # Apply global logic here: only return active Employees,
+  # filter results based on the current user, etc
+  def base_scope
+    Employee.all
+  end
+
   # Must execute query and return an array of Model instances
   def resolve(scope)
     scope.to_a

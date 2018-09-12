@@ -37,9 +37,10 @@ Resources
   * [many_to_many](#manytomany)
   * [polymorphic_belongs_to](#polymorphicbelongsto)
   * [polymorphic_has_many](#polymorphichasmany)
-* 6 Persisting
-* 7 Context
-* 8 Adapters
+* 6 [Generators](#generators)
+* 7 Persisting
+* 8 Context
+* 9 Adapters
 </div>
 
 <div markdown="1" class="col-md-8">
@@ -49,6 +50,9 @@ Resources
 The same way a `Model` is an abstraction around a database table, a
 `Resource` is an abstraction around an API endpoint. It holds logic for
 ***querying***, ***persisting***, and ***serializing*** data.
+
+> For a condensed view of the Resource interface, see the
+> [cheatsheet](/cheatsheet).
 
 ## 2 Attributes
 
@@ -319,7 +323,7 @@ Use `.find` to find a single record by id, raising
 `Graphiti::Errors::RecordNotFound` if no records are returned:
 
 {% highlight ruby %}
-employee = EmployeeResource.all(id: 123)
+employee = EmployeeResource.find(id: 123)
 employee.data.first_name # => "Jane"
 {% endhighlight %}
 
@@ -447,7 +451,7 @@ Pass `:allow` or `:reject` to only allow filtering on certain values, or
 reject bad values:
 
 {% highlight ruby %}
-filter :size, :string, allow: %w(Big Medium Small)
+filter :size, :string, allow: ['Big', 'Medium', 'Small']
 
 filter :size, :string, reject: ['X-Large']
 {% endhighlight %}
@@ -1159,6 +1163,28 @@ class NoteResource < ApplicationResource
   attribute :notable_type, :string, only: [:filterable]
   # ... code ...
 end
+{% endhighlight %}
+
+## 6 Generators
+
+To generate a Resource:
+
+{% highlight bash %}
+$ rails generate graphiti:resource NAME [attribute:type] [options]
+{% endhighlight %}
+
+For example:
+
+{% highlight bash %}
+$ rails generate graphiti:resource Employee first_name:string age:integer
+{% endhighlight %}
+
+Will add a route, controller, resource, and tests.
+
+Limit the actions this resource supports with `-a`:
+
+{% highlight bash %}
+$ rails generate graphiti:resource Employee -a index show
 {% endhighlight %}
 
 </div>

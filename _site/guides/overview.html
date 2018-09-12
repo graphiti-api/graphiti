@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Graphiti</title>
+  <meta name="description" content="A stylish alternative to GraphQL">
+
+  <link rel="stylesheet" href="https://graphiti-api.github.io/graphiti/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="https://graphiti-api.github.io/graphiti" class="navbar-brand">Graphiti</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="toc col-md-3">
+  <h1 id="what-is-graphiti">What is Graphiti?</h1>
+
+  <ul>
+    <li>1 [Guiding Principles]</li>
+    <li>2 <a href="#lifecycle-of-a-graphiti-request">Lifecycle of a Graphiti Request</a></li>
+  </ul>
+
+</div>
+
+<div class="col-md-8">
+
+  <h2 id="lifecycle-of-a-graphiti-request">2 Lifecycle of a Graphiti Request</h2>
+
+  <p align="center">
+  <img width="100%" src="https://user-images.githubusercontent.com/55264/44479491-c3d3f100-a60e-11e8-90fb-e7654a94a2c9.png" />
+</p>
+
+  <p><br /></p>
+
+  <p>The key concept here is a <strong>Resource</strong>. <a href="/guides/concepts/resources">Resources</a> sit between a Request and a Backend, defining how to <strong><em>query</em></strong>, <strong><em>persist</em></strong>, and <strong><em>serialize</em></strong> data. They are accessible through <strong><a href="/guides/concepts/endpoints">Endpoints</a></strong>, which customize Resource behavior based on context.</p>
+
+  <p><br /></p>
+
+  <p align="center">
+  <img width="80%" src="https://user-images.githubusercontent.com/55264/44619632-13592d80-a858-11e8-807e-36db566f86c6.png" />
+</p>
+
+  <p>Each Resource is comprised of <strong>Attributes</strong>. Each Attribute corresponds to behavior for:</p>
+
+  <ul>
+    <li><strong>Reading</strong>: The fields rendered in the response, e.g. <code class="highlighter-rouge"><span class="p">{</span><span class="w"> </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Jane"</span><span class="w"> </span><span class="p">}</span></code></li>
+    <li><strong>Writing</strong>: The fields accepted in the payload, e.g. a POST or PUT request.</li>
+    <li><strong>Filtering</strong>: The fields we can query, e.g. <code class="highlighter-rouge">/employees?filter[first_name]=Jane</code></li>
+    <li><strong>Sorting</strong>: The fields we can sort on, e.g. <code class="highlighter-rouge">/employees?sort=age</code></li>
+  </ul>
+
+  <p>Each Attribute has a <strong>Type</strong>, which will be coerced and checked at runtime.</p>
+
+  <p align="center">
+  <img width="60%" src="https://user-images.githubusercontent.com/55264/44620523-df840500-a863-11e8-9a00-6eca2488b8ce.png" />
+</p>
+
+  <p>A Resource does not mean “a database table”, though the two have a lot in common and often match. A Resource is a generic interface wrapping a <strong>Backend</strong>. That Backend could be a relational database, a No-SQL database, or even a third-party service call. And you can use whichever client or ORM you’d like for a given Backend (<code class="highlighter-rouge">ActiveRecord</code>, <code class="highlighter-rouge">Sequel</code>, <code class="highlighter-rouge">Mongoid</code>, <code class="highlighter-rouge">Net::HTTP</code>, etc).</p>
+
+  <p>Resources define an interface for <strong>querying</strong> from and <strong>persisting</strong> to a given Backend. The generic, common, cross-Resource logic for connecting a Resource to a Backend is defined in an <strong>Adapter</strong>; individual Resources can override Adapter logic. The default adapter is <code class="highlighter-rouge">ActiveRecord</code> (<code class="highlighter-rouge">Graphiti::Adapters::ActiveRecord</code>).</p>
+
+  <p>From the raw backend results, the Resource builds <strong>Models</strong>, which hold
+business logic. In other words you might <strong>query</strong> using <code class="highlighter-rouge">elasticsearch-ruby</code>, but return POROs as the result of that query. In the case of ActiveRecord, <strong>Backend</strong> and <strong>Model</strong> are the same thing.</p>
+
+  <p>Finally, these Models are <em>serialized</em> when we actually render a response. You’ll still use <code class="highlighter-rouge">Rails</code>, <code class="highlighter-rouge">Sinatra</code>, or whatever-else to manage routing, HTTP codes, etc.</p>
+
+  <p align="center">
+  <img width="100%" src="https://user-images.githubusercontent.com/55264/44619631-13592d80-a858-11e8-9544-0809fb144cb2.png" />
+</p>
+
+  <p>Critically, <strong>each Resource can connect to other Resources</strong>. This can occur through <strong><em>Sideloading</em></strong> (“fetch the employee, her positions, and the departments for those positions in a single request”), <strong><em>Sideposting</em></strong> (“<em>save</em> the employee and her positions/departments in a single request), and <strong><em>Links</em></strong> (“here’s a URL to lazy-load positions in a separate request”). Because <code class="highlighter-rouge">Resource</code>s connect to each other, this is why we often refer to a Resource as a “node in the graph”.</p>
+
+  <p><strong>Any logic used for fetching a single Resource can be re-used when fetching multiple Resources</strong>. In other words, you can say “fetch me the Employee, and her last three Positions ordered by <code class="highlighter-rouge">created_at</code>”. Applying query logic to nested levels of the graph is called <strong>Deep Querying</strong>.</p>
+
+  <p>Graphiti does not depend on Rails, but it <em>is</em> a first-class citizen.
+Given the code:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># config/routes.rb</span>
+<span class="n">resources</span> <span class="ss">:employees</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/employees_controller.rb</span>
+<span class="k">class</span> <span class="nc">EmployeesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="n">employees</span> <span class="o">=</span> <span class="no">EmployeeResource</span><span class="p">.</span><span class="nf">all</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">respond_with</span><span class="p">(</span><span class="n">employees</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/models/employee.rb</span>
+<span class="k">class</span> <span class="nc">Employee</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+<span class="k">end</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="n">attribute</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:string</span>
+  <span class="n">attribute</span> <span class="ss">:age</span><span class="p">,</span> <span class="ss">:integer</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>We can now</p>
+
+  <ul>
+    <li>Fetch JSONAPI, Simple JSON, or XML
+      <ul>
+        <li><code class="highlighter-rouge">/employees.jsonapi</code></li>
+        <li><code class="highlighter-rouge">/employees.json</code></li>
+        <li><code class="highlighter-rouge">/employees.xml</code></li>
+      </ul>
+    </li>
+    <li>Paginate:
+      <ul>
+        <li><code class="highlighter-rouge">/employees?page[size]=10&amp;page[number]=2</code></li>
+      </ul>
+    </li>
+    <li>Sort:
+      <ul>
+        <li>Ascending: <code class="highlighter-rouge">/employees?sort=age</code></li>
+        <li>Descending: <code class="highlighter-rouge">/employees?sort=-age</code></li>
+      </ul>
+    </li>
+    <li>Filter:
+      <ul>
+        <li>Case Insensitive: <code class="highlighter-rouge">/employees?filter[name]=jane doe</code></li>
+        <li>Case Sensitive: <code class="highlighter-rouge">/employees?filter[name][eql]=Jane Doe</code></li>
+        <li>Prefix: <code class="highlighter-rouge">/employees?filter[name][prefix]=graph</code></li>
+        <li>Suffix: <code class="highlighter-rouge">/employees?filter[name][suffix]=rocks</code></li>
+        <li>Contains: <code class="highlighter-rouge">/employees?filter[name][match]=iti</code></li>
+        <li>Equal: <code class="highlighter-rouge">/employees?filter[age]=100</code></li>
+        <li>Greater Than: <code class="highlighter-rouge">/employees?filter[age][gt]=100</code></li>
+        <li>Greater Than or Equal To: <code class="highlighter-rouge">/employees?filter[age][gte]=100</code></li>
+        <li>Less Than: <code class="highlighter-rouge">/employees?filter[age][lt]=100</code></li>
+        <li>Less Than or Equal To: <code class="highlighter-rouge">/employees?filter[age][lte]=100</code></li>
+      </ul>
+    </li>
+    <li>Only return specific fields:
+      <ul>
+        <li><code class="highlighter-rouge">/employees?fields[employees]=name,age</code></li>
+      </ul>
+    </li>
+    <li>Get total count:
+      <ul>
+        <li><code class="highlighter-rouge">/employees?stats[total]=count</code></li>
+      </ul>
+    </li>
+  </ul>
+
+  <p>To add a relationship:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/models/employee.rb</span>
+<span class="n">has_many</span> <span class="ss">:positions</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/models/position.rb</span>
+<span class="k">class</span> <span class="nc">Position</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">belongs_to</span> <span class="ss">:employee</span>
+<span class="k">end</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="n">has_many</span> <span class="ss">:positions</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/position_resource.rb</span>
+<span class="k">class</span> <span class="nc">PositionResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="n">attribute</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:string</span>
+  <span class="n">belongs_to</span> <span class="ss">:employee</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p><br /></p>
+
+  <p>We can now fetch Posts and Comments in a single request - <strong><em>including</em></strong> sorting the comments, filtering, fieldsets and everything else a <a href="/guides/concepts/resources">Resource</a> supports.</p>
+
+  <p><br /></p>
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="https://graphiti-api.github.io/graphiti/concepts">Concepts</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Resources</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Contact us</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

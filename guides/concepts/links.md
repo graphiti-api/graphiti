@@ -67,7 +67,7 @@ request, the same data should always be returned.
 relationship will contain a URL. Clients can simply follow that URL to
 lazy-load the same data. We can now change the definition of a Top
 Comment - 500 upvotes, factor in recency, apply downvotes - and no
-clients need to change. They simple continue to follow a link.
+clients need to change. They simple continue to follow a Link.
 
 ### 1.1 Linking Relationships
 

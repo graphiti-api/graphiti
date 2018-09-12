@@ -9,7 +9,7 @@
   <title>Graphiti</title>
   <meta name="description" content="A stylish alternative to GraphQL">
 
-  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
+  <link rel="stylesheet" href="https://graphiti-api.github.io/graphiti/assets/main.css?ref=wh4t3v45">
   <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
 
   <!-- javascript -->
@@ -31,24 +31,18 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a href="http://localhost:4000" class="navbar-brand">Graphiti</a>
+      <a href="https://graphiti-api.github.io/graphiti" class="navbar-brand">Graphiti</a>
     </div>
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
       <ul class="nav navbar-nav">
         <li>
-          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
         </li>
         <li>
-          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
         </li>
         <li>
-          <a class="nav-link" href="http://localhost:4000/concepts">Concepts</a>
-        </li>
-        <li>
-          <a class="nav-link" href="http://localhost:4000/ruby">Docs</a>
-        </li>
-        <li>
-          <a class="nav-link" href="http://localhost:4000/js/home">Javascript Client</a>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
@@ -117,9 +111,10 @@
         <li><a href="#polymorphichasmany">polymorphic_has_many</a></li>
       </ul>
     </li>
-    <li>6 Persisting</li>
-    <li>7 Context</li>
-    <li>8 Adapters</li>
+    <li>6 <a href="#generators">Generators</a></li>
+    <li>7 Persisting</li>
+    <li>8 Context</li>
+    <li>9 Adapters</li>
   </ul>
 </div>
 
@@ -130,6 +125,11 @@
   <p>The same way a <code class="highlighter-rouge">Model</code> is an abstraction around a database table, a
 <code class="highlighter-rouge">Resource</code> is an abstraction around an API endpoint. It holds logic for
 <strong><em>querying</em></strong>, <strong><em>persisting</em></strong>, and <strong><em>serializing</em></strong> data.</p>
+
+  <blockquote>
+    <p>For a condensed view of the Resource interface, see the
+<a href="/cheatsheet">cheatsheet</a>.</p>
+  </blockquote>
 
   <h2 id="attributes">2 Attributes</h2>
 
@@ -367,7 +367,7 @@ JSON, or XML:</p>
   <p>Use <code class="highlighter-rouge">.find</code> to find a single record by id, raising
 <code class="highlighter-rouge">Graphiti::Errors::RecordNotFound</code> if no records are returned:</p>
 
-  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">employee</span> <span class="o">=</span> <span class="no">EmployeeResource</span><span class="p">.</span><span class="nf">all</span><span class="p">(</span><span class="ss">id: </span><span class="mi">123</span><span class="p">)</span>
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">employee</span> <span class="o">=</span> <span class="no">EmployeeResource</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="ss">id: </span><span class="mi">123</span><span class="p">)</span>
 <span class="n">employee</span><span class="p">.</span><span class="nf">data</span><span class="p">.</span><span class="nf">first_name</span> <span class="c1"># =&gt; "Jane"</span></code></pre></figure>
 
   <h4 id="composing-with-scopes">3.2 Composing with Scopes</h4>
@@ -481,7 +481,7 @@ behavior, like sorting, it’s best to define the attribute first.</p>
   <p>Pass <code class="highlighter-rouge">:allow</code> or <code class="highlighter-rouge">:reject</code> to only allow filtering on certain values, or
 reject bad values:</p>
 
-  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">filter</span> <span class="ss">:size</span><span class="p">,</span> <span class="ss">:string</span><span class="p">,</span> <span class="ss">allow: </span><span class="sx">%w(Big Medium Small)</span>
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">filter</span> <span class="ss">:size</span><span class="p">,</span> <span class="ss">:string</span><span class="p">,</span> <span class="ss">allow: </span><span class="p">[</span><span class="s1">'Big'</span><span class="p">,</span> <span class="s1">'Medium'</span><span class="p">,</span> <span class="s1">'Small'</span><span class="p">]</span>
 
 <span class="n">filter</span> <span class="ss">:size</span><span class="p">,</span> <span class="ss">:string</span><span class="p">,</span> <span class="ss">reject: </span><span class="p">[</span><span class="s1">'X-Large'</span><span class="p">]</span></code></pre></figure>
 
@@ -1118,6 +1118,22 @@ for further querying.</p>
   <span class="c1"># ... code ...</span>
 <span class="k">end</span></code></pre></figure>
 
+  <h2 id="generators">6 Generators</h2>
+
+  <p>To generate a Resource:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>rails generate graphiti:resource NAME <span class="o">[</span>attribute:type] <span class="o">[</span>options]</code></pre></figure>
+
+  <p>For example:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>rails generate graphiti:resource Employee first_name:string age:integer</code></pre></figure>
+
+  <p>Will add a route, controller, resource, and tests.</p>
+
+  <p>Limit the actions this resource supports with <code class="highlighter-rouge">-a</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>rails generate graphiti:resource Employee -a index show</code></pre></figure>
+
 </div>
 
         </div>
@@ -1130,13 +1146,13 @@ for further querying.</p>
         <h3>Overview</h3>
         <ul>
           <li>
-            <a href="http://localhost:4000/quickstart">Quickstart</a>
+            <a href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
           </li>
           <li>
-            <a href="http://localhost:4000/tutorial">Tutorial</a>
+            <a href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
           </li>
           <li>
-            <a href="http://localhost:4000/concepts">Concepts</a>
+            <a href="https://graphiti-api.github.io/graphiti/concepts">Concepts</a>
           </li>
         </ul>
       </div>
