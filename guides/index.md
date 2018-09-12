@@ -40,5 +40,11 @@ But ideally, read everything 🙂
     * Rails Integration
     * Usage without Rails
     * Debugging
+  * ## Tutorial
+    * [Step-By-Step]({{site.github.url}}/tutorial)
+  * ## Sample Apps
+    * [Rails](https://github.com/graphiti-api/employee_directory)
+    * [Sinatra](https://github.com/graphiti-api/sinatra_example)
+    * [Plain Ruby](https://github.com/graphiti-api/plain_ruby_example)
   * ## Contributing
     * Roadmap
