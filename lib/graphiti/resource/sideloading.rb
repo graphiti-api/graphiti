@@ -17,9 +17,13 @@ module Graphiti
             parent.children[name] = sideload
           else
             config[:sideloads][name] = sideload
-            apply_sideloads_to_serializer if rails_autoloading?
+            apply_sideload_to_serializer(name) if eagerly_apply_sideload?(sideload)
           end
           sideload
+        end
+
+        def apply_sideload_to_serializer(name)
+          Util::SerializerRelationships.new(self, config[:sideloads].slice(name)).apply
         end
 
         def apply_sideloads_to_serializer
@@ -105,8 +109,9 @@ module Graphiti
           memo
         end
 
-        def rails_autoloading?
-          defined?(::Rails) && !::Rails.application.config.eager_load
+        def eagerly_apply_sideload?(sideload)
+          autoloading = defined?(::Rails) && !::Rails.application.config.eager_load
+          autoloading || sideload.resource_class_loaded?
         end
       end
     end

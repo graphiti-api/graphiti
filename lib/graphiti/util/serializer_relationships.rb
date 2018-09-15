@@ -62,7 +62,7 @@ module Graphiti
       def data_proc
         _sl = @sideload
         ->(_) {
-          if records = @object.public_send(_sl.name)
+          if records = @object.public_send(_sl.association_name)
             if records.respond_to?(:to_ary)
               records.each { |r| _sl.resource.decorate_record(r) }
             else

@@ -149,7 +149,8 @@ class Graphiti::Util::Persistence
   def persist_object(method, attributes)
     case method
       when :destroy
-        call_resource_method(:destroy, attributes[:id], @caller_model)
+        model = @resource.class._find(attributes.slice(:id)).data
+        call_resource_method(:destroy, model, @caller_model)
       when :update, nil, :disassociate
         call_resource_method(:update, attributes, @caller_model)
       else
@@ -172,8 +173,12 @@ class Graphiti::Util::Persistence
   def process_belongs_to(relationships)
     [].tap do |processed|
       iterate(only: [:polymorphic_belongs_to, :belongs_to]) do |x|
-        x[:object] = x[:sideload].resource
-          .persist_with_relationships(x[:meta], x[:attributes], x[:relationships])
+        if x[:sideload].writable?
+          x[:object] = x[:sideload].resource
+            .persist_with_relationships(x[:meta], x[:attributes], x[:relationships])
+        else
+          raise Graphiti::Errors::UnwritableRelationship.new(@resource, x[:sideload])
+        end
         processed << x
       end
     end

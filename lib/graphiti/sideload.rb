@@ -181,8 +181,8 @@ module Graphiti
         end
 
         if relevant_children.is_a?(Array)
-            associated |= relevant_children if track_associated
-            associate_all(parent, relevant_children)
+          associated |= relevant_children if track_associated
+          associate_all(parent, relevant_children)
         else
           associated << relevant_children if track_associated && relevant_children
           associate(parent, relevant_children)
@@ -278,7 +278,7 @@ module Graphiti
       fk_type = parent_resource_class.attributes[:id][:type]
       resource_class.filter true_foreign_key, fk_type do
         eq do |scope, value|
-          _self.resource.adapter.belongs_to_many_filter(_self, scope, value)
+          _self.belongs_to_many_filter(scope, value)
         end
       end
     end

@@ -618,7 +618,8 @@ RSpec.describe Graphiti::Schema do
 
     context 'when Rails is defined' do
       let(:rails) do
-        double(application: double(eager_load!: true))
+        app = double(eager_load!: true, config: double.as_null_object)
+        double(application: app)
       end
 
       before do

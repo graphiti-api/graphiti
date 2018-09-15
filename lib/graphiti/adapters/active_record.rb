@@ -200,14 +200,6 @@ module Graphiti
         end
       end
 
-      def belongs_to_many_filter(sideload, scope, value)
-        scope
-          .includes(sideload.through_relationship_name)
-          .where(sideload.through_table_name => {
-            sideload.true_foreign_key => value
-          })
-      end
-
       def associate_all(parent, children, association_name, association_type)
         if activerecord_associate?(parent, children[0], association_name)
           association = parent.association(association_name)
@@ -264,11 +256,9 @@ module Graphiti
         instance
       end
 
-      # (see Adapters::Abstract#destroy)
-      def destroy(model_class, id)
-        instance = model_class.find(id)
-        instance.destroy
-        instance
+      def destroy(model)
+        model.destroy
+        model
       end
     end
   end

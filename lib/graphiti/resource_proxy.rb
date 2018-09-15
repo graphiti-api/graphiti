@@ -89,8 +89,9 @@ module Graphiti
     end
 
     def destroy
+      record = data
       validator = @resource.transaction do
-        model = @resource.destroy(@query.filters[:id])
+        model = @resource.destroy(record)
         model.instance_variable_set(:@__serializer_klass, @resource.serializer)
         validator = ::Graphiti::Util::ValidationResponse.new \
           model, @payload

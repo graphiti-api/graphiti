@@ -88,8 +88,8 @@ module Graphiti
       adapter.update(model, update_params)
     end
 
-    def destroy(id)
-      adapter.destroy(model, id)
+    def destroy(model)
+      adapter.destroy(model)
     end
 
     def associate_all(parent, children, association_name, type)

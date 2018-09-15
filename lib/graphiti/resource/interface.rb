@@ -17,6 +17,10 @@ module Graphiti
 
         def find(params = {}, base_scope = nil)
           validate!(params)
+          _find(params, base_scope)
+        end
+
+        def _find(params = {}, base_scope = nil)
           id = params[:data].try(:[], :id) || params.delete(:id)
           params[:filter] ||= {}
           params[:filter].merge!(id: id) if id

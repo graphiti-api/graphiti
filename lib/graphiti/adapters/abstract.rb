@@ -447,17 +447,7 @@ module Graphiti
         raise 'you must override #update in an adapter subclass'
       end
 
-      # @param [Class] model_class The configured model class (see Resource.model)
-      # @param [Integer] id the id for this model
-      # @return the model instance just destroyed
-      # @see Resource.model
-      # @example ActiveRecord default
-      #   def destroy(model_class, id)
-      #     instance = model_class.find(id)
-      #     instance.destroy
-      #     instance
-      #   end
-      def destroy(model_class, id)
+      def destroy(model)
         raise 'you must override #destroy in an adapter subclass'
       end
 
