@@ -44,6 +44,9 @@
         <li>
           <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
         </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/js">Spraypaint</a>
+        </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
         <li>
@@ -56,8 +59,8 @@
 
         <div class="container">
           <h1>
-  JSORM
-  <small>the isomorphic, framework-agnostic Javascript ORM</small>
+  Spraypaint
+  <small>the isomorphic, framework-agnostic Graphiti ORM</small>
 </h1>
 
 <div class="js-toc col-md-3">
@@ -101,12 +104,12 @@
   <h3 id="writes">Writes</h3>
 
   <p>Similar to <code class="highlighter-rouge">ActiveRecord</code>, you can simply call <code class="highlighter-rouge">#save()</code> on a model
-instance. JSORM will <a href="http://jsonapi.org/format/#crud-creating">create</a> (<code class="highlighter-rouge">POST</code>) or <a href="http://jsonapi.org/format/#crud-updating">update</a> (<code class="highlighter-rouge">PATCH</code>) as needed.</p>
+instance. Spraypaint will <a href="http://jsonapi.org/format/#crud-creating">create</a> (<code class="highlighter-rouge">POST</code>) or <a href="http://jsonapi.org/format/#crud-updating">update</a> (<code class="highlighter-rouge">PATCH</code>) as needed.</p>
 
   <p><code class="highlighter-rouge">#save()</code> returns a <code class="highlighter-rouge">Promise</code> that will resolve a <code class="highlighter-rouge">boolean</code> - <code class="highlighter-rouge">true</code>
 when the server returns a 200-ish response code, <code class="highlighter-rouge">false</code> when the server
 returns a <code class="highlighter-rouge">422</code> response code (see
-<a href="/js/writes/validations">validations</a>). As always, anything else will
+<a href="https://graphiti-api.github.io/graphiti/js/writes/validations">validations</a>). As always, anything else will
 reject the promise.</p>
 
   <div class="tabs">

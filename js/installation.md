@@ -14,13 +14,13 @@ hood, we recommend installing alongside a `fetch` polyfill.
 If using `yarn`:
 
 {% highlight bash %}
-$ yarn add jsorm isomorphic-fetch
+$ yarn add spraypaint isomorphic-fetch
 {% endhighlight %}
 
 If using `npm`:
 
 {% highlight bash %}
-$ npm install jsorm isomorphic-fetch
+$ npm install spraypaint isomorphic-fetch
 {% endhighlight %}
 
 Now import it:
@@ -30,26 +30,26 @@ Now import it:
 {% highlight typescript %}
 import {
   Model,
-  JSORMBase,
+  SpraypaintBase,
   Attr,
   BelongsTo,
   HasMany
   // etc
-} from "jsorm"
+} from "spraypaint"
 {% endhighlight %}
 
 {% highlight javascript %}
 const {
-  JSORMBase,
+  SpraypaintBase,
   attr,
   belongsTo,
   hasMany
   // etc
-} = require("jsorm/dist/jsorm")
+} = require("spraypaint/dist/spraypaint")
 {% endhighlight %}
 </div>
 
-...or, if you're avoiding JS modules, `jsorm` will be available as a global in
+...or, if you're avoiding JS modules, `spraypaint` will be available as a global in
 the browser.
 
 ### Defining Models
@@ -63,14 +63,14 @@ holds connection information (`ApplicationRecord`, or
 {% include js-code-tabs.html %}
 <div markdown="1" class="code-tabs">
 {% highlight typescript %}
-class ApplicationRecord extends JSORMBase {
+class ApplicationRecord extends SpraypaintBase {
   static baseUrl = "http://my-api.com"
   static apiNamespace = "/api/v1"
 }
 {% endhighlight %}
 
 {% highlight javascript %}
-const ApplicationRecord = JSORMBase.extend({
+const ApplicationRecord = SpraypaintBase.extend({
   static: {
     baseUrl: "http://my-api.com",
     apiNamespace: "/api/v1"
@@ -145,14 +145,14 @@ person.fullName // "John Doe"
 {% endhighlight %}
 
 {% highlight javascript %}
-const attr = jsorm.attr
+const attr = spraypaint.attr
 const Person = ApplicationRecord.extend({
   // ... code ...
   attrs: {
     firstName: attr(),
     lastName: attr(),
     age: attr()
-    },}
+  },
   methods: {
     fullName: function() {
       return this.firstName + " " + this.lastName;
@@ -206,8 +206,8 @@ class Person extends ApplicationRecord {
 {% endhighlight %}
 
 {% highlight javascript %}
-const hasMany = jsorm.hasMany
-const belongsTo = jsorm.belongsTo
+const hasMany = spraypaint.hasMany
+const belongsTo = spraypaint.belongsTo
 
 const Person = ApplicationRecord.extend({
   // ... code ...

@@ -40,6 +40,8 @@ But ideally, read everything 🙂
     * Rails Integration
     * Usage without Rails
     * Debugging
+  * ## Consuming Graphiti
+    * [Spraypaint JS Client]({{site.github.url}}/js)
   * ## Tutorial
     * [Step-By-Step]({{site.github.url}}/tutorial)
   * ## Sample Apps

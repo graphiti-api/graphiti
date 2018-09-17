@@ -19,7 +19,7 @@ Example: redirecting to the login page every time the server returns `401`:
 {% include js-code-tabs.html %}
 <div markdown="1" class="code-tabs">
   {% highlight typescript %}
-  import { MiddlewareStack } from 'jsorm'
+  import { MiddlewareStack } from 'spraypaint'
 
   let middleware = new MiddlewareStack()
   middleware.afterFilters.push((response, json) => {
@@ -33,7 +33,7 @@ Example: redirecting to the login page every time the server returns `401`:
   {% endhighlight %}
 
   {% highlight javascript %}
-  var MiddlewareStack = jsorm.MiddlewareStack;
+  var MiddlewareStack = spraypaint.MiddlewareStack;
 
   var middleware = new MiddlewareStack();
   middleware.afterFilters.push(function(response, json) {
@@ -52,7 +52,7 @@ Example: adding a custom header before the request is sent:
 {% include js-code-tabs.html %}
 <div markdown="1" class="code-tabs">
   {% highlight typescript %}
-  import { MiddlewareStack } from 'jsorm'
+  import { MiddlewareStack } from 'spraypaint'
 
   let middleware = new MiddlewareStack()
   middleware.beforeFilters.push((url, options) => {
@@ -63,7 +63,7 @@ Example: adding a custom header before the request is sent:
   {% endhighlight %}
 
   {% highlight javascript %}
-  var MiddlewareStack = jsorm.MiddlewareStack;
+  var MiddlewareStack = spraypaint.MiddlewareStack;
 
   var middleware = new MiddlewareStack();
   middleware.beforeFilters.push(function(url, options) {

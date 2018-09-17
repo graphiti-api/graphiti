@@ -44,6 +44,9 @@
         <li>
           <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
         </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/js">Spraypaint</a>
+        </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
         <li>
@@ -56,8 +59,8 @@
 
         <div class="container">
           <h1>
-  JSORM
-  <small>the isomorphic, framework-agnostic Javascript ORM</small>
+  Spraypaint
+  <small>the isomorphic, framework-agnostic Graphiti ORM</small>
 </h1>
 
 <div class="js-toc col-md-3">
@@ -99,7 +102,7 @@
 
 <div class="col-md-8 col-md-offset-1">
   <blockquote>
-    <p><strong>Start here</strong>: <a href="https://graphiti-api.github.io/graphiti/js/introduction">Why JSORM?</a></p>
+    <p><strong>Start here</strong>: <a href="https://graphiti-api.github.io/graphiti/js/introduction">Why Spraypaint?</a></p>
   </blockquote>
 
   <div class="tabs">
@@ -112,7 +115,7 @@
   </div>
   <div class="code-tabs">
 
-    <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="c1">// JSORM is like "ActiveRecord in Javascript". It can:</span>
+    <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="c1">// Spraypaint is like "ActiveRecord in Javascript". It can:</span>
 <span class="c1">//</span>
 <span class="c1">// * Deeply nest reads and writes</span>
 <span class="c1">// * Automatically handle validation errors</span>
@@ -121,7 +124,7 @@
 
 <span class="c1">// define models</span>
 <span class="err">@</span><span class="nx">Model</span><span class="p">()</span>
-<span class="kr">class</span> <span class="nx">ApplicationRecord</span> <span class="k">extends</span> <span class="nx">JSORMBase</span> <span class="p">{</span>
+<span class="kr">class</span> <span class="nx">ApplicationRecord</span> <span class="k">extends</span> <span class="nx">SpraypaintBase</span> <span class="p">{</span>
   <span class="k">static</span> <span class="nx">baseUrl</span> <span class="o">=</span> <span class="s2">"http://my-api.com"</span>
   <span class="k">static</span> <span class="nx">apiNamespace</span> <span class="o">=</span> <span class="s2">"/api/v1"</span>
 <span class="p">}</span>
@@ -151,17 +154,17 @@
 <span class="nx">person</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
     </code></pre></figure>
 
-    <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// JSORM is like "ActiveRecord in Javascript". It can:</span>
+    <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// Spraypaint is like "ActiveRecord in Javascript". It can:</span>
 <span class="c1">//</span>
 <span class="c1">// * Deeply nest reads and writes</span>
 <span class="c1">// * Automatically handle validation errors</span>
 <span class="c1">// * Replace *ux patterns</span>
 <span class="c1">// * ...and much more!</span>
 
-<span class="kd">var</span> <span class="nx">jsorm</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'jsorm'</span><span class="p">)</span>
+<span class="kd">var</span> <span class="nx">spnt</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'spraypaint/dist/spraypaint'</span><span class="p">)</span>
 
 <span class="c1">// define models</span>
-<span class="kr">const</span> <span class="nx">ApplicationRecord</span> <span class="o">=</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">JSORMBase</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+<span class="kr">const</span> <span class="nx">ApplicationRecord</span> <span class="o">=</span> <span class="nx">spnt</span><span class="p">.</span><span class="nx">JSORMBase</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
   <span class="na">static</span><span class="p">:</span> <span class="p">{</span>
     <span class="na">baseUrl</span><span class="p">:</span> <span class="s1">'http://my-api.com'</span><span class="p">,</span>
     <span class="na">apiNamespace</span><span class="p">:</span> <span class="s1">'/api/v1'</span>
@@ -170,8 +173,8 @@
 
 <span class="kr">const</span> <span class="nx">Person</span> <span class="o">=</span> <span class="nx">ApplicationRecord</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
   <span class="na">attrs</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">firstName</span><span class="p">:</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">attr</span><span class="p">(),</span>
-    <span class="na">lastName</span><span class="p">:</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">attr</span><span class="p">()</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="nx">spnt</span><span class="p">.</span><span class="nx">attr</span><span class="p">(),</span>
+    <span class="na">lastName</span><span class="p">:</span> <span class="nx">spnt</span><span class="p">.</span><span class="nx">attr</span><span class="p">()</span>
   <span class="p">},</span>
   <span class="na">methods</span><span class="p">:</span> <span class="p">{</span>
     <span class="na">fullName</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>

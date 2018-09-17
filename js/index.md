@@ -3,14 +3,14 @@ layout: page
 ---
 
 <h1>
-  JSORM
-  <small>the isomorphic, framework-agnostic Javascript ORM</small>
+  Spraypaint
+  <small>the isomorphic, framework-agnostic Graphiti ORM</small>
 </h1>
 
 {% include js-toc.html %}
 
 <div markdown="1" class="col-md-8 col-md-offset-1">
-  > **Start here**: [Why JSORM?]({{ site.github.url }}/js/introduction)
+  > **Start here**: [Why Spraypaint?]({{ site.github.url }}/js/introduction)
 
   <div class="tabs">
     <div class="tab typescript">
@@ -22,7 +22,7 @@ layout: page
   </div>
   <div markdown="1" class="code-tabs">
     {% highlight typescript %}
-// JSORM is like "ActiveRecord in Javascript". It can:
+// Spraypaint is like "ActiveRecord in Javascript". It can:
 //
 // * Deeply nest reads and writes
 // * Automatically handle validation errors
@@ -31,7 +31,7 @@ layout: page
 
 // define models
 @Model()
-class ApplicationRecord extends JSORMBase {
+class ApplicationRecord extends SpraypaintBase {
   static baseUrl = "http://my-api.com"
   static apiNamespace = "/api/v1"
 }
@@ -62,17 +62,17 @@ person.save()
     {% endhighlight %}
 
     {% highlight javascript %}
-// JSORM is like "ActiveRecord in Javascript". It can:
+// Spraypaint is like "ActiveRecord in Javascript". It can:
 //
 // * Deeply nest reads and writes
 // * Automatically handle validation errors
 // * Replace *ux patterns
 // * ...and much more!
 
-var jsorm = require('jsorm')
+var spnt = require('spraypaint/dist/spraypaint')
 
 // define models
-const ApplicationRecord = jsorm.JSORMBase.extend({
+const ApplicationRecord = spnt.JSORMBase.extend({
   static: {
     baseUrl: 'http://my-api.com',
     apiNamespace: '/api/v1'
@@ -81,8 +81,8 @@ const ApplicationRecord = jsorm.JSORMBase.extend({
 
 const Person = ApplicationRecord.extend({
   attrs: {
-    firstName: jsorm.attr(),
-    lastName: jsorm.attr()
+    firstName: spnt.attr(),
+    lastName: spnt.attr()
   },
   methods: {
     fullName: function() {

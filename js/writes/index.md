@@ -9,12 +9,12 @@ layout: page
 ### Writes
 
 Similar to `ActiveRecord`, you can simply call `#save()` on a model
-instance. JSORM will [create](http://jsonapi.org/format/#crud-creating) (`POST`) or [update](http://jsonapi.org/format/#crud-updating) (`PATCH`) as needed.
+instance. Spraypaint will [create](http://jsonapi.org/format/#crud-creating) (`POST`) or [update](http://jsonapi.org/format/#crud-updating) (`PATCH`) as needed.
 
 `#save()` returns a `Promise` that will resolve a `boolean` - `true`
 when the server returns a 200-ish response code, `false` when the server
 returns a `422` response code (see
-[validations](/js/writes/validations)). As always, anything else will
+[validations]({{site.github.url}}/js/writes/validations)). As always, anything else will
 reject the promise.
 
 {% include js-code-tabs.html %}

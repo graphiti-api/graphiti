@@ -9,7 +9,7 @@ layout: page
 ### State Syncing
 
 You may have encountered state management libraries like [Flux](https://facebook.github.io/flux/docs/overview.html),
-[Redux](https://redux.js.org) or [Vuex](https://vuex.vuejs.org/en/intro.html). These are fantastic libraries, but you likely won't need them with JSORM. As a full-fledged model layer, JSORM manages state for you, automatically.
+[Redux](https://redux.js.org) or [Vuex](https://vuex.vuejs.org/en/intro.html). These are fantastic libraries, but their usefulness is lessened with Spraypaint. As a full-fledged model layer, Spraypaint manages state for you, automatically.
 
 If you opt-in to this feature:
 
@@ -107,5 +107,5 @@ instance.unlisten()
 
 In practice, when developing in a SPA, you'll want to `#unlisten()`
 whenever a view is destroyed and model instances no longer need to be referenced. If
-you are using VueJS, this is done automatically by adding [jsorm-vue](https://github.com/jsonapi-suite/jsorm-vue)
+you are using VueJS, this is done automatically by adding [spraypaint-vue](https://github.com/jsonapi-suite/spraypaint-vue)
 to your application.

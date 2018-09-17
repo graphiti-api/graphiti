@@ -8,7 +8,7 @@ layout: page
 <div markdown="1" class="col-md-8 col-md-offset-1">
 ### Authentication
 
-JSORM supports [JSON Web Tokens](https://jwt.io/introduction). These can
+Spraypaint supports [JSON Web Tokens](https://jwt.io/introduction). These can
 be set manually, or automatically fetched from `localStorage`.
 
 To set manually:
@@ -38,7 +38,7 @@ server:
 {% include js-code-tabs.html %}
 <div markdown="1" class="code-tabs">
   {% highlight typescript %}
-  class ApplicationRecord extends JSORMBase {
+  class ApplicationRecord extends SpraypaintBase {
     // ... code ...
     static generateAuthHeader(token) {
       return `Bearer ${token}`
@@ -47,7 +47,7 @@ server:
   {% endhighlight %}
 
   {% highlight javascript %}
-  var ApplicationRecord = JSORMBase.extend({
+  var ApplicationRecord = SpraypaintBase.extend({
     // ... code ...
     static: {
       generateAuthHeader: function(token) {

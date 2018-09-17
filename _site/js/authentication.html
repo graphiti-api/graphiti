@@ -44,6 +44,9 @@
         <li>
           <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
         </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/js">Spraypaint</a>
+        </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
         <li>
@@ -56,8 +59,8 @@
 
         <div class="container">
           <h1>
-  JSORM
-  <small>the isomorphic, framework-agnostic Javascript ORM</small>
+  Spraypaint
+  <small>the isomorphic, framework-agnostic Graphiti ORM</small>
 </h1>
 
 <div class="js-toc col-md-3">
@@ -100,7 +103,7 @@
 <div class="col-md-8 col-md-offset-1">
   <h3 id="authentication">Authentication</h3>
 
-  <p>JSORM supports <a href="https://jwt.io/introduction">JSON Web Tokens</a>. These can
+  <p>Spraypaint supports <a href="https://jwt.io/introduction">JSON Web Tokens</a>. These can
 be set manually, or automatically fetched from <code class="highlighter-rouge">localStorage</code>.</p>
 
   <p>To set manually:</p>
@@ -135,7 +138,7 @@ server:</p>
 
   <div class="code-tabs">
 
-    <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript">  <span class="kr">class</span> <span class="nx">ApplicationRecord</span> <span class="k">extends</span> <span class="nx">JSORMBase</span> <span class="p">{</span>
+    <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript">  <span class="kr">class</span> <span class="nx">ApplicationRecord</span> <span class="k">extends</span> <span class="nx">SpraypaintBase</span> <span class="p">{</span>
     <span class="c1">// ... code ...</span>
     <span class="k">static</span> <span class="nx">generateAuthHeader</span><span class="p">(</span><span class="nx">token</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">return</span> <span class="err">`</span><span class="nx">Bearer</span> <span class="nx">$</span><span class="p">{</span><span class="nx">token</span><span class="p">}</span><span class="err">`</span>
@@ -143,7 +146,7 @@ server:</p>
   <span class="p">}</span>
   </code></pre></figure>
 
-    <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">  <span class="kd">var</span> <span class="nx">ApplicationRecord</span> <span class="o">=</span> <span class="nx">JSORMBase</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">  <span class="kd">var</span> <span class="nx">ApplicationRecord</span> <span class="o">=</span> <span class="nx">SpraypaintBase</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
     <span class="c1">// ... code ...</span>
     <span class="na">static</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">generateAuthHeader</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">token</span><span class="p">)</span> <span class="p">{</span>

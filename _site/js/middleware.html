@@ -44,6 +44,9 @@
         <li>
           <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
         </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/js">Spraypaint</a>
+        </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
         <li>
@@ -56,8 +59,8 @@
 
         <div class="container">
           <h1>
-  JSORM
-  <small>the isomorphic, framework-agnostic Javascript ORM</small>
+  Spraypaint
+  <small>the isomorphic, framework-agnostic Graphiti ORM</small>
 </h1>
 
 <div class="js-toc col-md-3">
@@ -119,7 +122,7 @@ promise will be rejected.</p>
 
   <div class="code-tabs">
 
-    <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript">  <span class="k">import</span> <span class="p">{</span> <span class="nx">MiddlewareStack</span> <span class="p">}</span> <span class="k">from</span> <span class="s1">'jsorm'</span>
+    <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript">  <span class="k">import</span> <span class="p">{</span> <span class="nx">MiddlewareStack</span> <span class="p">}</span> <span class="k">from</span> <span class="s1">'spraypaint'</span>
 
   <span class="kd">let</span> <span class="nx">middleware</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MiddlewareStack</span><span class="p">()</span>
   <span class="nx">middleware</span><span class="p">.</span><span class="nx">afterFilters</span><span class="p">.</span><span class="nx">push</span><span class="p">((</span><span class="nx">response</span><span class="p">,</span> <span class="nx">json</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -132,7 +135,7 @@ promise will be rejected.</p>
   <span class="nx">ApplicationRecord</span><span class="p">.</span><span class="nx">middlewareStack</span> <span class="o">=</span> <span class="nx">middleware</span>
   </code></pre></figure>
 
-    <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">  <span class="kd">var</span> <span class="nx">MiddlewareStack</span> <span class="o">=</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">MiddlewareStack</span><span class="p">;</span>
+    <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">  <span class="kd">var</span> <span class="nx">MiddlewareStack</span> <span class="o">=</span> <span class="nx">spraypaint</span><span class="p">.</span><span class="nx">MiddlewareStack</span><span class="p">;</span>
 
   <span class="kd">var</span> <span class="nx">middleware</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MiddlewareStack</span><span class="p">();</span>
   <span class="nx">middleware</span><span class="p">.</span><span class="nx">afterFilters</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">response</span><span class="p">,</span> <span class="nx">json</span><span class="p">)</span> <span class="p">{</span>
@@ -160,7 +163,7 @@ promise will be rejected.</p>
 
   <div class="code-tabs">
 
-    <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript">  <span class="k">import</span> <span class="p">{</span> <span class="nx">MiddlewareStack</span> <span class="p">}</span> <span class="k">from</span> <span class="s1">'jsorm'</span>
+    <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript">  <span class="k">import</span> <span class="p">{</span> <span class="nx">MiddlewareStack</span> <span class="p">}</span> <span class="k">from</span> <span class="s1">'spraypaint'</span>
 
   <span class="kd">let</span> <span class="nx">middleware</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MiddlewareStack</span><span class="p">()</span>
   <span class="nx">middleware</span><span class="p">.</span><span class="nx">beforeFilters</span><span class="p">.</span><span class="nx">push</span><span class="p">((</span><span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -170,7 +173,7 @@ promise will be rejected.</p>
   <span class="nx">ApplicationRecord</span><span class="p">.</span><span class="nx">middlewareStack</span> <span class="o">=</span> <span class="nx">middleware</span>
   </code></pre></figure>
 
-    <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">  <span class="kd">var</span> <span class="nx">MiddlewareStack</span> <span class="o">=</span> <span class="nx">jsorm</span><span class="p">.</span><span class="nx">MiddlewareStack</span><span class="p">;</span>
+    <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">  <span class="kd">var</span> <span class="nx">MiddlewareStack</span> <span class="o">=</span> <span class="nx">spraypaint</span><span class="p">.</span><span class="nx">MiddlewareStack</span><span class="p">;</span>
 
   <span class="kd">var</span> <span class="nx">middleware</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MiddlewareStack</span><span class="p">();</span>
   <span class="nx">middleware</span><span class="p">.</span><span class="nx">beforeFilters</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>

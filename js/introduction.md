@@ -6,7 +6,7 @@ layout: page
 {% include js-toc.html %}
 
 <div markdown="1" class="col-md-8 col-md-offset-1">
-### Why JSORM?
+### Why Spraypaint?
 
 Contracts like JSONAPI and GraphQL treat the API like a database. When querying a
 database, we have two options:
