@@ -12132,11 +12132,25 @@ html.portfolio-page {
 .nav-menu .main-menu ul li a {
   padding-left: 3rem; }
 
+.layout-home .brand {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 300px;
+  text-align: center;
+  padding-top: 200px; }
+  .layout-home .brand .graphiti {
+    font-size: 50px; }
+  .layout-home .brand .desc {
+    color: #b0b0b0; }
+
 body {
   background: #414B5B;
   font-size: 17px;
   line-height: 1.7; }
   body .page-content {
+    background: white; }
+  body.layout-home {
     background: white; }
 
 #next {

@@ -9,7 +9,7 @@
   <title>Graphiti</title>
   <meta name="description" content="A stylish alternative to GraphQL">
 
-  <link rel="stylesheet" href="https://graphiti-api.github.io/graphiti/assets/main.css?ref=wh4t3v45">
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
   <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
 
   <!-- javascript -->
@@ -31,18 +31,18 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a href="https://graphiti-api.github.io/graphiti" class="navbar-brand">Graphiti</a>
+      <a href="http://localhost:4000" class="navbar-brand">Graphiti</a>
     </div>
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
       <ul class="nav navbar-nav">
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+          <a class="nav-link" href="http://localhost:4000/guides">Guides</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
@@ -112,8 +112,19 @@
       </ul>
     </li>
     <li>6 <a href="#generators">Generators</a></li>
-    <li>7 Persisting</li>
-    <li>8 Context</li>
+    <li>7 <a href="#persisting">Persisting</a>
+      <ul>
+        <li><a href="#side-effects">Side Effects</a></li>
+        <li><a href="#sideposting">Sideposting</a>
+          <ul>
+            <li><a href="#create">Create</a></li>
+            <li><a href="#expanded-example">Expanded Example</a></li>
+          </ul>
+        </li>
+        <li><a href="#validation-errors">Validation Errors</a></li>
+      </ul>
+    </li>
+    <li>8 <a href="#context">Context</a></li>
     <li>9 Adapters</li>
   </ul>
 </div>
@@ -128,7 +139,7 @@
 
   <blockquote>
     <p>For a condensed view of the Resource interface, see the
-<a href="https://graphiti-api.github.io/graphiti/cheatsheet">cheatsheet</a>.</p>
+<a href="http://localhost:4000/cheatsheet">cheatsheet</a>.</p>
   </blockquote>
 
   <h2 id="attributes">2 Attributes</h2>
@@ -1134,6 +1145,317 @@ for further querying.</p>
 
   <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>rails generate graphiti:resource Employee -a index show</code></pre></figure>
 
+  <h2 id="persisting">7 Persisting</h2>
+
+  <p>Graphiti allows writing a graph of data in a single request. We’ll do
+the work of parsing the graph and ordering operations, so you can focus
+on the part you care about: the logic for actually persisting an object.</p>
+
+  <p>By default, persistence operations are handled by your adapter. The
+“expanded” view of the ActiveRecord implementation is below:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
+
+<span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+  <span class="n">employee</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+  <span class="n">employee</span><span class="p">.</span><span class="nf">save</span>
+  <span class="n">employee</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+  <span class="n">employee</span> <span class="o">=</span> <span class="no">EmployeeResource</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">attributes</span><span class="p">.</span><span class="nf">delete</span><span class="p">(</span><span class="ss">:id</span><span class="p">)).</span><span class="nf">data</span>
+  <span class="n">employee</span><span class="p">.</span><span class="nf">update_attributes</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+  <span class="n">employee</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+  <span class="n">employee</span> <span class="o">=</span> <span class="no">EmployeeResource</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">attributes</span><span class="p">.</span><span class="nf">delete</span><span class="p">(</span><span class="ss">:id</span><span class="p">)).</span><span class="nf">data</span>
+  <span class="n">employee</span><span class="p">.</span><span class="nf">destroy</span>
+  <span class="n">employee</span>
+<span class="k">end</span></code></pre></figure>
+
+  <ul>
+    <li>We’ll process any <code class="highlighter-rouge">writable: false</code> or guarded attributes prior to
+these methods.</li>
+    <li>After these methods, we’ll check the Model instance for validation
+errors, rolling back the transaction if any Model in the graph is
+invalid.</li>
+    <li>These methods <strong>must return the Model instance</strong>.</li>
+  </ul>
+
+  <h3 id="side-effects">7.1 Side Effects</h3>
+
+  <p>RESTful Resources can cause side effects as the result of a persistence
+operation. For example, imagine sending a welcome email after persisting
+a <code class="highlighter-rouge">User</code>.</p>
+
+  <p>You can cause side effects in three ways. The simplest is to override a
+persistence method:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/user_resource.rb</span>
+<span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+  <span class="k">super</span><span class="p">.</span><span class="nf">tap</span> <span class="k">do</span> <span class="o">|</span><span class="n">user</span><span class="o">|</span>
+    <span class="no">UserMailer</span><span class="p">.</span><span class="nf">welcome</span><span class="p">(</span><span class="n">user</span><span class="p">).</span><span class="nf">deliver_later</span> <span class="k">if</span> <span class="n">user</span><span class="p">.</span><span class="nf">valid?</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>The downside of this approach is that validation processing happens
+<em>after</em> the persistence methods. If we were saving the User and their
+Account at the same time, and the Account was invalid, the database
+transaction would be rolled back but the email would still be sent.
+Consider this approach only for logic that can be rolled back as part of
+a transaction.</p>
+
+  <p>We can solve this issue with <code class="highlighter-rouge">before_commit</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/user_resource.rb</span>
+<span class="n">before_commit</span> <span class="k">do</span> <span class="o">|</span><span class="n">user</span><span class="o">|</span>
+  <span class="no">UserMailer</span><span class="p">.</span><span class="nf">welcome</span><span class="p">(</span><span class="n">user</span><span class="p">).</span><span class="nf">deliver_later</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p><code class="highlighter-rouge">before_commit</code> hooks happen <strong>after</strong> we validate the entire graph,
+right before committing to the database.</p>
+
+  <p>Use <code class="highlighter-rouge">only</code> to restrict the operations which will cause the
+<code class="highlighter-rouge">before_commit</code> hook to fire:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/user_resource.rb</span>
+<span class="n">before_commit</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:create</span><span class="p">]</span> <span class="k">do</span>
+  <span class="c1"># ... code ...</span>
+<span class="k">end</span></code></pre></figure>
+
+  <h3 id="sideposting">7.2 Sideposting</h3>
+
+  <p>The act of persisting multiple Resources in a single request is called
+<strong>Sideposting</strong>. The payload mirrors the side<strong>loading</strong> payload for
+read operations, with minor additions.</p>
+
+  <p>Let’s create a Post and associate it to an existing Blog in a single
+request:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># POST /api/v1/posts</span>
+<span class="p">{</span>
+  <span class="ss">type: </span><span class="s1">'posts'</span><span class="p">,</span>
+  <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">title: </span><span class="s1">'My post'</span> <span class="p">},</span>
+  <span class="ss">relationships: </span><span class="p">{</span>
+    <span class="ss">blog: </span><span class="p">{</span>
+      <span class="ss">data: </span><span class="p">{</span>
+        <span class="ss">id: </span><span class="s1">'1'</span><span class="p">,</span>
+        <span class="ss">type: </span><span class="s1">'blogs'</span><span class="p">,</span>
+        <span class="ss">method: </span><span class="s1">'update'</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+  <p>The critical addition here is the <code class="highlighter-rouge">method</code> key. When we persist RESTful
+Resources, we send a corresponding HTTP verb. This follows the same
+pattern, adding a verb for each Resource in the graph. <code class="highlighter-rouge">method</code> can be
+one of:</p>
+
+  <ul>
+    <li><code class="highlighter-rouge">create</code></li>
+    <li><code class="highlighter-rouge">update</code></li>
+    <li><code class="highlighter-rouge">destroy</code></li>
+    <li><code class="highlighter-rouge">disassociate</code> (e.g. <code class="highlighter-rouge">null</code> foreign key)</li>
+  </ul>
+
+  <p>When we sidepost, all objects will be persisted within the same database
+transaction, which rolls back if an error is raised or any objects are invalid.</p>
+
+  <h4 id="create">7.2.1 Create</h4>
+
+  <p>Let’s say we want to create a Post and its Blog in a single request.
+You’ll note that we don’t have the <code class="highlighter-rouge">id</code> key to generate a <a href="http://jsonapi.org/format/#document-resource-identifier-objects">Resource
+Identifier</a> (combination of <code class="highlighter-rouge">id</code> and <code class="highlighter-rouge">type</code>
+that uniquely identifies a Resource).</p>
+
+  <p>To accomodate this, send an ephemeral <code class="highlighter-rouge">temp-id</code> (any UUID):</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="p">{</span>
+  <span class="c1"># POST /api/v1/posts</span>
+  <span class="p">{</span>
+    <span class="ss">type: </span><span class="s1">'posts'</span><span class="p">,</span>
+    <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">title: </span><span class="s1">'My post'</span> <span class="p">},</span>
+    <span class="ss">relationships: </span><span class="p">{</span>
+      <span class="ss">blog: </span><span class="p">{</span>
+        <span class="ss">data: </span><span class="p">{</span>
+          <span class="ss">:'temp-id'</span> <span class="o">=&gt;</span> <span class="s1">'abc123'</span><span class="p">,</span>
+          <span class="ss">type: </span><span class="s1">'blogs'</span><span class="p">,</span>
+          <span class="ss">method: </span><span class="s1">'create'</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="ss">included: </span><span class="p">[</span>
+      <span class="p">{</span>
+        <span class="ss">:'temp-id'</span> <span class="o">=&gt;</span> <span class="s1">'abc123'</span>
+        <span class="ss">type: </span><span class="s1">'blogs'</span><span class="p">,</span>
+        <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'New Blog'</span> <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+  <p>This random UUID:</p>
+
+  <ul>
+    <li>Connects relevant sections of the payload.</li>
+    <li>Rells clients how to associate their in-memory objects with the ids returned from the server.</li>
+  </ul>
+
+  <h4 id="expanded-example">7.2.2 Expanded Example</h4>
+
+  <p>Here we’re updating a Post, changing the name of its associated Blog, creating a Tag, deleting one Comment, and disassociating (<code class="highlighter-rouge">null</code> foreign key) a different Comment, all in a single request:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="p">{</span>
+  <span class="ss">data: </span><span class="p">{</span>
+    <span class="ss">type: </span><span class="s1">'posts'</span><span class="p">,</span>
+    <span class="ss">id: </span><span class="mi">123</span><span class="p">,</span>
+    <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">title: </span><span class="s1">'Updated!'</span> <span class="p">},</span>
+    <span class="ss">relationships: </span><span class="p">{</span>
+      <span class="ss">blog: </span><span class="p">{</span>
+        <span class="ss">data: </span><span class="p">{</span>
+          <span class="ss">type: </span><span class="s1">'blogs'</span><span class="p">,</span>
+          <span class="ss">id: </span><span class="mi">123</span><span class="p">,</span>
+          <span class="ss">method: </span><span class="s1">'update'</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="ss">tags: </span><span class="p">{</span>
+        <span class="ss">data: </span><span class="p">[{</span>
+          <span class="ss">type: </span><span class="s1">'tags'</span><span class="p">,</span>
+          <span class="n">temp</span><span class="o">-</span><span class="ss">id: </span><span class="s1">'s0m3uu1d'</span><span class="p">,</span>
+          <span class="ss">method: </span><span class="s1">'create'</span>
+        <span class="p">}]</span>
+      <span class="p">},</span>
+      <span class="ss">comments: </span><span class="p">{</span>
+        <span class="ss">data: </span><span class="p">[</span>
+          <span class="p">{</span>
+            <span class="ss">type: </span><span class="s1">'comments'</span><span class="p">,</span>
+            <span class="ss">id: </span><span class="s1">'123'</span><span class="p">,</span>
+            <span class="ss">method: </span><span class="s1">'destroy'</span>
+          <span class="p">},</span>
+          <span class="p">{</span>
+            <span class="ss">type: </span><span class="s1">'comments'</span><span class="p">,</span>
+            <span class="ss">id: </span><span class="s1">'456'</span><span class="p">,</span>
+            <span class="ss">method: </span><span class="s1">'disassociate'</span>
+          <span class="p">}</span>
+        <span class="p">]</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="ss">included: </span><span class="p">[</span>
+    <span class="p">{</span>
+      <span class="ss">type: </span><span class="s1">'tags'</span><span class="p">,</span>
+      <span class="ss">:'temp-id'</span> <span class="o">=&gt;</span> <span class="s1">'s0m3uu1d'</span><span class="p">,</span>
+      <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Important'</span> <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="ss">type: </span><span class="s1">'blogs'</span><span class="p">,</span>
+      <span class="ss">:'temp-id'</span> <span class="o">=&gt;</span> <span class="s1">'123'</span><span class="p">,</span>
+      <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Updated!'</span> <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span></code></pre></figure>
+
+  <h3 id="validation-errors">7.3 Validation Errors</h3>
+
+  <p>When a persistence operation is attempted but the corresponding Resource
+is invalid, the transaction will be rolled back and an <a href="http://jsonapi.org/format/#errors">errors payload</a> will be returned
+with a <code class="highlighter-rouge">422</code> response code:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="p">{</span>
+  <span class="ss">errors: </span><span class="p">[{</span>
+    <span class="ss">code:  </span><span class="s1">'unprocessable_entity'</span><span class="p">,</span>
+    <span class="ss">status: </span><span class="s1">'422'</span><span class="p">,</span>
+    <span class="ss">title: </span><span class="s2">"Validation Error"</span><span class="p">,</span>
+    <span class="ss">detail: </span><span class="s2">"Title can't be blank"</span><span class="p">,</span>
+    <span class="ss">source: </span><span class="p">{</span> <span class="ss">pointer: </span><span class="s1">'/data/attributes/title'</span> <span class="p">},</span>
+    <span class="ss">meta: </span><span class="p">{</span>
+      <span class="ss">attribute: :title</span><span class="p">,</span>
+      <span class="ss">message: </span><span class="s2">"can't be blank"</span><span class="p">,</span>
+      <span class="ss">code: :blank</span>
+    <span class="p">}</span>
+  <span class="p">}]</span>
+<span class="p">}</span></code></pre></figure>
+
+  <p>To get this functionality, your Model must adhere to the
+<a href="https://api.rubyonrails.org/classes/ActiveModel/Validations.html">ActiveModel::Validations API</a>.</p>
+
+  <p>You get this for free with ActiveRecord, or it can be mixed in to any
+PORO:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Post</span>
+  <span class="kp">include</span> <span class="no">ActiveModel</span><span class="o">::</span><span class="no">Validations</span>
+  <span class="n">validates</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">presence: </span><span class="kp">true</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Errors on associations will have a slightly expanded payload:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="p">{</span>
+  <span class="ss">errors: </span><span class="p">[{</span>
+    <span class="ss">code: </span><span class="s1">'unprocessable_entity'</span><span class="p">,</span>
+    <span class="ss">status: </span><span class="s1">'422'</span><span class="p">,</span>
+    <span class="ss">title: </span><span class="s1">'Validation Error'</span><span class="p">,</span>
+    <span class="ss">detail: </span><span class="s2">"Name can't be blank"</span><span class="p">,</span>
+    <span class="ss">source: </span><span class="p">{</span> <span class="ss">pointer: </span><span class="s1">'/data/attributes/name'</span> <span class="p">},</span>
+    <span class="ss">meta: </span><span class="p">{</span>
+      <span class="ss">relationship: </span><span class="p">{</span>
+        <span class="ss">attribute: :name</span><span class="p">,</span>
+        <span class="ss">message: </span><span class="s2">"can't be blank"</span><span class="p">,</span>
+        <span class="ss">code: :blank</span><span class="p">,</span>
+        <span class="ss">name: :pets</span><span class="p">,</span>
+        <span class="ss">id: </span><span class="s1">'444'</span><span class="p">,</span>
+        <span class="ss">type: </span><span class="s1">'pets'</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}]</span>
+<span class="p">}</span></code></pre></figure>
+
+  <p>When <a href="#sideposting">Sideposting</a>, the errors payload will contain all
+invalid Resources in the graph.</p>
+
+  <h2 id="context">8 Context</h2>
+
+  <p>All resources have access to <code class="highlighter-rouge">#context</code>. If you’re using Rails,
+<code class="highlighter-rouge">context</code> is the controller instance processing the request.</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/post_resource.rb</span>
+<span class="n">attribute</span> <span class="ss">:active</span><span class="p">,</span> <span class="ss">:boolean</span><span class="p">,</span> <span class="ss">writable: :admin?</span>
+
+<span class="k">def</span> <span class="nf">admin?</span>
+  <span class="n">context</span><span class="p">.</span><span class="nf">current_user</span><span class="p">.</span><span class="nf">admin?</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Because <code class="highlighter-rouge">current_user</code> is so common, we recommend putting this in
+<code class="highlighter-rouge">ApplicationResource</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/application_resource.rb</span>
+<span class="k">class</span> <span class="nc">ApplicationResource</span> <span class="o">&lt;</span> <span class="no">Graphiti</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="c1"># ... code ...</span>
+  <span class="k">def</span> <span class="nf">current_user</span>
+    <span class="n">context</span><span class="p">.</span><span class="nf">current_user</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># app/resources/post_resource.rb</span>
+<span class="k">class</span> <span class="nc">PostResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="c1"># ... code ...</span>
+  <span class="k">def</span> <span class="nf">admin?</span>
+    <span class="n">current_user</span><span class="p">.</span><span class="nf">admin?</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>You can manually set context with <code class="highlighter-rouge">with_context</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">ctx</span> <span class="o">=</span> <span class="no">OpenStruct</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">current_user: </span><span class="no">User</span><span class="p">.</span><span class="nf">first</span><span class="p">)</span>
+<span class="no">Graphiti</span><span class="p">.</span><span class="nf">with_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span> <span class="k">do</span>
+  <span class="c1"># current_user == ctx.current_user</span>
+  <span class="no">PostResource</span><span class="p">.</span><span class="nf">all</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p><br />
+<br /></p>
+
 </div>
 
         </div>
@@ -1146,27 +1468,24 @@ for further querying.</p>
         <h3>Overview</h3>
         <ul>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
           </li>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
           </li>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/concepts">Concepts</a>
+            <a href="http://localhost:4000/guides">Guides</a>
           </li>
         </ul>
       </div>
       <div class="col-sm-4 menu">
-        <h3>Resources</h3>
+        <h3>Contact</h3>
         <ul>
-          <li>
-            <a target="_blank" href="https://jsonapi-suite.github.io/jsonapi_compliable">YARD Documentation</a>
-          </li>
           <li>
             <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
           </li>
           <li>
-            <a href="mailto:richmolj@gmail.com">Contact us</a>
+            <a href="mailto:richmolj@gmail.com">Email</a>
           </li>
         </ul>
       </div>

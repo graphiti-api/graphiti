@@ -73,12 +73,35 @@
   }
 }
 
+.layout-home {
+  .brand {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 300px;
+    text-align: center;
+    padding-top: 200px;
+
+    .graphiti {
+      font-size: 50px;
+    }
+
+    .desc {
+      color: #b0b0b0;
+    }
+  }
+}
+
 body {
   background: #414B5B;
   font-size: 17px;
   line-height: 1.7;
 
   .page-content {
+    background: white;
+  }
+
+  &.layout-home {
     background: white;
   }
 }

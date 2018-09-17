@@ -38,8 +38,13 @@ Resources
   * [polymorphic_belongs_to](#polymorphicbelongsto)
   * [polymorphic_has_many](#polymorphichasmany)
 * 6 [Generators](#generators)
-* 7 Persisting
-* 8 Context
+* 7 [Persisting](#persisting)
+  * [Side Effects](#side-effects)
+  * [Sideposting](#sideposting)
+    * [Create](#create)
+    * [Expanded Example](#expanded-example)
+  * [Validation Errors](#validation-errors)
+* 8 [Context](#context)
 * 9 Adapters
 </div>
 
@@ -1186,5 +1191,336 @@ Limit the actions this resource supports with `-a`:
 {% highlight bash %}
 $ rails generate graphiti:resource Employee -a index show
 {% endhighlight %}
+
+## 7 Persisting
+
+Graphiti allows writing a graph of data in a single request. We'll do
+the work of parsing the graph and ordering operations, so you can focus
+on the part you care about: the logic for actually persisting an object.
+
+By default, persistence operations are handled by your adapter. The
+"expanded" view of the ActiveRecord implementation is below:
+
+{% highlight ruby %}
+# app/resources/employee_resource.rb
+
+def create(attributes)
+  employee = Employee.new(attributes)
+  employee.save
+  employee
+end
+
+def update(attributes)
+  employee = EmployeeResource.find(attributes.delete(:id)).data
+  employee.update_attributes(attributes)
+  employee
+end
+
+def destroy(attributes)
+  employee = EmployeeResource.find(attributes.delete(:id)).data
+  employee.destroy
+  employee
+end
+{% endhighlight %}
+
+* We'll process any `writable: false` or guarded attributes prior to
+these methods.
+* After these methods, we'll check the Model instance for validation
+errors, rolling back the transaction if any Model in the graph is
+invalid.
+* These methods **must return the Model instance**.
+
+### 7.1 Side Effects
+
+RESTful Resources can cause side effects as the result of a persistence
+operation. For example, imagine sending a welcome email after persisting
+a `User`.
+
+You can cause side effects in three ways. The simplest is to override a
+persistence method:
+
+{% highlight ruby %}
+# app/resources/user_resource.rb
+def create(attributes)
+  super.tap do |user|
+    UserMailer.welcome(user).deliver_later if user.valid?
+  end
+end
+{% endhighlight %}
+
+The downside of this approach is that validation processing happens
+*after* the persistence methods. If we were saving the User and their
+Account at the same time, and the Account was invalid, the database
+transaction would be rolled back but the email would still be sent.
+Consider this approach only for logic that can be rolled back as part of
+a transaction.
+
+We can solve this issue with `before_commit`:
+
+{% highlight ruby %}
+# app/resources/user_resource.rb
+before_commit do |user|
+  UserMailer.welcome(user).deliver_later
+end
+{% endhighlight %}
+
+`before_commit` hooks happen **after** we validate the entire graph,
+right before committing to the database.
+
+Use `only` to restrict the operations which will cause the
+`before_commit` hook to fire:
+
+{% highlight ruby %}
+# app/resources/user_resource.rb
+before_commit only: [:create] do
+  # ... code ...
+end
+{% endhighlight %}
+
+### 7.2 Sideposting
+
+The act of persisting multiple Resources in a single request is called
+**Sideposting**. The payload mirrors the side**loading** payload for
+read operations, with minor additions.
+
+Let's create a Post and associate it to an existing Blog in a single
+request:
+
+{% highlight ruby %}
+# POST /api/v1/posts
+{
+  type: 'posts',
+  attributes: { title: 'My post' },
+  relationships: {
+    blog: {
+      data: {
+        id: '1',
+        type: 'blogs',
+        method: 'update'
+      }
+    }
+  }
+}
+{% endhighlight %}
+
+The critical addition here is the `method` key. When we persist RESTful
+Resources, we send a corresponding HTTP verb. This follows the same
+pattern, adding a verb for each Resource in the graph. `method` can be
+one of:
+
+  * `create`
+  * `update`
+  * `destroy`
+  * `disassociate` (e.g. `null` foreign key)
+
+When we sidepost, all objects will be persisted within the same database
+transaction, which rolls back if an error is raised or any objects are invalid.
+
+#### 7.2.1 Create
+
+Let's say we want to create a Post and its Blog in a single request.
+You'll note that we don't have the `id` key to generate a [Resource
+Identifier](http://jsonapi.org/format/#document-resource-identifier-objects) (combination of `id` and `type`
+that uniquely identifies a Resource).
+
+To accomodate this, send an ephemeral `temp-id` (any UUID):
+
+{% highlight ruby %}
+{
+  # POST /api/v1/posts
+  {
+    type: 'posts',
+    attributes: { title: 'My post' },
+    relationships: {
+      blog: {
+        data: {
+          :'temp-id' => 'abc123',
+          type: 'blogs',
+          method: 'create'
+        }
+      }
+    },
+    included: [
+      {
+        :'temp-id' => 'abc123'
+        type: 'blogs',
+        attributes: { name: 'New Blog' }
+      }
+    ]
+  }
+}
+{% endhighlight %}
+
+This random UUID:
+
+* Connects relevant sections of the payload.
+* Rells clients how to associate their in-memory objects with the ids returned from the server.
+
+#### 7.2.2 Expanded Example
+
+Here we're updating a Post, changing the name of its associated Blog, creating a Tag, deleting one Comment, and disassociating (`null` foreign key) a different Comment, all in a single request:
+
+{% highlight ruby %}
+{
+  data: {
+    type: 'posts',
+    id: 123,
+    attributes: { title: 'Updated!' },
+    relationships: {
+      blog: {
+        data: {
+          type: 'blogs',
+          id: 123,
+          method: 'update'
+        }
+      },
+      tags: {
+        data: [{
+          type: 'tags',
+          temp-id: 's0m3uu1d',
+          method: 'create'
+        }]
+      },
+      comments: {
+        data: [
+          {
+            type: 'comments',
+            id: '123',
+            method: 'destroy'
+          },
+          {
+            type: 'comments',
+            id: '456',
+            method: 'disassociate'
+          }
+        ]
+      }
+    }
+  },
+  included: [
+    {
+      type: 'tags',
+      :'temp-id' => 's0m3uu1d',
+      attributes: { name: 'Important' }
+    },
+    {
+      type: 'blogs',
+      :'temp-id' => '123',
+      attributes: { name: 'Updated!' }
+    }
+  ]
+}
+{% endhighlight %}
+
+### 7.3 Validation Errors
+
+When a persistence operation is attempted but the corresponding Resource
+is invalid, the transaction will be rolled back and an [errors payload](http://jsonapi.org/format/#errors) will be returned
+with a `422` response code:
+
+{% highlight ruby %}
+{
+  errors: [{
+    code:  'unprocessable_entity',
+    status: '422',
+    title: "Validation Error",
+    detail: "Title can't be blank",
+    source: { pointer: '/data/attributes/title' },
+    meta: {
+      attribute: :title,
+      message: "can't be blank",
+      code: :blank
+    }
+  }]
+}
+{% endhighlight %}
+
+To get this functionality, your Model must adhere to the
+[ActiveModel::Validations API](https://api.rubyonrails.org/classes/ActiveModel/Validations.html).
+
+You get this for free with ActiveRecord, or it can be mixed in to any
+PORO:
+
+{% highlight ruby %}
+class Post
+  include ActiveModel::Validations
+  validates :title, presence: true
+end
+{% endhighlight %}
+
+Errors on associations will have a slightly expanded payload:
+
+{% highlight ruby %}
+{
+  errors: [{
+    code: 'unprocessable_entity',
+    status: '422',
+    title: 'Validation Error',
+    detail: "Name can't be blank",
+    source: { pointer: '/data/attributes/name' },
+    meta: {
+      relationship: {
+        attribute: :name,
+        message: "can't be blank",
+        code: :blank,
+        name: :pets,
+        id: '444',
+        type: 'pets'
+      }
+    }
+  }]
+}
+{% endhighlight %}
+
+When [Sideposting](#sideposting), the errors payload will contain all
+invalid Resources in the graph.
+
+## 8 Context
+
+All resources have access to `#context`. If you're using Rails,
+`context` is the controller instance processing the request.
+
+{% highlight ruby %}
+# app/resources/post_resource.rb
+attribute :active, :boolean, writable: :admin?
+
+def admin?
+  context.current_user.admin?
+end
+{% endhighlight %}
+
+Because `current_user` is so common, we recommend putting this in
+`ApplicationResource`:
+
+{% highlight ruby %}
+# app/resources/application_resource.rb
+class ApplicationResource < Graphiti::Resource
+  # ... code ...
+  def current_user
+    context.current_user
+  end
+end
+
+# app/resources/post_resource.rb
+class PostResource < ApplicationResource
+  # ... code ...
+  def admin?
+    current_user.admin?
+  end
+end
+{% endhighlight %}
+
+You can manually set context with `with_context`:
+
+{% highlight ruby %}
+ctx = OpenStruct.new(current_user: User.first)
+Graphiti.with_context(ctx) do
+  # current_user == ctx.current_user
+  PostResource.all
+end
+{% endhighlight %}
+
+<br />
+<br />
 
 </div>
