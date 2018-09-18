@@ -182,49 +182,49 @@ what query functionality we have. We’ve listed all <code class="highlighter-ro
       </li>
       <li>Case Sensitive:
         <ul>
-          <li>URL: <code class="highlighter-rouge">/posts?filter[title][eql]=My title</code></li>
+          <li>URL: <code class="highlighter-rouge">/api/v1/posts?filter[title][eql]=My title</code></li>
           <li>SQL: <code class="highlighter-rouge">SELECT * FROM posts WHERE lower(title) = "my title!"</code></li>
         </ul>
       </li>
       <li>Prefix:
         <ul>
-          <li>URL: <code class="highlighter-rouge">/posts?filter[title][prefix]=my</code></li>
+          <li>URL: <code class="highlighter-rouge">/api/v1/posts?filter[title][prefix]=my</code></li>
           <li>SQL: <code class="highlighter-rouge">SELECT * FROM posts WHERE lower(title) LIKE 'my%'</code></li>
         </ul>
       </li>
       <li>Suffix:
         <ul>
-          <li>URL: <code class="highlighter-rouge">/posts?filter[title][suffix]=title</code></li>
+          <li>URL: <code class="highlighter-rouge">/api/v1/posts?filter[title][suffix]=title</code></li>
           <li>SQL: <code class="highlighter-rouge">SELECT * FROM posts WHERE lower(title) LIKE '%title!'</code></li>
         </ul>
       </li>
       <li>Contains:
         <ul>
-          <li>URL: <code class="highlighter-rouge">/posts?filter[title][match]=itl</code></li>
+          <li>URL: <code class="highlighter-rouge">/api/v1/posts?filter[title][match]=itl</code></li>
           <li>SQL: <code class="highlighter-rouge">SELECT * FROM posts WHERE lower(title) LIKE '%itl%'</code></li>
         </ul>
       </li>
       <li>Greater Than:
         <ul>
-          <li>URL: <code class="highlighter-rouge">/posts?filter[upvotes][gt]=20</code></li>
+          <li>URL: <code class="highlighter-rouge">/api/v1/posts?filter[upvotes][gt]=20</code></li>
           <li>SQL: <code class="highlighter-rouge">SELECT * FROM posts WHERE upvotes &gt; 20</code></li>
         </ul>
       </li>
       <li>Greater Than or Equal To:
         <ul>
-          <li>URL: <code class="highlighter-rouge">/posts?filter[upvotes][gte]=20</code></li>
+          <li>URL: <code class="highlighter-rouge">/api/v1/posts?filter[upvotes][gte]=20</code></li>
           <li>SQL: <code class="highlighter-rouge">SELECT * FROM posts WHERE upvotes &gt;= 20</code></li>
         </ul>
       </li>
       <li>Less Than:
         <ul>
-          <li>URL: <code class="highlighter-rouge">/posts?filter[upvotes][lt]=20</code></li>
+          <li>URL: <code class="highlighter-rouge">/api/v1/posts?filter[upvotes][lt]=20</code></li>
           <li>SQL: <code class="highlighter-rouge">SELECT * FROM posts WHERE upvotes &lt; 20</code></li>
         </ul>
       </li>
       <li>Less Than or Equal To:
         <ul>
-          <li>URL: <code class="highlighter-rouge">/posts?filter[upvotes][lte]=20</code></li>
+          <li>URL: <code class="highlighter-rouge">/api/v1/posts?filter[upvotes][lte]=20</code></li>
           <li>SQL: <code class="highlighter-rouge">SELECT * FROM posts WHERE upvotes &lt;= 20</code></li>
         </ul>
       </li>

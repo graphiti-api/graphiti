@@ -112,28 +112,28 @@ what query functionality we have. We've listed all `Post`s at
     * URL: `/api/v1/posts?filter[title]=my title`
     * SQL: `SELECT * FROM posts WHERE title = "My title!"`
   * Case Sensitive:
-    * URL: `/posts?filter[title][eql]=My title`
+    * URL: `/api/v1/posts?filter[title][eql]=My title`
     * SQL: `SELECT * FROM posts WHERE lower(title) = "my title!"`
   * Prefix:
-    * URL: `/posts?filter[title][prefix]=my`
+    * URL: `/api/v1/posts?filter[title][prefix]=my`
     * SQL: `SELECT * FROM posts WHERE lower(title) LIKE 'my%'`
   * Suffix:
-    * URL: `/posts?filter[title][suffix]=title`
+    * URL: `/api/v1/posts?filter[title][suffix]=title`
     * SQL: `SELECT * FROM posts WHERE lower(title) LIKE '%title!'`
   * Contains:
-    * URL: `/posts?filter[title][match]=itl`
+    * URL: `/api/v1/posts?filter[title][match]=itl`
     * SQL: `SELECT * FROM posts WHERE lower(title) LIKE '%itl%'`
   * Greater Than:
-    * URL: `/posts?filter[upvotes][gt]=20`
+    * URL: `/api/v1/posts?filter[upvotes][gt]=20`
     * SQL: `SELECT * FROM posts WHERE upvotes > 20`
   * Greater Than or Equal To:
-    * URL: `/posts?filter[upvotes][gte]=20`
+    * URL: `/api/v1/posts?filter[upvotes][gte]=20`
     * SQL: `SELECT * FROM posts WHERE upvotes >= 20`
   * Less Than:
-    * URL: `/posts?filter[upvotes][lt]=20`
+    * URL: `/api/v1/posts?filter[upvotes][lt]=20`
     * SQL: `SELECT * FROM posts WHERE upvotes < 20`
   * Less Than or Equal To:
-    * URL: `/posts?filter[upvotes][lte]=20`
+    * URL: `/api/v1/posts?filter[upvotes][lte]=20`
     * SQL: `SELECT * FROM posts WHERE upvotes <= 20`
   * Any filter not whitelisted will raise `JsonapiCompliable::BadFilter`
   error.
