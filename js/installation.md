@@ -52,6 +52,9 @@ const {
 ...or, if you're avoiding JS modules, `spraypaint` will be available as a global in
 the browser.
 
+> **NOTE**: Spraypaint does not yet support Typescript `>= 2.9`. We're
+> working on it!
+
 ### Defining Models
 
 #### Connecting to the API
