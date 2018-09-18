@@ -9,7 +9,7 @@
   <title>Graphiti</title>
   <meta name="description" content="A stylish alternative to GraphQL">
 
-  <link rel="stylesheet" href="https://graphiti-api.github.io/graphiti/assets/main.css?ref=wh4t3v45">
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
   <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
 
   <!-- javascript -->
@@ -31,21 +31,21 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a href="https://graphiti-api.github.io/graphiti" class="navbar-brand">Graphiti</a>
+      <a href="http://localhost:4000" class="navbar-brand">Graphiti</a>
     </div>
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
       <ul class="nav navbar-nav">
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+          <a class="nav-link" href="http://localhost:4000/guides">Guides</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/js">Spraypaint</a>
+          <a class="nav-link" href="http://localhost:4000/js">Spraypaint</a>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
@@ -90,7 +90,7 @@
   <h2 id="overview">1 Overview</h2>
 
   <p><strong>Endpoints</strong> expose and customize
-<a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources">Resources</a>.</p>
+<a href="http://localhost:4000/guides/concepts/resources">Resources</a>.</p>
 
   <p>It’s important to remember that Resources themselves can operate
 completely independently of a request or response:</p>
@@ -121,7 +121,7 @@ Rails, an Endpoint is the combination of a Route and Controller.</p>
   <h3 id="endpoint-logic">1.1 Endpoint Logic</h3>
 
   <p>Often, you won’t need to customize Endpoints - especially if you’re
-using our <a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#generators">Rails Resource
+using our <a href="http://localhost:4000/guides/concepts/resources#generators">Rails Resource
 generator</a>. Endpoint logic mostly
 concerns:</p>
 
@@ -165,14 +165,14 @@ our application generator):</p>
 <span class="k">end</span></code></pre></figure>
 
   <p>This gives us <a href="#sideload-allowlist">#sideload_allowlist</a> and sets the
-<a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#context">context</a>.</p>
+<a href="http://localhost:4000/guides/concepts/resources#context">context</a>.</p>
 
   <h2 id="customizing-resources">2 Customizing Resources</h2>
 
   <h3 id="scope-overrides">Scope Overrides</h3>
 
   <p>One common use case for endpoints is customizing the Resource
-<a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#basescope">base scope</a>. This causes a new
+<a href="http://localhost:4000/guides/concepts/resources#basescope">base scope</a>. This causes a new
 “starting point” for query building.</p>
 
   <p>Consider the endpoints <code class="highlighter-rouge">/posts</code> (basic CRUD) and <code class="highlighter-rouge">/top_posts</code>. Though
@@ -202,7 +202,7 @@ those positions in a single request. But is it really valid to <em>also</em> pul
 all the hardware, as well as all the historical data on the cost of that hardware,
 in a single request? Allowing the entire graph to be pulled down in a single request can cause excessive load on our
 servers (and this is probably a better fit for lazy-loading via
-<a href="https://graphiti-api.github.io/graphiti/guides/concepts/links">Links</a>).</p>
+<a href="http://localhost:4000/guides/concepts/links">Links</a>).</p>
 
   <p>Let’s instead say that if we’re entering the graph at <code class="highlighter-rouge">/employees</code>, the
 furthest we can go is Department:</p>
@@ -269,7 +269,7 @@ sideloading (and filtering) Positions as well. Use custom endpoints or
 
   <h2 id="testing">4 Testing</h2>
 
-  <p>If you have custom Endpoint logic, we suggest testing using an <a href="https://graphiti-api.github.io/graphiti/guides/concepts/testing#api-tests">API
+  <p>If you have custom Endpoint logic, we suggest testing using an <a href="http://localhost:4000/guides/concepts/testing#api-tests">API
 Test</a>.</p>
 </div>
 
@@ -283,13 +283,13 @@ Test</a>.</p>
         <h3>Overview</h3>
         <ul>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
           </li>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
           </li>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+            <a href="http://localhost:4000/guides">Guides</a>
           </li>
         </ul>
       </div>

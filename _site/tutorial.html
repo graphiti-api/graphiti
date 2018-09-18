@@ -9,7 +9,7 @@
   <title>Graphiti</title>
   <meta name="description" content="A stylish alternative to GraphQL">
 
-  <link rel="stylesheet" href="https://graphiti-api.github.io/graphiti/assets/main.css?ref=wh4t3v45">
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
   <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
 
   <!-- javascript -->
@@ -31,21 +31,21 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a href="https://graphiti-api.github.io/graphiti" class="navbar-brand">Graphiti</a>
+      <a href="http://localhost:4000" class="navbar-brand">Graphiti</a>
     </div>
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
       <ul class="nav navbar-nav">
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+          <a class="nav-link" href="http://localhost:4000/guides">Guides</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/js">Spraypaint</a>
+          <a class="nav-link" href="http://localhost:4000/js">Spraypaint</a>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
@@ -60,19 +60,68 @@
         <div class="container">
           <h1 id="tutorial">Tutorial</h1>
 
-<p>Our <a href="https://github.com/graphiti-api/employee_directory">Rails Sample Application</a> is broken into step-by-step branches. See the diff of each step to see what’s going on.</p>
+<p align="center">
+<img src="https://user-images.githubusercontent.com/55264/45711831-c87dbd80-bb58-11e8-9c67-84ba9427d60a.gif" />
+</p>
 
-<ul>
-  <li><a href="https://github.com/graphiti-api/employee_directory/commit/45c1c92e14fb1c3a47b8ed246ceb2cba50e97c72">Step 1: Initial Resource</a></li>
-  <li><a href="https://github.com/graphiti-api/employee_directory/compare/step_1_employees...step_2_positions">Step 2: Has Many</a></li>
-  <li><a href="https://github.com/graphiti-api/employee_directory/compare/step_2_positions...step_3_departments">Step 3: Belongs To</a></li>
-  <li><a href="https://github.com/graphiti-api/employee_directory/compare/step_3_departments...step_4_customizations">Step 4: Customizing Queries</a></li>
-  <li><a href="https://github.com/graphiti-api/employee_directory/compare/step_4_customizations...step_5_has_one">Step 5: Has One</a></li>
-  <li><a href="https://github.com/graphiti-api/employee_directory/compare/step_5_has_one...step_6_write_customization">Step 6: Customizing Writes</a></li>
-  <li><a href="https://github.com/graphiti-api/employee_directory/compare/step_6_write_customization...step_7_many_to_many">Step 7: Many-to-Many</a></li>
-  <li><a href="https://github.com/graphiti-api/employee_directory/compare/step_7_many_to_many...step_8_polymorphic_belongs_to">Step 8: Polymorphic Relationships</a></li>
-  <li><a href="https://github.com/graphiti-api/employee_directory/compare/step_8_polymorphic_belongs_to...step_9_polymorphic_resource">Step 9: Polymorphic Resources</a></li>
-</ul>
+<p><br /></p>
+
+<p>This tutorial <strong>reads a graph of data</strong> and <strong>writes a graph of data</strong>,
+performing common operations like sorting, filtering, and nested forms.</p>
+
+<p>The sample applications are broken into step-by-step branches. See the diff
+of each step to see what’s going on.</p>
+
+<div class="clearfix">
+<div class="tutorial col-md-6">
+
+    <h3 id="server-side-rails">Server Side: Rails</h3>
+
+    <p><a href="https://github.com/graphiti-api/employee_directory">Rails Sample Application</a></p>
+
+    <ul>
+      <li><a href="https://github.com/graphiti-api/employee_directory/commit/45c1c92e14fb1c3a47b8ed246ceb2cba50e97c72">Step 1: Initial Resource</a></li>
+      <li><a href="https://github.com/graphiti-api/employee_directory/compare/step_1_employees...step_2_positions">Step 2: Has Many</a></li>
+      <li><a href="https://github.com/graphiti-api/employee_directory/compare/step_2_positions...step_3_departments">Step 3: Belongs To</a></li>
+      <li><a href="https://github.com/graphiti-api/employee_directory/compare/step_3_departments...step_4_customizations">Step 4: Customizing Queries</a></li>
+      <li><a href="https://github.com/graphiti-api/employee_directory/compare/step_4_customizations...step_5_has_one">Step 5: Has One</a></li>
+      <li><a href="https://github.com/graphiti-api/employee_directory/compare/step_5_has_one...step_6_write_customization">Step 6: Customizing Writes</a></li>
+      <li><a href="https://github.com/graphiti-api/employee_directory/compare/step_6_write_customization...step_7_many_to_many">Step 7: Many-to-Many</a></li>
+      <li><a href="https://github.com/graphiti-api/employee_directory/compare/step_7_many_to_many...step_8_polymorphic_belongs_to">Step 8: Polymorphic Relationships</a></li>
+      <li><a href="https://github.com/graphiti-api/employee_directory/compare/step_8_polymorphic_belongs_to...step_9_polymorphic_resource">Step 9: Polymorphic Resources</a></li>
+    </ul>
+
+  </div>
+
+<div class="tutorial col-md-6">
+
+    <h3 id="client-side-vuejs">Client Side: VueJS</h3>
+
+    <p><a href="https://github.com/graphiti-api/employee-directory-vue">VueJS Sample Application</a></p>
+
+    <ul>
+      <li><a href="https://github.com/graphiti-api/employee-directory-vue/commit/be690c3038380e17e326935d595a0b83fc8004f9">Step 0: Setup</a>
+        <ul>
+          <li>Run after <code class="highlighter-rouge">vue create employee-directory-vue</code> using <a href="https://cli.vuejs.org">Vue CLI</a>.</li>
+        </ul>
+      </li>
+      <li><a href="https://github.com/graphiti-api/employee-directory-vue/compare/step_0_setup...step_1_models">Step 1: Define Models</a></li>
+      <li><a href="https://github.com/graphiti-api/employee-directory-vue/compare/step_1_models...step_2_data_grid">Step 2: Data Grid</a></li>
+      <li><a href="https://github.com/graphiti-api/employee-directory-vue/compare/step_2_data_grid...step_3_includes">Step 3: Relationships</a></li>
+      <li><a href="https://github.com/graphiti-api/employee-directory-vue/compare/step_3_includes...step_4_filtering">Step 4: Filtering</a></li>
+      <li><a href="https://github.com/graphiti-api/employee-directory-vue/compare/step_4_filtering...step_5_sorting">Step 5: Sorting</a></li>
+      <li><a href="https://github.com/graphiti-api/employee-directory-vue/compare/step_5_sorting...step_6_stats">Step 6: Total Count</a></li>
+      <li><a href="https://github.com/graphiti-api/employee-directory-vue/compare/step_6_stats...step_7_pagination">Step 7: Pagination</a></li>
+      <li><a href="https://github.com/graphiti-api/employee-directory-vue/compare/step_7_pagination...step_8_basic_form_setup">Step 8: Basic Form Setup</a></li>
+      <li><a href="https://github.com/graphiti-api/employee-directory-vue/compare/step_8_basic_form_setup...step_9_dropdown">Step 9: Dropdown</a></li>
+      <li><a href="https://github.com/graphiti-api/employee-directory-vue/compare/step_9_dropdown...step_10_nested_create">Step 10: Nested Form Submission</a></li>
+      <li><a href="https://github.com/graphiti-api/employee-directory-vue/compare/step_10_nested_create...step_11_validations">Step 11: Validation Errors</a></li>
+      <li><a href="https://github.com/graphiti-api/employee-directory-vue/compare/step_11_validations...step_12_nested_destroy">Step 12: Nested Destroy</a></li>
+      <li><a href="https://github.com/graphiti-api/employee-directory-vue/compare/step_12_nested_destroy...step_13_vue">Step 13: Vue-Specific Glue Code</a></li>
+    </ul>
+
+  </div>
+</div>
 
 <p><br />
 <br />
@@ -91,13 +140,13 @@
         <h3>Overview</h3>
         <ul>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
           </li>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
           </li>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+            <a href="http://localhost:4000/guides">Guides</a>
           </li>
         </ul>
       </div>
