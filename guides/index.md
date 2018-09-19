@@ -24,7 +24,7 @@ But ideally, read everything 🙂
     * Guiding Principles
     * [Lifecycle of a Graphiti Request]({{site.github.url}}/guides/overview#lifecycle-of-a-graphiti-request)
   * ## Getting Started
-    * Installation
+    * [Installation]({{site.github.url}}/guides/getting-started/installation)
     * [Quickstart]({{site.github.url}}/quickstart)
     * What's Next?
     * Feedback

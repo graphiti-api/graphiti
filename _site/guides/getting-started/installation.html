@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Graphiti</title>
+  <meta name="description" content="A stylish alternative to GraphQL">
+
+  <link rel="stylesheet" href="https://graphiti-api.github.io/graphiti/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="https://graphiti-api.github.io/graphiti" class="navbar-brand">Graphiti</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/js">Spraypaint</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="toc col-md-3">
+  <h1 id="installation">Installation</h1>
+
+  <ul>
+    <li>1 <a href="#from-scratch">From Scratch</a></li>
+    <li>2 <a href="#adding-to-an-existing-app">Adding to an Existing App</a>
+      <ul>
+        <li><a href="#responders">Responders</a></li>
+        <li><a href="#testing">Testing</a></li>
+        <li><a href="#willpaginate">will_paginate</a></li>
+      </ul>
+    </li>
+    <li>3 <a href="#without-rails">Without Rails</a></li>
+  </ul>
+
+</div>
+
+<div class="col-md-8">
+  <h2 id="from-scratch">1 From Scratch</h2>
+
+  <p>The easiest way to start from scratch is to use the application
+template:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>rails new blog --api -m https://raw.githubusercontent.com/graphiti-api/graphiti_rails_template/master/all.rb</code></pre></figure>
+
+  <p>Alternatively, download and point to the template locally:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>curl -O https://raw.githubusercontent.com/graphiti-api/graphiti_rails_template/master/all.rb
+<span class="gp">$ </span>rails new blog --api -m all.rb</code></pre></figure>
+
+  <p>Run <code class="highlighter-rouge">git diff</code> to see the changes to a blank Rails app.</p>
+
+  <h2 id="adding-to-an-existing-app">2 Adding to an Existing App</h2>
+
+  <p>This process is straightforward; you can add Graphiti to an existing
+Rails app alongside <a href="https://github.com/rails/jbuilder">JBuilder</a> or <a href="https://github.com/rails-api/active_model_serializers">ActiveModelSerializers</a>.</p>
+
+  <p>Start with gems:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># The only strictly-required gem</span>
+<span class="n">gem</span> <span class="s1">'graphiti'</span>
+
+<span class="c1"># For automatic ActiveRecord pagination</span>
+<span class="n">gem</span> <span class="s1">'kaminari'</span>
+
+<span class="c1"># Test-specific gems</span>
+<span class="n">group</span> <span class="ss">:development</span><span class="p">,</span> <span class="ss">:test</span> <span class="k">do</span>
+  <span class="n">gem</span> <span class="s1">'rspec-rails'</span>
+  <span class="n">gem</span> <span class="s1">'factory_bot_rails'</span>
+  <span class="n">gem</span> <span class="s1">'faker'</span>
+  <span class="n">gem</span> <span class="s1">'graphiti_spec_helpers'</span>
+<span class="k">end</span>
+
+<span class="n">group</span> <span class="ss">:test</span> <span class="k">do</span>
+  <span class="n">gem</span> <span class="s1">'database_cleaner'</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>You’ll be up-and-running at this point. Verify with a simple standalone
+Resource:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Assuming you already have a Post ActiveRecord Model</span>
+<span class="k">class</span> <span class="nc">PostResource</span> <span class="o">&lt;</span> <span class="no">Graphiti</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">adapter</span> <span class="o">=</span> <span class="no">Graphiti</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">ActiveRecord</span>
+  <span class="n">attribute</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:string</span>
+<span class="k">end</span>
+
+<span class="no">PostResource</span><span class="p">.</span><span class="nf">all</span><span class="p">.</span><span class="nf">data</span> <span class="c1"># =&gt; [#&lt;Post&gt;, #&lt;Post&gt;, ...]</span></code></pre></figure>
+
+  <p>Now we just need to integrate with Rails endpoints (to give us things
+like <a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#context">#context</a>):</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/application_controller.rb</span>
+<span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">Base</span>
+  <span class="kp">include</span> <span class="no">Graphiti</span><span class="o">::</span><span class="no">Rails</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>And wire-up our error-handling:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/application_controller.rb</span>
+<span class="c1"># When #show action does not find record, return 404</span>
+<span class="n">register_exception</span> <span class="no">Graphiti</span><span class="o">::</span><span class="no">Errors</span><span class="o">::</span><span class="no">RecordNotFound</span><span class="p">,</span>
+  <span class="ss">status: </span><span class="mi">404</span>
+
+<span class="n">rescue_from</span> <span class="no">Exception</span> <span class="k">do</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span>
+  <span class="n">handle_exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>That’s it for the basics. You may have issues with generators
+conflicting with your existing application structure - but you can
+always write files manually or <a href="https://github.com/graphiti-api/graphiti/issues">submit an issue</a>.</p>
+
+  <h3 id="responders">2.1 Responders</h3>
+
+  <p>Graphiti supports JSONAPI, simple JSON, and XML. You can do this
+manually:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">index</span>
+  <span class="n">posts</span> <span class="o">=</span> <span class="no">PostResource</span><span class="p">.</span><span class="nf">all</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+  <span class="n">respond_to</span> <span class="k">do</span> <span class="o">|</span><span class="nb">format</span><span class="o">|</span>
+    <span class="nb">format</span><span class="p">.</span><span class="nf">json</span> <span class="p">{</span> <span class="n">posts</span><span class="p">.</span><span class="nf">to_json</span> <span class="p">}</span>
+    <span class="nb">format</span><span class="p">.</span><span class="nf">jsonapi</span> <span class="p">{</span> <span class="n">posts</span><span class="p">.</span><span class="nf">to_jsonapi</span> <span class="p">}</span>
+    <span class="nb">format</span><span class="p">.</span><span class="nf">xml</span> <span class="p">{</span> <span class="n">posts</span><span class="p">.</span><span class="nf">to_xml</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>We can avoid this boilerplate with the <a href="https://github.com/plataformatec/responders">Responders</a> gem:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">index</span>
+  <span class="n">posts</span> <span class="o">=</span> <span class="no">PostResource</span><span class="p">.</span><span class="nf">all</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+  <span class="n">respond_with</span><span class="p">(</span><span class="n">posts</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>To get this functionality:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Gemfile</span>
+<span class="n">gem</span> <span class="s1">'responders'</span>
+
+<span class="c1"># app/controllers/application_controller.rb</span>
+<span class="kp">include</span> <span class="no">Graphiti</span><span class="o">::</span><span class="no">Responders</span></code></pre></figure>
+
+  <blockquote>
+    <p>Note: Persistence operations only support JSONAPI format, so you’ll
+still use <code class="highlighter-rouge">render jsonapi:</code> and <code class="highlighter-rouge">render jsonapi_errors:</code> for those.</p>
+  </blockquote>
+
+  <h3 id="testing">2.2 Testing</h3>
+
+  <p>To add our <a href="https://graphiti-api.github.io/graphiti/guides/concepts/testing">Integration Tests</a>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Gemfile</span>
+<span class="n">group</span> <span class="ss">:development</span><span class="p">,</span> <span class="ss">:test</span> <span class="k">do</span>
+  <span class="n">gem</span> <span class="s1">'graphiti_spec_helpers'</span>
+  <span class="n">gem</span> <span class="s1">'factory_bot_rails'</span>
+  <span class="n">gem</span> <span class="s1">'rspec_rails'</span>
+  <span class="n">gem</span> <span class="s1">'faker'</span>
+<span class="k">end</span>
+
+<span class="n">group</span> <span class="ss">:test</span> <span class="k">do</span>
+  <span class="n">gem</span> <span class="s1">'database_cleaner'</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Bootstrap RSpec if you haven’t already:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>bin/rails g rspec:install</code></pre></figure>
+
+  <p>Add some RSpec configuration:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">RSpec</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">include</span> <span class="no">FactoryBot</span><span class="o">::</span><span class="no">Syntax</span><span class="o">::</span><span class="no">Methods</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">include</span> <span class="no">GraphitiSpecHelpers</span><span class="o">::</span><span class="no">RSpec</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">include</span> <span class="no">GraphitiSpecHelpers</span><span class="o">::</span><span class="no">Sugar</span>
+
+  <span class="c1"># Raise errors during tests by default</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">before</span> <span class="ss">:each</span> <span class="k">do</span>
+    <span class="no">GraphitiErrors</span><span class="p">.</span><span class="nf">disable!</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Clean your DB between test runs</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">before</span><span class="p">(</span><span class="ss">:suite</span><span class="p">)</span> <span class="k">do</span>
+    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">strategy</span> <span class="o">=</span> <span class="ss">:transaction</span>
+    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">clean_with</span><span class="p">(</span><span class="ss">:truncation</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">config</span><span class="p">.</span><span class="nf">around</span><span class="p">(</span><span class="ss">:each</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">example</span><span class="o">|</span>
+    <span class="k">begin</span><span class="p">)</span>
+      <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">cleaning</span> <span class="k">do</span>
+        <span class="n">example</span><span class="p">.</span><span class="nf">run</span>
+      <span class="k">end</span>
+    <span class="k">ensure</span>
+      <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">clean</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <h3 id="willpaginate">2.3 will_paginate</h3>
+
+  <p>By default, we use <a href="https://github.com/kaminari/kaminari">Kaminari</a> for
+ActiveRecord pagination. If you prefer [will_paginate] (or anything
+else):</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/application_resource.rb</span>
+<span class="n">paginate</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">current_page</span><span class="p">,</span> <span class="n">per_page</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">paginate</span><span class="p">(</span><span class="ss">page: </span><span class="n">current_page</span><span class="p">,</span> <span class="ss">per_page: </span><span class="n">per_page</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
+  <h2 id="without-rails">Without Rails</h2>
+
+  <p>You can use Graphiti in any plain <code class="highlighter-rouge">.rb</code> file. To see this in action,
+check out the <a href="https://github.com/graphiti-api/plain_ruby_example">Plain Ruby Sample App</a>.</p>
+
+  <p><br />
+<br /></p>
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Contact</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Email</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>
