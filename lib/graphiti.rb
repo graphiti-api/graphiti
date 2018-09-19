@@ -143,3 +143,25 @@ module Graphiti
 end
 
 require "graphiti/runner"
+
+# Because we set 2 magic variables when processing the graph,
+# as_json will fail on a PORO with stack level too deep
+#
+# #as_json calls #instance_variables, defined in
+# active_support/core_ext/object/instance_variables.rb
+#
+# So, override that to not see these magic vars.
+module InstanceVariableOverride
+  def instance_values
+    values = super
+    if @__graphiti_serializer
+      values.reject! do |v|
+        ['__graphiti_serializer', '__graphiti_resource'].include?(v)
+      end
+    end
+    values
+  end
+end
+class Object
+  prepend InstanceVariableOverride
+end
