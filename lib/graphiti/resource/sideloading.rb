@@ -31,22 +31,22 @@ module Graphiti
         end
 
         def has_many(name, opts = {}, &blk)
-          opts[:class] = adapter.sideloading_classes[:has_many]
+          opts[:class] ||= adapter.sideloading_classes[:has_many]
           allow_sideload(name, opts, &blk)
         end
 
         def belongs_to(name, opts = {}, &blk)
-          opts[:class] = adapter.sideloading_classes[:belongs_to]
+          opts[:class] ||= adapter.sideloading_classes[:belongs_to]
           allow_sideload(name, opts, &blk)
         end
 
         def has_one(name, opts = {}, &blk)
-          opts[:class] = adapter.sideloading_classes[:has_one]
+          opts[:class] ||= adapter.sideloading_classes[:has_one]
           allow_sideload(name, opts, &blk)
         end
 
         def many_to_many(name, opts = {}, &blk)
-          opts[:class] = adapter.sideloading_classes[:many_to_many]
+          opts[:class] ||= adapter.sideloading_classes[:many_to_many]
           allow_sideload(name, opts, &blk)
         end
 
