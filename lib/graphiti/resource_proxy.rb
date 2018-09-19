@@ -78,6 +78,9 @@ module Graphiti
     end
 
     def save(action: :create)
+      # TODO: remove this. Only used for persisting many-to-many with AR
+      # (see activerecord adapter)
+      Graphiti.context[:namespace] = action
       validator = persist do
         @resource.persist_with_relationships \
           @payload.meta(action: action),
