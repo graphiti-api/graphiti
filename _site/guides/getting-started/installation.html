@@ -206,7 +206,9 @@ still use <code class="highlighter-rouge">render jsonapi:</code> and <code class
 
   <p>Add some RSpec configuration:</p>
 
-  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">RSpec</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="nb">require</span> <span class="s1">'graphiti_spec_helpers/rspec'</span>
+
+<span class="no">RSpec</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
   <span class="n">config</span><span class="p">.</span><span class="nf">include</span> <span class="no">FactoryBot</span><span class="o">::</span><span class="no">Syntax</span><span class="o">::</span><span class="no">Methods</span>
   <span class="n">config</span><span class="p">.</span><span class="nf">include</span> <span class="no">GraphitiSpecHelpers</span><span class="o">::</span><span class="no">RSpec</span>
   <span class="n">config</span><span class="p">.</span><span class="nf">include</span> <span class="no">GraphitiSpecHelpers</span><span class="o">::</span><span class="no">Sugar</span>

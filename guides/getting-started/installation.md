@@ -167,6 +167,8 @@ $ bin/rails g rspec:install
 Add some RSpec configuration:
 
 {% highlight ruby %}
+require 'graphiti_spec_helpers/rspec'
+
 RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
   config.include GraphitiSpecHelpers::RSpec
