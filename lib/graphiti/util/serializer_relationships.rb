@@ -38,18 +38,19 @@ module Graphiti
       private
 
       def block
-        if _link = link?
-          if @resource_class.validate_endpoints?
-            validate_link! unless @sideload.link_proc
-          end
-        end
-
+        _link = link?
+        _resource_class = @resource_class
         _sl = @sideload
         _data_proc = data_proc
+        _self = self
+        validate_link! if eagerly_validate_links?
+
         proc do
           data { instance_eval(&_data_proc) }
 
           if _link
+            _self.send(:validate_link!) unless _self.send(:eagerly_validate_links?)
+
             if @proxy.query.links?
               link(:related) do
                 ::Graphiti::Util::Link.new(_sl, @object).generate
@@ -74,7 +75,19 @@ module Graphiti
         }
       end
 
+      def eagerly_validate_links?
+        if defined?(::Rails)
+          ::Rails.application.config.eager_load
+        else
+          true
+        end
+      end
+
       def validate_link!
+        return unless link?
+        return unless @resource_class.validate_endpoints?
+        return if @sideload.link_proc
+
         unless Graphiti.config.context_for_endpoint
           raise Errors::Unlinkable.new(@resource_class, @sideload)
         end
