@@ -52,8 +52,23 @@ const {
 ...or, if you're avoiding JS modules, `spraypaint` will be available as a global in
 the browser.
 
-> **NOTE**: Spraypaint does not yet support Typescript `>= 2.9`. We're
-> working on it!
+### Typescript
+
+Spraypaint supports Typescript versions `>= 2.8`.
+
+By default you will need a `!` after each attribute and relationship:
+
+{% highlight typescript %}
+@Attr first_name!: string
+@HasMany() positions!: Position[]
+{% endhighlight %}
+
+This is due to [Strict Class Initialization](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-7.html#strict-class-initialization). For the purposes of Spraypaint, we don't need this. Remove the need for
+`!` (as the rest of these guides do) by setting
+
+`"strictPropertyInitialization": false`
+
+in `tsconfig.json`.
 
 ### Defining Models
 
