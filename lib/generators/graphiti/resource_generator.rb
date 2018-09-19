@@ -52,6 +52,7 @@ module Graphiti
     def generate_application_resource
       to = File.join('app/resources', class_path, "application_resource.rb")
       template('application_resource.rb.erb', to)
+      require "#{::Rails.root}/#{to}"
     end
 
     def application_resource_defined?
@@ -82,6 +83,7 @@ module Graphiti
     def generate_resource
       to = File.join('app/resources', class_path, "#{file_name}_resource.rb")
       template('resource.rb.erb', to)
+      require "#{::Rails.root}/#{to}"
     end
 
     def model_klass
