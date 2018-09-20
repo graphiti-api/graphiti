@@ -28,6 +28,7 @@ But ideally, read everything 🙂
     * [Quickstart]({{site.github.url}}/quickstart)
     * What's Next?
     * Feedback
+    * [Upgrading from JSONAPI Suite]({{site.github.url}}/guides/upgrading)
   * ## Concepts
     * [Resources]({{site.github.url}}/guides/concepts/resources)
     * [Endpoints]({{site.github.url}}/guides/concepts/endpoints)
