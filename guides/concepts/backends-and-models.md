@@ -86,7 +86,7 @@ class EmployeeResource < ApplicationResource
     scope[:sort] = { name: direction }
   end
 
-  # 'scope' here is out hash
+  # 'scope' here is our hash
   # We pass it to Backend.query, and return Models
   def resolve(scope)
     results = Backend.query(scope)
@@ -96,7 +96,7 @@ end
 {% endhighlight %}
 
 As you see above, a **scope** can be anything from an
-`ActiveRecord::Relation` to a plain ruby hash. We want to adjust
+`ActiveRecord::Relation` to a plain Ruby Hash. We want to adjust
 *something* based on the request parameters and pass it to our backend.
 From the raw backend results, we can instantiate Models.
 
@@ -124,7 +124,7 @@ From the [ActiveRecord Guides](https://guides.rubyonrails.org/active_record_basi
 In other words, ActiveRecord is **combines** a Backend and Model.
 Opinions on this [vary](https://blog.lelonek.me/why-is-your-rails-application-still-coupled-to-activerecord-efe34d657c91),
 but Graphiti supports either approach: we can separate data and business layers, or
-combine them. See the ActiveRecord doppleganger of the above at our
+combine them. See the ActiveRecord doppelgänger of the above at our
 [Resource cheatsheet]({{site.github.url}}/cheatsheet).
 
 ### 1.2 Model Requirements
@@ -148,7 +148,7 @@ attribute :name, :string do
 end
 {% endhighlight %}
 
-If your Model does not respond to an attribute name, either pass a block to `attribute` or
+If your Model does not respond to `#name`, either pass a block to `attribute` or
 look into [aliasing](https://blog.bigbinary.com/2012/01/08/alias-vs-alias-method.html).
 
 #### 1.2.1 Validations
@@ -192,7 +192,7 @@ class Employee
 end
 {% endhighlight %}
 
-This is a common ruby example. `attr_accessor` defines getters and
+This is a common Ruby example. `attr_accessor` defines getters and
 setters for our properties, and we assign those properties in the
 constructor:
 

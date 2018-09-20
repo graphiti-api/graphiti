@@ -54,7 +54,9 @@ Test first.
 
 Wait, hear me out!
 
-[Even if you're not a fan of TDD](http://david.heinemeierhansson.com/2014/tdd-is-dead-long-live-testing.html), Graphiti *integration* tests are simply the easiest, most pleasant way to develop. In fact, most Graphiti development can happen without even opening a browser...and as a side effect, you get a reliable test suite.
+[Even if you're not a fan of TDD](http://david.heinemeierhansson.com/2014/tdd-is-dead-long-live-testing.html), Graphiti *integration* tests are simply the easiest, most pleasant way to develop.
+In fact, most Graphiti development can happen without even opening a browser.
+And as a side effect, you get a reliable test suite.
 
 Let's say we want to filter Employees by `title`, which comes from
 the `positions` table. Start with a spec:
@@ -108,13 +110,13 @@ There are two types of Graphiti tests: **API tests** and **Resource
 tests**.
 
 This is because the same Resource logic can be re-used at multiple
-endpoints. PostResource can be referenced at `/posts` and `/top_posts`
+endpoints. PostResource can be referenced at `/posts`, `/top_posts`,
 and `/admin/posts`, but we shouldn't have to test the same filtering and
-sorting logic over and over. Querying, Persistence and Serialization are
+sorting logic over and over. Querying, persistence, and serialization are
 all Resource responsibilities, tested in Resource tests.
 
 We still want API tests, though, to test everything outside of the
-Resource: routing, middleware, cache rules, response codes, etc.
+Resource: routing, middleware, cache rules, response codes, etc…
 
 Typically, you'll write the API test **once** and not have to touch it
 again.
@@ -122,7 +124,7 @@ again.
 ### 1.2 Factories
 
 > Note: Factories are not **required**, but they are considered a best
-> practice used by the Graphiti test generator. Read Thoughtbot's
+> practice used by the Graphiti test generator. Read thoughtbot's
 > [Why Factories?](https://robots.thoughtbot.com/why-factories) for more
 > information.
 
@@ -213,7 +215,7 @@ expect(sideload.body).to eq('body')
 {% endhighlight %}
 
 The `sideload` method accepts the *name of the relationship*. It returns
-a normal `jsonapi_data` Node containing the `included` data.
+a normal `jsonapi_data` `GraphitiSpecHelpers::Node` containing the `include`-ed data.
 
 #### 2.3 Accessing Links
 
@@ -228,7 +230,7 @@ link URL.
 
 ### 2.2 `#json`
 
-To see the raw JSON response, just type `json`.
+To see the raw JSON response, use `json`.
 
 ### 2.3 `#datetime`
 
@@ -302,8 +304,7 @@ end
 
 ### 2.6 API Test Helpers
 
-When executing an API test request, always use the `jsonapi_`
-dopplegangers:
+When executing an API test request, always use the `jsonapi_` doppelgänger:
 
 * `jsonapi_get(url, params:)` instead of `get`
 * `jsonapi_post(url, payload)` instead of `post`
@@ -593,9 +594,8 @@ end
 
 You have 3 options here:
 
-* Turn off this validation in test mode. Add `config.active_record.belongs_to_required_by_default = true` to `config/environments/test.rb`.
-* Turn off the validation for this specific relationship: `belongs_to
-:department) optional: true`
+* Turn off this validation in test mode. Add `config.active_record.belongs_to_required_by_default = false` to `config/environments/test.rb`.
+* Turn off the validation for this specific relationship: `belongs_to :department, optional: true`.
 * Associate as part of the request.
 
 We recommend the third option to preserve real-world end-to-end
