@@ -47,7 +47,7 @@ And Resources connect to other Resources. Our graph of data is defined
 Endpoints expose this graph to the world. We might choose to have a `/employees`
 endpoint that can eager load comments (`?include=comments`), but never expose
 `/comments` directly. Or, we could do the opposite: expose lazy-loading `/comments`,
-but disallow eager loading from `/employees.` We can add caching rules,
+but disallow eager loading from `/employees`. We can add caching rules,
 or add an `/exemplary_employees` endpoint with special query overrides.
 
 Finally, Endpoints are in charge of the [HTTP specification](https://tools.ietf.org/html/rfc2616):
@@ -131,7 +131,7 @@ filters, sorts, etc - while only returning "Top Posts".
 ### Sideload Allowlist
 
 Resources define relationships to other resources. But we may not want
-all those relationships exposed at a given endpoint.
+all of those relationships exposed at a given endpoint.
 
 Let's say we've defined relationships:
 

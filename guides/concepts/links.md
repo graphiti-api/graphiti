@@ -35,7 +35,7 @@ might **eager load** the data like so:
 
 This fetches all the data in a single request. But after some UI
 testing, we decide to add a "show comments" button. This way our
-page can load quicker - it only needs to load the Post
+page can load more quickly - it only needs to load the Post
 initially, and loading Top Comments can be deferred. We
 want to **lazy load** the relationship.
 
@@ -45,7 +45,7 @@ How would we do this? We *could* bake this logic into our next request:
 
 But this requires the client to have knowledge of what a "Top Comment"
 is. If this logic ever changed, we'd have to update every client - our
-desktop app, mobile apps, reports, etc. Not to mention, third parties who
+desktop app, mobile apps, reports, etc… Not to mention, third parties who
 just want to display Top Comments are required to have this knowledge
 and update their implementations as well.
 

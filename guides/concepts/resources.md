@@ -172,7 +172,7 @@ The built-in Types are:
 * `hash`
 * `array`
 
-All but the last 3 have Array dopplegangers: `array_of_integers`,
+All but the last 3 have Array doppelgängers: `array_of_integers`,
 `array_of_dates`, etc.
 
 ##### 2.5 Custom Types
@@ -508,7 +508,7 @@ multiple values. These filters will be `single: true` by default.
 ##### 3.5.3 Hash Filter
 
 Filters with type `hash` will automatically parse JSON when passed in a
-url query string:
+URL query string:
 
 {% highlight ruby %}
 # GET /employees?filter[metadata]={ "foo": 100 }
@@ -786,7 +786,7 @@ PostResource.all(includes: 'comments')
 # Under the hood:
 # CommentResource.all(filter: { post_id: array_of_post_ids })
 
-CommentResource.all(inclues: 'post')
+CommentResource.all(includes: 'post')
 # Under the hood:
 # PostResource.all(filter: { id: array_of_comment_ids })
 {% endhighlight %}
@@ -1136,7 +1136,7 @@ for further querying.
 
 ##### 5.6 polymorphic_has_many
 
-Continuing from the proir section, the corresponding association of a
+Continuing from the prior section, the corresponding association of a
 `polymorphic_belongs_to` is a `polymorphic_has_many`:
 
 {% highlight ruby %}
@@ -1280,7 +1280,7 @@ end
 ### 7.2 Sideposting
 
 The act of persisting multiple Resources in a single request is called
-**Sideposting**. The payload mirrors the side**loading** payload for
+**Sideposting**. The payload mirrors the **sideloading** payload for
 read operations, with minor additions.
 
 Let's create a Post and associate it to an existing Blog in a single
@@ -1354,7 +1354,7 @@ To accomodate this, send an ephemeral `temp-id` (any UUID):
 This random UUID:
 
 * Connects relevant sections of the payload.
-* Rells clients how to associate their in-memory objects with the ids returned from the server.
+* Tells clients how to associate their in-memory objects with the ids returned from the server.
 
 #### 7.2.2 Expanded Example
 
