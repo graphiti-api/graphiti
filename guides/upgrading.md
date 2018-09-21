@@ -107,7 +107,7 @@ end
 {% endhighlight %}
 
 If you have manual sideloading logic with scope, it is **highly
-recommended** you rewriting using `params` - see [relationship docs]({{site.github.url}}/guides/concepts/resources#relationships]). If you **do** still need `scope`, it now yields the parent ids as the first argument and the actual parent models as the second.
+recommended** you rewriting using `params` - see [relationship docs]({{site.github.url}}/guides/concepts/resources#relationships). If you **do** still need `scope`, it now yields the parent ids as the first argument and the actual parent models as the second.
 
 At this point, get all your `spec/legacy` specs passing.
 
