@@ -141,7 +141,9 @@
 
   <p>Wait, hear me out!</p>
 
-  <p><a href="http://david.heinemeierhansson.com/2014/tdd-is-dead-long-live-testing.html">Even if you’re not a fan of TDD</a>, Graphiti <em>integration</em> tests are simply the easiest, most pleasant way to develop. In fact, most Graphiti development can happen without even opening a browser…and as a side effect, you get a reliable test suite.</p>
+  <p><a href="http://david.heinemeierhansson.com/2014/tdd-is-dead-long-live-testing.html">Even if you’re not a fan of TDD</a>, Graphiti <em>integration</em> tests are simply the easiest, most pleasant way to develop.
+In fact, most Graphiti development can happen without even opening a browser.
+And as a side effect, you get a reliable test suite.</p>
 
   <p>Let’s say we want to filter Employees by <code class="highlighter-rouge">title</code>, which comes from
 the <code class="highlighter-rouge">positions</code> table. Start with a spec:</p>
@@ -195,13 +197,13 @@ need to worry about <a href="http://david.heinemeierhansson.com/2014/test-induce
 tests</strong>.</p>
 
   <p>This is because the same Resource logic can be re-used at multiple
-endpoints. PostResource can be referenced at <code class="highlighter-rouge">/posts</code> and <code class="highlighter-rouge">/top_posts</code>
+endpoints. PostResource can be referenced at <code class="highlighter-rouge">/posts</code>, <code class="highlighter-rouge">/top_posts</code>,
 and <code class="highlighter-rouge">/admin/posts</code>, but we shouldn’t have to test the same filtering and
-sorting logic over and over. Querying, Persistence and Serialization are
+sorting logic over and over. Querying, persistence, and serialization are
 all Resource responsibilities, tested in Resource tests.</p>
 
   <p>We still want API tests, though, to test everything outside of the
-Resource: routing, middleware, cache rules, response codes, etc.</p>
+Resource: routing, middleware, cache rules, response codes, etc…</p>
 
   <p>Typically, you’ll write the API test <strong>once</strong> and not have to touch it
 again.</p>
@@ -210,7 +212,7 @@ again.</p>
 
   <blockquote>
     <p>Note: Factories are not <strong>required</strong>, but they are considered a best
-practice used by the Graphiti test generator. Read Thoughtbot’s
+practice used by the Graphiti test generator. Read thoughtbot’s
 <a href="https://robots.thoughtbot.com/why-factories">Why Factories?</a> for more
 information.</p>
   </blockquote>
@@ -297,7 +299,7 @@ be raised.</li>
 <span class="n">expect</span><span class="p">(</span><span class="n">sideload</span><span class="p">.</span><span class="nf">body</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span><span class="p">(</span><span class="s1">'body'</span><span class="p">)</span></code></pre></figure>
 
   <p>The <code class="highlighter-rouge">sideload</code> method accepts the <em>name of the relationship</em>. It returns
-a normal <code class="highlighter-rouge">jsonapi_data</code> Node containing the <code class="highlighter-rouge">included</code> data.</p>
+a normal <code class="highlighter-rouge">jsonapi_data</code> <code class="highlighter-rouge">GraphitiSpecHelpers::Node</code> containing the <code class="highlighter-rouge">include</code>-ed data.</p>
 
   <h4 id="accessing-links">2.3 Accessing Links</h4>
 
@@ -310,7 +312,7 @@ link URL.</p>
 
   <h3 id="json">2.2 <code class="highlighter-rouge">#json</code></h3>
 
-  <p>To see the raw JSON response, just type <code class="highlighter-rouge">json</code>.</p>
+  <p>To see the raw JSON response, use <code class="highlighter-rouge">json</code>.</p>
 
   <h3 id="datetime">2.3 <code class="highlighter-rouge">#datetime</code></h3>
 
@@ -376,8 +378,7 @@ accessed as normal:</p>
 
   <h3 id="api-test-helpers">2.6 API Test Helpers</h3>
 
-  <p>When executing an API test request, always use the <code class="highlighter-rouge">jsonapi_</code>
-dopplegangers:</p>
+  <p>When executing an API test request, always use the <code class="highlighter-rouge">jsonapi_</code> doppelgänger:</p>
 
   <ul>
     <li><code class="highlighter-rouge">jsonapi_get(url, params:)</code> instead of <code class="highlighter-rouge">get</code></li>
@@ -656,9 +657,8 @@ correctly:</p>
   <p>You have 3 options here:</p>
 
   <ul>
-    <li>Turn off this validation in test mode. Add <code class="highlighter-rouge">config.active_record.belongs_to_required_by_default = true</code> to <code class="highlighter-rouge">config/environments/test.rb</code>.</li>
-    <li>Turn off the validation for this specific relationship: <code class="highlighter-rouge">belongs_to
-:department) optional: true</code></li>
+    <li>Turn off this validation in test mode. Add <code class="highlighter-rouge">config.active_record.belongs_to_required_by_default = false</code> to <code class="highlighter-rouge">config/environments/test.rb</code>.</li>
+    <li>Turn off the validation for this specific relationship: <code class="highlighter-rouge">belongs_to :department, optional: true</code>.</li>
     <li>Associate as part of the request.</li>
   </ul>
 

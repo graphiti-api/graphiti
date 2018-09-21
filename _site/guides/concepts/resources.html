@@ -246,7 +246,7 @@ render an integer:</p>
     <li><code class="highlighter-rouge">array</code></li>
   </ul>
 
-  <p>All but the last 3 have Array dopplegangers: <code class="highlighter-rouge">array_of_integers</code>,
+  <p>All but the last 3 have Array doppelgängers: <code class="highlighter-rouge">array_of_integers</code>,
 <code class="highlighter-rouge">array_of_dates</code>, etc.</p>
 
   <h5 id="custom-types">2.5 Custom Types</h5>
@@ -540,7 +540,7 @@ multiple values. These filters will be <code class="highlighter-rouge">single: t
   <h5 id="hash-filter">3.5.3 Hash Filter</h5>
 
   <p>Filters with type <code class="highlighter-rouge">hash</code> will automatically parse JSON when passed in a
-url query string:</p>
+URL query string:</p>
 
   <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># GET /employees?filter[metadata]={ "foo": 100 }</span>
 
@@ -795,7 +795,7 @@ Each relationship determines behavior for:</p>
 <span class="c1"># Under the hood:</span>
 <span class="c1"># CommentResource.all(filter: { post_id: array_of_post_ids })</span>
 
-<span class="no">CommentResource</span><span class="p">.</span><span class="nf">all</span><span class="p">(</span><span class="ss">inclues: </span><span class="s1">'post'</span><span class="p">)</span>
+<span class="no">CommentResource</span><span class="p">.</span><span class="nf">all</span><span class="p">(</span><span class="ss">includes: </span><span class="s1">'post'</span><span class="p">)</span>
 <span class="c1"># Under the hood:</span>
 <span class="c1"># PostResource.all(filter: { id: array_of_comment_ids })</span></code></pre></figure>
 
@@ -1104,7 +1104,7 @@ for further querying.</p>
 
   <h5 id="polymorphichasmany">5.6 polymorphic_has_many</h5>
 
-  <p>Continuing from the proir section, the corresponding association of a
+  <p>Continuing from the prior section, the corresponding association of a
 <code class="highlighter-rouge">polymorphic_belongs_to</code> is a <code class="highlighter-rouge">polymorphic_has_many</code>:</p>
 
   <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
@@ -1230,7 +1230,7 @@ right before committing to the database.</p>
   <h3 id="sideposting">7.2 Sideposting</h3>
 
   <p>The act of persisting multiple Resources in a single request is called
-<strong>Sideposting</strong>. The payload mirrors the side<strong>loading</strong> payload for
+<strong>Sideposting</strong>. The payload mirrors the <strong>sideloading</strong> payload for
 read operations, with minor additions.</p>
 
   <p>Let’s create a Post and associate it to an existing Blog in a single
@@ -1303,7 +1303,7 @@ that uniquely identifies a Resource).</p>
 
   <ul>
     <li>Connects relevant sections of the payload.</li>
-    <li>Rells clients how to associate their in-memory objects with the ids returned from the server.</li>
+    <li>Tells clients how to associate their in-memory objects with the ids returned from the server.</li>
   </ul>
 
   <h4 id="expanded-example">7.2.2 Expanded Example</h4>

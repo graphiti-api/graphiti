@@ -145,7 +145,7 @@ that accepts a hash of options to perform a query:</p>
     <span class="n">scope</span><span class="p">[</span><span class="ss">:sort</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">name: </span><span class="n">direction</span> <span class="p">}</span>
   <span class="k">end</span>
 
-  <span class="c1"># 'scope' here is out hash</span>
+  <span class="c1"># 'scope' here is our hash</span>
   <span class="c1"># We pass it to Backend.query, and return Models</span>
   <span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
     <span class="n">results</span> <span class="o">=</span> <span class="no">Backend</span><span class="p">.</span><span class="nf">query</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
@@ -154,7 +154,7 @@ that accepts a hash of options to perform a query:</p>
 <span class="k">end</span></code></pre></figure>
 
   <p>As you see above, a <strong>scope</strong> can be anything from an
-<code class="highlighter-rouge">ActiveRecord::Relation</code> to a plain ruby hash. We want to adjust
+<code class="highlighter-rouge">ActiveRecord::Relation</code> to a plain Ruby Hash. We want to adjust
 <em>something</em> based on the request parameters and pass it to our backend.
 From the raw backend results, we can instantiate Models.</p>
 
@@ -182,7 +182,7 @@ results.</p>
   <p>In other words, ActiveRecord is <strong>combines</strong> a Backend and Model.
 Opinions on this <a href="https://blog.lelonek.me/why-is-your-rails-application-still-coupled-to-activerecord-efe34d657c91">vary</a>,
 but Graphiti supports either approach: we can separate data and business layers, or
-combine them. See the ActiveRecord doppleganger of the above at our
+combine them. See the ActiveRecord doppelgänger of the above at our
 <a href="https://graphiti-api.github.io/graphiti/cheatsheet">Resource cheatsheet</a>.</p>
 
   <h3 id="model-requirements">1.2 Model Requirements</h3>
@@ -202,7 +202,7 @@ combine them. See the ActiveRecord doppleganger of the above at our
   <span class="vi">@object</span><span class="p">.</span><span class="nf">name</span>
 <span class="k">end</span></code></pre></figure>
 
-  <p>If your Model does not respond to an attribute name, either pass a block to <code class="highlighter-rouge">attribute</code> or
+  <p>If your Model does not respond to <code class="highlighter-rouge">#name</code>, either pass a block to <code class="highlighter-rouge">attribute</code> or
 look into <a href="https://blog.bigbinary.com/2012/01/08/alias-vs-alias-method.html">aliasing</a>.</p>
 
   <h4 id="validations">1.2.1 Validations</h4>
@@ -240,7 +240,7 @@ below are a few examples.</p>
   <span class="k">end</span>
 <span class="k">end</span></code></pre></figure>
 
-  <p>This is a common ruby example. <code class="highlighter-rouge">attr_accessor</code> defines getters and
+  <p>This is a common Ruby example. <code class="highlighter-rouge">attr_accessor</code> defines getters and
 setters for our properties, and we assign those properties in the
 constructor:</p>
 

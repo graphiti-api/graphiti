@@ -34,7 +34,7 @@ But ideally, read everything 🙂
     * [Endpoints]({{site.github.url}}/guides/concepts/endpoints)
     * [Backends and Models]({{site.github.url}}/guides/concepts/backends-and-models)
     * [Links]({{site.github.url}}/guides/concepts/links)
-    * Error Handling
+    * [Error Handling]({{site.github.url}}/guides/concepts/error-handling)
     * [Testing]({{site.github.url}}/guides/concepts/testing)
     * Schema
     * The JSONAPI Specification

@@ -111,7 +111,7 @@ completely independently of a request or response:</p>
   <p>Endpoints expose this graph to the world. We might choose to have a <code class="highlighter-rouge">/employees</code>
 endpoint that can eager load comments (<code class="highlighter-rouge">?include=comments</code>), but never expose
 <code class="highlighter-rouge">/comments</code> directly. Or, we could do the opposite: expose lazy-loading <code class="highlighter-rouge">/comments</code>,
-but disallow eager loading from <code class="highlighter-rouge">/employees.</code> We can add caching rules,
+but disallow eager loading from <code class="highlighter-rouge">/employees</code>. We can add caching rules,
 or add an <code class="highlighter-rouge">/exemplary_employees</code> endpoint with special query overrides.</p>
 
   <p>Finally, Endpoints are in charge of the <a href="https://tools.ietf.org/html/rfc2616">HTTP specification</a>:
@@ -191,7 +191,7 @@ filters, sorts, etc - while only returning “Top Posts”.</p>
   <h3 id="sideload-allowlist">Sideload Allowlist</h3>
 
   <p>Resources define relationships to other resources. But we may not want
-all those relationships exposed at a given endpoint.</p>
+all of those relationships exposed at a given endpoint.</p>
 
   <p>Let’s say we’ve defined relationships:</p>
 

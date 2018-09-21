@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Graphiti</title>
+  <meta name="description" content="A stylish alternative to GraphQL">
+
+  <link rel="stylesheet" href="https://graphiti-api.github.io/graphiti/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="https://graphiti-api.github.io/graphiti" class="navbar-brand">Graphiti</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/js">Spraypaint</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/jsonapi-suite/jsonapi_suite" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="toc col-md-3">
+  <h1 id="error-handling">Error Handling</h1>
+
+  <ul>
+    <li>1 <a href="#overview">Overview</a>
+      <ul>
+        <li><a href="#setup">Setup</a></li>
+        <li><a href="#displaying-raw-errors">Displaying Raw Errors</a></li>
+      </ul>
+    </li>
+    <li>2 <a href="#usage">Usage</a>
+      <ul>
+        <li><a href="#basic">Basic</a></li>
+        <li><a href="#advanced">Advanced</a></li>
+        <li><a href="#logging">Logging</a></li>
+      </ul>
+    </li>
+    <li>3 <a href="#testing">Testing</a></li>
+  </ul>
+
+</div>
+
+<div class="col-md-8">
+
+  <h2 id="overview">1 Overview</h2>
+
+  <p>Whenever we have an application error, we want to respond with a
+<a href="http://jsonapi.org/format/#errors">JSONAPI-compliant errors payload</a>.
+This way clients have a predictable response detailing information about
+the error.</p>
+
+  <p align="center">
+  <img width="100%" src="https://user-images.githubusercontent.com/55264/45879320-06096300-bd72-11e8-8920-6e83f4a2fce3.png" />
+</p>
+
+  <p>To do these we’ll need to globally rescue errors so that we can render
+the correct response. As part of that logic, we’ll need a way to say “if
+a <code class="highlighter-rouge">NotAuthorized</code> error is raised, the response should have a <code class="highlighter-rouge">403</code>
+status code”, or “when this error is raised, send a helpful message to
+the user about why the error occurred.”</p>
+
+  <p>To do this we use the <a href="https://github.com/graphiti-api/graphiti_errors">Graphiti Errors</a> gem.</p>
+
+  <h3 id="setup">1.1 Setup</h3>
+
+  <p>Error handling is part of <a href="https://graphiti-api.github.io/graphiti/guides/getting-started/installation">Installation</a>,
+but here’s the code:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># With Rails</span>
+<span class="c1"># app/controllers/application_controller.rb</span>
+<span class="kp">include</span> <span class="no">Graphiti</span><span class="o">::</span><span class="no">Rails</span>
+<span class="n">rescue_from</span> <span class="no">Exception</span> <span class="k">do</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span>
+  <span class="n">handle_exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="c1"># Without Rails:</span>
+<span class="kp">include</span> <span class="no">GraphitiErrors</span>
+<span class="c1"># ... your code to globally rescue errors ...</span>
+<span class="n">handle_exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></code></pre></figure>
+
+  <p>We expose this directly so you can add additional logic, like sending
+the error to NewRelic.</p>
+
+  <h4 id="displaying-raw-errors">1.1.1 Displaying Raw Errors</h4>
+
+  <p align="center">
+  <img width="100%" src="https://user-images.githubusercontent.com/55264/45879208-9bf0be00-bd71-11e8-8427-282c5a426394.png" />
+</p>
+  <p><br /></p>
+
+  <p>It can be useful to display the raw error as part of the JSON response -
+but you probably don’t want to expose your stack trace to customers.
+Let’s only show raw errors for the <code class="highlighter-rouge">staging</code> environment:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/application_controller.rb</span>
+<span class="n">rescue_from</span> <span class="no">Exception</span> <span class="k">do</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span>
+  <span class="n">handle_exception</span><span class="p">(</span><span class="n">e</span><span class="p">,</span>  <span class="ss">show_raw_error: </span><span class="no">Rails</span><span class="p">.</span><span class="nf">env</span><span class="p">.</span><span class="nf">staging?</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Another common pattern is to only show raw errors when the user is
+privileged to see them:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/application_controller.rb</span>
+<span class="n">rescue_from</span> <span class="no">Exception</span> <span class="k">do</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span>
+  <span class="n">handle_exception</span><span class="p">(</span><span class="n">e</span><span class="p">,</span>  <span class="ss">show_raw_error: </span><span class="n">current_user</span><span class="p">.</span><span class="nf">developer?</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>When <code class="highlighter-rouge">show_raw_error</code> is <code class="highlighter-rouge">true</code>, you’ll get the raw error class,
+message, and backtrace in the JSON response.</p>
+
+  <h2 id="usage">2 Usage</h2>
+
+  <h3 id="basic">2.1 Basic</h3>
+
+  <p>Let’s register an error with a custom response code:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">register_exception</span> <span class="no">Errors</span><span class="o">::</span><span class="no">NotAuthorized</span><span class="p">,</span> <span class="ss">status: </span><span class="mi">403</span></code></pre></figure>
+
+  <p>Now if we <code class="highlighter-rouge">raise Errors::NotAuthorized</code>, the response code will be
+<code class="highlighter-rouge">403</code>.</p>
+
+  <p>Additional options:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">register_exception</span> <span class="no">Errors</span><span class="o">::</span><span class="no">NotAuthorized</span><span class="p">,</span>
+  <span class="ss">status: </span><span class="mi">403</span><span class="p">,</span>
+  <span class="ss">title: </span><span class="s2">"You cannot perform this action"</span><span class="p">,</span>
+  <span class="ss">message: </span><span class="kp">true</span><span class="p">,</span> <span class="c1"># render the raw error message</span>
+  <span class="ss">message: </span><span class="o">-&gt;</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span> <span class="s2">"Invalid Action"</span> <span class="p">},</span> <span class="c1"># message via proc</span>
+  <span class="ss">log: </span><span class="kp">false</span> <span class="c1"># don't log the error</span></code></pre></figure>
+
+  <p>All controllers will inherit any registered exceptions from their parent. They can also add their own. In this example, <code class="highlighter-rouge">FooError</code> will only throw a custom status code when thrown from <code class="highlighter-rouge">FooController</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">FooController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">register_exception</span> <span class="no">FooError</span><span class="p">,</span> <span class="ss">status: </span><span class="mi">422</span>
+<span class="k">end</span></code></pre></figure>
+
+  <h3 id="advanced">2.2 Advanced</h3>
+
+  <p>The final option <code class="highlighter-rouge">register_exception</code> accepts is <code class="highlighter-rouge">handler</code>. Here you can inject your own error handling class that customize <code class="highlighter-rouge">GraphitiErrors::ExceptionHandler</code>. For example:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">MyCustomHandler</span> <span class="o">&lt;</span> <span class="no">GraphitiErrors</span><span class="o">::</span><span class="no">ExceptionHandler</span>
+  <span class="k">def</span> <span class="nf">status_code</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+    <span class="c1"># ...customize...</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">error_code</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+    <span class="c1"># ...customize...</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">title</span>
+    <span class="c1"># ...customize...</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">detail</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+    <span class="c1"># ...customize...</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">meta</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+    <span class="c1"># ...customize...</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+    <span class="c1"># ...customize...</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">register_exception</span> <span class="no">FooError</span><span class="p">,</span> <span class="ss">handler: </span><span class="no">MyCustomHandler</span></code></pre></figure>
+
+  <p>If you would like to use the same custom handler for all errors, override <code class="highlighter-rouge">default_exception_handler</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/application_controller.rb</span>
+<span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">default_exception_handler</span>
+  <span class="no">MyCustomHandler</span>
+<span class="k">end</span></code></pre></figure>
+
+  <h3 id="logging">2.3 Logging</h3>
+
+  <p>You can assign any logger using <code class="highlighter-rouge">GraphitiErrors.logger =
+your_logger</code>. When using Rails this defaults to <code class="highlighter-rouge">Rails.logger</code>.</p>
+
+  <h2 id="testing">3 Testing</h2>
+
+  <p>This pattern of globally rescuing exceptions makes sense when
+running our live application…but during testing, we may want to
+raise real errors and bypass this rescue logic.</p>
+
+  <p>This is why we <a href="https://github.com/graphiti-api/employee_directory/blob/master/spec/rails_helper.rb#L35-L37">turn off Graphiti Errors during tests by default</a>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># spec/rails_helper.rb</span>
+<span class="no">RSpec</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <span class="c1"># ... code ...</span>
+
+  <span class="n">config</span><span class="p">.</span><span class="nf">before</span> <span class="ss">:each</span> <span class="k">do</span>
+    <span class="no">GraphitiErrors</span><span class="p">.</span><span class="nf">disable!</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>If you want to turn this on for an individual test (so you can test
+error codes, etc):</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">before</span> <span class="k">do</span>
+  <span class="no">GraphitiErrors</span><span class="p">.</span><span class="nf">enable!</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p><br />
+<br /></p>
+
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Contact</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/jsonapi-suite/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Email</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>
