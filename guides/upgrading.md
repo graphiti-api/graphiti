@@ -95,9 +95,9 @@ instead of JSONAPI. Avoid the responders gem if you don't want this.
 If you have a `def destroy(id)` in your Resource, that method now
 accepts the Model instance.
 
-You may want to move some persistence logic to [before_commit]({{site.github.url}}/graphiti/guides/concepts/resources#side-effects).
+You may want to move some persistence logic to [before_commit]({{site.github.url}}/guides/concepts/resources#side-effects).
 
-Resources now have [#base_scope]({{site.github.url}}/graphiti/guides/concepts/resources#basescope). If you previously were using `default_filter` or passing in a custom scope in your controller, consider moving to `base_scope`:
+Resources now have [#base_scope]({{site.github.url}}/guides/concepts/resources#basescope). If you previously were using `default_filter` or passing in a custom scope in your controller, consider moving to `base_scope`:
 
 {% highlight ruby %}
 # app/resources/post_resource.rb
@@ -107,11 +107,11 @@ end
 {% endhighlight %}
 
 If you have manual sideloading logic with scope, it is **highly
-recommended** you rewriting using `params` - see [relationship docs]({{site.github.url}}/graphiti/guides/concepts/resources#relationships]). If you **do** still need `scope`, it now yields the parent ids as the first argument and the actual parent models as the second.
+recommended** you rewriting using `params` - see [relationship docs]({{site.github.url}}/guides/concepts/resources#relationships]). If you **do** still need `scope`, it now yields the parent ids as the first argument and the actual parent models as the second.
 
 At this point, get all your `spec/legacy` specs passing.
 
-When you're done, generate the new [Resource and API Specs](https://graphiti-api.github.io/graphiti/guides/concepts/testing). Note that much of this is syntax changes, you can copy/paste large amounts of logic from `spec/legacy`. To ease this process, try `rails g graphiti:api_test PostResource` and `rails g graphiti:resource_test PostResource`.
+When you're done, generate the new [Resource and API Specs]({{site.github.url}}/guides/concepts/testing). Note that much of this is syntax changes, you can copy/paste large amounts of logic from `spec/legacy`. To ease this process, try `rails g graphiti:api_test PostResource` and `rails g graphiti:resource_test PostResource`.
 
 You should now have the upgraded **and** legacy test suite working. We
 can now remove the legacy specs:

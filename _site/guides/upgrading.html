@@ -150,9 +150,9 @@ instead of JSONAPI. Avoid the responders gem if you don’t want this.</p>
 <p>If you have a <code class="highlighter-rouge">def destroy(id)</code> in your Resource, that method now
 accepts the Model instance.</p>
 
-<p>You may want to move some persistence logic to <a href="https://graphiti-api.github.io/graphiti/graphiti/guides/concepts/resources#side-effects">before_commit</a>.</p>
+<p>You may want to move some persistence logic to <a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#side-effects">before_commit</a>.</p>
 
-<p>Resources now have <a href="https://graphiti-api.github.io/graphiti/graphiti/guides/concepts/resources#basescope">#base_scope</a>. If you previously were using <code class="highlighter-rouge">default_filter</code> or passing in a custom scope in your controller, consider moving to <code class="highlighter-rouge">base_scope</code>:</p>
+<p>Resources now have <a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#basescope">#base_scope</a>. If you previously were using <code class="highlighter-rouge">default_filter</code> or passing in a custom scope in your controller, consider moving to <code class="highlighter-rouge">base_scope</code>:</p>
 
 <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/post_resource.rb</span>
 <span class="k">def</span> <span class="nf">base_scope</span>
@@ -160,7 +160,7 @@ accepts the Model instance.</p>
 <span class="k">end</span></code></pre></figure>
 
 <p>If you have manual sideloading logic with scope, it is <strong>highly
-recommended</strong> you rewriting using <code class="highlighter-rouge">params</code> - see <a href="https://graphiti-api.github.io/graphiti/graphiti/guides/concepts/resources#relationships]">relationship docs</a>. If you <strong>do</strong> still need <code class="highlighter-rouge">scope</code>, it now yields the parent ids as the first argument and the actual parent models as the second.</p>
+recommended</strong> you rewriting using <code class="highlighter-rouge">params</code> - see <a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#relationships]">relationship docs</a>. If you <strong>do</strong> still need <code class="highlighter-rouge">scope</code>, it now yields the parent ids as the first argument and the actual parent models as the second.</p>
 
 <p>At this point, get all your <code class="highlighter-rouge">spec/legacy</code> specs passing.</p>
 
