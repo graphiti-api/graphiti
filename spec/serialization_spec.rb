@@ -174,13 +174,13 @@ RSpec.describe 'serialization' do
         it 'coerces integers' do
           PORO::Employee.create(age: 40)
           render
-          expect(attributes['age']).to eq('0.4E2')
+          expect(attributes['age'].downcase).to eq('0.4e2')
         end
 
         it 'coerces strings' do
           PORO::Employee.create(age: '40.01')
           render
-          expect(attributes['age']).to eq('0.4001E2')
+          expect(attributes['age'].downcase).to eq('0.4001e2')
         end
 
         it 'allows nils' do
