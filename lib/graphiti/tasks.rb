@@ -1,10 +1,4 @@
 namespace :graphiti do
-  include GraphitiSpecHelpers::Helpers
-
-  def response
-    session.response
-  end
-
   def session
     @session ||= ActionDispatch::Integration::Session.new(Rails.application)
   end
@@ -26,6 +20,7 @@ namespace :graphiti do
     end
     path = "#{path}&debug=true" if debug
     session.get("#{path}")
+    JSON.parse(session.response.body)
   end
 
   desc "Execute request without web server."
@@ -36,7 +31,7 @@ namespace :graphiti do
     require 'pp'
     path, debug = args[:path], args[:debug]
     puts "Graphiti Request: #{path}"
-    make_request(path, debug)
+    json = make_request(path, debug)
     pp json
     Graphiti::Debugger.flush if debug
   end
