@@ -75,6 +75,7 @@ module Graphiti
       end
 
       def on_primary_data(payload, params, took)
+        results = results(payload[:results])
         add_chunk(payload[:resource], payload[:parent]) do |logs, json|
           logs << [""]
           logs << ["=== Graphiti Debug", :green, true]
