@@ -412,29 +412,31 @@ RSpec.describe Graphiti::Sideload do
       allow(instance).to receive(:base_scope) { base }
       expect(resource_class).to receive(:_all)
         .with(anything, anything, base)
-      instance.load(parents, query)
+      instance.load(parents, query, nil)
     end
 
     it 'uses load params' do
       expect(resource_class).to receive(:_all)
         .with({ foo: 'bar' }, anything, { type: :positions })
-      instance.load(parents, query)
+      instance.load(parents, query, nil)
     end
 
     it 'passes internal load options' do
       expected = {
         default_paginate: false,
         sideload_parent_length: 2,
+        parent: 'parent',
+        sideload: instance,
         query: anything,
         after_resolve: anything
       }
       expect(resource_class).to receive(:_all)
         .with(anything, expected, { type: :positions })
-      instance.load(parents, query)
+      instance.load(parents, query, 'parent')
     end
 
     it 'returns records' do
-      records = instance.load(parents, query)
+      records = instance.load(parents, query, nil)
       expect(records).to eq(results)
     end
 
@@ -452,7 +454,7 @@ RSpec.describe Graphiti::Sideload do
         }
         expect(resource_class).to receive(:_all)
           .with(expected, anything, { type: :positions })
-        instance.load(parents, query)
+        instance.load(parents, query, nil)
       end
     end
 
@@ -476,7 +478,7 @@ RSpec.describe Graphiti::Sideload do
           sort: [{ id: :desc }],
           parents: []
         }).and_return([])
-        instance.load(parents, query)
+        instance.load(parents, query, nil)
       end
     end
   end

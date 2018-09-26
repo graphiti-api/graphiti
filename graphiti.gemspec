@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   # Pinning this version until backwards-incompatibility is addressed
   spec.add_dependency 'jsonapi-serializable', '~> 0.3.0'
   spec.add_dependency 'dry-types', '~> 0.13'
-  spec.add_dependency 'graphiti_errors', '~> 1.0.alpha.2'
+  spec.add_dependency 'graphiti_errors', '~> 1.0.beta.1'
   spec.add_dependency 'concurrent-ruby', '~> 1.0'
   spec.add_dependency 'activesupport', ['>= 4.1', '< 6']
 
@@ -32,5 +32,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "sqlite3"
   spec.add_development_dependency "database_cleaner"
   spec.add_development_dependency "activemodel", ['>= 4.1', '< 6']
-  spec.add_development_dependency "graphiti_spec_helpers", '>= 1.0.alpha.1'
+  spec.add_development_dependency "graphiti_spec_helpers", '>= 1.0.beta.3'
 end

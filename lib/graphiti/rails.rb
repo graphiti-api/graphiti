@@ -12,11 +12,18 @@ module Graphiti
         include Graphiti::Context
         include GraphitiErrors
         around_action :wrap_context
+        around_action :debug
       end
     end
 
     def wrap_context
       Graphiti.with_context(jsonapi_context, action_name.to_sym) do
+        yield
+      end
+    end
+
+    def debug
+      Debugger.debug do
         yield
       end
     end

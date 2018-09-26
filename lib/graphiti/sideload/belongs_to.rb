@@ -10,7 +10,7 @@ class Graphiti::Sideload::BelongsTo < Graphiti::Sideload
     end
   end
 
-  def load(parents, query)
+  def load(parents, query, graph_parent)
     if ids_for_parents(parents).empty?
       []
     else

@@ -792,6 +792,22 @@ RSpec.describe Graphiti::Query do
 
     it { is_expected.to eq(true) }
 
+    context 'when xml' do
+      before do
+        params[:format] = 'xml'
+      end
+
+      it { is_expected.to eq(false) }
+    end
+
+    context 'when simple json' do
+      before do
+        params[:format] = 'json'
+      end
+
+      it { is_expected.to eq(false) }
+    end
+
     context 'when links_on_demand' do
       around do |e|
         original = Graphiti.config.links_on_demand

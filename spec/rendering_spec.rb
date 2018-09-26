@@ -255,4 +255,66 @@ RSpec.describe 'serialization' do
       end
     end
   end
+
+  context 'when debug is not requested' do
+    it 'does not render debug json' do
+      json = JSON.parse(proxy.to_json)
+      expect(json).to_not have_key('meta')
+    end
+  end
+
+  context 'when debug is requested' do
+    before do
+      params[:debug] = true
+    end
+
+    context 'and context does not respond to debug json method' do
+      let(:graphiti_context) { OpenStruct.new }
+
+      it 'does not render debug json' do
+        json = JSON.parse(proxy.to_json)
+        expect(json).to_not have_key('meta')
+      end
+    end
+
+    context 'and context allows debug json' do
+      let(:graphiti_context) do
+        OpenStruct.new(allow_graphiti_debug_json?: true)
+      end
+
+      context 'but debugging is disabled' do
+        around do |e|
+          original = ::Graphiti::Debugger.enabled
+          ::Graphiti::Debugger.enabled = false
+          begin
+            e.run
+          ensure
+            ::Graphiti::Debugger.enabled = original
+          end
+        end
+
+        it 'does not render debug json' do
+          json = JSON.parse(proxy.to_json)
+          expect(json).to_not have_key('meta')
+        end
+      end
+
+      context 'and debugging is enabled' do
+        around do |e|
+          original = ::Graphiti::Debugger.enabled
+          ::Graphiti::Debugger.enabled = true
+          begin
+            e.run
+          ensure
+            ::Graphiti::Debugger.enabled = original
+          end
+        end
+
+        it 'renders debug json' do
+          json = JSON.parse(proxy.to_json)
+          expect(json['meta']['debug']).to be_a(Array)
+        end
+      end
+    end
+  end
 end

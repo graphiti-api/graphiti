@@ -35,6 +35,12 @@ module Graphiti
         @serializer.relationship(@sideload.name, &block)
       end
 
+      # If we can't eagerly validate links on app boot, we do it at runtime
+      # To avoid any performance confusion, this caches that lookup
+      def self.validated_link_cache
+        @validated_link_cache ||= []
+      end
+
       private
 
       def block
@@ -49,11 +55,13 @@ module Graphiti
           data { instance_eval(&_data_proc) }
 
           if _link
-            _self.send(:validate_link!) unless _self.send(:eagerly_validate_links?)
+            if _links = @proxy.query.links?
+              _self.send(:validate_link!) unless _self.send(:eagerly_validate_links?)
 
-            if @proxy.query.links?
               link(:related) do
-                ::Graphiti::Util::Link.new(_sl, @object).generate
+                if _links
+                  ::Graphiti::Util::Link.new(_sl, @object).generate
+                end
               end
             end
           end
@@ -103,10 +111,13 @@ module Graphiti
 
       def _validate_link!(sideload)
         action = sideload.type == :belongs_to ? :show : :index
+        cache_key = :"#{@sideload.object_id}-#{action}"
+        return if self.class.validated_link_cache.include?(cache_key)
         prc = Graphiti.config.context_for_endpoint
         unless prc.call(sideload.resource.endpoint[:full_path], action)
           raise Errors::InvalidLink.new(@resource_class, sideload, action)
         end
+        self.class.validated_link_cache << cache_key
       end
 
       def link?

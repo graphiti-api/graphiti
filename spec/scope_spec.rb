@@ -46,7 +46,7 @@ RSpec.describe Graphiti::Scope do
 
         it 'resolves the sideload' do
           expect(sideload).to receive(:resolve)
-            .with(results, query.sideloads[:positions])
+            .with(results, query.sideloads[:positions], anything)
           instance.resolve
         end
 

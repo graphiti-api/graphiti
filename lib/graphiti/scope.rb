@@ -17,7 +17,11 @@ module Graphiti
       if @query.zero_results?
         []
       else
-        resolved = @resource.resolve(@object)
+        resolved = broadcast_data do |payload|
+          payload[:results] = @resource.resolve(@object)
+          payload[:results]
+        end
+        resolved.compact!
         assign_serializer(resolved)
         yield resolved if block_given?
         if @opts[:after_resolve]
@@ -29,6 +33,18 @@ module Graphiti
     end
 
     private
+
+    def broadcast_data
+      opts = {
+        resource: @resource,
+        params: @opts[:params],
+        sideload: @opts[:sideload],
+        parent: @opts[:parent]
+      }
+      Graphiti.broadcast("data", opts) do |payload|
+        yield payload
+      end
+    end
 
     # Used to ensure the resource's serializer is used
     # Not one derived through the usual jsonapi-rb logic
@@ -46,8 +62,9 @@ module Graphiti
 
       @query.sideloads.each_pair do |name, q|
         sideload = @resource.class.sideload(name)
+        _parent = @resource
         resolve_sideload = -> {
-          sideload.resolve(results, q)
+          sideload.resolve(results, q, _parent)
           if concurrent && defined?(ActiveRecord)
             ActiveRecord::Base.clear_active_connections!
           end

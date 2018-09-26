@@ -22,11 +22,16 @@ module Graphiti
     end
 
     def links?
+      return false if [:json, :xml, 'json', 'xml'].include?(params[:format])
       if Graphiti.config.links_on_demand
         [true, 'true'].include?(@params[:links])
       else
         true
       end
+    end
+
+    def debug_requested?
+      !!@params[:debug]
     end
 
     def hash

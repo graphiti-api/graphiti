@@ -12,6 +12,77 @@ RSpec.describe Graphiti::Configuration do
     end
   end
 
+  around do |e|
+    begin
+      orig = Graphiti.instance_variable_get(:@config)
+      Graphiti.instance_variable_set(:@config, nil)
+      e.run
+    ensure
+      Graphiti.instance_variable_set(:@config, orig)
+    end
+  end
+
+  describe 'when rails is defined' do
+    let(:rails) do
+      double(root: '/foo/bar', logger: OpenStruct.new(level: 1))
+    end
+
+    before do
+      stub_const('::Rails', rails)
+      Graphiti.instance_variable_set(:@config, nil)
+    end
+
+    after do
+      Graphiti.instance_variable_set(:@config, nil)
+    end
+
+    describe '#schema_path' do
+      it 'defaults' do
+        expect(Graphiti.config.schema_path)
+          .to eq('/foo/bar/public/schema.json')
+      end
+    end
+
+    describe '#debug' do
+      subject { Graphiti.config.debug }
+
+      context 'when rails logger is debug level' do
+        before do
+          rails.logger.level = 0
+        end
+
+        it { is_expected.to eq(true) }
+      end
+
+      context 'when rails logger is not debug level' do
+        it { is_expected.to eq(false) }
+      end
+    end
+
+    it 'sets the graphiti logger to the rails logger' do
+      Graphiti.config
+      expect(Graphiti.logger).to eq(rails.logger)
+    end
+  end
+
+  describe '#debug=' do
+    it 'toggles Debugger.enabled' do
+      Graphiti.config.debug = true
+      expect(Graphiti::Debugger.enabled).to eq(true)
+      Graphiti.config.debug = false
+      expect(Graphiti::Debugger.enabled).to eq(false)
+    end
+  end
+
+  describe '#debug_models=' do
+    it 'toggles Debugger.enabled' do
+      Graphiti.config.debug_models = true
+      expect(Graphiti::Debugger.debug_models).to eq(true)
+      Graphiti.config.debug_models = false
+      expect(Graphiti::Debugger.debug_models).to eq(false)
+    end
+  end
+
   describe '#schema_path' do
     after do
       Graphiti.config.schema_path = nil
@@ -30,7 +101,7 @@ RSpec.describe Graphiti::Configuration do
 
     context 'when Rails is defined' do
       before do
-        rails = double(root: '/foo/bar')
+        rails = double(root: '/foo/bar', logger: double.as_null_object)
         stub_const('::Rails', rails)
         Graphiti.instance_variable_set(:@config, nil)
       end

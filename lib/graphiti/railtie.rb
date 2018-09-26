@@ -1,5 +1,10 @@
 module Graphiti
   class Railtie < ::Rails::Railtie
+    rake_tasks do
+      path = File.expand_path(__dir__)
+      load "#{path}/tasks.rb"
+    end
+
     initializer "graphiti.require_activerecord_adapter" do
       config.after_initialize do |app|
         ActiveSupport.on_load(:active_record) do

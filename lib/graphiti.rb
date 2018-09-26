@@ -68,6 +68,7 @@ require "graphiti/extensions/extra_attribute"
 require "graphiti/extensions/boolean_attribute"
 require "graphiti/extensions/temp_id"
 require "graphiti/serializer"
+require "graphiti/debugger"
 
 if defined?(ActiveRecord)
   require 'graphiti/adapters/active_record'
@@ -125,6 +126,34 @@ module Graphiti
 
   def self.resources
     @resources ||= []
+  end
+
+  def self.broadcast(name, payload)
+    name = "graphiti.#{name}"
+    ActiveSupport::Notifications.instrument(name, payload) do
+      yield payload if block_given?
+    end
+  end
+
+  def self.logger
+    @logger ||= stdout_logger
+  end
+
+  def self.stdout_logger
+    logger = Logger.new($stdout)
+    logger.formatter = proc do |severity, datetime, progname, msg|
+      "#{msg}\n"
+    end
+    logger
+  end
+
+  def self.logger=(val)
+    @logger = val
+  end
+
+  def self.log(msg, color = :white, bold = false)
+    colored = ActiveSupport::LogSubscriber.new.send(:color, msg, color, bold)
+    logger.debug(colored)
   end
 
   # When we add a sideload, we need to do configuration, such as
