@@ -4,13 +4,16 @@ module Graphiti
 
     attr_reader :resource, :query, :scope, :payload
 
-    def initialize(resource, scope, query, payload: nil, single: false, raise_on_missing: false)
-      @resource = resource
-      @scope = scope
-      @query = query
-      @payload = payload
-      @single = single
-      @raise_on_missing = raise_on_missing
+    def initialize(resource, scope, query,
+      payload: nil,
+      single: false,
+      raise_on_missing: false)
+        @resource = resource
+        @scope = scope
+        @query = query
+        @payload = payload
+        @single = single
+        @raise_on_missing = raise_on_missing
     end
 
     def single?
@@ -120,6 +123,10 @@ module Graphiti
 
     def extra_fields
       query.extra_fields
+    end
+
+    def debug_requested?
+      query.debug_requested?
     end
 
     private

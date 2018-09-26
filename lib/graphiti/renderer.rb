@@ -38,7 +38,7 @@ module Graphiti
     private
 
     def render(renderer)
-      notify do
+      Graphiti.broadcast(:render, records: records, options: options) do
         options[:fields] = proxy.fields
         options[:expose] ||= {}
         options[:expose][:extra_fields] = proxy.extra_fields
@@ -46,25 +46,21 @@ module Graphiti
         options[:include] = proxy.include_hash
         options[:meta] ||= {}
         options[:meta].merge!(stats: proxy.stats) unless proxy.stats.empty?
+        options[:meta][:debug] = Debugger.to_a if debug_json?
+
         renderer.render(records, options)
       end
     end
 
-    # TODO: more generic notification pattern
-    # Likely comes out of debugger work
-    def notify
-      if defined?(ActiveSupport::Notifications)
-        opts = [
-          'render.graphiti',
-          records: records,
-          options: options
-        ]
-        ActiveSupport::Notifications.instrument(*opts) do
-          yield
+    def debug_json?
+      debug = false
+      if Debugger.enabled && proxy.debug_requested?
+        context = proxy.resource.context
+        if context.respond_to?(:allow_graphiti_debug_json?)
+          debug = context.allow_graphiti_debug_json?
         end
-      else
-        yield
       end
+      debug
     end
   end
 end

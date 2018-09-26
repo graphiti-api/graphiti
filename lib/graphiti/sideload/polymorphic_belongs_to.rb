@@ -78,14 +78,14 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
     end
   end
 
-  def resolve(parents, query)
+  def resolve(parents, query, graph_parent)
     parents.group_by(&grouper.field_name).each_pair do |group_name, group|
       next if group_name.nil?
 
       match = ->(c) { c.group_name == group_name.to_sym }
       if sideload = children.values.find(&match)
         query = remove_invalid_sideloads(sideload.resource, query)
-        sideload.resolve(group, query)
+        sideload.resolve(group, query, graph_parent)
       else
         err = ::Graphiti::Errors::PolymorphicSideloadChildNotFound
         raise err.new(self, group_name)

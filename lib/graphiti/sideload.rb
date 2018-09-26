@@ -141,10 +141,12 @@ module Graphiti
       end
     end
 
-    def load(parents, query)
+    def load(parents, query, graph_parent)
       params = load_params(parents, query)
       params_proc.call(params, parents) if params_proc
       opts = load_options(parents, query)
+      opts[:sideload] = self
+      opts[:parent] = graph_parent
       proxy = resource.class._all(params, opts, base_scope)
       pre_load_proc.call(proxy, parents) if pre_load_proc
       proxy.to_a
@@ -191,23 +193,28 @@ module Graphiti
       children.replace(associated) if track_associated
     end
 
-    def resolve(parents, query)
+    def resolve(parents, query, graph_parent)
       if single? && parents.length > 1
         raise Errors::SingularSideload.new(self, parents.length)
       end
 
       if self.class.scope_proc
-        sideload_scope = fire_scope(parents)
-        sideload_scope = Scope.new sideload_scope,
-          resource,
-          query,
-          sideload_parent_length: parents.length,
-          default_paginate: false
-        sideload_scope.resolve do |sideload_results|
-          fire_assign(parents, sideload_results)
+        Graphiti.broadcast("data", resource_class: resource.class, sideload: self) do |payload|
+          sideload_scope = fire_scope(parents)
+          sideload_scope = Scope.new sideload_scope,
+            resource,
+            query,
+            parent: graph_parent,
+            sideload: self,
+            sideload_parent_length: parents.length,
+            default_paginate: false
+          sideload_scope.resolve do |sideload_results|
+            payload[:results] = sideload_results
+            fire_assign(parents, sideload_results)
+          end
         end
       else
-        load(parents, query)
+        load(parents, query, graph_parent)
       end
     end
 

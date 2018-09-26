@@ -13,6 +13,8 @@ module Graphiti
     attr_accessor :schema_path
     attr_accessor :links_on_demand
     attr_accessor :typecast_reads
+    attr_accessor :debug
+    attr_accessor :debug_models
 
     # Set defaults
     # @api private
@@ -22,14 +24,28 @@ module Graphiti
       @respond_to = [:json, :jsonapi, :xml]
       @links_on_demand = false
       @typecast_reads = true
+      self.debug = ENV.fetch('GRAPHITI_DEBUG', true)
+      self.debug_models = ENV.fetch('GRAPHITI_DEBUG_MODELS', false)
 
       if defined?(::Rails)
         @schema_path = "#{::Rails.root}/public/schema.json"
+        self.debug = ::Rails.logger.level.zero?
+        Graphiti.logger = ::Rails.logger
       end
     end
 
     def schema_path
       @schema_path ||= raise('No schema_path defined! Set Graphiti.config.schema_path to save your schema.')
+    end
+
+    def debug=(val)
+      @debug = val
+      Debugger.enabled = val
+    end
+
+    def debug_models=(val)
+      @debug_models = val
+      Debugger.debug_models = val
     end
   end
 end

@@ -12,6 +12,7 @@ module Graphiti
         # @api private
         def _all(params, opts, base_scope)
           runner = Runner.new(self, params, opts.delete(:query))
+          opts[:params] = params
           runner.proxy(base_scope, opts)
         end
 
