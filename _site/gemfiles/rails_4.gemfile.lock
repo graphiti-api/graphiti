@@ -1,11 +1,11 @@
 PATH
   remote: ..
   specs:
-    graphiti (1.0.beta.4)
+    graphiti (1.0.beta.6)
       activesupport (>= 4.1, < 6)
       concurrent-ruby (~> 1.0)
       dry-types (~> 0.13)
-      graphiti_errors (~> 1.0.alpha.2)
+      graphiti_errors (~> 1.0.beta.1)
       jsonapi-serializable (~> 0.3.0)
 
 GEM
@@ -82,9 +82,10 @@ GEM
     formatador (0.2.5)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
-    graphiti_errors (1.0.alpha.2)
+    graphiti_errors (1.0.beta.2)
       jsonapi-serializable (~> 0.1)
-    graphiti_spec_helpers (1.0.alpha.2)
+    graphiti_spec_helpers (1.0.beta.3)
+      graphiti (>= 1.0.alpha.1)
       rspec (~> 3.0)
     guard (2.14.2)
       formatador (>= 0.2.4)
@@ -219,7 +220,7 @@ DEPENDENCIES
   bundler (~> 1.12)
   database_cleaner
   graphiti!
-  graphiti_spec_helpers (>= 1.0.alpha.1)
+  graphiti_spec_helpers (>= 1.0.beta.3)
   guard
   guard-rspec
   jsonapi-rails (~> 0.3.1)
@@ -232,4 +233,4 @@ DEPENDENCIES
   sqlite3
 
 BUNDLED WITH
-   1.15.4
+   1.16.2

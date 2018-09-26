@@ -40,7 +40,7 @@ But ideally, read everything 🙂
     * The JSONAPI Specification
     * Rails Integration
     * Usage without Rails
-    * Debugging
+    * [Debugging]({{site.github.url}}/guides/concepts/debugging)
   * ## Consuming Graphiti
     * [Spraypaint JS Client]({{site.github.url}}/js)
   * ## Tutorial
