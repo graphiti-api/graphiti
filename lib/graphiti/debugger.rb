@@ -44,7 +44,9 @@ module Graphiti
               json[:query] = query
             end
             logs << "\n\n"
-            payload[:exception_object].instance_variable_set(:@__graphiti_debug, json)
+            if payload[:exception_object]
+              payload[:exception_object].instance_variable_set(:@__graphiti_debug, json)
+            end
           end
         end
       end
