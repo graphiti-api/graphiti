@@ -63,7 +63,9 @@ module Graphiti
       @query.sideloads.each_pair do |name, q|
         sideload = @resource.class.sideload(name)
         _parent = @resource
+        _context = Graphiti.context
         resolve_sideload = -> {
+          Graphiti.context = _context
           sideload.resolve(results, q, _parent)
           if concurrent && defined?(ActiveRecord)
             ActiveRecord::Base.clear_active_connections!
