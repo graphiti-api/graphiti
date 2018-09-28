@@ -158,7 +158,7 @@ module Graphiti
         @chunks.each do |chunk|
           if parent = chunk[:parent]
             relevant = chunks.find { |c| c[:resource] == parent }
-            relevant[:children].unshift(chunk)
+            relevant[:children].unshift(chunk) if relevant
           end
         end
         @chunks.reject! { |c| !!c[:parent] }
