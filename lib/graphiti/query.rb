@@ -149,6 +149,8 @@ module Graphiti
               value.each_pair do |k,v|
                 hash[k.to_sym] = v.to_i
               end
+            elsif nested?(name)
+              hash.merge!(value)
             elsif top_level? && [:number, :size].include?(name.to_sym)
               hash[name.to_sym] = value.to_i
             end
