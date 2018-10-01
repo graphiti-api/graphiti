@@ -1277,6 +1277,26 @@ before_commit only: [:create] do
 end
 {% endhighlight %}
 
+The final way to cause a side effect is to explicitly fire it in the
+controller:
+
+{% highlight ruby %}
+def create
+  user = UserResource.build(params)
+
+  if user.save
+    UserMailer.welcome(user.data).deliver_later
+    render jsonapi: user, status: 201
+  else
+    render jsonapi_errors: user
+  end
+end
+{% endhighlight %}
+
+Use this approach when the side effect should *not* fire every time the
+Resource is created, but only when the resource is created from *this
+particular endpoint*.
+
 ### 7.2 Sideposting
 
 The act of persisting multiple Resources in a single request is called

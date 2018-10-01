@@ -1227,6 +1227,24 @@ right before committing to the database.</p>
   <span class="c1"># ... code ...</span>
 <span class="k">end</span></code></pre></figure>
 
+  <p>The final way to cause a side effect is to explicitly fire it in the
+controller:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">create</span>
+  <span class="n">user</span> <span class="o">=</span> <span class="no">UserResource</span><span class="p">.</span><span class="nf">build</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+  <span class="k">if</span> <span class="n">user</span><span class="p">.</span><span class="nf">save</span>
+    <span class="no">UserMailer</span><span class="p">.</span><span class="nf">welcome</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="nf">data</span><span class="p">).</span><span class="nf">deliver_later</span>
+    <span class="n">render</span> <span class="ss">jsonapi: </span><span class="n">user</span><span class="p">,</span> <span class="ss">status: </span><span class="mi">201</span>
+  <span class="k">else</span>
+    <span class="n">render</span> <span class="ss">jsonapi_errors: </span><span class="n">user</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Use this approach when the side effect should <em>not</em> fire every time the
+Resource is created, but only when the resource is created from <em>this
+particular endpoint</em>.</p>
+
   <h3 id="sideposting">7.2 Sideposting</h3>
 
   <p>The act of persisting multiple Resources in a single request is called
