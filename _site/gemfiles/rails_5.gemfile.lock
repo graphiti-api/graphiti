@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    graphiti (1.0.beta.5)
+    graphiti (1.0.beta.10)
       activesupport (>= 4.1, < 6)
       concurrent-ruby (~> 1.0)
       dry-types (~> 0.13)
@@ -89,7 +89,7 @@ GEM
     formatador (0.2.5)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
-    graphiti_errors (1.0.beta.1)
+    graphiti_errors (1.0.beta.2)
       jsonapi-serializable (~> 0.1)
     graphiti_spec_helpers (1.0.beta.3)
       graphiti (>= 1.0.alpha.1)

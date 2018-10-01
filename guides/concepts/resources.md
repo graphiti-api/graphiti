@@ -751,7 +751,7 @@ class EpicResource < TaskResource
 end
 
 class MilestoneResource < TaskResource
-  belongs_to :employee
+  belongs_to :epic
 end
 {% endhighlight %}
 

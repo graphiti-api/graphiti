@@ -760,7 +760,7 @@ two things:</p>
 <span class="k">end</span>
 
 <span class="k">class</span> <span class="nc">MilestoneResource</span> <span class="o">&lt;</span> <span class="no">TaskResource</span>
-  <span class="n">belongs_to</span> <span class="ss">:employee</span>
+  <span class="n">belongs_to</span> <span class="ss">:epic</span>
 <span class="k">end</span></code></pre></figure>
 
   <p>If we hit a <code class="highlighter-rouge">/tasks</code> endpoint, we’d get back <a href="http://jsonapi.org/format/#document-resource-identifier-objects">JSONAPI types</a> of <code class="highlighter-rouge">bugs</code>, <code class="highlighter-rouge">features</code> and <code class="highlighter-rouge">epics</code>. Only <code class="highlighter-rouge">features</code> would render the <code class="highlighter-rouge">points</code> attribute, and only <code class="highlighter-rouge">epics</code> would render the <code class="highlighter-rouge">milestones relationship</code>.</p>
