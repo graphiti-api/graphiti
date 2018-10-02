@@ -53,26 +53,28 @@ class Graphiti::Util::ValidationResponse
   end
 
   def all_valid?(model, deserialized_params)
-    valid = true
-    return false unless valid_object?(model)
+    checks = []
+    checks << valid_object?(model)
     deserialized_params.each_pair do |name, payload|
       if payload.is_a?(Array)
         related_objects = model.send(name)
-        related_objects.each do |r|
+        related_objects.each_with_index do |r, index|
           valid = valid_object?(r)
+          checks << valid
 
           if valid
-            valid = all_valid?(r, deserialized_params[:relationships] || {})
+            checks << all_valid?(r, payload[index][:relationships] || {})
           end
         end
       else
         related_object = model.send(name)
         valid = valid_object?(related_object)
+        checks << valid
         if valid
-          valid = all_valid?(related_object, deserialized_params[:relationships] || {})
+          checks << all_valid?(related_object, payload[:relationships] || {})
         end
       end
     end
-    valid
+    checks.all? { |c| c == true }
   end
 end

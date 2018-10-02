@@ -14,7 +14,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             errors: {
               employee: employee.errors,
               positions: employee.data.positions.map(&:errors),
-              departments: employee.data.positions.map(&:department).map(&:errors)
+              departments: employee.data.positions.map(&:department).compact.map(&:errors)
             }
           }
         end
@@ -390,6 +390,52 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(positions[0].title).to eq('specialist')
         expect(positions[1].title).to eq('manager')
         expect(department.name).to eq('safety')
+      end
+
+      context 'when a has_many relationship has validation error' do
+        around do |e|
+          begin
+            Position.validates :title, presence: true
+            e.run
+          ensure
+            Position.clear_validators!
+          end
+        end
+
+        before do
+          payload[:included][0][:attributes].delete(:title)
+        end
+
+        it 'rolls back the entire transaction' do
+          expect {
+            do_post
+          }.to_not change { Employee.count+Position.count+Department.count }
+          expect(json['errors']['positions'])
+            .to eq([{ 'title' => ["can't be blank"] }, {}])
+        end
+      end
+
+      context 'when a belongs_to relationship has a validation error' do
+        around do |e|
+          begin
+            Department.validates :name, presence: true
+            e.run
+          ensure
+            Department.clear_validators!
+          end
+        end
+
+        before do
+          payload[:included][1][:attributes].delete(:name)
+        end
+
+        it 'rolls back the entire transaction' do
+          expect {
+            do_post
+          }.to_not change { Employee.count+Position.count+Department.count }
+          expect(json['errors']['departments'])
+            .to eq([{ 'name' => ["can't be blank"] }])
+        end
       end
 
       context 'when associating to an existing record' do
