@@ -513,7 +513,6 @@ RSpec.describe Graphiti::Query do
           }
         end
 
-
         it 'parses correctly' do
           expect(hash).to eq(expected)
         end
@@ -566,6 +565,36 @@ RSpec.describe Graphiti::Query do
           it 'still works' do
             expect(hash).to eq(expected)
           end
+        end
+      end
+
+      context 'via dot syntax' do
+        before do
+          params[:page] = {
+            number: 2, size: 1,
+            :'positions.page' => { number: 3, size: 2 },
+            :'positions.department.page' => { number: 4, size: 3 }
+          }
+        end
+
+        let(:expected) do
+          {
+            page: { number: 2, size: 1 },
+            include: {
+              positions: {
+                page: { number: 3, size: 2 },
+                include: {
+                  department: {
+                    page: { number: 4, size: 3 }
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        it 'works' do
+          expect(hash).to eq(expected)
         end
       end
     end
