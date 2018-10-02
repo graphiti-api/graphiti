@@ -59,12 +59,11 @@ module Graphiti
         sideload = payload[:sideload]
         results = results(payload[:results])
         add_chunk(payload[:resource], payload[:parent]) do |logs, json|
-          #logs << [" \\_ #{sideload.parent_resource_class} > \"#{sideload.name}\":", :yellow, true]
           logs << [" \\_ #{sideload.name}", :yellow, true]
           json[:name] = sideload.name
           query = "#{payload[:resource].class.name}.all(#{params.inspect})"
-          unless params
-            query = "#{payload[:resource].class.name}: Manual sideload via .scope"
+          unless payload[:resource]
+            query = "#{sideload.resource.class.name}: Manual sideload via .scope"
           end
           logs << ["    #{query}", :cyan, true]
           json[:query] = query
