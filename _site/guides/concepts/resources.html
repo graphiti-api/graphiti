@@ -556,7 +556,7 @@ URL query string:</p>
 are times you may not want this - for instance a “keyword search” field
 that could contain a comma.</p>
 
-  <p>Wrap values in `` to avoid parsing:</p>
+  <p>Wrap values in <code class="highlighter-rouge"><span class="p">{</span><span class="err">{curlies</span><span class="p">}</span><span class="err">}</span></code> to avoid parsing:</p>
 
   <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># GET /employees?filter[keywords]={{some,value}}</span>
 

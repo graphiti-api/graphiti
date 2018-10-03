@@ -526,7 +526,7 @@ By default, Graphiti parses a comma-delimited string as an array. There
 are times you may not want this - for instance a "keyword search" field
 that could contain a comma.
 
-Wrap values in `{{curlies}}` to avoid parsing:
+Wrap values in {% raw %}`{{curlies}}`{% endraw %} to avoid parsing:
 
 {% highlight ruby %}
 {% raw %}
