@@ -906,7 +906,7 @@ RSpec.describe 'serialization' do
         context 'and ?links param NOT given' do
           it 'is not present' do
             render
-            expect(json['data'][0]).to_not have_key('relationships')
+            expect(json['data'][0]['relationships']).to eq({})
           end
         end
       end

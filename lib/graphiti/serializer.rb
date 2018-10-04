@@ -48,8 +48,7 @@ module Graphiti
     def strip_relationships!(hash)
       hash[:relationships].select! do |name, payload|
         payload.has_key?(:data)
-      end
-      hash.delete(:relationships) if hash[:relationships].empty?
+      end if hash[:relationships]
     end
 
     def strip_relationships?
