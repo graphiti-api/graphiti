@@ -47,5 +47,15 @@ module Graphiti
       @debug_models = val
       Debugger.debug_models = val
     end
+
+    def with_option(key, value)
+      begin
+        original = send(key)
+        send(:"#{key}=", value)
+        yield
+      ensure
+        send(:"#{key}=", original)
+      end
+    end
   end
 end

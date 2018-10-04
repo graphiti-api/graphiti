@@ -865,12 +865,8 @@ RSpec.describe 'serialization' do
 
         context 'when links_on_demand' do
           around do |e|
-            original = Graphiti.config.links_on_demand
-            begin
-              Graphiti.config.links_on_demand = true
+            Graphiti.config.with_option(:links_on_demand, true) do
               e.run
-            ensure
-              Graphiti.config.links_on_demand = original
             end
           end
 
@@ -884,17 +880,72 @@ RSpec.describe 'serialization' do
       end
     end
 
+    describe 'placeholder relationships' do
+      before do
+        resource.has_many :positions, link: true
+      end
+
+      context 'when links on demand' do
+        around do |e|
+          Graphiti.config.with_option(:links_on_demand, true) do
+            e.run
+          end
+        end
+
+        context 'and ?links param given' do
+          before do
+            graphiti_context.params = { links: true }
+          end
+
+          it 'is present' do
+            render
+            expect(json['data'][0]['relationships']).to be_present
+          end
+        end
+
+        context 'and ?links param NOT given' do
+          it 'is not present' do
+            render
+            expect(json['data'][0]).to_not have_key('relationships')
+          end
+        end
+      end
+
+      context 'and links not on demand' do
+        around do |e|
+          Graphiti.config.with_option(:links_on_demand, false) do
+            e.run
+          end
+        end
+
+        context 'and a relationship is sideloaded' do
+          before do
+            params[:include] = 'positions'
+          end
+
+          it 'is present' do
+            render
+            expect(json['data'][0]['relationships']).to be_present
+          end
+        end
+
+        context 'and a relationship is not sideloaded' do
+          it 'is still present' do
+            render
+            expect(json['data'][0]['relationships']).to be_present
+          end
+        end
+      end
+    end
+
     context 'when only linking if requested' do
       around do |e|
         resource.autolink = true
         params[:include] = 'positions'
         resource.has_many :positions
-        original = Graphiti.config.links_on_demand
-        begin
-          Graphiti.config.links_on_demand = true
+
+        Graphiti.config.with_option(:links_on_demand, true) do
           e.run
-        ensure
-          Graphiti.config.links_on_demand = original
         end
       end
 

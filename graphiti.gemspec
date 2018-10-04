@@ -32,5 +32,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "sqlite3"
   spec.add_development_dependency "database_cleaner"
   spec.add_development_dependency "activemodel", ['>= 4.1', '< 6']
-  spec.add_development_dependency "graphiti_spec_helpers", '>= 1.0.beta.3'
+  spec.add_development_dependency "graphiti_spec_helpers", '1.0.beta.4'
 end

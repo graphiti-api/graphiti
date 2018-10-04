@@ -22,6 +22,12 @@ module Graphiti
       end
     end
 
+    def as_jsonapi(*)
+      super.tap do |hash|
+        strip_relationships!(hash) if strip_relationships?
+      end
+    end
+
     # Temporary fix until fixed upstream
     # https://github.com/jsonapi-rb/jsonapi-serializable/pull/102
     def requested_relationships(fields)
@@ -35,6 +41,21 @@ module Graphiti
       else
         super
       end
+    end
+
+    private
+
+    def strip_relationships!(hash)
+      hash[:relationships].select! do |name, payload|
+        payload.has_key?(:data)
+      end
+      hash.delete(:relationships) if hash[:relationships].empty?
+    end
+
+    def strip_relationships?
+      return false unless Graphiti.config.links_on_demand
+      params = Graphiti.context[:object].params || {}
+      [false, nil, 'false'].include?(params[:links])
     end
   end
 end
