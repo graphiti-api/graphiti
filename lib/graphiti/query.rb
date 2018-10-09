@@ -135,6 +135,8 @@ module Graphiti
               arr << { key => value }
             elsif !type && top_level? && validate!(key, :sortable)
               arr << { key => value }
+            elsif nested?("#{type}.#{key}")
+              arr << { key => value }
             end
           end
         end
@@ -215,6 +217,7 @@ module Graphiti
 
     def nested?(name)
       return false unless association?
+
       split = name.to_s.split('.')
       query_names = split[0..split.length-2].map(&:to_sym)
       my_names = parents.map(&:association_name).compact + [association_name].compact
@@ -257,7 +260,13 @@ module Graphiti
     def sort_hashes
       sorts = @params[:sort].split(',')
       sorts.each do |s|
-        type, attr = s.split('.')
+        attr = nil
+        type = s
+        if s.include?('.')
+          split = s.split('.')
+          attr = split.pop
+          type = split.join('.')
+        end
 
         if attr.nil? # top-level
           next if @association_name

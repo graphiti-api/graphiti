@@ -485,6 +485,30 @@ RSpec.describe Graphiti::Query do
           end
         end
       end
+
+      context 'via nested dot syntax' do
+        before do
+          params[:sort] = '-positions.department.name'
+        end
+
+        let(:expected) do
+          {
+            include: {
+              positions: {
+                include: {
+                  department: {
+                    sort: [{ name: :desc }]
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        it 'parses correctly' do
+          expect(hash).to eq(expected)
+        end
+      end
     end
 
     describe 'pagination' do
