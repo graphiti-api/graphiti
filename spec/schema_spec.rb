@@ -56,6 +56,7 @@ RSpec.describe Graphiti::Schema do
             }
           }
         ],
+        base_url: 'http://example.com',
         endpoints: {
           :"/api/v1/schema/employees" => {
             actions: {
@@ -142,6 +143,7 @@ RSpec.describe Graphiti::Schema do
 
     let(:application_resource) do
       Class.new(Graphiti::Resource) do
+        self.base_url = 'http://example.com'
         self.endpoint_namespace = '/api/v1'
       end
     end
@@ -202,6 +204,10 @@ RSpec.describe Graphiti::Schema do
 
     it 'has correct types' do
       expect(schema[:types]).to eq(expected[:types])
+    end
+
+    it 'has correct base url' do
+      expect(schema[:base_url]).to eq(expected[:base_url])
     end
 
     context 'when no resources passed' do
