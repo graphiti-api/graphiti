@@ -21,7 +21,7 @@ module Graphiti
     end
 
     def initialize(resources)
-      @resources = resources
+      @resources = resources.sort_by(&:name)
     end
 
     def generate
