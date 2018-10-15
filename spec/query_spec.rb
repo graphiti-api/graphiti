@@ -596,8 +596,10 @@ RSpec.describe Graphiti::Query do
         before do
           params[:page] = {
             number: 2, size: 1,
-            :'positions.page' => { number: 3, size: 2 },
-            :'positions.department.page' => { number: 4, size: 3 }
+            :'positions.size' => 2,
+            :'positions.number' => 3,
+            :'positions.department.size' => 3,
+            :'positions.department.number' => 4
           }
         end
 
