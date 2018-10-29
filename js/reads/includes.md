@@ -20,7 +20,7 @@ Post.includes("comments").all()
 You can also pass an array of associations:
 
 {% highlight typescript %}
-Post.includes(["blog, "comments"]).all()
+Post.includes(["blog", "comments"]).all()
 {% endhighlight %}
 <blockquote class="url">
   <p>/posts?include=blog,comments</p>

@@ -1051,13 +1051,13 @@ Other times, however, clients of the API should not have knowledge of
 this implementation detail. In these cases, use `many_to_many`:
 
 {% highlight ruby %}
-class EmployeeResource < ApplicationRecord
+class EmployeeResource < ApplicationResource
   many_to_many :teams
 end
 # Generates the Link
 # /teams?filter[employee_id]=1,2,3
 
-class TeamResource < ApplicationRecord
+class TeamResource < ApplicationResource
   many_to_many :employees
 end
 # Generates the Link
