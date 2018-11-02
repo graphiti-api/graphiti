@@ -73,6 +73,7 @@ module Graphiti
       filter_param.each_pair do |param_name, param_value|
         filter = find_filter!(param_name)
         value, operator = normalize_param(filter, param_value)
+        validate_operator(filter, operator)
         value  = parse_string_value(filter.values[0], value) if value.is_a?(String)
         validate_singular(resource, filter, value)
         value = coerce_types(filter.values[0], param_name.to_sym, value)
@@ -109,6 +110,14 @@ module Graphiti
       end
 
       [value, operator]
+    end
+
+    def validate_operator(filter, operator)
+      supported = filter.values[0][:operators].keys
+      unless supported.include?(operator)
+        raise Errors::UnsupportedOperator.new \
+          resource, filter.keys[0], supported, operator
+      end
     end
 
     def validate_singular(resource, filter, value)

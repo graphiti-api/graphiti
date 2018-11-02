@@ -16,6 +16,21 @@ The adapter #{@adapter.class} does not implement method '#{@method}', which was 
       end
     end
 
+    class UnsupportedOperator < Base
+      def initialize(resource, filter_name, supported, operator)
+        @resource = resource
+        @filter_name = filter_name
+        @supported = supported
+        @operator = operator
+      end
+
+      def message
+        <<-MSG
+#{@resource.class}: Tried to filter #{@filter_name.inspect} on operator #{@operator.inspect}, but not supported! Supported operators are #{@supported}.
+        MSG
+      end
+    end
+
     class UnwritableRelationship < Base
       def initialize(resource, sideload)
         @resource = resource
