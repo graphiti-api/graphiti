@@ -44,11 +44,11 @@ module Graphiti
     def to_hash(serializers, opts)
       {}.tap do |hash|
         if serializers.is_a?(Array)
-          hash[@resource.type] = serializers.map do |s|
+          hash[:data] = serializers.map do |s|
             s.to_hash(opts)
           end
         else
-          hash[@resource.type] = serializers.to_hash(opts)
+          hash[:data] = serializers.to_hash(opts)
         end
       end
     end
