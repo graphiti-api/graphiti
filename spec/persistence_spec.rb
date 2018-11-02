@@ -1,6 +1,5 @@
 require 'spec_helper'
 
-# TODO: update
 RSpec.describe 'persistence' do
   let(:payload) do
     {
@@ -31,6 +30,794 @@ RSpec.describe 'persistence' do
     expect(employee.save).to eq(true)
     expect(employee.data.id).to_not be_nil
     expect(employee.data.first_name).to eq('Jane')
+  end
+
+  describe 'lifecycle hooks' do
+    before do
+      klass.class_eval do
+        class << self
+          attr_accessor :calls
+        end
+        self.calls = []
+      end
+    end
+
+    RSpec.shared_context 'create hooks' do
+      subject(:employee) do
+        proxy = klass.build(payload)
+        proxy.save
+        proxy.data
+      end
+    end
+
+    RSpec.shared_context 'update hooks' do
+      subject(:employee) do
+        proxy = klass.find(payload)
+        proxy.update_attributes
+        proxy.data
+      end
+
+      before do
+        employee = PORO::Employee.create
+        payload[:data][:id] = employee.id
+      end
+    end
+
+    RSpec.shared_context 'destroy hooks' do
+      include_context 'update hooks'
+
+      subject(:employee) do
+        proxy = klass.find(payload)
+        proxy.destroy
+        proxy.data
+      end
+    end
+
+    describe '.before_attributes' do
+      RSpec.shared_examples 'before attributes' do |opts|
+        opts ||= {}
+
+        before do
+          klass.class_eval do
+            def do_before_attributes(attributes)
+              self.class.calls << {
+                name: :do_before_attributes,
+                args: [attributes.dup]
+              }
+              attributes[:last_name] = attributes.delete(:first_name)
+            end
+          end
+        end
+
+        if opts[:only_update]
+          context 'when creating' do
+            include_context 'create hooks'
+
+            it 'does not fire' do
+              employee
+              expect(klass.calls.length).to eq(0)
+            end
+          end
+        else
+          context 'when creating' do
+            include_context 'create hooks'
+
+            it 'yields attributes' do
+              employee
+              expect(klass.calls[0][:args]).to eq([{ first_name: 'Jane' }])
+            end
+
+            it 'can modify attributes' do
+              expect(employee.last_name).to eq('Jane')
+            end
+          end
+        end
+
+        context 'when updating' do
+          include_context 'update hooks'
+
+          it 'yields attributes' do
+            employee
+            expect(klass.calls[0][:args]).to eq([{ first_name: 'Jane' }])
+          end
+
+          it 'can modify attributes' do
+            expect(employee.last_name).to eq('Jane')
+          end
+        end
+
+        context 'when destroying' do
+          include_context 'destroy hooks'
+
+          it 'does not fire' do
+            employee
+            expect(klass.calls.length).to be_zero
+          end
+        end
+      end
+
+      context 'when registering via proc' do
+        before do
+          klass.before_attributes do |attrs|
+            do_before_attributes(attrs)
+          end
+        end
+
+        include_examples 'before attributes'
+      end
+
+      context 'when registering via method' do
+        before do
+          klass.before_attributes :do_before_attributes
+        end
+
+        include_examples 'before attributes'
+      end
+
+      context 'when limiting to update' do
+        before do
+          klass.before_attributes :do_before_attributes, only: [:update]
+        end
+
+        include_examples 'before attributes', only_update: true
+      end
+    end
+
+    describe '.after_attributes' do
+      RSpec.shared_examples 'after attributes' do |opts|
+        opts ||= {}
+
+        before do
+          klass.class_eval do
+            def do_after_attributes(model)
+              self.class.calls << {
+                name: :do_after_attributes,
+                args: [model.dup]
+              }
+              model.last_name = model.first_name
+            end
+          end
+        end
+
+        if opts[:only_update]
+          context 'when creating' do
+            include_context 'create hooks'
+
+            it 'does not fire' do
+              employee
+              expect(klass.calls.length).to eq(0)
+            end
+          end
+        else
+          context 'when creating' do
+            include_context 'create hooks'
+
+            it 'is passed model' do
+              employee
+              expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
+            end
+
+            it 'can modify the model' do
+              expect(employee.last_name).to eq('Jane')
+            end
+          end
+        end
+
+        context 'when updating' do
+          include_context 'update hooks'
+
+          it 'is passed model' do
+            employee
+            expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
+          end
+
+          it 'can modify the model' do
+            expect(employee.last_name).to eq('Jane')
+          end
+        end
+
+        context 'when destroying' do
+          include_context 'destroy hooks'
+
+          it 'does not fire' do
+            employee
+            expect(klass.calls.length).to be_zero
+          end
+        end
+      end
+
+      context 'when registering via proc' do
+        before do
+          klass.after_attributes do |model|
+            do_after_attributes(model)
+          end
+        end
+
+        include_examples 'after attributes'
+      end
+
+      context 'when registering via method' do
+        before do
+          klass.after_attributes :do_after_attributes
+        end
+
+        include_examples 'after attributes'
+      end
+
+      context 'when limiting to update' do
+        before do
+          klass.after_attributes :do_after_attributes, only: [:update]
+        end
+
+        include_examples 'after attributes', only_update: true
+      end
+    end
+
+    describe '.around_attributes' do
+      RSpec.shared_examples 'around attributes' do |opts|
+        opts ||= {}
+
+        before do
+          klass.class_eval do
+            def do_around_attributes(attributes)
+              self.class.calls << {
+                name: :do_around_attributes,
+                args: [attributes.dup]
+              }
+              attributes[:last_name] = attributes.delete(:first_name)
+              model_instance = yield attributes
+              model_instance.first_name = 'after yield'
+            end
+          end
+        end
+
+        if opts[:only_update]
+          context 'when creating' do
+            include_context 'create hooks'
+
+            it 'does not fire' do
+              employee
+              expect(klass.calls.length).to eq(0)
+            end
+          end
+        else
+          context 'when creating' do
+            include_context 'create hooks'
+
+            it 'is passed attributes' do
+              employee
+              expect(klass.calls[0][:args]).to eq([{ first_name: 'Jane' }])
+            end
+
+            it 'can modify the attribute hash' do
+              expect(employee.first_name).to eq('after yield')
+            end
+
+            it 'can modify the resulting model' do
+              expect(employee.last_name).to eq('Jane')
+            end
+          end
+        end
+
+        context 'when updating' do
+          include_context 'update hooks'
+
+          it 'is passed attributes' do
+            employee
+            expect(klass.calls[0][:args]).to eq([{ first_name: 'Jane' }])
+          end
+
+          it 'can modify the attribute hash' do
+            expect(employee.first_name).to eq('after yield')
+          end
+
+          it 'can modify the resulting model' do
+            expect(employee.last_name).to eq('Jane')
+          end
+        end
+      end
+
+      context 'when registering via method' do
+        before do
+          klass.around_attributes :do_around_attributes
+        end
+
+        include_examples 'around attributes'
+      end
+
+      context 'when registering via proc' do
+        it 'raises error' do
+          expect {
+            klass.around_attributes do
+              'dontgethere'
+            end
+          }.to raise_error(Graphiti::Errors::AroundCallbackProc, /around_attributes/)
+        end
+      end
+
+      context 'when limiting actions' do
+        before do
+          klass.around_attributes :do_around_attributes, only: [:update]
+        end
+
+        include_examples 'around attributes', only_update: true
+      end
+    end
+
+    describe '.before_save' do
+      RSpec.shared_examples 'before save' do |opts|
+        opts ||= {}
+
+        before do
+          klass.class_eval do
+            def do_before_save(model)
+              self.class.calls << {
+                name: :do_before_save,
+                args: [model.dup]
+              }
+              model.first_name = 'b4 save'
+            end
+          end
+        end
+
+        if opts[:only_update]
+          context 'when creating' do
+            include_context 'create hooks'
+
+            it 'does not fire' do
+              employee
+              expect(klass.calls.length).to eq(0)
+            end
+          end
+        else
+          context 'when creating' do
+            include_context 'create hooks'
+
+            it 'yields model instance' do
+              employee
+              expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
+            end
+
+            it 'can modify the model instance' do
+              expect(employee.first_name).to eq('b4 save')
+            end
+          end
+        end
+
+        context 'when updating' do
+          include_context 'update hooks'
+
+          it 'yields model instance' do
+            employee
+            expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
+          end
+
+          it 'can modify the model instance' do
+            expect(employee.first_name).to eq('b4 save')
+          end
+        end
+
+        context 'when destroying' do
+          include_context 'destroy hooks'
+
+          it 'does not fire' do
+            employee
+            expect(klass.calls.length).to be_zero
+          end
+        end
+      end
+
+      context 'when registering via proc' do
+        before do
+          klass.before_save do |model|
+            do_before_save(model)
+          end
+        end
+
+        include_examples 'before save'
+      end
+
+      context 'when registering via method' do
+        before do
+          klass.before_save :do_before_save
+        end
+
+        include_examples 'before save'
+      end
+
+      context 'when limiting actions' do
+        before do
+          klass.before_save :do_before_save, only: [:update]
+        end
+
+        include_examples 'before save', only_update: true
+      end
+    end
+
+    describe '.after_save' do
+      RSpec.shared_examples 'after save' do |opts|
+        opts ||= {}
+
+        before do
+          klass.class_eval do
+            def do_after_save(model)
+              self.class.calls << {
+                name: :do_after_save,
+                args: [model.dup]
+              }
+              model.first_name = 'after save'
+            end
+          end
+        end
+
+        if opts[:only_update]
+          context 'when creating' do
+            include_context 'create hooks'
+
+            it 'does not fire' do
+              employee
+              expect(klass.calls.length).to eq(0)
+            end
+          end
+        else
+          context 'when creating' do
+            include_context 'create hooks'
+
+            it 'is passed the model instance' do
+              employee
+              expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
+            end
+
+            it 'can modify the model instance, but would not persist' do
+              expect(employee.first_name).to eq('after save')
+              reloaded = PORO::Employee.find(employee.id)
+              expect(reloaded.first_name).to eq('Jane')
+            end
+          end
+        end
+
+        context 'when updating' do
+          include_context 'update hooks'
+
+          it 'is passed the model instance' do
+            employee
+            expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
+          end
+
+          it 'can modify the model instance, but would not persist' do
+            expect(employee.first_name).to eq('after save')
+            reloaded = PORO::Employee.find(employee.id)
+            expect(reloaded.first_name).to eq('Jane')
+          end
+        end
+
+        context 'when destroying' do
+          include_context 'destroy hooks'
+
+          it 'does not fire' do
+            employee
+            expect(klass.calls.length).to be_zero
+          end
+        end
+      end
+
+      context 'when registering via proc' do
+        before do
+          klass.class_eval do
+            after_save do |model|
+              do_after_save(model)
+            end
+          end
+        end
+
+        include_examples 'after save'
+      end
+
+      context 'when registering via method' do
+        before do
+          klass.class_eval do
+            after_save :do_after_save
+          end
+        end
+
+        include_examples 'after save'
+      end
+
+      context 'when limiting actions' do
+        before do
+          klass.after_save :do_after_save, only: [:update]
+        end
+
+        include_examples 'after save', only_update: true
+      end
+    end
+
+    describe '.around_save' do
+      RSpec.shared_examples 'around save' do |opts|
+        opts ||= {}
+
+        before do
+          klass.class_eval do
+            def do_around_save(model)
+              self.class.calls << {
+                name: :do_around_save,
+                args: [model.dup]
+              }
+              model.first_name = 'b4 yield'
+              model_instance = yield model
+              model_instance.first_name = 'after yield'
+            end
+          end
+        end
+
+        if opts[:only_update]
+          context 'when creating' do
+            include_context 'create hooks'
+
+            it 'does not fire' do
+              employee
+              expect(klass.calls.length).to eq(0)
+            end
+          end
+        else
+          context 'when creating' do
+            include_context 'create hooks'
+
+            it 'yields the model' do
+              employee
+              expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
+            end
+
+            it 'can modify the model before yielding' do
+              expect(employee.first_name).to eq('after yield')
+            end
+
+            it 'can modify the model with unpersisted changes after yielding' do
+              reloaded = PORO::Employee.find(employee.id)
+              expect(reloaded.first_name).to eq('b4 yield')
+            end
+          end
+        end
+
+        context 'when updating' do
+          include_context 'update hooks'
+
+          it 'yields the model' do
+            employee
+            expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
+          end
+
+          it 'can modify the model before yielding' do
+            expect(employee.first_name).to eq('after yield')
+          end
+
+          it 'can modify the model with unpersisted changes after yielding' do
+            reloaded = PORO::Employee.find(employee.id)
+            expect(reloaded.first_name).to eq('b4 yield')
+          end
+        end
+      end
+
+      context 'when registering via method' do
+        before do
+          klass.around_save :do_around_save
+        end
+
+        include_examples 'around save'
+      end
+
+      context 'when registering via proc' do
+        it 'raises error' do
+          expect {
+            klass.around_save :do_around_save do
+              'dontgethere'
+            end
+          }.to raise_error(Graphiti::Errors::AroundCallbackProc, /around_save/)
+        end
+      end
+
+      context 'when limiting actions' do
+        before do
+          klass.around_save :do_around_save, only: [:update]
+        end
+
+        include_examples 'around save', only_update: true
+      end
+    end
+
+    describe '.before_destroy' do
+      RSpec.shared_examples 'before_destroy' do
+        before do
+          klass.class_eval do
+            def do_before_destroy(model)
+              model.first_name = 'updated b4 destroy'
+              self.class.calls << {
+                name: :do_before_destroy,
+                args: [model.dup]
+              }
+            end
+          end
+        end
+
+        context 'when creating' do
+          include_context 'create hooks'
+
+          it 'is not called' do
+            employee
+            expect(klass.calls.length).to be_zero
+          end
+        end
+
+        context 'when updating' do
+          include_context 'update hooks'
+
+          it 'is not called' do
+            employee
+            expect(klass.calls.length).to be_zero
+          end
+        end
+
+        context 'when destroying' do
+          include_context 'destroy hooks'
+
+          it 'is called, yielding the model instance' do
+            employee
+            expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
+            expect(klass.calls[0][:args][0].first_name).to eq('updated b4 destroy')
+          end
+        end
+      end
+
+      context 'when registering via proc' do
+        before do
+          klass.before_destroy do |model|
+            do_before_destroy(model)
+          end
+        end
+
+        include_examples 'before_destroy'
+      end
+
+      context 'when registering via method' do
+        before do
+          klass.before_destroy :do_before_destroy
+        end
+
+        include_examples 'before_destroy'
+      end
+    end
+
+    describe '.after_destroy' do
+      RSpec.shared_examples 'after_destroy' do
+        before do
+          klass.class_eval do
+            def do_after_destroy(model)
+              model.first_name = 'updated after destroy'
+              self.class.calls << {
+                name: :do_after_destroy,
+                args: [model.dup]
+              }
+            end
+          end
+        end
+
+        context 'when creating' do
+          include_context 'create hooks'
+
+          it 'is not called' do
+            employee
+            expect(klass.calls.length).to be_zero
+          end
+        end
+
+        context 'when updating' do
+          include_context 'update hooks'
+
+          it 'is not called' do
+            employee
+            expect(klass.calls.length).to be_zero
+          end
+        end
+
+        context 'when destroying' do
+          include_context 'destroy hooks'
+
+          it 'is called, yielding the model instance' do
+            employee
+            expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
+            expect(klass.calls[0][:args][0].first_name).to eq('updated after destroy')
+          end
+        end
+      end
+
+      context 'when registering via proc' do
+        before do
+          klass.after_destroy do |model|
+            do_after_destroy(model)
+          end
+        end
+
+        include_examples 'after_destroy'
+      end
+
+      context 'when registering via method' do
+        before do
+          klass.after_destroy :do_after_destroy
+        end
+
+        include_examples 'after_destroy'
+      end
+    end
+
+    describe '.around_destroy' do
+      RSpec.shared_examples 'around_destroy' do
+        before do
+          klass.class_eval do
+            def do_around_destroy(model)
+              model.first_name = 'updated b4 destroy'
+              self.class.calls << {
+                name: :do_around_destroy,
+                args: [model.dup]
+              }
+              if PORO::Employee.find(model.id).nil?
+                raise 'something went wrong'
+              end
+              yield model
+              unless PORO::Employee.find(model.id).nil?
+                raise 'something went wrong'
+              end
+            end
+          end
+        end
+
+        context 'when creating' do
+          include_context 'create hooks'
+
+          it 'is not called' do
+            employee
+            expect(klass.calls.length).to be_zero
+          end
+        end
+
+        context 'when updating' do
+          include_context 'update hooks'
+
+          it 'is not called' do
+            employee
+            expect(klass.calls.length).to be_zero
+          end
+        end
+
+        context 'when destroying' do
+          include_context 'destroy hooks'
+
+          it 'is called, yielding the model instance' do
+            employee
+            expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
+            expect(klass.calls[0][:args][0].first_name).to eq('updated b4 destroy')
+            expect(PORO::Employee.find(employee.id)).to eq(nil)
+          end
+        end
+      end
+
+      context 'when registering via proc' do
+        it 'raises error' do
+          expect {
+            klass.around_destroy do |model|
+              'dontgethere'
+            end
+          }.to raise_error(Graphiti::Errors::AroundCallbackProc, /around_destroy/)
+        end
+      end
+
+      context 'when registering via method' do
+        before do
+          klass.around_destroy :do_around_destroy
+        end
+
+        include_examples 'around_destroy'
+      end
+    end
   end
 
   context 'when given an attribute that does not exist' do

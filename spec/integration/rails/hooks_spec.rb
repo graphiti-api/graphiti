@@ -1,5 +1,5 @@
 if ENV["APPRAISAL_INITIALIZED"]
-  RSpec.describe 'sideload lifecycle hooks', type: :controller do
+  RSpec.describe 'persistence lifecycle hooks', type: :controller do
     class Callbacks
       def self.fired
         @fired

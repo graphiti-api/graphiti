@@ -260,6 +260,16 @@ module Graphiti
         model.destroy
         model
       end
+
+      def save(model_instance)
+        model_instance.save
+        model_instance
+      end
+
+      def destroy(model_instance)
+        model_instance.destroy
+        model_instance
+      end
     end
   end
 end

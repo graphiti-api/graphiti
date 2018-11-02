@@ -115,6 +115,11 @@ module PORO
       end
     end
 
+    def self.find(id)
+      raw = DB.data[type].find { |r| r[:id] == id }
+      new(raw) if raw
+    end
+
     def self.type
       name.underscore.pluralize.split('/').last.to_sym
     end
@@ -124,8 +129,41 @@ module PORO
     end
 
     def update_attributes(attrs)
-      record = DB.data[self.class.type].find { |r| r[:id] == id }
-      record.merge!(attrs)
+      attrs.each_pair { |k, v| send(:"#{k}=", v) }
+
+      if valid?
+        record = DB.data[self.class.type].find { |r| r[:id] == id }
+        record.merge!(attrs)
+        true
+      else
+        false
+      end
+    end
+
+    def destroy
+      DB.data[self.class.type]
+        .delete_if { |r| r[:id] == id }
+    end
+
+    def attributes
+      {}.tap do |attrs|
+        instance_variables.each do |iv|
+          key = iv.to_s.gsub('@', '').to_sym
+          next if key.to_s.starts_with?('__')
+          value = instance_variable_get(iv)
+          attrs[key] = value
+        end
+      end
+    end
+
+    def save
+      if record = DB.data[self.class.type].find { |r| r[:id] == id }
+        update_attributes(attributes)
+      else
+        record = self.class.create(attributes)
+        self.id = record.id
+        valid?
+      end
     end
   end
 
@@ -268,6 +306,16 @@ module PORO
 
     def resolve(scope)
       ::PORO::DB.all(scope)
+    end
+
+    def save(model_instance)
+      model_instance.save
+      model_instance
+    end
+
+    def destroy(model_instance)
+      model_instance.destroy
+      model_instance
     end
   end
 
