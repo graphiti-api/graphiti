@@ -45,7 +45,7 @@ class Graphiti::Adapters::ActiveRecord::ManyToManySideload < Graphiti::Sideload:
 
   def parent_reflection
     parent_model = parent_resource_class.model
-    parent_model.reflections[name.to_s]
+    parent_model.reflections[association_name.to_s]
   end
 
   def infer_foreign_key
