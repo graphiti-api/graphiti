@@ -194,3 +194,5 @@ end
 class Object
   prepend InstanceVariableOverride
 end
+
+ActiveSupport.run_load_hooks(:graphiti, Graphiti)
