@@ -6,6 +6,10 @@ module Graphiti
     include Sideloading
     include Links
 
+    ActiveSupport.on_load(:i18n) do
+      include Translation
+    end
+
     attr_reader :context
 
     def around_scoping(scope, query_hash)
