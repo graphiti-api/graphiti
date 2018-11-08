@@ -111,6 +111,10 @@ class Employee < ApplicationRecord
       errors.blank?
     end
   end
+
+  def nickname
+    %w[Champ Sport Slugger].sample
+  end
 end
 
 class Position < ApplicationRecord
@@ -152,19 +156,27 @@ class OfficeResource < ApplicationResource
 end
 
 class HomeOfficeResource < ApplicationResource
+  self.description = "An employee's primary office location"
+
   attribute :address, :string
 end
 
 class SalaryResource < ApplicationResource
+  self.description = "An employee salary"
+
   attribute :employee_id, :integer, only: [:writable]
   attribute :base_rate, :float
   attribute :overtime_rate, :float
 end
 
 class EmployeeResource < ApplicationResource
-  attribute :first_name, :string
-  attribute :last_name, :string
+  attribute :first_name, :string, description: "The employee's first name"
+  attribute :last_name, :string, description: "The employee's last name"
   attribute :age, :integer
+
+  extra_attribute :nickname, :string
+  extra_attribute :salutation, :string
+  extra_attribute :professional_titles, :string
 
   has_many :positions
   has_one :salary
@@ -176,4 +188,10 @@ class EmployeeResource < ApplicationResource
       on(:HomeOffice)
     end
   end
+end
+
+class EmployeeSearchResource < ApplicationResource
+  attribute :first_name, :string
+  attribute :last_name, :string
+  attribute :age, :integer
 end

@@ -29,6 +29,8 @@ RSpec.configure do |config|
       example.run
     end
   end
+
+  config.filter_run_when_matching :focus
 end
 
 # We test rails through appraisal

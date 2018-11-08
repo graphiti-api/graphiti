@@ -83,6 +83,7 @@ module Graphiti
         config = {
           name: r.name,
           type: r.type.to_s,
+          description: r.description,
           attributes: attributes(r),
           extra_attributes: extra_attributes(r),
           sorts: sorts(r),
@@ -116,7 +117,8 @@ module Graphiti
             attrs[name] = {
               type:       config[:type].to_s,
               readable:   flag(config[:readable]),
-              writable:   flag(config[:writable])
+              writable:   flag(config[:writable]),
+              description: resource.attribute_description(name),
             }
           end
         end
@@ -128,7 +130,8 @@ module Graphiti
         resource.extra_attributes.each_pair do |name, config|
           attrs[name] = {
             type:     config[:type].to_s,
-            readable: flag(config[:readable])
+            readable: flag(config[:readable]),
+            description: resource.attribute_description(name),
           }
         end
       end

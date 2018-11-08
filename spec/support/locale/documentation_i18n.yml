@@ -1,0 +1,29 @@
+en:
+  graphiti:
+    types:
+      employees:
+        description: An employee from i18n
+        attributes:
+          last_name:
+            description: Employee last name from i18n
+          nickname:
+            description: Employee nickname from i18n
+          professional_title:
+            description: Professional titles from type
+      salaries:
+        description: A salary from i18n
+
+    resources:
+      employee_search:
+        description: Search-based employee lookup
+        attributes:
+          last_name:
+            description: Employee last name, but doing a weird Elastic Search thing
+      employee:
+        attributes:
+          salutation:
+            description: Employee salutation from i18n
+          professional_titles:
+            description: Professional titles from resource
+      department:
+        description: Resource-based i18n department description

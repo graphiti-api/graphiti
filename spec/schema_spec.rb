@@ -10,16 +10,19 @@ RSpec.describe Graphiti::Schema do
           {
             name: 'Schema::EmployeeResource',
             type: 'employees',
+            description: "An employee of the organization",
             attributes: {
               id: {
                 type: 'integer_id',
                 readable: true,
-                writable: true
+                writable: true,
+                description: nil
               },
               first_name: {
                 type: 'string',
                 readable: true,
-                writable: true
+                writable: true,
+                description: "The employee's first name",
               }
             },
             sorts: {
@@ -43,7 +46,8 @@ RSpec.describe Graphiti::Schema do
             extra_attributes: {
               net_sales: {
                 type: 'float',
-                readable: true
+                readable: true,
+                description: "The total value of the employee's sales",
               }
             },
             relationships: {
@@ -153,10 +157,11 @@ RSpec.describe Graphiti::Schema do
       Class.new(application_resource) do
         def self.name;'Schema::EmployeeResource';end
         self.type = :employees
+        self.description = "An employee of the organization"
 
-        attribute :first_name, :string
+        attribute :first_name, :string, description: "The employee's first name"
 
-        extra_attribute :net_sales, :float
+        extra_attribute :net_sales, :float, description: "The total value of the employee's sales"
 
         filter :title, :string do
           eq do |scope, value|
