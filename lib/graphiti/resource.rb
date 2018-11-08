@@ -5,10 +5,7 @@ module Graphiti
     include Configuration
     include Sideloading
     include Links
-
-    ActiveSupport.on_load(:i18n) do
-      include Translation
-    end
+    include Documentation
 
     attr_reader :context
 

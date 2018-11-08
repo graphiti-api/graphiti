@@ -175,6 +175,8 @@ class EmployeeResource < ApplicationResource
   attribute :age, :integer
 
   extra_attribute :nickname, :string
+  extra_attribute :salutation, :string
+  extra_attribute :professional_titles, :string
 
   has_many :positions
   has_one :salary
@@ -186,4 +188,10 @@ class EmployeeResource < ApplicationResource
       on(:HomeOffice)
     end
   end
+end
+
+class EmployeeSearchResource < ApplicationResource
+  attribute :first_name, :string
+  attribute :last_name, :string
+  attribute :age, :integer
 end

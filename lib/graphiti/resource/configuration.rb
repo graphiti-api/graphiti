@@ -132,32 +132,6 @@ module Graphiti
           name.gsub('Resource', '').safe_constantize if name
         end
 
-        def description=(val)
-          @description = val
-        end
-
-        def description
-          return @description if @description.present?
-
-          if self.respond_to?(:i18n_scope)
-            I18n.t :description,
-              scope: i18n_scope,
-              default: nil
-          end
-        end
-
-        # @api private
-        def attribute_description(attr_name)
-          desc = all_attributes[attr_name][:description]
-          return desc if desc.present?
-
-          if self.respond_to?(:i18n_scope)
-            I18n.t :description,
-              scope: [*i18n_scope, :attributes, attr_name],
-              default: nil
-          end
-        end
-
         # @api private
         def infer_serializer_superclass
           serializer_class = ::Graphiti::Serializer
