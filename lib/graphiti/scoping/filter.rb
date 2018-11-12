@@ -1,32 +1,7 @@
 module Graphiti
-  # Apply filtering logic to the scope
-  #
-  # If the user requests to filter a field that has not been allowlisted,
-  # a +Graphiti::Errors::BadFilter+ error will be raised.
-  #
-  #   allow_filter :title # :title now allowlisted
-  #
-  # If the user requests a filter field that has been allowlisted, but
-  # does not pass the associated `+:if+ clause, +BadFilter+ will be raised.
-  #
-  #   allow_filter :title, if: :admin?
-  #
-  # This will also honor filter aliases.
-  #
-  #   # GET /posts?filter[headline]=foo will filter on title
-  #   allow_filter :title, aliases: [:headline]
-  #
-  # @see Adapters::Abstract#filter
-  # @see Adapters::ActiveRecord#filter
-  # @see Resource.allow_filter
   class Scoping::Filter < Scoping::Base
     include Scoping::Filterable
 
-    # Apply the filtering logic.
-    #
-    # Loop and parse all requested filters, taking into account guards and
-    # aliases. If valid, call either the default or custom filtering logic.
-    # @return the scope we are chaining/modifying
     def apply
       if missing_required_filters.any?
         raise Errors::RequiredFilter.new(resource, missing_required_filters)
@@ -47,8 +22,6 @@ module Graphiti
     private
 
     def filter_scope(filter, operator, value)
-      operator = operator.to_s.gsub('!', 'not_').to_sym
-
       if custom_scope = filter.values[0][:operators][operator]
         custom_scope.call(@scope, value, resource.context)
       else
@@ -73,6 +46,7 @@ module Graphiti
       filter_param.each_pair do |param_name, param_value|
         filter = find_filter!(param_name)
         value, operator = normalize_param(filter, param_value)
+        operator = operator.to_s.gsub('!', 'not_').to_sym
         validate_operator(filter, operator)
         value  = parse_string_value(filter.values[0], value) if value.is_a?(String)
         validate_singular(resource, filter, value)
@@ -98,7 +72,9 @@ module Graphiti
     end
 
     def normalize_param(filter, param_value)
-      param_value = { eq: param_value } unless param_value.is_a?(Hash)
+      unless param_value.is_a?(Hash) && param_value.present?
+        param_value = { eq: param_value }
+      end
       value = param_value.values.first
       operator = param_value.keys.first
 
