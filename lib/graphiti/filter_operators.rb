@@ -5,7 +5,7 @@ module Graphiti
 
       def initialize(resource, type_name, opts)
         @procs = {}
-        defaults = resource.adapter.default_operators[type_name] || []
+        defaults = resource.adapter.default_operators[type_name] || [:eq]
         if opts[:only]
           defaults = defaults.select { |op| opts[:only].include?(op) }
         end

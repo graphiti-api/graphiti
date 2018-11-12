@@ -41,7 +41,9 @@ module Graphiti
           float: numerical_operators,
           boolean: [:eq],
           date: numerical_operators,
-          datetime: numerical_operators
+          datetime: numerical_operators,
+          hash: [:eq],
+          array: [:eq]
         }
       end
 
