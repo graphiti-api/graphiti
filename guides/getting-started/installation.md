@@ -186,7 +186,7 @@ RSpec.configure do |config|
   end
 
   config.around(:each) do |example|
-    begin)
+    begin
       DatabaseCleaner.cleaning do
         example.run
       end

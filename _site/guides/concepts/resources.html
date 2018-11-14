@@ -1038,13 +1038,13 @@ useful if that table holds metadata about the relationship.</p>
   <p>Other times, however, clients of the API should not have knowledge of
 this implementation detail. In these cases, use <code class="highlighter-rouge">many_to_many</code>:</p>
 
-  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
   <span class="n">many_to_many</span> <span class="ss">:teams</span>
 <span class="k">end</span>
 <span class="c1"># Generates the Link</span>
 <span class="c1"># /teams?filter[employee_id]=1,2,3</span>
 
-<span class="k">class</span> <span class="nc">TeamResource</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+<span class="k">class</span> <span class="nc">TeamResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
   <span class="n">many_to_many</span> <span class="ss">:employees</span>
 <span class="k">end</span>
 <span class="c1"># Generates the Link</span>

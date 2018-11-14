@@ -235,7 +235,7 @@ still use <code class="highlighter-rouge">render jsonapi:</code> and <code class
   <span class="k">end</span>
 
   <span class="n">config</span><span class="p">.</span><span class="nf">around</span><span class="p">(</span><span class="ss">:each</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">example</span><span class="o">|</span>
-    <span class="k">begin</span><span class="p">)</span>
+    <span class="k">begin</span>
       <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">cleaning</span> <span class="k">do</span>
         <span class="n">example</span><span class="p">.</span><span class="nf">run</span>
       <span class="k">end</span>

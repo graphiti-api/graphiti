@@ -124,7 +124,7 @@
 
   <p>You can also pass an array of associations:</p>
 
-  <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="nx">Post</span><span class="p">.</span><span class="nx">includes</span><span class="p">([</span><span class="s2">"blog, "</span><span class="nx">comments</span><span class="err">"</span><span class="p">]).</span><span class="nx">all</span><span class="p">()</span></code></pre></figure>
+  <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="nx">Post</span><span class="p">.</span><span class="nx">includes</span><span class="p">([</span><span class="s2">"blog"</span><span class="p">,</span> <span class="s2">"comments"</span><span class="p">]).</span><span class="nx">all</span><span class="p">()</span></code></pre></figure>
 
   <blockquote class="url">
   <p>/posts?include=blog,comments</p>
