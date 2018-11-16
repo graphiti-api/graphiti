@@ -381,75 +381,26 @@ module Graphiti
         end
       end
 
-      # Remove the association without destroying objects
-      #
-      # This is NOT needed in the standard use case. The standard use case would be:
-      #
-      #   def update(attrs)
-      #     # attrs[:the_foreign_key] is nil, so updating the record disassociates
-      #   end
-      #
-      # However, sometimes you need side-effect or elsewise non-standard behavior. Consider
-      # using {{https://github.com/mbleigh/acts-as-taggable-on acts_as_taggable_on}} gem:
-      #
-      #   # Not actually needed, just an example
-      #   def disassociate(parent, child, association_name, association_type)
-      #     parent.tag_list.remove(child.name)
-      #   end
-      #
-      # @example Basic accessor
-      #   def disassociate(parent, child, association_name, association_type)
-      #     if association_type == :has_many
-      #       parent.send(association_name).delete(child)
-      #     else
-      #       child.send(:"#{association_name}=", nil)
-      #     end
-      #   end
-      #
-      # +association_name+ and +association_type+ come from your sideload
-      # configuration:
-      #
-      #   allow_sideload :the_name, type: the_type do
-      #     # ... code.
-      #   end
-      #
-      # @param parent The parent object (via the JSONAPI 'relationships' graph)
-      # @param child The child object (via the JSONAPI 'relationships' graph)
-      # @param association_name The 'relationships' key we are processing
-      # @param association_type The Sideload type (see Sideload#type). Usually :has_many/:belongs_to/etc
       def disassociate(parent, child, association_name, association_type)
         raise 'you must override #disassociate in an adapter subclass'
       end
 
-      # @param [Class] model_class The configured model class (see Resource.model)
-      # @param [Hash] create_params Attributes + id
-      # @return the model instance just created
-      # @see Resource.model
-      # @example ActiveRecord default
-      #   def create(model_class, create_params)
-      #     instance = model_class.new(create_params)
-      #     instance.save
-      #     instance
-      #   end
-      def create(model_class, create_params)
-        raise 'you must override #create in an adapter subclass'
+      def build(model_class)
+        model_class.new
       end
 
-      # @param [Class] model_class The configured model class (see Resource.model)
-      # @param [Hash] update_params Attributes + id
-      # @return the model instance just created
-      # @see Resource.model
-      # @example ActiveRecord default
-      #   def update(model_class, update_params)
-      #     instance = model_class.find(update_params.delete(:id))
-      #     instance.update_attributes(update_params)
-      #     instance
-      #   end
-      def update(model_class, update_params)
-        raise 'you must override #update in an adapter subclass'
+      # TODO respond to and specific error
+      def assign_attributes(model_instance, attributes)
+        attributes.each_pair do |k, v|
+          model_instance.send(:"#{k}=", v)
+        end
       end
 
-      def destroy(model)
+      def save(model_instance)
+        raise 'you must override #save in an adapter subclass'
+      end
+
+      def destroy(model_instance)
         raise 'you must override #destroy in an adapter subclass'
       end
 

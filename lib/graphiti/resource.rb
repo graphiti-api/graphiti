@@ -6,6 +6,7 @@ module Graphiti
     include Sideloading
     include Links
     include Documentation
+    include Persistence
 
     attr_reader :context
 
@@ -79,18 +80,6 @@ module Graphiti
       rescue Exception => e
         raise Errors::TypecastFailed.new(self, name, value, e)
       end
-    end
-
-    def create(create_params)
-      adapter.create(model, create_params)
-    end
-
-    def update(update_params)
-      adapter.update(model, update_params)
-    end
-
-    def destroy(model)
-      adapter.destroy(model)
     end
 
     def associate_all(parent, children, association_name, type)

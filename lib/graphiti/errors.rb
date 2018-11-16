@@ -16,6 +16,19 @@ The adapter #{@adapter.class} does not implement method '#{@method}', which was 
       end
     end
 
+    class AroundCallbackProc < Base
+      def initialize(resource_class, method_name)
+        @resource_class = resource_class
+        @method_name = method_name
+      end
+
+      def message
+        <<-MSG
+#{@resource_class}: Tried to pass block to .#{@method_name}, which only accepts a method name.
+        MSG
+      end
+    end
+
     class UnsupportedOperator < Base
       def initialize(resource, filter_name, supported, operator)
         @resource = resource

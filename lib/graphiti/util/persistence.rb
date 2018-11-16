@@ -149,8 +149,7 @@ class Graphiti::Util::Persistence
   def persist_object(method, attributes)
     case method
       when :destroy
-        model = @resource.class._find(attributes.slice(:id)).data
-        call_resource_method(:destroy, model, @caller_model)
+        call_resource_method(:destroy, attributes[:id], @caller_model)
       when :update, nil, :disassociate
         call_resource_method(:update, attributes, @caller_model)
       else

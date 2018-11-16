@@ -169,7 +169,8 @@ module Graphiti
               before_commit: {},
               attributes: {},
               extra_attributes: {},
-              sideloads: {}
+              sideloads: {},
+              callbacks: {}
             }
         end
 
