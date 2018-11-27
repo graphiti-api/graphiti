@@ -13,6 +13,12 @@ module Graphiti
       end
     end
 
+    initializer 'graphti.logger' do
+      config.after_initialize do
+        Graphiti.logger = ::Rails.logger
+      end
+    end
+
     initializer 'graphiti.init' do
       if ::Rails.application.config.eager_load
         config.after_initialize do |app|
