@@ -10,7 +10,8 @@ module Graphiti
       :primary_key,
       :parent,
       :group_name,
-      :link
+      :link,
+      :description
 
     class_attribute :scope_proc,
       :assign_proc,
@@ -33,6 +34,8 @@ module Graphiti
       @link                  = opts[:link]
       @single                = opts[:single]
       apply_belongs_to_many_filter if type == :many_to_many
+
+      @description           = opts[:description]
 
       # polymorphic-specific
       @group_name            = opts[:group_name]
@@ -131,6 +134,11 @@ module Graphiti
 
     def load_params(parents, query)
       raise 'Override #load_params in subclass'
+    end
+
+    def description
+      return @description if @description.present?
+      parent_resource_class.resolve_i18n_field_description(name, field_type: :relationships)
     end
 
     def base_scope

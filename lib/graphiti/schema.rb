@@ -188,7 +188,7 @@ module Graphiti
     def relationships(resource)
       {}.tap do |r|
         resource.sideloads.each_pair do |name, config|
-          schema = { type: config.type.to_s }
+          schema = { type: config.type.to_s, description: config.description }
           if config.type == :polymorphic_belongs_to
             schema[:resources] = config.children.values
               .map(&:resource).map(&:class).map(&:name)

@@ -26,12 +26,22 @@ module Graphiti
           desc = all_attributes[attr_name][:description]
           return desc if desc.present?
 
+          resolve_i18n_field_description(attr_name, field_type: :attributes)
+        end
+
+        # @api private
+        def sideload_description(sideload_name)
+          sideloads[sideload_name].description
+        end
+
+        # @api private
+        def resolve_i18n_field_description(name, field_type:)
           if defined?(::I18n)
             desc = ::I18n.t :description,
-              scope: [*i18n_type_scope, :attributes, attr_name],
+              scope: [*i18n_type_scope, field_type, name],
               default: nil
             desc ||= ::I18n.t :description,
-              scope: [*i18n_resource_scope, :attributes, attr_name],
+              scope: [*i18n_resource_scope, field_type, name],
               default: nil
           end
         end
