@@ -181,8 +181,8 @@ class EmployeeResource < ApplicationResource
   has_many :positions
   has_one :salary
   belongs_to :classification
-  many_to_many :teams
-  polymorphic_belongs_to :workspace do
+  many_to_many :teams, description: "Teams the employee belongs to"
+  polymorphic_belongs_to :workspace, description: "The employee's primary work area" do
     group_by(:workspace_type) do
       on(:Office)
       on(:HomeOffice)

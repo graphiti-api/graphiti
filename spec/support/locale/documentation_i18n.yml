@@ -10,6 +10,9 @@ en:
             description: Employee nickname from i18n
           professional_title:
             description: Professional titles from type
+        relationships:
+          positions:
+            description: Employee positions from i18n
       salaries:
         description: A salary from i18n
 
@@ -25,5 +28,12 @@ en:
             description: Employee salutation from i18n
           professional_titles:
             description: Professional titles from resource
+        relationships:
+          salary:
+            description: Employee salary from i18n
+          classification:
+            description: Employee classificiation from resource
+
+
       department:
         description: Resource-based i18n department description

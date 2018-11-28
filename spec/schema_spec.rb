@@ -53,7 +53,8 @@ RSpec.describe Graphiti::Schema do
             relationships: {
               positions: {
                 resource: 'Schema::PositionResource',
-                type: 'has_many'
+                type: 'has_many',
+                description: nil,
                 #writable: true,
                 #readable: true
               }
@@ -621,6 +622,7 @@ RSpec.describe Graphiti::Schema do
 
       it 'associates the relationship with multiple resources' do
         expect(schema[:resources][0][:relationships][:dwelling]).to eq({
+          description: nil,
           type: 'polymorphic_belongs_to',
           resources: ['Schema::HouseResource', 'Schema::CondoResource']
         })
