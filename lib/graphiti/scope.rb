@@ -1,7 +1,7 @@
 module Graphiti
   class Scope
     attr_accessor :object, :unpaginated_object
-
+    attr_reader :pagination
     def initialize(object, resource, query, opts = {})
       @object    = object
       @resource  = resource

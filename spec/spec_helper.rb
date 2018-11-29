@@ -56,4 +56,17 @@ if ENV["APPRAISAL_INITIALIZED"]
   ActiveRecord::Base.establish_connection adapter: 'sqlite3',
     database: ':memory:'
   Dir[File.dirname(__FILE__) + "/fixtures/**/*.rb"].each {|f| require f }
+
+
+  # This config option will be enabled by default on RSpec 4,
+  # but for reasons of backwards compatibility, you have to
+  # set it on RSpec 3.
+  #
+  # It causes the host group and examples to inherit metadata
+  # from the shared context.
+  rspec.shared_context_metadata_behavior = :apply_to_host_groups
+
+
+  config.include_context "pagination_context", include_shared: true
+
 end
