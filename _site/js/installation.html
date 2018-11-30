@@ -195,7 +195,8 @@ holds connection information (<code class="highlighter-rouge">ApplicationRecord<
 
   <div class="code-tabs">
 
-    <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="kr">class</span> <span class="nx">ApplicationRecord</span> <span class="k">extends</span> <span class="nx">SpraypaintBase</span> <span class="p">{</span>
+    <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="err">@</span><span class="nx">Model</span><span class="p">()</span>
+<span class="kr">class</span> <span class="nx">ApplicationRecord</span> <span class="k">extends</span> <span class="nx">SpraypaintBase</span> <span class="p">{</span>
   <span class="k">static</span> <span class="nx">baseUrl</span> <span class="o">=</span> <span class="s2">"http://my-api.com"</span>
   <span class="k">static</span> <span class="nx">apiNamespace</span> <span class="o">=</span> <span class="s2">"/api/v1"</span>
 <span class="p">}</span></code></pre></figure>
@@ -228,7 +229,8 @@ a top-level <code class="highlighter-rouge">ApplicationRecord</code> (though any
 
     <div class="code-tabs">
 
-      <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="kr">class</span> <span class="nx">Person</span> <span class="k">extends</span> <span class="nx">ApplicationRecord</span> <span class="p">{</span>
+      <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="err">@</span><span class="nx">Model</span><span class="p">()</span>
+<span class="kr">class</span> <span class="nx">Person</span> <span class="k">extends</span> <span class="nx">ApplicationRecord</span> <span class="p">{</span>
   <span class="k">static</span> <span class="nx">jsonapiType</span> <span class="o">=</span> <span class="s2">"people"</span>
 <span class="p">}</span></code></pre></figure>
 
@@ -253,6 +255,38 @@ a top-level <code class="highlighter-rouge">ApplicationRecord</code> (though any
 and set the endpoint manually.</p>
     </blockquote>
 
+    <h5 id="setting-application-name">Setting Application Name</h5>
+
+    <p>It can be helpful to send the name of your client application in request
+headers. With this information, servers can keep track of which clients
+are hitting which APIs.</p>
+
+    <p>To do this:</p>
+
+    <div class="tabs">
+  <div class="tab typescript active">
+    <span>Typescript</span>
+  </div>
+  <div class="tab javascript">
+    <span>Javascript</span>
+  </div>
+</div>
+
+    <div class="code-tabs">
+
+      <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="err">@</span><span class="nx">Model</span><span class="p">()</span>
+<span class="kr">class</span> <span class="nx">Person</span> <span class="k">extends</span> <span class="nx">ApplicationRecord</span> <span class="p">{</span>
+  <span class="k">static</span> <span class="nx">clientApplication</span> <span class="o">=</span> <span class="s2">"sales-backend"</span>
+<span class="p">}</span></code></pre></figure>
+
+      <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kr">const</span> <span class="nx">Person</span> <span class="o">=</span> <span class="nx">ApplicationRecord</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="na">static</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">clientApplication</span><span class="p">:</span> <span class="s2">"sales-backend"</span>
+  <span class="p">}</span>
+<span class="p">})</span></code></pre></figure>
+
+    </div>
+
     <h4 id="defining-attributes">Defining Attributes</h4>
 
     <p><code class="highlighter-rouge">ActiveRecord</code> automatically sets attributes by introspecting database
@@ -275,7 +309,8 @@ to track which applications are using which attributes of the API.</p>
 
     <div class="code-tabs">
 
-      <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="kr">class</span> <span class="nx">Person</span> <span class="k">extends</span> <span class="nx">ApplicationRecord</span> <span class="p">{</span>
+      <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="err">@</span><span class="nx">Model</span><span class="p">()</span>
+<span class="kr">class</span> <span class="nx">Person</span> <span class="k">extends</span> <span class="nx">ApplicationRecord</span> <span class="p">{</span>
   <span class="c1">// ... code ...</span>
   <span class="err">@</span><span class="nx">Attr</span><span class="p">()</span> <span class="nx">firstName</span><span class="err">:</span> <span class="kr">string</span>
   <span class="err">@</span><span class="nx">Attr</span><span class="p">()</span> <span class="nx">lastName</span><span class="err">:</span> <span class="kr">string</span>
@@ -355,7 +390,8 @@ on a write request:</p>
 
     <div class="code-tabs">
 
-      <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="kr">class</span> <span class="nx">Dog</span> <span class="k">extends</span> <span class="nx">ApplicationRecord</span> <span class="p">{</span>
+      <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="err">@</span><span class="nx">Model</span><span class="p">()</span>
+<span class="kr">class</span> <span class="nx">Dog</span> <span class="k">extends</span> <span class="nx">ApplicationRecord</span> <span class="p">{</span>
   <span class="c1">// ... code ...</span>
   <span class="err">@</span><span class="nx">BelongsTo</span><span class="p">()</span> <span class="nx">person</span><span class="err">:</span> <span class="nx">Person</span><span class="p">[]</span>
 <span class="p">}</span>
@@ -399,7 +435,8 @@ use this convention, feel free to supply it explicitly:</p>
 
     <div class="code-tabs">
 
-      <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="kr">class</span> <span class="nx">Dog</span> <span class="k">extends</span> <span class="nx">ApplicationRecord</span> <span class="p">{</span>
+      <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="err">@</span><span class="nx">Model</span><span class="p">()</span>
+<span class="kr">class</span> <span class="nx">Dog</span> <span class="k">extends</span> <span class="nx">ApplicationRecord</span> <span class="p">{</span>
   <span class="c1">// ... code ...</span>
   <span class="err">@</span><span class="nx">BelongsTo</span><span class="p">(</span><span class="s1">'people'</span><span class="p">)</span> <span class="nx">owner</span><span class="err">:</span> <span class="nx">Person</span><span class="p">[]</span>
 <span class="p">}</span>

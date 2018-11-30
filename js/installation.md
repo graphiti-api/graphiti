@@ -81,6 +81,7 @@ holds connection information (`ApplicationRecord`, or
 {% include js-code-tabs.html %}
 <div markdown="1" class="code-tabs">
 {% highlight typescript %}
+@Model()
 class ApplicationRecord extends SpraypaintBase {
   static baseUrl = "http://my-api.com"
   static apiNamespace = "/api/v1"
@@ -107,6 +108,7 @@ a top-level `ApplicationRecord` (though any subclass can override).
 {% include js-code-tabs.html %}
 <div markdown="1" class="code-tabs">
 {% highlight typescript %}
+@Model()
 class Person extends ApplicationRecord {
   static jsonapiType = "people"
 }
@@ -130,6 +132,32 @@ With the above configuration, all `Person` endpoints will begin
 > **TIP**: You can always use the `endpoint` option to override this pattern
 and set the endpoint manually.
 
+##### Setting Application Name
+
+It can be helpful to send the name of your client application in request
+headers. With this information, servers can keep track of which clients
+are hitting which APIs.
+
+To do this:
+
+{% include js-code-tabs.html %}
+<div markdown="1" class="code-tabs">
+{% highlight typescript %}
+@Model()
+class Person extends ApplicationRecord {
+  static clientApplication = "sales-backend"
+}
+{% endhighlight %}
+
+{% highlight javascript %}
+const Person = ApplicationRecord.extend({
+  static: {
+    clientApplication: "sales-backend"
+  }
+})
+{% endhighlight %}
+</div>
+
 #### Defining Attributes
 
 `ActiveRecord` automatically sets attributes by introspecting database
@@ -144,6 +172,7 @@ Though this is configurable, by default we expect the API to be
 {% include js-code-tabs.html %}
 <div markdown="1" class="code-tabs">
 {% highlight typescript %}
+@Model()
 class Person extends ApplicationRecord {
   // ... code ...
   @Attr() firstName: string
@@ -212,6 +241,7 @@ Just like `ActiveRecord`, there are `HasMany`, `BelongsTo`, and
 {% include js-code-tabs.html %}
 <div markdown="1" class="code-tabs">
 {% highlight typescript %}
+@Model()
 class Dog extends ApplicationRecord {
   // ... code ...
   @BelongsTo() person: Person[]
@@ -250,6 +280,7 @@ use this convention, feel free to supply it explicitly:
 {% include js-code-tabs.html %}
 <div markdown="1" class="code-tabs">
 {% highlight typescript %}
+@Model()
 class Dog extends ApplicationRecord {
   // ... code ...
   @BelongsTo('people') owner: Person[]
