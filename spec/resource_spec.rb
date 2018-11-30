@@ -67,6 +67,26 @@ RSpec.describe Graphiti::Resource do
         expect(klass.relationships_writable_by_default).to eq(true)
       end
 
+      context 'when assigning new adapter' do
+        let(:adapter) do
+          Class.new(Graphiti::Adapters::Abstract) do
+            def count(*args)
+              42
+            end
+          end
+        end
+
+        def count
+          klass.config[:stats][:total].calculations[:count].call
+        end
+
+        it 'updates total count config' do
+          expect { count }.to raise_error(ArgumentError)
+          klass.adapter = adapter
+          expect(count).to eq(42)
+        end
+      end
+
       context 'when model can be inferred' do
         before do
           klass.class_eval do

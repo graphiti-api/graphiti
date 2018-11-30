@@ -28,6 +28,13 @@ module Graphiti
           end
         end
 
+        # The .stat call stores a proc based on adapter
+        # So if we assign a new adapter, reconfigure
+        def adapter=(val)
+          super
+          stat total: [:count]
+        end
+
         def model
           klass = super
           unless klass || abstract_class?
