@@ -1425,7 +1425,7 @@ Here we're updating a Post, changing the name of its associated Blog, creating a
     },
     {
       type: 'blogs',
-      :'temp-id' => '123',
+      id: => '123',
       attributes: { name: 'Updated!' }
     }
   ]
