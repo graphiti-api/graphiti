@@ -28,8 +28,7 @@ module Graphiti
       {
         resources: generate_resources,
         endpoints: generate_endpoints,
-        types: generate_types,
-        base_url: resources.map(&:base_url)[0]
+        types: generate_types
       }
     end
 
