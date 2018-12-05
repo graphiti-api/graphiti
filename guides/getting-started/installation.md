@@ -111,9 +111,9 @@ def index
   posts = PostResource.all(params)
 
   respond_to do |format|
-    format.json { posts.to_json }
-    format.jsonapi { posts.to_jsonapi }
-    format.xml { posts.to_xml }
+    format.json { render(json: posts.to_json) }
+    format.jsonapi { render(jsonapi: posts.to_jsonapi) }
+    format.xml { render(xml: posts.to_xml) }
   end
 end
 {% endhighlight %}
