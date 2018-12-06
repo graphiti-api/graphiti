@@ -22,10 +22,7 @@ module Graphiti
 
     desc "This generator creates a resource file at app/resources, as well as corresponding controller/specs/route/etc"
     def generate_all
-      unless model_klass
-        raise "You must define a #{class_name} model before generating the corresponding resource."
-      end
-
+      generate_model
       generate_controller
       generate_application_resource unless application_resource_defined?
       generate_route
@@ -35,6 +32,27 @@ module Graphiti
     end
 
     private
+
+    class ModelAction
+      attr_reader :class_name
+      def initialize(class_name)
+        @class_name = class_name
+      end
+
+      def invoke!
+        unless class_name.safe_constantize
+          raise "You must define a #{class_name} model before generating the corresponding resource."
+        end
+      end
+
+      def revoke!
+        # Do nothing on destroy
+      end
+    end
+
+    def generate_model
+      action(ModelAction.new(class_name))
+    end
 
     def omit_comments?
       @options['omit-comments']
@@ -60,11 +78,11 @@ module Graphiti
     end
 
     def generate_route
-      code = "    resources :#{type}"
-      code << ", only: [#{actions.map { |a| ":#{a}" }.join(', ')}]" if actions.length < 5
+      code = "resources :#{plural_route_name}"
+      code << %{, only: [#{actions.map { |a| ":#{a}" }.join(', ')}]} if actions.length < 5
       code << "\n"
       inject_into_file 'config/routes.rb', after: /ApplicationResource.*$\n/ do
-        code
+        indent(code, 4)
       end
     end
 
@@ -83,7 +101,11 @@ module Graphiti
     def generate_resource
       to = File.join('app/resources', class_path, "#{file_name}_resource.rb")
       template('resource.rb.erb', to)
-      require "#{::Rails.root}/#{to}"
+      require "#{::Rails.root}/#{to}" if create?
+    end
+
+    def create?
+      behavior == :invoke
     end
 
     def model_klass
