@@ -94,6 +94,7 @@ module Graphiti
 
     def apply_scoping(scope, opts)
       @object = scope
+      opts[:default_paginate] = false unless @query.paginate?
       add_scoping(nil, Graphiti::Scoping::DefaultFilter, opts)
       add_scoping(:filter, Graphiti::Scoping::Filter, opts)
       add_scoping(:sort, Graphiti::Scoping::Sort, opts)

@@ -1,32 +1,7 @@
 module Graphiti
-  # Apply pagination logic to the scope
-  #
-  # If the user requests a page size greater than +MAX_PAGE_SIZE+,
-  # a +Graphiti::Errors::UnsupportedPageSize+ error will be raised.
-  #
-  # Notably, this will not fire when the `default: false` option is passed.
-  # This is the case for sideloads - if the user requests "give me the post
-  # and its comments", we shouldn't implicitly limit those comments to 20.
-  # *BUT* if the user requests, "give me the post and 3 of its comments", we
-  # *should* honor that pagination.
-  #
-  # This can be confusing because there are also 'default' and 'customized'
-  # pagination procs. The default comes 'for free'. Customized pagination
-  # looks like
-  #
-  #   class PostResource < ApplicationResource
-  #     paginate do |scope, current_page, per_page|
-  #       # ... the custom logic ...
-  #     end
-  #   end
-  #
-  # We should use the default unless the user has customized.
-  # @see Resource.paginate
   class Scoping::Paginate < Scoping::Base
     DEFAULT_PAGE_SIZE = 20
 
-    # Apply the pagination logic. Raise error if over the max page size.
-    # @return the scope object we are chaining/modifying
     def apply
       if size > resource.max_page_size
         raise Graphiti::Errors::UnsupportedPageSize
