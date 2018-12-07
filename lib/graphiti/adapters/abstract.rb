@@ -35,6 +35,7 @@ module Graphiti
             :match,
             :not_match
           ],
+          uuid: [:eq, :not_eq],
           integer_id: numerical_operators,
           integer: numerical_operators,
           big_decimal: numerical_operators,
@@ -85,6 +86,14 @@ module Graphiti
 
       def filter_string_not_match(scope, attribute, value)
         raise Errors::AdapterNotImplemented.new(self, attribute, :filter_string_not_match)
+      end
+
+      def filter_uuid_eq(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_uuid_eq)
+      end
+
+      def filter_uuid_not_eq(scope, attribute, value)
+        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_uuid_not_eq)
       end
 
       def filter_integer_eq(scope, attribute, value)

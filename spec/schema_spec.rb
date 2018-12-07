@@ -81,6 +81,10 @@ RSpec.describe Graphiti::Schema do
             kind: 'scalar',
             description: 'Base Type.'
           },
+          uuid: {
+            description: 'Base Type. Like a normal string, but by default only eq/!eq and case-sensitive.',
+            kind: 'scalar'
+          },
           integer: {
             kind: 'scalar',
             description: 'Base Type.'
@@ -120,6 +124,10 @@ RSpec.describe Graphiti::Schema do
           array_of_strings: {
             kind: 'array',
             description: 'Base Type.'
+          },
+          array_of_uuids: {
+            description: 'Base Type.',
+            kind: 'array'
           },
           array_of_integers: {
             kind: 'array',

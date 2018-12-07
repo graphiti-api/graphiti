@@ -28,7 +28,8 @@ if ENV['APPRAISAL_INITIALIZED']
         organization: org1,
         dwelling: house,
         created_at: one_day_ago,
-        created_at_date: one_day_ago.to_date
+        created_at_date: one_day_ago.to_date,
+        identifier: SecureRandom.uuid
     end
     let!(:author2) do
       Legacy::Author.create! first_name: 'George',
@@ -38,7 +39,8 @@ if ENV['APPRAISAL_INITIALIZED']
         decimal_age: 70.011,
         dwelling: condo,
         created_at: two_days_ago,
-        created_at_date: two_days_ago.to_date
+        created_at_date: two_days_ago.to_date,
+        identifier: SecureRandom.uuid
     end
     let!(:book1)   { Legacy::Book.create!(author: author1, genre: genre, title: 'The Shining') }
     let!(:book2)   { Legacy::Book.create!(author: author1, genre: genre, title: 'The Stand') }
@@ -96,6 +98,7 @@ if ENV['APPRAISAL_INITIALIZED']
       let!(:author3) do
         Legacy::Author.create! first_name: 'GeOrge',
           age: 72,
+          identifier: 'AbC123',
           active: true,
           float_age: 70.05,
           decimal_age: 70.055,
@@ -119,6 +122,32 @@ if ENV['APPRAISAL_INITIALIZED']
 
           it 'works' do
             expect(ids).to eq([author2.id])
+          end
+        end
+      end
+
+      context 'when a uuid' do
+        context 'eq' do
+          it 'executes case-sensitive search (invalid)' do
+            get :index, params: { filter: { identifier: 'abc123' } }
+            expect(d.map(&:id)).to eq([])
+          end
+
+          it 'executes case-sensitive search (valid)' do
+            get :index, params: { filter: { identifier: 'AbC123' } }
+            expect(d.map(&:id)).to eq([author3.id])
+          end
+        end
+
+        context '!eq' do
+          it 'executes case-sensitive search (invalid)' do
+            get :index, params: { filter: { identifier: { not_eq: 'abc123' } } }
+            expect(d.map(&:id).length).to eq(3)
+          end
+
+          it 'executes case-sensitive search (valid)' do
+            get :index, params: { filter: { identifier: { not_eq: 'AbC123' } } }
+            expect(d.map(&:id).length).to eq(2)
           end
         end
       end
@@ -606,7 +635,7 @@ if ENV['APPRAISAL_INITIALIZED']
       it 'works' do
         make_request
         expect(json['data']['id']).to eq(author1.id.to_s)
-        expect(json['data']['attributes']).to eq({
+        expect(json['data']['attributes'].except('identifier')).to eq({
           'first_name' => 'Stephen',
           'age' => 70,
           'float_age' => 70.03,
