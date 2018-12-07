@@ -86,6 +86,13 @@ module Graphiti
             kind: 'scalar',
             description: 'Base Type. Query/persist as integer, render as string.'
           },
+          uuid: {
+            params: Dry::Types['coercible.string'],
+            read: Dry::Types['coercible.string'],
+            write: Dry::Types['coercible.string'],
+            kind: 'scalar',
+            description: 'Base Type. Like a normal string, but by default only eq/!eq and case-sensitive.'
+          },
           string: {
             params: Dry::Types['coercible.string'],
             read: Dry::Types['coercible.string'],
