@@ -21,6 +21,7 @@ module Graphiti
           _find(params, base_scope)
         end
 
+        # @api private
         def _find(params = {}, base_scope = nil)
           id = params[:data].try(:[], :id) || params.delete(:id)
           params[:filter] ||= {}
