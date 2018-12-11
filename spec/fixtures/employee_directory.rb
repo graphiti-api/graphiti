@@ -126,6 +126,7 @@ class Department < ApplicationRecord
 end
 
 class Salary < ApplicationRecord
+  belongs_to :employee
 end
 
 class ApplicationResource < Graphiti::Resource

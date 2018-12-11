@@ -46,13 +46,8 @@ RSpec.describe Graphiti::Scope do
 
         it 'resolves the sideload' do
           expect(sideload).to receive(:resolve)
-            .with(results, query.sideloads[:positions], anything)
+            .with(results, query.sideloads[:positions], resource)
           instance.resolve
-        end
-
-        context 'and it is nested within the same namespace' do
-          xit 'resolves with the correct namespace' do
-          end
         end
 
         context 'but no parents were found' do
@@ -73,6 +68,38 @@ RSpec.describe Graphiti::Scope do
 
       it 'returns empty array' do
         expect(instance.resolve).to eq([])
+      end
+    end
+  end
+
+  describe '#resolve_sideloads' do
+    let(:sideload) { double(name: :positions) }
+    let(:results)  { [double.as_null_object] }
+
+    before do
+      params[:include] = { positions: {} }
+      objekt = instance.instance_variable_get(:@object)
+      allow(resource).to receive(:resolve).with(objekt) { results }
+    end
+
+    context 'when the requested sideload exists on the resource' do
+      before do
+        allow(resource.class).to receive(:sideload).with(:positions) { sideload }
+      end
+
+      it 'resolves the sideload' do
+        expect(sideload).to receive(:resolve)
+          .with(results, query.sideloads[:positions], resource)
+        instance.resolve_sideloads(results)
+      end
+
+      context 'but no parents were found' do
+        let(:results) { [] }
+
+        it 'does not resolve the sideload' do
+          expect(sideload).to_not receive(:resolve)
+          instance.resolve_sideloads(results)
+        end
       end
     end
   end

@@ -91,6 +91,11 @@ module Graphiti
           @payload.relationships
       end
       @data, success = validator.to_a
+
+      if success
+        @scope.resolve_sideloads([@data])
+      end
+
       success
     end
 
@@ -113,7 +118,10 @@ module Graphiti
     end
 
     def include_hash
-      @payload ? @payload.include_hash : @query.include_hash
+      @include_hash ||= begin
+        base = @payload ? @payload.include_hash : {}
+        base.deep_merge(@query.include_hash)
+      end
     end
 
     def fields
