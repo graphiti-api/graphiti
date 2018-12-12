@@ -25,6 +25,165 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     let(:request_path) { "#{path}?#{params.to_param}" }
 
+    describe 'create' do
+      let(:request_method) { :post }
+      let(:path) { "/employees" }
+
+      describe 'basic create' do
+        let(:payload) do
+          {
+            data: {
+              type: 'employees',
+              attributes: { first_name: 'Joe' }
+            }
+          }
+        end
+
+        context 'when stats are requested' do
+          let(:params) do
+            {
+              stats: {
+                total: 'count'
+              }
+            }
+          end
+
+          it 'should include the stats in the response' do
+            make_request
+
+            expect(json['meta']).to eq({
+              "stats" => {
+                "total" => {
+                  "count" => 1
+                }
+              }
+            })
+          end
+        end
+
+        context 'when specific fields are requested' do
+          let(:params) do
+            {
+              fields: {
+                employees: 'first_name'
+              }
+            }
+          end
+
+          it 'should only return the requested fields' do
+            make_request
+
+            expect(jsonapi_data.attributes).to eq({
+              "id" => Employee.last.id.to_s,
+              "jsonapi_type" => 'employees',
+              "first_name" => 'Joe'
+            })
+          end
+        end
+      end
+
+      describe 'nested create' do
+        let(:payload) do
+          {
+            data: {
+              type: 'employees',
+              :'temp-id' => 'empl1',
+              attributes: { first_name: 'Joe' },
+              relationships: {
+                positions: {
+                  data: [
+                    { type: 'positions', :'temp-id' => 'pos1', method: 'create' },
+                    { type: 'positions', :'temp-id' => 'pos2', method: 'create' }
+                  ]
+                }
+              }
+            },
+            included: [
+              {
+                type: 'positions',
+                :'temp-id' => 'pos1',
+                attributes: { title: 'specialist' },
+                relationships: {
+                  department: {
+                    data: { type: 'departments', :'temp-id' => 'dep1', method: 'create' }
+                  }
+                }
+              },
+              {
+                type: 'departments',
+                :'temp-id' => 'dep1',
+                attributes: { name: 'safety' }
+              },
+              {
+                type: 'positions',
+                :'temp-id' => 'pos2',
+                attributes: { title: 'manager' }
+              }
+            ]
+          }
+        end
+
+        context 'when specific fields are specified' do
+          let(:params) do
+            {
+              fields: {
+                employees: 'first_name',
+                positions: 'title',
+                departments: 'name'
+              }
+            }
+          end
+
+          it 'still returns the temporary IDs' do
+            make_request
+
+            raw_json = JSON.parse(response.body)
+            includes_temp_ids = raw_json['included'].map {|i| i['temp-id']}
+
+            expect(raw_json['data']['temp-id']).to eq('empl1')
+            expect(includes_temp_ids.sort).to eq(['dep1', 'pos1', 'pos2'])
+          end
+        end
+
+        context 'when associating to an existing record' do
+          let!(:department) { Department.create!(name: 'Parks & Recreation') }
+          let!(:position) { Position.create!(title: 'Deputy Director', department: department) }
+
+          let(:payload) do
+            {
+              data: {
+                type: 'employees',
+                attributes: { first_name: 'Leslie' },
+                relationships: {
+                  positions: {
+                    data: {
+                      type: 'positions', id: position.id.to_s
+                    }
+                  }
+                }
+              }
+            }
+          end
+
+          let(:params) do
+            {
+              include: 'positions.department'
+            }
+          end
+
+          it 'allows sideloading nested records' do
+            make_request
+
+            expect(included('departments')[0].attributes).to eq({
+              "id" => department.id.to_s,
+              "name" => department.name,
+              "jsonapi_type" => 'departments'
+            })
+          end
+        end
+      end
+    end
+
     describe 'update' do
       let(:request_method) { :put }
       let(:path) { "/employees/#{employee.id}" }
