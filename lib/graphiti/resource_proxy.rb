@@ -93,7 +93,12 @@ module Graphiti
       @data, success = validator.to_a
 
       if success
-        @scope.resolve_sideloads([@data])
+        # If the context namespace is `update` or `create`, certain
+        # adapters will cause N+1 validation calls, so lets explicitly
+        # switch to a lookup context.
+        Graphiti.with_context(Graphiti.context[:object], :show) do
+          @scope.resolve_sideloads([@data])
+        end
       end
 
       success
