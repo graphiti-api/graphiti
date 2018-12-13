@@ -233,6 +233,7 @@ module Graphiti
       end
 
       def save(model)
+        model.valid? if model.respond_to?(:valid?)
         model
       end
     end
