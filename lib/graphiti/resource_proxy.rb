@@ -91,6 +91,16 @@ module Graphiti
           @payload.relationships
       end
       @data, success = validator.to_a
+
+      if success
+        # If the context namespace is `update` or `create`, certain
+        # adapters will cause N+1 validation calls, so lets explicitly
+        # switch to a lookup context.
+        Graphiti.with_context(Graphiti.context[:object], :show) do
+          @scope.resolve_sideloads([@data])
+        end
+      end
+
       success
     end
 
@@ -113,7 +123,10 @@ module Graphiti
     end
 
     def include_hash
-      @payload ? @payload.include_hash : @query.include_hash
+      @include_hash ||= begin
+        base = @payload ? @payload.include_hash : {}
+        base.deep_merge(@query.include_hash)
+      end
     end
 
     def fields

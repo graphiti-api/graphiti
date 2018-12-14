@@ -27,6 +27,9 @@ ActiveRecord::Schema.define(:version => 1) do
     t.string :first_name
     t.string :last_name
     t.integer :age
+    t.string :nickname
+    t.string :salutation
+    t.string :professional_titles
   end
 
   create_table :positions do |t|
@@ -111,10 +114,6 @@ class Employee < ApplicationRecord
       errors.blank?
     end
   end
-
-  def nickname
-    %w[Champ Sport Slugger].sample
-  end
 end
 
 class Position < ApplicationRecord
@@ -127,6 +126,7 @@ class Department < ApplicationRecord
 end
 
 class Salary < ApplicationRecord
+  belongs_to :employee
 end
 
 class ApplicationResource < Graphiti::Resource
@@ -146,7 +146,7 @@ class DepartmentResource < ApplicationResource
 end
 
 class PositionResource < ApplicationResource
-  attribute :employee_id, :integer, only: [:writable]
+  attribute :employee_id, :integer, only: [:writable, :filterable]
   attribute :title, :string
   belongs_to :department
 end
@@ -164,7 +164,7 @@ end
 class SalaryResource < ApplicationResource
   self.description = "An employee salary"
 
-  attribute :employee_id, :integer, only: [:writable]
+  attribute :employee_id, :integer, only: [:writable, :filterable]
   attribute :base_rate, :float
   attribute :overtime_rate, :float
 end

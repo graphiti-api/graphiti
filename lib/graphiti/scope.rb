@@ -27,34 +27,12 @@ module Graphiti
         if @opts[:after_resolve]
           @opts[:after_resolve].call(resolved)
         end
-        sideload(resolved) unless @query.sideloads.empty?
+        resolve_sideloads(resolved) unless @query.sideloads.empty?
         resolved
       end
     end
 
-    private
-
-    def broadcast_data
-      opts = {
-        resource: @resource,
-        params: @opts[:params],
-        sideload: @opts[:sideload],
-        parent: @opts[:parent]
-      }
-      Graphiti.broadcast("data", opts) do |payload|
-        yield payload
-      end
-    end
-
-    # Used to ensure the resource's serializer is used
-    # Not one derived through the usual jsonapi-rb logic
-    def assign_serializer(records)
-      records.each do |r|
-        @resource.decorate_record(r)
-      end
-    end
-
-    def sideload(results)
+    def resolve_sideloads(results)
       return if results == []
 
       concurrent = Graphiti.config.concurrency
@@ -89,6 +67,28 @@ module Graphiti
         if rejected = promises.find(&:rejected?)
           raise rejected.reason
         end
+      end
+    end
+
+    private
+
+    def broadcast_data
+      opts = {
+        resource: @resource,
+        params: @opts[:params],
+        sideload: @opts[:sideload],
+        parent: @opts[:parent]
+      }
+      Graphiti.broadcast("data", opts) do |payload|
+        yield payload
+      end
+    end
+
+    # Used to ensure the resource's serializer is used
+    # Not one derived through the usual jsonapi-rb logic
+    def assign_serializer(records)
+      records.each do |r|
+        @resource.decorate_record(r)
       end
     end
 
