@@ -181,7 +181,7 @@ module Graphiti
       end
 
       def base_scope(model)
-        raise 'Null adapter has no base scope!'
+        {}
       end
 
       # (see Adapters::Abstract#order)
@@ -230,6 +230,11 @@ module Graphiti
       # (see Adapters::Abstract#resolve)
       def resolve(scope)
         scope
+      end
+
+      def save(model)
+        model.valid? if model.respond_to?(:valid?)
+        model
       end
     end
   end

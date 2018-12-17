@@ -34,13 +34,13 @@ if ENV['APPRAISAL_INITIALIZED']
     let(:path) { '/legacy/author_searches' }
 
     it 'works' do
-      get :index, params: { include: 'special_books' }
+      do_index({ include: 'special_books' })
       expect(d[0].sideload(:special_books).map(&:id)).to eq([book.id])
     end
 
     context 'belongs_to' do
       it 'works' do
-        get :index, params: { include: 'special_state' }
+        do_index({ include: 'special_state' })
         expect(d[0].sideload(:special_state).id).to eq(state.id)
       end
     end

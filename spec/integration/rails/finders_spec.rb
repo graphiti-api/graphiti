@@ -28,7 +28,8 @@ if ENV['APPRAISAL_INITIALIZED']
         organization: org1,
         dwelling: house,
         created_at: one_day_ago,
-        created_at_date: one_day_ago.to_date
+        created_at_date: one_day_ago.to_date,
+        identifier: SecureRandom.uuid
     end
     let!(:author2) do
       Legacy::Author.create! first_name: 'George',
@@ -38,7 +39,8 @@ if ENV['APPRAISAL_INITIALIZED']
         decimal_age: 70.011,
         dwelling: condo,
         created_at: two_days_ago,
-        created_at_date: two_days_ago.to_date
+        created_at_date: two_days_ago.to_date,
+        identifier: SecureRandom.uuid
     end
     let!(:book1)   { Legacy::Book.create!(author: author1, genre: genre, title: 'The Shining') }
     let!(:book2)   { Legacy::Book.create!(author: author1, genre: genre, title: 'The Stand') }
@@ -62,40 +64,41 @@ if ENV['APPRAISAL_INITIALIZED']
     let(:path) { '/legacy/authors' }
 
     it 'allows basic sorting' do
-      get :index, params: { sort: '-id' }
+      do_index({ sort: '-id' })
       expect(d.map(&:id)).to eq([author2.id, author1.id])
     end
 
     it 'allows basic pagination' do
-      get :index, params: { page: { number: 2, size: 1 } }
+      do_index({ page: { number: 2, size: 1 } })
       expect(d.map(&:id)).to eq([author2.id])
     end
 
     it 'allows allowlisted filters (and other configs)' do
-      get :index, params: { filter: { first_name: 'George' } }
+      do_index({ filter: { first_name: 'George' } })
       expect(d.map(&:id)).to eq([author2.id])
     end
 
     it 'allows basic sideloading' do
-      get :index, params: { include: 'books' }
+      do_index({ include: 'books' })
       expect(included.map(&:jsonapi_type).uniq).to match_array(%w(books))
     end
 
     it 'allows nested sideloading' do
-      get :index, params: { include: 'books.genre' }
+      do_index({ include: 'books.genre' })
       expect(included.map(&:jsonapi_type).uniq)
         .to match_array(%w(books genres))
     end
 
     describe 'filtering' do
       subject(:ids) do
-        get :index, params: { filter: filter }
+        do_index({ filter: filter })
         d.map(&:id)
       end
 
       let!(:author3) do
         Legacy::Author.create! first_name: 'GeOrge',
           age: 72,
+          identifier: 'AbC123',
           active: true,
           float_age: 70.05,
           decimal_age: 70.055,
@@ -119,6 +122,32 @@ if ENV['APPRAISAL_INITIALIZED']
 
           it 'works' do
             expect(ids).to eq([author2.id])
+          end
+        end
+      end
+
+      context 'when a uuid' do
+        context 'eq' do
+          it 'executes case-sensitive search (invalid)' do
+            do_index({ filter: { identifier: 'abc123' } })
+            expect(d.map(&:id)).to eq([])
+          end
+
+          it 'executes case-sensitive search (valid)' do
+            do_index({ filter: { identifier: 'AbC123' } })
+            expect(d.map(&:id)).to eq([author3.id])
+          end
+        end
+
+        context '!eq' do
+          it 'executes case-sensitive search (invalid)' do
+            do_index({ filter: { identifier: { not_eq: 'abc123' } } })
+            expect(d.map(&:id).length).to eq(3)
+          end
+
+          it 'executes case-sensitive search (valid)' do
+            do_index({ filter: { identifier: { not_eq: 'AbC123' } } })
+            expect(d.map(&:id).length).to eq(2)
           end
         end
       end
@@ -591,13 +620,7 @@ if ENV['APPRAISAL_INITIALIZED']
 
     context 'when hitting #show' do
       subject(:make_request) do
-        if Rails::VERSION::MAJOR >= 5
-          get :show, params: { id: id, include: 'books' }
-        else
-          get :show, id: id, params: {
-            id: id, include: 'books'
-          }
-        end
+        do_show({ id: id, include: 'books' })
       end
 
       let(:id) { author1.id.to_s }
@@ -606,7 +629,7 @@ if ENV['APPRAISAL_INITIALIZED']
       it 'works' do
         make_request
         expect(json['data']['id']).to eq(author1.id.to_s)
-        expect(json['data']['attributes']).to eq({
+        expect(json['data']['attributes'].except('identifier')).to eq({
           'first_name' => 'Stephen',
           'age' => 70,
           'float_age' => 70.03,
@@ -630,10 +653,10 @@ if ENV['APPRAISAL_INITIALIZED']
     context 'when passing sparse fieldsets on primary data' do
       context 'and sideloading' do
         it 'is able to sideload without adding the field' do
-          get :index, params: {
+          do_index({
             fields: { authors: 'first_name' },
             include: 'books'
-          }
+          })
           expect(json['data'][0]['relationships']).to be_present
           expect(included.map(&:jsonapi_type).uniq).to match_array(%w(books))
         end
@@ -642,16 +665,16 @@ if ENV['APPRAISAL_INITIALIZED']
 
     context 'sideloading has_many' do
       it 'can sideload' do
-        get :index, params: { include: 'books' }
+        do_index({ include: 'books' })
         expect(included('books').map(&:id)).to eq([book1.id, book2.id])
       end
 
       context 'when paginating the sideload' do
         let(:request) do
-          get :index, params: {
+          do_index({
             include: 'books',
             page: { books: { size: 1, number: 2 } }
-          }
+          })
         end
 
         context 'and only 1 parent' do
@@ -675,17 +698,17 @@ if ENV['APPRAISAL_INITIALIZED']
       end
 
       it 'allows sorting of sideloaded resource' do
-        get :index, params: { include: 'books', sort: '-books.id' }
+        do_index({ include: 'books', sort: '-books.id' })
         expect(included('books').map(&:id)).to eq([book2.id, book1.id])
       end
 
       it 'allows filtering of sideloaded resource' do
-        get :index, params: { include: 'books', filter: { books: { id: book2.id } } }
+        do_index({ include: 'books', filter: { books: { id: book2.id } } })
         expect(included('books').map(&:id)).to eq([book2.id])
       end
 
       it 'allows extra fields for sideloaded resource' do
-        get :index, params: { include: 'books', extra_fields: { books: 'alternate_title' } }
+        do_index({ include: 'books', extra_fields: { books: 'alternate_title' } })
         book = included('books')[0]
         expect(book['title']).to be_present
         expect(book['pages']).to be_present
@@ -693,7 +716,7 @@ if ENV['APPRAISAL_INITIALIZED']
       end
 
       it 'allows sparse fieldsets for the sideloaded resource' do
-        get :index, params: { include: 'books', fields: { books: 'pages' } }
+        do_index({ include: 'books', fields: { books: 'pages' } })
         book = included('books')[0]
         expect(book).to_not have_key('title')
         expect(book).to_not have_key('alternate_title')
@@ -701,7 +724,7 @@ if ENV['APPRAISAL_INITIALIZED']
       end
 
       it 'allows extra fields and sparse fieldsets for the sideloaded resource' do
-        get :index, params: { include: 'books', fields: { books: 'pages' }, extra_fields: { books: 'alternate_title' } }
+        do_index({ include: 'books', fields: { books: 'pages' }, extra_fields: { books: 'alternate_title' } })
         book = included('books')[0]
         expect(book).to have_key('pages')
         expect(book).to have_key('alternate_title')
@@ -711,12 +734,12 @@ if ENV['APPRAISAL_INITIALIZED']
 
     context 'sideloading belongs_to' do
       it 'can sideload' do
-        get :index, params: { include: 'state' }
+        do_index({ include: 'state' })
         expect(included('states').map(&:id)).to eq([state.id])
       end
 
       it 'allows extra fields for sideloaded resource' do
-        get :index, params: { include: 'state', extra_fields: { states: 'population' } }
+        do_index({ include: 'state', extra_fields: { states: 'population' } })
         state = included('states')[0]
         expect(state['name']).to be_present
         expect(state['abbreviation']).to be_present
@@ -724,7 +747,7 @@ if ENV['APPRAISAL_INITIALIZED']
       end
 
       it 'allows sparse fieldsets for the sideloaded resource' do
-        get :index, params: { include: 'state', fields: { states: 'name' } }
+        do_index({ include: 'state', fields: { states: 'name' } })
         state = included('states')[0]
         expect(state['name']).to be_present
         expect(state).to_not have_key('abbreviation')
@@ -732,7 +755,7 @@ if ENV['APPRAISAL_INITIALIZED']
       end
 
       it 'allows extra fields and sparse fieldsets for the sideloaded resource' do
-        get :index, params: { include: 'state', fields: { states: 'name' }, extra_fields: { states: 'population' } }
+        do_index({ include: 'state', fields: { states: 'name' }, extra_fields: { states: 'population' } })
         state = included('states')[0]
         expect(state).to have_key('name')
         expect(state).to have_key('population')
@@ -742,12 +765,12 @@ if ENV['APPRAISAL_INITIALIZED']
 
     context 'sideloading has_one' do
       it 'can sideload' do
-        get :index, params: { include: 'bio' }
+        do_index({ include: 'bio' })
         expect(included('bios').map(&:id)).to eq([bio.id])
       end
 
       it 'allows extra fields for sideloaded resource' do
-        get :index, params: { include: 'bio', extra_fields: { bios: 'created_at' } }
+        do_index({ include: 'bio', extra_fields: { bios: 'created_at' } })
         bio = included('bios')[0]
         expect(bio['description']).to be_present
         expect(bio['created_at']).to be_present
@@ -755,7 +778,7 @@ if ENV['APPRAISAL_INITIALIZED']
       end
 
       it 'allows sparse fieldsets for the sideloaded resource' do
-        get :index, params: { include: 'bio', fields: { bios: 'description' } }
+        do_index({ include: 'bio', fields: { bios: 'description' } })
         bio = included('bios')[0]
         expect(bio['description']).to be_present
         expect(bio).to_not have_key('created_at')
@@ -763,7 +786,7 @@ if ENV['APPRAISAL_INITIALIZED']
       end
 
       it 'allows extra fields and sparse fieldsets for the sideloaded resource' do
-        get :index, params: { include: 'bio', fields: { bios: 'description' }, extra_fields: { bios: 'created_at' } }
+        do_index({ include: 'bio', fields: { bios: 'description' }, extra_fields: { bios: 'created_at' } })
         bio = included('bios')[0]
         expect(bio).to have_key('description')
         expect(bio).to have_key('created_at')
@@ -777,7 +800,7 @@ if ENV['APPRAISAL_INITIALIZED']
 
         it 'still uses the activerecord adapter, not the PORO adapter' do
           expect_any_instance_of(Legacy::Author).to_not receive(:bio=)
-          get :index, params: { include: 'bio' }
+          do_index({ include: 'bio' })
           expect(json['data'][0]['relationships']['bio']['data'])
             .to be_nil
         end
@@ -794,7 +817,7 @@ if ENV['APPRAISAL_INITIALIZED']
           end
 
           it 'still works' do
-            get :index, params: { include: 'bio.bio_labels' }
+            do_index({ include: 'bio.bio_labels' })
             expect(included('bio_labels').length).to eq(1)
           end
         end
@@ -803,28 +826,28 @@ if ENV['APPRAISAL_INITIALIZED']
 
     context 'sideloading many_to_many' do
       it 'can sideload' do
-        get :index, params: { include: 'hobbies' }
+        do_index({ include: 'hobbies' })
         expect(included('hobbies').map(&:id)).to eq([hobby1.id, hobby2.id])
       end
 
       it 'allows sorting of sideloaded resource' do
-        get :index, params: { include: 'hobbies', sort: '-hobbies.name' }
+        do_index({ include: 'hobbies', sort: '-hobbies.name' })
         expect(included('hobbies').map(&:id)).to eq([hobby2.id, hobby1.id])
       end
 
       it 'allows filtering of sideloaded resource' do
-        get :index, params: {
+        do_index({
           include: 'hobbies',
           filter: { hobbies: { id: hobby2.id } }
-        }
+        })
         expect(included('hobbies').map(&:id)).to eq([hobby2.id])
       end
 
       it 'allows extra fields for sideloaded resource' do
-        get :index, params: {
+        do_index({
           include: 'hobbies',
           extra_fields: { hobbies: 'reason' }
-        }
+        })
         hobby = included('hobbies')[0]
         expect(hobby['name']).to be_present
         expect(hobby['description']).to be_present
@@ -832,7 +855,7 @@ if ENV['APPRAISAL_INITIALIZED']
       end
 
       it 'allows sparse fieldsets for the sideloaded resource' do
-        get :index, params: { include: 'hobbies', fields: { hobbies: 'name' } }
+        do_index({ include: 'hobbies', fields: { hobbies: 'name' } })
         hobby = included('hobbies')[0]
         expect(hobby['name']).to be_present
         expect(hobby).to_not have_key('description')
@@ -840,11 +863,11 @@ if ENV['APPRAISAL_INITIALIZED']
       end
 
       it 'allows extra fields and sparse fieldsets for the sideloaded resource' do
-        get :index, params: {
+        do_index({
           include: 'hobbies',
           fields: { hobbies: 'name' },
           extra_fields: { hobbies: 'reason' }
-        }
+        })
         hobby = included('hobbies')[0]
         expect(hobby).to have_key('name')
         expect(hobby).to have_key('reason')
@@ -852,11 +875,11 @@ if ENV['APPRAISAL_INITIALIZED']
       end
 
       it 'allows extra fields and sparse fieldsets for multiple resources' do
-        get :index, params: {
+        do_index({
           include: 'hobbies,books',
           fields: { hobbies: 'name', books: 'title',  },
           extra_fields: { hobbies: 'reason', books: 'alternate_title' },
-        }
+        })
         hobby = included('hobbies')[0]
         book = included('books')[0]
         expect(hobby).to have_key('name')
@@ -868,7 +891,7 @@ if ENV['APPRAISAL_INITIALIZED']
       end
 
       it 'does not duplicate results' do
-        get :index, params: { include: 'hobbies' }
+        do_index({ include: 'hobbies' })
         author1_relationships = json['data'][0]['relationships']
         author2_relationships = json['data'][1]['relationships']
 
@@ -899,7 +922,7 @@ if ENV['APPRAISAL_INITIALIZED']
         let!(:other_table_hobby2)  { Legacy::Hobby.create!(name: 'Woodworking', authors: [author1, author2]) }
 
         it 'still works' do
-          get :index, params: { include: 'hobbies' }
+          do_index({ include: 'hobbies' })
           expect(included('hobbies').map(&:id))
             .to eq([other_table_hobby1.id, other_table_hobby2.id])
         end
@@ -908,7 +931,7 @@ if ENV['APPRAISAL_INITIALIZED']
 
     context 'sideloading self-referential' do
       it 'works' do
-        get :index, params: { include: 'organization.children' }
+        do_index({ include: 'organization.children' })
         includes = included('organizations')
         expect(includes[0]['name']).to eq('Org1')
         expect(includes[1]['name']).to eq('Org2')
@@ -931,20 +954,20 @@ if ENV['APPRAISAL_INITIALIZED']
       it 'works' do
         book2.genre = Legacy::Genre.create! name: 'Comedy'
         book2.save!
-        get :index, params: {
+        do_index({
           filter: { books: { id: book1.id }, other_books: { id: book2.id } },
           include: 'books.genre,other_books.genre'
-        }
+        })
         expect(included('genres').length).to eq(2)
       end
     end
 
     context 'sideloading polymorphic belongs_to' do
       it 'allows extra fields for the sideloaded resource' do
-        get :index, params: {
+        do_index({
           include: 'dwelling',
           extra_fields: { houses: 'house_price', condos: 'condo_price' }
-        }
+        })
         house = included('houses')[0]
         expect(house['name']).to be_present
         expect(house['house_description']).to be_present
@@ -956,10 +979,10 @@ if ENV['APPRAISAL_INITIALIZED']
       end
 
       it 'allows sparse fieldsets for the sideloaded resource' do
-        get :index, params: {
+        do_index({
           include: 'dwelling',
           fields: { houses: 'name', condos: 'condo_description' }
-        }
+        })
         house = included('houses')[0]
         expect(house['name']).to be_present
         expect(house).to_not have_key('house_description')
@@ -971,11 +994,11 @@ if ENV['APPRAISAL_INITIALIZED']
       end
 
       it 'allows extra fields and sparse fieldsets for the sideloaded resource' do
-        get :index, params: {
+        do_index({
           include: 'dwelling',
           fields: { houses: 'name', condos: 'condo_description' },
           extra_fields: { houses: 'house_price', condos: 'condo_price' }
-        }
+        })
         house = included('houses')[0]
         condo = included('condos')[0]
         expect(house).to have_key('name')
@@ -988,7 +1011,7 @@ if ENV['APPRAISAL_INITIALIZED']
 
       # NB: Condo does NOT have a state relationship
       it 'allows additional levels of nesting' do
-        get :index, params: { include: 'dwelling.state' }
+        do_index({ include: 'dwelling.state' })
         expect(included('states').length).to eq(1)
       end
     end

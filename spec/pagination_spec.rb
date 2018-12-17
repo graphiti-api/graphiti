@@ -21,6 +21,34 @@ RSpec.describe 'pagination' do
     expect(ids.length).to eq(2)
   end
 
+  context 'when pagination disabled' do
+    before do
+      resource.class_eval do
+        self.default_page_size = 2
+      end
+    end
+
+    context 'via string query param' do
+      before do
+        params[:paginate] = 'false'
+      end
+
+      it 'does not attempt to paginate' do
+        expect(ids.length).to eq(4)
+      end
+    end
+
+    context 'via boolean query param' do
+      before do
+        params[:paginate] = false
+      end
+
+      it 'does not attempt to paginate' do
+        expect(ids.length).to eq(4)
+      end
+    end
+  end
+
   context 'when requested size > 1000' do
     before do
       params[:page] = { size: 1_001 }

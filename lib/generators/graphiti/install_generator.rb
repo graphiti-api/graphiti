@@ -27,7 +27,10 @@ module Graphiti
       end
 
       inject_into_file 'config/application.rb', after: "Rails::Application\n" do
-"    routes.default_url_options[:host] = ENV.fetch('HOST', 'http://localhost:3000')\n"
+<<-'TXT'
+    argv_options = Rails::Server::Options.new.parse!(ARGV)
+    routes.default_url_options[:host] = ENV.fetch('HOST', "http://#{argv_options[:Host]}:#{argv_options[:Port]}")
+TXT
       end
 
       inject_into_file 'spec/rails_helper.rb', after: /RSpec.configure.+^end$/m do

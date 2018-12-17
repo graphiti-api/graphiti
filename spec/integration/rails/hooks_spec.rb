@@ -154,7 +154,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       it 'fires hooks correctly' do
-        post :create, params: payload
+        do_create(payload)
 
         expect(Callbacks.fired.keys).to match_array([:after_create, :after_save])
         author, books = Callbacks.fired[:after_create]
@@ -174,7 +174,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       it 'fires hooks correctly' do
-        post :create, params: payload
+        do_create(payload)
 
         expect(Callbacks.fired.keys)
           .to match_array([:after_update, :after_save])
@@ -194,7 +194,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       it 'fires hooks correctly' do
-        post :create, params: payload
+        do_create(payload)
 
         expect(Callbacks.fired.keys).to match_array([:after_destroy, :after_save])
         author, books = Callbacks.fired[:after_destroy]
@@ -215,7 +215,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       it 'fires hooks correctly' do
-        post :create, params: payload
+        do_create(payload)
 
         expect(Callbacks.fired.keys).to match_array([:after_disassociate, :after_save])
         author, books = Callbacks.fired[:after_disassociate]
@@ -238,7 +238,8 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       it 'also works' do
-        post :create, params: payload
+        do_create(payload)
+
         expect(Callbacks.fired.keys).to match_array([:state_after_create])
         author, states = Callbacks.fired[:state_after_create]
         state = states[0]

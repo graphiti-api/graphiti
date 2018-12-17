@@ -842,6 +842,46 @@ RSpec.describe Graphiti::Query do
     end
   end
 
+  describe '#paginate?' do
+    subject { instance.paginate? }
+
+    context 'when given boolean' do
+      context 'when true' do
+        before do
+          params[:paginate] = true
+        end
+
+        it { is_expected.to eq(true) }
+      end
+
+      context 'when false' do
+        before do
+          params[:paginate] = false
+        end
+
+        it { is_expected.to eq(false) }
+      end
+    end
+
+    context 'when given string' do
+      context 'when true' do
+        before do
+          params[:paginate] = 'true'
+        end
+
+        it { is_expected.to eq(true) }
+      end
+
+      context 'when false' do
+        before do
+          params[:paginate] = 'false'
+        end
+
+        it { is_expected.to eq(false) }
+      end
+    end
+  end
+
   describe '#links?' do
     subject { instance.links? }
 
