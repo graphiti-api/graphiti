@@ -31,7 +31,7 @@ RSpec.describe 'filtering' do
     before do
       resource.filter :by_json, :hash do
         eq do |scope, value|
-          ids = value.map { |v| v['id'] }
+          ids = value.map { |v| [v['id'], v['id2']] }.flatten
           scope[:conditions].merge!(id: ids)
           scope
         end
@@ -43,13 +43,23 @@ RSpec.describe 'filtering' do
       expect(records.map(&:id)).to eq([employee2.id])
     end
 
+    context 'and the hash has multiple keys' do
+      before do
+        params[:filter] = { by_json: '{ "id": 2, "id2": 3 }' }
+      end
+
+      it 'still works' do
+        expect(records.map(&:id)).to eq([employee2.id, employee3.id])
+      end
+    end
+
     context 'and an array of json objects passed' do
       before do
-        params[:filter] = { by_json: '{ "id": 2 },{ "id": 3 }' }
+        params[:filter] = { by_json: '{ "id": 2, "id2": 3 },{ "id": 4 }' }
       end
 
       it 'works' do
-        expect(records.map(&:id)).to eq([employee2.id, employee3.id])
+        expect(records.map(&:id)).to eq([employee2.id, employee3.id, employee4.id])
       end
     end
   end
