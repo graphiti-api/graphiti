@@ -55,11 +55,14 @@ RSpec.describe 'filtering' do
 
     context 'and an array of json objects passed' do
       before do
-        params[:filter] = { by_json: '{ "id": 2, "id2": 3 },{ "id": 4 }' }
+        params[:filter] = {
+          by_json: '{ "id": 2, "id2": 3 },{ "id": 4 },{ "id": 5 },{ "id": 6 }'
+        }
       end
 
       it 'works' do
-        expect(records.map(&:id)).to eq([employee2.id, employee3.id, employee4.id])
+        expect(records.map(&:id))
+          .to eq([employee2.id, employee3.id, employee4.id])
       end
     end
   end

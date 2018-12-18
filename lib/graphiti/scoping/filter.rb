@@ -140,6 +140,8 @@ module Graphiti
               v = "#{v}}"
             elsif v.ends_with?('}') && !v.starts_with?('{')
               v = "{#{v}"
+            else
+              "{#{v}}"
             end
           end
         end
