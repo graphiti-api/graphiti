@@ -27,10 +27,19 @@ module Graphiti
       end
 
       inject_into_file 'config/application.rb', after: "Rails::Application\n" do
-<<-'TXT'
-    argv_options = Rails::Server::Options.new.parse!(ARGV)
-    routes.default_url_options[:host] = ENV.fetch('HOST', "http://#{argv_options[:Host]}:#{argv_options[:Port]}")
-TXT
+<<-'RUBY'
+    # In order for Graphiti to generate links, you need to set the routes host.
+    # When not explicitly set, via the HOST env var, this will fall back to
+    # the rails server settings.
+    # Rails::Server is not defined in console or rake tasks, so this will only
+    # use those defaults when they are available.
+    routes.default_url_options[:host] = ENV.fetch('HOST') do
+      if defined?(Rails::Server)
+        argv_options = Rails::Server::Options.new.parse!(ARGV)
+        "http://#{argv_options[:Host]}:#{argv_options[:Port]}"
+      end
+    end
+RUBY
       end
 
       inject_into_file 'spec/rails_helper.rb', after: /RSpec.configure.+^end$/m do
