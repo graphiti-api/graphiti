@@ -6,7 +6,12 @@ RSpec.describe <%= resource_class %>, type: :resource do
       {
         data: {
           type: '<%= type %>',
+      <%- if defined?(FactoryBot) -%>
+          attributes: build(:<%= type.to_s.singularize %>).attributes.
+            except("created_at", "updated_at")
+       <%- else -%>
           attributes: { }
+       <%- end -%>
         }
       }
     end
@@ -17,7 +22,7 @@ RSpec.describe <%= resource_class %>, type: :resource do
 
     it 'works' do
       expect {
-        expect(instance.save).to eq(true)
+        expect(instance.save).to eq(true), instance.errors.full_messages.to_sentence
       }.to change { <%= model_class %>.count }.by(1)
     end
   end
