@@ -12,4 +12,12 @@ class ApplicationResource < Graphiti::Resource
   self.adapter = Graphiti::Adapters::ActiveRecord
   self.base_url = Rails.application.routes.default_url_options[:host]
   self.endpoint_namespace = '<%= api_namespace %>'
+
+
+  def self.default_attributes
+    klass = self.to_s.gsub(/Resource$/,"").constantize
+    klass.columns.each do |c|
+      attribute c.name.to_sym, c.type
+    end
+  end
 end
