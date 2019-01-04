@@ -1079,6 +1079,25 @@ filter :team_id, :integer do
 end
 {% endhighlight %}
 
+To customize the foreign key, you will need to specify a hash rather
+than a symbol. The hash key is the relationship name, so the above is
+equivalent to
+
+{% highlight ruby %}
+# app/resources/employee_resource.rb
+
+many_to_many :teams, foreign_key: { team_memberships: :team_id }
+{% endhighlight %}
+
+If using ActiveRecord, and the API relationship name does not match your
+Model relationship name, use `:as` to specify the model relationship
+that should be used to derive the query:
+
+{% highlight ruby %}
+# The API relationship is "teams", ActiveRecord has "groups"
+many_to_many :teams, as: :groups
+{% endhighlight %}
+
 ##### 5.5 polymorphic_belongs_to
 
 With polymorphic associations, a Resource can belong to more than one other Resource, on a single association. Though these relationships are not specific to `ActiveRecord`, we'll use `ActiveRecord` conventions to describe the use case.

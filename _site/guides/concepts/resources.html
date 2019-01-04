@@ -1063,6 +1063,21 @@ associated resource. The logic for that filter, in the case of <code class="high
   <span class="k">end</span>
 <span class="k">end</span></code></pre></figure>
 
+  <p>To customize the foreign key, you will need to specify a hash rather
+than a symbol. The hash key is the relationship name, so the above is
+equivalent to</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
+
+<span class="n">many_to_many</span> <span class="ss">:teams</span><span class="p">,</span> <span class="ss">foreign_key: </span><span class="p">{</span> <span class="ss">team_memberships: :team_id</span> <span class="p">}</span></code></pre></figure>
+
+  <p>If using ActiveRecord, and the API relationship name does not match your
+Model relationship name, use <code class="highlighter-rouge">:as</code> to specify the model relationship
+that should be used to derive the query:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># The API relationship is "teams", ActiveRecord has "groups"</span>
+<span class="n">many_to_many</span> <span class="ss">:teams</span><span class="p">,</span> <span class="ss">as: :groups</span></code></pre></figure>
+
   <h5 id="polymorphicbelongsto">5.5 polymorphic_belongs_to</h5>
 
   <p>With polymorphic associations, a Resource can belong to more than one other Resource, on a single association. Though these relationships are not specific to <code class="highlighter-rouge">ActiveRecord</code>, we’ll use <code class="highlighter-rouge">ActiveRecord</code> conventions to describe the use case.</p>
