@@ -92,9 +92,6 @@ Note that we now support multiple content types for read requests:
 at the end of the URL, they are now going to get a simple JSON response
 instead of JSONAPI. Avoid the responders gem if you don't want this.
 
-If you have a `def destroy(id)` in your Resource, that method now
-accepts the Model instance.
-
 You may want to move some persistence logic to [before_commit]({{site.github.url}}/guides/concepts/resources#side-effects).
 
 Resources now have [#base_scope]({{site.github.url}}/guides/concepts/resources#basescope). If you previously were using `default_filter` or passing in a custom scope in your controller, consider moving to `base_scope`:

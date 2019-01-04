@@ -157,9 +157,6 @@ with <code class="highlighter-rouge">only:</code>.</p>
 at the end of the URL, they are now going to get a simple JSON response
 instead of JSONAPI. Avoid the responders gem if you don’t want this.</p>
 
-<p>If you have a <code class="highlighter-rouge">def destroy(id)</code> in your Resource, that method now
-accepts the Model instance.</p>
-
 <p>You may want to move some persistence logic to <a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#side-effects">before_commit</a>.</p>
 
 <p>Resources now have <a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#basescope">#base_scope</a>. If you previously were using <code class="highlighter-rouge">default_filter</code> or passing in a custom scope in your controller, consider moving to <code class="highlighter-rouge">base_scope</code>:</p>
