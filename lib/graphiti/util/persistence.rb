@@ -162,8 +162,11 @@ class Graphiti::Util::Persistence
       iterate(except: [:polymorphic_belongs_to, :belongs_to]) do |x|
         yield x
 
-        x[:object] = x[:sideload].resource
-          .persist_with_relationships(x[:meta], x[:attributes], x[:relationships], caller_model)
+        if x[:sideload].writable?
+          x[:object] = x[:resource]
+            .persist_with_relationships(x[:meta], x[:attributes], x[:relationships], caller_model)
+        end
+
         processed << x
       end
     end
@@ -173,7 +176,7 @@ class Graphiti::Util::Persistence
     [].tap do |processed|
       iterate(only: [:polymorphic_belongs_to, :belongs_to]) do |x|
         if x[:sideload].writable?
-          x[:object] = x[:sideload].resource
+          x[:object] = x[:resource]
             .persist_with_relationships(x[:meta], x[:attributes], x[:relationships])
         else
           raise Graphiti::Errors::UnwritableRelationship.new(@resource, x[:sideload])
