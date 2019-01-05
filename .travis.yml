@@ -9,6 +9,10 @@ script: "bundle exec rake"
 
 install: bundle install --retry=3 --jobs=3
 
+#https://docs.travis-ci.com/user/languages/ruby/
+before_install:
+  - gem install bundler -v '< 2'
+
 gemfile:
   - gemfiles/rails_4.gemfile
   - gemfiles/rails_5.gemfile
