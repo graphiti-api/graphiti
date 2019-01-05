@@ -766,7 +766,49 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
-    describe 'nested polymorphic relationship' do
+    describe 'nested relationship to polymorphic resource' do
+      subject(:make_request) do
+        do_create(payload)
+      end
+
+      let(:payload) do
+        {
+          data: {
+            type: 'employees',
+            attributes: { first_name: 'Joe' },
+            relationships: {
+              tasks: {
+                data: [
+                  { :'temp-id' => 'abc123', type: 'features', method: 'create' },
+                  { :'temp-id' => 'abc456', type: 'bugs', method: 'create' }
+                ]
+              }
+            }
+          },
+          included: [
+            {
+              :'temp-id' => 'abc123',
+              type: 'features',
+              attributes: { name: 'test feature' }
+            },
+            {
+              :'temp-id' => 'abc456',
+              type: 'bugs',
+              attributes: { name: 'test bug' }
+            }
+          ]
+        }
+      end
+
+      it 'creates correct records' do
+        make_request
+        employee = Employee.last
+        expect(employee.features.length).to eq(1)
+        expect(employee.bugs.length).to eq(1)
+      end
+    end
+
+    describe 'nested polymorphic_belongs_to relationship' do
       let(:workspace_type) { 'offices' }
 
       subject(:make_request) do
