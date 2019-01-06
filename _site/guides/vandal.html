@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Graphiti</title>
-  <meta name="description" content="A stylish alternative to GraphQL">
+  <meta name="description" content="Stylish Graph APIs">
 
   <link rel="stylesheet" href="https://graphiti-api.github.io/graphiti/assets/main.css?ref=wh4t3v45">
   <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
@@ -110,6 +110,10 @@ install from the <code class="highlighter-rouge">vandal_ui</code> gem, or manual
 specify an alternate location:</p>
 
   <p><code class="highlighter-rouge">SCHEMA_PATH=/foo_api/myschema.json rake vandal:install</code></p>
+
+  <p>*Note: early versions of Graphiti did not include the API namespace in
+the default schema search path. Run specs again and remove
+<code class="highlighter-rouge">public/schema.json</code> if you have issues.</p>
 
   <h3 id="manual-installation">Manual Installation</h3>
 

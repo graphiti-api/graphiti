@@ -39,6 +39,10 @@ specify an alternate location:
 
 `SCHEMA_PATH=/foo_api/myschema.json rake vandal:install`
 
+*Note: early versions of Graphiti did not include the API namespace in
+the default schema search path. Run specs again and remove
+`public/schema.json` if you have issues.
+
 ### Manual Installation
 
 [Vandal](https://github.com/graphiti-api/vandal) is a VueJS
