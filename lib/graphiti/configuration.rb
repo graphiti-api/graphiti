@@ -28,7 +28,8 @@ module Graphiti
       self.debug_models = ENV.fetch('GRAPHITI_DEBUG_MODELS', false)
 
       if defined?(::Rails)
-        @schema_path = "#{::Rails.root}/public/schema.json"
+        cfg = YAML.load_file("#{::Rails.root}/.graphiticfg.yml")
+        @schema_path = "#{::Rails.root}/public#{cfg['namespace']}/schema.json"
         self.debug = ::Rails.logger.level.zero?
         Graphiti.logger = ::Rails.logger
       end
