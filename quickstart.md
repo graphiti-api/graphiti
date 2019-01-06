@@ -329,6 +329,30 @@ Also note: just as we can query a graph of Resources in a single
 request, we can *persist* a graph of Resources in a single request. See
 [Sideposting]({{site.github.url}}/guides/concepts/resources#sideposting).
 
+## Exploring with Vandal
+
+<p align="center">
+  <img width="100%" src="https://user-images.githubusercontent.com/55264/50739987-cb5af780-11b5-11e9-9839-cdb913dafbd1.png">
+</p>
+
+Vandal is the Graphiti UI. It introspects your schema to make data
+exploration a breeze. The above screenshot shows Vandal fetching posts
+and comments from our blog.
+
+To run Vandal, hit `http://localhost:3000/api/v1/vandal`. Click a
+relationship once to include it in the response, click a second time to
+edit deep query logic for the associated Resource.
+
+If you've included an association, you can click a table row to view associated data.
+The below screenshot is hitting `/posts`, and including only comments
+with the text "two":
+
+<p align="center">
+  <img width="100%" src="https://user-images.githubusercontent.com/55264/50739988-cb5af780-11b5-11e9-81ad-2e28f6fa5ac2.png">
+</p>
+
+[Click here](https://jsonapi-employee-directory.herokuapp.com/vandal) to play with Vandal hitting our [Employee Directory Tutorial]({{site.github.url}}/tutorial). Initial load might take longer as it runs on a free Heroku instance.
+
 ## What's Next
 
 We have a full CRUD API with robust querying functionality, and the

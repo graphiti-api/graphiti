@@ -21,13 +21,11 @@ Or to dive into code, check out our sample apps in [**Rails**](https://github.co
 But ideally, read everything 🙂
 
   * ## Overview: What is Graphiti?
-    * Guiding Principles
     * [Lifecycle of a Graphiti Request]({{site.github.url}}/guides/overview#lifecycle-of-a-graphiti-request)
   * ## Getting Started
     * [Installation]({{site.github.url}}/guides/getting-started/installation)
     * [Quickstart]({{site.github.url}}/quickstart)
-    * What's Next?
-    * Feedback
+    * [Vandal: The Graphiti UI]({{site.github.url}}/guides/vandal)
     * [Upgrading from JSONAPI Suite]({{site.github.url}}/guides/upgrading)
   * ## Concepts
     * [Resources]({{site.github.url}}/guides/concepts/resources)
@@ -36,10 +34,6 @@ But ideally, read everything 🙂
     * [Links]({{site.github.url}}/guides/concepts/links)
     * [Error Handling]({{site.github.url}}/guides/concepts/error-handling)
     * [Testing]({{site.github.url}}/guides/concepts/testing)
-    * Schema
-    * The JSONAPI Specification
-    * Rails Integration
-    * Usage without Rails
     * [Debugging]({{site.github.url}}/guides/concepts/debugging)
   * ## Consuming Graphiti
     * [Spraypaint JS Client]({{site.github.url}}/js)
@@ -49,8 +43,6 @@ But ideally, read everything 🙂
     * [Rails](https://github.com/graphiti-api/employee_directory)
     * [Sinatra](https://github.com/graphiti-api/sinatra_example)
     * [Plain Ruby](https://github.com/graphiti-api/plain_ruby_example)
-  * ## Contributing
-    * Roadmap
 
  <br />
  <br />

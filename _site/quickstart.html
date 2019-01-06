@@ -437,6 +437,30 @@ reuse code across multiple Endpoints.</p>
 request, we can <em>persist</em> a graph of Resources in a single request. See
 <a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#sideposting">Sideposting</a>.</p>
 
+<h2 id="exploring-with-vandal">Exploring with Vandal</h2>
+
+<p align="center">
+  <img width="100%" src="https://user-images.githubusercontent.com/55264/50739987-cb5af780-11b5-11e9-9839-cdb913dafbd1.png" />
+</p>
+
+<p>Vandal is the Graphiti UI. It introspects your schema to make data
+exploration a breeze. The above screenshot shows Vandal fetching posts
+and comments from our blog.</p>
+
+<p>To run Vandal, hit <code class="highlighter-rouge">http://localhost:3000/api/v1/vandal</code>. Click a
+relationship once to include it in the response, click a second time to
+edit deep query logic for the associated Resource.</p>
+
+<p>If you’ve included an association, you can click a table row to view associated data.
+The below screenshot is hitting <code class="highlighter-rouge">/posts</code>, and including only comments
+with the text “two”:</p>
+
+<p align="center">
+  <img width="100%" src="https://user-images.githubusercontent.com/55264/50739988-cb5af780-11b5-11e9-81ad-2e28f6fa5ac2.png" />
+</p>
+
+<p><a href="https://jsonapi-employee-directory.herokuapp.com/vandal">Click here</a> to play with Vandal hitting our <a href="https://graphiti-api.github.io/graphiti/tutorial">Employee Directory Tutorial</a>. Initial load might take longer as it runs on a free Heroku instance.</p>
+
 <h2 id="whats-next">What’s Next</h2>
 
 <p>We have a full CRUD API with robust querying functionality, and the
