@@ -14,10 +14,19 @@ class ApplicationResource < Graphiti::Resource
   self.endpoint_namespace = '<%= api_namespace %>'
 
 
-  def self.default_attributes
-    klass = self.to_s.gsub(/Resource$/,"").constantize
-    klass.columns.each do |c|
-      attribute c.name.to_sym, c.type
+  def self.default_attributes(opts = { })
+    begin
+      unless opts[:from] <= ApplicationRecord
+        raise "Unable to set #{self} default_attributes from #{opts[:from]}. #{opts[:from]} must be a kind of ApplicationRecord"
+      end
+      klass = opts[:from]
+      if klass.table_exists?
+        klass.columns.each do |c|
+          attribute c.name.to_sym, c.type
+        end
+      end
+    rescue => e
+      Rails.logger.error e.message
     end
   end
 end
