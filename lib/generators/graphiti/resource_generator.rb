@@ -21,7 +21,7 @@ module Graphiti
       aliases: ['--actions', '-a'],
       desc: 'Array of controller actions to support, e.g. "index show destroy"'
 
-    class_option :'default-attributes',
+    class_option :'default-attributes-class',
       banner: 'Model',
       type: :string,
       default: nil,
@@ -66,7 +66,7 @@ module Graphiti
     end
 
     def default_attributes_class
-      @options['default-attributes']
+      @options['default-attributes-class']
     end
 
     def responders?
