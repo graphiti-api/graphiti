@@ -1,7 +1,7 @@
 <% module_namespacing do -%>
 class <%= class_name %>Resource < ApplicationResource
-  <%- if attributes.empty? -%>
-  default_attributes
+  <%- if default_attributes_class -%>
+  default_attributes from: <%= default_attributes_class %>
   <%- else -%>
   <%- attributes.each do |a| -%>
   <%- if [:created_at, :updated_at].include?(a.name.to_sym) -%>

@@ -14,11 +14,18 @@ module Graphiti
       default: false,
       aliases: ['--omit-comments', '-c'],
       desc: 'Generate without documentation comments'
+
     class_option :'actions',
       type: :array,
       default: nil,
       aliases: ['--actions', '-a'],
       desc: 'Array of controller actions to support, e.g. "index show destroy"'
+
+    class_option :'default-attributes',
+      banner: 'Model',
+      type: :string,
+      default: nil,
+      desc: 'Specify to use attributes from a particular model'
 
     desc "This generator creates a resource file at app/resources, as well as corresponding controller/specs/route/etc"
     def generate_all
@@ -56,6 +63,10 @@ module Graphiti
 
     def omit_comments?
       @options['omit-comments']
+    end
+
+    def default_attributes_class
+      @options['default-attributes']
     end
 
     def responders?
