@@ -264,8 +264,8 @@ render an integer:</p>
   <p><a href="https://dry-rb.org/gems/dry-types/custom-types">Dry Types supports custom types</a>. Let’s register a “capital letters” type:</p>
 
   <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Define the Type</span>
-<span class="n">type</span> <span class="o">=</span> <span class="no">Dry</span><span class="o">::</span><span class="no">Types</span><span class="o">::</span><span class="no">Definition</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">String</span><span class="p">)</span>
-<span class="n">type</span><span class="p">.</span><span class="nf">constructor</span> <span class="k">do</span> <span class="o">|</span><span class="n">input</span><span class="o">|</span>
+<span class="n">definition</span> <span class="o">=</span> <span class="no">Dry</span><span class="o">::</span><span class="no">Types</span><span class="o">::</span><span class="no">Definition</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">String</span><span class="p">)</span>
+<span class="n">type</span> <span class="o">=</span> <span class="n">definition</span><span class="p">.</span><span class="nf">constructor</span> <span class="k">do</span> <span class="o">|</span><span class="n">input</span><span class="o">|</span>
   <span class="n">input</span><span class="p">.</span><span class="nf">upcase</span>
 <span class="k">end</span>
 

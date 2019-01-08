@@ -181,8 +181,8 @@ All but the last 3 have Array doppelgängers: `array_of_integers`,
 
 {% highlight ruby %}
 # Define the Type
-type = Dry::Types::Definition.new(String)
-type.constructor do |input|
+definition = Dry::Types::Definition.new(String)
+type = definition.constructor do |input|
   input.upcase
 end
 

@@ -81,12 +81,11 @@ perform the upgrade with confidence by ensuring our tests pass.</p>
 <h3 id="before-you-start">Before You Start</h3>
 
 <p>Begin by understanding Graphiti. Walk through the documentation and
-sample application to get a feel for the new API.</p>
+<a href="https://github.com/graphiti-api/employee_directory">sample application</a> to get a feel for the new API. <a href="https://github.com/graphiti-api/employee_directory/blob/master/app/controllers/employees_controller.rb">Here’s a controller</a>.</p>
 
-<p>There is no Swagger UI equivalent for Graphiti (yet). Swagger is a
+<p>There is no Swagger UI equivalent for Graphiti. Swagger is a
 poor fit for graph APIs, and we instead rely on a custom Graphiti
-Schema. You’ll still get all the benefits of backwards-compatibility
-checks and introspection, but if you need a UI hold off for now.</p>
+Schema. Instead, check out <a href="https://graphiti-api.github.io/graphiti/guides/vandal">Vandal</a>.</p>
 
 <h3 id="setup">Setup</h3>
 
@@ -184,6 +183,19 @@ can now remove the legacy specs:</p>
 
 <p>And you’re done! Deploy to a staging environment and verify your API
 supports all your real-world scenarios.</p>
+
+<h3 id="persistence">Persistence</h3>
+
+<p>Though you can get specs passing with your existing <code class="highlighter-rouge">create</code>, <code class="highlighter-rouge">update</code>,
+etc, try to rewrite them using hooks. It’s no longer considered a best
+practice to override these methods because you’ll be bypassing hooks.
+Instead, add hooks and override <code class="highlighter-rouge">def save(model)</code> if you need to.</p>
+
+<h3 id="gotchas">Gotchas</h3>
+
+<p>We use <code class="highlighter-rouge">respond_with</code> in read operations and <code class="highlighter-rouge">render jsonapi:</code> in write
+operations. This is because the <code class="highlighter-rouge">responders</code> gem bypasses renderers for
+<code class="highlighter-rouge">PUT</code>, and a few other minor issues.</p>
 
 <p><br />
 <br /></p>
