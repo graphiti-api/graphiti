@@ -532,6 +532,83 @@ RSpec.describe 'persistence' do
       end
     end
 
+    describe '.around_persistence' do
+      RSpec.shared_examples 'around persistence' do |opts|
+        opts ||= {}
+
+        before do
+          klass.class_eval do
+            before_attributes do |attrs|
+              attrs[:first_name] = "#{attrs[:first_name]}mid"
+            end
+
+            def do_around_persistence(attributes)
+              attributes[:first_name] = 'b4'
+              model = yield
+              model.update_attributes(first_name: "#{model.first_name}after")
+              model
+              1 # return value shouldnt matter
+            end
+          end
+        end
+
+        if opts[:only_update]
+          context 'when creating' do
+            include_context 'create hooks'
+
+            it 'does not fire' do
+              employee
+              expect(klass.calls.length).to eq(0)
+            end
+          end
+        else
+          context 'when creating' do
+            include_context 'create hooks'
+
+            it 'can modify attributes and the saved model' do
+              reloaded = PORO::Employee.find(employee.id)
+              expect(reloaded.first_name).to eq('b4midafter')
+            end
+          end
+        end
+
+        context 'when updating' do
+          include_context 'update hooks'
+
+          it 'can modify attributes and the saved model' do
+            reloaded = PORO::Employee.find(employee.id)
+            expect(reloaded.first_name).to eq('b4midafter')
+          end
+        end
+      end
+
+      context 'when registering via method' do
+        before do
+          klass.around_persistence :do_around_persistence
+        end
+
+        include_examples 'around persistence'
+      end
+
+      context 'when registering via proc' do
+        it 'raises error' do
+          expect {
+            klass.around_persistence do
+              'dontgethere'
+            end
+          }.to raise_error(Graphiti::Errors::AroundCallbackProc, /around_persistence/)
+        end
+      end
+
+      context 'when limiting actions' do
+        before do
+          klass.around_persistence :do_around_persistence, only: [:update]
+        end
+
+        include_examples 'around persistence', only_update: true
+      end
+    end
+
     describe '.around_save' do
       RSpec.shared_examples 'around save' do |opts|
         opts ||= {}
