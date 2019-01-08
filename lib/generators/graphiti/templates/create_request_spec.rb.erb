@@ -21,8 +21,8 @@ RSpec.describe "<%= type %>#create", type: :request do
       expect(<%= resource_class %>).to receive(:build).and_call_original
       expect {
         make_request
+        expect(response.status).to eq(201), response.body
       }.to change { <%= model_class %>.count }.by(1)
-      expect(response.status).to eq(201)
     end
   end
 end
