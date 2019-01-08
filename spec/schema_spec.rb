@@ -670,6 +670,7 @@ RSpec.describe Graphiti::Schema do
     end
 
     before do
+      allow(FileUtils).to receive(:mkdir_p).with('/schema/path')
       allow(File).to receive(:write)
       allow(File).to receive(:read).with('/schema/path/schema.json') { old_schema }
       allow(File).to receive(:exists?)

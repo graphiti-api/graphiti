@@ -16,6 +16,7 @@ module Graphiti
         errors = Graphiti::SchemaDiff.new(old, schema).compare
         return errors if errors.any?
       end
+      FileUtils.mkdir_p(Graphiti.config.schema_path.gsub('/schema.json', ''))
       File.write(Graphiti.config.schema_path, JSON.pretty_generate(schema))
       []
     end
