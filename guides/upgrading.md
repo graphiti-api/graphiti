@@ -16,12 +16,11 @@ perform the upgrade with confidence by ensuring our tests pass.
 ### Before You Start
 
 Begin by understanding Graphiti. Walk through the documentation and
-sample application to get a feel for the new API.
+[sample application](https://github.com/graphiti-api/employee_directory) to get a feel for the new API. [Here's a controller](https://github.com/graphiti-api/employee_directory/blob/master/app/controllers/employees_controller.rb).
 
-There is no Swagger UI equivalent for Graphiti (yet). Swagger is a
+There is no Swagger UI equivalent for Graphiti. Swagger is a
 poor fit for graph APIs, and we instead rely on a custom Graphiti
-Schema. You'll still get all the benefits of backwards-compatibility
-checks and introspection, but if you need a UI hold off for now.
+Schema. Instead, check out [Vandal]({{site.github.url}}/guides/vandal).
 
 ### Setup
 
@@ -119,6 +118,19 @@ can now remove the legacy specs:
 
 And you're done! Deploy to a staging environment and verify your API
 supports all your real-world scenarios.
+
+### Persistence
+
+Though you can get specs passing with your existing `create`, `update`,
+etc, try to rewrite them using hooks. It's no longer considered a best
+practice to override these methods because you'll be bypassing hooks.
+Instead, add hooks and override `def save(model)` if you need to.
+
+### Gotchas
+
+We use `respond_with` in read operations and `render jsonapi:` in write
+operations. This is because the `responders` gem bypasses renderers for
+`PUT`, and a few other minor issues.
 
 <br />
 <br />
