@@ -45,6 +45,33 @@ RSpec.describe 'serialization' do
       expect(json['data'][0]['attributes']).to eq('first_name' => 'John')
     end
 
+    context 'when id is custom type' do
+      before do
+        type = Dry::Types::Definition.new(String).constructor do |input|
+          'custom!'
+        end
+        Graphiti::Types[:custom] = {
+          params: type,
+          canonical_name: :string,
+          read: type,
+          write: type,
+          kind: 'scalar',
+          description: 'test'
+        }
+        resource.attribute :id, :custom
+      end
+
+      after do
+        Graphiti::Types.map.delete(:custom)
+      end
+
+      it 'goes through type coercion' do
+        PORO::Employee.create
+        render
+        expect(json['data'][0]['id']).to eq('custom!')
+      end
+    end
+
     describe 'helper functions' do
       let(:app_serializer) do
         Class.new(Graphiti::Serializer) do
