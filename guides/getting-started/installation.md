@@ -104,7 +104,7 @@ always write files manually or [submit an issue](https://github.com/graphiti-api
 ### 2.1 Responders
 
 Graphiti supports JSONAPI, simple JSON, and XML. You can do this
-manually:
+manually when inheriting from `ActionController::Base`
 
 {% highlight ruby %}
 def index
@@ -118,7 +118,8 @@ def index
 end
 {% endhighlight %}
 
-We can avoid this boilerplate with the [Responders](https://github.com/plataformatec/responders) gem:
+But we can inherit from `ActionController::API` while avoiding this
+boilerplate with with the [Responders](https://github.com/plataformatec/responders) gem:
 
 {% highlight ruby %}
 def index

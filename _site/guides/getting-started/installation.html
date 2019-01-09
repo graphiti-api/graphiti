@@ -162,7 +162,7 @@ always write files manually or <a href="https://github.com/graphiti-api/graphiti
   <h3 id="responders">2.1 Responders</h3>
 
   <p>Graphiti supports JSONAPI, simple JSON, and XML. You can do this
-manually:</p>
+manually when inheriting from <code class="highlighter-rouge">ActionController::Base</code></p>
 
   <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">index</span>
   <span class="n">posts</span> <span class="o">=</span> <span class="no">PostResource</span><span class="p">.</span><span class="nf">all</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
@@ -174,7 +174,8 @@ manually:</p>
   <span class="k">end</span>
 <span class="k">end</span></code></pre></figure>
 
-  <p>We can avoid this boilerplate with the <a href="https://github.com/plataformatec/responders">Responders</a> gem:</p>
+  <p>But we can inherit from <code class="highlighter-rouge">ActionController::API</code> while avoiding this
+boilerplate with with the <a href="https://github.com/plataformatec/responders">Responders</a> gem:</p>
 
   <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">index</span>
   <span class="n">posts</span> <span class="o">=</span> <span class="no">PostResource</span><span class="p">.</span><span class="nf">all</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
