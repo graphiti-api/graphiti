@@ -16,8 +16,8 @@ class ApplicationResource < Graphiti::Resource
 
   def self.default_attributes(opts = { })
     begin
-      unless opts[:from] <= ApplicationRecord
-        raise "Unable to set #{self} default_attributes from #{opts[:from]}. #{opts[:from]} must be a kind of ApplicationRecord"
+      unless opts[:from].kind_of?(Class) && opts[:from] <= ApplicationRecord
+        raise "Unable to set #{self} default_attributes from #{opts[:from].inspect}. #{opts[:from].inspect} must be a kind of ApplicationRecord"
       end
       klass = opts[:from]
       if klass.table_exists?
