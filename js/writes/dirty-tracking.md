@@ -119,6 +119,30 @@ object.
   {% endhighlight %}
 </div>
 
+If you need to reset back to original state, call `reset()`:
+
+{% include js-code-tabs.html %}
+<div markdown="1" class="code-tabs">
+{% highlight typescript %}
+  let post = await Post.first()
+  post.title // "original"
+  post.title = "changed"
+  post.title // "changed"
+  post.reset()
+  post.title // "original"
+{% endhighlight %}
+
+{% highlight javascript %}
+  Post.first().then(function(post) {
+    post.title; // "original"
+    post.title = "changed";
+    post.title; // "changed"
+    post.reset();
+    post.title; // "original"
+  });
+{% endhighlight %}
+</div>
+
 <div class="clearfix">
   <h2 id="next">
     <a href="{{site.github.url}}/js/writes/nested">

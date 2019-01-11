@@ -245,6 +245,36 @@ object.</li>
 
   </div>
 
+  <p>If you need to reset back to original state, call <code class="highlighter-rouge">reset()</code>:</p>
+
+  <div class="tabs">
+  <div class="tab typescript active">
+    <span>Typescript</span>
+  </div>
+  <div class="tab javascript">
+    <span>Javascript</span>
+  </div>
+</div>
+
+  <div class="code-tabs">
+
+    <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript">  <span class="kd">let</span> <span class="nx">post</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Post</span><span class="p">.</span><span class="nx">first</span><span class="p">()</span>
+  <span class="nx">post</span><span class="p">.</span><span class="nx">title</span> <span class="c1">// "original"</span>
+  <span class="nx">post</span><span class="p">.</span><span class="nx">title</span> <span class="o">=</span> <span class="s2">"changed"</span>
+  <span class="nx">post</span><span class="p">.</span><span class="nx">title</span> <span class="c1">// "changed"</span>
+  <span class="nx">post</span><span class="p">.</span><span class="nx">reset</span><span class="p">()</span>
+  <span class="nx">post</span><span class="p">.</span><span class="nx">title</span> <span class="c1">// "original"</span></code></pre></figure>
+
+    <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">  <span class="nx">Post</span><span class="p">.</span><span class="nx">first</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">post</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">post</span><span class="p">.</span><span class="nx">title</span><span class="p">;</span> <span class="c1">// "original"</span>
+    <span class="nx">post</span><span class="p">.</span><span class="nx">title</span> <span class="o">=</span> <span class="s2">"changed"</span><span class="p">;</span>
+    <span class="nx">post</span><span class="p">.</span><span class="nx">title</span><span class="p">;</span> <span class="c1">// "changed"</span>
+    <span class="nx">post</span><span class="p">.</span><span class="nx">reset</span><span class="p">();</span>
+    <span class="nx">post</span><span class="p">.</span><span class="nx">title</span><span class="p">;</span> <span class="c1">// "original"</span>
+  <span class="p">});</span></code></pre></figure>
+
+  </div>
+
   <div class="clearfix">
   <h2 id="next">
     <a href="https://graphiti-api.github.io/graphiti/js/writes/nested">
