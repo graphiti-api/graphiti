@@ -62,10 +62,12 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         attribute :first_name, :string
 
-        before_commit only: [:create] do |employee|
-          Callbacks.add(:create, employee)
-          if $raise_on_before_commit[:employee]
-            raise 'rollitback'
+        before_commit only: [:create] do |employee, method|
+          if method == :create
+            Callbacks.add(:create, employee)
+            if $raise_on_before_commit[:employee]
+              raise 'rollitback'
+            end
           end
         end
 
