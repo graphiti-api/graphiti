@@ -631,7 +631,7 @@ that could contain a comma.</p>
 
   <p>You can also define custom statistics:</p>
 
-  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">allow_stat</span> <span class="ss">rating: </span><span class="p">[</span><span class="ss">:average</span><span class="p">]</span> <span class="k">do</span>
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">stat</span> <span class="ss">rating: </span><span class="p">[</span><span class="ss">:average</span><span class="p">]</span> <span class="k">do</span>
   <span class="n">standard_deviation</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="kp">attr</span><span class="o">|</span>
     <span class="c1"># your standard deviation code here</span>
   <span class="k">end</span>

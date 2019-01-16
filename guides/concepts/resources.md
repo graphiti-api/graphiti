@@ -604,7 +604,7 @@ stat score: [:maximum]
 You can also define custom statistics:
 
 {% highlight ruby %}
-allow_stat rating: [:average] do
+stat rating: [:average] do
   standard_deviation do |scope, attr|
     # your standard deviation code here
   end
