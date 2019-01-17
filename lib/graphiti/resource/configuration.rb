@@ -35,6 +35,11 @@ module Graphiti
           stat total: [:count]
         end
 
+        def remote=(val)
+          super
+          include ::Graphiti::Resource::Remote
+        end
+
         def model
           klass = super
           unless klass || abstract_class?
@@ -55,6 +60,8 @@ module Graphiti
 
         class_attribute :adapter, instance_reader: false
         class_attribute :model,
+          :remote,
+          :remote_base_url,
           :type,
           :polymorphic,
           :polymorphic_child,

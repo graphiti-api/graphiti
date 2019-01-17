@@ -106,6 +106,10 @@ module Graphiti
       stats_dsl.calculation(calculation)
     end
 
+    def before_resolve(scope, query)
+      scope
+    end
+
     def resolve(scope)
       adapter.resolve(scope)
     end
