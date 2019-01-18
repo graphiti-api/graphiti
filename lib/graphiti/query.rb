@@ -64,15 +64,27 @@ module Graphiti
       end
     end
 
+    def resource_for_sideload(sideload)
+      if @resource.remote?
+        Class.new(Graphiti::Resource) do
+          self.remote = '_remote_sideload_'
+        end.new
+      else
+        sideload.resource
+      end
+    end
+
     def sideloads
       @sideloads ||= begin
         {}.tap do |hash|
           include_hash.each_pair do |key, sub_hash|
             sideload = @resource.class.sideload(key)
-            if sideload
+
+            if sideload || @resource.remote?
+              sl_resource = resource_for_sideload(sideload)
               _parents = parents + [self]
               sub_hash = sub_hash[:include] if sub_hash.has_key?(:include)
-              hash[key] = Query.new(sideload.resource, @params, key, sub_hash, _parents)
+              hash[key] = Query.new(sl_resource, @params, key, sub_hash, _parents)
             else
               handle_missing_sideload(key)
             end
@@ -131,7 +143,9 @@ module Graphiti
         [].tap do |arr|
           sort_hashes do |key, value, type|
             if legacy_nested?(type)
-              @resource.get_attr!(key, :sortable, request: true)
+              unless @resource.remote?
+                @resource.get_attr!(key, :sortable, request: true)
+              end
               arr << { key => value }
             elsif !type && top_level? && validate!(key, :sortable)
               arr << { key => value }
@@ -196,6 +210,15 @@ module Graphiti
       not [false, 'false'].include?(@params[:paginate])
     end
 
+    # If this is a remote call, we don't care about local parents
+    def chain
+      if @resource.remote && parents.present? && !parents.last.resource.remote?
+        []
+      else
+        parents.map(&:association_name).compact + [association_name].compact
+      end
+    end
+
     private
 
     # Try to find on this resource
@@ -204,6 +227,7 @@ module Graphiti
     # TODO: Eventually, remove the legacy logic
     def validate!(name, flag)
       return false if name.to_s.include?('.') # nested
+      return true if @resource.remote?
 
       if att = @resource.get_attr(name, flag, request: true)
         return att
@@ -248,7 +272,7 @@ module Graphiti
     end
 
     def handle_missing_sideload(name)
-      if Graphiti.config.raise_on_missing_sideload
+      if Graphiti.config.raise_on_missing_sideload && !@resource.remote?
         raise Graphiti::Errors::InvalidInclude
           .new(@resource, name)
       end

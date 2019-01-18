@@ -22,6 +22,18 @@ RSpec.describe Graphiti::Sideload do
   let(:name) { :foo }
   let(:instance) { Class.new(described_class).new(name, opts) }
 
+  context 'when passed both :remote and :resource options' do
+    before do
+      opts[:remote] = 'asdf'
+    end
+
+    it 'raises error' do
+      expect {
+        instance
+      }.to raise_error(Graphiti::Errors::SideloadConfig)
+    end
+  end
+
   describe '#primary_key' do
     it 'defaults to id' do
       expect(instance.primary_key).to eq(:id)

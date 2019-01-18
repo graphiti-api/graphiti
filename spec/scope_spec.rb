@@ -30,7 +30,7 @@ RSpec.describe Graphiti::Scope do
     end
 
     context 'when sideloading' do
-      let(:sideload) { double(name: :positions) }
+      let(:sideload) { double(shared_remote?: false, name: :positions) }
       let(:results)  { [double.as_null_object] }
 
       before do
@@ -73,7 +73,7 @@ RSpec.describe Graphiti::Scope do
   end
 
   describe '#resolve_sideloads' do
-    let(:sideload) { double(name: :positions) }
+    let(:sideload) { double(shared_remote?: false, name: :positions) }
     let(:results)  { [double.as_null_object] }
 
     before do

@@ -22,6 +22,7 @@ module Graphiti
 
     def initialize(name, opts)
       @name                  = name
+      validate_options!(opts)
       @parent_resource_class = opts[:parent_resource]
       @resource_class        = opts[:resource]
       @primary_key           = opts[:primary_key]
@@ -33,6 +34,7 @@ module Graphiti
       @as                    = opts[:as]
       @link                  = opts[:link]
       @single                = opts[:single]
+      @remote                = opts[:remote]
       apply_belongs_to_many_filter if type == :many_to_many
 
       @description           = opts[:description]
@@ -43,6 +45,10 @@ module Graphiti
       @parent                = opts[:parent]
       if polymorphic_child?
         parent.resource.polymorphic << resource_class
+      end
+
+      if remote?
+        @resource_class = create_remote_resource
       end
     end
 
@@ -70,8 +76,23 @@ module Graphiti
       self.link_proc = blk
     end
 
+    # Todo ApplicationResource
+    def create_remote_resource
+      _remote = @remote
+      Class.new(Graphiti::Resource) do
+        self.adapter = Graphiti::Adapters::GraphitiAPI
+        self.model = OpenStruct
+        self.remote = _remote
+        self.validate_endpoints = false
+      end
+    end
+
     def errors
       @errors ||= []
+    end
+
+    def remote?
+      !!@remote
     end
 
     def readable?
@@ -94,6 +115,13 @@ module Graphiti
       else
         !!@link
       end
+    end
+
+    # The parent resource is a remote,
+    # AND the sideload is a remote to the same endpoint
+    def shared_remote?
+      resource.remote? &&
+        resource.remote_base_url = parent_resource_class.remote_base_url
     end
 
     def polymorphic_parent?
@@ -287,6 +315,12 @@ module Graphiti
     end
 
     private
+
+    def validate_options!(opts)
+      if opts[:resource] && opts[:remote]
+        raise Errors::SideloadConfig.new(@name, opts[:parent_resource], 'cannot pass :remote and :resource options together')
+      end
+    end
 
     def apply_belongs_to_many_filter
       _self = self
