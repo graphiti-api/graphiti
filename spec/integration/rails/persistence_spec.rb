@@ -808,6 +808,39 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
+    describe 'nested polymorphic_has_many relationship' do
+      subject(:make_request) { do_create(payload) }
+
+      let(:payload) do
+        {
+          data: {
+            type: 'employees',
+            attributes: { first_name: 'Jane' },
+            relationships: {
+              notes: {
+                data: [{
+                  :'temp-id' => 'abc123', type: 'notes', method: 'create'
+                }]
+              }
+            }
+          },
+          included: [
+            {
+              type: 'notes',
+              :'temp-id' => 'abc123',
+              attributes: { body: 'foo' }
+            }
+          ]
+        }
+      end
+
+      it 'works' do
+        make_request
+        employee = Employee.first
+        expect(employee.notes.map(&:body)).to eq(['foo'])
+      end
+    end
+
     describe 'nested polymorphic_belongs_to relationship' do
       let(:workspace_type) { 'offices' }
 

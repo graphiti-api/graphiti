@@ -21,6 +21,12 @@ ActiveRecord::Schema.define(:version => 1) do
     t.string :name
   end
 
+  create_table :notes do |t|
+    t.integer :notable_id
+    t.string :notable_type
+    t.text :body
+  end
+
   create_table :employee_teams do |t|
     t.integer :team_id
     t.integer :employee_id
@@ -75,8 +81,10 @@ class ApplicationRecord < ActiveRecord::Base
 end
 
 class Classification < ApplicationRecord
-  #has_many :employees
-  #validates :description, presence: true
+end
+
+class Note < ApplicationRecord
+  belongs_to :notable, polymorphic: true
 end
 
 class Team < ApplicationRecord
@@ -113,6 +121,7 @@ class Employee < ApplicationRecord
   has_many :tasks
   has_many :bugs
   has_many :features
+  has_many :notes, as: :notable
   validates :first_name, presence: true
   validates :delete_confirmation,
     presence: true,
@@ -213,12 +222,19 @@ class EmployeeResource < ApplicationResource
   has_one :salary
   belongs_to :classification
   many_to_many :teams, description: "Teams the employee belongs to"
+  polymorphic_has_many :notes, as: :notable
   polymorphic_belongs_to :workspace, description: "The employee's primary work area" do
     group_by(:workspace_type) do
       on(:Office)
       on(:HomeOffice)
     end
   end
+end
+
+class NoteResource < ApplicationResource
+  attribute :notable_id, :integer
+  attribute :notable_type, :string
+  attribute :body, :string
 end
 
 class EmployeeSearchResource < ApplicationResource

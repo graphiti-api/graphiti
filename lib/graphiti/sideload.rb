@@ -11,7 +11,8 @@ module Graphiti
       :parent,
       :group_name,
       :link,
-      :description
+      :description,
+      :polymorphic_as
 
     class_attribute :scope_proc,
       :assign_proc,
@@ -39,7 +40,9 @@ module Graphiti
 
       @description           = opts[:description]
 
-      # polymorphic-specific
+      # polymorphic has_many
+      @polymorphic_as        = opts[:polymorphic_as]
+      # polymorphic_belongs_to-specific
       @group_name            = opts[:group_name]
       @polymorphic_child     = opts[:polymorphic_child]
       @parent                = opts[:parent]
@@ -105,6 +108,10 @@ module Graphiti
 
     def single?
       !!@single
+    end
+
+    def polymorphic_has_many?
+      !!@polymorphic_as
     end
 
     def link?
