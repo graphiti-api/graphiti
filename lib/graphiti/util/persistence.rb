@@ -83,6 +83,9 @@ class Graphiti::Util::Persistence
       attrs[x[:foreign_key]] = nil
       update_foreign_type(attrs, x, null: true) if x[:is_polymorphic]
     else
+      if x[:sideload].polymorphic_has_many?
+        attrs[:"#{x[:sideload].polymorphic_as}_type"] = parent_object.class.name
+      end
       attrs[x[:foreign_key]] = parent_object.send(x[:primary_key])
       update_foreign_type(attrs, x) if x[:is_polymorphic]
     end
