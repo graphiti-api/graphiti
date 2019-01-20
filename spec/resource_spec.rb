@@ -1515,7 +1515,7 @@ RSpec.describe Graphiti::Resource do
         end
 
         context 'when coercion fails' do
-          let(:value) { {} }
+          let(:value) { 'not-an-integer' }
 
           it 'raises helpful error' do
             expect {
@@ -1560,7 +1560,7 @@ RSpec.describe Graphiti::Resource do
       end
 
       context 'when coercion fails' do
-        let(:value) { {} }
+        let(:value) { 'not-an-integer' }
 
         it 'raises helpful error' do
           expect {
@@ -1580,7 +1580,7 @@ RSpec.describe Graphiti::Resource do
       end
 
       context 'when coercion fails' do
-        let(:value) { {} }
+        let(:value) { 'not-an-integer' }
 
         it 'raises helpful error' do
           expect {
@@ -1612,7 +1612,7 @@ RSpec.describe Graphiti::Resource do
       end
 
       context 'when coercion fails' do
-        let(:value) { {} }
+        let(:value) { 'not-an-integer' }
 
         it 'raises helpful error' do
           expect {

@@ -57,23 +57,25 @@ module Graphiti
     end
 
     Integer = create(::Integer) do |input|
-      Dry::Types['coercible.integer'][input] if input
+      Dry::Types['coercible.integer'][input] unless input.blank?
     end
 
     # The Float() check here is to ensure we have a number
     # Otherwise BigDecimal('foo') *will return a decimal*
     ParamDecimal = create(::BigDecimal) do |input|
-      Float(input)
-      input = Dry::Types['coercible.decimal'][input]
-      Dry::Types['strict.decimal'][input]
+      unless input.blank?
+        Float(input)
+        input = Dry::Types['coercible.decimal'][input]
+        Dry::Types['strict.decimal'][input]
+      end
     end
 
     PresentInteger = create(::Integer) do |input|
-      Dry::Types['coercible.integer'][input]
+      Dry::Types['coercible.integer'][input] unless input.blank?
     end
 
     Float = create(::Float) do |input|
-      Dry::Types['coercible.float'][input] if input
+      Dry::Types['coercible.float'][input] unless input.blank?
     end
 
     PresentParamsHash = create(::Hash) do |input|

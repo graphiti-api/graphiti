@@ -983,16 +983,14 @@ RSpec.describe 'persistence' do
         expect(save(nil)).to eq(nil)
       end
 
-      it 'does not coerce blank string to 0' do
-        expect {
-          save('')
-        }.to raise_error(Graphiti::Errors::TypecastFailed)
+      it 'coerces blank string to nil' do
+        expect(save('')).to eq(nil)
       end
 
       context 'when cannot coerce' do
         it 'raises error' do
           expect {
-            save({})
+            save('not-an-integer')
           }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end
@@ -1013,6 +1011,10 @@ RSpec.describe 'persistence' do
 
       it 'allows nils' do
         expect(save(nil)).to eq(nil)
+      end
+
+      it 'coerces blank string to nil' do
+        expect(save('')).to eq(nil)
       end
 
       context 'when cannot coerce' do
@@ -1041,10 +1043,14 @@ RSpec.describe 'persistence' do
         expect(save(nil)).to eq(nil)
       end
 
+      it 'coerces blank string to nil' do
+        expect(save('')).to eq(nil)
+      end
+
       context 'when cannot coerce' do
         it 'raises error' do
           expect {
-            save({})
+            save('not-a-float')
           }.to raise_error(Graphiti::Errors::TypecastFailed)
         end
       end

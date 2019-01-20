@@ -254,7 +254,7 @@ RSpec.describe 'serialization' do
 
         context 'when cannot coerce' do
           before do
-            PORO::Employee.create(age: {})
+            PORO::Employee.create(age: 'not-a-float')
           end
 
           it 'raises error' do
