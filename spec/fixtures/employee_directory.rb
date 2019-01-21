@@ -15,6 +15,18 @@ ActiveRecord::Schema.define(:version => 1) do
     t.string :name
   end
 
+  create_table :tasks do |t|
+    t.integer :employee_id
+    t.string :type
+    t.string :name
+  end
+
+  create_table :notes do |t|
+    t.integer :notable_id
+    t.string :notable_type
+    t.text :body
+  end
+
   create_table :employee_teams do |t|
     t.integer :team_id
     t.integer :employee_id
@@ -69,8 +81,10 @@ class ApplicationRecord < ActiveRecord::Base
 end
 
 class Classification < ApplicationRecord
-  #has_many :employees
-  #validates :description, presence: true
+end
+
+class Note < ApplicationRecord
+  belongs_to :notable, polymorphic: true
 end
 
 class Team < ApplicationRecord
@@ -91,10 +105,23 @@ class HomeOffice < ApplicationRecord
   has_many :employees, as: :workspace
 end
 
+class Task < ApplicationRecord
+end
+
+class Bug < Task
+end
+
+class Feature < Task
+end
+
 class Employee < ApplicationRecord
   belongs_to :workspace, polymorphic: true
   belongs_to :classification
   has_many :positions
+  has_many :tasks
+  has_many :bugs
+  has_many :features
+  has_many :notes, as: :notable
   validates :first_name, presence: true
   validates :delete_confirmation,
     presence: true,
@@ -151,6 +178,18 @@ class PositionResource < ApplicationResource
   belongs_to :department
 end
 
+class TaskResource < ApplicationResource
+  self.polymorphic = %w(BugResource FeatureResource)
+  attribute :name, :string
+  attribute :employee_id, :string, only: [:writable]
+end
+
+class BugResource < TaskResource
+end
+
+class FeatureResource < TaskResource
+end
+
 class OfficeResource < ApplicationResource
   attribute :address, :string
 end
@@ -179,15 +218,23 @@ class EmployeeResource < ApplicationResource
   extra_attribute :professional_titles, :string
 
   has_many :positions
+  has_many :tasks
   has_one :salary
   belongs_to :classification
   many_to_many :teams, description: "Teams the employee belongs to"
+  polymorphic_has_many :notes, as: :notable
   polymorphic_belongs_to :workspace, description: "The employee's primary work area" do
     group_by(:workspace_type) do
       on(:Office)
       on(:HomeOffice)
     end
   end
+end
+
+class NoteResource < ApplicationResource
+  attribute :notable_id, :integer
+  attribute :notable_type, :string
+  attribute :body, :string
 end
 
 class EmployeeSearchResource < ApplicationResource

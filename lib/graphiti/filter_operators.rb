@@ -7,10 +7,10 @@ module Graphiti
         @procs = {}
         defaults = resource.adapter.default_operators[type_name] || [:eq]
         if opts[:only]
-          defaults = defaults.select { |op| opts[:only].include?(op) }
+          defaults = defaults.select { |op| Array(opts[:only]).include?(op) }
         end
         if opts[:except]
-          defaults = defaults.reject { |op| opts[:except].include?(op) }
+          defaults = defaults.reject { |op| Array(opts[:except]).include?(op) }
         end
         defaults.each do |op|
           @procs[op] = nil

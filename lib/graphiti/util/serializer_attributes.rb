@@ -13,7 +13,7 @@ module Graphiti
         return unless readable?
 
         if @name == :id
-          @serializer.id(&@attr[:proc]) if @attr[:proc]
+          @serializer.id(&proc)
         elsif @attr[:proc]
           @serializer.send(_method, @name, serializer_options, &proc)
         else

@@ -44,6 +44,14 @@ module Graphiti
           end
         end
 
+        def around_persistence(method = nil, only: [:create, :update], &blk)
+          if blk
+            raise Errors::AroundCallbackProc.new(self, 'around_persistence')
+          else
+            add_callback(:persistence, :around, method, only, &blk)
+          end
+        end
+
         def around_destroy(method = nil, &blk)
           if blk
             raise Errors::AroundCallbackProc.new(self, 'around_destroy')
@@ -57,38 +65,42 @@ module Graphiti
         def add_callback(kind, lifecycle, method = nil, only, &blk)
           config[:callbacks][kind] ||= {}
           config[:callbacks][kind][lifecycle] ||= []
-          config[:callbacks][kind][lifecycle] << { callback: (method || blk), only: only }
+          config[:callbacks][kind][lifecycle] << { callback: (method || blk), only: Array(only) }
         end
       end
 
       def create(create_params)
         model_instance = nil
 
-        run_callbacks :attributes, :create, create_params do |params|
-          model_instance = build(model)
-          assign_attributes(model_instance, params)
+        run_callbacks :persistence, :create, create_params do
+          run_callbacks :attributes, :create, create_params do |params|
+            model_instance = build(model)
+            assign_attributes(model_instance, params)
+            model_instance
+          end
+
+          run_callbacks :save, :create, model_instance do
+            model_instance = save(model_instance)
+          end
+
           model_instance
         end
-
-        run_callbacks :save, :create, model_instance do
-          model_instance = save(model_instance)
-        end
-
-        model_instance
       end
 
       def update(update_params)
         model_instance = nil
         id = update_params.delete(:id)
 
-        run_callbacks :attributes, :update, update_params do |params|
-          model_instance = self.class._find(params.merge(id: id)).data
-          assign_attributes(model_instance, params)
-          model_instance
-        end
+        run_callbacks :persistence, :update, update_params do
+          run_callbacks :attributes, :update, update_params do |params|
+            model_instance = self.class._find(params.merge(id: id)).data
+            assign_attributes(model_instance, params)
+            model_instance
+          end
 
-        run_callbacks :save, :update, model_instance do
-          model_instance = save(model_instance)
+          run_callbacks :save, :update, model_instance do
+            model_instance = save(model_instance)
+          end
         end
 
         model_instance

@@ -18,6 +18,7 @@ module Graphiti
         []
       else
         resolved = broadcast_data do |payload|
+          @object = @resource.before_resolve(@object, @query)
           payload[:results] = @resource.resolve(@object)
           payload[:results]
         end
@@ -40,6 +41,7 @@ module Graphiti
 
       @query.sideloads.each_pair do |name, q|
         sideload = @resource.class.sideload(name)
+        next if sideload.nil? || sideload.shared_remote?
         _parent = @resource
         _context = Graphiti.context
         resolve_sideload = -> {
@@ -94,11 +96,15 @@ module Graphiti
 
     def apply_scoping(scope, opts)
       @object = scope
-      opts[:default_paginate] = false unless @query.paginate?
-      add_scoping(nil, Graphiti::Scoping::DefaultFilter, opts)
-      add_scoping(:filter, Graphiti::Scoping::Filter, opts)
-      add_scoping(:sort, Graphiti::Scoping::Sort, opts)
-      add_scoping(:paginate, Graphiti::Scoping::Paginate, opts)
+
+      unless @resource.remote?
+        opts[:default_paginate] = false unless @query.paginate?
+        add_scoping(nil, Graphiti::Scoping::DefaultFilter, opts)
+        add_scoping(:filter, Graphiti::Scoping::Filter, opts)
+        add_scoping(:sort, Graphiti::Scoping::Sort, opts)
+        add_scoping(:paginate, Graphiti::Scoping::Paginate, opts)
+      end
+
       @object
     end
 

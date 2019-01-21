@@ -83,6 +83,9 @@ class Graphiti::Util::Persistence
       attrs[x[:foreign_key]] = nil
       update_foreign_type(attrs, x, null: true) if x[:is_polymorphic]
     else
+      if x[:sideload].polymorphic_has_many?
+        attrs[:"#{x[:sideload].polymorphic_as}_type"] = parent_object.class.name
+      end
       attrs[x[:foreign_key]] = parent_object.send(x[:primary_key])
       update_foreign_type(attrs, x) if x[:is_polymorphic]
     end
@@ -162,8 +165,11 @@ class Graphiti::Util::Persistence
       iterate(except: [:polymorphic_belongs_to, :belongs_to]) do |x|
         yield x
 
-        x[:object] = x[:sideload].resource
-          .persist_with_relationships(x[:meta], x[:attributes], x[:relationships], caller_model)
+        if x[:sideload].writable?
+          x[:object] = x[:resource]
+            .persist_with_relationships(x[:meta], x[:attributes], x[:relationships], caller_model)
+        end
+
         processed << x
       end
     end
@@ -173,7 +179,7 @@ class Graphiti::Util::Persistence
     [].tap do |processed|
       iterate(only: [:polymorphic_belongs_to, :belongs_to]) do |x|
         if x[:sideload].writable?
-          x[:object] = x[:sideload].resource
+          x[:object] = x[:resource]
             .persist_with_relationships(x[:meta], x[:attributes], x[:relationships])
         else
           raise Graphiti::Errors::UnwritableRelationship.new(@resource, x[:sideload])
