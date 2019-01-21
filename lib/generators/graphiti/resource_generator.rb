@@ -66,7 +66,28 @@ module Graphiti
     end
 
     def default_attributes_class
-      @options['default-attributes-class']
+      @default_attributes_class ||=
+        if @options['default-attributes-class'].kind_of?(String)
+          klass = @options['default-attributes-class'].classify
+          begin
+            klass.constantize
+          rescue NameError
+            raise NameError, "default-attributes-model #{klass} does not exist."
+          end
+        end
+    end
+
+    def default_attributes
+      unless default_attributes_class.kind_of?(Class) && default_attributes_class <= ApplicationRecord
+        raise "Unable to set #{self} default_attributes from #{default_attributes_class}. #{default_attributes_class} must be a kind of ApplicationRecord"
+      end
+      if default_attributes_class.table_exists?
+        default_attributes_class.columns.map do |c|
+          OpenStruct.new({ name: c.name.to_sym, type: c.type })
+        end
+      else
+        raise "#{default_attributes_class} table must exist. Please run migrations."
+      end
     end
 
     def responders?
