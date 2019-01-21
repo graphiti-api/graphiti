@@ -58,7 +58,12 @@ module Graphiti
         @path ||=
           path = @sideload.resource.endpoint[:url].to_s
           if @sideload.type == :belongs_to
-            path = "#{path}/#{@model.send(@sideload.foreign_key)}"
+            linked_resource_id = @model.send(@sideload.foreign_key)
+            if linked_resource_id
+              path = "#{path}/#{linked_resource_id}"
+            else
+              path = nil
+            end
           end
           path
       end
