@@ -212,8 +212,17 @@ module Graphiti
 
     # If this is a remote call, we don't care about local parents
     def chain
-      if @resource.remote && parents.present? && !parents.last.resource.remote?
-        []
+      if @resource.remote
+        top_remote_parent = parents.find { |p| p.resource.remote? }
+        [].tap do |chain|
+          parents.each do |p|
+            chain << p.association_name unless p == top_remote_parent
+          end
+          immediate_parent = parents.reverse[0]
+          # This is not currently checking that it is a remote of the same API
+          chain << association_name if immediate_parent && immediate_parent.resource.remote
+          chain.compact
+        end.compact
       else
         parents.map(&:association_name).compact + [association_name].compact
       end

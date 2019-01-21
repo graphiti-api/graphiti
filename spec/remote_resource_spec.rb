@@ -502,6 +502,51 @@ RSpec.describe 'remote resources' do
       expect(positions[0].employee_id).to eq(1)
     end
 
+    context 'when additional nesting' do
+      let(:params) { {} }
+
+      def assert_remote_url(url)
+        expect(Faraday).to receive(:get).with(url, anything, anything)
+        klass.all(params).data
+      end
+
+      context 'when nested sort' do
+        before do
+          params[:include] = 'positions.department'
+          params[:sort] = '-positions.department.name'
+        end
+
+        it 'queries correctly' do
+          assert_remote_url \
+            'http://foo.com/api/v1/positions?filter[employee_id]=1&include=department&sort=-department.name'
+        end
+      end
+
+      context 'and there is a nested filter' do
+        before do
+          params[:include] = 'positions.department'
+          params[:filter] = { :'positions.department.name' => 'foo' }
+        end
+
+        it 'queries correctly' do
+          assert_remote_url \
+            'http://foo.com/api/v1/positions?filter[department.name]=foo&filter[employee_id]=1&include=department'
+        end
+      end
+
+      context 'and there is nested pagination' do
+        before do
+          params[:include] = 'positions.department'
+          params[:page] = { :'positions.department.size' => 2 }
+        end
+
+        it 'queries correctly' do
+          assert_remote_url \
+            'http://foo.com/api/v1/positions?filter[employee_id]=1&include=department&page[department.size]=2'
+        end
+      end
+    end
+
     context 'and manually altering params' do
       before do
         klass.has_many :positions, remote: 'http://foo.com/api/v1/positions' do

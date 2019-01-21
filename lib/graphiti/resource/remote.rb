@@ -12,6 +12,12 @@ module Graphiti
           :open_timeout
       end
 
+      class_methods do
+        def remote_url
+          [remote_base_url, remote].join
+        end
+      end
+
       def save(*args)
         raise Errors::RemoteWrite.new(self.class)
       end
@@ -32,6 +38,10 @@ module Graphiti
         else
           {}
         end
+      end
+
+      def remote_url
+        self.class.remote_url
       end
 
       def make_request(url)

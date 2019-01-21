@@ -474,6 +474,44 @@ RSpec.describe Graphiti::Schema do
       end
     end
 
+    context 'when sideload is remote' do
+      before do
+        employee_resource.has_many :foos,
+          remote: 'http://foo.com/api/v1/foos'
+      end
+
+      it 'adds the associated resource to the schema correctly' do
+        schema
+        expect(schema[:resources][0][:relationships][:foos]).to eq({
+          description: nil,
+          resource: 'Schema::EmployeeResource.foos.remote',
+          type: 'has_many'
+        })
+      end
+    end
+
+    # todo still need local rels
+    context 'when resource is remote' do
+      before do
+        employee_resource.remote = 'http://foo.com'
+      end
+
+      it 'is added to the schema correctly' do
+        expect(schema[:resources][0]).to eq({
+          description: 'An employee of the organization',
+          name: 'Schema::EmployeeResource',
+          remote: 'http://foo.com',
+          relationships: {
+            positions: {
+              description: nil,
+              resource: 'Schema::PositionResource',
+              type: 'has_many'
+            }
+          }
+        })
+      end
+    end
+
     context 'when sideload is single: true' do
       before do
         employee_resource.has_many :positions,
