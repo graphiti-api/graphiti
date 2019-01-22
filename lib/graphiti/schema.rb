@@ -24,7 +24,7 @@ module Graphiti
     def initialize(resources)
       @resources = resources.sort_by(&:name)
       @remote_resources = resources.select(&:remote?)
-      @resources = @resources - @remote_resources
+      @local_resources = @resources - @remote_resources
     end
 
     def generate
@@ -81,7 +81,7 @@ module Graphiti
     end
 
     def generate_resources
-      arr = @resources.map do |r|
+      arr = @local_resources.map do |r|
         config = {
           name: r.name,
           type: r.type.to_s,
