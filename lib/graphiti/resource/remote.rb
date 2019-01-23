@@ -33,10 +33,13 @@ module Graphiti
 
       # Forward all headers
       def request_headers
-        if defined?(Rails)
-          context.request.headers.to_h.reject { |k, v| k.include?('.') }
-        else
-          {}
+        {}.tap do |headers|
+          if defined?(Rails) && context
+            raw = context.request.headers.to_h
+            if auth = raw['Authorization']
+              headers['Authorization'] = auth
+            end
+          end
         end
       end
 

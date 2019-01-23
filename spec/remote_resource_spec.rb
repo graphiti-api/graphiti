@@ -211,8 +211,8 @@ RSpec.describe 'remote resources' do
         stub_const('Rails', true)
       end
 
-      it 'forwards headers to the remote endpoint' do
-        headers = { 'Some-Rails' => 'header' }
+      it 'forwards Authorization header to the remote endpoint' do
+        headers = { 'Authorization' => 'header' }
         ctx = double(request: double(env: {}, headers: double(to_h: headers)))
         assert_headers(headers, ctx)
       end
