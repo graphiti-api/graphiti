@@ -212,9 +212,9 @@ RSpec.describe 'remote resources' do
       end
 
       it 'forwards Authorization header to the remote endpoint' do
-        headers = { 'Authorization' => 'header' }
+        headers = { 'HTTP_AUTHORIZATION' => 'header' }
         ctx = double(request: double(env: {}, headers: double(to_h: headers)))
-        assert_headers(headers, ctx)
+        assert_headers({ 'Authorization' => 'header' }, ctx)
       end
 
       it 'still sends the JSONAPI Content-Type header' do
