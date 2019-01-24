@@ -1221,7 +1221,9 @@ RSpec.describe 'serialization' do
         end
 
         context 'that is empty' do
-          let!(:employee) { PORO::Employee.create(classification_id: nil) }
+          before do
+            employee.update_attributes(classification_id: nil)
+          end          
           it 'generates an empty link' do
             resource.belongs_to :classification
             render
