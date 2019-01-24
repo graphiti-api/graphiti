@@ -15,9 +15,24 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
   class Grouper
     attr_reader :field_name
 
-    def initialize(field_name)
+    def initialize(field_name, opts={})
       @field_name = field_name
       @groups = []
+      @except = Array(opts[:except]).map(&:to_sym)
+      @only = Array(opts[:only]).map(&:to_sym)
+    end
+
+    def expected?(group_sym)
+      @only.empty? || @only.include?(group_sym)
+    end
+
+    def excluded?(group_sym)
+      @except.include?(group_sym)
+    end
+
+    def ignore?(group_name)
+      group_sym = group_name.to_sym
+      !expected?(group_sym) || excluded?(group_sym)
     end
 
     def on(name, &blk)
@@ -61,8 +76,8 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
     :"#{name}_id"
   end
 
-  def self.group_by(name, &blk)
-    self.grouper = Grouper.new(name)
+  def self.group_by(name, opts={}, &blk)
+    self.grouper = Grouper.new(name, opts)
     self.grouper.instance_eval(&blk)
   end
 
@@ -80,7 +95,7 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
 
   def resolve(parents, query, graph_parent)
     parents.group_by(&grouper.field_name).each_pair do |group_name, group|
-      next if group_name.nil?
+      next if group_name.nil? || grouper.ignore?(group_name)
 
       match = ->(c) { c.group_name == group_name.to_sym }
       if sideload = children.values.find(&match)
