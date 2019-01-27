@@ -239,7 +239,7 @@ RSpec.describe 'remote resources' do
       before do
         params[:sort] = '-first_name,last_name'
       end
-
+ 
       it 'queries correctly' do
         assert_params('sort=-first_name,last_name')
       end
@@ -437,6 +437,103 @@ RSpec.describe 'remote resources' do
             assert_params('include=positions.department,teams&stats[total]=count')
           end
         end
+      end
+    end
+  end
+
+  context 'when nesting local > local > remote > remote' do
+    let(:klass) do
+      Class.new(PORO::EmployeeResource) do
+        def self.name
+          'PORO::EmployeeResource'
+        end
+      end
+    end
+    let(:position_resource) do
+      Class.new(PORO::PositionResource) do
+        def self.name
+          'PORO::PositionResource'
+        end
+      end
+    end
+    let(:department_resource) do
+      Class.new(PORO::DepartmentResource) do
+        self.remote = 'http://foo.com/api/v1/departments'
+
+        def base_scope; {};end
+        def self.name; 'PORO::DepartmentResource';end
+      end
+    end
+
+    before do
+      employee = PORO::Employee.create
+      PORO::Position.create(employee_id: employee.id, department_id: 444)
+      klass.has_many :positions, resource: position_resource
+      position_resource.belongs_to :department,
+        resource: department_resource,
+        foreign_key: :department_id
+      params[:include] = 'positions.department.teams'
+    end
+
+    def assert_params(params)
+      expect(Faraday).to receive(:get)
+        .with("http://foo.com/api/v1/departments?#{params}", anything, anything)
+      get_data
+    end
+
+    context 'when sort params' do
+      before do
+        params[:sort] = 'id,-positions.id,positions.department.name,-positions.department.teams.id'
+      end
+
+      it 'passes sorts correctly' do
+        assert_params('filter[id]=444&include=teams&sort=name,-teams.id')
+      end
+    end
+
+    context 'when pagination params' do
+      before do
+        params[:page] = {
+          :'positions.department.size' => 3,
+          :'positions.department.teams.size' => 2
+        }
+      end
+
+      it 'passes pagination correctly' do
+        assert_params('filter[id]=444&include=teams&page[size]=3&page[teams.size]=2')
+      end
+    end
+
+    context 'when filter params' do
+      before do
+        params[:filter] = {
+          :'positions.department.name' => 'foo',
+          :'positions.department.teams.id' => '4'
+        }
+      end
+
+      it 'passes filters correctly' do
+        assert_params('filter[id]=444&filter[name]=foo&filter[teams.id]=4&include=teams')
+      end
+    end
+
+    context 'when passed fields' do
+      before do
+        params[:fields] = { departments: 'foo,bar', teams: 'baz,bax' }
+      end
+
+      it 'passes fields correctly' do
+        assert_params('fields[departments]=foo,bar&fields[teams]=baz,bax&filter[id]=444&include=teams')
+      end
+    end
+
+    context 'when passed extra fields' do
+      before do
+        params[:extra_fields] = { departments: 'foo,bar', teams: 'baz,bax' }
+      end
+
+      it 'passes extra fields correctly' do
+        assert_params('extra_fields[departments]=foo,bar&extra_fields[teams]=baz,bax&filter[id]=444&include=teams')
       end
     end
   end

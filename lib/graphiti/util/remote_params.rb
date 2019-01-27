@@ -36,8 +36,8 @@ module Graphiti
       def collect_params(query)
         query_hash = query.hash
         process_sorts(query_hash[:sort], query)
-        process_fields(query_hash[:fields])
-        process_extra_fields(query_hash[:extra_fields])
+        process_fields(query.fields.merge(query.hash[:fields] || {}))
+        process_extra_fields(query.extra_fields.merge(query.hash[:extra_fields] || {}))
         process_filters(query_hash[:filter], query)
         process_pagination(query_hash[:page], query)
         process_stats(query_hash[:stats])
@@ -76,12 +76,18 @@ module Graphiti
 
       def process_fields(fields)
         return unless fields
-        @fields[fields.keys.first.to_sym] = fields.values.join(',')
+
+        fields.each_pair do |type, attrs|
+          @fields[type] = attrs.join(',')
+        end
       end
 
       def process_extra_fields(fields)
         return unless fields
-        @extra_fields[fields.keys.first.to_sym] = fields.values.join(',')
+
+        fields.each_pair do |type, attrs|
+          @extra_fields[type] = attrs.join(',')
+        end
       end
 
       def process_sorts(sorts, query)

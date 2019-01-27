@@ -215,7 +215,7 @@ module Graphiti
       if @resource.remote
         top_remote_parent = parents.find { |p| p.resource.remote? }
         [].tap do |chain|
-          parents.each do |p|
+          parents.select { |p| p.resource.remote? }.each do |p|
             chain << p.association_name unless p == top_remote_parent
           end
           immediate_parent = parents.reverse[0]
