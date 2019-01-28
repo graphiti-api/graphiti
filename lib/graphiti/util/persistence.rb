@@ -80,6 +80,9 @@ class Graphiti::Util::Persistence
     return if x[:sideload].type == :many_to_many
 
     if [:destroy, :disassociate].include?(x[:meta][:method])
+      if x[:sideload].polymorphic_has_many?
+        attrs[:"#{x[:sideload].polymorphic_as}_type"] = nil
+      end
       attrs[x[:foreign_key]] = nil
       update_foreign_type(attrs, x, null: true) if x[:is_polymorphic]
     else
