@@ -957,5 +957,38 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(workspace.address).to eq('Fake Workspace Address')
       end
     end
+
+    describe 'delete nested item' do
+      subject(:make_request) { do_update(payload) }
+
+      let!(:employee)   { Employee.create!(first_name: 'original', positions: [position1, position2, position3]) }
+      let!(:position1)  { Position.create!(title: 'pos1') }
+      let!(:position2)  { Position.create!(title: 'pos2') }
+      let!(:position3)  { Position.create!(title: 'pos3') }
+
+      let(:path) { "/employees/#{employee.id}" }
+
+      let(:payload) do
+        {
+            data: {
+                id: employee.id,
+                type: 'employees',
+                attributes: { },
+                relationships: {
+                    positions: {
+                        data: [
+                            { type: 'positions', id: position2.id.to_s, method: 'destroy' }
+                        ]
+                    }
+                }
+            },
+        }
+      end
+
+      it 'works' do
+        expect(employee.positions.count).to eq(3)
+        expect {make_request}.to change { employee.positions.count }.by(-1)
+        end
+    end
   end
 end
