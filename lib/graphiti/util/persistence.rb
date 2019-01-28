@@ -12,15 +12,15 @@ class Graphiti::Util::Persistence
     @relationships = relationships
     @caller_model  = caller_model
 
-    @attributes.each_pair do |key, value|
-      @attributes[key] = @resource.typecast(key, value, :writable)
-    end
-
     # Find the correct child resource for a given jsonapi type
     if meta_type = @meta[:type].try(:to_sym)
       if @resource.type != meta_type && @resource.polymorphic?
         @resource = @resource.class.resource_for_type(meta_type).new
       end
+    end
+
+    @attributes.each_pair do |key, value|
+      @attributes[key] = @resource.typecast(key, value, :writable)
     end
   end
 

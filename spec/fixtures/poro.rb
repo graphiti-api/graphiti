@@ -229,10 +229,12 @@ module PORO
   end
 
   class Visa < CreditCard
+    attr_accessor :visa_only_attr
     attr_accessor :visa_rewards
 
     def initialize(*)
       super
+      @visa_only_attr ||= nil
       @visa_rewards ||= []
     end
   end
