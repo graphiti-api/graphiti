@@ -114,6 +114,7 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
   # but not others. Remove anything we don't support.
   def remove_invalid_sideloads(resource, query)
     query = query.dup
+    query.instance_variable_set(:@hash, nil)
     query.sideloads.each_pair do |key, value|
       unless resource.class.sideload(key)
         query.sideloads.delete(key)

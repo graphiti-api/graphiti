@@ -665,7 +665,98 @@ RSpec.describe 'remote resources' do
     end
   end
 
-  context 'when performing write operating' do
+  context 'when polymorphic_belongs_to remote relationship' do
+    let(:mastercard_resource) do
+      Class.new(PORO::DepartmentResource) do
+        self.remote = 'http://foo.com/api/v1/mastercards'
+        def self.name;'PORO::MastercardResource';end
+
+        def base_scope;{};end
+      end
+    end
+
+    let(:klass) do
+      Class.new(PORO::EmployeeResource) do
+        def self.name;'PORO::EmployeeResource';end
+      end
+    end
+
+    let(:response) do
+      {
+        data: [
+          id: '789',
+          type: 'mastercards',
+          attributes: {
+            number: 2222
+          }
+        ]
+      }
+    end
+
+    before do
+      PORO::Visa.create(id: 567, number: 4444)
+      PORO::Employee.create(first_name: 'Jane', credit_card_id: 789, credit_card_type: 'Mastercard')
+      PORO::Employee.create(first_name: 'Joe', credit_card_id: 567, credit_card_type: 'Visa')
+
+      _mastercard = mastercard_resource
+      klass.class_eval do
+        polymorphic_belongs_to :credit_card do
+          group_by :credit_card_type do
+            on(:Visa).belongs_to :visa, resource: PORO::CreditCardResource
+            on(:Mastercard).belongs_to :mastercard, resource: _mastercard
+            #on(:engineering).belongs_to :e,
+              #remote: 'http://foo.com/api/v1/departments'
+          end
+        end
+      end
+    end
+
+    it 'executes correct HTTP request' do
+      url = 'http://foo.com/api/v1/mastercards?filter[id]=789'
+      expect(Faraday).to receive(:get)
+        .with(url, anything, anything)
+      klass.all(include: 'credit_card').data
+    end
+
+    it 'loads remote and non-remote types correctly' do
+      employees = klass.all(include: 'credit_card').data
+      mastercard = employees[0].credit_card
+      expect(mastercard).to be_a(OpenStruct)
+      expect(mastercard.id).to eq('789')
+      expect(mastercard.number).to eq(2222)
+      visa = employees[1].credit_card
+      expect(visa).to be_a(PORO::CreditCard)
+      expect(visa.id).to eq(567)
+      expect(visa.number).to eq(4444)
+    end
+
+    context 'when manipulating params' do
+      before do
+        _mastercard = mastercard_resource
+        klass.class_eval do
+          polymorphic_belongs_to :credit_card do
+            group_by :credit_card_type do
+              on(:Mastercard).belongs_to :mastercard, resource: _mastercard do
+                params do |hash|
+                  hash[:filter][:number] = 1
+                end
+              end
+              on(:Visa).belongs_to :visa, resource: PORO::CreditCardResource
+              #on(:engineering).belongs_to :e,
+                #remote: 'http://foo.com/api/v1/departments'
+            end
+          end
+        end
+      end
+
+      it 'does not let param manipulation affect other sub-relations' do
+        employees = klass.all(include: 'credit_card').data
+        expect(employees[1].credit_card).to be_present
+      end
+    end
+  end
+
+  context 'when performing write operation' do
     context 'when creating' do
       it 'raises error' do
         expect {
