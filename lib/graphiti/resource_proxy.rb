@@ -80,6 +80,10 @@ module Graphiti
       end
     end
 
+    def pagination
+      @pagination ||= Delegates::Pagination.new(self)
+    end
+
     def save(action: :create)
       # TODO: remove this. Only used for persisting many-to-many with AR
       # (see activerecord adapter)
