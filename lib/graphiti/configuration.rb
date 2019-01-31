@@ -13,6 +13,7 @@ module Graphiti
     attr_accessor :schema_path
     attr_accessor :links_on_demand
     attr_accessor :pagination_links_on_demand
+    attr_accessor :pagination_links
     attr_accessor :typecast_reads
     attr_accessor :debug
     attr_accessor :debug_models
@@ -25,6 +26,7 @@ module Graphiti
       @respond_to = [:json, :jsonapi, :xml]
       @links_on_demand = false
       @pagination_links_on_demand = false
+      @pagination_links = false
       @typecast_reads = true
       self.debug = ENV.fetch('GRAPHITI_DEBUG', true)
       self.debug_models = ENV.fetch('GRAPHITI_DEBUG_MODELS', false)

@@ -67,9 +67,9 @@ if ENV["APPRAISAL_INITIALIZED"]
   #
   # It causes the host group and examples to inherit metadata
   # from the shared context.
-  rspec.shared_context_metadata_behavior = :apply_to_host_groups
+  #RSpec.shared_context_metadata_behavior = :apply_to_host_groups
 
 
-  config.include_context "pagination_context", include_shared: true
+  #config.include_context "pagination_context", include_shared: true
 
 end
