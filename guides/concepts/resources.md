@@ -1224,14 +1224,20 @@ By default, persistence operations are handled by your adapter. The
 # app/resources/employee_resource.rb
 
 def create(attributes)
-  employee = Employee.new(attributes)
+  employee = Employee.new
+  attributes.each_pair do |key, value|
+    employee.send(:"#{key}=", value)
+  end
   employee.save
   employee
 end
 
 def update(attributes)
   employee = EmployeeResource.find(attributes.delete(:id)).data
-  employee.update_attributes(attributes)
+  attributes.each_pair do |key, value|
+    employee.send(:"#{key}=", value)
+  end
+  employee.save
   employee
 end
 
@@ -1242,6 +1248,8 @@ def destroy(attributes)
 end
 {% endhighlight %}
 
+* You are encouraged **not** to override these directly. Instead, use
+hooks (see next section).
 * We'll process any `writable: false` or guarded attributes prior to
 these methods.
 * After these methods, we'll check the Model instance for validation
@@ -1249,72 +1257,119 @@ errors, rolling back the transaction if any Model in the graph is
 invalid.
 * These methods **must return the Model instance**.
 
-### 7.1 Side Effects
+### 7.1 Persistence Lifecycle Hooks
 
-RESTful Resources can cause side effects as the result of a persistence
-operation. For example, imagine sending a welcome email after persisting
-a `User`.
+Let's dive into a persistence request. If you look at the code snippets in
+the prior section, the flow breaks down into 3 steps:
 
-You can cause side effects in three ways. The simplest is to override a
-persistence method:
+* Build or find the model
+* Assign attributes to the model
+* Save
+
+You can hook into each step:
 
 {% highlight ruby %}
-# app/resources/user_resource.rb
-def create(attributes)
-  super.tap do |user|
-    UserMailer.welcome(user).deliver_later if user.valid?
+class PostResource < ApplicationResource
+  before_attributes do |attributes|
+    # Before attributes have been assigned to the model
+  end
+
+  after_attributes do |model|
+    # After attributes have been assigned to the model
+  end
+
+  around_attributes :do_around_attributes
+
+  def do_around_attributes(attributes)
+    # before
+    model_instance = yield attributes
+    # after
+  end
+
+  before_save do |model|
+    # After attributes assigned, but before persisting
+  end
+
+  after_save do |model|
+    # After model has been saved
+  end
+
+  around_save :do_around_save
+
+  def do_around_save(model)
+    # before
+    yield model
+    # after
+  end
+
+  # This is an *override*
+  # During #create, build a blank model instance
+  # By default, we'd call adapter.build(model_class)
+  def build(model_class)
+    model_class.new
+  end
+
+  # This is an *override*
+  # During #create/#update, assign new attributes to the model instance
+  # By default, we'd call adapter.assign_attributes(model_instance, attributes)
+  def assign_attributes(model_instance, attributes)
+    attributes.each_pair do |key, value|
+      model_instance.send(:"#{key}=", value)
+    end
+  end
+
+  # This is an *override*
+  # During #create/#update, actually save the model instance
+  # By default, we'd call adapter.save(model_instance)
+  def save(model_instance)
+    model_instance.save
+  end
+
+  # This is an *override*
+  # During #destroy, actually save the model instance
+  # By default, we'd call adapter.destroy(model_instance)
+  def delete(model_instance)
+    model.destroy
+  end
+
+  # Finally, you may want to hook around *all* the above steps:
+  # Only applies to #create/#update
+  around_persistence :do_around_persistence
+
+  def do_around_persistence(attributes)
+    attributes[:foo] = 'bar'
+    model = yield # build/find, assign attrs, save
+    model.update_counter_cache
   end
 end
 {% endhighlight %}
 
-The downside of this approach is that validation processing happens
-*after* the persistence methods. If we were saving the User and their
-Account at the same time, and the Account was invalid, the database
-transaction would be rolled back but the email would still be sent.
-Consider this approach only for logic that can be rolled back as part of
-a transaction.
+* All hooks have `only/except` options, e.g. `before_attributes only:
+[:update]`
+* Most hooks can be called with an in-line block, or by passing a method
+name (e.g. `before_attriubtes :do_something`). The exception is
+`around_*` hooks, which *must* be called with a method name.
 
-We can solve this issue with `before_commit`:
+When persisting multiple objects at once, we'll open a database
+transaction, process each model individually, ensure all models pass
+validation, then close the transaction. This means that if you raise an
+error at any point, or any model does not pass validations, the
+transaction will be rolled back.
 
-{% highlight ruby %}
-# app/resources/user_resource.rb
-before_commit do |user|
-  UserMailer.welcome(user).deliver_later
-end
-{% endhighlight %}
+You may want to perform an operation after all models have been
+processed and validated, but before the transaction is closed. One
+example is sending an email - you don't want to send if the models were
+invalid, so `after_save` wouldn't work. And you still want to do it
+*within* the transaction, so if your email server is down and an error
+is raised the transaction gets rolled back.
 
-`before_commit` hooks happen **after** we validate the entire graph,
-right before committing to the database.
-
-Use `only` to restrict the operations which will cause the
-`before_commit` hook to fire:
-
-{% highlight ruby %}
-# app/resources/user_resource.rb
-before_commit only: [:create] do
-  # ... code ...
-end
-{% endhighlight %}
-
-The final way to cause a side effect is to explicitly fire it in the
-controller:
+For this scenario, use `before_commit`:
 
 {% highlight ruby %}
-def create
-  user = UserResource.build(params)
-
-  if user.save
-    UserMailer.welcome(user.data).deliver_later
-    render jsonapi: user, status: 201
-  else
-    render jsonapi_errors: user
-  end
+before_commit do |model|
+  PostMailer.with(post: model).some_email.deliver
 end
 {% endhighlight %}
-
-Use this approach when the side effect should *not* fire every time the
-Resource is created, but only when the resource is created from *this
-particular endpoint*.
 
 ### 7.2 Sideposting
 
