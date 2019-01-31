@@ -34,7 +34,7 @@ module Graphiti
       if Graphiti.config.pagination_links_on_demand
         [true, 'true'].include?(@params[:pagination_links])
       else
-        true
+        Graphiti.config.pagination_links
       end
     end
 
