@@ -31,27 +31,27 @@ module Graphiti
 
     def generate_api_specs
       if actions?('index')
-        to = "spec/api/v1/#{dir}/index_spec.rb"
+        to = File.join("spec", ApplicationResource.endpoint_namespace, dir, "index_spec.rb")
         template('index_request_spec.rb.erb', to)
       end
 
       if actions?('show')
-        to = "spec/api/v1/#{dir}/show_spec.rb"
+        to = File.join("spec", ApplicationResource.endpoint_namespace, dir, "show_spec.rb")
         template('show_request_spec.rb.erb', to)
       end
 
       if actions?('create')
-        to = "spec/api/v1/#{dir}/create_spec.rb"
+        to = File.join("spec", ApplicationResource.endpoint_namespace, dir, "create_spec.rb")
         template('create_request_spec.rb.erb', to)
       end
 
       if actions?('update')
-        to = "spec/api/v1/#{dir}/update_spec.rb"
+        to = File.join("spec", ApplicationResource.endpoint_namespace, dir, "update_spec.rb")
         template('update_request_spec.rb.erb', to)
       end
 
       if actions?('destroy')
-        to = "spec/api/v1/#{dir}/destroy_spec.rb"
+        to = File.join("spec", ApplicationResource.endpoint_namespace, dir, "destroy_spec.rb")
         template('destroy_request_spec.rb.erb', to)
       end
     end

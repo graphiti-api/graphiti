@@ -16,6 +16,36 @@ The adapter #{@adapter.class} does not implement method '#{@method}', which was 
       end
     end
 
+    class SideloadConfig < Base
+      def initialize(name, parent_resource_class, message)
+        @name = name
+        @parent_resource_class = parent_resource_class
+        @message = message
+      end
+
+      def message
+        <<-MSG
+#{@parent_resource_class} sideload :#{@name} - #{@message}
+        MSG
+      end
+    end
+
+    class Remote < Base
+      def initialize(url, errors)
+        @url = url
+        @errors = errors
+      end
+
+      def message
+        msg = "Error hitting remote API: #{@url}"
+        @errors.each do |e|
+          msg << "\n\n#{e[:message]}"
+          msg << "\n\n#{e[:backtrace].join("\n")}\n\n\n\n" if e[:backtrace]
+        end
+        msg
+      end
+    end
+
     class AroundCallbackProc < Base
       def initialize(resource_class, method_name)
         @resource_class = resource_class
@@ -25,6 +55,18 @@ The adapter #{@adapter.class} does not implement method '#{@method}', which was 
       def message
         <<-MSG
 #{@resource_class}: Tried to pass block to .#{@method_name}, which only accepts a method name.
+        MSG
+      end
+    end
+
+    class RemoteWrite < Base
+      def initialize(resource_class)
+        @resource_class = resource_class
+      end
+
+      def message
+        <<-MSG
+#{@resource_class}: Tried to perform write operation. Writes are not supported for remote resources - hit the endpoint directly.
         MSG
       end
     end

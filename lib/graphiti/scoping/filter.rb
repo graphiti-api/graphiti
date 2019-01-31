@@ -48,7 +48,9 @@ module Graphiti
         value, operator = normalize_param(filter, param_value)
         operator = operator.to_s.gsub('!', 'not_').to_sym
         validate_operator(filter, operator)
-        value  = parse_string_value(filter.values[0], value) if value.is_a?(String)
+        unless filter.values[0][:type] == :hash || !value.is_a?(String)
+          value = parse_string_value(filter.values[0], value)
+        end
         validate_singular(resource, filter, value)
         value = coerce_types(filter.values[0], param_name.to_sym, value)
         validate_allowlist(resource, filter, value)
@@ -130,6 +132,19 @@ module Graphiti
 
       if value.is_a?(String)
         value = value.gsub('{{{', '{').gsub('}}}', '}')
+
+        # Accomodate array of hashes
+        if value.include?('},{')
+          value = value.split('},{').map do |v|
+            if v.starts_with?('{') && !v.ends_with?('}')
+              v = "#{v}}"
+            elsif v.ends_with?('}') && !v.starts_with?('{')
+              v = "{#{v}"
+            else
+              "{#{v}}"
+            end
+          end
+        end
       end
 
       [value, operator]

@@ -1,14 +1,23 @@
 sudo: false
 language: ruby
 rvm:
-  - 2.3
-  - 2.4
-  - 2.5
+- 2.4
+- 2.5
+- 2.6
 
-script: "bundle exec rake"
-
+script: bundle exec rake
 install: bundle install --retry=3 --jobs=3
 
+before_install:
+- gem install bundler -v '< 2'
+
 gemfile:
-  - gemfiles/rails_4.gemfile
-  - gemfiles/rails_5.gemfile
+- gemfiles/rails_4.gemfile
+- gemfiles/rails_5.gemfile
+
+deploy:
+  provider: rubygems
+  api_key:
+    secure: WbnbSdU4Tje9FbrJp/H80vBRvFGU9MpgyOOr8VSZUxOHJxzppaVWNS15luY9RKyai6jCn32az5dkcdatm+ij4bbT5DcEP+JERON6bgMlVQ8H5OJ6WncdN4KzMLAP0nbHbdC6j6rin5v4Ex8hUWEfFb4A4TRjCdRVmXtgPmITGjgdkHKNFp1xpJLGk3ya5T5Ii4sG/HRjJ7KtY6/xOJC/6qR+o7OBNC3lCocfIuqz6mS146n5nAy037Utuf/UatB9l5KX9k543GdKDGoP/MaAgA6PiOn3fF2osboSw1/re1485wVY/EtO/nIvwhBY99HiZFSg7RVxdCvP0LeP9Tug48LFP8zCW2lJIokOH9dAEddk/IDVRqp+Jl/WhXr1QU7en1GuHqtBrWX8CQeYOIU1bQwguzTvWe/4a5DB70iUeSamTRYUvwgkEyD/91QywaFQKNjDBHc0Uo3D+55p/Q4oR2x3jmr8NS0Af1oIPJFCck58UgN1RSln4iUBdaqST0hMbzjhOpa6ZCShbwT/P9qJkkUbE4pY9gB+XY5PFiXkC/KoWWUpjXJ2ZNEDL1vBAVOeT77lAbXczhMmg38aMSRjW312z2o+YjsWs8Ti0U+ie/98UZRR2zoydfr3VmURpaCBpKmK4K+uRbau5h2/G4uOMHR7YmCiiU4dq0bGmb8iM48=
+  on:
+    tags: true

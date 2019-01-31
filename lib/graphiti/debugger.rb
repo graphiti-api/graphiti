@@ -17,7 +17,9 @@ module Graphiti
           on_data_exception(payload, params)
         else
           if payload[:sideload]
-            on_sideload_data(payload, params, took)
+            if payload[:results]
+              on_sideload_data(payload, params, took)
+            end
           else
             on_primary_data(payload, params, took)
           end

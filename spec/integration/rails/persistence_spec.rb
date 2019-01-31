@@ -2,52 +2,8 @@ if ENV["APPRAISAL_INITIALIZED"]
   RSpec.describe 'persistence', type: :controller do
     include GraphitiSpecHelpers
 
-    # todo ?include=foo
-    controller(ApplicationController) do
-      def create
-        employee = EmployeeResource.build(params)
-
-        if employee.save
-          render jsonapi: employee
-        else
-          render json: {
-            errors: {
-              employee: employee.errors,
-              positions: employee.data.positions.map(&:errors),
-              departments: employee.data.positions.map(&:department).compact.map(&:errors)
-            }
-          }
-        end
-      end
-
-      def update
-        employee = EmployeeResource.find(params)
-
-        if employee.update_attributes
-          render jsonapi: employee
-        else
-          render json: { error: employee.errors }
-        end
-      end
-
-      def destroy
-        employee = EmployeeResource.find(params)
-
-        if employee.destroy
-          render json: { meta: {} }
-        else
-          render json: { error: employee.errors }
-        end
-      end
-    end
-
-    def do_post
-      post :create, params: payload
-    end
-
-    def do_put(id)
-      put :update, params: payload
-    end
+    # defined in spec/supports/rails/employee_controller.rb
+    controller(ApplicationController, &EMPLOYEE_CONTROLLER_BLOCK)
 
     before do
       allow(controller.request.env).to receive(:[])
@@ -79,16 +35,20 @@ if ENV["APPRAISAL_INITIALIZED"]
         }
       end
 
+      subject(:make_request) do
+        do_create(payload)
+      end
+
       it 'persists the employee' do
         expect {
-          do_post
+          make_request
         }.to change { Employee.count }.by(1)
         employee = Employee.first
         expect(employee.first_name).to eq('Joe')
       end
 
       it 'responds with the persisted data' do
-        do_post
+        make_request
         expect(jsonapi_data['id']).to eq(Employee.first.id.to_s)
         expect(jsonapi_data['first_name']).to eq('Joe')
       end
@@ -99,7 +59,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         it 'returns validation error response' do
-          do_post
+          make_request
           expect(json['errors']).to eq({
             'employee' => { 'first_name' => ["can't be blank"] },
             'departments' => [],
@@ -124,14 +84,18 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       let(:path) { "/employees/#{employee.id}" }
 
+      subject(:make_request) do
+        do_update(payload)
+      end
+
       it 'updates the data correctly' do
         expect {
-          do_put(employee.id)
+          make_request
         }.to change { employee.reload.first_name }.from('Joe').to('Jane')
       end
 
       it 'responds with the persisted data' do
-        do_put(employee.id)
+        make_request
         expect(jsonapi_data['id']).to eq(employee.id.to_s)
         expect(jsonapi_data['first_name']).to eq('Jane')
       end
@@ -142,7 +106,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         it 'responds with error' do
-          do_put(employee.id)
+          make_request
           expect(json['error']).to eq('first_name' => ["can't be blank"])
         end
       end
@@ -162,13 +126,13 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       it 'deletes the object' do
         expect {
-          delete :destroy, params: { id: employee.id }
+          do_destroy({ id: employee.id })
         }.to change { Employee.count }.by(-1)
         expect { employee.reload }.to raise_error(ActiveRecord::RecordNotFound)
       end
 
       it 'responds with 200, empty meta' do
-        delete :destroy, params: { id: employee.id }
+        do_destroy({ id: employee.id })
         expect(response.status).to eq(200)
         expect(json).to eq({ 'meta' => {} })
       end
@@ -178,7 +142,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         it 'responds with correct error payload' do
           expect {
-            delete :destroy, params: { id: employee.id }
+            do_destroy({ id: employee.id })
           }.to_not change { Employee.count }
           expect(json['error']).to eq('base' => ['Forced validation error'])
         end
@@ -221,7 +185,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         it 'can create' do
           expect {
-            do_post
+            do_create(payload)
           }.to change { Salary.count }.by(1)
 
           salary = Employee.first.salary
@@ -237,6 +201,10 @@ if ENV["APPRAISAL_INITIALIZED"]
         before do
           employee.salary = salary
           employee.save!
+        end
+
+        subject(:make_request) do
+          do_update(payload)
         end
 
         context 'on update' do
@@ -271,7 +239,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
           it 'can update' do
             expect {
-              do_put(employee.id)
+              make_request
             }.to change { employee.reload.salary.base_rate }.from(15.0).to(15.75)
           end
         end
@@ -298,7 +266,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           end
 
           it 'can destroy' do
-            do_put(employee.id)
+            make_request
             employee.reload
 
             expect(employee.salary).to be_nil
@@ -328,7 +296,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           let(:path) { "/employees/#{employee.id}" }
 
           it 'can disassociate' do
-            do_put(employee.id)
+            make_request
             salary.reload
 
             expect(salary.employee_id).to be_nil
@@ -338,6 +306,10 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     describe 'nested create' do
+      subject(:make_request) do
+        do_create(payload)
+      end
+
       let(:payload) do
         {
           data: {
@@ -379,7 +351,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       it 'creates the objects' do
         expect {
-          do_post
+          make_request
         }.to change { Employee.count }.by(1)
         employee = Employee.first
         positions = employee.positions
@@ -408,7 +380,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         it 'rolls back the entire transaction' do
           expect {
-            do_post
+            make_request
           }.to_not change { Employee.count+Position.count+Department.count }
           expect(json['errors']['positions'])
             .to eq([{ 'title' => ["can't be blank"] }, {}])
@@ -431,7 +403,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         it 'rolls back the entire transaction' do
           expect {
-            do_post
+            make_request
           }.to_not change { Employee.count+Position.count+Department.count }
           expect(json['errors']['departments'])
             .to eq([{ 'name' => ["can't be blank"] }])
@@ -458,7 +430,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         it 'associates to existing record' do
-          do_post
+          make_request
           employee = Employee.first
           expect(employee.classification).to eq(classification)
         end
@@ -496,8 +468,8 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         it 'updates' do
-          do_post
-          position.reload
+          make_request
+
           employee = Employee.first
           expect(employee.positions[0]).to eq(position)
           expect(position.department_id).to be_nil
@@ -513,6 +485,10 @@ if ENV["APPRAISAL_INITIALIZED"]
       let!(:department) { Department.create!(name: 'original') }
 
       let(:path) { "/employees/#{employee.id}" }
+
+      subject(:make_request) do
+        do_update(payload)
+      end
 
       let(:payload) do
         {
@@ -549,7 +525,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       it 'updates the objects' do
-        do_put(employee.id)
+        make_request
         employee.reload
         expect(employee.first_name).to eq('updated first name')
         expect(employee.positions[0].title).to eq('unchanged')
@@ -559,7 +535,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       # NB - should only sideload updated position, not all positions
       it 'sideloads the objects in response' do
-        do_put(employee.id)
+        make_request
         expect(included('positions').length).to eq(1)
         expect(included('positions')[0].id).to eq(position2.id)
         expect(included('departments').length).to eq(1)
@@ -570,6 +546,10 @@ if ENV["APPRAISAL_INITIALIZED"]
       let!(:employee)   { Employee.create!(first_name: 'Joe') }
       let!(:position)   { Position.create!(department_id: department.id, employee_id: employee.id) }
       let!(:department) { Department.create! }
+
+      subject(:make_request) do
+        do_update(payload)
+      end
 
       let(:payload) do
         {
@@ -608,24 +588,24 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         it 'belongs_to: updates the foreign key on child' do
           expect {
-            do_put(employee.id)
+            make_request
           }.to change { position.reload.department_id }.to(nil)
         end
 
         it 'has_many: updates the foreign key on the child' do
           expect {
-            do_put(employee.id)
+            make_request
           }.to change { position.reload.employee_id }.to(nil)
         end
 
         it 'does not delete the objects' do
-          do_put(employee.id)
+          make_request
           expect { position.reload }.to_not raise_error
           expect { department.reload }.to_not raise_error
         end
 
         it 'does not sideload the objects in the response' do
-          do_put(employee.id)
+          make_request
           expect(json).to_not have_key('included')
         end
       end
@@ -635,7 +615,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         let(:path) { "/employees/#{employee.id}" }
 
         it 'deletes the objects' do
-          do_put(employee.id)
+          make_request
           expect { position.reload }
             .to raise_error(ActiveRecord::RecordNotFound)
           expect { department.reload }
@@ -643,7 +623,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         it 'does not sideload the objects in the response' do
-          do_put(employee.id)
+          make_request
           expect(json).to_not have_key('included')
         end
       end
@@ -698,7 +678,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       it 'displays validation errors for each nested object' do
-        do_post
+        do_create(payload)
         expect(json).to eq({
           'errors' => {
             'employee' => { 'base' => ['Forced validation error'] },
@@ -723,6 +703,10 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       let(:path) { "/employees/#{employee.id}" }
+
+      subject(:make_request) do
+        do_update(payload)
+      end
 
       let(:payload) do
         {
@@ -763,7 +747,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       it 'can create/update/disassociate/associate/destroy' do
         expect(employee.teams).to include(destroy_team)
         expect(employee.teams).to include(disassociate_team)
-        do_put(employee.id)
+        make_request
 
         # Should properly delete/create from the through table
         combos = EmployeeTeam.all.map { |et| [et.employee_id, et.team_id] }
@@ -781,8 +765,143 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
-    describe 'nested polymorphic relationship' do
+    describe 'nested relationship to polymorphic resource' do
+      subject(:make_request) do
+        do_create(payload)
+      end
+
+      let(:payload) do
+        {
+          data: {
+            type: 'employees',
+            attributes: { first_name: 'Joe' },
+            relationships: {
+              tasks: {
+                data: [
+                  { :'temp-id' => 'abc123', type: 'features', method: 'create' },
+                  { :'temp-id' => 'abc456', type: 'bugs', method: 'create' }
+                ]
+              }
+            }
+          },
+          included: [
+            {
+              :'temp-id' => 'abc123',
+              type: 'features',
+              attributes: { name: 'test feature' }
+            },
+            {
+              :'temp-id' => 'abc456',
+              type: 'bugs',
+              attributes: { name: 'test bug' }
+            }
+          ]
+        }
+      end
+
+      it 'creates correct records' do
+        make_request
+        employee = Employee.last
+        expect(employee.features.length).to eq(1)
+        expect(employee.bugs.length).to eq(1)
+      end
+    end
+
+    describe 'nested polymorphic_has_many relationship' do
+      subject(:make_request) { do_update(payload) }
+      let!(:employee) { Employee.create!(first_name: 'Jane') }
+      let(:path) { "/employees/#{employee.id}" }
+
+      let(:payload) do
+        {
+          data: {
+            type: 'employees',
+            id: employee.id,
+            attributes: { first_name: 'Jane' },
+            relationships: {
+              notes: {
+                data: [{
+                  note_id_key => note_id, type: 'notes', method: method
+                }]
+              }
+            }
+          },
+          included: [
+            {
+              type: 'notes',
+              note_id_key => note_id,
+              attributes: { body: 'foo' }
+            }
+          ]
+        }
+      end
+
+      context 'when creating' do
+        let(:note_id) { 'abc123' }
+        let(:note_id_key) { :'temp-id' }
+        let(:method) { 'create' }
+
+        it 'works' do
+          make_request
+          expect(employee.reload.notes.map(&:body)).to eq(['foo'])
+        end
+      end
+
+      context 'when updating' do
+        let!(:note) { Note.create(body: 'bar') }
+        let(:note_id) { note.id.to_s }
+        let(:note_id_key) { :id }
+        let(:method) { :update }
+
+        it 'works' do
+          make_request
+          expect(employee.reload.notes.map(&:body)).to eq(['foo'])
+        end
+      end
+
+      context 'when destroying' do
+        let!(:note) do
+          Note.create notable_id: employee.id,
+            notable_type: 'Employee'
+        end
+        let(:note_id) { note.id.to_s }
+        let(:note_id_key) { :id }
+        let(:method) { :destroy }
+
+        it 'works' do
+          expect {
+            make_request
+          }.to change { employee.reload.notes.count }.by(-1)
+           .and change { Note.count }.by(-1)
+        end
+      end
+
+      context 'when disassociating' do
+        let!(:note) do
+          Note.create notable_id: employee.id,
+            notable_type: 'Employee'
+        end
+        let(:note_id) { note.id.to_s }
+        let(:note_id_key) { :id }
+        let(:method) { :disassociate }
+
+        it 'works' do
+          expect {
+            make_request
+          }.to change { employee.reload.notes.count }.by(-1)
+          expect { note.reload }.to_not raise_error
+          expect(note.notable_id).to be_nil
+          expect(note.notable_type).to be_nil
+        end
+      end
+    end
+
+    describe 'nested polymorphic_belongs_to relationship' do
       let(:workspace_type) { 'offices' }
+
+      subject(:make_request) do
+        do_create(payload)
+      end
 
       let(:payload) do
         {
@@ -811,7 +930,8 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       context 'with jsonapi type "offices"' do
         it 'associates workspace as office' do
-          do_post
+          make_request
+
           employee = Employee.first
           expect(employee.workspace).to be_a(Office)
         end
@@ -821,7 +941,8 @@ if ENV["APPRAISAL_INITIALIZED"]
         let(:workspace_type) { 'home_offices' }
 
         it 'associates workspace as home office' do
-          do_post
+          make_request
+
           employee = Employee.first
           expect(employee.workspace).to be_a(HomeOffice)
         end
@@ -829,7 +950,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       it 'saves the relationship correctly' do
         expect {
-          do_post
+          make_request
         }.to change { Employee.count }.by(1)
         employee = Employee.first
         workspace = employee.workspace

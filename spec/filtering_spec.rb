@@ -31,7 +31,7 @@ RSpec.describe 'filtering' do
     before do
       resource.filter :by_json, :hash do
         eq do |scope, value|
-          ids = value.map { |v| v['id'] }
+          ids = value.map { |v| [v['id'], v['id2']] }.flatten
           scope[:conditions].merge!(id: ids)
           scope
         end
@@ -43,13 +43,26 @@ RSpec.describe 'filtering' do
       expect(records.map(&:id)).to eq([employee2.id])
     end
 
+    context 'and the hash has multiple keys' do
+      before do
+        params[:filter] = { by_json: '{ "id": 2, "id2": 3 }' }
+      end
+
+      it 'still works' do
+        expect(records.map(&:id)).to eq([employee2.id, employee3.id])
+      end
+    end
+
     context 'and an array of json objects passed' do
       before do
-        params[:filter] = { by_json: '{ "id": 2 },{ "id": 3 }' }
+        params[:filter] = {
+          by_json: '{ "id": 2, "id2": 3 },{ "id": 4 },{ "id": 5 },{ "id": 6 }'
+        }
       end
 
       it 'works' do
-        expect(records.map(&:id)).to eq([employee2.id, employee3.id])
+        expect(records.map(&:id))
+          .to eq([employee2.id, employee3.id, employee4.id])
       end
     end
   end
@@ -1093,6 +1106,16 @@ RSpec.describe 'filtering' do
           expect(resource.filters[:foo][:operators].keys).to eq([:eq, :foo])
         end
       end
+
+      context 'when only argument is not an array' do
+        before do
+          resource.filter :foo, :string, only: :eq
+        end
+
+        it 'limits available operators' do
+          expect(resource.filters[:foo][:operators].keys).to eq([:eq])
+        end
+      end
     end
 
     context 'and given :except option' do
@@ -1123,6 +1146,18 @@ RSpec.describe 'filtering' do
         it 'limits available operators, adding custom ones' do
           expect(resource.filters[:foo][:operators].keys).to eq([
             :gt, :gte, :lt, :lte, :foo
+          ])
+        end
+      end
+
+      context 'when except argument is not an array' do
+        before do
+          resource.filter :foo, :integer, except: :eq
+        end
+
+        it 'limits available operators' do
+          expect(resource.filters[:foo][:operators].keys).to eq([
+            :not_eq, :gt, :gte, :lt, :lte
           ])
         end
       end

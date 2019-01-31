@@ -16,20 +16,22 @@ module Graphiti
         errors = Graphiti::SchemaDiff.new(old, schema).compare
         return errors if errors.any?
       end
+      FileUtils.mkdir_p(Graphiti.config.schema_path.gsub('/schema.json', ''))
       File.write(Graphiti.config.schema_path, JSON.pretty_generate(schema))
       []
     end
 
     def initialize(resources)
       @resources = resources.sort_by(&:name)
+      @remote_resources = resources.select(&:remote?)
+      @local_resources = @resources - @remote_resources
     end
 
     def generate
       {
         resources: generate_resources,
         endpoints: generate_endpoints,
-        types: generate_types,
-        base_url: resources.map(&:base_url)[0]
+        types: generate_types
       }
     end
 
@@ -79,7 +81,7 @@ module Graphiti
     end
 
     def generate_resources
-      @resources.map do |r|
+      arr = @local_resources.map do |r|
         config = {
           name: r.name,
           type: r.type.to_s,
@@ -108,6 +110,17 @@ module Graphiti
 
         config
       end
+
+      arr |= @remote_resources.map do |r|
+        {
+          name: r.name,
+          description: r.description,
+          remote: r.remote_url,
+          relationships: relationships(r)
+        }
+      end
+
+      arr
     end
 
     def attributes(resource)

@@ -24,6 +24,7 @@ module Graphiti
       alias :filter_big_decimal_eq :filter_eq
       alias :filter_date_eq :filter_eq
       alias :filter_boolean_eq :filter_eq
+      alias :filter_uuid_eq :filter_eq
 
       def filter_not_eq(scope, attribute, value)
         scope.where.not(attribute => value)
@@ -33,6 +34,7 @@ module Graphiti
       alias :filter_big_decimal_not_eq :filter_not_eq
       alias :filter_date_not_eq :filter_not_eq
       alias :filter_boolean_not_eq :filter_not_eq
+      alias :filter_uuid_not_eq :filter_not_eq
 
       def filter_string_eq(scope, attribute, value, is_not: false)
         column = scope.klass.arel_table[attribute]

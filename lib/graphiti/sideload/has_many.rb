@@ -21,6 +21,16 @@ class Graphiti::Sideload::HasMany < Graphiti::Sideload
   end
 
   def children_for(parent, map)
-    map[parent.send(primary_key)] || []
+    pk = parent.send(primary_key)
+    children = map[pk]
+    return children if children
+
+    keys = map.keys
+    if pk.is_a?(String) && keys[0].is_a?(Integer)
+      pk = pk.to_i
+    elsif pk.is_a?(Integer) && keys[0].is_a?(String)
+      pk = pk.to_s
+    end
+    map[pk] || []
   end
 end

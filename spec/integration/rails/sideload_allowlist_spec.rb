@@ -29,7 +29,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     context 'when no sideload allowlist' do
       it 'allows loading all relationships' do
-        get :index, params: { include: 'books.genre' }
+        do_index({ include: 'books.genre' })
         expect(json_includes('books')).to_not be_blank
         expect(json_includes('genres')).to_not be_blank
       end
@@ -44,7 +44,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       it 'restricts what sideloads can be loaded' do
-        get :index, params: { include: 'books.genre' }
+        do_index({ include: 'books.genre' })
         expect(json_includes('books')).to_not be_blank
         expect(json_includes('genres')).to be_blank
       end

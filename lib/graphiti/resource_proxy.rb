@@ -87,14 +87,29 @@ module Graphiti
     def save(action: :create)
       # TODO: remove this. Only used for persisting many-to-many with AR
       # (see activerecord adapter)
-      Graphiti.context[:namespace] = action
-      validator = persist do
-        @resource.persist_with_relationships \
-          @payload.meta(action: action),
-          @payload.attributes,
-          @payload.relationships
+      original = Graphiti.context[:namespace]
+      begin
+        Graphiti.context[:namespace] = action
+        validator = persist do
+          @resource.persist_with_relationships \
+            @payload.meta(action: action),
+            @payload.attributes,
+            @payload.relationships
+        end
+      ensure
+        Graphiti.context[:namespace] = original
       end
       @data, success = validator.to_a
+
+      if success
+        # If the context namespace is `update` or `create`, certain
+        # adapters will cause N+1 validation calls, so lets explicitly
+        # switch to a lookup context.
+        Graphiti.with_context(Graphiti.context[:object], :show) do
+          @scope.resolve_sideloads([@data])
+        end
+      end
+
       success
     end
 
@@ -117,7 +132,10 @@ module Graphiti
     end
 
     def include_hash
-      @payload ? @payload.include_hash : @query.include_hash
+      @include_hash ||= begin
+        base = @payload ? @payload.include_hash : {}
+        base.deep_merge(@query.include_hash)
+      end
     end
 
     def fields

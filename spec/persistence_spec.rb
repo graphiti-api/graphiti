@@ -532,6 +532,83 @@ RSpec.describe 'persistence' do
       end
     end
 
+    describe '.around_persistence' do
+      RSpec.shared_examples 'around persistence' do |opts|
+        opts ||= {}
+
+        before do
+          klass.class_eval do
+            before_attributes do |attrs|
+              attrs[:first_name] = "#{attrs[:first_name]}mid"
+            end
+
+            def do_around_persistence(attributes)
+              attributes[:first_name] = 'b4'
+              model = yield
+              model.update_attributes(first_name: "#{model.first_name}after")
+              model
+              1 # return value shouldnt matter
+            end
+          end
+        end
+
+        if opts[:only_update]
+          context 'when creating' do
+            include_context 'create hooks'
+
+            it 'does not fire' do
+              employee
+              expect(klass.calls.length).to eq(0)
+            end
+          end
+        else
+          context 'when creating' do
+            include_context 'create hooks'
+
+            it 'can modify attributes and the saved model' do
+              reloaded = PORO::Employee.find(employee.id)
+              expect(reloaded.first_name).to eq('b4midafter')
+            end
+          end
+        end
+
+        context 'when updating' do
+          include_context 'update hooks'
+
+          it 'can modify attributes and the saved model' do
+            reloaded = PORO::Employee.find(employee.id)
+            expect(reloaded.first_name).to eq('b4midafter')
+          end
+        end
+      end
+
+      context 'when registering via method' do
+        before do
+          klass.around_persistence :do_around_persistence
+        end
+
+        include_examples 'around persistence'
+      end
+
+      context 'when registering via proc' do
+        it 'raises error' do
+          expect {
+            klass.around_persistence do
+              'dontgethere'
+            end
+          }.to raise_error(Graphiti::Errors::AroundCallbackProc, /around_persistence/)
+        end
+      end
+
+      context 'when limiting actions' do
+        before do
+          klass.around_persistence :do_around_persistence, only: [:update]
+        end
+
+        include_examples 'around persistence', only_update: true
+      end
+    end
+
     describe '.around_save' do
       RSpec.shared_examples 'around save' do |opts|
         opts ||= {}
@@ -816,6 +893,194 @@ RSpec.describe 'persistence' do
         end
 
         include_examples 'around_destroy'
+      end
+    end
+
+    describe 'stacking callbacks' do
+      before do
+        klass.before_attributes do |attrs|
+          attrs[:first_name] << '_b4attrsA'
+        end
+
+        klass.before_attributes do |attrs|
+          attrs[:first_name] << '_b4attrsB'
+        end
+
+        klass.before_attributes only: [:update] do |attrs|
+          attrs[:first_name] << '_b4attrsC'
+        end
+
+        klass.after_attributes do |model|
+          model.first_name << '_afterattrsA'
+        end
+
+        klass.after_attributes do |model|
+          model.first_name << '_afterattrsB'
+        end
+
+        klass.after_attributes only: [:update] do |model|
+          model.first_name << '_afterattrsC'
+        end
+
+        klass.around_attributes :around_attrs_a
+        klass.around_attributes :around_attrs_b
+        klass.around_attributes :around_attrs_c, only: [:update]
+
+        klass.before_save do |model|
+          model.first_name << '_b4saveA'
+        end
+
+        klass.before_save do |model|
+          model.first_name << '_b4saveB'
+        end
+
+        klass.before_save only: [:update] do |model|
+          model.first_name << '_b4saveC'
+        end
+
+        klass.after_save do |model|
+          model.first_name << '_aftersaveA'
+        end
+
+        klass.after_save do |model|
+          model.first_name << '_aftersaveB'
+        end
+
+        klass.after_save only: [:update] do |model|
+          model.first_name << '_aftersaveC'
+        end
+
+        klass.around_save :around_save_a
+        klass.around_save :around_save_b
+        klass.around_save :around_save_c, only: [:update]
+
+        klass.around_persistence :around_persistence_a
+        klass.around_persistence :around_persistence_b
+        klass.around_persistence :around_persistence_c, only: [:update]
+
+        klass.class_eval do
+          def around_attrs_a(attrs)
+            attrs[:first_name] << '_aroundattrsA1'
+            yield attrs
+            attrs[:first_name] << '_aroundattrsA2'
+          end
+
+          def around_attrs_b(attrs)
+            attrs[:first_name] << '_aroundattrsB1'
+            yield attrs
+            attrs[:first_name] << '_aroundattrsB2'
+          end
+
+          def around_attrs_c(attrs)
+            attrs[:first_name] << '_aroundattrsC1'
+            yield attrs
+            attrs[:first_name] << '_aroundattrsC2'
+          end
+
+          def around_save_a(model)
+            model.first_name << '_aroundsaveA1'
+            yield model
+            model.first_name << '_aroundsaveA2'
+          end
+
+          def around_save_b(model)
+            model.first_name << '_aroundsaveB1'
+            yield model
+            model.first_name << '_aroundsaveB2'
+          end
+
+          def around_save_c(model)
+            model.first_name << '_aroundsaveC1'
+            yield model
+            model.first_name << '_aroundsaveC2'
+          end
+
+          def around_persistence_a(attrs)
+            attrs[:first_name] << '_aroundpersA1'
+            model = yield attrs
+            model.first_name << '_aroundpersA2'
+          end
+
+          def around_persistence_b(attrs)
+            attrs[:first_name] << '_aroundpersB1'
+            model = yield attrs
+            model.first_name << '_aroundpersB2'
+          end
+
+          def around_persistence_c(attrs)
+            attrs[:first_name] << '_aroundpersC1'
+            model = yield attrs
+            model.first_name << '_aroundpersC2'
+          end
+        end
+      end
+
+      it 'can stack multiple callbacks on create' do
+        proxy = klass.build(payload)
+        proxy.save
+        expect(proxy.data.first_name.split('_')).to eq([
+          'Jane',
+          'aroundpersA1',
+          'aroundpersB1',
+          'aroundattrsA1',
+          'aroundattrsB1',
+          'b4attrsA',
+          'b4attrsB',
+          'afterattrsA',
+          'afterattrsB',
+          'aroundattrsB2',
+          'aroundattrsA2',
+          'aroundsaveA1',
+          'aroundsaveB1',
+          'b4saveA',
+          'b4saveB',
+          'aftersaveA',
+          'aftersaveB',
+          'aroundsaveB2',
+          'aroundsaveA2',
+          'aroundpersB2',
+          'aroundpersA2'
+        ])
+      end
+
+      it 'can stack multiple callbacks on update' do
+        employee = PORO::Employee.create
+        payload[:data][:id] = employee.id
+        proxy = klass.find(payload)
+        proxy.update_attributes
+        expect(proxy.data.first_name.split('_')).to eq([
+          'Jane',
+          'aroundpersA1',
+          'aroundpersB1',
+          'aroundpersC1',
+          'aroundattrsA1',
+          'aroundattrsB1',
+          'aroundattrsC1',
+          'b4attrsA',
+          'b4attrsB',
+          'b4attrsC',
+          'afterattrsA',
+          'afterattrsB',
+          'afterattrsC',
+          'aroundattrsC2',
+          'aroundattrsB2',
+          'aroundattrsA2',
+          'aroundsaveA1',
+          'aroundsaveB1',
+          'aroundsaveC1',
+          'b4saveA',
+          'b4saveB',
+          'b4saveC',
+          'aftersaveA',
+          'aftersaveB',
+          'aftersaveC',
+          'aroundsaveC2',
+          'aroundsaveB2',
+          'aroundsaveA2',
+          'aroundpersC2',
+          'aroundpersB2',
+          'aroundpersA2'
+        ])
       end
     end
   end

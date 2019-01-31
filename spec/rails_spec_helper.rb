@@ -51,19 +51,10 @@ end
 class ApplicationController < ActionController::Base
   include Rails.application.routes.url_helpers
   include Graphiti::Rails
-
-  prepend_before_action :fix_params!
-
-  private
-
-  # Honestly not sure why this is needed
-  # Otherwise params is { params: actual_params }
-  def fix_params!
-    if Rails::VERSION::MAJOR == 4
-      good_params = { action: action_name }.merge(params[:params] || {})
-      self.params = ActionController::Parameters.new(good_params.with_indifferent_access)
-    end
-  end
 end
 
 require 'rspec/rails'
+
+RSpec.configure do |config|
+  config.include UniversalControllerSpecHelper
+end

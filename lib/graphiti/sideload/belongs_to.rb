@@ -48,6 +48,16 @@ class Graphiti::Sideload::BelongsTo < Graphiti::Sideload
   end
 
   def children_for(parent, map)
-    map[parent.send(foreign_key)]
+    fk = parent.send(foreign_key)
+    children = map[fk]
+    return children if children
+
+    keys = map.keys
+    if fk.is_a?(String) && keys[0].is_a?(Integer)
+      fk = fk.to_i
+    elsif fk.is_a?(Integer) && keys[0].is_a?(String)
+      fk = fk.to_s
+    end
+    map[fk] || []
   end
 end

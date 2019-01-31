@@ -22,6 +22,8 @@ module Graphiti
     def compare_resources
       @old[:resources].each_with_index do |r, index|
         new_resource = @new[:resources].find { |n| n[:name] == r[:name] }
+        next if new_resource.try(:[], :remote) || r.try(:[], :remote)
+
         compare_resource(r, new_resource) do
           compare_attributes(r, new_resource)
           compare_defaults(r, new_resource)

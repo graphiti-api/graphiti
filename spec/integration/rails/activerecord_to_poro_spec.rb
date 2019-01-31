@@ -45,7 +45,7 @@ if ENV['APPRAISAL_INITIALIZED']
 
     context 'when has_many' do
       it 'works' do
-        get :index, params: { include: 'books' }
+        do_index({ include: 'books' })
         sl = d[0].sideload(:books)
         expect(sl.map(&:id)).to eq([book.id])
         expect(sl[0].jsonapi_type).to eq('books')
@@ -54,7 +54,7 @@ if ENV['APPRAISAL_INITIALIZED']
 
     context 'when belongs_to' do
       it 'works' do
-        get :index, params: { include: 'state' }
+        do_index({ include: 'state' })
         sl = d[0].sideload(:state)
         expect(sl.id).to eq(state.id)
         expect(sl.jsonapi_type).to eq('states')

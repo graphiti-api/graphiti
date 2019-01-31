@@ -18,6 +18,7 @@ module Graphiti
         []
       else
         resolved = broadcast_data do |payload|
+          @object = @resource.before_resolve(@object, @query)
           payload[:results] = @resource.resolve(@object)
           payload[:results]
         end
@@ -27,34 +28,12 @@ module Graphiti
         if @opts[:after_resolve]
           @opts[:after_resolve].call(resolved)
         end
-        sideload(resolved) unless @query.sideloads.empty?
+        resolve_sideloads(resolved) unless @query.sideloads.empty?
         resolved
       end
     end
 
-    private
-
-    def broadcast_data
-      opts = {
-        resource: @resource,
-        params: @opts[:params],
-        sideload: @opts[:sideload],
-        parent: @opts[:parent]
-      }
-      Graphiti.broadcast("data", opts) do |payload|
-        yield payload
-      end
-    end
-
-    # Used to ensure the resource's serializer is used
-    # Not one derived through the usual jsonapi-rb logic
-    def assign_serializer(records)
-      records.each do |r|
-        @resource.decorate_record(r)
-      end
-    end
-
-    def sideload(results)
+    def resolve_sideloads(results)
       return if results == []
 
       concurrent = Graphiti.config.concurrency
@@ -62,6 +41,7 @@ module Graphiti
 
       @query.sideloads.each_pair do |name, q|
         sideload = @resource.class.sideload(name)
+        next if sideload.nil? || sideload.shared_remote?
         _parent = @resource
         _context = Graphiti.context
         resolve_sideload = -> {
@@ -92,12 +72,39 @@ module Graphiti
       end
     end
 
+    private
+
+    def broadcast_data
+      opts = {
+        resource: @resource,
+        params: @opts[:params],
+        sideload: @opts[:sideload],
+        parent: @opts[:parent]
+      }
+      Graphiti.broadcast("data", opts) do |payload|
+        yield payload
+      end
+    end
+
+    # Used to ensure the resource's serializer is used
+    # Not one derived through the usual jsonapi-rb logic
+    def assign_serializer(records)
+      records.each do |r|
+        @resource.decorate_record(r)
+      end
+    end
+
     def apply_scoping(scope, opts)
       @object = scope
-      add_scoping(nil, Graphiti::Scoping::DefaultFilter, opts)
-      add_scoping(:filter, Graphiti::Scoping::Filter, opts)
-      add_scoping(:sort, Graphiti::Scoping::Sort, opts)
-      add_scoping(:paginate, Graphiti::Scoping::Paginate, opts)
+
+      unless @resource.remote?
+        opts[:default_paginate] = false unless @query.paginate?
+        add_scoping(nil, Graphiti::Scoping::DefaultFilter, opts)
+        add_scoping(:filter, Graphiti::Scoping::Filter, opts)
+        add_scoping(:sort, Graphiti::Scoping::Sort, opts)
+        add_scoping(:paginate, Graphiti::Scoping::Paginate, opts)
+      end
+
       @object
     end
 

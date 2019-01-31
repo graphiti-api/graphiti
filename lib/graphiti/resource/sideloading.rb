@@ -63,6 +63,7 @@ module Graphiti
 
         def polymorphic_has_many(name, opts = {}, as:, &blk)
           opts[:foreign_key] ||= :"#{as}_id"
+          opts[:polymorphic_as] ||= as
           _model = model
           has_many name, opts do
             params do |hash|
