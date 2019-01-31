@@ -1220,6 +1220,18 @@ RSpec.describe 'serialization' do
           end
         end
 
+        context 'that is empty' do
+          before do
+            employee.update_attributes(classification_id: nil)
+          end
+
+          it 'generates an empty link' do
+            resource.belongs_to :classification
+            render
+            expect(classification['links']['related']).to be_nil
+          end
+        end
+
         # ie fields
         xit 'runtime options' do
         end

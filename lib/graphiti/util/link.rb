@@ -14,10 +14,20 @@ module Graphiti
       end
 
       def generate
-        on_demand_links(raw_url)
+        if linkable?
+          on_demand_links(raw_url)
+        end
       end
 
       private
+
+      def linkable?
+        if @sideload.type == :belongs_to
+          not @model.send(@sideload.foreign_key).nil?
+        else
+          true
+        end
+      end
 
       def raw_url
         if @sideload.link_proc
