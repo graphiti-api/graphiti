@@ -69,6 +69,11 @@ if ENV["APPRAISAL_INITIALIZED"]
           end
         end
 
+        # Stacking second callback on create
+        before_commit only: [:create] do |employee|
+          Callbacks.add(:stacked_create, employee)
+        end
+
         before_commit only: [:update] do |employee|
           Callbacks.add(:update, employee)
           if $raise_on_before_commit[:employee]
@@ -165,6 +170,17 @@ if ENV["APPRAISAL_INITIALIZED"]
           expect(Callbacks.entities.length).to eq(1)
           expect(Callbacks.fired[:create]).to be_a(Employee)
         end
+
+        context 'when stacking' do
+          before do
+            $raise_on_before_commit = { employee: false }
+          end
+
+          it 'works' do
+            post :create, params: payload
+            expect(Callbacks.entities).to eq([:create, :stacked_create])
+          end
+        end
       end
 
       context 'nested' do
@@ -210,7 +226,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             .to receive(:validate!)
           post :create, params: payload
           expect(Callbacks.entities)
-            .to eq([:create, :position, :department])
+            .to eq([:create, :stacked_create, :position, :department])
           expect(Callbacks.fired[:create]).to be_a(Employee)
           expect(Callbacks.fired[:position]).to be_a(Position)
           expect(Callbacks.fired[:department]).to be_a(Department)

@@ -82,7 +82,8 @@ module Graphiti
 
         def before_commit(only: [:create, :update, :destroy], &blk)
           Array(only).each do |verb|
-            config[:before_commit][verb] = blk
+            config[:before_commit][verb] ||= []
+            config[:before_commit][verb] << blk
           end
         end
 
