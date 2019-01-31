@@ -59,6 +59,8 @@ class Graphiti::Util::ValidationResponse
       if payload.is_a?(Array)
         related_objects = model.send(name)
         related_objects.each_with_index do |r, index|
+          method = payload[index].try(:[], :meta).try(:[], :method)
+          next if [nil, :destroy, :disassociate].include?(method)
           valid = valid_object?(r)
           checks << valid
 
