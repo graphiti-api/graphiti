@@ -109,7 +109,7 @@ module Graphiti
       def destroy(id)
         model_instance = self.class._find(id: id).data
         run_callbacks :destroy, :destroy, model_instance do
-          adapter.destroy(model_instance)
+          delete(model_instance)
         end
         model_instance
       end
@@ -124,6 +124,10 @@ module Graphiti
 
       def save(model_instance)
         adapter.save(model_instance)
+      end
+
+      def delete(model_instance)
+        adapter.destroy(model_instance)
       end
 
       private
