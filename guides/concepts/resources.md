@@ -1569,6 +1569,33 @@ Errors on associations will have a slightly expanded payload:
 When [Sideposting](#sideposting), the errors payload will contain all
 invalid Resources in the graph.
 
+## 7.4 Read on Write
+
+By default, the response of a persistence operation will mirror your
+request. But sometimes you need control over the response. The most
+common scenario is sideloading an additional entity - imagine creating
+an order, and wanting the order's shipping information to come back in
+the response.
+
+You can do this by POSTing the payload as normal, but adding query
+parameters to the URL:
+
+```
+POST /api/v1/orders?include=shipping_information
+
+{
+  type: 'orders',
+  attributes: { ... }
+}
+```
+
+This will sideload the shipping information in the response. When using
+[Spraypaint]({{site.github.url}}/js/home), do this with:
+
+{% highlight js %}
+order.save({ returnScope: Order.includes('shipping_information') })
+{% endhighlight %}
+
 ## 8 Context
 
 All resources have access to `#context`. If you're using Rails,
