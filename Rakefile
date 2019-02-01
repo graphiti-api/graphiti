@@ -8,7 +8,7 @@ RSpec::Core::RakeTask.new(:spec) do |t|
   end
 end
 
-if !ENV["APPRAISAL_INITIALIZED"] && !ENV["TRAVIS"]
+if !ENV["APPRAISAL_INITIALIZED"] && !ENV['TRAVIS']
   task :default => [:spec, :appraisal]
 else
   task :default => [:spec]
