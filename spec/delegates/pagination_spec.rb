@@ -84,6 +84,32 @@ RSpec.describe Graphiti::Delegates::Pagination do
       allow(instance).to receive(:page_size).and_return(2)
       expect(subject).to eq 2
     end
+
+    context "when item_count is 0" do
+      it "returns nil" do
+        allow(instance).to receive(:item_count).and_return(0)
+        allow(instance).to receive(:page_size).and_return(2)
+        expect(subject).to eq nil
+      end
+    end
+
+    context "when page_size is 0" do
+      it "returns nil" do
+        allow(instance).to receive(:item_count).and_return(3)
+        allow(instance).to receive(:page_size).and_return(0)
+        expect(subject).to eq nil
+      end
+    end
+  end
+
+  describe "#item_count" do
+    subject{ instance.send(:item_count) }
+
+    it "returns 0 if resource.stat(:total, :count) is nil" do
+      expect(proxy.scope).to receive(:unpaginated_object)
+      expect(proxy.resource).to receive(:stat).with(:total, :count).and_return(lambda{ |obj, meth| nil })
+      expect(subject).to eq 0
+    end
   end
 
 end
