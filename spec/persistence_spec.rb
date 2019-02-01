@@ -32,6 +32,88 @@ RSpec.describe 'persistence' do
     expect(employee.data.first_name).to eq('Jane')
   end
 
+  describe 'overrides' do
+    before do
+      klass.class_eval do
+        class << self
+          attr_accessor :overridden
+        end
+      end
+    end
+
+    describe '#build' do
+      before do
+        klass.class_eval do
+          def build(model_class)
+            self.class.overridden = true
+            super
+          end
+        end
+      end
+
+      let(:payload) do
+        {
+          data: {
+            type: 'employees',
+            attributes: { first_name: 'Jane' }
+          }
+        }
+      end
+
+      it 'overrides correctly' do
+        e = klass.build(payload)
+        e.save
+        expect(klass.overridden).to be(true)
+        expect(PORO::Employee.find(e.data.id).first_name).to eq('Jane')
+      end
+    end
+
+    describe '#assign_attributes' do
+      before do
+        klass.class_eval do
+          def assign_attributes(model, attrs)
+            self.class.overridden = true
+            super
+          end
+        end
+      end
+
+      let(:payload) do
+        {
+          data: {
+            type: 'employees',
+            attributes: { first_name: 'Jane' }
+          }
+        }
+      end
+
+      it 'overrides correctly' do
+        e = klass.build(payload)
+        e.save
+        expect(klass.overridden).to be(true)
+        expect(PORO::Employee.find(e.data.id).first_name).to eq('Jane')
+      end
+    end
+
+    describe '#delete' do
+      before do
+        klass.class_eval do
+          def delete(model_instance)
+            self.class.overridden = true
+            super
+          end
+        end
+      end
+
+      it 'overrides correctly' do
+        employee = PORO::Employee.create(first_name: 'Jane')
+        klass.find(id: employee.id).destroy
+        expect(klass.overridden).to be(true)
+        expect(PORO::Employee.find(employee.id)).to be_nil
+      end
+    end
+  end
+
   describe 'lifecycle hooks' do
     before do
       klass.class_eval do
