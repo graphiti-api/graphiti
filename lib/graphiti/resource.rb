@@ -114,9 +114,9 @@ module Graphiti
       adapter.resolve(scope)
     end
 
-    def before_commit(model, method)
-      hooks = self.class.config[:before_commit][method] || []
-      hooks.each { |hook| hook.call(model) }
+    def before_commit(model, metadata)
+      hook = self.class.config[:before_commit][metadata[:method]]
+      instance_exec(model, metadata, &hook) if hook
     end
 
     def transaction

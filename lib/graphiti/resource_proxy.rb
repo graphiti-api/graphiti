@@ -115,12 +115,13 @@ module Graphiti
 
     def destroy
       validator = @resource.transaction do
-        model = @resource.destroy(@query.filters[:id])
+        metadata = { method: :destroy }
+        model = @resource.destroy(@query.filters[:id], metadata)
         model.instance_variable_set(:@__serializer_klass, @resource.serializer)
         validator = ::Graphiti::Util::ValidationResponse.new \
           model, @payload
         validator.validate!
-        @resource.before_commit(model, :destroy)
+        @resource.before_commit(model, metadata)
         validator
       end
       @data, success = validator.to_a
