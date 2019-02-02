@@ -37,7 +37,7 @@ module Graphiti
       alias :filter_uuid_not_eq :filter_not_eq
 
       def filter_string_eq(scope, attribute, value, is_not: false)
-        column = scope.klass.arel_table[attribute]
+        column = column_for(scope, attribute)
         clause = column.lower.eq_any(value.map(&:downcase))
         is_not ? scope.where.not(clause) : scope.where(clause)
       end
@@ -56,7 +56,7 @@ module Graphiti
       end
 
       def filter_string_prefix(scope, attribute, value, is_not: false)
-        column = scope.klass.arel_table[attribute]
+        column = column_for(scope, attribute)
         map = value.map { |v| "#{v}%" }
         clause = column.lower.matches_any(map)
         is_not ? scope.where.not(clause) : scope.where(clause)
@@ -67,7 +67,7 @@ module Graphiti
       end
 
       def filter_string_suffix(scope, attribute, value, is_not: false)
-        column = scope.klass.arel_table[attribute]
+        column = column_for(scope, attribute)
         map = value.map { |v| "%#{v}" }
         clause = column.lower.matches_any(map)
         is_not ? scope.where.not(clause) : scope.where(clause)
@@ -78,7 +78,7 @@ module Graphiti
       end
 
       def filter_string_match(scope, attribute, value, is_not: false)
-        column = scope.klass.arel_table[attribute]
+        column = column_for(scope, attribute)
         map = value.map { |v| "%#{v.downcase}%" }
         clause = column.lower.matches_any(map)
         is_not ? scope.where.not(clause) : scope.where(clause)
@@ -89,7 +89,7 @@ module Graphiti
       end
 
       def filter_gt(scope, attribute, value)
-        column = scope.klass.arel_table[attribute]
+        column = column_for(scope, attribute)
         scope.where(column.gt_any(value))
       end
       alias :filter_integer_gt :filter_gt
@@ -99,7 +99,7 @@ module Graphiti
       alias :filter_date_gt :filter_gt
 
       def filter_gte(scope, attribute, value)
-        column = scope.klass.arel_table[attribute]
+        column = column_for(scope, attribute)
         scope.where(column.gteq_any(value))
       end
       alias :filter_integer_gte :filter_gte
@@ -109,7 +109,7 @@ module Graphiti
       alias :filter_date_gte :filter_gte
 
       def filter_lt(scope, attribute, value)
-        column = scope.klass.arel_table[attribute]
+        column = column_for(scope, attribute)
         scope.where(column.lt_any(value))
       end
       alias :filter_integer_lt :filter_lt
@@ -119,7 +119,7 @@ module Graphiti
       alias :filter_date_lt :filter_lt
 
       def filter_lte(scope, attribute, value)
-        column = scope.klass.arel_table[attribute]
+        column = column_for(scope, attribute)
         scope.where(column.lteq_any(value))
       end
       alias :filter_integer_lte :filter_lte
@@ -271,6 +271,17 @@ module Graphiti
       def destroy(model_instance)
         model_instance.destroy
         model_instance
+      end
+
+      private
+
+      def column_for(scope, name)
+        table = scope.klass.arel_table
+        if other = scope.attribute_alias(name)
+          table[other]
+        else
+          table[name]
+        end
       end
     end
   end
