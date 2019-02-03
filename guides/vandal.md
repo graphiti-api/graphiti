@@ -32,16 +32,17 @@ install from the `vandal_ui` gem, or manually install.
 
 * Add the `vandal_ui` gem.
 * Run `rake vandal:install`
+* Mount the engine:
 
-That's it! We expect your schema to be located at
-`<your_api_namespace>/schema.json` (the Graphiti default). To
-specify an alternate location:
+{% highlight ruby %}
+# config/routes.rb
+scope path: ApplicationResource.endpoint_namespace, defaults: { format: :jsonapi } do
+  # ... routes ...
+  mount VandalUi::Engine, at: '/vandal'
+end
+{% endhighlight %}
 
-`SCHEMA_PATH=/foo_api/myschema.json rake vandal:install`
-
-*Note: early versions of Graphiti did not include the API namespace in
-the default schema search path. Run specs again and remove
-`public/schema.json` if you have issues.
+That's it! Vandal will dynamically generate a schema at `<api_namespace>/vandal/schema.json`, and you can view the UI at `<api_namespace>/vandal`.
 
 ### Manual Installation
 
@@ -49,7 +50,7 @@ the default schema search path. Run specs again and remove
 application. Just grab the [dist files](https://github.com/graphiti-api/vandal/tree/master/dist) and put them anywhere you'd like.
 
 Note that `index.html` has a placeholder, `__SCHEMA_PATH__`. Replace
-this with a URL hosting your schema, and you'll be good to go
+this with a URL hosting your schema, and you'll be good to go.
 
 ## Usage
 

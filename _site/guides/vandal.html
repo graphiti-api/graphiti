@@ -103,17 +103,16 @@ install from the <code class="highlighter-rouge">vandal_ui</code> gem, or manual
   <ul>
     <li>Add the <code class="highlighter-rouge">vandal_ui</code> gem.</li>
     <li>Run <code class="highlighter-rouge">rake vandal:install</code></li>
+    <li>Mount the engine:</li>
   </ul>
 
-  <p>That’s it! We expect your schema to be located at
-<code class="highlighter-rouge">&lt;your_api_namespace&gt;/schema.json</code> (the Graphiti default). To
-specify an alternate location:</p>
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># config/routes.rb</span>
+<span class="n">scope</span> <span class="ss">path: </span><span class="no">ApplicationResource</span><span class="p">.</span><span class="nf">endpoint_namespace</span><span class="p">,</span> <span class="ss">defaults: </span><span class="p">{</span> <span class="ss">format: :jsonapi</span> <span class="p">}</span> <span class="k">do</span>
+  <span class="c1"># ... routes ...</span>
+  <span class="n">mount</span> <span class="no">VandalUi</span><span class="o">::</span><span class="no">Engine</span><span class="p">,</span> <span class="ss">at: </span><span class="s1">'/vandal'</span>
+<span class="k">end</span></code></pre></figure>
 
-  <p><code class="highlighter-rouge">SCHEMA_PATH=/foo_api/myschema.json rake vandal:install</code></p>
-
-  <p>*Note: early versions of Graphiti did not include the API namespace in
-the default schema search path. Run specs again and remove
-<code class="highlighter-rouge">public/schema.json</code> if you have issues.</p>
+  <p>That’s it! Vandal will dynamically generate a schema at <code class="highlighter-rouge">&lt;api_namespace&gt;/vandal/schema.json</code>, and you can view the UI at <code class="highlighter-rouge">&lt;api_namespace&gt;/vandal</code>.</p>
 
   <h3 id="manual-installation">Manual Installation</h3>
 
@@ -121,7 +120,7 @@ the default schema search path. Run specs again and remove
 application. Just grab the <a href="https://github.com/graphiti-api/vandal/tree/master/dist">dist files</a> and put them anywhere you’d like.</p>
 
   <p>Note that <code class="highlighter-rouge">index.html</code> has a placeholder, <code class="highlighter-rouge">__SCHEMA_PATH__</code>. Replace
-this with a URL hosting your schema, and you’ll be good to go</p>
+this with a URL hosting your schema, and you’ll be good to go.</p>
 
   <h2 id="usage">Usage</h2>
 

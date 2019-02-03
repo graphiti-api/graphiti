@@ -1185,14 +1185,20 @@ on the part you care about: the logic for actually persisting an object.</p>
   <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
 
 <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
-  <span class="n">employee</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+  <span class="n">employee</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">new</span>
+  <span class="n">attributes</span><span class="p">.</span><span class="nf">each_pair</span> <span class="k">do</span> <span class="o">|</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+    <span class="n">employee</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="ss">:"</span><span class="si">#{</span><span class="n">key</span><span class="si">}</span><span class="ss">="</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+  <span class="k">end</span>
   <span class="n">employee</span><span class="p">.</span><span class="nf">save</span>
   <span class="n">employee</span>
 <span class="k">end</span>
 
 <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
   <span class="n">employee</span> <span class="o">=</span> <span class="no">EmployeeResource</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">attributes</span><span class="p">.</span><span class="nf">delete</span><span class="p">(</span><span class="ss">:id</span><span class="p">)).</span><span class="nf">data</span>
-  <span class="n">employee</span><span class="p">.</span><span class="nf">update_attributes</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+  <span class="n">attributes</span><span class="p">.</span><span class="nf">each_pair</span> <span class="k">do</span> <span class="o">|</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+    <span class="n">employee</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="ss">:"</span><span class="si">#{</span><span class="n">key</span><span class="si">}</span><span class="ss">="</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+  <span class="k">end</span>
+  <span class="n">employee</span><span class="p">.</span><span class="nf">save</span>
   <span class="n">employee</span>
 <span class="k">end</span>
 
@@ -1203,6 +1209,8 @@ on the part you care about: the logic for actually persisting an object.</p>
 <span class="k">end</span></code></pre></figure>
 
   <ul>
+    <li>You are encouraged <strong>not</strong> to override these directly. Instead, use
+hooks (see next section).</li>
     <li>We’ll process any <code class="highlighter-rouge">writable: false</code> or guarded attributes prior to
 these methods.</li>
     <li>After these methods, we’ll check the Model instance for validation
@@ -1211,64 +1219,119 @@ invalid.</li>
     <li>These methods <strong>must return the Model instance</strong>.</li>
   </ul>
 
-  <h3 id="side-effects">7.1 Side Effects</h3>
+  <h3 id="persistence-lifecycle-hooks">7.1 Persistence Lifecycle Hooks</h3>
 
-  <p>RESTful Resources can cause side effects as the result of a persistence
-operation. For example, imagine sending a welcome email after persisting
-a <code class="highlighter-rouge">User</code>.</p>
+  <p>Let’s dive into a persistence request. If you look at the code snippets in
+the prior section, the flow breaks down into 3 steps:</p>
 
-  <p>You can cause side effects in three ways. The simplest is to override a
-persistence method:</p>
+  <ul>
+    <li>Build or find the model</li>
+    <li>Assign attributes to the model</li>
+    <li>Save</li>
+  </ul>
 
-  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/user_resource.rb</span>
-<span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
-  <span class="k">super</span><span class="p">.</span><span class="nf">tap</span> <span class="k">do</span> <span class="o">|</span><span class="n">user</span><span class="o">|</span>
-    <span class="no">UserMailer</span><span class="p">.</span><span class="nf">welcome</span><span class="p">(</span><span class="n">user</span><span class="p">).</span><span class="nf">deliver_later</span> <span class="k">if</span> <span class="n">user</span><span class="p">.</span><span class="nf">valid?</span>
+  <p>You can hook into each step:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">PostResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="n">before_attributes</span> <span class="k">do</span> <span class="o">|</span><span class="n">attributes</span><span class="o">|</span>
+    <span class="c1"># Before attributes have been assigned to the model</span>
+  <span class="k">end</span>
+
+  <span class="n">after_attributes</span> <span class="k">do</span> <span class="o">|</span><span class="n">model</span><span class="o">|</span>
+    <span class="c1"># After attributes have been assigned to the model</span>
+  <span class="k">end</span>
+
+  <span class="n">around_attributes</span> <span class="ss">:do_around_attributes</span>
+
+  <span class="k">def</span> <span class="nf">do_around_attributes</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="c1"># before</span>
+    <span class="n">model_instance</span> <span class="o">=</span> <span class="k">yield</span> <span class="n">attributes</span>
+    <span class="c1"># after</span>
+  <span class="k">end</span>
+
+  <span class="n">before_save</span> <span class="k">do</span> <span class="o">|</span><span class="n">model</span><span class="o">|</span>
+    <span class="c1"># After attributes assigned, but before persisting</span>
+  <span class="k">end</span>
+
+  <span class="n">after_save</span> <span class="k">do</span> <span class="o">|</span><span class="n">model</span><span class="o">|</span>
+    <span class="c1"># After model has been saved</span>
+  <span class="k">end</span>
+
+  <span class="n">around_save</span> <span class="ss">:do_around_save</span>
+
+  <span class="k">def</span> <span class="nf">do_around_save</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="c1"># before</span>
+    <span class="k">yield</span> <span class="n">model</span>
+    <span class="c1"># after</span>
+  <span class="k">end</span>
+
+  <span class="c1"># This is an *override*</span>
+  <span class="c1"># During #create, build a blank model instance</span>
+  <span class="c1"># By default, we'd call adapter.build(model_class)</span>
+  <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="n">model_class</span><span class="p">)</span>
+    <span class="n">model_class</span><span class="p">.</span><span class="nf">new</span>
+  <span class="k">end</span>
+
+  <span class="c1"># This is an *override*</span>
+  <span class="c1"># During #create/#update, assign new attributes to the model instance</span>
+  <span class="c1"># By default, we'd call adapter.assign_attributes(model_instance, attributes)</span>
+  <span class="k">def</span> <span class="nf">assign_attributes</span><span class="p">(</span><span class="n">model_instance</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+    <span class="n">attributes</span><span class="p">.</span><span class="nf">each_pair</span> <span class="k">do</span> <span class="o">|</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+      <span class="n">model_instance</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="ss">:"</span><span class="si">#{</span><span class="n">key</span><span class="si">}</span><span class="ss">="</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="c1"># This is an *override*</span>
+  <span class="c1"># During #create/#update, actually save the model instance</span>
+  <span class="c1"># By default, we'd call adapter.save(model_instance)</span>
+  <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="n">model_instance</span><span class="p">)</span>
+    <span class="n">model_instance</span><span class="p">.</span><span class="nf">save</span>
+  <span class="k">end</span>
+
+  <span class="c1"># This is an *override*</span>
+  <span class="c1"># During #destroy, actually save the model instance</span>
+  <span class="c1"># By default, we'd call adapter.destroy(model_instance)</span>
+  <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="n">model_instance</span><span class="p">)</span>
+    <span class="n">model</span><span class="p">.</span><span class="nf">destroy</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Finally, you may want to hook around *all* the above steps:</span>
+  <span class="c1"># Only applies to #create/#update</span>
+  <span class="n">around_persistence</span> <span class="ss">:do_around_persistence</span>
+
+  <span class="k">def</span> <span class="nf">do_around_persistence</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="n">attributes</span><span class="p">[</span><span class="ss">:foo</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'bar'</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="k">yield</span> <span class="c1"># build/find, assign attrs, save</span>
+    <span class="n">model</span><span class="p">.</span><span class="nf">update_counter_cache</span>
   <span class="k">end</span>
 <span class="k">end</span></code></pre></figure>
 
-  <p>The downside of this approach is that validation processing happens
-<em>after</em> the persistence methods. If we were saving the User and their
-Account at the same time, and the Account was invalid, the database
-transaction would be rolled back but the email would still be sent.
-Consider this approach only for logic that can be rolled back as part of
-a transaction.</p>
+  <ul>
+    <li>All hooks have <code class="highlighter-rouge">only/except</code> options, e.g. <code class="highlighter-rouge">before_attributes only:
+[:update]</code></li>
+    <li>Most hooks can be called with an in-line block, or by passing a method
+name (e.g. <code class="highlighter-rouge">before_attriubtes :do_something</code>). The exception is
+<code class="highlighter-rouge">around_*</code> hooks, which <em>must</em> be called with a method name.</li>
+  </ul>
 
-  <p>We can solve this issue with <code class="highlighter-rouge">before_commit</code>:</p>
+  <p>When persisting multiple objects at once, we’ll open a database
+transaction, process each model individually, ensure all models pass
+validation, then close the transaction. This means that if you raise an
+error at any point, or any model does not pass validations, the
+transaction will be rolled back.</p>
 
-  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/user_resource.rb</span>
-<span class="n">before_commit</span> <span class="k">do</span> <span class="o">|</span><span class="n">user</span><span class="o">|</span>
-  <span class="no">UserMailer</span><span class="p">.</span><span class="nf">welcome</span><span class="p">(</span><span class="n">user</span><span class="p">).</span><span class="nf">deliver_later</span>
+  <p>You may want to perform an operation after all models have been
+processed and validated, but before the transaction is closed. One
+example is sending an email - you don’t want to send if the models were
+invalid, so <code class="highlighter-rouge">after_save</code> wouldn’t work. And you still want to do it
+<em>within</em> the transaction, so if your email server is down and an error
+is raised the transaction gets rolled back.</p>
+
+  <p>For this scenario, use <code class="highlighter-rouge">before_commit</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">before_commit</span> <span class="k">do</span> <span class="o">|</span><span class="n">model</span><span class="o">|</span>
+  <span class="no">PostMailer</span><span class="p">.</span><span class="nf">with</span><span class="p">(</span><span class="ss">post: </span><span class="n">model</span><span class="p">).</span><span class="nf">some_email</span><span class="p">.</span><span class="nf">deliver</span>
 <span class="k">end</span></code></pre></figure>
-
-  <p><code class="highlighter-rouge">before_commit</code> hooks happen <strong>after</strong> we validate the entire graph,
-right before committing to the database.</p>
-
-  <p>Use <code class="highlighter-rouge">only</code> to restrict the operations which will cause the
-<code class="highlighter-rouge">before_commit</code> hook to fire:</p>
-
-  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/user_resource.rb</span>
-<span class="n">before_commit</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:create</span><span class="p">]</span> <span class="k">do</span>
-  <span class="c1"># ... code ...</span>
-<span class="k">end</span></code></pre></figure>
-
-  <p>The final way to cause a side effect is to explicitly fire it in the
-controller:</p>
-
-  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">create</span>
-  <span class="n">user</span> <span class="o">=</span> <span class="no">UserResource</span><span class="p">.</span><span class="nf">build</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-
-  <span class="k">if</span> <span class="n">user</span><span class="p">.</span><span class="nf">save</span>
-    <span class="no">UserMailer</span><span class="p">.</span><span class="nf">welcome</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="nf">data</span><span class="p">).</span><span class="nf">deliver_later</span>
-    <span class="n">render</span> <span class="ss">jsonapi: </span><span class="n">user</span><span class="p">,</span> <span class="ss">status: </span><span class="mi">201</span>
-  <span class="k">else</span>
-    <span class="n">render</span> <span class="ss">jsonapi_errors: </span><span class="n">user</span>
-  <span class="k">end</span>
-<span class="k">end</span></code></pre></figure>
-
-  <p>Use this approach when the side effect should <em>not</em> fire every time the
-Resource is created, but only when the resource is created from <em>this
-particular endpoint</em>.</p>
 
   <h3 id="sideposting">7.2 Sideposting</h3>
 
@@ -1459,6 +1522,31 @@ PORO:</p>
 
   <p>When <a href="#sideposting">Sideposting</a>, the errors payload will contain all
 invalid Resources in the graph.</p>
+
+  <h2 id="read-on-write">7.4 Read on Write</h2>
+
+  <p>By default, the response of a persistence operation will mirror your
+request. But sometimes you need control over the response. The most
+common scenario is sideloading an additional entity - imagine creating
+an order, and wanting the order’s shipping information to come back in
+the response.</p>
+
+  <p>You can do this by POSTing the payload as normal, but adding query
+parameters to the URL:</p>
+
+  <div class="highlighter-rouge"><pre class="highlight"><code>POST /api/v1/orders?include=shipping_information
+
+{
+  type: 'orders',
+  attributes: { ... }
+}
+</code></pre>
+  </div>
+
+  <p>This will sideload the shipping information in the response. When using
+<a href="https://graphiti-api.github.io/graphiti/js/home">Spraypaint</a>, do this with:</p>
+
+  <figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">order</span><span class="p">.</span><span class="nx">save</span><span class="p">({</span> <span class="na">returnScope</span><span class="p">:</span> <span class="nx">Order</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="s1">'shipping_information'</span><span class="p">)</span> <span class="p">})</span></code></pre></figure>
 
   <h2 id="context">8 Context</h2>
 
