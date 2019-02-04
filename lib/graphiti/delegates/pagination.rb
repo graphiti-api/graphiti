@@ -60,9 +60,8 @@ module Graphiti
 
           # Graphiti.logger.warn(e.message)
           @item_count = 0
-        ensure
-          @item_count = @item_count.to_i
         end
+        @item_count
       end
 
       def current_page
