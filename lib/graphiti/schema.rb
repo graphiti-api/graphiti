@@ -5,6 +5,7 @@ module Graphiti
     def self.generate(resources = nil)
       ::Rails.application.eager_load! if defined?(::Rails)
       resources ||= Graphiti.resources.reject(&:abstract_class?)
+      resources.reject! { |r| r.name.nil? }
       new(resources).generate
     end
 
