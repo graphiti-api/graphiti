@@ -218,6 +218,21 @@ RSpec.describe Graphiti::Schema do
       expect(schema[:types]).to eq(expected[:types])
     end
 
+    # Dynamically-created resources, e.g. remote resources
+    context 'when resource has missing name' do
+      let(:no_name) do
+        Class.new(Graphiti::Resource)
+      end
+
+      before do
+        resources << no_name
+      end
+
+      it 'is not included in the schema' do
+        expect(schema[:resources]).to eq(expected[:resources])
+      end
+    end
+
     context 'when no resources passed' do
       subject(:schema) { described_class.generate }
 
@@ -235,6 +250,8 @@ RSpec.describe Graphiti::Schema do
         expect(schema[:resources][0][:name]).to eq('Schema::PositionResource')
       end
     end
+
+    context 
 
     context 'when attribute is not readable' do
       before do
