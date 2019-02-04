@@ -115,8 +115,8 @@ module Graphiti
     end
 
     def before_commit(model, method)
-      hook = self.class.config[:before_commit][method]
-      hook.call(model) if hook
+      hooks = self.class.config[:before_commit][method] || []
+      hooks.each { |hook| hook.call(model) }
     end
 
     def transaction
