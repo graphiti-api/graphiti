@@ -94,7 +94,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     controller(ApplicationController) do
       def create
-        employee = IntegrationHooks::EmployeeResource.build(params)
+        employee = resource.build(params)
 
         if employee.save
           render jsonapi: employee
@@ -104,7 +104,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       def update
-        employee = IntegrationHooks::EmployeeResource.find(params)
+        employee = resource.find(params)
 
         if employee.update_attributes
           render_jsonapi(employee, scope: false)
@@ -114,13 +114,17 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       def destroy
-        employee = IntegrationHooks::EmployeeResource.find(params)
+        employee = resource.find(params)
 
         if employee.destroy
           render jsonapi: employee
         else
           raise 'whoops'
         end
+      end
+
+      def resource
+        IntegrationHooks::EmployeeResource
       end
 
       private
@@ -149,17 +153,17 @@ if ENV["APPRAISAL_INITIALIZED"]
       JSON.parse(response.body)
     end
 
+    let(:payload) do
+      {
+        data: {
+          type: 'employees',
+          attributes: { first_name: 'Jane' }
+        }
+      }
+    end
+
     context 'before_commit' do
       context 'on create' do
-        let(:payload) do
-          {
-            data: {
-              type: 'employees',
-              attributes: { first_name: 'Jane' }
-            }
-          }
-        end
-
         it 'fires after validations but before ending the transaction' do
           expect_any_instance_of(Graphiti::Util::ValidationResponse)
             .to receive(:validate!)
@@ -230,6 +234,101 @@ if ENV["APPRAISAL_INITIALIZED"]
           expect(Callbacks.fired[:create]).to be_a(Employee)
           expect(Callbacks.fired[:position]).to be_a(Position)
           expect(Callbacks.fired[:department]).to be_a(Department)
+        end
+      end
+
+      context 'when yielding meta' do
+        let(:klass) do
+          Class.new(IntegrationHooks::ApplicationResource) do
+            class << self
+              attr_accessor :meta
+            end
+            self.model = ::Employee
+            self.validate_endpoints = false
+
+            attribute :first_name, :string
+
+            before_commit do |employee, meta|
+              self.class.meta = meta
+            end
+          end
+        end
+
+        let(:position_resource) do
+          Class.new(IntegrationHooks::ApplicationResource) do
+            class << self
+              attr_accessor :meta
+            end
+            self.model = ::Position
+            attribute :title, :string
+            attribute :employee_id, :string
+            before_commit do |position, meta|
+              self.class.meta = meta
+            end
+          end
+        end
+
+        let(:payload) do
+          {
+            data: {
+              type: 'employees',
+              attributes: { first_name: 'Jane' },
+              relationships: {
+                positions: {
+                  data: {
+                    type: 'positions', :'temp-id' => 'abc123', method: 'create'
+                  }
+                }
+              }
+            },
+            included: [
+              {
+                type: 'positions',
+                :'temp-id' => 'abc123',
+                attributes: { title: 'foo' }
+              }
+            ]
+          }
+        end
+
+        before do
+          klass.has_many :positions, resource: position_resource
+          allow(controller).to receive(:resource) { klass }
+        end
+
+        it 'gets correct metadata' do
+          post :create, params: payload
+          expect(klass.meta).to eq({
+            method: :create,
+            temp_id: nil,
+            caller_model: nil,
+            attributes: { 'first_name' => 'Jane' },
+            relationships: {
+              positions: {
+                meta: {
+                  jsonapi_type: 'positions',
+                  temp_id: 'abc123',
+                  method: :create
+                },
+                attributes: {
+                  'title' => 'foo',
+                  'employee_id' => '1'
+                },
+                relationships: {}
+              }
+            }
+          })
+          expect(position_resource.meta.except(:caller_model)).to eq({
+            method: :create,
+            temp_id: 'abc123',
+            attributes: {
+              'title' => 'foo',
+              'employee_id' => '1'
+            },
+            relationships: {}
+          })
+
+          expect(position_resource.meta[:caller_model]).to be_a(::Employee)
         end
       end
     end

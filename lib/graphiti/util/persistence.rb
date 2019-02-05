@@ -61,7 +61,7 @@ class Graphiti::Util::Persistence
 
     post_process(persisted, parents)
     post_process(persisted, children)
-    before_commit = -> { @resource.before_commit(persisted, @meta[:method]) }
+    before_commit = -> { @resource.before_commit(persisted, metadata) }
     add_hook(before_commit)
     persisted
   end
@@ -218,22 +218,23 @@ class Graphiti::Util::Persistence
     end
   end
 
-  # In the Resource, we want to allow:
-  #
-  # def create(attrs)
-  #
-  # and
-  #
-  # def create(attrs, parent = nil)
-  #
-  # 'parent' is an optional parameter that should not be part of the
-  # method signature in most use cases.
+  def metadata
+    {
+      method: @meta[:method],
+      temp_id: @meta[:temp_id],
+      caller_model: @caller_model,
+      attributes: @attributes,
+      relationships: @relationships
+    }
+  end
+
   def call_resource_method(method_name, attributes, caller_model)
     method = @resource.method(method_name)
-    if [2,-2].include?(method.arity)
-      method.call(attributes, caller_model)
-    else
+
+    if method.arity == 1
       method.call(attributes)
+    else
+      method.call(attributes, metadata)
     end
   end
 end
