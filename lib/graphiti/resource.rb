@@ -115,8 +115,10 @@ module Graphiti
     end
 
     def before_commit(model, metadata)
-      hook = self.class.config[:before_commit][metadata[:method]]
-      instance_exec(model, metadata, &hook) if hook
+      hooks = self.class.config[:before_commit][metadata[:method]] || []
+      hooks.each do |hook|
+        instance_exec(model, metadata, &hook)
+      end
     end
 
     def transaction
