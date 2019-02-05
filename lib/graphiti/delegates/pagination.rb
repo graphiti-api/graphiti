@@ -36,7 +36,11 @@ module Graphiti
       end
 
       def last_page
-        return @last_page if @last_page || page_size == 0
+        if @last_page
+          return @last_page
+        elsif page_size == 0 || item_count == 0
+          return nil
+        end
         @last_page = (item_count / page_size)
         @last_page += 1 if item_count % page_size > 0
         @last_page
@@ -57,6 +61,7 @@ module Graphiti
           # Graphiti.logger.warn(e.message)
           @item_count = 0
         end
+        @item_count
       end
 
       def current_page

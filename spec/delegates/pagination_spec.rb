@@ -1,5 +1,4 @@
 require 'spec_helper'
-require_relative "../pagination_links/pagination_context.rb"
 
 RSpec.describe Graphiti::Delegates::Pagination do
   include_context "pagination_context"
@@ -9,7 +8,6 @@ RSpec.describe Graphiti::Delegates::Pagination do
     subject{ instance.links }
     before do
       allow(instance).to receive(:item_count).and_return(current_per_page * total_pages)
-      # expect(query).to receive(:pagination_links?).and_return(true)
     end
     it "generates pagination links" do
       expect(subject).to include(:first, :next, :last, :prev)
@@ -83,6 +81,39 @@ RSpec.describe Graphiti::Delegates::Pagination do
       allow(instance).to receive(:item_count).and_return(3)
       allow(instance).to receive(:page_size).and_return(2)
       expect(subject).to eq 2
+    end
+
+    context "when item_count is 0" do
+      it "returns nil" do
+        allow(instance).to receive(:item_count).and_return(0)
+        allow(instance).to receive(:page_size).and_return(2)
+        expect(subject).to eq nil
+      end
+    end
+
+    context "when page_size is 0" do
+      it "returns nil" do
+        allow(instance).to receive(:item_count).and_return(3)
+        allow(instance).to receive(:page_size).and_return(0)
+        expect(subject).to eq nil
+      end
+    end
+  end
+
+  describe "#item_count" do
+    subject{ instance.send(:item_count) }
+    let(:expected_item_count){ 1 }
+
+    it "returns 0 if resource.stat(:total, :count) is nil" do
+      expect(proxy.scope).to receive(:unpaginated_object)
+      expect(proxy.resource).to receive(:stat).with(:total, :count).and_return(lambda{ |obj, meth| nil })
+      expect(subject).to eq 0
+    end
+
+    it "returns the value of resource.stat(:total, :count)" do
+      expect(proxy.scope).to receive(:unpaginated_object)
+      expect(proxy.resource).to receive(:stat).with(:total, :count).and_return(lambda{ |obj, meth| expected_item_count })
+      expect(subject).to eq expected_item_count
     end
   end
 
