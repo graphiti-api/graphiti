@@ -7,7 +7,7 @@ RSpec.describe <%= resource_class %>, type: :resource do
         data: {
           type: '<%= type %>',
       <%- if defined?(FactoryBot) -%>
-          attributes: build(:<%= type.to_s.singularize %>).attributes.
+          attributes: attributes_for(:<%= type.to_s.singularize %>).
             except("created_at", "updated_at")
        <%- else -%>
           attributes: { }
