@@ -34,6 +34,19 @@ RSpec.describe Graphiti::Sideload do
     end
   end
 
+  context 'when passed both :remote and :link options' do
+    before do
+      opts[:remote] = 'asdf'
+      opts[:link] = true
+    end
+
+    it 'raises error' do
+      expect {
+        instance
+      }.to raise_error(Graphiti::Errors::SideloadConfig)
+    end
+  end
+
   describe '#primary_key' do
     it 'defaults to id' do
       expect(instance.primary_key).to eq(:id)
@@ -330,6 +343,37 @@ RSpec.describe Graphiti::Sideload do
         expect(employees[0].positions).to eq(positions[0..1])
         expect(employees[1].positions).to eq([positions.last])
       end
+
+      context 'when match, but parent is integer and child is string' do
+        let(:positions) do
+          [
+            PORO::Position.new(id: 1, employee_id: '1'),
+            PORO::Position.new(id: 2, employee_id: '1'),
+            PORO::Position.new(id: 3, employee_id: '2')
+          ]
+        end
+
+        it 'still works' do
+          instance.assign(employees, positions)
+          expect(employees[0].positions).to eq(positions[0..1])
+          expect(employees[1].positions).to eq([positions.last])
+        end
+      end
+
+      context 'when match, but parent is string and child is integer' do
+        let(:employees) do
+          [
+            PORO::Employee.new(id: '1'),
+            PORO::Employee.new(id: '2')
+          ]
+        end
+
+        it 'still works' do
+          instance.assign(employees, positions)
+          expect(employees[0].positions).to eq(positions[0..1])
+          expect(employees[1].positions).to eq([positions.last])
+        end
+      end
     end
 
     context 'when a to-one relationship' do
@@ -358,6 +402,36 @@ RSpec.describe Graphiti::Sideload do
         instance.assign(positions, departments)
         expect(positions[0].department).to eq(departments[0])
         expect(positions[1].department).to eq(departments[1])
+      end
+
+      context 'when match, but parent is integer and child is string' do
+        let(:departments) do
+          [
+            PORO::Department.new(id: '1'),
+            PORO::Department.new(id: '2')
+          ]
+        end
+
+        it 'still works' do
+          instance.assign(positions, departments)
+          expect(positions[0].department).to eq(departments[0])
+          expect(positions[1].department).to eq(departments[1])
+        end
+      end
+
+      context 'when match, but child is string and parent is integer' do
+        let(:positions) do
+          [
+            PORO::Position.new(id: 1, department_id: '1'),
+            PORO::Position.new(id: 2, department_id: '2')
+          ]
+        end
+
+        it 'still works' do
+          instance.assign(positions, departments)
+          expect(positions[0].department).to eq(departments[0])
+          expect(positions[1].department).to eq(departments[1])
+        end
       end
     end
   end

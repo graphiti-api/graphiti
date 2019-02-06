@@ -616,6 +616,172 @@ if ENV['APPRAISAL_INITIALIZED']
           end
         end
       end
+
+      context 'when aliasing the column' do
+        context 'when string' do
+          let(:filter) { { fname: value } }
+
+          describe 'eq' do
+            let(:value) { { eq: author2.first_name.upcase } }
+
+            it 'works' do
+              expect(ids).to eq([author2.id, author3.id])
+            end
+          end
+
+          describe 'not_eq' do
+            let(:value) { { not_eq: author2.first_name.upcase } }
+
+            it 'works' do
+              expect(ids).to eq([author1.id])
+            end
+          end
+
+          describe 'eql' do
+            let(:value) { { eql: author2.first_name } }
+
+            it 'works' do
+              expect(ids).to eq([author2.id])
+            end
+          end
+
+          describe 'not_eql' do
+            let(:value) { { not_eql: author2.first_name } }
+
+            it 'works' do
+              expect(ids).to eq([author1.id, author3.id])
+            end
+          end
+
+          describe 'prefix' do
+            let(:value) { { prefix: author2.first_name[0..3] } }
+
+            it 'works' do
+              expect(ids).to eq([author2.id, author3.id])
+            end
+          end
+
+          describe 'not_prefix' do
+            let(:value) { { not_prefix: author2.first_name[0..3] } }
+
+            it 'works' do
+              expect(ids).to eq([author1.id])
+            end
+          end
+
+          describe 'suffix' do
+            let(:value) { { suffix: 'rge' } }
+
+            it 'works' do
+              expect(ids).to eq([author2.id, author3.id])
+            end
+          end
+
+          describe 'not_suffix' do
+            let(:value) { { not_suffix: 'rge' } }
+
+            it 'works' do
+              expect(ids).to eq([author1.id])
+            end
+          end
+
+          describe 'match' do
+            let(:value) { { match: 'eor' } }
+
+            it 'works' do
+              expect(ids).to eq([author2.id, author3.id])
+            end
+          end
+
+          describe 'not match' do
+            let(:value) { { not_match: 'eor' } }
+
+            it 'works' do
+              expect(ids).to eq([author1.id])
+            end
+          end
+        end
+
+        context 'when numeric' do
+          let(:filter) { { birthdays: value } }
+
+          describe 'eq' do
+            let(:value) { { eq: author2.age } }
+
+            it 'works' do
+              expect(ids).to eq([author2.id])
+            end
+          end
+
+          describe 'not_eq' do
+            let(:value) { { not_eq: author2.age } }
+
+            it 'works' do
+              expect(ids).to eq([author1.id, author3.id])
+            end
+          end
+
+          describe 'gt' do
+            let(:value) { { gt: 70 } }
+
+            it 'works' do
+              expect(ids).to eq([author3.id])
+            end
+          end
+
+          describe 'gte' do
+            let(:value) { { gte: 70 } }
+
+            it 'works' do
+              expect(ids).to eq([author1.id, author3.id])
+            end
+          end
+
+          describe 'lt' do
+            let(:value) { { lt: 70 } }
+
+            it 'works' do
+              expect(ids).to eq([author2.id])
+            end
+          end
+
+          describe 'lte' do
+            let(:value) { { lte: 70 } }
+
+            it 'works' do
+              expect(ids).to eq([author1.id, author2.id])
+            end
+          end
+        end
+
+        context 'when datetime' do
+          let(:filter) { { created_at: value } }
+
+          describe 'eq' do
+            let(:value) { { eq: two_days_ago.iso8601 } }
+
+            it 'works' do
+              expect(ids).to eq([author2.id])
+            end
+          end
+
+          describe 'not_eq' do
+            let(:value) { { not_eq: two_days_ago.iso8601 } }
+
+            it 'works' do
+              expect(ids).to eq([author1.id, author3.id])
+            end
+          end
+
+          describe 'lte' do
+            let(:value) { { lte: one_day_ago.iso8601 } }
+
+            it 'works' do
+              expect(ids).to eq([author1.id, author2.id])
+            end
+          end
+        end
+      end
     end
 
     context 'when hitting #show' do
@@ -631,7 +797,9 @@ if ENV['APPRAISAL_INITIALIZED']
         expect(json['data']['id']).to eq(author1.id.to_s)
         expect(json['data']['attributes'].except('identifier')).to eq({
           'first_name' => 'Stephen',
+          'fname' => 'Stephen', # alias
           'age' => 70,
+          'birthdays' => 70, # alias
           'float_age' => 70.03,
           'decimal_age' => '70.033',
           'active' => true

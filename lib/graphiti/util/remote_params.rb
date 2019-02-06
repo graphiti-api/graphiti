@@ -21,7 +21,7 @@ module Graphiti
         if include_hash = @query.include_hash.presence
           @params[:include] = trim_sideloads(include_hash)
         end
-        collect_params(@query)
+        collect_params(@query, @resource)
         @params[:sort] = @sorts.join(',') if @sorts.present?
         @params[:filter] = @filters if @filters.present?
         @params[:page] = @pagination if @pagination.present?
@@ -33,13 +33,32 @@ module Graphiti
 
       private
 
-      def collect_params(query)
+      # If this is a remote call, we don't care about local parents
+      # When polymorphic, query is top-level (ie, query.resource is
+      # the parent, not a child type implementation).
+      # This is why we pass BOTH the resource and the query
+      def query_chain(resource, query)
+        top_remote_parent = query.parents.find { |p| p.resource.remote? }
+        [].tap do |chain|
+          query.parents.select { |p| p.resource.remote? }.each do |p|
+            chain << p.association_name unless p == top_remote_parent
+          end
+          immediate_parent = query.parents.reverse[0]
+          # This is not currently checking that it is a remote of the same API
+          chain << query.association_name if immediate_parent && immediate_parent.resource.remote
+          chain.compact
+        end.compact
+      end
+
+      def collect_params(query, resource = nil)
         query_hash = query.hash
-        process_sorts(query_hash[:sort], query)
-        process_fields(query_hash[:fields])
-        process_extra_fields(query_hash[:extra_fields])
-        process_filters(query_hash[:filter], query)
-        process_pagination(query_hash[:page], query)
+        resource ||= query.resource
+        chain = query_chain(resource, query)
+        process_sorts(query_hash[:sort], chain)
+        process_fields(query.fields.merge(query.hash[:fields] || {}))
+        process_extra_fields(query.extra_fields.merge(query.hash[:extra_fields] || {}))
+        process_filters(query_hash[:filter], chain)
+        process_pagination(query_hash[:page], chain)
         process_stats(query_hash[:stats])
 
         query.sideloads.each_pair do |assn_name, nested_query|
@@ -54,44 +73,50 @@ module Graphiti
         @stats = { stats.keys.first => stats.values.join(',') }
       end
 
-      def process_pagination(page, query)
+      def process_pagination(page, chain)
         return unless page.present?
         if size = page[:size]
-          key = (query.chain + [:size]).join('.')
+          key = (chain + [:size]).join('.')
           @pagination[key.to_sym] = size
         end
         if number = page[:number]
-          key = (query.chain + [:number]).join('.')
+          key = (chain + [:number]).join('.')
           @pagination[key.to_sym] = number
         end
       end
 
-      def process_filters(filters, query)
+      def process_filters(filters, chain)
         return unless filters.present?
         filters.each_pair do |att, config|
-          att = (query.chain + [att]).join('.')
+          att = (chain + [att]).join('.')
           @filters[att.to_sym] = config
         end
       end
 
       def process_fields(fields)
         return unless fields
-        @fields[fields.keys.first.to_sym] = fields.values.join(',')
+
+        fields.each_pair do |type, attrs|
+          @fields[type] = attrs.join(',')
+        end
       end
 
       def process_extra_fields(fields)
         return unless fields
-        @extra_fields[fields.keys.first.to_sym] = fields.values.join(',')
+
+        fields.each_pair do |type, attrs|
+          @extra_fields[type] = attrs.join(',')
+        end
       end
 
-      def process_sorts(sorts, query)
+      def process_sorts(sorts, chain)
         return unless sorts
 
         if sorts.is_a?(String) # manually assigned
           @sorts << sorts
         else
           sorts.each do |s|
-            sort = (query.chain + [s.keys.first]).join('.')
+            sort = (chain + [s.keys.first]).join('.')
             sort = "-#{sort}" if s.values.first == :desc
             @sorts << sort
           end

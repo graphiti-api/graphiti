@@ -30,6 +30,14 @@ module Graphiti
       end
     end
 
+    def pagination_links?
+      if Graphiti.config.pagination_links_on_demand
+        [true, 'true'].include?(@params[:pagination_links])
+      else
+        Graphiti.config.pagination_links
+      end
+    end
+
     def debug_requested?
       !!@params[:debug]
     end
@@ -208,15 +216,6 @@ module Graphiti
 
     def paginate?
       not [false, 'false'].include?(@params[:paginate])
-    end
-
-    # If this is a remote call, we don't care about local parents
-    def chain
-      if @resource.remote && parents.present? && !parents.last.resource.remote?
-        []
-      else
-        parents.map(&:association_name).compact + [association_name].compact
-      end
     end
 
     private

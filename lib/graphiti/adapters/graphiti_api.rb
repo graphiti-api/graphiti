@@ -33,10 +33,7 @@ module Graphiti
       end
 
       def build_url(scope)
-        url = resource.remote
-        if resource.remote_base_url
-          url = "#{resource.remote_base_url}#{resource.remote}"
-        end
+        url = resource.remote_url
         params = scope[:params].merge(scope.except(:params))
         params = CGI.unescape(params.to_query)
         url = "#{url}?#{params}" unless params.blank?

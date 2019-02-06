@@ -96,6 +96,9 @@ module Legacy
     has_many :hobbies, through: :author_hobbies
     has_one :bio
 
+    alias_attribute :fname, :first_name
+    alias_attribute :birthdays, :age
+
     # This logic should not ever fire
     has_many :special_books,
       -> { where(id: 9999) },
@@ -262,7 +265,9 @@ module Legacy
 
   class AuthorResource < ApplicationResource
     attribute :first_name, :string
+    attribute :fname, :string # alias
     attribute :age, :integer
+    attribute :birthdays, :integer # alias
     attribute :float_age, :float
     attribute :decimal_age, :big_decimal
     attribute :active, :boolean

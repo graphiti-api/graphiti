@@ -14,6 +14,34 @@ RSpec.describe 'polymorphic resource behavior' do
   let!(:visa) { PORO::Visa.create(number: 123) }
   let!(:mastercard) { PORO::Mastercard.create(number: 456) }
 
+  describe 'persisting' do
+    let(:params) do
+      {
+        data: {
+          type: 'visas',
+          attributes: {
+            number: '4222222222222222',
+            visa_only_attr: 'TestInheritance'
+          }
+        }
+      }
+    end
+    context 'through derived resource' do
+      let(:resproxy) { PORO::VisaResource.build(params) }
+      it 'works' do
+        expect(resproxy.save).to be_truthy
+        expect(resproxy.data).to be_a(PORO::Visa)
+      end
+    end
+    context 'through base resource' do
+      let(:resproxy) { PORO::CreditCardResource.build(params) }
+      it 'works' do
+        expect(resproxy.save).to be_truthy
+        expect(resproxy.data).to be_a(PORO::Visa)
+      end
+    end
+  end
+
   describe 'querying' do
     context 'via superclass' do
       it 'works' do

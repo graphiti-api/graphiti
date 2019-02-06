@@ -10,10 +10,12 @@ RSpec.describe "<%= type %>#destroy", type: :request do
 
     it 'updates the resource' do
       expect(<%= resource_class %>).to receive(:find).and_call_original
-      expect { make_request }.to change { <%= model_class %>.count }.by(-1)
+      expect {
+        make_request
+        expect(response.status).to eq(200), response.body
+      }.to change { <%= model_class %>.count }.by(-1)
       expect { <%= var %>.reload }
         .to raise_error(ActiveRecord::RecordNotFound)
-      expect(response.status).to eq(200)
       expect(json).to eq('meta' => {})
     end
   end

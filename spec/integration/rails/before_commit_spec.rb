@@ -69,6 +69,11 @@ if ENV["APPRAISAL_INITIALIZED"]
           end
         end
 
+        # Stacking second callback on create
+        before_commit only: [:create] do |employee|
+          Callbacks.add(:stacked_create, employee)
+        end
+
         before_commit only: [:update] do |employee|
           Callbacks.add(:update, employee)
           if $raise_on_before_commit[:employee]
@@ -89,7 +94,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     controller(ApplicationController) do
       def create
-        employee = IntegrationHooks::EmployeeResource.build(params)
+        employee = resource.build(params)
 
         if employee.save
           render jsonapi: employee
@@ -99,7 +104,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       def update
-        employee = IntegrationHooks::EmployeeResource.find(params)
+        employee = resource.find(params)
 
         if employee.update_attributes
           render_jsonapi(employee, scope: false)
@@ -109,13 +114,17 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       def destroy
-        employee = IntegrationHooks::EmployeeResource.find(params)
+        employee = resource.find(params)
 
         if employee.destroy
           render jsonapi: employee
         else
           raise 'whoops'
         end
+      end
+
+      def resource
+        IntegrationHooks::EmployeeResource
       end
 
       private
@@ -144,17 +153,17 @@ if ENV["APPRAISAL_INITIALIZED"]
       JSON.parse(response.body)
     end
 
+    let(:payload) do
+      {
+        data: {
+          type: 'employees',
+          attributes: { first_name: 'Jane' }
+        }
+      }
+    end
+
     context 'before_commit' do
       context 'on create' do
-        let(:payload) do
-          {
-            data: {
-              type: 'employees',
-              attributes: { first_name: 'Jane' }
-            }
-          }
-        end
-
         it 'fires after validations but before ending the transaction' do
           expect_any_instance_of(Graphiti::Util::ValidationResponse)
             .to receive(:validate!)
@@ -164,6 +173,17 @@ if ENV["APPRAISAL_INITIALIZED"]
           expect(Employee.count).to be_zero
           expect(Callbacks.entities.length).to eq(1)
           expect(Callbacks.fired[:create]).to be_a(Employee)
+        end
+
+        context 'when stacking' do
+          before do
+            $raise_on_before_commit = { employee: false }
+          end
+
+          it 'works' do
+            post :create, params: payload
+            expect(Callbacks.entities).to eq([:create, :stacked_create])
+          end
         end
       end
 
@@ -210,10 +230,105 @@ if ENV["APPRAISAL_INITIALIZED"]
             .to receive(:validate!)
           post :create, params: payload
           expect(Callbacks.entities)
-            .to eq([:create, :position, :department])
+            .to eq([:create, :stacked_create, :position, :department])
           expect(Callbacks.fired[:create]).to be_a(Employee)
           expect(Callbacks.fired[:position]).to be_a(Position)
           expect(Callbacks.fired[:department]).to be_a(Department)
+        end
+      end
+
+      context 'when yielding meta' do
+        let(:klass) do
+          Class.new(IntegrationHooks::ApplicationResource) do
+            class << self
+              attr_accessor :meta
+            end
+            self.model = ::Employee
+            self.validate_endpoints = false
+
+            attribute :first_name, :string
+
+            before_commit do |employee, meta|
+              self.class.meta = meta
+            end
+          end
+        end
+
+        let(:position_resource) do
+          Class.new(IntegrationHooks::ApplicationResource) do
+            class << self
+              attr_accessor :meta
+            end
+            self.model = ::Position
+            attribute :title, :string
+            attribute :employee_id, :string
+            before_commit do |position, meta|
+              self.class.meta = meta
+            end
+          end
+        end
+
+        let(:payload) do
+          {
+            data: {
+              type: 'employees',
+              attributes: { first_name: 'Jane' },
+              relationships: {
+                positions: {
+                  data: {
+                    type: 'positions', :'temp-id' => 'abc123', method: 'create'
+                  }
+                }
+              }
+            },
+            included: [
+              {
+                type: 'positions',
+                :'temp-id' => 'abc123',
+                attributes: { title: 'foo' }
+              }
+            ]
+          }
+        end
+
+        before do
+          klass.has_many :positions, resource: position_resource
+          allow(controller).to receive(:resource) { klass }
+        end
+
+        it 'gets correct metadata' do
+          post :create, params: payload
+          expect(klass.meta).to eq({
+            method: :create,
+            temp_id: nil,
+            caller_model: nil,
+            attributes: { 'first_name' => 'Jane' },
+            relationships: {
+              positions: {
+                meta: {
+                  jsonapi_type: 'positions',
+                  temp_id: 'abc123',
+                  method: :create
+                },
+                attributes: {
+                  'title' => 'foo',
+                  'employee_id' => '1'
+                },
+                relationships: {}
+              }
+            }
+          })
+          expect(position_resource.meta.except(:caller_model)).to eq({
+            method: :create,
+            temp_id: 'abc123',
+            attributes: {
+              'title' => 'foo',
+              'employee_id' => '1'
+            },
+            relationships: {}
+          })
+
+          expect(position_resource.meta[:caller_model]).to be_a(::Employee)
         end
       end
     end

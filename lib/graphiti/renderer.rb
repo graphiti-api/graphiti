@@ -44,6 +44,7 @@ module Graphiti
         options[:expose][:extra_fields] = proxy.extra_fields
         options[:expose][:proxy] = proxy
         options[:include] = proxy.include_hash
+        options[:links] = proxy.pagination.links if proxy.pagination.links?
         options[:meta] ||= {}
         options[:meta].merge!(stats: proxy.stats) unless proxy.stats.empty?
         options[:meta][:debug] = Debugger.to_a if debug_json?

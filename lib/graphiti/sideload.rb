@@ -51,6 +51,7 @@ module Graphiti
       end
 
       if remote?
+        @link = false
         @resource_class = create_remote_resource
       end
     end
@@ -79,15 +80,17 @@ module Graphiti
       self.link_proc = blk
     end
 
-    # Todo ApplicationResource
     def create_remote_resource
       _remote = @remote
-      Class.new(Graphiti::Resource) do
+      klass = Class.new(Graphiti::Resource) do
         self.adapter = Graphiti::Adapters::GraphitiAPI
         self.model = OpenStruct
         self.remote = _remote
         self.validate_endpoints = false
       end
+      name = "#{parent_resource_class.name}.#{@name}.remote"
+      klass.class_eval("def self.name;'#{name}';end")
+      klass
     end
 
     def errors
@@ -324,8 +327,14 @@ module Graphiti
     private
 
     def validate_options!(opts)
-      if opts[:resource] && opts[:remote]
-        raise Errors::SideloadConfig.new(@name, opts[:parent_resource], 'cannot pass :remote and :resource options together')
+      if opts[:remote]
+        if opts[:resource]
+          raise Errors::SideloadConfig.new(@name, opts[:parent_resource], 'cannot pass :remote and :resource options together')
+        end
+
+        if opts[:link]
+          raise Errors::SideloadConfig.new(@name, opts[:parent_resource], 'remote sideloads do not currently support :link')
+        end
       end
     end
 

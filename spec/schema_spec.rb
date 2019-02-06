@@ -218,6 +218,21 @@ RSpec.describe Graphiti::Schema do
       expect(schema[:types]).to eq(expected[:types])
     end
 
+    # Dynamically-created resources, e.g. remote resources
+    context 'when resource has missing name' do
+      let(:no_name) do
+        Class.new(Graphiti::Resource)
+      end
+
+      before do
+        resources << no_name
+      end
+
+      it 'is not included in the schema' do
+        expect(schema[:resources]).to eq(expected[:resources])
+      end
+    end
+
     context 'when no resources passed' do
       subject(:schema) { described_class.generate }
 
@@ -235,6 +250,8 @@ RSpec.describe Graphiti::Schema do
         expect(schema[:resources][0][:name]).to eq('Schema::PositionResource')
       end
     end
+
+    context 
 
     context 'when attribute is not readable' do
       before do
@@ -471,6 +488,44 @@ RSpec.describe Graphiti::Schema do
 
       it 'is present in the resource schema' do
         expect(schema[:resources][0][:default_page_size]).to eq(10)
+      end
+    end
+
+    context 'when sideload is remote' do
+      before do
+        employee_resource.has_many :foos,
+          remote: 'http://foo.com/api/v1/foos'
+      end
+
+      it 'adds the associated resource to the schema correctly' do
+        schema
+        expect(schema[:resources][0][:relationships][:foos]).to eq({
+          description: nil,
+          resource: 'Schema::EmployeeResource.foos.remote',
+          type: 'has_many'
+        })
+      end
+    end
+
+    # todo still need local rels
+    context 'when resource is remote' do
+      before do
+        employee_resource.remote = 'http://foo.com'
+      end
+
+      it 'is added to the schema correctly' do
+        expect(schema[:resources][0]).to eq({
+          description: 'An employee of the organization',
+          name: 'Schema::EmployeeResource',
+          remote: 'http://foo.com',
+          relationships: {
+            positions: {
+              description: nil,
+              resource: 'Schema::PositionResource',
+              type: 'has_many'
+            }
+          }
+        })
       end
     end
 

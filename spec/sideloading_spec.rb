@@ -337,9 +337,14 @@ RSpec.describe 'sideloading' do
   describe 'polymorphic_belongs_to macro' do
     let!(:visa) { PORO::Visa.create }
     let!(:mastercard) { PORO::Mastercard.create }
+    let!(:paypal) { PORO::Paypal.create }
     let!(:employee2) do
       PORO::Employee.create credit_card_type: 'Mastercard',
           credit_card_id: mastercard.id
+    end
+    let!(:employee3) do
+      PORO::Employee.create credit_card_type: 'Paypal',
+                            credit_card_id: paypal.id
     end
 
     before do
@@ -370,7 +375,7 @@ RSpec.describe 'sideloading' do
     context 'when defaults' do
       before do
         resource.polymorphic_belongs_to :credit_card do
-          group_by(:credit_card_type) do
+          group_by(:credit_card_type, except: [:Paypal]) do
             on(:Visa)
             on(:Mastercard)
           end
@@ -404,6 +409,99 @@ RSpec.describe 'sideloading' do
           sl.children[:visa].resource_class,
           sl.children[:mastercard].resource_class
         ])
+      end
+
+      it 'does not create or require excluded types' do
+        sl = resource.sideload(:credit_card)
+        expect(sl.resource).to be_polymorphic
+        expect(sl.resource.class).to be_abstract_class
+        expect(sl.children.keys).not_to include(:paypal)
+      end
+    end
+
+    context 'with except option specified' do
+      before do
+        resource.polymorphic_belongs_to :credit_card do
+          group_by(:credit_card_type, except: [:Mastercard, :Paypal]) do
+            on(:Visa)
+          end
+        end
+
+        params[:include] = 'credit_card'
+      end
+
+      it 'does not add excluded relationships' do
+        render
+        expect(included.map(&:jsonapi_type)).to contain_exactly('visas')
+      end
+    end
+
+    context 'with only option specified' do
+      before do
+        resource.polymorphic_belongs_to :credit_card do
+          group_by(:credit_card_type, only: [:Visa, :Mastercard]) do
+            on(:Visa)
+            on(:Mastercard)
+          end
+        end
+
+        params[:include] = 'credit_card'
+      end
+
+      it 'only builds specified relationships' do
+        render
+        expect(included.map(&:jsonapi_type)).to contain_exactly('visas', 'mastercards')
+      end
+    end
+
+    context 'when multiple macros defined on the same keys' do
+      before do
+        resource.polymorphic_belongs_to :credit_card do
+          group_by(:credit_card_type, except: [:Paypal]) do
+            on(:Visa)
+            on(:Mastercard)
+          end
+        end
+
+        resource.polymorphic_belongs_to :payment_processor do
+          group_by(:credit_card_type, only: [:Paypal]) do
+            on(:Paypal).belongs_to :payment_processor,
+                                   resource: PORO::PaypalResource,
+                                   foreign_key: :credit_card_id
+          end
+        end
+
+        params[:include] = 'credit_card,payment_processor'
+      end
+
+      def payment_processor(index)
+        json['data'][index]['relationships']['payment_processor']['data']
+      end
+
+      def assert_correct_response
+        expect(credit_card(0)).to eq({
+          'type' => 'visas', 'id' => '1'
+        })
+        expect(credit_card(1)).to eq({
+          'type' => 'mastercards', 'id' => '1'
+        })
+        expect(payment_processor(2)).to eq({
+          'type' => 'paypals', 'id' => '1'
+        })
+        expect(included[0].jsonapi_type).to eq('visas')
+        expect(included[0].relationships).to eq({
+          'visa_rewards' => { 'meta' => { 'included' => false } }
+        })
+        expect(included[1].jsonapi_type).to eq('mastercards')
+        expect(included[1].relationships).to be_nil
+        expect(included[2].jsonapi_type).to eq('paypals')
+        expect(included[2].relationships).to be_nil
+      end
+
+
+      it 'works' do
+        render
+        assert_correct_response
       end
     end
 
@@ -442,7 +540,7 @@ RSpec.describe 'sideloading' do
     context 'when custom FK' do
       before do
         resource.polymorphic_belongs_to :credit_card, foreign_key: :cc_id do
-          group_by(:credit_card_type) do
+          group_by(:credit_card_type, except: [:Paypal]) do
             on(:Visa)
             on(:Mastercard)
           end
@@ -468,7 +566,7 @@ RSpec.describe 'sideloading' do
       before do
         _resource = special_visa_resource
         resource.polymorphic_belongs_to :credit_card do
-          group_by(:credit_card_type) do
+          group_by(:credit_card_type, except: [:Paypal]) do
             on(:Visa).belongs_to :visa, resource: _resource
             on(:Mastercard)
           end
