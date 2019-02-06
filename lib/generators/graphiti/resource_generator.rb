@@ -21,9 +21,10 @@ module Graphiti
       aliases: ['--actions', '-a'],
       desc: 'Array of controller actions to support, e.g. "index show destroy"'
 
-    class_option :'default-attributes-class',
+    class_option :'attributes-from',
       banner: 'Model',
       type: :string,
+      alias: ["--attributes-from", ""]
       default: nil,
       desc: 'Specify to use attributes from a particular model'
 
@@ -65,28 +66,32 @@ module Graphiti
       @options['omit-comments']
     end
 
-    def default_attributes_class
-      @default_attributes_class ||=
-        if @options['default-attributes-class'].kind_of?(String)
-          klass = @options['default-attributes-class'].classify
+    def attributes_class
+      @attributes_class ||=
+        if @options['attributes-from'].kind_of?(String)
+          klass = @options['attributes-from'].classify
           begin
             klass.constantize
           rescue NameError
-            raise NameError, "default-attributes-model #{klass} does not exist."
+            raise NameError, "attributes-from #{klass} does not exist."
           end
         end
     end
 
+    ##
+    # Generates a list of OpenStruct(:name, :type) objects that map to
+    # the +attributes_class+ columns.
+    ##
     def default_attributes
-      unless default_attributes_class.kind_of?(Class) && default_attributes_class <= ApplicationRecord
-        raise "Unable to set #{self} default_attributes from #{default_attributes_class}. #{default_attributes_class} must be a kind of ApplicationRecord"
+      unless attributes_class.kind_of?(Class) && attributes_class <= ApplicationRecord
+        raise "Unable to set #{self} default_attributes from #{attributes_class}. #{attributes_class} must be a kind of ApplicationRecord"
       end
-      if default_attributes_class.table_exists?
-        default_attributes_class.columns.map do |c|
+      if attributes_class.table_exists?
+        attributes_class.columns.map do |c|
           OpenStruct.new({ name: c.name.to_sym, type: c.type })
         end
       else
-        raise "#{default_attributes_class} table must exist. Please run migrations."
+        raise "#{attributes_class} table must exist. Please run migrations."
       end
     end
 
