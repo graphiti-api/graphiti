@@ -24,7 +24,7 @@ module Graphiti
     class_option :'attributes-from',
       banner: 'Model',
       type: :string,
-      alias: ["--attributes-from", ""]
+      alias: ["--model", "-m"]
       default: nil,
       desc: 'Specify to use attributes from a particular model'
 
