@@ -11,6 +11,7 @@ module PORO
             bios: [],
             team_memberships: [],
             teams: [],
+            paypals: [],
             visas: [],
             mastercards: [],
             visa_rewards: [],
@@ -33,6 +34,7 @@ module PORO
           classifications: PORO::Classification,
           bios: PORO::Bio,
           teams: PORO::Team,
+          paypals: PORO::Paypal,
           visas: PORO::Visa,
           mastercards: PORO::Mastercard,
           visa_rewards: PORO::VisaReward,
@@ -182,6 +184,7 @@ module PORO
       :credit_card_id,
       :cc_id,
       :credit_card_type,
+      :payment_processor,
       :salary
 
     def initialize(*)
@@ -226,10 +229,12 @@ module PORO
   end
 
   class Visa < CreditCard
+    attr_accessor :visa_only_attr
     attr_accessor :visa_rewards
 
     def initialize(*)
       super
+      @visa_only_attr ||= nil
       @visa_rewards ||= []
     end
   end
@@ -239,6 +244,10 @@ module PORO
 
   class VisaReward < Base
     attr_accessor :visa_id, :points
+  end
+
+  class Paypal < Base
+    attr_accessor :account_id
   end
 
   class Book < Base
@@ -427,6 +436,14 @@ module PORO
 
     def base_scope
       { type: :visa_rewards }
+    end
+  end
+
+  class PaypalResource < ApplicationResource
+    attribute :account_id, :integer
+
+    def base_scope
+      { type: :paypals }
     end
   end
 

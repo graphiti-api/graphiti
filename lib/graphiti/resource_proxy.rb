@@ -80,15 +80,24 @@ module Graphiti
       end
     end
 
+    def pagination
+      @pagination ||= Delegates::Pagination.new(self)
+    end
+
     def save(action: :create)
       # TODO: remove this. Only used for persisting many-to-many with AR
       # (see activerecord adapter)
-      Graphiti.context[:namespace] = action
-      validator = persist do
-        @resource.persist_with_relationships \
-          @payload.meta(action: action),
-          @payload.attributes,
-          @payload.relationships
+      original = Graphiti.context[:namespace]
+      begin
+        Graphiti.context[:namespace] = action
+        validator = persist do
+          @resource.persist_with_relationships \
+            @payload.meta(action: action),
+            @payload.attributes,
+            @payload.relationships
+        end
+      ensure
+        Graphiti.context[:namespace] = original
       end
       @data, success = validator.to_a
 
@@ -106,12 +115,13 @@ module Graphiti
 
     def destroy
       validator = @resource.transaction do
-        model = @resource.destroy(@query.filters[:id])
+        metadata = { method: :destroy }
+        model = @resource.destroy(@query.filters[:id], metadata)
         model.instance_variable_set(:@__serializer_klass, @resource.serializer)
         validator = ::Graphiti::Util::ValidationResponse.new \
           model, @payload
         validator.validate!
-        @resource.before_commit(model, :destroy)
+        @resource.before_commit(model, metadata)
         validator
       end
       @data, success = validator.to_a

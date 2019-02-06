@@ -106,13 +106,19 @@ module Graphiti
       stats_dsl.calculation(calculation)
     end
 
+    def before_resolve(scope, query)
+      scope
+    end
+
     def resolve(scope)
       adapter.resolve(scope)
     end
 
-    def before_commit(model, method)
-      hook = self.class.config[:before_commit][method]
-      hook.call(model) if hook
+    def before_commit(model, metadata)
+      hooks = self.class.config[:before_commit][metadata[:method]] || []
+      hooks.each do |hook|
+        instance_exec(model, metadata, &hook)
+      end
     end
 
     def transaction

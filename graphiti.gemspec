@@ -25,12 +25,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'concurrent-ruby', '~> 1.0'
   spec.add_dependency 'activesupport', ['>= 4.1', '< 6']
 
-  spec.add_development_dependency "activerecord", ['>= 4.1', '< 6']
+  spec.add_development_dependency "faraday", '~> 0.15'
   spec.add_development_dependency "kaminari", '~> 0.17'
-  spec.add_development_dependency "bundler", "~> 1.12"
+  spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "sqlite3"
-  spec.add_development_dependency "database_cleaner"
   spec.add_development_dependency "activemodel", ['>= 4.1', '< 6']
   spec.add_development_dependency "graphiti_spec_helpers", '1.0.beta.4'
 end

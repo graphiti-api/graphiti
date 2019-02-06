@@ -1106,6 +1106,16 @@ RSpec.describe 'filtering' do
           expect(resource.filters[:foo][:operators].keys).to eq([:eq, :foo])
         end
       end
+
+      context 'when only argument is not an array' do
+        before do
+          resource.filter :foo, :string, only: :eq
+        end
+
+        it 'limits available operators' do
+          expect(resource.filters[:foo][:operators].keys).to eq([:eq])
+        end
+      end
     end
 
     context 'and given :except option' do
@@ -1136,6 +1146,18 @@ RSpec.describe 'filtering' do
         it 'limits available operators, adding custom ones' do
           expect(resource.filters[:foo][:operators].keys).to eq([
             :gt, :gte, :lt, :lte, :foo
+          ])
+        end
+      end
+
+      context 'when except argument is not an array' do
+        before do
+          resource.filter :foo, :integer, except: :eq
+        end
+
+        it 'limits available operators' do
+          expect(resource.filters[:foo][:operators].keys).to eq([
+            :not_eq, :gt, :gte, :lt, :lte
           ])
         end
       end

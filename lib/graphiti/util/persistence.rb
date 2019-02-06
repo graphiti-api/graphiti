@@ -12,15 +12,15 @@ class Graphiti::Util::Persistence
     @relationships = relationships
     @caller_model  = caller_model
 
-    @attributes.each_pair do |key, value|
-      @attributes[key] = @resource.typecast(key, value, :writable)
-    end
-
     # Find the correct child resource for a given jsonapi type
     if meta_type = @meta[:type].try(:to_sym)
       if @resource.type != meta_type && @resource.polymorphic?
         @resource = @resource.class.resource_for_type(meta_type).new
       end
+    end
+
+    @attributes.each_pair do |key, value|
+      @attributes[key] = @resource.typecast(key, value, :writable)
     end
   end
 
@@ -61,7 +61,7 @@ class Graphiti::Util::Persistence
 
     post_process(persisted, parents)
     post_process(persisted, children)
-    before_commit = -> { @resource.before_commit(persisted, @meta[:method]) }
+    before_commit = -> { @resource.before_commit(persisted, metadata) }
     add_hook(before_commit)
     persisted
   end
@@ -80,9 +80,15 @@ class Graphiti::Util::Persistence
     return if x[:sideload].type == :many_to_many
 
     if [:destroy, :disassociate].include?(x[:meta][:method])
+      if x[:sideload].polymorphic_has_many?
+        attrs[:"#{x[:sideload].polymorphic_as}_type"] = nil
+      end
       attrs[x[:foreign_key]] = nil
       update_foreign_type(attrs, x, null: true) if x[:is_polymorphic]
     else
+      if x[:sideload].polymorphic_has_many?
+        attrs[:"#{x[:sideload].polymorphic_as}_type"] = parent_object.class.name
+      end
       attrs[x[:foreign_key]] = parent_object.send(x[:primary_key])
       update_foreign_type(attrs, x) if x[:is_polymorphic]
     end
@@ -162,8 +168,11 @@ class Graphiti::Util::Persistence
       iterate(except: [:polymorphic_belongs_to, :belongs_to]) do |x|
         yield x
 
-        x[:object] = x[:sideload].resource
-          .persist_with_relationships(x[:meta], x[:attributes], x[:relationships], caller_model)
+        if x[:sideload].writable?
+          x[:object] = x[:resource]
+            .persist_with_relationships(x[:meta], x[:attributes], x[:relationships], caller_model)
+        end
+
         processed << x
       end
     end
@@ -173,7 +182,7 @@ class Graphiti::Util::Persistence
     [].tap do |processed|
       iterate(only: [:polymorphic_belongs_to, :belongs_to]) do |x|
         if x[:sideload].writable?
-          x[:object] = x[:sideload].resource
+          x[:object] = x[:resource]
             .persist_with_relationships(x[:meta], x[:attributes], x[:relationships])
         else
           raise Graphiti::Errors::UnwritableRelationship.new(@resource, x[:sideload])
@@ -209,22 +218,23 @@ class Graphiti::Util::Persistence
     end
   end
 
-  # In the Resource, we want to allow:
-  #
-  # def create(attrs)
-  #
-  # and
-  #
-  # def create(attrs, parent = nil)
-  #
-  # 'parent' is an optional parameter that should not be part of the
-  # method signature in most use cases.
+  def metadata
+    {
+      method: @meta[:method],
+      temp_id: @meta[:temp_id],
+      caller_model: @caller_model,
+      attributes: @attributes,
+      relationships: @relationships
+    }
+  end
+
   def call_resource_method(method_name, attributes, caller_model)
     method = @resource.method(method_name)
-    if [2,-2].include?(method.arity)
-      method.call(attributes, caller_model)
-    else
+
+    if method.arity == 1
       method.call(attributes)
+    else
+      method.call(attributes, metadata)
     end
   end
 end

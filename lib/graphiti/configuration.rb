@@ -12,6 +12,8 @@ module Graphiti
     attr_accessor :context_for_endpoint
     attr_accessor :schema_path
     attr_accessor :links_on_demand
+    attr_accessor :pagination_links_on_demand
+    attr_accessor :pagination_links
     attr_accessor :typecast_reads
     attr_accessor :debug
     attr_accessor :debug_models
@@ -23,12 +25,19 @@ module Graphiti
       @concurrency = false
       @respond_to = [:json, :jsonapi, :xml]
       @links_on_demand = false
+      @pagination_links_on_demand = false
+      @pagination_links = false
       @typecast_reads = true
       self.debug = ENV.fetch('GRAPHITI_DEBUG', true)
       self.debug_models = ENV.fetch('GRAPHITI_DEBUG_MODELS', false)
 
       if defined?(::Rails)
-        @schema_path = "#{::Rails.root}/public/schema.json"
+        if File.exists?("#{::Rails.root}/.graphiticfg.yml")
+          cfg = YAML.load_file("#{::Rails.root}/.graphiticfg.yml")
+          @schema_path = "#{::Rails.root}/public#{cfg['namespace']}/schema.json"
+        else
+          @schema_path = "#{::Rails.root}/public/schema.json"
+        end
         self.debug = ::Rails.logger.level.zero?
         Graphiti.logger = ::Rails.logger
       end

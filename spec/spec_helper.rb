@@ -11,6 +11,9 @@ Graphiti::Resource.autolink = false
 require 'fixtures/poro'
 Graphiti.setup!
 
+# Optional dep for cross-api requests
+require 'faraday'
+
 RSpec.configure do |config|
   config.include GraphitiSpecHelpers::RSpec
   config.include GraphitiSpecHelpers::Sugar

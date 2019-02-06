@@ -14,7 +14,7 @@ RSpec.describe "<%= type %>#index", type: :request do
     it 'works' do
       expect(<%= resource_class %>).to receive(:all).and_call_original
       make_request
-      expect(response.status).to eq(200)
+      expect(response.status).to eq(200), response.body
       expect(d.map(&:jsonapi_type).uniq).to match_array(['<%= type %>'])
       expect(d.map(&:id)).to match_array([<%= var %>1.id, <%= var %>2.id])
     end

@@ -5,7 +5,6 @@ if ENV["APPRAISAL_INITIALIZED"]
     # defined in spec/supports/rails/employee_controller.rb
     controller(ApplicationController, &EMPLOYEE_CONTROLLER_BLOCK)
 
-
     before do
       allow(controller.request.env).to receive(:[])
         .with(anything).and_call_original
@@ -766,7 +765,138 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
-    describe 'nested polymorphic relationship' do
+    describe 'nested relationship to polymorphic resource' do
+      subject(:make_request) do
+        do_create(payload)
+      end
+
+      let(:payload) do
+        {
+          data: {
+            type: 'employees',
+            attributes: { first_name: 'Joe' },
+            relationships: {
+              tasks: {
+                data: [
+                  { :'temp-id' => 'abc123', type: 'features', method: 'create' },
+                  { :'temp-id' => 'abc456', type: 'bugs', method: 'create' }
+                ]
+              }
+            }
+          },
+          included: [
+            {
+              :'temp-id' => 'abc123',
+              type: 'features',
+              attributes: { name: 'test feature' }
+            },
+            {
+              :'temp-id' => 'abc456',
+              type: 'bugs',
+              attributes: { name: 'test bug' }
+            }
+          ]
+        }
+      end
+
+      it 'creates correct records' do
+        make_request
+        employee = Employee.last
+        expect(employee.features.length).to eq(1)
+        expect(employee.bugs.length).to eq(1)
+      end
+    end
+
+    describe 'nested polymorphic_has_many relationship' do
+      subject(:make_request) { do_update(payload) }
+      let!(:employee) { Employee.create!(first_name: 'Jane') }
+      let(:path) { "/employees/#{employee.id}" }
+
+      let(:payload) do
+        {
+          data: {
+            type: 'employees',
+            id: employee.id,
+            attributes: { first_name: 'Jane' },
+            relationships: {
+              notes: {
+                data: [{
+                  note_id_key => note_id, type: 'notes', method: method
+                }]
+              }
+            }
+          },
+          included: [
+            {
+              type: 'notes',
+              note_id_key => note_id,
+              attributes: { body: 'foo' }
+            }
+          ]
+        }
+      end
+
+      context 'when creating' do
+        let(:note_id) { 'abc123' }
+        let(:note_id_key) { :'temp-id' }
+        let(:method) { 'create' }
+
+        it 'works' do
+          make_request
+          expect(employee.reload.notes.map(&:body)).to eq(['foo'])
+        end
+      end
+
+      context 'when updating' do
+        let!(:note) { Note.create(body: 'bar') }
+        let(:note_id) { note.id.to_s }
+        let(:note_id_key) { :id }
+        let(:method) { :update }
+
+        it 'works' do
+          make_request
+          expect(employee.reload.notes.map(&:body)).to eq(['foo'])
+        end
+      end
+
+      context 'when destroying' do
+        let!(:note) do
+          Note.create notable_id: employee.id,
+            notable_type: 'Employee'
+        end
+        let(:note_id) { note.id.to_s }
+        let(:note_id_key) { :id }
+        let(:method) { :destroy }
+
+        it 'works' do
+          expect {
+            make_request
+          }.to change { employee.reload.notes.count }.by(-1)
+           .and change { Note.count }.by(-1)
+        end
+      end
+
+      context 'when disassociating' do
+        let!(:note) do
+          Note.create notable_id: employee.id,
+            notable_type: 'Employee'
+        end
+        let(:note_id) { note.id.to_s }
+        let(:note_id_key) { :id }
+        let(:method) { :disassociate }
+
+        it 'works' do
+          expect {
+            make_request
+          }.to change { employee.reload.notes.count }.by(-1)
+          expect { note.reload }.to_not raise_error
+          expect(note.notable_id).to be_nil
+          expect(note.notable_type).to be_nil
+        end
+      end
+    end
+
+    describe 'nested polymorphic_belongs_to relationship' do
       let(:workspace_type) { 'offices' }
 
       subject(:make_request) do
@@ -825,6 +955,39 @@ if ENV["APPRAISAL_INITIALIZED"]
         employee = Employee.first
         workspace = employee.workspace
         expect(workspace.address).to eq('Fake Workspace Address')
+      end
+    end
+
+    describe 'delete nested item' do
+      subject(:make_request) { do_update(payload) }
+
+      let!(:employee)   { Employee.create!(first_name: 'original', positions: [position1, position2, position3]) }
+      let!(:position1)  { Position.create!(title: 'pos1') }
+      let!(:position2)  { Position.create!(title: 'pos2') }
+      let!(:position3)  { Position.create!(title: 'pos3') }
+
+      let(:path) { "/employees/#{employee.id}" }
+
+      let(:payload) do
+        {
+            data: {
+                id: employee.id,
+                type: 'employees',
+                attributes: { },
+                relationships: {
+                    positions: {
+                        data: [
+                            { type: 'positions', id: position2.id.to_s, method: 'destroy' }
+                        ]
+                    }
+                }
+            },
+        }
+      end
+
+      it 'works' do
+        expect(employee.positions.count).to eq(3)
+        expect {make_request}.to change { employee.positions.count }.by(-1)
       end
     end
   end

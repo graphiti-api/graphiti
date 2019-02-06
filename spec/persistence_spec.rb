@@ -32,6 +32,88 @@ RSpec.describe 'persistence' do
     expect(employee.data.first_name).to eq('Jane')
   end
 
+  describe 'overrides' do
+    before do
+      klass.class_eval do
+        class << self
+          attr_accessor :overridden
+        end
+      end
+    end
+
+    describe '#build' do
+      before do
+        klass.class_eval do
+          def build(model_class)
+            self.class.overridden = true
+            super
+          end
+        end
+      end
+
+      let(:payload) do
+        {
+          data: {
+            type: 'employees',
+            attributes: { first_name: 'Jane' }
+          }
+        }
+      end
+
+      it 'overrides correctly' do
+        e = klass.build(payload)
+        e.save
+        expect(klass.overridden).to be(true)
+        expect(PORO::Employee.find(e.data.id).first_name).to eq('Jane')
+      end
+    end
+
+    describe '#assign_attributes' do
+      before do
+        klass.class_eval do
+          def assign_attributes(model, attrs)
+            self.class.overridden = true
+            super
+          end
+        end
+      end
+
+      let(:payload) do
+        {
+          data: {
+            type: 'employees',
+            attributes: { first_name: 'Jane' }
+          }
+        }
+      end
+
+      it 'overrides correctly' do
+        e = klass.build(payload)
+        e.save
+        expect(klass.overridden).to be(true)
+        expect(PORO::Employee.find(e.data.id).first_name).to eq('Jane')
+      end
+    end
+
+    describe '#delete' do
+      before do
+        klass.class_eval do
+          def delete(model_instance)
+            self.class.overridden = true
+            super
+          end
+        end
+      end
+
+      it 'overrides correctly' do
+        employee = PORO::Employee.create(first_name: 'Jane')
+        klass.find(id: employee.id).destroy
+        expect(klass.overridden).to be(true)
+        expect(PORO::Employee.find(employee.id)).to be_nil
+      end
+    end
+  end
+
   describe 'lifecycle hooks' do
     before do
       klass.class_eval do
@@ -532,6 +614,83 @@ RSpec.describe 'persistence' do
       end
     end
 
+    describe '.around_persistence' do
+      RSpec.shared_examples 'around persistence' do |opts|
+        opts ||= {}
+
+        before do
+          klass.class_eval do
+            before_attributes do |attrs|
+              attrs[:first_name] = "#{attrs[:first_name]}mid"
+            end
+
+            def do_around_persistence(attributes)
+              attributes[:first_name] = 'b4'
+              model = yield
+              model.update_attributes(first_name: "#{model.first_name}after")
+              model
+              1 # return value shouldnt matter
+            end
+          end
+        end
+
+        if opts[:only_update]
+          context 'when creating' do
+            include_context 'create hooks'
+
+            it 'does not fire' do
+              employee
+              expect(klass.calls.length).to eq(0)
+            end
+          end
+        else
+          context 'when creating' do
+            include_context 'create hooks'
+
+            it 'can modify attributes and the saved model' do
+              reloaded = PORO::Employee.find(employee.id)
+              expect(reloaded.first_name).to eq('b4midafter')
+            end
+          end
+        end
+
+        context 'when updating' do
+          include_context 'update hooks'
+
+          it 'can modify attributes and the saved model' do
+            reloaded = PORO::Employee.find(employee.id)
+            expect(reloaded.first_name).to eq('b4midafter')
+          end
+        end
+      end
+
+      context 'when registering via method' do
+        before do
+          klass.around_persistence :do_around_persistence
+        end
+
+        include_examples 'around persistence'
+      end
+
+      context 'when registering via proc' do
+        it 'raises error' do
+          expect {
+            klass.around_persistence do
+              'dontgethere'
+            end
+          }.to raise_error(Graphiti::Errors::AroundCallbackProc, /around_persistence/)
+        end
+      end
+
+      context 'when limiting actions' do
+        before do
+          klass.around_persistence :do_around_persistence, only: [:update]
+        end
+
+        include_examples 'around persistence', only_update: true
+      end
+    end
+
     describe '.around_save' do
       RSpec.shared_examples 'around save' do |opts|
         opts ||= {}
@@ -816,6 +975,770 @@ RSpec.describe 'persistence' do
         end
 
         include_examples 'around_destroy'
+      end
+    end
+
+    describe 'stacking callbacks' do
+      before do
+        klass.before_attributes do |attrs|
+          attrs[:first_name] << '_b4attrsA'
+        end
+
+        klass.before_attributes do |attrs|
+          attrs[:first_name] << '_b4attrsB'
+        end
+
+        klass.before_attributes only: [:update] do |attrs|
+          attrs[:first_name] << '_b4attrsC'
+        end
+
+        klass.after_attributes do |model|
+          model.first_name << '_afterattrsA'
+        end
+
+        klass.after_attributes do |model|
+          model.first_name << '_afterattrsB'
+        end
+
+        klass.after_attributes only: [:update] do |model|
+          model.first_name << '_afterattrsC'
+        end
+
+        klass.around_attributes :around_attrs_a
+        klass.around_attributes :around_attrs_b
+        klass.around_attributes :around_attrs_c, only: [:update]
+
+        klass.before_save do |model|
+          model.first_name << '_b4saveA'
+        end
+
+        klass.before_save do |model|
+          model.first_name << '_b4saveB'
+        end
+
+        klass.before_save only: [:update] do |model|
+          model.first_name << '_b4saveC'
+        end
+
+        klass.after_save do |model|
+          model.first_name << '_aftersaveA'
+        end
+
+        klass.after_save do |model|
+          model.first_name << '_aftersaveB'
+        end
+
+        klass.after_save only: [:update] do |model|
+          model.first_name << '_aftersaveC'
+        end
+
+        klass.around_save :around_save_a
+        klass.around_save :around_save_b
+        klass.around_save :around_save_c, only: [:update]
+
+        klass.around_persistence :around_persistence_a
+        klass.around_persistence :around_persistence_b
+        klass.around_persistence :around_persistence_c, only: [:update]
+
+        klass.class_eval do
+          def around_attrs_a(attrs)
+            attrs[:first_name] << '_aroundattrsA1'
+            yield attrs
+            attrs[:first_name] << '_aroundattrsA2'
+          end
+
+          def around_attrs_b(attrs)
+            attrs[:first_name] << '_aroundattrsB1'
+            yield attrs
+            attrs[:first_name] << '_aroundattrsB2'
+          end
+
+          def around_attrs_c(attrs)
+            attrs[:first_name] << '_aroundattrsC1'
+            yield attrs
+            attrs[:first_name] << '_aroundattrsC2'
+          end
+
+          def around_save_a(model)
+            model.first_name << '_aroundsaveA1'
+            yield model
+            model.first_name << '_aroundsaveA2'
+          end
+
+          def around_save_b(model)
+            model.first_name << '_aroundsaveB1'
+            yield model
+            model.first_name << '_aroundsaveB2'
+          end
+
+          def around_save_c(model)
+            model.first_name << '_aroundsaveC1'
+            yield model
+            model.first_name << '_aroundsaveC2'
+          end
+
+          def around_persistence_a(attrs)
+            attrs[:first_name] << '_aroundpersA1'
+            model = yield attrs
+            model.first_name << '_aroundpersA2'
+          end
+
+          def around_persistence_b(attrs)
+            attrs[:first_name] << '_aroundpersB1'
+            model = yield attrs
+            model.first_name << '_aroundpersB2'
+          end
+
+          def around_persistence_c(attrs)
+            attrs[:first_name] << '_aroundpersC1'
+            model = yield attrs
+            model.first_name << '_aroundpersC2'
+          end
+        end
+      end
+
+      it 'can stack multiple callbacks on create' do
+        proxy = klass.build(payload)
+        proxy.save
+        expect(proxy.data.first_name.split('_')).to eq([
+          'Jane',
+          'aroundpersA1',
+          'aroundpersB1',
+          'aroundattrsA1',
+          'aroundattrsB1',
+          'b4attrsA',
+          'b4attrsB',
+          'afterattrsA',
+          'afterattrsB',
+          'aroundattrsB2',
+          'aroundattrsA2',
+          'aroundsaveA1',
+          'aroundsaveB1',
+          'b4saveA',
+          'b4saveB',
+          'aftersaveA',
+          'aftersaveB',
+          'aroundsaveB2',
+          'aroundsaveA2',
+          'aroundpersB2',
+          'aroundpersA2'
+        ])
+      end
+
+      it 'can stack multiple callbacks on update' do
+        employee = PORO::Employee.create
+        payload[:data][:id] = employee.id
+        proxy = klass.find(payload)
+        proxy.update_attributes
+        expect(proxy.data.first_name.split('_')).to eq([
+          'Jane',
+          'aroundpersA1',
+          'aroundpersB1',
+          'aroundpersC1',
+          'aroundattrsA1',
+          'aroundattrsB1',
+          'aroundattrsC1',
+          'b4attrsA',
+          'b4attrsB',
+          'b4attrsC',
+          'afterattrsA',
+          'afterattrsB',
+          'afterattrsC',
+          'aroundattrsC2',
+          'aroundattrsB2',
+          'aroundattrsA2',
+          'aroundsaveA1',
+          'aroundsaveB1',
+          'aroundsaveC1',
+          'b4saveA',
+          'b4saveB',
+          'b4saveC',
+          'aftersaveA',
+          'aftersaveB',
+          'aftersaveC',
+          'aroundsaveC2',
+          'aroundsaveB2',
+          'aroundsaveA2',
+          'aroundpersC2',
+          'aroundpersB2',
+          'aroundpersA2'
+        ])
+      end
+    end
+  end
+
+  context 'when in need of meta information in a hook' do
+    subject(:save) do
+      instance = klass.build(payload)
+      instance.save
+      instance
+    end
+
+    let(:payload) do
+      {
+        data: {
+          type: 'employees',
+          attributes: { first_name: 'Jane' },
+          relationships: {
+            positions: {
+              data: [{
+                type: 'positions', :'temp-id' => 'abc123', method: 'create'
+              }]
+            }
+          }
+        },
+        included: [
+          {
+            type: 'positions',
+            :'temp-id' => 'abc123',
+            attributes: { title: 'Engineer' }
+          }
+        ]
+      }
+    end
+
+    let(:position_resource) do
+      Class.new(PORO::PositionResource) do
+        class << self
+          attr_accessor :meta
+        end
+
+        def self.name;'PORO::PositionResource';end
+
+        attribute :employee_id, :integer
+      end
+    end
+
+    before do
+      klass.class_eval do
+        class << self
+          attr_accessor :meta
+        end
+      end
+      klass.has_many :positions, resource: position_resource
+    end
+
+    def assert_meta
+      expect(klass.meta[:method]).to eq(:create)
+      expect(klass.meta[:attributes]).to eq(first_name: 'Jane')
+      expect(klass.meta[:relationships]).to eq({
+        positions: [{
+          attributes: { employee_id: 1, title: 'Engineer' },
+          meta: {
+            jsonapi_type: 'positions',
+            method: :create,
+            temp_id: 'abc123'
+          },
+          relationships: {}
+        }]
+      })
+
+      meta = position_resource.meta
+      expect(meta[:method]).to eq(:create)
+      expect(meta[:temp_id]).to eq('abc123')
+      expect(meta[:caller_model]).to be_a(PORO::Employee)
+      expect(meta[:attributes]).to eq(employee_id: 1, title: 'Engineer')
+      expect(meta[:relationships]).to eq({})
+    end
+
+    context 'when before_attributes' do
+      context 'via proc' do
+        before do
+          klass.class_eval do
+            before_attributes do |attrs, meta|
+              self.class.meta = meta
+            end
+          end
+
+          position_resource.class_eval do
+            before_attributes do |attrs, meta|
+              self.class.meta = meta
+            end
+          end
+        end
+
+        it 'works' do
+          save
+          assert_meta
+        end
+      end
+
+      context 'via method' do
+        before do
+          klass.class_eval do
+            before_attributes :do_meta
+
+            def do_meta(attributes, meta)
+              self.class.meta = meta
+            end
+          end
+
+          position_resource.class_eval do
+            before_attributes :do_meta
+
+            def do_meta(attributes, meta)
+              self.class.meta = meta
+            end
+          end
+        end
+
+        it 'works' do
+          save
+          assert_meta
+        end
+      end
+    end
+
+    context 'when after_attributes' do
+      context 'via proc' do
+        before do
+          klass.class_eval do
+            after_attributes do |model, meta|
+              self.class.meta = meta
+            end
+          end
+
+          position_resource.class_eval do
+            after_attributes do |attrs, meta|
+              self.class.meta = meta
+            end
+          end
+        end
+
+        it 'works' do
+          save
+          assert_meta
+        end
+      end
+
+      context 'via method name' do
+        before do
+          klass.class_eval do
+            after_attributes :do_after_attributes
+
+            def do_after_attributes(attrs, meta)
+              self.class.meta = meta
+            end
+          end
+
+          position_resource.class_eval do
+            after_attributes :do_after_attributes
+
+            def do_after_attributes(attrs, meta)
+              self.class.meta = meta
+            end
+          end
+        end
+
+        it 'works' do
+          save
+          assert_meta
+        end
+      end
+    end
+
+    context 'when around_attributes' do
+      before do
+        klass.class_eval do
+          around_attributes :do_around_attributes
+
+          def do_around_attributes(attrs, meta)
+            self.class.meta = meta
+            yield attrs
+          end
+        end
+
+        position_resource.class_eval do
+          around_attributes :do_around_attributes
+
+          def do_around_attributes(attrs, meta)
+            self.class.meta = meta
+            yield attrs
+          end
+        end
+      end
+
+      it 'works' do
+        save
+        assert_meta
+      end
+    end
+
+    context 'when before_save' do
+      context 'when registered via proc' do
+        before do
+          klass.class_eval do
+            before_save do |model, meta|
+              self.class.meta = meta
+            end
+          end
+
+          position_resource.class_eval do
+            before_save do |model, meta|
+              self.class.meta = meta
+            end
+          end
+        end
+
+        it 'works' do
+          save
+          assert_meta
+        end
+      end
+
+      context 'when registered via method' do
+        before do
+          klass.class_eval do
+            before_save :do_before_save
+
+            def do_before_save(model, meta)
+              self.class.meta = meta
+            end
+          end
+
+          position_resource.class_eval do
+            before_save :do_before_save
+
+            def do_before_save(model, meta)
+              self.class.meta = meta
+            end
+          end
+        end
+
+        it 'works' do
+          save
+          assert_meta
+        end
+      end
+    end
+
+    context 'after_save' do
+      context 'when registered via proc' do
+        before do
+          klass.class_eval do
+            after_save do |model, meta|
+              self.class.meta = meta
+            end
+          end
+
+          position_resource.class_eval do
+            after_save do |model, meta|
+              self.class.meta = meta
+            end
+          end
+        end
+
+        it 'works' do
+          save
+          assert_meta
+        end
+      end
+
+      context 'when registered via method' do
+        before do
+          klass.class_eval do
+            after_save :do_after_save
+
+            def do_after_save(model, meta)
+              self.class.meta = meta
+            end
+          end
+
+          position_resource.class_eval do
+            after_save :do_after_save
+
+            def do_after_save(model, meta)
+              self.class.meta = meta
+            end
+          end
+        end
+
+        it 'works' do
+          save
+          assert_meta
+        end
+      end
+    end
+
+    context 'around_save' do
+      before do
+        klass.class_eval do
+          around_save :do_around_save
+
+          def do_around_save(model, meta)
+            self.class.meta = meta
+            yield model
+          end
+        end
+
+        position_resource.class_eval do
+          around_save :do_around_save
+
+          def do_around_save(model, meta)
+            self.class.meta = meta
+            yield model
+          end
+        end
+      end
+
+      it 'works' do
+        save
+        assert_meta
+      end
+    end
+
+    context 'around_persistence' do
+      before do
+        klass.class_eval do
+          around_persistence :do_around_persistence
+
+          def do_around_persistence(attrs, meta)
+            self.class.meta = meta
+            yield attrs
+          end
+        end
+
+        position_resource.class_eval do
+          around_persistence :do_around_persistence
+
+          def do_around_persistence(attrs, meta)
+            self.class.meta = meta
+            yield attrs
+          end
+        end
+      end
+
+      it 'works' do
+        save
+        assert_meta
+      end
+    end
+
+    context 'before_destroy' do
+      context 'when registered via proc' do
+        before do
+          klass.class_eval do
+            before_destroy do |model, meta|
+              self.class.meta = meta
+            end
+          end
+        end
+
+        it 'works' do
+          employee = PORO::Employee.create(first_name: 'Jane')
+          klass.find(id: employee.id).destroy
+          expect(klass.meta).to eq(method: :destroy)
+        end
+      end
+
+      context 'when registered via method' do
+        before do
+          klass.class_eval do
+            before_destroy :do_before_destroy
+
+            def do_before_destroy(model, meta)
+              self.class.meta = meta
+            end
+          end
+        end
+
+        it 'works' do
+          employee = PORO::Employee.create(first_name: 'Jane')
+          klass.find(id: employee.id).destroy
+          expect(klass.meta).to eq(method: :destroy)
+        end
+      end
+
+      context 'when sideposted' do
+        let(:employee) { PORO::Employee.create(first_name: 'Jane') }
+        let(:position) { PORO::Position.create(title: 'foo') }
+
+        let(:payload) do
+          {
+            data: {
+              type: 'employees',
+              id: employee.id,
+              relationships: {
+                positions: {
+                  data: [{
+                    id: position.id.to_s,
+                    type: 'positions',
+                    method: :destroy
+                  }]
+                }
+              }
+            }
+          }
+        end
+
+        let(:position_resource) do
+          Class.new(PORO::PositionResource) do
+            class << self
+              attr_accessor :meta
+            end
+            def self.name;'PORO::PositionResource';end
+            attribute :employee_id, :integer
+            before_destroy do |model, meta|
+              self.class.meta = meta
+            end
+          end
+        end
+
+        before do
+          klass.has_many :positions, resource: position_resource
+        end
+
+        it 'works' do
+          klass.find(payload).save
+          expect(position_resource.meta.except(:caller_model)).to eq({
+            method: :destroy,
+            attributes: { employee_id: nil, id: 1 },
+            relationships: {},
+            temp_id: nil
+          })
+          expect(position_resource.meta[:caller_model]).to be_a(PORO::Employee)
+        end
+      end
+    end
+
+    context 'after_destroy' do
+      context 'when registered via proc' do
+        before do
+          klass.class_eval do
+            after_destroy do |model, meta|
+              self.class.meta = meta
+            end
+          end
+        end
+
+        it 'works' do
+          employee = PORO::Employee.create(first_name: 'Jane')
+          klass.find(id: employee.id).destroy
+          expect(klass.meta).to eq(method: :destroy)
+        end
+      end
+
+      context 'when registered via method' do
+        before do
+          klass.class_eval do
+            after_destroy :do_after_destroy
+
+            def do_after_destroy(model, meta)
+              self.class.meta = meta
+            end
+          end
+        end
+
+        it 'works' do
+          employee = PORO::Employee.create(first_name: 'Jane')
+          klass.find(id: employee.id).destroy
+          expect(klass.meta).to eq(method: :destroy)
+        end
+      end
+    end
+
+    context 'around_destroy' do
+      before do
+        klass.class_eval do
+          around_destroy :do_around_destroy
+
+          def do_around_destroy(model, meta)
+            self.class.meta = meta
+            yield model
+          end
+        end
+      end
+
+      it 'works' do
+        employee = PORO::Employee.create(first_name: 'Jane')
+        klass.find(id: employee.id).destroy
+        expect(klass.meta).to eq(method: :destroy)
+      end
+    end
+
+    context '#build' do
+      before do
+        klass.class_eval do
+          def build(model_class, meta)
+            self.class.meta = meta
+            super
+          end
+        end
+
+        position_resource.class_eval do
+          def build(model_class, meta)
+            self.class.meta = meta
+            super
+          end
+        end
+      end
+
+      it 'works' do
+        save
+        assert_meta
+      end
+    end
+
+    context '#save' do
+      before do
+        klass.class_eval do
+          def save(model, meta)
+            self.class.meta = meta
+            super
+          end
+        end
+
+        position_resource.class_eval do
+          def save(model, meta)
+            self.class.meta = meta
+            super
+          end
+        end
+      end
+
+      it 'works' do
+        save
+        assert_meta
+      end
+    end
+
+    context '#assign_attributes' do
+      before do
+        klass.class_eval do
+          def assign_attributes(model, attrs, meta)
+            self.class.meta = meta
+            super
+          end
+        end
+
+        position_resource.class_eval do
+          def assign_attributes(model, attrs, meta)
+            self.class.meta = meta
+            super
+          end
+        end
+      end
+
+      it 'works' do
+        save
+        assert_meta
+      end
+    end
+
+    context '#delete' do
+      before do
+        klass.class_eval do
+          def delete(model, meta)
+            self.class.meta = meta
+            super
+          end
+        end
+      end
+
+      it 'works' do
+        employee = PORO::Employee.create(first_name: 'Jane')
+        klass.find(id: employee.id).destroy
+        expect(klass.meta).to eq(method: :destroy)
       end
     end
   end

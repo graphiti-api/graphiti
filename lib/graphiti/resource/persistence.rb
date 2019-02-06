@@ -44,6 +44,14 @@ module Graphiti
           end
         end
 
+        def around_persistence(method = nil, only: [:create, :update], &blk)
+          if blk
+            raise Errors::AroundCallbackProc.new(self, 'around_persistence')
+          else
+            add_callback(:persistence, :around, method, only, &blk)
+          end
+        end
+
         def around_destroy(method = nil, &blk)
           if blk
             raise Errors::AroundCallbackProc.new(self, 'around_destroy')
@@ -57,61 +65,69 @@ module Graphiti
         def add_callback(kind, lifecycle, method = nil, only, &blk)
           config[:callbacks][kind] ||= {}
           config[:callbacks][kind][lifecycle] ||= []
-          config[:callbacks][kind][lifecycle] << { callback: (method || blk), only: only }
+          config[:callbacks][kind][lifecycle] << { callback: (method || blk), only: Array(only) }
         end
       end
 
-      def create(create_params)
+      def create(create_params, meta = nil)
         model_instance = nil
 
-        run_callbacks :attributes, :create, create_params do |params|
-          model_instance = build(model)
-          assign_attributes(model_instance, params)
+        run_callbacks :persistence, :create, create_params, meta do
+          run_callbacks :attributes, :create, create_params, meta do |params|
+            model_instance = call_with_meta(:build, model, meta)
+            call_with_meta(:assign_attributes, model_instance, params, meta)
+            model_instance
+          end
+
+          run_callbacks :save, :create, model_instance, meta do
+            model_instance = call_with_meta(:save, model_instance, meta)
+          end
+
           model_instance
         end
-
-        run_callbacks :save, :create, model_instance do
-          model_instance = save(model_instance)
-        end
-
-        model_instance
       end
 
-      def update(update_params)
+      def update(update_params, meta = nil)
         model_instance = nil
         id = update_params.delete(:id)
 
-        run_callbacks :attributes, :update, update_params do |params|
-          model_instance = self.class._find(params.merge(id: id)).data
-          assign_attributes(model_instance, params)
-          model_instance
-        end
+        run_callbacks :persistence, :update, update_params, meta do
+          run_callbacks :attributes, :update, update_params, meta do |params|
+            model_instance = self.class._find(params.merge(id: id)).data
+            call_with_meta(:assign_attributes, model_instance, params, meta)
+            model_instance
+          end
 
-        run_callbacks :save, :update, model_instance do
-          model_instance = save(model_instance)
+          run_callbacks :save, :update, model_instance, meta do
+            model_instance = call_with_meta(:save, model_instance, meta)
+          end
         end
 
         model_instance
       end
 
-      def destroy(id)
+      def destroy(id, meta = nil)
         model_instance = self.class._find(id: id).data
-        run_callbacks :destroy, :destroy, model_instance do
-          adapter.destroy(model_instance)
+        run_callbacks :destroy, :destroy, model_instance, meta do
+          call_with_meta(:delete, model_instance, meta)
         end
         model_instance
       end
 
-      def build(model)
+      def build(model, meta = nil)
         adapter.build(model)
       end
 
-      def assign_attributes(model_instance, update_params)
+      def assign_attributes(model_instance, update_params, meta = nil)
         adapter.assign_attributes(model_instance, update_params)
       end
 
-      def save(model_instance)
+      def save(model_instance, meta = nil)
         adapter.save(model_instance)
+      end
+
+      def delete(model_instance, meta = nil)
+        adapter.destroy(model_instance)
       end
 
       private
@@ -120,7 +136,7 @@ module Graphiti
         fire_around_callbacks(kind, action, *args) do |*yieldargs|
           fire_callbacks(kind, :before, action, *yieldargs)
           result = yield(*yieldargs)
-          fire_callbacks(kind, :after, action, result)
+          fire_callbacks(kind, :after, action, *[result, args.last])
           result
         end
       end
@@ -131,13 +147,21 @@ module Graphiti
           callbacks.each do |config|
             callback = config[:callback]
             next unless config[:only].include?(action)
-
-            if callback.respond_to?(:call)
-              instance_exec(*args, &callback)
-            else
-              send(callback, *args)
-            end
+            call_with_meta(callback, *args)
           end
+        end
+      end
+
+      # Convenience for calling a method or proc
+      # while taking into account 'meta' is an optional argument
+      def call_with_meta(callback, *args)
+        if callback.respond_to?(:call)
+          instance_exec(*args, &callback)
+        else
+          arity = method(callback).arity
+          args = args[0..0] if arity == 1
+          args = args[0..1] if arity == 2
+          send(callback, *args)
         end
       end
 
@@ -161,6 +185,7 @@ module Graphiti
         if callbacks[index + 1]
           proc do
             r = nil
+            args = args[0..0] if method(method_name).arity == 1
             send(method_name, *args) do |r2|
               wrapped = around_callback_proc(callbacks, index+1, r2, &blk)
               r = instance_exec(r2, &wrapped)
@@ -168,9 +193,10 @@ module Graphiti
             r
           end
         else
-          proc do |result|
+          proc do |*args2|
             r = nil
-            send(callbacks[index][:callback], result) do |r2|
+            args2 = args2[0..0] if method(callbacks[index][:callback]).arity == 1
+            send(callbacks[index][:callback], *args2) do |r2|
               r = instance_exec(r2, &blk)
             end
             r

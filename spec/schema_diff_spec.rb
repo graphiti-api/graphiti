@@ -115,6 +115,30 @@ RSpec.describe Graphiti::SchemaDiff do
       it { is_expected.to eq([]) }
     end
 
+    context 'when new resource is remote' do
+      before do
+        resource_b.class_eval do
+          self.remote = 'http://foo.com'
+        end
+      end
+
+      it 'does not diff' do
+        expect(diff).to eq([])
+      end
+    end
+
+    context 'when old resource is remote' do
+      before do
+        resource_a.class_eval do
+          self.remote = 'http://foo.com'
+        end
+      end
+
+      it 'does not diff' do
+        expect(diff).to eq([])
+      end
+    end
+
     context 'when attribute changes type' do
       before do
         resource_b.attribute :first_name, :integer

@@ -25,8 +25,8 @@ RSpec.describe "<%= type %>#update", type: :request do
       expect(<%= resource_class %>).to receive(:find).and_call_original
       expect {
         make_request
+        expect(response.status).to eq(200), response.body
       }.to change { <%= var %>.reload.attributes }
-      expect(response.status).to eq(200)
     end
   end
 end
