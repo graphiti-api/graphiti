@@ -24,7 +24,7 @@ module Graphiti
     class_option :'attributes-from',
       banner: 'Model',
       type: :string,
-      alias: ["--model", "-m"]
+      aliases: ["--model", "-m"],
       default: nil,
       desc: 'Specify to use attributes from a particular model'
 
@@ -87,11 +87,22 @@ module Graphiti
         raise "Unable to set #{self} default_attributes from #{attributes_class}. #{attributes_class} must be a kind of ApplicationRecord"
       end
       if attributes_class.table_exists?
-        attributes_class.columns.map do |c|
+        return attributes_class.columns.map do |c|
           OpenStruct.new({ name: c.name.to_sym, type: c.type })
         end
       else
         raise "#{attributes_class} table must exist. Please run migrations."
+      end
+    end
+
+    def resource_attributes
+      # set a temporary variable because overriding attributes causes
+      # weird behavior when the generator is run. It will override
+      # everytime regardless of the conditional.
+      if !attributes_class.nil?
+        default_attributes
+      else
+        attributes
       end
     end
 

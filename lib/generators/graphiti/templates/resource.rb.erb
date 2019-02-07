@@ -1,9 +1,6 @@
 <% module_namespacing do -%>
 class <%= class_name %>Resource < ApplicationResource
-  <%- if default_attributes_class -%>
-  <%- attributes = default_attributes -%>
-  <%- end -%>
-  <%- attributes.each do |a| -%>
+  <%- resource_attributes.each do |a| -%>
   <%- if [:id, :created_at, :updated_at].include?(a.name.to_sym) -%>
   attribute :<%= a.name %>, :<%= a.type %>, writable: false
   <%- else -%>
