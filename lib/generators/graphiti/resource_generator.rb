@@ -25,7 +25,6 @@ module Graphiti
       banner: 'Model',
       type: :string,
       aliases: ["--model", "-m"],
-      default: nil,
       desc: 'Specify to use attributes from a particular model'
 
     desc "This generator creates a resource file at app/resources, as well as corresponding controller/specs/route/etc"
@@ -67,15 +66,23 @@ module Graphiti
     end
 
     def attributes_class
-      @attributes_class ||=
-        if @options['attributes-from'].kind_of?(String)
-          klass = @options['attributes-from'].classify
-          begin
-            klass.constantize
-          rescue NameError
-            raise NameError, "attributes-from #{klass} does not exist."
-          end
-        end
+      return @attributes_class if @attributes_class
+
+      case @options['attributes-from']
+           # thor will set the value to the key if no value is specified
+      when "attributes-from"
+        klass = class_name
+      when :kind_of?, String
+        klass = @options['attributes-from'].classify
+      else
+        # return nil if attributes-from isn't set or has an invalid value
+        return
+      end
+      begin
+        @attributes_class = klass.safe_constantize
+      rescue NameError
+        raise NameError, "attributes-from #{klass.inspect} does not exist."
+      end
     end
 
     ##
