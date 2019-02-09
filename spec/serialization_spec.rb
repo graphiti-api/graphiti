@@ -1155,6 +1155,21 @@ RSpec.describe 'serialization' do
             expect(credit_card).to_not have_key('links')
           end
         end
+
+        context 'but the relationship is nil' do
+          before do
+            employee.update_attributes \
+              credit_card_id: nil,
+              credit_card_type: nil
+          end
+
+          it 'has nil link' do
+            define_relationship
+            render
+            credit_card = json['data'][0]['relationships']['credit_card']
+            expect(credit_card['links']).to eq('related' => nil)
+          end
+        end
       end
 
       context 'and a many_to_many relationship' do
