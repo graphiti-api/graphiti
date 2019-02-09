@@ -4,11 +4,15 @@ module Graphiti
       def initialize(sideload, model)
         @sideload = sideload
         @model = model
+        @linkable = true
 
         if @sideload.type == :polymorphic_belongs_to
-          type = @model.send(@sideload.grouper.field_name)
-          @sideload = @sideload.children.values.find do |c|
-            c.group_name == type.to_sym
+          if type = @model.send(@sideload.grouper.field_name)
+            @sideload = @sideload.children.values.find do |c|
+              c.group_name == type.to_sym
+            end
+          else
+            @linkable = false
           end
         end
       end
@@ -25,7 +29,7 @@ module Graphiti
         if @sideload.type == :belongs_to
           not @model.send(@sideload.foreign_key).nil?
         else
-          true
+          @linkable
         end
       end
 

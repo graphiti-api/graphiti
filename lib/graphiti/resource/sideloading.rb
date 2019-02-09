@@ -61,7 +61,8 @@ module Graphiti
           allow_sideload(name, opts, &blk)
         end
 
-        def polymorphic_has_many(name, opts = {}, as:, &blk)
+        def polymorphic_has_many(name, opts = {}, &blk)
+          as = opts.delete(:as)
           opts[:foreign_key] ||= :"#{as}_id"
           opts[:polymorphic_as] ||= as
           _model = model
