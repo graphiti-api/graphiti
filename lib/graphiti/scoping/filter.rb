@@ -157,6 +157,8 @@ module Graphiti
     # JSON of
     # {{{ "id": 1 }}} becomes { 'id' => 1 }
     def parse_string_value(filter, value)
+      return value if !!filter[:single]
+
       type = Graphiti::Types[filter[:type]]
       array_or_string = [:string, :array].include?(type[:canonical_name])
       if (arr = value.scan(/\[.*?\]/)).present? && array_or_string
