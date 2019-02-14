@@ -658,7 +658,7 @@ class ApplicationResource < Graphiti::Resource
   self.abstract_class = true
 
   # Subclasses can override if needed
-  self.adapter = Graphiti::Adapters::ActiveRecord::Base
+  self.adapter = Graphiti::Adapters::ActiveRecord
 
   # Default attribute flags:
   # attribute :title, :string,
