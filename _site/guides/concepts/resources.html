@@ -251,6 +251,7 @@ render an integer:</p>
     <li><code class="highlighter-rouge">float</code></li>
     <li><code class="highlighter-rouge">date</code></li>
     <li><code class="highlighter-rouge">datetime</code></li>
+    <li><code class="highlighter-rouge">uuid</code></li>
     <li><code class="highlighter-rouge">boolean</code></li>
     <li><code class="highlighter-rouge">hash</code></li>
     <li><code class="highlighter-rouge">array</code></li>
@@ -258,6 +259,10 @@ render an integer:</p>
 
   <p>All but the last 3 have Array doppelgängers: <code class="highlighter-rouge">array_of_integers</code>,
 <code class="highlighter-rouge">array_of_dates</code>, etc.</p>
+
+  <p>The <code class="highlighter-rouge">integer_id</code> type says, “render as a string, but query as an
+integer” and is the default for the <code class="highlighter-rouge">id</code> attribute. The <code class="highlighter-rouge">uuid</code> type says
+“this is a string, but query me case-sensitive by default”.</p>
 
   <h5 id="custom-types">2.5 Custom Types</h5>
 

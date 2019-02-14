@@ -168,12 +168,17 @@ The built-in Types are:
 * `float`
 * `date`
 * `datetime`
+* `uuid`
 * `boolean`
 * `hash`
 * `array`
 
 All but the last 3 have Array doppelgängers: `array_of_integers`,
 `array_of_dates`, etc.
+
+The `integer_id` type says, "render as a string, but query as an
+integer" and is the default for the `id` attribute. The `uuid` type says
+"this is a string, but query me case-sensitive by default".
 
 ##### 2.5 Custom Types
 
