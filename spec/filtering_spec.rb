@@ -126,6 +126,18 @@ RSpec.describe 'filtering' do
     end
   end
 
+  context 'when passed comma, but filter marked single: true' do
+    before do
+      resource.filter :first_name, single: true
+      employee2.update_attributes(first_name: 'foo,bar')
+      params[:filter] = { first_name: 'foo,bar' }
+    end
+
+    it 'does not parse as array' do
+      expect(records.map(&:id)).to eq([employee2.id])
+    end
+  end
+
   # Legacy Compat
   context 'when filter value is {{{escaped json string}}}' do
     before do
@@ -268,13 +280,6 @@ RSpec.describe 'filtering' do
           scope
         end
       end
-    end
-
-    it 'rejects multiples' do
-      params[:filter] = { first_name: { eq: 'William,Harold' } }
-      expect {
-        records
-      }.to raise_error(Graphiti::Errors::SingularFilter, /passed multiple values to filter :first_name/)
     end
 
     it 'allows singles' do
