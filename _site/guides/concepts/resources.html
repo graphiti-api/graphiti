@@ -586,6 +586,9 @@ that could contain a comma.</p>
   <span class="k">end</span>
 <span class="k">end</span></code></pre></figure>
 
+  <p>If a filter is marked <code class="highlighter-rouge">single: true</code>, we’ll avoid any array parsing and
+escape the value for you, filtering on the string as given.</p>
+
   <h4 id="statistics">3.6 Statistics</h4>
 
   <p>Statistics are useful and common. Consider a datagrid listing posts - we might want a “Total Posts” count displayed above the grid without firing an additional request. Notably, that statistic <strong>should</strong> take into account filtering, but <strong>should not</strong> take into account pagination.</p>

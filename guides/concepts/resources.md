@@ -552,6 +552,9 @@ filter :keywords, :string do
 end
 {% endhighlight %}
 
+If a filter is marked `single: true`, we'll avoid any array parsing and
+escape the value for you, filtering on the string as given.
+
 #### 3.6 Statistics
 
 Statistics are useful and common. Consider a datagrid listing posts - we might want a "Total Posts" count displayed above the grid without firing an additional request. Notably, that statistic **should** take into account filtering, but **should not** take into account pagination.

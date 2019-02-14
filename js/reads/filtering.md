@@ -58,6 +58,17 @@ Post.where({ status_or: ['draft', 'review'] })
 Post.where({ status: ['draft', 'review'] })
 {% endhighlight %}
 
+#### Escaping Values
+
+[Graphiti treats a comma as a delimiter of multiple values]({{site.github.url}}/guides/concepts/resources#escaping-values). To escape the
+comma and tell Graphiti this is a single value, wrap it in {% raw %}`{{curlies}}`{% endraw %}:
+
+{% highlight typescript %}
+{% raw %}
+Post.where({ title: "{{Hello World, here I am}}" })
+{% endraw %}
+{% endhighlight %}
+
 <div class="clearfix">
   <h2 id="next">
     <a href="{{site.github.url}}/js/reads/fieldsets">

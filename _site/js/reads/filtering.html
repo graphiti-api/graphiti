@@ -160,6 +160,13 @@ conventions we promote:</p>
 <span class="c1">// AND these two values (default)</span>
 <span class="nx">Post</span><span class="p">.</span><span class="nx">where</span><span class="p">({</span> <span class="na">status</span><span class="p">:</span> <span class="p">[</span><span class="s1">'draft'</span><span class="p">,</span> <span class="s1">'review'</span><span class="p">]</span> <span class="p">})</span></code></pre></figure>
 
+  <h4 id="escaping-values">Escaping Values</h4>
+
+  <p><a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#escaping-values">Graphiti treats a comma as a delimiter of multiple values</a>. To escape the
+comma and tell Graphiti this is a single value, wrap it in <code class="highlighter-rouge"><span class="p">{</span><span class="err">{curlies</span><span class="p">}</span><span class="err">}</span></code>:</p>
+
+  <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="nx">Post</span><span class="p">.</span><span class="nx">where</span><span class="p">({</span> <span class="na">title</span><span class="p">:</span> <span class="s2">"{{Hello World, here I am}}"</span> <span class="p">})</span></code></pre></figure>
+
   <div class="clearfix">
   <h2 id="next">
     <a href="https://graphiti-api.github.io/graphiti/js/reads/fieldsets">
