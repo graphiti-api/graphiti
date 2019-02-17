@@ -341,10 +341,10 @@ This screenshot is from [Vandal](https://graphiti-api.github.io/graphiti/guides/
 Because we started with a better abstraction, we ended with a better
 visualization. As a marketer-turned-programmer myself, I really
 appreciate when data exploration tools like this are friendly to
-less-technical users. I like that my product owner and I can walk
+less-technical users. A user of Vandal doesn't need to know about `Connection`s
+or `Edge`s, they just need to click around. I like that my product owner and I can walk
 through the domain together, validating concepts and solidifying a shared
-understanding. A user of Vandal doesn't need to know about `Connection`s
-or `Edge`s, they just need to click around.
+understanding.
 
 We even get schema benefits. Schemas are great for tooling and
 backwards-compatibility checks...but when they are oriented around
@@ -433,6 +433,30 @@ some smart things JSON:API does. One example is de-duplicating each node
 in the graph: if we're listing 100 `Post`s and they all have the same
 `Author`, you'll have to render that `Author` 100 times. JSON:API would
 only render it once.
+
+Another is the `type/id` combo:
+
+<p align="center">
+  <div style="width: 500px;margin:auto">
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Namely, those constraints are that all entities must be addressable top level by type and ID. (Very similar to JSON:API in this respect.)</p>&mdash; Tom Dale (@tomdale) <a href="https://twitter.com/tomdale/status/786951015945895936?ref_src=twsrc%5Etfw">October 14, 2016</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </div>
+</p>
+
+There's a bunch of reasons this is important, but one I've always been
+partial to is websockets. This `type/id` combo allows us to uniquely
+identify records once they've been loaded in JS memory. So, every time a
+Resource is saved we can push its state (JSON representation) to clients
+with a websocket. Here I am randomly updating a bunch of backend data,
+and watching the UI update in real-time.
+
+<p align="center">
+  <img width="80%" src="https://user-images.githubusercontent.com/55264/38929932-042408da-42dc-11e8-93ec-16b0f9b62da3.gif" />
+</p>
+<br />
+
+This took only a handful of lines of code, all of which could be
+packaged into a library to make this automatic.
 
 Another example is lazy-loading data with Links:
 
