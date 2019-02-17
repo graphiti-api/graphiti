@@ -82,6 +82,366 @@ In other words, **this is REST**:
 We're moving an object from the server to the client, possibly modifying
 that object, then moving back to the server.
 
+Pretty simple right? Here's how we might implement this in GraphQL:
+
+{% highlight typescript %}
+type CreateEmployeeInput {
+  name: String
+  age: Int
+}
+
+type CreateEmployeePayload {
+  employee: Employee
+}
+
+type UpdateEmployeeInput {
+  employeeId: ID!
+  name: String
+  age: Int
+}
+
+type UpdateEmployeePayload {
+  employee: Employee
+}
+
+type DestroyEmployeeInput {
+  id: ID!
+}
+
+type DestroyEmployeePayload {
+  employee: Employee
+}
+
+type Employee {
+  id: ID!
+  name: String
+}
+
+createEmployee(input: CreateEmployeeInput!): CreateEmployeePayload
+updateEmployee(input: UpdateEmployeeInput!): UpdateEmployeePayload
+destroyEmployee(input: DestroyEmployeeInput!): DestroyEmployeePayload
+
+employee(id: ID!): Employee
+{% endhighlight %}
+
+The first things to note is that GraphQL is super badass at describing
+fields and types. The next thing to note is that fields and types are
+the wrong abstraction.
+
+Defining a schema like this allows bespoke, fine-grained detail. If we
+wanted, the `CreateEmployeePayload` could be different than the
+`UpdateEmployeePayload` - same for inputs like `CreateEmployeeInput` and
+`UpdateEmployeeInput`. If we wanted other actions, like
+`promoteEmployee` or `deactivateEmployee`, they would be easy to add and
+follow the same basic constructs.
+
+This is RPC - hand-crafted, custom requests. We have a high level of
+**configuration** but a low level of **convention**. Not only will
+developers have to spend more time hand-crafting these requests, but
+patterns are likely to diverge from one API to the next, from team to
+team, as time moves on. In fact, the above is really a best-case
+scenario with common naming convention of `create/update/destroy` - the
+Github API adds verbs like `add`, `remove`, `lock`, `move` and more.
+
+The benefit of REST over RPC is conventions. Conventions cause increased
+productivity and consistency (leading to fewer misunderstandiings and
+chances for bugs). Let's start thinking in REST, and see where it takes
+us.
+
+In REST, we know the input and output is always the Resource:
+
+{% highlight typescript %}
+type Employee {
+  id: ID!
+  name: string
+}
+
+createEmployee(input: Employee): Employee
+updateEmployee(input: Employee!): Employee
+destroyEmployee(input: Employee!): Employee
+
+employee(id: ID): Employee
+{% endhighlight %}
+
+OK, a little tighter. But there's actually no reason to type this out
+each time - we can assume developers are already familiar with the
+convention.
+
+{% highlight typescript %}
+type Employee {
+  id: ID!
+  name: string
+}
+
+createEmployee
+updateEmployee
+destroyEmployee
+
+employee(id: ID)
+{% endhighlight %}
+
+Getting there. OK and we know we're dealing with an Employee, and we
+know we won't have custom verbs like `promote` or `remove`.
+
+{% highlight typescript %}
+type Employee {
+  id: ID!
+  name: string
+}
+
+create
+update
+destroy
+show // employee(id: ID)
+index // employee()
+{% endhighlight %}
+
+By adopting conventions, we not only removed boilerplate - we removed
+the chance of subtle inconsistencies. This is better for both providers
+and consumers of the API.
+
+We're just getting started.
+
+The above schema covers basic CRUD. But we probably want to filter data, right? Let's say we want to return all employees with a given name:
+
+{% highlight typescript %}
+employee(id: ID, name: String)
+{% endhighlight %}
+
+Again, we're seeing chances for inconsistency. What's the `name`
+parameter - straight equality? Case sensitive? Contains? I guess we
+could throw a bunch of suffixes at it:
+
+{% highlight typescript %}
+employee(id: ID, name_eq: String, name_suffix: String, name_prefix:
+String, name_contains: String, name_not_eq: String, name_not_suffix:
+String, name_prefix: String, name_not_prefix: String)
+{% endhighlight %}
+
+Works, but a bit unwieldy...and again, likely to diverge wildly across
+implementations.
+
+What about sorting? Should we do it similar to the Github API?:
+
+{% highlight typescript %}
+enum OrderDirection {
+  ASC
+  DESC
+}
+
+enum EmployeeOrderField {
+  ID
+  NAME
+}
+
+type EmployeeOrder {
+  field: EmployeeOrderField!
+  direction: OrderDirection
+}
+
+employee(orderBy: EmployeeOrder)
+{% endhighlight %}
+
+Or should we do it like [How to
+GraphQL](https://www.howtographql.com/graphql-js/8-filtering-pagination-and-sorting/)?:
+
+{% highlight typescript %}
+enum EmployeeOrderByInput {
+  id_ASC
+  id_DESC
+  name_ASC
+  name_DESC
+}
+
+employee(orderBy: EmployeeOrderByInput)
+{% endhighlight %}
+
+We have divergent APIs right off the bat, and neither one supports
+multisort.
+
+Let's take a step back and think RESTfully. REST doesn't have a query
+specification, but it does have this Resource concept. **Instead of
+thinking in fields and types, what if we thought in Resources**?:
+
+Resources have attributes (fields) with corresponding types (String, Int, etc). We'd
+probably want to filter and sort by these attributes right? We might add
+some additional filters and sorts, we might want to opt-out of others,
+but it makes a reasonable baseline to query a Resource by its
+attributes.
+
+If we have an attribute and it's a `string`, we know we're
+talking about operators like `suffix` and `prefix`, but an `integer`
+attribute would want operators like `greater_than` and `less_than`.
+
+OK, so really we don't need to define *inputs* and *outputs* - those can
+be assumed by convention. What we really need to define is the Resource.
+
+Welcome to Graphiti:
+
+{% highlight ruby %}
+class EmployeeResource < ApplicationRecord
+  attribute :name, :string, sortable: true, filterable: true
+  attribute :age, :integer, writable: false
+end
+{% endhighlight %}
+
+With nothing but this Resource definition and some assumed conventions,
+we get all this behavior out of the box:
+
+* Create
+* Update
+* Delete
+* Read
+  * Filter
+    * String (`name`)
+      * `eq` (case sensitive)
+      * `eql` (case insensitive)
+      * `prefix`
+      * `suffix`
+      * `match`
+      * `not_*` (`not_eq`, `not_prefix`, etc)
+    * Dates and Numbers (`age`)
+      * `eq`
+      * `gt` (greater than)
+      * `lt` (less than)
+      * `gte` (greater than/equal to)
+      * `lte` (less than/equal to)
+  * Sort / Multisort
+  * Paginate
+  * Fieldsets
+
+There's more to this than a bunch of out-of-the-box standards and
+behavior. If we thought only in Fields and Types, we'd use GraphiQL to
+see something like:
+
+<br />
+
+<p align="center">
+  <img width="30%" src="https://user-images.githubusercontent.com/55264/52915902-78418d80-32a7-11e9-8515-021312258400.png" />
+</p>
+
+<br />
+
+But if we thought in Resources...well, REST is super popular for
+websites, websites have forms, so what if we:
+
+<br />
+
+<p align="center">
+  <img width="30%" src="https://user-images.githubusercontent.com/55264/52916024-e3d82a80-32a8-11e9-8bb6-07ac9bf988dc.png" />
+</p>
+
+<br />
+
+This screenshot is from [Vandal](https://graphiti-api.github.io/graphiti/guides/vandal), the Graphiti UI.
+
+Because we started with a better abstraction, we ended with a better
+visualization. As a marketer-turned-programmer myself, I really
+appreciate when data exploration tools like this are friendly to
+less-technical users. I like that my product owner and I can walk
+through the domain together, validating concepts and solidifying a shared
+understanding. A user of Vandal doesn't need to know about `Connection`s
+or `Edge`s, they just need to click around.
+
+We even get schema benefits. Schemas are great for tooling and
+backwards-compatibility checks...but when they are oriented around
+Fields and Types, they can only tell you so much. When they are oriented
+around Resources, they can expose less-obvious concepts. Maybe we sort
+Employees by `created_at` by default:
+
+{% highlight bash %}
+{
+  "name": "EmployeeResource",
+  "type": "employees",
+  "attributes": { ... },
+  "default_sort": [{ "created_at": "desc" }],
+  ...
+}
+{% endhighlight %}
+
+Because this is specified in the schema, not only are clients more
+informed but changing this default could raise a backwards-compatibility
+error:
+
+{% highlight bash %}
+EmployeeResource: default sort changed from [{:created_at=>"desc"}] to [{:last_name=>"asc"}].
+{% endhighlight %}
+
+
+Relationships at some point?
+schema stitching.
+
+
+
+
+
+
+
+* backwards compat sort
+
+
+
+
+then schema stiching
+
+
+
+
+
+
+
+
+
+
+
+
+https://twitter.com/sarahmei/status/702281663896653824
+
+
+
+
+
+
+Why do we have to spell
+this out each time? This can lead to subtle inconsistencies, both within
+this project and across other projects.
+* Same for the input.
+* 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+changeUserStatus(input: ChangeUserStatusInput!): ChangeUserStatusPayload
+
+addPullRequestReview(input: AddPullRequestReviewInput!): AddPullRequestReviewPayload
+
+submitPullRequestReview(input: SubmitPullRequestReviewInput!): SubmitPullRequestReviewPayload
+
+deletePullRequestReview(input: DeletePullRequestReviewInput!): DeletePullRequestReviewPayload
+
+
+
+
+
+
+
+
+
+
 Those objects are connected, and together those connections form a
 **graph**. REST allows you to lazy-load that graph using URL links:
 
@@ -111,21 +471,6 @@ don't need to get rid of REST. We need to add **eager loading**:
 >
 > \- ["Resources on Rails"](https://www.youtube.com/watch?v=GFhoSMD6idk), David Heinemeier Hansson
 
-{% highlight js %}
-// https://blog.tylerbuchea.com/a-simple-graphql-example-with-relationships/
-type Mutation {
-  signup(organization:String, id:String, name:String): User
-}
-
-// more "restful"
-type Mutation {
-  addUserToGroup(input: AddUserToGroupInput): AddUserToGroupPayload
-  removeUserFromGroup(input: AddUserToGroupInput): AddUserToGroupPayload
-}
-{% endhighlight %}
-
-Can we do it with domain? Sure. But means choices, and often lock-in to
-a specific library
 
 
 

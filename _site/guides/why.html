@@ -153,6 +153,310 @@ Maybe tell him: “Marcus, please add 2 cows to your farm”.</em></p>
 <p>We’re moving an object from the server to the client, possibly modifying
 that object, then moving back to the server.</p>
 
+<p>Pretty simple right? Here’s how we might implement this in GraphQL:</p>
+
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="kd">type</span> <span class="nx">CreateEmployeeInput</span> <span class="p">{</span>
+  <span class="nl">name</span><span class="p">:</span> <span class="nb">String</span>
+  <span class="nl">age</span><span class="p">:</span> <span class="nx">Int</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">CreateEmployeePayload</span> <span class="p">{</span>
+  <span class="nl">employee</span><span class="p">:</span> <span class="nx">Employee</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">UpdateEmployeeInput</span> <span class="p">{</span>
+  <span class="nl">employeeId</span><span class="p">:</span> <span class="nx">ID</span><span class="o">!</span>
+  <span class="nx">name</span><span class="err">:</span> <span class="nb">String</span>
+  <span class="nl">age</span><span class="p">:</span> <span class="nx">Int</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">UpdateEmployeePayload</span> <span class="p">{</span>
+  <span class="nl">employee</span><span class="p">:</span> <span class="nx">Employee</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">DestroyEmployeeInput</span> <span class="p">{</span>
+  <span class="nl">id</span><span class="p">:</span> <span class="nx">ID</span><span class="o">!</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">DestroyEmployeePayload</span> <span class="p">{</span>
+  <span class="nl">employee</span><span class="p">:</span> <span class="nx">Employee</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">Employee</span> <span class="p">{</span>
+  <span class="nl">id</span><span class="p">:</span> <span class="nx">ID</span><span class="o">!</span>
+  <span class="nx">name</span><span class="err">:</span> <span class="nb">String</span>
+<span class="p">}</span>
+
+<span class="nx">createEmployee</span><span class="p">(</span><span class="nx">input</span><span class="err">:</span> <span class="nx">CreateEmployeeInput</span><span class="o">!</span><span class="p">)</span><span class="err">:</span> <span class="nx">CreateEmployeePayload</span>
+<span class="nx">updateEmployee</span><span class="p">(</span><span class="nx">input</span><span class="err">:</span> <span class="nx">UpdateEmployeeInput</span><span class="o">!</span><span class="p">)</span><span class="err">:</span> <span class="nx">UpdateEmployeePayload</span>
+<span class="nx">destroyEmployee</span><span class="p">(</span><span class="nx">input</span><span class="err">:</span> <span class="nx">DestroyEmployeeInput</span><span class="o">!</span><span class="p">)</span><span class="err">:</span> <span class="nx">DestroyEmployeePayload</span>
+
+<span class="nx">employee</span><span class="p">(</span><span class="nx">id</span><span class="err">:</span> <span class="nx">ID</span><span class="o">!</span><span class="p">)</span><span class="err">:</span> <span class="nx">Employee</span></code></pre></figure>
+
+<p>The first things to note is that GraphQL is super badass at describing
+fields and types. The next thing to note is that fields and types are
+the wrong abstraction.</p>
+
+<p>Defining a schema like this allows bespoke, fine-grained detail. If we
+wanted, the <code class="highlighter-rouge">CreateEmployeePayload</code> could be different than the
+<code class="highlighter-rouge">UpdateEmployeePayload</code> - same for inputs like <code class="highlighter-rouge">CreateEmployeeInput</code> and
+<code class="highlighter-rouge">UpdateEmployeeInput</code>. If we wanted other actions, like
+<code class="highlighter-rouge">promoteEmployee</code> or <code class="highlighter-rouge">deactivateEmployee</code>, they would be easy to add and
+follow the same basic constructs.</p>
+
+<p>This is RPC - hand-crafted, custom requests. We have a high level of
+<strong>configuration</strong> but a low level of <strong>convention</strong>. Not only will
+developers have to spend more time hand-crafting these requests, but
+patterns are likely to diverge from one API to the next, from team to
+team, as time moves on. In fact, the above is really a best-case
+scenario with common naming convention of <code class="highlighter-rouge">create/update/destroy</code> - the
+Github API adds verbs like <code class="highlighter-rouge">add</code>, <code class="highlighter-rouge">remove</code>, <code class="highlighter-rouge">lock</code>, <code class="highlighter-rouge">move</code> and more.</p>
+
+<p>The benefit of REST over RPC is conventions. Conventions cause increased
+productivity and consistency (leading to fewer misunderstandiings and
+chances for bugs). Let’s start thinking in REST, and see where it takes
+us.</p>
+
+<p>In REST, we know the input and output is always the Resource:</p>
+
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="kd">type</span> <span class="nx">Employee</span> <span class="p">{</span>
+  <span class="nl">id</span><span class="p">:</span> <span class="nx">ID</span><span class="o">!</span>
+  <span class="nx">name</span><span class="err">:</span> <span class="kr">string</span>
+<span class="p">}</span>
+
+<span class="nx">createEmployee</span><span class="p">(</span><span class="nx">input</span><span class="err">:</span> <span class="nx">Employee</span><span class="p">)</span><span class="err">:</span> <span class="nx">Employee</span>
+<span class="nx">updateEmployee</span><span class="p">(</span><span class="nx">input</span><span class="err">:</span> <span class="nx">Employee</span><span class="o">!</span><span class="p">)</span><span class="err">:</span> <span class="nx">Employee</span>
+<span class="nx">destroyEmployee</span><span class="p">(</span><span class="nx">input</span><span class="err">:</span> <span class="nx">Employee</span><span class="o">!</span><span class="p">)</span><span class="err">:</span> <span class="nx">Employee</span>
+
+<span class="nx">employee</span><span class="p">(</span><span class="nx">id</span><span class="err">:</span> <span class="nx">ID</span><span class="p">)</span><span class="err">:</span> <span class="nx">Employee</span></code></pre></figure>
+
+<p>OK, a little tighter. But there’s actually no reason to type this out
+each time - we can assume developers are already familiar with the
+convention.</p>
+
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="kd">type</span> <span class="nx">Employee</span> <span class="p">{</span>
+  <span class="nl">id</span><span class="p">:</span> <span class="nx">ID</span><span class="o">!</span>
+  <span class="nx">name</span><span class="err">:</span> <span class="kr">string</span>
+<span class="p">}</span>
+
+<span class="nx">createEmployee</span>
+<span class="nx">updateEmployee</span>
+<span class="nx">destroyEmployee</span>
+
+<span class="nx">employee</span><span class="p">(</span><span class="nx">id</span><span class="err">:</span> <span class="nx">ID</span><span class="p">)</span></code></pre></figure>
+
+<p>Getting there. OK and we know we’re dealing with an Employee, and we
+know we won’t have custom verbs like <code class="highlighter-rouge">promote</code> or <code class="highlighter-rouge">remove</code>.</p>
+
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="kd">type</span> <span class="nx">Employee</span> <span class="p">{</span>
+  <span class="nl">id</span><span class="p">:</span> <span class="nx">ID</span><span class="o">!</span>
+  <span class="nx">name</span><span class="err">:</span> <span class="kr">string</span>
+<span class="p">}</span>
+
+<span class="nx">create</span>
+<span class="nx">update</span>
+<span class="nx">destroy</span>
+<span class="nx">show</span> <span class="c1">// employee(id: ID)</span>
+<span class="nx">index</span> <span class="c1">// employee()</span></code></pre></figure>
+
+<p>By adopting conventions, we not only removed boilerplate - we removed
+the chance of subtle inconsistencies. This is better for both providers
+and consumers of the API.</p>
+
+<p>We’re just getting started.</p>
+
+<p>The above schema covers basic CRUD. But we probably want to filter data, right? Let’s say we want to return all employees with a given name:</p>
+
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="nx">employee</span><span class="p">(</span><span class="nx">id</span><span class="err">:</span> <span class="nx">ID</span><span class="p">,</span> <span class="nx">name</span><span class="err">:</span> <span class="nb">String</span><span class="p">)</span></code></pre></figure>
+
+<p>Again, we’re seeing chances for inconsistency. What’s the <code class="highlighter-rouge">name</code>
+parameter - straight equality? Case sensitive? Contains? I guess we
+could throw a bunch of suffixes at it:</p>
+
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="nx">employee</span><span class="p">(</span><span class="nx">id</span><span class="err">:</span> <span class="nx">ID</span><span class="p">,</span> <span class="nx">name_eq</span><span class="err">:</span> <span class="nb">String</span><span class="p">,</span> <span class="nx">name_suffix</span><span class="err">:</span> <span class="nb">String</span><span class="p">,</span> <span class="nx">name_prefix</span><span class="err">:</span>
+<span class="nb">String</span><span class="p">,</span> <span class="nx">name_contains</span><span class="err">:</span> <span class="nb">String</span><span class="p">,</span> <span class="nx">name_not_eq</span><span class="err">:</span> <span class="nb">String</span><span class="p">,</span> <span class="nx">name_not_suffix</span><span class="err">:</span>
+<span class="nb">String</span><span class="p">,</span> <span class="nx">name_prefix</span><span class="err">:</span> <span class="nb">String</span><span class="p">,</span> <span class="nx">name_not_prefix</span><span class="err">:</span> <span class="nb">String</span><span class="p">)</span></code></pre></figure>
+
+<p>Works, but a bit unwieldy…and again, likely to diverge wildly across
+implementations.</p>
+
+<p>What about sorting? Should we do it similar to the Github API?:</p>
+
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="kr">enum</span> <span class="nx">OrderDirection</span> <span class="p">{</span>
+  <span class="nx">ASC</span>
+  <span class="nx">DESC</span>
+<span class="p">}</span>
+
+<span class="kr">enum</span> <span class="nx">EmployeeOrderField</span> <span class="p">{</span>
+  <span class="nx">ID</span>
+  <span class="nx">NAME</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">EmployeeOrder</span> <span class="p">{</span>
+  <span class="nl">field</span><span class="p">:</span> <span class="nx">EmployeeOrderField</span><span class="o">!</span>
+  <span class="nx">direction</span><span class="err">:</span> <span class="nx">OrderDirection</span>
+<span class="p">}</span>
+
+<span class="nx">employee</span><span class="p">(</span><span class="nx">orderBy</span><span class="err">:</span> <span class="nx">EmployeeOrder</span><span class="p">)</span></code></pre></figure>
+
+<p>Or should we do it like <a href="https://www.howtographql.com/graphql-js/8-filtering-pagination-and-sorting/">How to
+GraphQL</a>?:</p>
+
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="kr">enum</span> <span class="nx">EmployeeOrderByInput</span> <span class="p">{</span>
+  <span class="nx">id_ASC</span>
+  <span class="nx">id_DESC</span>
+  <span class="nx">name_ASC</span>
+  <span class="nx">name_DESC</span>
+<span class="p">}</span>
+
+<span class="nx">employee</span><span class="p">(</span><span class="nx">orderBy</span><span class="err">:</span> <span class="nx">EmployeeOrderByInput</span><span class="p">)</span></code></pre></figure>
+
+<p>We have divergent APIs right off the bat, and neither one supports
+multisort.</p>
+
+<p>Let’s take a step back and think RESTfully. REST doesn’t have a query
+specification, but it does have this Resource concept. <strong>Instead of
+thinking in fields and types, what if we thought in Resources</strong>?:</p>
+
+<p>Resources have attributes (fields) with corresponding types (String, Int, etc). We’d
+probably want to filter and sort by these attributes right? We might add
+some additional filters and sorts, we might want to opt-out of others,
+but it makes a reasonable baseline to query a Resource by its
+attributes.</p>
+
+<p>If we have an attribute and it’s a <code class="highlighter-rouge">string</code>, we know we’re
+talking about operators like <code class="highlighter-rouge">suffix</code> and <code class="highlighter-rouge">prefix</code>, but an <code class="highlighter-rouge">integer</code>
+attribute would want operators like <code class="highlighter-rouge">greater_than</code> and <code class="highlighter-rouge">less_than</code>.</p>
+
+<p>OK, so really we don’t need to define <em>inputs</em> and <em>outputs</em> - those can
+be assumed by convention. What we really need to define is the Resource.</p>
+
+<p>Welcome to Graphiti:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">attribute</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:string</span><span class="p">,</span> <span class="ss">sortable: </span><span class="kp">true</span><span class="p">,</span> <span class="ss">filterable: </span><span class="kp">true</span>
+  <span class="n">attribute</span> <span class="ss">:age</span><span class="p">,</span> <span class="ss">:integer</span><span class="p">,</span> <span class="ss">writable: </span><span class="kp">false</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>With nothing but this Resource definition and some assumed conventions,
+we get all this behavior out of the box:</p>
+
+<ul>
+  <li>Create</li>
+  <li>Update</li>
+  <li>Delete</li>
+  <li>Read
+    <ul>
+      <li>Filter
+        <ul>
+          <li>String (<code class="highlighter-rouge">name</code>)
+            <ul>
+              <li><code class="highlighter-rouge">eq</code> (case sensitive)</li>
+              <li><code class="highlighter-rouge">eql</code> (case insensitive)</li>
+              <li><code class="highlighter-rouge">prefix</code></li>
+              <li><code class="highlighter-rouge">suffix</code></li>
+              <li><code class="highlighter-rouge">match</code></li>
+              <li><code class="highlighter-rouge">not_*</code> (<code class="highlighter-rouge">not_eq</code>, <code class="highlighter-rouge">not_prefix</code>, etc)</li>
+            </ul>
+          </li>
+          <li>Dates and Numbers (<code class="highlighter-rouge">age</code>)
+            <ul>
+              <li><code class="highlighter-rouge">eq</code></li>
+              <li><code class="highlighter-rouge">gt</code> (greater than)</li>
+              <li><code class="highlighter-rouge">lt</code> (less than)</li>
+              <li><code class="highlighter-rouge">gte</code> (greater than/equal to)</li>
+              <li><code class="highlighter-rouge">lte</code> (less than/equal to)</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Sort / Multisort</li>
+      <li>Paginate</li>
+      <li>Fieldsets</li>
+    </ul>
+  </li>
+</ul>
+
+<p>There’s more to this than a bunch of out-of-the-box standards and
+behavior. If we thought only in Fields and Types, we’d use GraphiQL to
+see something like:</p>
+
+<p><br /></p>
+
+<p align="center">
+  <img width="30%" src="https://user-images.githubusercontent.com/55264/52915902-78418d80-32a7-11e9-8515-021312258400.png" />
+</p>
+
+<p><br /></p>
+
+<p>But if we thought in Resources…well, REST is super popular for
+websites, websites have forms, so what if we:</p>
+
+<p><br /></p>
+
+<p align="center">
+  <img width="30%" src="https://user-images.githubusercontent.com/55264/52916024-e3d82a80-32a8-11e9-8bb6-07ac9bf988dc.png" />
+</p>
+
+<p><br /></p>
+
+<p>This screenshot is from <a href="https://graphiti-api.github.io/graphiti/guides/vandal">Vandal</a>, the Graphiti UI.</p>
+
+<p>Because we started with a better abstraction, we ended with a better
+visualization. As a marketer-turned-programmer myself, I really
+appreciate when data exploration tools like this are friendly to
+less-technical users. I like that my product owner and I can walk
+through the domain together, validating concepts and solidifying a shared
+understanding. A user of Vandal doesn’t need to know about <code class="highlighter-rouge">Connection</code>s
+or <code class="highlighter-rouge">Edge</code>s, they just need to click around.</p>
+
+<p>We even get schema benefits. Schemas are great for tooling and
+backwards-compatibility checks…but when they are oriented around
+Fields and Types, they can only tell you so much. When they are oriented
+around Resources, they can expose less-obvious concepts. Maybe we sort
+Employees by <code class="highlighter-rouge">created_at</code> by default:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="o">{</span>
+  <span class="s2">"name"</span>: <span class="s2">"EmployeeResource"</span>,
+  <span class="s2">"type"</span>: <span class="s2">"employees"</span>,
+  <span class="s2">"attributes"</span>: <span class="o">{</span> ... <span class="o">}</span>,
+  <span class="s2">"default_sort"</span>: <span class="o">[{</span> <span class="s2">"created_at"</span>: <span class="s2">"desc"</span> <span class="o">}]</span>,
+  ...
+<span class="o">}</span></code></pre></figure>
+
+<p>Because this is specified in the schema, not only are clients more
+informed but changing this default could raise a backwards-compatibility
+error:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">EmployeeResource: default sort changed from <span class="o">[{</span>:created_at<span class="o">=</span>&gt;<span class="s2">"desc"</span><span class="o">}]</span> to <span class="o">[{</span>:last_name<span class="o">=</span>&gt;<span class="s2">"asc"</span><span class="o">}]</span>.</code></pre></figure>
+
+<p>Relationships at some point?
+schema stitching.</p>
+
+<ul>
+  <li>backwards compat sort</li>
+</ul>
+
+<p>then schema stiching</p>
+
+<p>https://twitter.com/sarahmei/status/702281663896653824</p>
+
+<p>Why do we have to spell
+this out each time? This can lead to subtle inconsistencies, both within
+this project and across other projects.</p>
+<ul>
+  <li>Same for the input.</li>
+  <li></li>
+</ul>
+
+<p>changeUserStatus(input: ChangeUserStatusInput!): ChangeUserStatusPayload</p>
+
+<p>addPullRequestReview(input: AddPullRequestReviewInput!): AddPullRequestReviewPayload</p>
+
+<p>submitPullRequestReview(input: SubmitPullRequestReviewInput!): SubmitPullRequestReviewPayload</p>
+
+<p>deletePullRequestReview(input: DeletePullRequestReviewInput!): DeletePullRequestReviewPayload</p>
+
 <p>Those objects are connected, and together those connections form a
 <strong>graph</strong>. REST allows you to lazy-load that graph using URL links:</p>
 
@@ -181,20 +485,6 @@ same things to happen.</p>
 
   <p>- <a href="https://www.youtube.com/watch?v=GFhoSMD6idk">“Resources on Rails”</a>, David Heinemeier Hansson</p>
 </blockquote>
-
-<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// https://blog.tylerbuchea.com/a-simple-graphql-example-with-relationships/</span>
-<span class="nx">type</span> <span class="nx">Mutation</span> <span class="p">{</span>
-  <span class="nx">signup</span><span class="p">(</span><span class="nx">organization</span><span class="err">:</span><span class="nb">String</span><span class="p">,</span> <span class="nx">id</span><span class="err">:</span><span class="nb">String</span><span class="p">,</span> <span class="nx">name</span><span class="err">:</span><span class="nb">String</span><span class="p">)</span><span class="err">:</span> <span class="nx">User</span>
-<span class="p">}</span>
-
-<span class="c1">// more "restful"</span>
-<span class="nx">type</span> <span class="nx">Mutation</span> <span class="p">{</span>
-  <span class="nx">addUserToGroup</span><span class="p">(</span><span class="nx">input</span><span class="err">:</span> <span class="nx">AddUserToGroupInput</span><span class="p">)</span><span class="err">:</span> <span class="nx">AddUserToGroupPayload</span>
-  <span class="nx">removeUserFromGroup</span><span class="p">(</span><span class="nx">input</span><span class="err">:</span> <span class="nx">AddUserToGroupInput</span><span class="p">)</span><span class="err">:</span> <span class="nx">AddUserToGroupPayload</span>
-<span class="p">}</span></code></pre></figure>
-
-<p>Can we do it with domain? Sure. But means choices, and often lock-in to
-a specific library</p>
 
 <p>This first, on simplicity and conventions:</p>
 
