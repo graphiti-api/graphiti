@@ -372,16 +372,16 @@ EmployeeResource: default sort changed from [{:created_at=>"desc"}] to [{:last_n
 
 ## Graphs
 
-You may be thinking, "OK, but REST only works for a single object. I'll
+You may be thinking, "*OK, but REST only works for a single object. I'll
 have to make multiple requests, and be right back where I started. I
-need GraphQL to solve this problem".
+need GraphQL to solve this problem*".
 
 Not true.
 
 Years before GraphQL came out, respected developers from different
 companies and backgrounds came together and began the discussion on how to improve REST
 APIs. This wasn't a project pushed by a hundred-billion dollar
-company, it was an organic, community-driven effort. The result was the [JSON:API](https://jsonapi.org) standard,
+company; it was an organic, community-driven effort. The result was the [JSON:API](https://jsonapi.org) standard,
 which tackled granular queries long ago:
 
 > (*Quick aside: I've always found the name of this project hilariously
@@ -480,6 +480,10 @@ state is now a graph of objects instead of a single object, but there's
 no need for a wholesale revamp. In fact, we don't need to change much at
 all.
 
+<p align="center">
+  <img width="30%" src="https://user-images.githubusercontent.com/55264/52920466-a68c9080-32da-11e9-823c-1ff275db40f6.jpg" />
+</p>
+
 Just as we can **query** multiple Resources at once, we can also
 **persist** multiple objects at once.
 
@@ -530,16 +534,111 @@ request:
 
 [TODO IMAGE]
 
-### (Micro) Services
+## Automation with Escape Valves / ORM Agnostic
 
-Schema Stitching
+ORM/DB, etcs
 
-### Clients
+## (Micro) Services
+
+> *You should think hard before breaking up [a Magestic Monolith](https://m.signalvnoise.com/the-majestic-monolith); beware the tradeoffs. Still, if you need it, Graphiti has your back.*
+
+We now have a consistent interface for queries and relationships. We
+also talked about how Resources connect together with Links. Put two and
+two together, and you'll see a Resource doesn't need to be local to same
+application. We can have cross-API, remote Resources as well.
+
+The popular GraphQL platform Apollo calls this [Schema Stitching](https://www.apollographql.com/docs/graphql-tools/schema-stitching.html):
+
+<p align="center">
+  <img width="50%" src="https://user-images.githubusercontent.com/55264/52920133-506a1e00-32d7-11e9-8986-23795dbedc2c.png" />
+</p>
+
+You won't need to write code like this in Graphiti. Because we have
+conventions, we can automate this stuff. Just supply a URL:
+
+{% highlight ruby %}
+class EmployeeResource < ApplicationResource
+  has_many :positions, remote: 'http://example.com/api/positions'
+end
+{% endhighlight %}
+
+That's it. Everything works the same. We can fetch an `Employee` and her `Position`s in a single
+request, add additional local *or* remote Resources to the request, and
+Deep Query. If you use Vandal, you'll think it's all the same API.
+
+Microservices 🎉!
+
+### Domain-Driven Design
+
+TODO
+
+## Clients
 
 -- js client - take advantage of conventions, and mirror moving the
 object. Instead of focusing on the *request*, FOCUS ON DOMAIN.
 
-### Magic
+## GraphQL Support
+
+OK, let's come full circle. Let's say some of these conventions resonate
+with you, but you'd still like a GraphQL server. I ***still*** think
+Graphiti is your best bet, because Graphiti supports GraphQL.
+
+Remember, we started with this long-hand RPC code:
+
+{% highlight typescript %}
+type CreateEmployeeInput {
+  name: String
+  age: Int
+}
+
+type CreateEmployeePayload {
+  employee: Employee
+}
+
+type UpdateEmployeeInput {
+  employeeId: ID!
+  name: String
+  age: Int
+}
+
+type UpdateEmployeePayload {
+  employee: Employee
+}
+
+type DestroyEmployeeInput {
+  id: ID!
+}
+
+type DestroyEmployeePayload {
+  employee: Employee
+}
+
+type Employee {
+  id: ID!
+  name: String
+}
+
+createEmployee(input: CreateEmployeeInput!): CreateEmployeePayload
+updateEmployee(input: UpdateEmployeeInput!): UpdateEmployeePayload
+destroyEmployee(input: DestroyEmployeeInput!): DestroyEmployeePayload
+
+employee(id: ID!): Employee
+{% endhighlight %}
+
+Graphiti does not need all this boilerplate. But
+if we have the short-hand, that means **we can automatically generate
+the long-hand**. We can introspect the Graphiti Resources, and use
+[graphql-ruby](https://github.com/rmosolgo/graphql-ruby) to automatically generate GraphQL code.
+
+That project is [graphiti-graphql](https://github.com/wadetandy/graphiti-graphql). While still more of an experiment at this stage, it's shaping up nicely. The main blockers are the conventions missing from any GraphQL API - how should we render validation errors, which sorting standard should we adopt, etc. But we have proof that if there's a target to hit, we can autogenerate it.
+
+So we ***can*** generate GraphQL via Graphiti, but should we? Maybe! Not
+an unreasonable pursuit. If you'd like to go down this route, I'd love
+to hear from you!
+
+Still, let's be clear what we're missing: HTTP caching, error codes, lazy-loading, and more.
+
+## Magic
 
 > *Having that level of consistency, and working with that for
 > just a little while means that you can start to forget about it. And

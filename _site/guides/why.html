@@ -9,7 +9,7 @@
   <title>Graphiti</title>
   <meta name="description" content="Stylish Graph APIs">
 
-  <link rel="stylesheet" href="https://richmolj.github.io/t/assets/main.css?ref=wh4t3v45">
+  <link rel="stylesheet" href="https://graphiti-api.github.io/graphiti/assets/main.css?ref=wh4t3v45">
   <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -41,21 +41,21 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a href="https://richmolj.github.io/t" class="navbar-brand">Graphiti</a>
+      <a href="https://graphiti-api.github.io/graphiti" class="navbar-brand">Graphiti</a>
     </div>
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
       <ul class="nav navbar-nav">
         <li>
-          <a class="nav-link" href="https://richmolj.github.io/t/quickstart">Quickstart</a>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
         </li>
         <li>
-          <a class="nav-link" href="https://richmolj.github.io/t/guides">Guides</a>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
         </li>
         <li>
-          <a class="nav-link" href="https://richmolj.github.io/t/tutorial">Tutorial</a>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
         </li>
         <li>
-          <a class="nav-link" href="https://richmolj.github.io/t/js">Spraypaint</a>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/js">Spraypaint</a>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
@@ -435,16 +435,16 @@ error:</p>
 
 <h2 id="graphs">Graphs</h2>
 
-<p>You may be thinking, “OK, but REST only works for a single object. I’ll
+<p>You may be thinking, “<em>OK, but REST only works for a single object. I’ll
 have to make multiple requests, and be right back where I started. I
-need GraphQL to solve this problem”.</p>
+need GraphQL to solve this problem</em>”.</p>
 
 <p>Not true.</p>
 
 <p>Years before GraphQL came out, respected developers from different
 companies and backgrounds came together and began the discussion on how to improve REST
 APIs. This wasn’t a project pushed by a hundred-billion dollar
-company, it was an organic, community-driven effort. The result was the <a href="https://jsonapi.org">JSON:API</a> standard,
+company; it was an organic, community-driven effort. The result was the <a href="https://jsonapi.org">JSON:API</a> standard,
 which tackled granular queries long ago:</p>
 
 <blockquote>
@@ -539,6 +539,10 @@ state is now a graph of objects instead of a single object, but there’s
 no need for a wholesale revamp. In fact, we don’t need to change much at
 all.</p>
 
+<p align="center">
+  <img width="30%" src="https://user-images.githubusercontent.com/55264/52920466-a68c9080-32da-11e9-823c-1ff275db40f6.jpg" />
+</p>
+
 <p>Just as we can <strong>query</strong> multiple Resources at once, we can also
 <strong>persist</strong> multiple objects at once.</p>
 
@@ -587,16 +591,109 @@ request:</p>
 
 <p>[TODO IMAGE]</p>
 
-<h3 id="micro-services">(Micro) Services</h3>
+<h2 id="automation-with-escape-valves--orm-agnostic">Automation with Escape Valves / ORM Agnostic</h2>
 
-<p>Schema Stitching</p>
+<p>ORM/DB, etcs</p>
 
-<h3 id="clients">Clients</h3>
+<h2 id="micro-services">(Micro) Services</h2>
+
+<blockquote>
+  <p><em>You should think hard before breaking up <a href="https://m.signalvnoise.com/the-majestic-monolith">a Magestic Monolith</a>; beware the tradeoffs. Still, if you need it, Graphiti has your back.</em></p>
+</blockquote>
+
+<p>We now have a consistent interface for queries and relationships. We
+also talked about how Resources connect together with Links. Put two and
+two together, and you’ll see a Resource doesn’t need to be local to same
+application. We can have cross-API, remote Resources as well.</p>
+
+<p>The popular GraphQL platform Apollo calls this <a href="https://www.apollographql.com/docs/graphql-tools/schema-stitching.html">Schema Stitching</a>:</p>
+
+<p align="center">
+  <img width="50%" src="https://user-images.githubusercontent.com/55264/52920133-506a1e00-32d7-11e9-8986-23795dbedc2c.png" />
+</p>
+
+<p>You won’t need to write code like this in Graphiti. Because we have
+conventions, we can automate this stuff. Just supply a URL:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="n">has_many</span> <span class="ss">:positions</span><span class="p">,</span> <span class="ss">remote: </span><span class="s1">'http://example.com/api/positions'</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>That’s it. Everything works the same. We can fetch an <code class="highlighter-rouge">Employee</code> and her <code class="highlighter-rouge">Position</code>s in a single
+request, add additional local <em>or</em> remote Resources to the request, and
+Deep Query. If you use Vandal, you’ll think it’s all the same API.</p>
+
+<p>Microservices 🎉!</p>
+
+<h3 id="domain-driven-design">Domain-Driven Design</h3>
+
+<p>TODO</p>
+
+<h2 id="clients">Clients</h2>
 
 <p>– js client - take advantage of conventions, and mirror moving the
 object. Instead of focusing on the <em>request</em>, FOCUS ON DOMAIN.</p>
 
-<h3 id="magic">Magic</h3>
+<h2 id="graphql-support">GraphQL Support</h2>
+
+<p>OK, let’s come full circle. Let’s say some of these conventions resonate
+with you, but you’d still like a GraphQL server. I <strong><em>still</em></strong> think
+Graphiti is your best bet, because Graphiti supports GraphQL.</p>
+
+<p>Remember, we started with this long-hand RPC code:</p>
+
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="kd">type</span> <span class="nx">CreateEmployeeInput</span> <span class="p">{</span>
+  <span class="nl">name</span><span class="p">:</span> <span class="nb">String</span>
+  <span class="nl">age</span><span class="p">:</span> <span class="nx">Int</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">CreateEmployeePayload</span> <span class="p">{</span>
+  <span class="nl">employee</span><span class="p">:</span> <span class="nx">Employee</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">UpdateEmployeeInput</span> <span class="p">{</span>
+  <span class="nl">employeeId</span><span class="p">:</span> <span class="nx">ID</span><span class="o">!</span>
+  <span class="nx">name</span><span class="err">:</span> <span class="nb">String</span>
+  <span class="nl">age</span><span class="p">:</span> <span class="nx">Int</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">UpdateEmployeePayload</span> <span class="p">{</span>
+  <span class="nl">employee</span><span class="p">:</span> <span class="nx">Employee</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">DestroyEmployeeInput</span> <span class="p">{</span>
+  <span class="nl">id</span><span class="p">:</span> <span class="nx">ID</span><span class="o">!</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">DestroyEmployeePayload</span> <span class="p">{</span>
+  <span class="nl">employee</span><span class="p">:</span> <span class="nx">Employee</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">Employee</span> <span class="p">{</span>
+  <span class="nl">id</span><span class="p">:</span> <span class="nx">ID</span><span class="o">!</span>
+  <span class="nx">name</span><span class="err">:</span> <span class="nb">String</span>
+<span class="p">}</span>
+
+<span class="nx">createEmployee</span><span class="p">(</span><span class="nx">input</span><span class="err">:</span> <span class="nx">CreateEmployeeInput</span><span class="o">!</span><span class="p">)</span><span class="err">:</span> <span class="nx">CreateEmployeePayload</span>
+<span class="nx">updateEmployee</span><span class="p">(</span><span class="nx">input</span><span class="err">:</span> <span class="nx">UpdateEmployeeInput</span><span class="o">!</span><span class="p">)</span><span class="err">:</span> <span class="nx">UpdateEmployeePayload</span>
+<span class="nx">destroyEmployee</span><span class="p">(</span><span class="nx">input</span><span class="err">:</span> <span class="nx">DestroyEmployeeInput</span><span class="o">!</span><span class="p">)</span><span class="err">:</span> <span class="nx">DestroyEmployeePayload</span>
+
+<span class="nx">employee</span><span class="p">(</span><span class="nx">id</span><span class="err">:</span> <span class="nx">ID</span><span class="o">!</span><span class="p">)</span><span class="err">:</span> <span class="nx">Employee</span></code></pre></figure>
+
+<p>Graphiti does not need all this boilerplate. But
+if we have the short-hand, that means <strong>we can automatically generate
+the long-hand</strong>. We can introspect the Graphiti Resources, and use
+<a href="https://github.com/rmosolgo/graphql-ruby">graphql-ruby</a> to automatically generate GraphQL code.</p>
+
+<p>That project is <a href="https://github.com/wadetandy/graphiti-graphql">graphiti-graphql</a>. While still more of an experiment at this stage, it’s shaping up nicely. The main blockers are the conventions missing from any GraphQL API - how should we render validation errors, which sorting standard should we adopt, etc. But we have proof that if there’s a target to hit, we can autogenerate it.</p>
+
+<p>So we <strong><em>can</em></strong> generate GraphQL via Graphiti, but should we? Maybe! Not
+an unreasonable pursuit. If you’d like to go down this route, I’d love
+to hear from you!</p>
+
+<p>Still, let’s be clear what we’re missing: HTTP caching, error codes, lazy-loading, and more.</p>
+
+<h2 id="magic">Magic</h2>
 
 <blockquote>
   <p><em>Having that level of consistency, and working with that for
@@ -652,13 +749,13 @@ directly at richmolj@gmail.com or @richmolj on Twitter.</p>
         <h3>Overview</h3>
         <ul>
           <li>
-            <a href="https://richmolj.github.io/t/quickstart">Quickstart</a>
+            <a href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
           </li>
           <li>
-            <a href="https://richmolj.github.io/t/tutorial">Tutorial</a>
+            <a href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
           </li>
           <li>
-            <a href="https://richmolj.github.io/t/guides">Guides</a>
+            <a href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
           </li>
         </ul>
       </div>
