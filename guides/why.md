@@ -48,21 +48,21 @@ we need to look much further than what the letters actually stand for:
 
 > **Representational State Transfer**. *This sentence is not only what REST stands for, it is also the tiniest possible description of what REST actually means...It is not a standard, rather a style describing the act of transfering a state of something by its representation.*
 >
-> *Lets consider this:*
+> *Let's consider this:*
 >
-> *Marcus is a farmer. He has a ranch with 4 pigs, 12 chickens and 3 cows. He is now simulating a REST api while i am the client. If i want to request the current state of his farm using REST i just ask him: "State?"*
+> *Marcus is a farmer. He has a ranch with 4 pigs, 12 chickens and 3 cows. He is now simulating a REST API while I am the client. If I want to request the current state of his farm using REST I just ask him: "State?"*
 >
 > *Marcus answers: "4 pigs, 12 chickens, 3 cows".
 This is the most simple example of Representional State Transfer. Marcus transfered the state of his farm to me using a representation. The representation of the farm is the plain sentence: "4 pigs, 12 chickens, 3 cows".*
 >
-> *So lets get to the next level. How would i tell Marcus to add 2 cows to his farm the REST way?
+> *So lets get to the next level. How would I tell Marcus to add 2 cows to his farm the REST way?
 Maybe tell him: "Marcus, please add 2 cows to your farm".*
 >
-> *Do you think this was REST? Are we transfering state by its representation here? NO! This was calling a remote procedure. The procedure of adding 2 cows to the farm.*
+> *Do you think this was REST? Are we transfering state by its representation here? **NO!** This was calling a remote procedure. The procedure of adding 2 cows to the farm.*
 >
 > *Marcus sadly answers: "400, Bad Request. What do you mean?"*
 >
-> *So lets try this again. How would we do this the REST way? What was the representation again? It was "4 pigs, 12 chickens, 3 cows". Ok. so lets try this again transfering the representation...*
+> *So lets try this again. How would we do this the REST way? What was the representation again? It was "4 pigs, 12 chickens, 3 cows". Ok. so let's try this again transfering the representation...*
 >
 > *me: "Marcus, ... 4 pigs, 12 chickens, 5 cows ... please!".*
 > *Marcus: "Alright !".*
@@ -124,7 +124,7 @@ destroyEmployee(input: DestroyEmployeeInput!): DestroyEmployeePayload
 employee(id: ID!): Employee
 {% endhighlight %}
 
-The first things to note is that GraphQL is super badass at describing
+The first thing to note is that GraphQL is super badass at describing
 fields and types. The next thing to note is that fields and types are
 the wrong abstraction.
 
@@ -135,7 +135,7 @@ wanted, the `CreateEmployeePayload` could be different than the
 `promoteEmployee` or `deactivateEmployee`, they would be easy to add and
 follow the same basic constructs.
 
-This is RPC - hand-crafted, custom requests. We have a high level of
+This is **RPC** - hand-crafted, custom requests. We have a high level of
 **configuration** but a low level of **convention**. Not only will
 developers have to spend more time hand-crafting these requests, but
 patterns are likely to diverge from one API to the next, from team to
@@ -180,8 +180,11 @@ destroyEmployee
 employee(id: ID)
 {% endhighlight %}
 
-Getting there. OK and we know we're dealing with an Employee, and we
-know we won't have custom verbs like `promote` or `remove`.
+Getting there. OK, and we know we're dealing with an Employee, and we
+know we won't have custom verbs like `promote` or `remove` - we're
+moving objects here, and nothing else (if that throws you for a mental
+loop, see [this presentation by Derek Prior](https://www.youtube.com/watch?v=HctYHe-YjnE), Engineering Manager at
+GitHub).
 
 {% highlight typescript %}
 type Employee {
@@ -221,7 +224,7 @@ String, name_prefix: String, name_not_prefix: String)
 Works, but a bit unwieldy...and again, likely to diverge wildly across
 implementations.
 
-What about sorting? Should we do it similar to the Github API?:
+What about sorting? Should we do it similar to the [Github API](https://developer.github.com/v4/explorer/)?:
 
 {% highlight typescript %}
 enum OrderDirection {
@@ -266,15 +269,15 @@ thinking in fields and types, what if we thought in Resources**?:
 Resources have attributes (fields) with corresponding types (String, Int, etc). We'd
 probably want to filter and sort by these attributes right? We might add
 some additional filters and sorts, we might want to opt-out of others,
-but it makes a reasonable baseline to query a Resource by its
-attributes.
+but querying a Resource by its attributes serves as a reasonable
+baseline.
 
 If we have an attribute and it's a `string`, we know we're
 talking about operators like `suffix` and `prefix`, but an `integer`
 attribute would want operators like `greater_than` and `less_than`.
 
 OK, so really we don't need to define *inputs* and *outputs* - those can
-be assumed by convention. What we really need to define is the Resource.
+be assumed by convention. What we really need to define is the **Resource**.
 
 Welcome to Graphiti:
 
@@ -323,12 +326,12 @@ see something like:
 <br />
 
 But if we thought in Resources...well, REST is super popular for
-websites, websites have forms, so what if we:
+websites, websites have forms, so what if we...
 
 <br />
 
 <p align="center">
-  <img width="30%" src="https://user-images.githubusercontent.com/55264/52916024-e3d82a80-32a8-11e9-8bb6-07ac9bf988dc.png" />
+  <img width="40%" src="https://user-images.githubusercontent.com/55264/52916024-e3d82a80-32a8-11e9-8bb6-07ac9bf988dc.png" />
 </p>
 
 <br />
@@ -360,191 +363,222 @@ Employees by `created_at` by default:
 {% endhighlight %}
 
 Because this is specified in the schema, not only are clients more
-informed but changing this default could raise a backwards-compatibility
+informed, but changing this default would raise a backwards-compatibility
 error:
 
 {% highlight bash %}
 EmployeeResource: default sort changed from [{:created_at=>"desc"}] to [{:last_name=>"asc"}].
 {% endhighlight %}
 
-
-Relationships at some point?
-schema stitching.
-
-
-
-
-
-
-
-* backwards compat sort
-
-
-
-
-then schema stiching
-
-
-
-
-
-
-
-
-
-
-
-
-https://twitter.com/sarahmei/status/702281663896653824
-
-
-
-
-
-
-Why do we have to spell
-this out each time? This can lead to subtle inconsistencies, both within
-this project and across other projects.
-* Same for the input.
-* 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-changeUserStatus(input: ChangeUserStatusInput!): ChangeUserStatusPayload
-
-addPullRequestReview(input: AddPullRequestReviewInput!): AddPullRequestReviewPayload
-
-submitPullRequestReview(input: SubmitPullRequestReviewInput!): SubmitPullRequestReviewPayload
-
-deletePullRequestReview(input: DeletePullRequestReviewInput!): DeletePullRequestReviewPayload
-
-
-
-
-
-
-
-
-
-
-Those objects are connected, and together those connections form a
-**graph**. REST allows you to lazy-load that graph using URL links:
-
-In other words, **REST is optimized for lazy-loading**. REST is great at A) supplying conventions that will lead to cleaner object-oriented code B) lazy-loading data C) caching.
-
-REST is incredibly powerful, well-understood, and well-supported. We
-don't need to get rid of REST. We need to add **eager loading**:
-
-[TODO EAGER]
-
-
-
-
-
-> 19:35 *Having that level of consistency, and working with that for
+## Graphs
+
+You may be thinking, "OK, but REST only works for a single object. I'll
+have to make multiple requests, and be right back where I started. I
+need GraphQL to solve this problem".
+
+Not true.
+
+Years before GraphQL came out, respected developers from different
+companies and backgrounds came together and began the discussion on how to improve REST
+APIs. This wasn't a project pushed by a hundred-billion dollar
+company, it was an organic, community-driven effort. The result was the [JSON:API](https://jsonapi.org) standard,
+which tackled granular queries long ago:
+
+> (*Quick aside: I've always found the name of this project hilariously
+awkward, easy to confuse with any API outputting JSON. But you could say
+the same about GraphQL! Just as JSON:API isn't the only API standard
+outputting JSON, GraphQL isn't the only Graph Query Language - in fact,
+you could call JSON:API a Graph Query Language as well!*)
+
+{% highlight ruby %}
+# GET /employees?include=positions
+
+{
+  data: {
+    id: "123",
+    type: "employees",
+    attributes: { name: "Kayla Webb" },
+    relationships: {
+      positions: {
+        data: { id: "456", type: "positions" }
+      }
+    }
+  },
+  included: [
+    {
+      id: "456",
+      type: "positions",
+      attributes: { title: "Engineer" }
+    }
+  ]
+}
+{% endhighlight %}
+
+Wonky payload, right? OK, first of all, don't be scared. In Graphiti,
+you can add `.json` to the URL and output a more traditional flat
+structure:
+
+{% highlight ruby %}
+{
+  data: {
+    id: "123",
+    name: "Jeesoo Ryoo",
+    positions: [{ id: "456", title: "Engineer" }]
+  }
+}
+{% endhighlight %}
+
+You can absolutely develop in Graphiti this way, but you'd be giving up
+some smart things JSON:API does. One example is de-duplicating each node
+in the graph: if we're listing 100 `Post`s and they all have the same
+`Author`, you'll have to render that `Author` 100 times. JSON:API would
+only render it once.
+
+Another example is lazy-loading data with Links:
+
+<p align="center">
+  <div style="width: 500px;margin:auto">
+    <blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr">A GraphQL response is going to be as slow as the slowest subquery it has to execute to build the response.</p>&mdash; Tom Dale (@tomdale) <a href="https://twitter.com/tomdale/status/786952448799825921?ref_src=twsrc%5Etfw">October 14, 2016</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </div>
+</p>
+
+Instead of loading everying up-front, we want to defer loading for
+performance reasons. Maybe we want to render our `Employee` detail page
+super quick, and we don't need to list the `Position`s until the user
+clicks something.
+
+You can do this in GraphQL, but you need to bake logic into the client,
+which means changing the logic would break clients (read more about
+this in the [Links Guide](https://graphiti-api.github.io/graphiti/guides/concepts/links)).
+Luckily, REST and JSON:API are optimized for lazy-loading:
+
+{% highlight ruby %}
+# ...
+positions: {
+  links: {
+    related: 'http://example.com/api/positions?filter[employee_id]=123'
+  }
+}
+# ...
+{% endhighlight %}
+
+Graphiti generates these Links between Resources automatically. If you
+change the logic, we'll update the Link - clients can simply follow the
+link, and we can change logic server-side with no breakage.
+
+There's a bunch of other great stuff about JSON:API, but that is a
+topic for another day.
+
+Anything you could do with a single Resource, you can do with multiple
+Resources. In other words, we can fetch an `Employee`, and their
+`Positions` - but only `active` positions where the title starts with
+`Eng`, ordered by `created_at`. This is called **Deep Querying**.
+
+The point here is that REST doesn't mean multiple requests. Sure, our
+state is now a graph of objects instead of a single object, but there's
+no need for a wholesale revamp. In fact, we don't need to change much at
+all.
+
+Just as we can **query** multiple Resources at once, we can also
+**persist** multiple objects at once.
+
+When persisting in REST, we send the same object back to the server
+alongside a verb. That verb tells us if we're creating, updating (part
+or whole), or deleting. Same thing here. Let's specify the verb
+alongside the relationship:
+
+{% highlight ruby %}
+# ...
+positions: {
+  data: { id: "456", type: "positions", method: "destroy" }
+}
+# ...
+{% endhighlight %}
+
+There are only 4 possible verbs:
+
+* `create`
+* `update`
+* `destroy`
+* `disassociate`
+
+Oh, and we'll run everything within a transaction, throwing in
+conventions for data validation as well:
+
+{% highlight ruby %}
+# Response code 422
+
+{
+  code:  'unprocessable_entity',
+  status: '422',
+  title: "Validation Error",
+  detail: "Name can't be blank",
+  source: { pointer: '/data/attributes/name' },
+  meta: {
+    attribute: :name,
+    message: "can't be blank",
+    code: :blank
+  }
+}
+{% endhighlight %}
+
+Earlier, we covered how REST was optimized for lazy-loading. Graphiti
+builds on top of REST to add eager-loading, and "eager-persisting". In
+other words, we can both read and write a graph of data in a single
+request:
+
+[TODO IMAGE]
+
+### (Micro) Services
+
+Schema Stitching
+
+### Clients
+
+-- js client - take advantage of conventions, and mirror moving the
+object. Instead of focusing on the *request*, FOCUS ON DOMAIN.
+
+### Magic
+
+> *Having that level of consistency, and working with that for
 > just a little while means that you can start to forget about it. And
 > that's the power of conventions in general...it used to be something
 > you had to think about and make a decision. Well, decisions are bad.
 > Decisions take up your brain power, and it requires brain cycles to
 > consider which or the other. The more decisions you can take out of
 > the whole thing, the more brain power you can free up to consider the
-> really important things.
-
-> If everybody is doing the same thing in the same way, it means that
+> really important things.*
+>
+> *If everybody is doing the same thing in the same way, it means that
 > you can easily go from one application to the other, and expect the
-> same things to happen.
+> same things to happen.*
 >
 > \- ["Resources on Rails"](https://www.youtube.com/watch?v=GFhoSMD6idk), David Heinemeier Hansson
 
+When conventions form your programming foundation, you end up with these
+high-level abstractions where a few lines of code hide the underlying
+complexity. Often, this is flippantly referred to as ✨"**Magic**"🔮
 
+The thing about magic is, once you learn the trick it often comes down
+to something simple: a mirror, a trick deck, a quick hand.
 
+An object, moving back and forth.
 
+<p align="center">
+  <img width="50%" src="https://user-images.githubusercontent.com/55264/52913247-36561e80-328a-11e9-98ea-5e743920d317.gif" />
+</p>
 
+Simple concepts can often be the most powerful, and I will never get
+tired of seeing this trick performed.
 
+There's plenty more we haven't even talked about. Check out the
+[Guides], or dive right in with the [Quickstart] or [Tutorial]. If
+things get tricky, ask for help in our [Slack Chat]. Reach out to me
+directly at richmolj@gmail.com or @richmolj on Twitter.
 
+Let's put on a show together.
 
-
-
-
-
-This first, on simplicity and conventions:
-
-There is simply no need for this:
-
-* submit, add, unlock
-* the input is a `PullRequestReview`
-* the output is a `PullRequestReview`
-
-submitPullRequestReview(input: SubmitPullRequestReviewInput!): SubmitPullRequestReviewPayload
-
-
-REST would say: just tell me about your Pull Request. I already know how
-to CRUD it, so just tell me what it is.
-
-Edges and Connections
-
-
-class PullRequestResource
-end
-
-* Create read update delete
-
-add
-
-has_many :comments
-
-CRUD comments, disassociate
-
-Let's see what else we can do.
-
-Because resource with attributes, and attributes have types, we can
-infer filters - prefix and suffix, greater than less than.
-
-
-Our schema doesn't need to define inputs and outputs - REST already
-tells us what those are. So, what we need to define are Resources,
-marking attributes writable readable etc
-
-
-Because query interface, schema stitching.
-
-
-Just as REST gives us constraints, for saving, thinking about resources
-gives us contraints for querying. Resources have attributes, and we'll
-want to filter and sort on those attributes. We'll need to paginate, and
-maybe add statistics. That's it.
-
-
-show it all, and say all this was possible because we started with a
-simple concept, one that's been around forever and powers much of the
-web today. When solving problems, we should build on existing solutions
-and embrase positive-sum thinking.
-
-
-
-
-When we add conventions, great things happen. That doesn't mean
-conventions are "what works with activerecord" - conventions must be
-informed by diverse opinions and perspectives. But still, arriving at
-one way to do things is the sweet spot.
-
-
-
-
-
-Core value: Common conventions informed by diverse perspectives
+<br />
+<br />
+<br />

@@ -9,7 +9,7 @@
   <title>Graphiti</title>
   <meta name="description" content="Stylish Graph APIs">
 
-  <link rel="stylesheet" href="https://graphiti-api.github.io/graphiti/assets/main.css?ref=wh4t3v45">
+  <link rel="stylesheet" href="https://richmolj.github.io/t/assets/main.css?ref=wh4t3v45">
   <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -41,21 +41,21 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a href="https://graphiti-api.github.io/graphiti" class="navbar-brand">Graphiti</a>
+      <a href="https://richmolj.github.io/t" class="navbar-brand">Graphiti</a>
     </div>
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
       <ul class="nav navbar-nav">
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+          <a class="nav-link" href="https://richmolj.github.io/t/quickstart">Quickstart</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+          <a class="nav-link" href="https://richmolj.github.io/t/guides">Guides</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+          <a class="nav-link" href="https://richmolj.github.io/t/tutorial">Tutorial</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/js">Spraypaint</a>
+          <a class="nav-link" href="https://richmolj.github.io/t/js">Spraypaint</a>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
@@ -118,21 +118,21 @@ we need to look much further than what the letters actually stand for:</p>
 <blockquote>
   <p><strong>Representational State Transfer</strong>. <em>This sentence is not only what REST stands for, it is also the tiniest possible description of what REST actually means…It is not a standard, rather a style describing the act of transfering a state of something by its representation.</em></p>
 
-  <p><em>Lets consider this:</em></p>
+  <p><em>Let’s consider this:</em></p>
 
-  <p><em>Marcus is a farmer. He has a ranch with 4 pigs, 12 chickens and 3 cows. He is now simulating a REST api while i am the client. If i want to request the current state of his farm using REST i just ask him: “State?”</em></p>
+  <p><em>Marcus is a farmer. He has a ranch with 4 pigs, 12 chickens and 3 cows. He is now simulating a REST API while I am the client. If I want to request the current state of his farm using REST I just ask him: “State?”</em></p>
 
   <p><em>Marcus answers: “4 pigs, 12 chickens, 3 cows”.
 This is the most simple example of Representional State Transfer. Marcus transfered the state of his farm to me using a representation. The representation of the farm is the plain sentence: “4 pigs, 12 chickens, 3 cows”.</em></p>
 
-  <p><em>So lets get to the next level. How would i tell Marcus to add 2 cows to his farm the REST way?
+  <p><em>So lets get to the next level. How would I tell Marcus to add 2 cows to his farm the REST way?
 Maybe tell him: “Marcus, please add 2 cows to your farm”.</em></p>
 
-  <p><em>Do you think this was REST? Are we transfering state by its representation here? NO! This was calling a remote procedure. The procedure of adding 2 cows to the farm.</em></p>
+  <p><em>Do you think this was REST? Are we transfering state by its representation here? <strong>NO!</strong> This was calling a remote procedure. The procedure of adding 2 cows to the farm.</em></p>
 
   <p><em>Marcus sadly answers: “400, Bad Request. What do you mean?”</em></p>
 
-  <p><em>So lets try this again. How would we do this the REST way? What was the representation again? It was “4 pigs, 12 chickens, 3 cows”. Ok. so lets try this again transfering the representation…</em></p>
+  <p><em>So lets try this again. How would we do this the REST way? What was the representation again? It was “4 pigs, 12 chickens, 3 cows”. Ok. so let’s try this again transfering the representation…</em></p>
 
   <p><em>me: “Marcus, … 4 pigs, 12 chickens, 5 cows … please!”.</em>
 <em>Marcus: “Alright !”.</em>
@@ -193,7 +193,7 @@ that object, then moving back to the server.</p>
 
 <span class="nx">employee</span><span class="p">(</span><span class="nx">id</span><span class="err">:</span> <span class="nx">ID</span><span class="o">!</span><span class="p">)</span><span class="err">:</span> <span class="nx">Employee</span></code></pre></figure>
 
-<p>The first things to note is that GraphQL is super badass at describing
+<p>The first thing to note is that GraphQL is super badass at describing
 fields and types. The next thing to note is that fields and types are
 the wrong abstraction.</p>
 
@@ -204,7 +204,7 @@ wanted, the <code class="highlighter-rouge">CreateEmployeePayload</code> could b
 <code class="highlighter-rouge">promoteEmployee</code> or <code class="highlighter-rouge">deactivateEmployee</code>, they would be easy to add and
 follow the same basic constructs.</p>
 
-<p>This is RPC - hand-crafted, custom requests. We have a high level of
+<p>This is <strong>RPC</strong> - hand-crafted, custom requests. We have a high level of
 <strong>configuration</strong> but a low level of <strong>convention</strong>. Not only will
 developers have to spend more time hand-crafting these requests, but
 patterns are likely to diverge from one API to the next, from team to
@@ -245,8 +245,11 @@ convention.</p>
 
 <span class="nx">employee</span><span class="p">(</span><span class="nx">id</span><span class="err">:</span> <span class="nx">ID</span><span class="p">)</span></code></pre></figure>
 
-<p>Getting there. OK and we know we’re dealing with an Employee, and we
-know we won’t have custom verbs like <code class="highlighter-rouge">promote</code> or <code class="highlighter-rouge">remove</code>.</p>
+<p>Getting there. OK, and we know we’re dealing with an Employee, and we
+know we won’t have custom verbs like <code class="highlighter-rouge">promote</code> or <code class="highlighter-rouge">remove</code> - we’re
+moving objects here, and nothing else (if that throws you for a mental
+loop, see <a href="https://www.youtube.com/watch?v=HctYHe-YjnE">this presentation by Derek Prior</a>, Engineering Manager at
+GitHub).</p>
 
 <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="kd">type</span> <span class="nx">Employee</span> <span class="p">{</span>
   <span class="nl">id</span><span class="p">:</span> <span class="nx">ID</span><span class="o">!</span>
@@ -280,7 +283,7 @@ could throw a bunch of suffixes at it:</p>
 <p>Works, but a bit unwieldy…and again, likely to diverge wildly across
 implementations.</p>
 
-<p>What about sorting? Should we do it similar to the Github API?:</p>
+<p>What about sorting? Should we do it similar to the <a href="https://developer.github.com/v4/explorer/">Github API</a>?:</p>
 
 <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="kr">enum</span> <span class="nx">OrderDirection</span> <span class="p">{</span>
   <span class="nx">ASC</span>
@@ -321,15 +324,15 @@ thinking in fields and types, what if we thought in Resources</strong>?:</p>
 <p>Resources have attributes (fields) with corresponding types (String, Int, etc). We’d
 probably want to filter and sort by these attributes right? We might add
 some additional filters and sorts, we might want to opt-out of others,
-but it makes a reasonable baseline to query a Resource by its
-attributes.</p>
+but querying a Resource by its attributes serves as a reasonable
+baseline.</p>
 
 <p>If we have an attribute and it’s a <code class="highlighter-rouge">string</code>, we know we’re
 talking about operators like <code class="highlighter-rouge">suffix</code> and <code class="highlighter-rouge">prefix</code>, but an <code class="highlighter-rouge">integer</code>
 attribute would want operators like <code class="highlighter-rouge">greater_than</code> and <code class="highlighter-rouge">less_than</code>.</p>
 
 <p>OK, so really we don’t need to define <em>inputs</em> and <em>outputs</em> - those can
-be assumed by convention. What we really need to define is the Resource.</p>
+be assumed by convention. What we really need to define is the <strong>Resource</strong>.</p>
 
 <p>Welcome to Graphiti:</p>
 
@@ -390,12 +393,12 @@ see something like:</p>
 <p><br /></p>
 
 <p>But if we thought in Resources…well, REST is super popular for
-websites, websites have forms, so what if we:</p>
+websites, websites have forms, so what if we…</p>
 
 <p><br /></p>
 
 <p align="center">
-  <img width="30%" src="https://user-images.githubusercontent.com/55264/52916024-e3d82a80-32a8-11e9-8bb6-07ac9bf988dc.png" />
+  <img width="40%" src="https://user-images.githubusercontent.com/55264/52916024-e3d82a80-32a8-11e9-8bb6-07ac9bf988dc.png" />
 </p>
 
 <p><br /></p>
@@ -425,124 +428,219 @@ Employees by <code class="highlighter-rouge">created_at</code> by default:</p>
 <span class="o">}</span></code></pre></figure>
 
 <p>Because this is specified in the schema, not only are clients more
-informed but changing this default could raise a backwards-compatibility
+informed, but changing this default would raise a backwards-compatibility
 error:</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash">EmployeeResource: default sort changed from <span class="o">[{</span>:created_at<span class="o">=</span>&gt;<span class="s2">"desc"</span><span class="o">}]</span> to <span class="o">[{</span>:last_name<span class="o">=</span>&gt;<span class="s2">"asc"</span><span class="o">}]</span>.</code></pre></figure>
 
-<p>Relationships at some point?
-schema stitching.</p>
+<h2 id="graphs">Graphs</h2>
 
-<ul>
-  <li>backwards compat sort</li>
-</ul>
+<p>You may be thinking, “OK, but REST only works for a single object. I’ll
+have to make multiple requests, and be right back where I started. I
+need GraphQL to solve this problem”.</p>
 
-<p>then schema stiching</p>
+<p>Not true.</p>
 
-<p>https://twitter.com/sarahmei/status/702281663896653824</p>
-
-<p>Why do we have to spell
-this out each time? This can lead to subtle inconsistencies, both within
-this project and across other projects.</p>
-<ul>
-  <li>Same for the input.</li>
-  <li></li>
-</ul>
-
-<p>changeUserStatus(input: ChangeUserStatusInput!): ChangeUserStatusPayload</p>
-
-<p>addPullRequestReview(input: AddPullRequestReviewInput!): AddPullRequestReviewPayload</p>
-
-<p>submitPullRequestReview(input: SubmitPullRequestReviewInput!): SubmitPullRequestReviewPayload</p>
-
-<p>deletePullRequestReview(input: DeletePullRequestReviewInput!): DeletePullRequestReviewPayload</p>
-
-<p>Those objects are connected, and together those connections form a
-<strong>graph</strong>. REST allows you to lazy-load that graph using URL links:</p>
-
-<p>In other words, <strong>REST is optimized for lazy-loading</strong>. REST is great at A) supplying conventions that will lead to cleaner object-oriented code B) lazy-loading data C) caching.</p>
-
-<p>REST is incredibly powerful, well-understood, and well-supported. We
-don’t need to get rid of REST. We need to add <strong>eager loading</strong>:</p>
-
-<p>[TODO EAGER]</p>
+<p>Years before GraphQL came out, respected developers from different
+companies and backgrounds came together and began the discussion on how to improve REST
+APIs. This wasn’t a project pushed by a hundred-billion dollar
+company, it was an organic, community-driven effort. The result was the <a href="https://jsonapi.org">JSON:API</a> standard,
+which tackled granular queries long ago:</p>
 
 <blockquote>
-  <p>19:35 *Having that level of consistency, and working with that for
+  <p>(<em>Quick aside: I’ve always found the name of this project hilariously
+awkward, easy to confuse with any API outputting JSON. But you could say
+the same about GraphQL! Just as JSON:API isn’t the only API standard
+outputting JSON, GraphQL isn’t the only Graph Query Language - in fact,
+you could call JSON:API a Graph Query Language as well!</em>)</p>
+</blockquote>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># GET /employees?include=positions</span>
+
+<span class="p">{</span>
+  <span class="ss">data: </span><span class="p">{</span>
+    <span class="ss">id: </span><span class="s2">"123"</span><span class="p">,</span>
+    <span class="ss">type: </span><span class="s2">"employees"</span><span class="p">,</span>
+    <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">name: </span><span class="s2">"Kayla Webb"</span> <span class="p">},</span>
+    <span class="ss">relationships: </span><span class="p">{</span>
+      <span class="ss">positions: </span><span class="p">{</span>
+        <span class="ss">data: </span><span class="p">{</span> <span class="ss">id: </span><span class="s2">"456"</span><span class="p">,</span> <span class="ss">type: </span><span class="s2">"positions"</span> <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="ss">included: </span><span class="p">[</span>
+    <span class="p">{</span>
+      <span class="ss">id: </span><span class="s2">"456"</span><span class="p">,</span>
+      <span class="ss">type: </span><span class="s2">"positions"</span><span class="p">,</span>
+      <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">title: </span><span class="s2">"Engineer"</span> <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>Wonky payload, right? OK, first of all, don’t be scared. In Graphiti,
+you can add <code class="highlighter-rouge">.json</code> to the URL and output a more traditional flat
+structure:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="p">{</span>
+  <span class="ss">data: </span><span class="p">{</span>
+    <span class="ss">id: </span><span class="s2">"123"</span><span class="p">,</span>
+    <span class="ss">name: </span><span class="s2">"Jeesoo Ryoo"</span><span class="p">,</span>
+    <span class="ss">positions: </span><span class="p">[{</span> <span class="ss">id: </span><span class="s2">"456"</span><span class="p">,</span> <span class="ss">title: </span><span class="s2">"Engineer"</span> <span class="p">}]</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>You can absolutely develop in Graphiti this way, but you’d be giving up
+some smart things JSON:API does. One example is de-duplicating each node
+in the graph: if we’re listing 100 <code class="highlighter-rouge">Post</code>s and they all have the same
+<code class="highlighter-rouge">Author</code>, you’ll have to render that <code class="highlighter-rouge">Author</code> 100 times. JSON:API would
+only render it once.</p>
+
+<p>Another example is lazy-loading data with Links:</p>
+
+<p align="center">
+  <div style="width: 500px;margin:auto">
+    <blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr">A GraphQL response is going to be as slow as the slowest subquery it has to execute to build the response.</p>&mdash; Tom Dale (@tomdale) <a href="https://twitter.com/tomdale/status/786952448799825921?ref_src=twsrc%5Etfw">October 14, 2016</a></blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </div>
+</p>
+
+<p>Instead of loading everying up-front, we want to defer loading for
+performance reasons. Maybe we want to render our <code class="highlighter-rouge">Employee</code> detail page
+super quick, and we don’t need to list the <code class="highlighter-rouge">Position</code>s until the user
+clicks something.</p>
+
+<p>You can do this in GraphQL, but you need to bake logic into the client,
+which means changing the logic would break clients (read more about
+this in the <a href="https://graphiti-api.github.io/graphiti/guides/concepts/links">Links Guide</a>).
+Luckily, REST and JSON:API are optimized for lazy-loading:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># ...</span>
+<span class="ss">positions: </span><span class="p">{</span>
+  <span class="ss">links: </span><span class="p">{</span>
+    <span class="ss">related: </span><span class="s1">'http://example.com/api/positions?filter[employee_id]=123'</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="c1"># ...</span></code></pre></figure>
+
+<p>Graphiti generates these Links between Resources automatically. If you
+change the logic, we’ll update the Link - clients can simply follow the
+link, and we can change logic server-side with no breakage.</p>
+
+<p>There’s a bunch of other great stuff about JSON:API, but that is a
+topic for another day.</p>
+
+<p>Anything you could do with a single Resource, you can do with multiple
+Resources. In other words, we can fetch an <code class="highlighter-rouge">Employee</code>, and their
+<code class="highlighter-rouge">Positions</code> - but only <code class="highlighter-rouge">active</code> positions where the title starts with
+<code class="highlighter-rouge">Eng</code>, ordered by <code class="highlighter-rouge">created_at</code>. This is called <strong>Deep Querying</strong>.</p>
+
+<p>The point here is that REST doesn’t mean multiple requests. Sure, our
+state is now a graph of objects instead of a single object, but there’s
+no need for a wholesale revamp. In fact, we don’t need to change much at
+all.</p>
+
+<p>Just as we can <strong>query</strong> multiple Resources at once, we can also
+<strong>persist</strong> multiple objects at once.</p>
+
+<p>When persisting in REST, we send the same object back to the server
+alongside a verb. That verb tells us if we’re creating, updating (part
+or whole), or deleting. Same thing here. Let’s specify the verb
+alongside the relationship:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># ...</span>
+<span class="ss">positions: </span><span class="p">{</span>
+  <span class="ss">data: </span><span class="p">{</span> <span class="ss">id: </span><span class="s2">"456"</span><span class="p">,</span> <span class="ss">type: </span><span class="s2">"positions"</span><span class="p">,</span> <span class="ss">method: </span><span class="s2">"destroy"</span> <span class="p">}</span>
+<span class="p">}</span>
+<span class="c1"># ...</span></code></pre></figure>
+
+<p>There are only 4 possible verbs:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">create</code></li>
+  <li><code class="highlighter-rouge">update</code></li>
+  <li><code class="highlighter-rouge">destroy</code></li>
+  <li><code class="highlighter-rouge">disassociate</code></li>
+</ul>
+
+<p>Oh, and we’ll run everything within a transaction, throwing in
+conventions for data validation as well:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Response code 422</span>
+
+<span class="p">{</span>
+  <span class="ss">code:  </span><span class="s1">'unprocessable_entity'</span><span class="p">,</span>
+  <span class="ss">status: </span><span class="s1">'422'</span><span class="p">,</span>
+  <span class="ss">title: </span><span class="s2">"Validation Error"</span><span class="p">,</span>
+  <span class="ss">detail: </span><span class="s2">"Name can't be blank"</span><span class="p">,</span>
+  <span class="ss">source: </span><span class="p">{</span> <span class="ss">pointer: </span><span class="s1">'/data/attributes/name'</span> <span class="p">},</span>
+  <span class="ss">meta: </span><span class="p">{</span>
+    <span class="ss">attribute: :name</span><span class="p">,</span>
+    <span class="ss">message: </span><span class="s2">"can't be blank"</span><span class="p">,</span>
+    <span class="ss">code: :blank</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>Earlier, we covered how REST was optimized for lazy-loading. Graphiti
+builds on top of REST to add eager-loading, and “eager-persisting”. In
+other words, we can both read and write a graph of data in a single
+request:</p>
+
+<p>[TODO IMAGE]</p>
+
+<h3 id="micro-services">(Micro) Services</h3>
+
+<p>Schema Stitching</p>
+
+<h3 id="clients">Clients</h3>
+
+<p>– js client - take advantage of conventions, and mirror moving the
+object. Instead of focusing on the <em>request</em>, FOCUS ON DOMAIN.</p>
+
+<h3 id="magic">Magic</h3>
+
+<blockquote>
+  <p><em>Having that level of consistency, and working with that for
 just a little while means that you can start to forget about it. And
 that’s the power of conventions in general…it used to be something
 you had to think about and make a decision. Well, decisions are bad.
 Decisions take up your brain power, and it requires brain cycles to
 consider which or the other. The more decisions you can take out of
 the whole thing, the more brain power you can free up to consider the
-really important things.</p>
-</blockquote>
+really important things.</em></p>
 
-<blockquote>
-  <p>If everybody is doing the same thing in the same way, it means that
+  <p><em>If everybody is doing the same thing in the same way, it means that
 you can easily go from one application to the other, and expect the
-same things to happen.</p>
+same things to happen.</em></p>
 
   <p>- <a href="https://www.youtube.com/watch?v=GFhoSMD6idk">“Resources on Rails”</a>, David Heinemeier Hansson</p>
 </blockquote>
 
-<p>This first, on simplicity and conventions:</p>
+<p>When conventions form your programming foundation, you end up with these
+high-level abstractions where a few lines of code hide the underlying
+complexity. Often, this is flippantly referred to as ✨”<strong>Magic</strong>“🔮</p>
 
-<p>There is simply no need for this:</p>
+<p>The thing about magic is, once you learn the trick it often comes down
+to something simple: a mirror, a trick deck, a quick hand.</p>
 
-<ul>
-  <li>submit, add, unlock</li>
-  <li>the input is a <code class="highlighter-rouge">PullRequestReview</code></li>
-  <li>the output is a <code class="highlighter-rouge">PullRequestReview</code></li>
-</ul>
+<p>An object, moving back and forth.</p>
 
-<p>submitPullRequestReview(input: SubmitPullRequestReviewInput!): SubmitPullRequestReviewPayload</p>
+<p align="center">
+  <img width="50%" src="https://user-images.githubusercontent.com/55264/52913247-36561e80-328a-11e9-98ea-5e743920d317.gif" />
+</p>
 
-<p>REST would say: just tell me about your Pull Request. I already know how
-to CRUD it, so just tell me what it is.</p>
+<p>Simple concepts can often be the most powerful, and I will never get
+tired of seeing this trick performed.</p>
 
-<p>Edges and Connections</p>
+<p>There’s plenty more we haven’t even talked about. Check out the
+[Guides], or dive right in with the [Quickstart] or [Tutorial]. If
+things get tricky, ask for help in our [Slack Chat]. Reach out to me
+directly at richmolj@gmail.com or @richmolj on Twitter.</p>
 
-<p>class PullRequestResource
-end</p>
+<p>Let’s put on a show together.</p>
 
-<ul>
-  <li>Create read update delete</li>
-</ul>
-
-<p>add</p>
-
-<p>has_many :comments</p>
-
-<p>CRUD comments, disassociate</p>
-
-<p>Let’s see what else we can do.</p>
-
-<p>Because resource with attributes, and attributes have types, we can
-infer filters - prefix and suffix, greater than less than.</p>
-
-<p>Our schema doesn’t need to define inputs and outputs - REST already
-tells us what those are. So, what we need to define are Resources,
-marking attributes writable readable etc</p>
-
-<p>Because query interface, schema stitching.</p>
-
-<p>Just as REST gives us constraints, for saving, thinking about resources
-gives us contraints for querying. Resources have attributes, and we’ll
-want to filter and sort on those attributes. We’ll need to paginate, and
-maybe add statistics. That’s it.</p>
-
-<p>show it all, and say all this was possible because we started with a
-simple concept, one that’s been around forever and powers much of the
-web today. When solving problems, we should build on existing solutions
-and embrase positive-sum thinking.</p>
-
-<p>When we add conventions, great things happen. That doesn’t mean
-conventions are “what works with activerecord” - conventions must be
-informed by diverse opinions and perspectives. But still, arriving at
-one way to do things is the sweet spot.</p>
-
-<p>Core value: Common conventions informed by diverse perspectives</p>
+<p><br />
+<br />
+<br /></p>
 
         </div>
       </div>
@@ -554,13 +652,13 @@ one way to do things is the sweet spot.</p>
         <h3>Overview</h3>
         <ul>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+            <a href="https://richmolj.github.io/t/quickstart">Quickstart</a>
           </li>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+            <a href="https://richmolj.github.io/t/tutorial">Tutorial</a>
           </li>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+            <a href="https://richmolj.github.io/t/guides">Guides</a>
           </li>
         </ul>
       </div>
