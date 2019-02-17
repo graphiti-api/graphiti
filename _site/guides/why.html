@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Graphiti</title>
+  <meta name="description" content="Stylish Graph APIs">
+
+  <link rel="stylesheet" href="https://graphiti-api.github.io/graphiti/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-127904727-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-127904727-1');
+  </script>
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="https://graphiti-api.github.io/graphiti" class="navbar-brand">Graphiti</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/js">Spraypaint</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+        <li>
+          <a href="https://github.com/graphiti-api/graphiti" class="button">Fork on Github</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <h1 id="why-graphiti">Why Graphiti</h1>
+
+<p>I have enourmous respect for GraphQL. I also believe there is a
+fundamental flaw in its design.</p>
+
+<p>Let’s remember <a href="https://dev.to/smizell/why-people-like-graphql-221c">why people like GraphQL</a> in the first place: because it addressed common frustrations with REST APIs:</p>
+
+<blockquote>
+  <p><em>[We] heard from integrators that our REST API also wasn’t very flexible. It sometimes required two or three separate calls to assemble a complete view of a resource. It seemed like our responses simultaneously sent too much data and didn’t include data that consumers needed.</em></p>
+
+  <p>- <a href="https://githubengineering.com/the-github-graphql-api">“The Github Graph API”</a>, GitHub Engineering</p>
+</blockquote>
+
+<p>GraphQL solves real problems. It’s flaw is that it solved these
+problems using zero-sum thinking: we must
+abandon the existing paradigm and forge a new one. It’s GraphQL
+versus REST, one or the other. <a href="https://medium.freecodecamp.org/rest-apis-are-rest-in-peace-apis-long-live-graphql-d412e559d8e4">REST is dead, long live GraphQL</a>.</p>
+
+<p>Graphiti instead approaches the problem using <a href="http://aturon.github.io/2018/06/02/listening-part-2">positive-sum thinking</a>:</p>
+
+<blockquote>
+  <p><em>Positive-sum thinking is how we embrace pluralism while retaining a coherent vision and set of values…A zero-sum view would assume that apparent oppositions are fundamental, e.g., that appealing to the JS crowd inherently hurts the C++ one. A positive-sum view starts by seeing different perspectives and priorities as legitimate and worthwhile, with a faith that</em> <strong>by respecting each other in this way, we can find strictly better solutions than had we optimized solely for one perspective.</strong></p>
+
+  <p>- <a href="http://aturon.github.io/2018/06/02/listening-part-2">“Listening and Trust”</a>, Aaron Turon</p>
+</blockquote>
+
+<p>GraphQL optimized around REST’s shortcomings, and in doing so it dropped
+REST’s advantages. There is no need for such a zero-sum tradeoff. We can take
+everything great about GraphQL and build it <strong><em>on top of</em></strong> REST (and
+HTTP!), instead of replacing it altogether. We can have our cake and eat it too.</p>
+
+<h2 id="rest">REST</h2>
+
+<p>Many GraphQL posts define REST like so:</p>
+
+<p><br /></p>
+
+<p align="center">
+  <img width="80%" src="https://user-images.githubusercontent.com/55264/52901666-6a6f0800-31d4-11e9-81be-4bc23a7c26aa.png" />
+</p>
+
+<p><br /></p>
+
+<p>It’s true that many REST APIs work this way, but this is not REST. While there’s
+endless debate around which APIs are considered “RESTful”, I don’t think
+we need to look much further than what the letters actually stand for:</p>
+
+<blockquote>
+  <p><strong>Representational State Transfer</strong>. <em>This sentence is not only what REST stands for, it is also the tiniest possible description of what REST actually means…It is not a standard, rather a style describing the act of transfering a state of something by its representation.</em></p>
+
+  <p><em>Lets consider this:</em></p>
+
+  <p><em>Marcus is a farmer. He has a ranch with 4 pigs, 12 chickens and 3 cows. He is now simulating a REST api while i am the client. If i want to request the current state of his farm using REST i just ask him: “State?”</em></p>
+
+  <p><em>Marcus answers: “4 pigs, 12 chickens, 3 cows”.
+This is the most simple example of Representional State Transfer. Marcus transfered the state of his farm to me using a representation. The representation of the farm is the plain sentence: “4 pigs, 12 chickens, 3 cows”.</em></p>
+
+  <p><em>So lets get to the next level. How would i tell Marcus to add 2 cows to his farm the REST way?
+Maybe tell him: “Marcus, please add 2 cows to your farm”.</em></p>
+
+  <p><em>Do you think this was REST? Are we transfering state by its representation here? NO! This was calling a remote procedure. The procedure of adding 2 cows to the farm.</em></p>
+
+  <p><em>Marcus sadly answers: “400, Bad Request. What do you mean?”</em></p>
+
+  <p><em>So lets try this again. How would we do this the REST way? What was the representation again? It was “4 pigs, 12 chickens, 3 cows”. Ok. so lets try this again transfering the representation…</em></p>
+
+  <p><em>me: “Marcus, … 4 pigs, 12 chickens, 5 cows … please!”.</em>
+<em>Marcus: “Alright !”.</em>
+<em>me: “Marcus, … what is your state now?”.</em>
+<em>Marcus: “4 pigs, 12 chickens, 5 cows”.</em>
+<em>me: “Ahh, great!”</em>
+<em>See? It was really not that hard and it was REST.</em></p>
+
+  <p>- <a href="http://www.beabetterdeveloper.com/2013/07/why-rest-is-so-important.html">“Why REST Is So Important”</a>, Gregor Riegler</p>
+</blockquote>
+
+<p>In other words, <strong>this is REST</strong>:</p>
+
+<p align="center">
+  <img width="50%" src="https://user-images.githubusercontent.com/55264/52913247-36561e80-328a-11e9-98ea-5e743920d317.gif" />
+</p>
+
+<p>We’re moving an object from the server to the client, possibly modifying
+that object, then moving back to the server.</p>
+
+<p>Those objects are connected, and together those connections form a
+<strong>graph</strong>. REST allows you to lazy-load that graph using URL links:</p>
+
+<p>In other words, <strong>REST is optimized for lazy-loading</strong>. REST is great at A) supplying conventions that will lead to cleaner object-oriented code B) lazy-loading data C) caching.</p>
+
+<p>REST is incredibly powerful, well-understood, and well-supported. We
+don’t need to get rid of REST. We need to add <strong>eager loading</strong>:</p>
+
+<p>[TODO EAGER]</p>
+
+<blockquote>
+  <p>19:35 *Having that level of consistency, and working with that for
+just a little while means that you can start to forget about it. And
+that’s the power of conventions in general…it used to be something
+you had to think about and make a decision. Well, decisions are bad.
+Decisions take up your brain power, and it requires brain cycles to
+consider which or the other. The more decisions you can take out of
+the whole thing, the more brain power you can free up to consider the
+really important things.</p>
+</blockquote>
+
+<blockquote>
+  <p>If everybody is doing the same thing in the same way, it means that
+you can easily go from one application to the other, and expect the
+same things to happen.</p>
+
+  <p>- <a href="https://www.youtube.com/watch?v=GFhoSMD6idk">“Resources on Rails”</a>, David Heinemeier Hansson</p>
+</blockquote>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// https://blog.tylerbuchea.com/a-simple-graphql-example-with-relationships/</span>
+<span class="nx">type</span> <span class="nx">Mutation</span> <span class="p">{</span>
+  <span class="nx">signup</span><span class="p">(</span><span class="nx">organization</span><span class="err">:</span><span class="nb">String</span><span class="p">,</span> <span class="nx">id</span><span class="err">:</span><span class="nb">String</span><span class="p">,</span> <span class="nx">name</span><span class="err">:</span><span class="nb">String</span><span class="p">)</span><span class="err">:</span> <span class="nx">User</span>
+<span class="p">}</span>
+
+<span class="c1">// more "restful"</span>
+<span class="nx">type</span> <span class="nx">Mutation</span> <span class="p">{</span>
+  <span class="nx">addUserToGroup</span><span class="p">(</span><span class="nx">input</span><span class="err">:</span> <span class="nx">AddUserToGroupInput</span><span class="p">)</span><span class="err">:</span> <span class="nx">AddUserToGroupPayload</span>
+  <span class="nx">removeUserFromGroup</span><span class="p">(</span><span class="nx">input</span><span class="err">:</span> <span class="nx">AddUserToGroupInput</span><span class="p">)</span><span class="err">:</span> <span class="nx">AddUserToGroupPayload</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>Can we do it with domain? Sure. But means choices, and often lock-in to
+a specific library</p>
+
+<p>This first, on simplicity and conventions:</p>
+
+<p>There is simply no need for this:</p>
+
+<ul>
+  <li>submit, add, unlock</li>
+  <li>the input is a <code class="highlighter-rouge">PullRequestReview</code></li>
+  <li>the output is a <code class="highlighter-rouge">PullRequestReview</code></li>
+</ul>
+
+<p>submitPullRequestReview(input: SubmitPullRequestReviewInput!): SubmitPullRequestReviewPayload</p>
+
+<p>REST would say: just tell me about your Pull Request. I already know how
+to CRUD it, so just tell me what it is.</p>
+
+<p>Edges and Connections</p>
+
+<p>class PullRequestResource
+end</p>
+
+<ul>
+  <li>Create read update delete</li>
+</ul>
+
+<p>add</p>
+
+<p>has_many :comments</p>
+
+<p>CRUD comments, disassociate</p>
+
+<p>Let’s see what else we can do.</p>
+
+<p>Because resource with attributes, and attributes have types, we can
+infer filters - prefix and suffix, greater than less than.</p>
+
+<p>Our schema doesn’t need to define inputs and outputs - REST already
+tells us what those are. So, what we need to define are Resources,
+marking attributes writable readable etc</p>
+
+<p>Because query interface, schema stitching.</p>
+
+<p>Just as REST gives us constraints, for saving, thinking about resources
+gives us contraints for querying. Resources have attributes, and we’ll
+want to filter and sort on those attributes. We’ll need to paginate, and
+maybe add statistics. That’s it.</p>
+
+<p>show it all, and say all this was possible because we started with a
+simple concept, one that’s been around forever and powers much of the
+web today. When solving problems, we should build on existing solutions
+and embrase positive-sum thinking.</p>
+
+<p>When we add conventions, great things happen. That doesn’t mean
+conventions are “what works with activerecord” - conventions must be
+informed by diverse opinions and perspectives. But still, arriving at
+one way to do things is the sweet spot.</p>
+
+<p>Core value: Common conventions informed by diverse perspectives</p>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Contact</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://join.slack.com/t/graphiti-api/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Email</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>
