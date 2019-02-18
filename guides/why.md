@@ -32,7 +32,7 @@ HTTP!), instead of replacing it altogether. We can have our cake and eat it too.
 
 ## REST
 
-Many GraphQL posts define REST like so:
+You'll find plenty of GraphQL [blog posts](https://blog.apollographql.com/graphql-vs-rest-5d425123e34b) that define REST like so:
 
 <br />
 
