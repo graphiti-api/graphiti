@@ -5,8 +5,7 @@ layout: page
 Why Graphiti
 ============
 
-I have enourmous respect for GraphQL. I also believe there is a
-fundamental flaw in its design.
+I've written GraphQL and had a pleasant experience. I have enourmous respect for GraphQL. I also believe there is a fundamental flaw in GraphQL's design.
 
 Let's remember [why people like GraphQL](https://dev.to/smizell/why-people-like-graphql-221c) in the first place: because it addressed common frustrations with REST APIs:
 
@@ -37,7 +36,7 @@ You'll find plenty of GraphQL [blog posts](https://blog.apollographql.com/graphq
 <br />
 
 <p align="center">
-  <img width="80%" src="https://user-images.githubusercontent.com/55264/52901666-6a6f0800-31d4-11e9-81be-4bc23a7c26aa.png" />
+  <img class="drop" width="80%" src="https://user-images.githubusercontent.com/55264/52901666-6a6f0800-31d4-11e9-81be-4bc23a7c26aa.png" />
 </p>
 
 <br />
@@ -45,6 +44,8 @@ You'll find plenty of GraphQL [blog posts](https://blog.apollographql.com/graphq
 It's true that many REST APIs work this way, but this is not REST. While there's
 endless debate around which APIs are considered "RESTful", I don't think
 we need to look much further than what the letters actually stand for:
+
+<div class="spacer"></div>
 
 > **Representational State Transfer**. *This sentence is not only what REST stands for, it is also the tiniest possible description of what REST actually means...It is not a standard, rather a style describing the act of transfering a state of something by its representation.*
 >
@@ -142,6 +143,8 @@ patterns are likely to diverge from one API to the next, from team to
 team, as time moves on. In fact, the above is really a best-case
 scenario with common naming convention of `create/update/destroy` - the
 Github API adds verbs like `add`, `remove`, `lock`, `move` and more.
+
+#### Conventions
 
 The benefit of REST over RPC is conventions. Conventions cause increased
 productivity and consistency (leading to fewer misunderstandiings and
@@ -279,7 +282,7 @@ attribute would want operators like `greater_than` and `less_than`.
 OK, so really we don't need to define *inputs* and *outputs* - those can
 be assumed by convention. What we really need to define is the **Resource**.
 
-Welcome to Graphiti:
+#### Welcome to Graphiti
 
 {% highlight ruby %}
 class EmployeeResource < ApplicationRecord
@@ -320,31 +323,51 @@ see something like:
 <br />
 
 <p align="center">
-  <img width="30%" src="https://user-images.githubusercontent.com/55264/52915902-78418d80-32a7-11e9-8515-021312258400.png" />
+  <img width="30%" class="drop" src="https://user-images.githubusercontent.com/55264/52915902-78418d80-32a7-11e9-8515-021312258400.png" />
 </p>
 
 <br />
 
-But if we thought in Resources...well, REST is super popular for
-websites, websites have forms, so what if we...
+But if we thought in Resources, it's not just a big bag of fields. We're
+able to organize those fields around meaningful concepts:
 
 <br />
 
 <p align="center">
-  <img width="40%" src="https://user-images.githubusercontent.com/55264/52916024-e3d82a80-32a8-11e9-8bb6-07ac9bf988dc.png" />
+  <img width="40%" class="drop" src="https://user-images.githubusercontent.com/55264/52916024-e3d82a80-32a8-11e9-8bb6-07ac9bf988dc.png" />
 </p>
 
 <br />
 
 This screenshot is from [Vandal](https://graphiti-api.github.io/graphiti/guides/vandal), the Graphiti UI.
 
-Because we started with a better abstraction, we ended with a better
-visualization. As a marketer-turned-programmer myself, I really
+Because we started with a better abstraction, we ended with a more
+intuitive
+UI. As a marketer-turned-programmer myself, I really
 appreciate when data exploration tools like this are friendly to
 less-technical users. A user of Vandal doesn't need to know about `Connection`s
 or `Edge`s, they just need to click around. I like that my product owner and I can walk
 through the domain together, validating concepts and solidifying a shared
 understanding.
+
+#### HTTP Endpoints
+
+While both GraphQL and Graphiti can fetch your graph of data in a single
+request, GraphQL does this with a single endpoint. Graphiti keeps
+RESTful URLs, for three reasons. First, HTTP caching: [Phil Sturgeon has
+an excellent comparison of GraphQL and endpoint-based caching here](https://philsturgeon.uk/api/2017/01/26/graphql-vs-rest-caching/).
+
+Second, adding endpoints allows for customization. Maybe we want to send
+a welcome email when we `POST /employees` but not when we `POST
+/admin/employees`. Maybe `/exemplary_employees` applies additional query
+logic by default, but wants to re-use everything else. In other words,
+Resources form your graph, but Endpoints *expose* that graph to the
+outside world (and hold relevant logic around exposure). Read more in
+our [Endpoints Guide](/guides/concepts/endpoints).
+
+The third reason is lazy-loading with [Links](https://graphiti-api.github.io/graphiti/guides/concepts/links), which we'll cover in a bit.
+
+#### Schema
 
 We even get schema benefits. Schemas are great for tooling and
 backwards-compatibility checks...but when they are oriented around
@@ -370,6 +393,10 @@ error:
 EmployeeResource: default sort changed from [{:created_at=>"desc"}] to [{:last_name=>"asc"}].
 {% endhighlight %}
 
+When developing in Graphiti, we introspect your Resources and
+automatically generate the schema for you. Backwards-compatibility
+checks can be done with a command-line task, or whenever your tests run.
+
 ## Graphs
 
 You may be thinking, "*OK, but REST only works for a single object. I'll
@@ -383,12 +410,6 @@ companies and backgrounds came together and began the discussion on how to impro
 APIs. This wasn't a project pushed by a hundred-billion dollar
 company; it was an organic, community-driven effort. The result was the [JSON:API](https://jsonapi.org) standard,
 which tackled granular queries long ago:
-
-> (*Quick aside: I've always found the name of this project hilariously
-awkward, easy to confuse with any API outputting JSON. But you could say
-the same about GraphQL! Just as JSON:API isn't the only API standard
-outputting JSON, GraphQL isn't the only Graph Query Language - in fact,
-you could call JSON:API a Graph Query Language as well!*)
 
 {% highlight ruby %}
 # GET /employees?include=positions
@@ -414,7 +435,7 @@ you could call JSON:API a Graph Query Language as well!*)
 }
 {% endhighlight %}
 
-Wonky payload, right? OK, first of all, don't be scared. In Graphiti,
+Wonky payload, right? First of all, don't be scared. In Graphiti,
 you can add `.json` to the URL and output a more traditional flat
 structure:
 
@@ -474,7 +495,7 @@ clicks something.
 
 You can do this in GraphQL, but you need to bake logic into the client,
 which means changing the logic would break clients (read more about
-this in the [Links Guide](https://graphiti-api.github.io/graphiti/guides/concepts/links)).
+this in the [Links Guide]({{site.github.url}}/guides/concepts/links)).
 Luckily, REST and JSON:API are optimized for lazy-loading:
 
 {% highlight ruby %}
@@ -488,11 +509,20 @@ positions: {
 {% endhighlight %}
 
 Graphiti generates these Links between Resources automatically. If you
-change the logic, we'll update the Link - clients can simply follow the
+change the logic connecting Resources (which applies to eager loading as
+well), we'll update the [Link]({{site.github.url}}/guides/concepts/links) - clients can simply follow the
 link, and we can change logic server-side with no breakage.
 
 There's a bunch of other great stuff about JSON:API, but that is a
 topic for another day.
+
+> (*Quick aside: I've always found the name of this project hilariously
+awkward, easy to confuse with any API outputting JSON. But you could say
+the same about GraphQL! Just as JSON:API isn't the only API standard
+outputting JSON, GraphQL isn't the only Graph Query Language - in fact,
+you could call JSON:API a Graph Query Language as well!*)
+
+#### REST != Multiple Requests
 
 Anything you could do with a single Resource, you can do with multiple
 Resources. In other words, we can fetch an `Employee`, and their
@@ -573,9 +603,11 @@ application. We can have cross-API, remote Resources as well.
 
 The popular GraphQL platform Apollo does something similar with [Schema Stitching](https://www.apollographql.com/docs/graphql-tools/schema-stitching.html):
 
+<div class="spacer"></div>
 <p align="center">
   <img width="50%" src="https://user-images.githubusercontent.com/55264/52920133-506a1e00-32d7-11e9-8986-23795dbedc2c.png" />
 </p>
+<div class="spacer"></div>
 
 You won't need to write code like this in Graphiti. Because we have
 conventions, we can automate this stuff. Just supply a URL:
@@ -592,9 +624,51 @@ Deep Query. If you use Vandal, you'll think it's all the same API.
 
 Microservices 🎉!
 
-### Don't Sleep On This One: Domain-Driven Design
+## Don't Sleep On This One: Domain-Driven Design
 
-TODO
+<div class="spacer"></div>
+<p align="center">
+  <img width="80%" class="drop" src="https://user-images.githubusercontent.com/55264/48570112-9034fa00-e8d1-11e8-8f0e-f392207db355.jpg" />
+</p>
+<div class="spacer"></div>
+<div class="spacer"></div>
+<div class="spacer"></div>
+
+OK, not that DDD. [This DDD](https://www.amazon.com/Domain-Driven-Design-Tackling-Complexity-Software/dp/0321125215):
+
+<div class="spacer"></div>
+<p align="center">
+  <img width="20%" class="drop" src="https://camo.githubusercontent.com/7812f718ee453d3153b82242f7373d6aab2d630c/68747470733a2f2f696d616765732d6e612e73736c2d696d616765732d616d617a6f6e2e636f6d2f696d616765732f492f3531735a573837736c524c2e5f53583337355f424f312c3230342c3230332c3230305f2e6a7067" />
+</p>
+<div class="spacer"></div>
+<div class="spacer"></div>
+
+This book can be a little dry, but the concepts are excellent. Let's
+check [StackOverflow for a quick summary of DDD](https://stackoverflow.com/questions/1222392/can-someone-explain-domain-driven-design-ddd-in-plain-english-please/1222488#1222488):
+
+<div class="spacer"></div>
+
+> *DDD is about trying to make your software a model of a real-world system or process. In using DDD, you are meant to work closely with a domain expert who can explain how the real-world system works. For example, if you're developing a system that handles the placing of bets on horse races, your domain expert might be an experienced bookmaker.*
+>
+> *Between yourself and the domain expert, you build a ubiquitous language (UL), which is basically a conceptual description of the system. The idea is that you should be able to write down what the system does in a way that the domain expert can read it and verify that it is correct. In our betting example, the ubiquitous language would include the definition of words such as 'race', 'bet', 'odds' and so on.*
+>
+> *The concepts described by the UL will form the basis of your object-oriented design. DDD provides some clear guidance...recommends several patterns...*
+>
+> \- Rob Knight
+
+I trim the quote because the prescriptive patterns of DDD often
+overshadow its core concepts. [The creator of DDD, Eric Evans covered this in his
+keynote last year](https://www.youtube.com/watch?v=R2IAgnpkBck).
+
+REST and Resources [force a developer to think deeply about their
+domain, and this leads to better object-oriented code](https://www.youtube.com/watch?v=GFhoSMD6idk).
+Rather than a bag of fields and types, Graphiti pushes you to think
+critically about your domain.
+
+A Resource is what DDD calls an [Entity](https://lostechies.com/jimmybogard/2008/05/21/entities-value-objects-aggregates-and-roots/). REST is about moving Domain Entities from client to server and back again.
+
+You don't ***need*** to know anything about DDD to develop in Graphiti.
+But don't sleep on it.
 
 ## Clients
 
@@ -630,7 +704,7 @@ under the hood, allowing you to focus on what matters - your domain.
 ## GraphQL Support
 
 OK, let's come full circle. Let's say some of these conventions resonate
-with you, but you'd still like a GraphQL server. I ***still*** think
+with you, but nevertheless you'd like to develop a GraphQL API. I ***still*** think
 Graphiti is your best bet, because Graphiti supports GraphQL.
 
 Remember, we started with this long-hand RPC code:
@@ -722,11 +796,41 @@ Simple concepts can often be the most powerful, and I will never get
 tired of seeing this trick performed.
 
 There's plenty more we haven't even touched on. Check out the
-[Guides], or dive right in with the [Quickstart] or [Tutorial]. If
-things get tricky, ask for help in our [Slack Chat]. Reach out to me
-directly at richmolj@gmail.com or @richmolj on Twitter.
+[Guides]({{site.github.url}}/guides), or dive right in with the [Quickstart]({{site.github.url}}/quickstart) or [Tutorial]({{site.github.url}}/tutorial). If
+things get tricky, ask for help in our [Slack Chat](https://join.slack.com/t/graphiti-api/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg). Reach out to me
+directly at <a href="mailto:richmolj@gmail.com">richmolj@gmail.com</a> or [@richmolj](https://twitter.com/richmolj) on Twitter.
 
-Let's put on a show together.
+## Addendum: Holy Shit
+
+I can't believe I just wrote all that. I swear, I never set out to do any of this.
+
+There are a lot of big ideas here, but this project is not some ideological crusade. Three years ago I had a bug in my application, and I found it surprisingly tricky to fix. I kept pulling that string, I connected with other developers pulling their own strings, one thing led to another, and here we are. This project is nothing more than a good-faith effort to build quality software, based on my own personal experience.
+
+Let's be clear: **GraphQL is awesome**. It solves real problems in a
+user-friendly manner, has sexy tooling and amazing libraries created
+by kickass developers. There are many advantages of GraphQL not covered
+here, and plenty more great ideas I'd like to steal. If you find some of
+the framing here annoying, if you find yourself thinking "*...but what
+about X and Y?*", just know I feel the same way whenever a GraphQL
+post talks about REST. It will be a continual goal of this project to
+raise the level of debate.
+
+Same for RPC. I work for a company that made billions off of RPC. I tend
+to think REST is a better fit for the web, and RPC is a better fit for
+things like financial trading systems or video games, but plenty of
+reasonable people can disagree. Conventions and abstractions come with
+their own cost: a learning curve, indirection, lack of flexibility. If
+you prefer something more low-level, I completely understand. I'll
+continue trying to learn from you.
+
+Beware projects and ideologies that claim to be a solution to all your
+problems. Everything has tradeoffs. The best we can do is to avoid
+zero-sum thinking, and instead think about how we can take the best
+ideas from a variety of solutions and experiences, striving to
+continually improve. It is hard, it is exhausting, it is the right thing
+to do.
+
+Unless you like XML. Screw XML.
 
 <br />
 <br />

@@ -9,7 +9,7 @@
   <title>Graphiti</title>
   <meta name="description" content="Stylish Graph APIs">
 
-  <link rel="stylesheet" href="https://graphiti-api.github.io/graphiti/assets/main.css?ref=wh4t3v45">
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
   <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -41,21 +41,21 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a href="https://graphiti-api.github.io/graphiti" class="navbar-brand">Graphiti</a>
+      <a href="http://localhost:4000" class="navbar-brand">Graphiti</a>
     </div>
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
       <ul class="nav navbar-nav">
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+          <a class="nav-link" href="http://localhost:4000/guides">Guides</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/js">Spraypaint</a>
+          <a class="nav-link" href="http://localhost:4000/js">Spraypaint</a>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
@@ -70,8 +70,7 @@
         <div class="container">
           <h1 id="why-graphiti">Why Graphiti</h1>
 
-<p>I have enourmous respect for GraphQL. I also believe there is a
-fundamental flaw in its design.</p>
+<p>I’ve written GraphQL and had a pleasant experience. I have enourmous respect for GraphQL. I also believe there is a fundamental flaw in GraphQL’s design.</p>
 
 <p>Let’s remember <a href="https://dev.to/smizell/why-people-like-graphql-221c">why people like GraphQL</a> in the first place: because it addressed common frustrations with REST APIs:</p>
 
@@ -106,7 +105,7 @@ HTTP!), instead of replacing it altogether. We can have our cake and eat it too.
 <p><br /></p>
 
 <p align="center">
-  <img width="80%" src="https://user-images.githubusercontent.com/55264/52901666-6a6f0800-31d4-11e9-81be-4bc23a7c26aa.png" />
+  <img class="drop" width="80%" src="https://user-images.githubusercontent.com/55264/52901666-6a6f0800-31d4-11e9-81be-4bc23a7c26aa.png" />
 </p>
 
 <p><br /></p>
@@ -114,6 +113,8 @@ HTTP!), instead of replacing it altogether. We can have our cake and eat it too.
 <p>It’s true that many REST APIs work this way, but this is not REST. While there’s
 endless debate around which APIs are considered “RESTful”, I don’t think
 we need to look much further than what the letters actually stand for:</p>
+
+<div class="spacer"></div>
 
 <blockquote>
   <p><strong>Representational State Transfer</strong>. <em>This sentence is not only what REST stands for, it is also the tiniest possible description of what REST actually means…It is not a standard, rather a style describing the act of transfering a state of something by its representation.</em></p>
@@ -211,6 +212,8 @@ patterns are likely to diverge from one API to the next, from team to
 team, as time moves on. In fact, the above is really a best-case
 scenario with common naming convention of <code class="highlighter-rouge">create/update/destroy</code> - the
 Github API adds verbs like <code class="highlighter-rouge">add</code>, <code class="highlighter-rouge">remove</code>, <code class="highlighter-rouge">lock</code>, <code class="highlighter-rouge">move</code> and more.</p>
+
+<h4 id="conventions">Conventions</h4>
 
 <p>The benefit of REST over RPC is conventions. Conventions cause increased
 productivity and consistency (leading to fewer misunderstandiings and
@@ -334,7 +337,7 @@ attribute would want operators like <code class="highlighter-rouge">greater_than
 <p>OK, so really we don’t need to define <em>inputs</em> and <em>outputs</em> - those can
 be assumed by convention. What we really need to define is the <strong>Resource</strong>.</p>
 
-<p>Welcome to Graphiti:</p>
+<h4 id="welcome-to-graphiti">Welcome to Graphiti</h4>
 
 <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
   <span class="n">attribute</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:string</span><span class="p">,</span> <span class="ss">sortable: </span><span class="kp">true</span><span class="p">,</span> <span class="ss">filterable: </span><span class="kp">true</span>
@@ -387,31 +390,51 @@ see something like:</p>
 <p><br /></p>
 
 <p align="center">
-  <img width="30%" src="https://user-images.githubusercontent.com/55264/52915902-78418d80-32a7-11e9-8515-021312258400.png" />
+  <img width="30%" class="drop" src="https://user-images.githubusercontent.com/55264/52915902-78418d80-32a7-11e9-8515-021312258400.png" />
 </p>
 
 <p><br /></p>
 
-<p>But if we thought in Resources…well, REST is super popular for
-websites, websites have forms, so what if we…</p>
+<p>But if we thought in Resources, it’s not just a big bag of fields. We’re
+able to organize those fields around meaningful concepts:</p>
 
 <p><br /></p>
 
 <p align="center">
-  <img width="40%" src="https://user-images.githubusercontent.com/55264/52916024-e3d82a80-32a8-11e9-8bb6-07ac9bf988dc.png" />
+  <img width="40%" class="drop" src="https://user-images.githubusercontent.com/55264/52916024-e3d82a80-32a8-11e9-8bb6-07ac9bf988dc.png" />
 </p>
 
 <p><br /></p>
 
 <p>This screenshot is from <a href="https://graphiti-api.github.io/graphiti/guides/vandal">Vandal</a>, the Graphiti UI.</p>
 
-<p>Because we started with a better abstraction, we ended with a better
-visualization. As a marketer-turned-programmer myself, I really
+<p>Because we started with a better abstraction, we ended with a more
+intuitive
+UI. As a marketer-turned-programmer myself, I really
 appreciate when data exploration tools like this are friendly to
 less-technical users. A user of Vandal doesn’t need to know about <code class="highlighter-rouge">Connection</code>s
 or <code class="highlighter-rouge">Edge</code>s, they just need to click around. I like that my product owner and I can walk
 through the domain together, validating concepts and solidifying a shared
 understanding.</p>
+
+<h4 id="http-endpoints">HTTP Endpoints</h4>
+
+<p>While both GraphQL and Graphiti can fetch your graph of data in a single
+request, GraphQL does this with a single endpoint. Graphiti keeps
+RESTful URLs, for three reasons. First, HTTP caching: <a href="https://philsturgeon.uk/api/2017/01/26/graphql-vs-rest-caching/">Phil Sturgeon has
+an excellent comparison of GraphQL and endpoint-based caching here</a>.</p>
+
+<p>Second, adding endpoints allows for customization. Maybe we want to send
+a welcome email when we <code class="highlighter-rouge">POST /employees</code> but not when we <code class="highlighter-rouge">POST
+/admin/employees</code>. Maybe <code class="highlighter-rouge">/exemplary_employees</code> applies additional query
+logic by default, but wants to re-use everything else. In other words,
+Resources form your graph, but Endpoints <em>expose</em> that graph to the
+outside world (and hold relevant logic around exposure). Read more in
+our <a href="/guides/concepts/endpoints">Endpoints Guide</a>.</p>
+
+<p>The third reason is lazy-loading with <a href="https://graphiti-api.github.io/graphiti/guides/concepts/links">Links</a>, which we’ll cover in a bit.</p>
+
+<h4 id="schema">Schema</h4>
 
 <p>We even get schema benefits. Schemas are great for tooling and
 backwards-compatibility checks…but when they are oriented around
@@ -433,6 +456,10 @@ error:</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash">EmployeeResource: default sort changed from <span class="o">[{</span>:created_at<span class="o">=</span>&gt;<span class="s2">"desc"</span><span class="o">}]</span> to <span class="o">[{</span>:last_name<span class="o">=</span>&gt;<span class="s2">"asc"</span><span class="o">}]</span>.</code></pre></figure>
 
+<p>When developing in Graphiti, we introspect your Resources and
+automatically generate the schema for you. Backwards-compatibility
+checks can be done with a command-line task, or whenever your tests run.</p>
+
 <h2 id="graphs">Graphs</h2>
 
 <p>You may be thinking, “<em>OK, but REST only works for a single object. I’ll
@@ -446,14 +473,6 @@ companies and backgrounds came together and began the discussion on how to impro
 APIs. This wasn’t a project pushed by a hundred-billion dollar
 company; it was an organic, community-driven effort. The result was the <a href="https://jsonapi.org">JSON:API</a> standard,
 which tackled granular queries long ago:</p>
-
-<blockquote>
-  <p>(<em>Quick aside: I’ve always found the name of this project hilariously
-awkward, easy to confuse with any API outputting JSON. But you could say
-the same about GraphQL! Just as JSON:API isn’t the only API standard
-outputting JSON, GraphQL isn’t the only Graph Query Language - in fact,
-you could call JSON:API a Graph Query Language as well!</em>)</p>
-</blockquote>
 
 <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># GET /employees?include=positions</span>
 
@@ -477,7 +496,7 @@ you could call JSON:API a Graph Query Language as well!</em>)</p>
   <span class="p">]</span>
 <span class="p">}</span></code></pre></figure>
 
-<p>Wonky payload, right? OK, first of all, don’t be scared. In Graphiti,
+<p>Wonky payload, right? First of all, don’t be scared. In Graphiti,
 you can add <code class="highlighter-rouge">.json</code> to the URL and output a more traditional flat
 structure:</p>
 
@@ -535,7 +554,7 @@ clicks something.</p>
 
 <p>You can do this in GraphQL, but you need to bake logic into the client,
 which means changing the logic would break clients (read more about
-this in the <a href="https://graphiti-api.github.io/graphiti/guides/concepts/links">Links Guide</a>).
+this in the <a href="http://localhost:4000/guides/concepts/links">Links Guide</a>).
 Luckily, REST and JSON:API are optimized for lazy-loading:</p>
 
 <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># ...</span>
@@ -547,11 +566,22 @@ Luckily, REST and JSON:API are optimized for lazy-loading:</p>
 <span class="c1"># ...</span></code></pre></figure>
 
 <p>Graphiti generates these Links between Resources automatically. If you
-change the logic, we’ll update the Link - clients can simply follow the
+change the logic connecting Resources (which applies to eager loading as
+well), we’ll update the <a href="http://localhost:4000/guides/concepts/links">Link</a> - clients can simply follow the
 link, and we can change logic server-side with no breakage.</p>
 
 <p>There’s a bunch of other great stuff about JSON:API, but that is a
 topic for another day.</p>
+
+<blockquote>
+  <p>(<em>Quick aside: I’ve always found the name of this project hilariously
+awkward, easy to confuse with any API outputting JSON. But you could say
+the same about GraphQL! Just as JSON:API isn’t the only API standard
+outputting JSON, GraphQL isn’t the only Graph Query Language - in fact,
+you could call JSON:API a Graph Query Language as well!</em>)</p>
+</blockquote>
+
+<h4 id="rest--multiple-requests">REST != Multiple Requests</h4>
 
 <p>Anything you could do with a single Resource, you can do with multiple
 Resources. In other words, we can fetch an <code class="highlighter-rouge">Employee</code>, and their
@@ -632,9 +662,11 @@ application. We can have cross-API, remote Resources as well.</p>
 
 <p>The popular GraphQL platform Apollo does something similar with <a href="https://www.apollographql.com/docs/graphql-tools/schema-stitching.html">Schema Stitching</a>:</p>
 
+<div class="spacer"></div>
 <p align="center">
   <img width="50%" src="https://user-images.githubusercontent.com/55264/52920133-506a1e00-32d7-11e9-8986-23795dbedc2c.png" />
 </p>
+<div class="spacer"></div>
 
 <p>You won’t need to write code like this in Graphiti. Because we have
 conventions, we can automate this stuff. Just supply a URL:</p>
@@ -649,9 +681,53 @@ Deep Query. If you use Vandal, you’ll think it’s all the same API.</p>
 
 <p>Microservices 🎉!</p>
 
-<h3 id="dont-sleep-on-this-one-domain-driven-design">Don’t Sleep On This One: Domain-Driven Design</h3>
+<h2 id="dont-sleep-on-this-one-domain-driven-design">Don’t Sleep On This One: Domain-Driven Design</h2>
 
-<p>TODO</p>
+<div class="spacer"></div>
+<p align="center">
+  <img width="80%" class="drop" src="https://user-images.githubusercontent.com/55264/48570112-9034fa00-e8d1-11e8-8f0e-f392207db355.jpg" />
+</p>
+<div class="spacer"></div>
+<div class="spacer"></div>
+<div class="spacer"></div>
+
+<p>OK, not that DDD. <a href="https://www.amazon.com/Domain-Driven-Design-Tackling-Complexity-Software/dp/0321125215">This DDD</a>:</p>
+
+<div class="spacer"></div>
+<p align="center">
+  <img width="20%" class="drop" src="https://camo.githubusercontent.com/7812f718ee453d3153b82242f7373d6aab2d630c/68747470733a2f2f696d616765732d6e612e73736c2d696d616765732d616d617a6f6e2e636f6d2f696d616765732f492f3531735a573837736c524c2e5f53583337355f424f312c3230342c3230332c3230305f2e6a7067" />
+</p>
+<div class="spacer"></div>
+<div class="spacer"></div>
+
+<p>This book can be a little dry, but the concepts are excellent. Let’s
+check <a href="https://stackoverflow.com/questions/1222392/can-someone-explain-domain-driven-design-ddd-in-plain-english-please/1222488#1222488">StackOverflow for a quick summary of DDD</a>:</p>
+
+<div class="spacer"></div>
+
+<blockquote>
+  <p><em>DDD is about trying to make your software a model of a real-world system or process. In using DDD, you are meant to work closely with a domain expert who can explain how the real-world system works. For example, if you’re developing a system that handles the placing of bets on horse races, your domain expert might be an experienced bookmaker.</em></p>
+
+  <p><em>Between yourself and the domain expert, you build a ubiquitous language (UL), which is basically a conceptual description of the system. The idea is that you should be able to write down what the system does in a way that the domain expert can read it and verify that it is correct. In our betting example, the ubiquitous language would include the definition of words such as ‘race’, ‘bet’, ‘odds’ and so on.</em></p>
+
+  <p><em>The concepts described by the UL will form the basis of your object-oriented design. DDD provides some clear guidance…recommends several patterns…</em></p>
+
+  <p>- Rob Knight</p>
+</blockquote>
+
+<p>I trim the quote because the prescriptive patterns of DDD often
+overshadow its core concepts. <a href="https://www.youtube.com/watch?v=R2IAgnpkBck">The creator of DDD, Eric Evans covered this in his
+keynote last year</a>.</p>
+
+<p>REST and Resources <a href="https://www.youtube.com/watch?v=GFhoSMD6idk">force a developer to think deeply about their
+domain, and this leads to better object-oriented code</a>.
+Rather than a bag of fields and types, Graphiti pushes you to think
+critically about your domain.</p>
+
+<p>A Resource is what DDD calls an <a href="https://lostechies.com/jimmybogard/2008/05/21/entities-value-objects-aggregates-and-roots/">Entity</a>. REST is about moving Domain Entities from client to server and back again.</p>
+
+<p>You don’t <strong><em>need</em></strong> to know anything about DDD to develop in Graphiti.
+But don’t sleep on it.</p>
 
 <h2 id="clients">Clients</h2>
 
@@ -660,7 +736,7 @@ Deep Query. If you use Vandal, you’ll think it’s all the same API.</p>
 
 <p>But you may be looking for a more robust client, one that takes
 advantage of Graphiti conventions. Look no further than
-<a href="https://graphiti-api.github.io/graphiti/js/home">Spraypaint</a>, our
+<a href="http://localhost:4000/js/home">Spraypaint</a>, our
 official client heavily inspired by ActiveRecord. Query your API the
 same way you query your database:</p>
 
@@ -685,7 +761,7 @@ under the hood, allowing you to focus on what matters - your domain.</p>
 <h2 id="graphql-support">GraphQL Support</h2>
 
 <p>OK, let’s come full circle. Let’s say some of these conventions resonate
-with you, but you’d still like a GraphQL server. I <strong><em>still</em></strong> think
+with you, but nevertheless you’d like to develop a GraphQL API. I <strong><em>still</em></strong> think
 Graphiti is your best bet, because Graphiti supports GraphQL.</p>
 
 <p>Remember, we started with this long-hand RPC code:</p>
@@ -777,11 +853,41 @@ to something simple: a mirror, a trick deck, a quick hand.</p>
 tired of seeing this trick performed.</p>
 
 <p>There’s plenty more we haven’t even touched on. Check out the
-[Guides], or dive right in with the [Quickstart] or [Tutorial]. If
-things get tricky, ask for help in our [Slack Chat]. Reach out to me
-directly at richmolj@gmail.com or @richmolj on Twitter.</p>
+<a href="http://localhost:4000/guides">Guides</a>, or dive right in with the <a href="http://localhost:4000/quickstart">Quickstart</a> or <a href="http://localhost:4000/tutorial">Tutorial</a>. If
+things get tricky, ask for help in our <a href="https://join.slack.com/t/graphiti-api/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>. Reach out to me
+directly at <a href="mailto:richmolj@gmail.com">richmolj@gmail.com</a> or <a href="https://twitter.com/richmolj">@richmolj</a> on Twitter.</p>
 
-<p>Let’s put on a show together.</p>
+<h2 id="addendum-holy-shit">Addendum: Holy Shit</h2>
+
+<p>I can’t believe I just wrote all that. I swear, I never set out to do any of this.</p>
+
+<p>There are a lot of big ideas here, but this project is not some ideological crusade. Three years ago I had a bug in my application, and I found it surprisingly tricky to fix. I kept pulling that string, I connected with other developers pulling their own strings, one thing led to another, and here we are. This project is nothing more than a good-faith effort to build quality software, based on my own personal experience.</p>
+
+<p>Let’s be clear: <strong>GraphQL is awesome</strong>. It solves real problems in a
+user-friendly manner, has sexy tooling and amazing libraries created
+by kickass developers. There are many advantages of GraphQL not covered
+here, and plenty more great ideas I’d like to steal. If you find some of
+the framing here annoying, if you find yourself thinking “<em>…but what
+about X and Y?</em>”, just know I feel the same way whenever a GraphQL
+post talks about REST. It will be a continual goal of this project to
+raise the level of debate.</p>
+
+<p>Same for RPC. I work for a company that made billions off of RPC. I tend
+to think REST is a better fit for the web, and RPC is a better fit for
+things like financial trading systems or video games, but plenty of
+reasonable people can disagree. Conventions and abstractions come with
+their own cost: a learning curve, indirection, lack of flexibility. If
+you prefer something more low-level, I completely understand. I’ll
+continue trying to learn from you.</p>
+
+<p>Beware projects and ideologies that claim to be a solution to all your
+problems. Everything has tradeoffs. The best we can do is to avoid
+zero-sum thinking, and instead think about how we can take the best
+ideas from a variety of solutions and experiences, striving to
+continually improve. It is hard, it is exhausting, it is the right thing
+to do.</p>
+
+<p>Unless you like XML. Screw XML.</p>
 
 <p><br />
 <br />
@@ -797,13 +903,13 @@ directly at richmolj@gmail.com or @richmolj on Twitter.</p>
         <h3>Overview</h3>
         <ul>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
           </li>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
           </li>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+            <a href="http://localhost:4000/guides">Guides</a>
           </li>
         </ul>
       </div>

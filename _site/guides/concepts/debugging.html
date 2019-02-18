@@ -9,7 +9,7 @@
   <title>Graphiti</title>
   <meta name="description" content="Stylish Graph APIs">
 
-  <link rel="stylesheet" href="https://graphiti-api.github.io/graphiti/assets/main.css?ref=wh4t3v45">
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
   <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -41,21 +41,21 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a href="https://graphiti-api.github.io/graphiti" class="navbar-brand">Graphiti</a>
+      <a href="http://localhost:4000" class="navbar-brand">Graphiti</a>
     </div>
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
       <ul class="nav navbar-nav">
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+          <a class="nav-link" href="http://localhost:4000/guides">Guides</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/js">Spraypaint</a>
+          <a class="nav-link" href="http://localhost:4000/js">Spraypaint</a>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
@@ -93,13 +93,13 @@
   <h2 id="debugger">1 Debugger</h2>
 
   <p>Graphiti comes with a debugger that shows the queries executed for a
-given request. Remember that Resources <a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#query-interface">have a query interface</a> independent of a request or response. And Resources connect similar to ActiveRecord’s <code class="highlighter-rouge">includes</code>:</p>
+given request. Remember that Resources <a href="http://localhost:4000/guides/concepts/resources#query-interface">have a query interface</a> independent of a request or response. And Resources connect similar to ActiveRecord’s <code class="highlighter-rouge">includes</code>:</p>
 
   <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">employees</span> <span class="o">=</span> <span class="no">EmployeeResource</span><span class="p">.</span><span class="nf">all</span>
 <span class="no">PositionResource</span><span class="p">.</span><span class="nf">all</span><span class="p">(</span><span class="ss">filter: </span><span class="p">{</span> <span class="ss">employee_id: </span><span class="n">employees</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:id</span><span class="p">)</span> <span class="p">})</span></code></pre></figure>
 
   <blockquote>
-    <p><em>Remember, this is all <a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#customizing-relationships">customizable</a></em>.</p>
+    <p><em>Remember, this is all <a href="http://localhost:4000/guides/concepts/resources#customizing-relationships">customizable</a></em>.</p>
   </blockquote>
 
   <p>That means we can log the requests made by individual Resources:</p>
@@ -147,7 +147,7 @@ JSON response. To enable this:</p>
 
   <p><br /></p>
 
-  <p>If there’s an error, and you’ve <a href="https://graphiti-api.github.io/graphiti/guides/concepts/error-handling#displaying-raw-errors">enabled raw errors</a>, you’ll also see the query that caused the error in the JSON response:</p>
+  <p>If there’s an error, and you’ve <a href="http://localhost:4000/guides/concepts/error-handling#displaying-raw-errors">enabled raw errors</a>, you’ll also see the query that caused the error in the JSON response:</p>
 
   <p><br /></p>
 
@@ -290,13 +290,13 @@ your Models and Backends.</p>
         <h3>Overview</h3>
         <ul>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
           </li>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
           </li>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+            <a href="http://localhost:4000/guides">Guides</a>
           </li>
         </ul>
       </div>

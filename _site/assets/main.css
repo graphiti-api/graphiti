@@ -12132,6 +12132,16 @@ html.portfolio-page {
 .nav-menu .main-menu ul li a {
   padding-left: 3rem; }
 
+.spacer {
+  width: 100%;
+  margin-bottom: 25px; }
+
+img.drop {
+  box-shadow: 2px 2px 6px 1px rgba(0, 0, 0, 0.3); }
+
+blockquote {
+  box-shadow: 2px 2px 7px 0px rgba(0, 0, 0, 0.4); }
+
 .layout-home .brand {
   display: block;
   margin-left: auto;

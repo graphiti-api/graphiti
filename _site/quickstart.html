@@ -9,7 +9,7 @@
   <title>Graphiti</title>
   <meta name="description" content="Stylish Graph APIs">
 
-  <link rel="stylesheet" href="https://graphiti-api.github.io/graphiti/assets/main.css?ref=wh4t3v45">
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
   <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -41,21 +41,21 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a href="https://graphiti-api.github.io/graphiti" class="navbar-brand">Graphiti</a>
+      <a href="http://localhost:4000" class="navbar-brand">Graphiti</a>
     </div>
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
       <ul class="nav navbar-nav">
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+          <a class="nav-link" href="http://localhost:4000/guides">Guides</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
         </li>
         <li>
-          <a class="nav-link" href="https://graphiti-api.github.io/graphiti/js">Spraypaint</a>
+          <a class="nav-link" href="http://localhost:4000/js">Spraypaint</a>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
@@ -74,7 +74,7 @@
 
 <p>This quickstart will use Rails with ActiveRecord to give an overview of
 Graphiti functionality on familiar ground. For a more in-depth breakdown, head to the
-<a href="https://graphiti-api.github.io/graphiti/guides"><strong>Guides</strong></a>.</p>
+<a href="http://localhost:4000/guides"><strong>Guides</strong></a>.</p>
 
 <p>If the below seems too “magical”, don’t worry - we’re just applying some
 sensible defaults to get started quickly.</p>
@@ -96,16 +96,16 @@ directly, you can download the file and and run this command as <code class="hig
 
 <h2 id="defining-a-resource">Defining a Resource</h2>
 
-<p>A <a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources"><strong>Resource</strong></a> defines how to query and persist your <a href="https://graphiti-api.github.io/graphiti/guides/concepts/backends-and-models"><strong>Model</strong></a>. In other
+<p>A <a href="http://localhost:4000/guides/concepts/resources"><strong>Resource</strong></a> defines how to query and persist your <a href="http://localhost:4000/guides/concepts/backends-and-models"><strong>Model</strong></a>. In other
 words: a Model is to the database as Resource is to the API. So
 first, let’s define our Model:</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>bundle <span class="nb">exec </span>rails generate model Post title:string upvotes:integer active:boolean
 <span class="gp">$ </span>bundle <span class="nb">exec </span>rails db:migrate</code></pre></figure>
 
-<p>Now we can use the built-in <a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#generators">generator</a> to define our Resource,
-corresponding <a href="https://graphiti-api.github.io/graphiti/guides/concepts/endpoints"><strong>Endpoint</strong></a>, and
-<a href="https://graphiti-api.github.io/graphiti/guides/concepts/testing"><strong>Integration Tests</strong></a>.</p>
+<p>Now we can use the built-in <a href="http://localhost:4000/guides/concepts/resources#generators">generator</a> to define our Resource,
+corresponding <a href="http://localhost:4000/guides/concepts/endpoints"><strong>Endpoint</strong></a>, and
+<a href="http://localhost:4000/guides/concepts/testing"><strong>Integration Tests</strong></a>.</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>bundle <span class="nb">exec </span>rails g graphiti:resource Post title:string upvotes:integer active:boolean</code></pre></figure>
 
@@ -240,7 +240,7 @@ what query functionality we have. We’ve listed all <code class="highlighter-ro
       </li>
       <li>Any filter not whitelisted will raise <code class="highlighter-rouge">JsonapiCompliable::BadFilter</code>
 error.</li>
-      <li><a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#filter">All filter logic can be customized</a></li>
+      <li><a href="http://localhost:4000/guides/concepts/resources#filter">All filter logic can be customized</a></li>
       <li>Customizations can be DRYed up and packaged into <strong>Adapters</strong>.</li>
     </ul>
   </li>
@@ -276,9 +276,9 @@ the total count of all posts”.</li>
       <li>
         <p>This is rendered in the <code class="highlighter-rouge">meta</code> section of the response:</p>
 
-        <p><img src="https://graphiti-api.github.io/graphiti/assets/img/meta_total_count.png" alt="meta_total_count" /></p>
+        <p><img src="http://localhost:4000/assets/img/meta_total_count.png" alt="meta_total_count" /></p>
       </li>
-      <li><a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#statistics">View Documentation</a></li>
+      <li><a href="http://localhost:4000/guides/concepts/resources#statistics">View Documentation</a></li>
     </ul>
   </li>
   <li><strong>Error Handling</strong>:
@@ -298,7 +298,7 @@ the total count of all posts”.</li>
   <li>
     <p>View the default payload:</p>
 
-    <p><img src="https://graphiti-api.github.io/graphiti/assets/img/error_payload.png" alt="error_payload" /></p>
+    <p><img src="http://localhost:4000/assets/img/error_payload.png" alt="error_payload" /></p>
   </li>
   <li>
     <p>Different errors can be customized with different response codes,
@@ -338,8 +338,8 @@ to take a look at the tests the generator created. One example:</p>
   <span class="k">end</span>
 <span class="k">end</span></code></pre></figure>
 
-<p>Read more about <a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#persisting">Persistence</a> and
-<a href="https://graphiti-api.github.io/graphiti/guides/concepts/testing#writes">Testing Persistence</a>.</p>
+<p>Read more about <a href="http://localhost:4000/guides/concepts/resources#persisting">Persistence</a> and
+<a href="http://localhost:4000/guides/concepts/testing#writes">Testing Persistence</a>.</p>
 
 <h2 id="adding-relationships">Adding Relationships</h2>
 
@@ -377,13 +377,13 @@ to take a look at the tests the generator created. One example:</p>
       <li>SQL: <code class="highlighter-rouge">SELECT * FROM comments WHERE post_id = 123</code></li>
     </ul>
   </li>
-  <li>Generates a <a href="https://graphiti-api.github.io/graphiti/guides/concepts/links"><strong>Link</strong></a> for
+  <li>Generates a <a href="http://localhost:4000/guides/concepts/links"><strong>Link</strong></a> for
 lazy-loading.</li>
-  <li>Will use <code class="highlighter-rouge">CommentResource</code> for querying logic (so we can <a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#deep-queries">Deep
+  <li>Will use <code class="highlighter-rouge">CommentResource</code> for querying logic (so we can <a href="http://localhost:4000/guides/concepts/resources#deep-queries">Deep
 Query</a>, e.g.
 “only return the latest 3 active comments”).</li>
   <li>By default, this will generate the query <code class="highlighter-rouge">CommentResource.all(filter:
-{ post_id: 123 })</code>, but <a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#relationships">relationships can be customized</a></li>
+{ post_id: 123 })</code>, but <a href="http://localhost:4000/guides/concepts/resources#relationships">relationships can be customized</a></li>
 </ul>
 
 <p>You should now be able to hit <code class="highlighter-rouge">/api/v1/comments</code> with all the same
@@ -435,7 +435,7 @@ reuse code across multiple Endpoints.</p>
 
 <p>Also note: just as we can query a graph of Resources in a single
 request, we can <em>persist</em> a graph of Resources in a single request. See
-<a href="https://graphiti-api.github.io/graphiti/guides/concepts/resources#sideposting">Sideposting</a>.</p>
+<a href="http://localhost:4000/guides/concepts/resources#sideposting">Sideposting</a>.</p>
 
 <h2 id="exploring-with-vandal">Exploring with Vandal</h2>
 
@@ -459,7 +459,7 @@ with the text “two”:</p>
   <img width="100%" src="https://user-images.githubusercontent.com/55264/50739988-cb5af780-11b5-11e9-81ad-2e28f6fa5ac2.png" />
 </p>
 
-<p><a href="https://jsonapi-employee-directory.herokuapp.com/vandal">Click here</a> to play with Vandal hitting our <a href="https://graphiti-api.github.io/graphiti/tutorial">Employee Directory Tutorial</a>. Initial load might take longer as it runs on a free Heroku instance.</p>
+<p><a href="https://jsonapi-employee-directory.herokuapp.com/vandal">Click here</a> to play with Vandal hitting our <a href="http://localhost:4000/tutorial">Employee Directory Tutorial</a>. Initial load might take longer as it runs on a free Heroku instance.</p>
 
 <h2 id="whats-next">What’s Next</h2>
 
@@ -471,8 +471,8 @@ altogether?</p>
 
 <p>These are important topics that Graphiti was built to address. To
 learn more about advanced usage and customization, we suggest following
-the <a href="https://graphiti-api.github.io/graphiti/tutorial"><strong>Tutorial</strong></a> and reading through the
-<a href="https://graphiti-api.github.io/graphiti/guides"><strong>Guides</strong></a>.</p>
+the <a href="http://localhost:4000/tutorial"><strong>Tutorial</strong></a> and reading through the
+<a href="http://localhost:4000/guides"><strong>Guides</strong></a>.</p>
 
 <p>For help with specific use cases, <a href="https://join.slack.com/t/graphiti-api/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg"><strong>join our Slack chat</strong></a>!</p>
 
@@ -483,7 +483,7 @@ write tests. But in Graphiti <strong>testing is the easiest, most pleasant way
 to develop your application</strong>.</p>
 
 <p>Even if you’re not normally a TDDer, we highly recommend reading through
-our <a href="https://graphiti-api.github.io/graphiti/guides/concepts/testing"><strong>Integration Testing Guide</strong></a>.</p>
+our <a href="http://localhost:4000/guides/concepts/testing"><strong>Integration Testing Guide</strong></a>.</p>
 
 <p><br />
 <br /></p>
@@ -498,13 +498,13 @@ our <a href="https://graphiti-api.github.io/graphiti/guides/concepts/testing"><s
         <h3>Overview</h3>
         <ul>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/quickstart">Quickstart</a>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
           </li>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/tutorial">Tutorial</a>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
           </li>
           <li>
-            <a href="https://graphiti-api.github.io/graphiti/guides">Guides</a>
+            <a href="http://localhost:4000/guides">Guides</a>
           </li>
         </ul>
       </div>
