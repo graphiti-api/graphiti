@@ -567,7 +567,7 @@ ORM/DB, etcs
 > *You should think hard before breaking up [a Magestic Monolith](https://m.signalvnoise.com/the-majestic-monolith); beware the tradeoffs. Still, if you need it, Graphiti has your back.*
 
 We now have a consistent interface for queries and relationships. We
-also talked about how Resources connect together with Links. Put two and
+also covered how Resources connect together with Links. Put two and
 two together, and you'll see a Resource doesn't need to be local to same
 application. We can have cross-API, remote Resources as well.
 
@@ -598,8 +598,34 @@ TODO
 
 ## Clients
 
--- js client - take advantage of conventions, and mirror moving the
-object. Instead of focusing on the *request*, FOCUS ON DOMAIN.
+You can use any HTTP client with Graphiti. If you're using JS, a simple
+`fetch` will do.
+
+But you may be looking for a more robust client, one that takes
+advantage of Graphiti conventions. Look no further than
+[Spraypaint]({{site.github.url}}/js/home), our
+official client heavily inspired by ActiveRecord. Query your API the
+same way you query your database:
+
+{% highlight typescript %}
+// All of this is chainable
+
+let { data } = await Employee
+  .where({ name: { prefix: "Jane" } })
+  .order({ created_at: "desc" })
+  .page(2).per(10)
+  .select(['name', 'age'])
+  .stat({ total: 'count' })
+  .includes({ positions: 'department' })
+  .all()
+
+let record = data[0]
+record.positions[0].department.name = 'Updated!'
+await record.save({ with: { positions: 'department' } })
+{% endhighlight %}
+
+By relying on conventions we can move the URL, request, and response
+under the hood, allowing you to focus on what matters - your domain.
 
 ## GraphQL Support
 
@@ -695,7 +721,7 @@ An object, moving back and forth.
 Simple concepts can often be the most powerful, and I will never get
 tired of seeing this trick performed.
 
-There's plenty more we haven't even talked about. Check out the
+There's plenty more we haven't even touched on. Check out the
 [Guides], or dive right in with the [Quickstart] or [Tutorial]. If
 things get tricky, ask for help in our [Slack Chat]. Reach out to me
 directly at richmolj@gmail.com or @richmolj on Twitter.

@@ -626,7 +626,7 @@ request:</p>
 </blockquote>
 
 <p>We now have a consistent interface for queries and relationships. We
-also talked about how Resources connect together with Links. Put two and
+also covered how Resources connect together with Links. Put two and
 two together, and you’ll see a Resource doesn’t need to be local to same
 application. We can have cross-API, remote Resources as well.</p>
 
@@ -655,8 +655,32 @@ Deep Query. If you use Vandal, you’ll think it’s all the same API.</p>
 
 <h2 id="clients">Clients</h2>
 
-<p>– js client - take advantage of conventions, and mirror moving the
-object. Instead of focusing on the <em>request</em>, FOCUS ON DOMAIN.</p>
+<p>You can use any HTTP client with Graphiti. If you’re using JS, a simple
+<code class="highlighter-rouge">fetch</code> will do.</p>
+
+<p>But you may be looking for a more robust client, one that takes
+advantage of Graphiti conventions. Look no further than
+<a href="https://graphiti-api.github.io/graphiti/js/home">Spraypaint</a>, our
+official client heavily inspired by ActiveRecord. Query your API the
+same way you query your database:</p>
+
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="c1">// All of this is chainable</span>
+
+<span class="kd">let</span> <span class="p">{</span> <span class="nx">data</span> <span class="p">}</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">Employee</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">({</span> <span class="na">name</span><span class="p">:</span> <span class="p">{</span> <span class="na">prefix</span><span class="p">:</span> <span class="s2">"Jane"</span> <span class="p">}</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">order</span><span class="p">({</span> <span class="na">created_at</span><span class="p">:</span> <span class="s2">"desc"</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">page</span><span class="p">(</span><span class="mi">2</span><span class="p">).</span><span class="nx">per</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">([</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'age'</span><span class="p">])</span>
+  <span class="p">.</span><span class="nx">stat</span><span class="p">({</span> <span class="na">total</span><span class="p">:</span> <span class="s1">'count'</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">includes</span><span class="p">({</span> <span class="na">positions</span><span class="p">:</span> <span class="s1">'department'</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">all</span><span class="p">()</span>
+
+<span class="kd">let</span> <span class="nx">record</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nx">record</span><span class="p">.</span><span class="nx">positions</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">department</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">'Updated!'</span>
+<span class="k">await</span> <span class="nx">record</span><span class="p">.</span><span class="nx">save</span><span class="p">({</span> <span class="na">with</span><span class="p">:</span> <span class="p">{</span> <span class="na">positions</span><span class="p">:</span> <span class="s1">'department'</span> <span class="p">}</span> <span class="p">})</span></code></pre></figure>
+
+<p>By relying on conventions we can move the URL, request, and response
+under the hood, allowing you to focus on what matters - your domain.</p>
 
 <h2 id="graphql-support">GraphQL Support</h2>
 
@@ -752,7 +776,7 @@ to something simple: a mirror, a trick deck, a quick hand.</p>
 <p>Simple concepts can often be the most powerful, and I will never get
 tired of seeing this trick performed.</p>
 
-<p>There’s plenty more we haven’t even talked about. Check out the
+<p>There’s plenty more we haven’t even touched on. Check out the
 [Guides], or dive right in with the [Quickstart] or [Tutorial]. If
 things get tricky, ask for help in our [Slack Chat]. Reach out to me
 directly at richmolj@gmail.com or @richmolj on Twitter.</p>
