@@ -77,7 +77,7 @@ Maybe tell him: "Marcus, please add 2 cows to your farm".*
 In other words, **this is REST**:
 
 <p align="center">
-  <img width="50%" src="https://user-images.githubusercontent.com/55264/52913247-36561e80-328a-11e9-98ea-5e743920d317.gif" />
+  <img width="80%" src="https://user-images.githubusercontent.com/55264/52964195-bf935100-336f-11e9-8be4-7046d6556f57.gif" />
 </p>
 
 We're moving an object from the server to the client, possibly modifying
@@ -584,11 +584,9 @@ conventions for data validation as well:
 Earlier, we covered how REST was optimized for lazy-loading. Graphiti
 builds on top of REST to add eager-loading, and "eager-persisting". In
 other words, we can both read and write a graph of data in a single
-request:
+request.
 
-[TODO IMAGE]
-
-## Automation with Escape Valves / ORM Agnostic
+## TODO Automation with Escape Valves / ORM Agnostic
 
 ORM/DB, etcs
 
@@ -789,7 +787,7 @@ to something simple: a mirror, a trick deck, a quick hand.
 An object, moving back and forth.
 
 <p align="center">
-  <img width="50%" src="https://user-images.githubusercontent.com/55264/52913247-36561e80-328a-11e9-98ea-5e743920d317.gif" />
+  <img width="80%" src="https://user-images.githubusercontent.com/55264/52964195-bf935100-336f-11e9-8be4-7046d6556f57.gif" />
 </p>
 
 Simple concepts can often be the most powerful, and I will never get
