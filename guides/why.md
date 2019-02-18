@@ -571,7 +571,7 @@ also covered how Resources connect together with Links. Put two and
 two together, and you'll see a Resource doesn't need to be local to same
 application. We can have cross-API, remote Resources as well.
 
-The popular GraphQL platform Apollo calls this [Schema Stitching](https://www.apollographql.com/docs/graphql-tools/schema-stitching.html):
+The popular GraphQL platform Apollo does something similar with [Schema Stitching](https://www.apollographql.com/docs/graphql-tools/schema-stitching.html):
 
 <p align="center">
   <img width="50%" src="https://user-images.githubusercontent.com/55264/52920133-506a1e00-32d7-11e9-8986-23795dbedc2c.png" />
@@ -592,7 +592,7 @@ Deep Query. If you use Vandal, you'll think it's all the same API.
 
 Microservices 🎉!
 
-### Domain-Driven Design
+### Don't Sleep On This One: Domain-Driven Design
 
 TODO
 
