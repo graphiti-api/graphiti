@@ -316,6 +316,45 @@ we get all this behavior out of the box:
   * Paginate
   * Fieldsets
 
+#### Automation
+
+So far, we've only talked in terms of schema. But the above Graphiti
+code not only provides conventions around our API contract, it powers
+the API as well.
+
+Let's follow the example at [graphql.org](https://graphql.org/learn/execution/):
+
+{% highlight typescript %}
+Query: {
+  employee(obj, args, context, info) {
+    return context.db.loadEmployeesByID(args.id).then(
+      employeeData => employeeData.map((e) => {
+        return new Employee(e)
+      })
+    )
+  }
+}
+{% endhighlight %}
+
+This example is hardcoded to find the employee by ID. If we added other
+parameters, we'd have something like
+
+{% highlight typescript %}
+Query: {
+  employee(obj, args, context, info) {
+    return context.db.loadEmployees(args).then(
+      employeeData => employeeData.map((e) => {
+        return new Employee(e)
+      })
+    )
+  }
+}
+{% endhighlight %}
+
+
+
+#### UI
+
 There's more to this than a bunch of out-of-the-box standards and
 behavior. If we thought only in Fields and Types, we'd use GraphiQL to
 see something like:
@@ -587,6 +626,8 @@ other words, we can both read and write a graph of data in a single
 request.
 
 ## TODO Automation with Escape Valves / ORM Agnostic
+
+visual: rest is a graph
 
 ORM/DB, etcs
 

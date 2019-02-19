@@ -9,7 +9,7 @@
   <title>Graphiti</title>
   <meta name="description" content="Stylish Graph APIs">
 
-  <link rel="stylesheet" href="https://richmolj.github.io/t/assets/main.css?ref=wh4t3v45">
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
   <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -41,21 +41,21 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a href="https://richmolj.github.io/t" class="navbar-brand">Graphiti</a>
+      <a href="http://localhost:4000" class="navbar-brand">Graphiti</a>
     </div>
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
       <ul class="nav navbar-nav">
         <li>
-          <a class="nav-link" href="https://richmolj.github.io/t/quickstart">Quickstart</a>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
         </li>
         <li>
-          <a class="nav-link" href="https://richmolj.github.io/t/guides">Guides</a>
+          <a class="nav-link" href="http://localhost:4000/guides">Guides</a>
         </li>
         <li>
-          <a class="nav-link" href="https://richmolj.github.io/t/tutorial">Tutorial</a>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
         </li>
         <li>
-          <a class="nav-link" href="https://richmolj.github.io/t/js">Spraypaint</a>
+          <a class="nav-link" href="http://localhost:4000/js">Spraypaint</a>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
@@ -85,7 +85,7 @@ perform the upgrade with confidence by ensuring our tests pass.</p>
 
 <p>There is no Swagger UI equivalent for Graphiti. Swagger is a
 poor fit for graph APIs, and we instead rely on a custom Graphiti
-Schema. Instead, check out <a href="https://richmolj.github.io/t/guides/vandal">Vandal</a>.</p>
+Schema. Instead, check out <a href="http://localhost:4000/guides/vandal">Vandal</a>.</p>
 
 <h3 id="setup">Setup</h3>
 
@@ -156,9 +156,9 @@ with <code class="highlighter-rouge">only:</code>.</p>
 at the end of the URL, they are now going to get a simple JSON response
 instead of JSONAPI. Avoid the responders gem if you don’t want this.</p>
 
-<p>You may want to move some persistence logic to <a href="https://richmolj.github.io/t/guides/concepts/resources#side-effects">before_commit</a>.</p>
+<p>You may want to move some persistence logic to <a href="http://localhost:4000/guides/concepts/resources#side-effects">before_commit</a>.</p>
 
-<p>Resources now have <a href="https://richmolj.github.io/t/guides/concepts/resources#basescope">#base_scope</a>. If you previously were using <code class="highlighter-rouge">default_filter</code> or passing in a custom scope in your controller, consider moving to <code class="highlighter-rouge">base_scope</code>:</p>
+<p>Resources now have <a href="http://localhost:4000/guides/concepts/resources#basescope">#base_scope</a>. If you previously were using <code class="highlighter-rouge">default_filter</code> or passing in a custom scope in your controller, consider moving to <code class="highlighter-rouge">base_scope</code>:</p>
 
 <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/post_resource.rb</span>
 <span class="k">def</span> <span class="nf">base_scope</span>
@@ -166,11 +166,11 @@ instead of JSONAPI. Avoid the responders gem if you don’t want this.</p>
 <span class="k">end</span></code></pre></figure>
 
 <p>If you have manual sideloading logic with scope, it is <strong>highly
-recommended</strong> you rewriting using <code class="highlighter-rouge">params</code> - see <a href="https://richmolj.github.io/t/guides/concepts/resources#relationships">relationship docs</a>. If you <strong>do</strong> still need <code class="highlighter-rouge">scope</code>, it now yields the parent ids as the first argument and the actual parent models as the second.</p>
+recommended</strong> you rewriting using <code class="highlighter-rouge">params</code> - see <a href="http://localhost:4000/guides/concepts/resources#relationships">relationship docs</a>. If you <strong>do</strong> still need <code class="highlighter-rouge">scope</code>, it now yields the parent ids as the first argument and the actual parent models as the second.</p>
 
 <p>At this point, get all your <code class="highlighter-rouge">spec/legacy</code> specs passing.</p>
 
-<p>When you’re done, generate the new <a href="https://richmolj.github.io/t/guides/concepts/testing">Resource and API Specs</a>. Note that much of this is syntax changes, you can copy/paste large amounts of logic from <code class="highlighter-rouge">spec/legacy</code>. To ease this process, try <code class="highlighter-rouge">rails g graphiti:api_test PostResource</code> and <code class="highlighter-rouge">rails g graphiti:resource_test PostResource</code>.</p>
+<p>When you’re done, generate the new <a href="http://localhost:4000/guides/concepts/testing">Resource and API Specs</a>. Note that much of this is syntax changes, you can copy/paste large amounts of logic from <code class="highlighter-rouge">spec/legacy</code>. To ease this process, try <code class="highlighter-rouge">rails g graphiti:api_test PostResource</code> and <code class="highlighter-rouge">rails g graphiti:resource_test PostResource</code>.</p>
 
 <p>You should now have the upgraded <strong>and</strong> legacy test suite working. We
 can now remove the legacy specs:</p>
@@ -210,13 +210,13 @@ operations. This is because the <code class="highlighter-rouge">responders</code
         <h3>Overview</h3>
         <ul>
           <li>
-            <a href="https://richmolj.github.io/t/quickstart">Quickstart</a>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
           </li>
           <li>
-            <a href="https://richmolj.github.io/t/tutorial">Tutorial</a>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
           </li>
           <li>
-            <a href="https://richmolj.github.io/t/guides">Guides</a>
+            <a href="http://localhost:4000/guides">Guides</a>
           </li>
         </ul>
       </div>

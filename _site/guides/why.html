@@ -9,7 +9,7 @@
   <title>Graphiti</title>
   <meta name="description" content="Stylish Graph APIs">
 
-  <link rel="stylesheet" href="https://richmolj.github.io/t/assets/main.css?ref=wh4t3v45">
+  <link rel="stylesheet" href="http://localhost:4000/assets/main.css?ref=wh4t3v45">
   <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/feed.xml">
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -41,21 +41,21 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a href="https://richmolj.github.io/t" class="navbar-brand">Graphiti</a>
+      <a href="http://localhost:4000" class="navbar-brand">Graphiti</a>
     </div>
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
       <ul class="nav navbar-nav">
         <li>
-          <a class="nav-link" href="https://richmolj.github.io/t/quickstart">Quickstart</a>
+          <a class="nav-link" href="http://localhost:4000/quickstart">Quickstart</a>
         </li>
         <li>
-          <a class="nav-link" href="https://richmolj.github.io/t/guides">Guides</a>
+          <a class="nav-link" href="http://localhost:4000/guides">Guides</a>
         </li>
         <li>
-          <a class="nav-link" href="https://richmolj.github.io/t/tutorial">Tutorial</a>
+          <a class="nav-link" href="http://localhost:4000/tutorial">Tutorial</a>
         </li>
         <li>
-          <a class="nav-link" href="https://richmolj.github.io/t/js">Spraypaint</a>
+          <a class="nav-link" href="http://localhost:4000/js">Spraypaint</a>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right visible-md visible-lg">
@@ -383,6 +383,39 @@ we get all this behavior out of the box:</p>
   </li>
 </ul>
 
+<h4 id="automation">Automation</h4>
+
+<p>So far, we’ve only talked in terms of schema. But the above Graphiti
+code not only provides conventions around our API contract, it powers
+the API as well.</p>
+
+<p>Let’s follow the example at <a href="https://graphql.org/learn/execution/">graphql.org</a>:</p>
+
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="nx">Query</span><span class="err">:</span> <span class="p">{</span>
+  <span class="nx">employee</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">args</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">info</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">context</span><span class="p">.</span><span class="nx">db</span><span class="p">.</span><span class="nx">loadEmployeesByID</span><span class="p">(</span><span class="nx">args</span><span class="p">.</span><span class="nx">id</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span>
+      <span class="nx">employeeData</span> <span class="o">=&gt;</span> <span class="nx">employeeData</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">e</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">Employee</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span>
+      <span class="p">})</span>
+    <span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>This example is hardcoded to find the employee by ID. If we added other
+parameters, we’d have something like</p>
+
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="nx">Query</span><span class="err">:</span> <span class="p">{</span>
+  <span class="nx">employee</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">args</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">info</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">context</span><span class="p">.</span><span class="nx">db</span><span class="p">.</span><span class="nx">loadEmployees</span><span class="p">(</span><span class="nx">args</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span>
+      <span class="nx">employeeData</span> <span class="o">=&gt;</span> <span class="nx">employeeData</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">e</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">Employee</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span>
+      <span class="p">})</span>
+    <span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<h4 id="ui">UI</h4>
+
 <p>There’s more to this than a bunch of out-of-the-box standards and
 behavior. If we thought only in Fields and Types, we’d use GraphiQL to
 see something like:</p>
@@ -554,7 +587,7 @@ clicks something.</p>
 
 <p>You can do this in GraphQL, but you need to bake logic into the client,
 which means changing the logic would break clients (read more about
-this in the <a href="https://richmolj.github.io/t/guides/concepts/links">Links Guide</a>).
+this in the <a href="http://localhost:4000/guides/concepts/links">Links Guide</a>).
 Luckily, REST and JSON:API are optimized for lazy-loading:</p>
 
 <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># ...</span>
@@ -567,7 +600,7 @@ Luckily, REST and JSON:API are optimized for lazy-loading:</p>
 
 <p>Graphiti generates these Links between Resources automatically. If you
 change the logic connecting Resources (which applies to eager loading as
-well), we’ll update the <a href="https://richmolj.github.io/t/guides/concepts/links">Link</a> - clients can simply follow the
+well), we’ll update the <a href="http://localhost:4000/guides/concepts/links">Link</a> - clients can simply follow the
 link, and we can change logic server-side with no breakage.</p>
 
 <p>There’s a bunch of other great stuff about JSON:API, but that is a
@@ -644,6 +677,8 @@ other words, we can both read and write a graph of data in a single
 request.</p>
 
 <h2 id="todo-automation-with-escape-valves--orm-agnostic">TODO Automation with Escape Valves / ORM Agnostic</h2>
+
+<p>visual: rest is a graph</p>
 
 <p>ORM/DB, etcs</p>
 
@@ -734,7 +769,7 @@ But don’t sleep on it.</p>
 
 <p>But you may be looking for a more robust client, one that takes
 advantage of Graphiti conventions. Look no further than
-<a href="https://richmolj.github.io/t/js/home">Spraypaint</a>, our
+<a href="http://localhost:4000/js/home">Spraypaint</a>, our
 official client heavily inspired by ActiveRecord. Query your API the
 same way you query your database:</p>
 
@@ -851,7 +886,7 @@ to something simple: a mirror, a trick deck, a quick hand.</p>
 tired of seeing this trick performed.</p>
 
 <p>There’s plenty more we haven’t even touched on. Check out the
-<a href="https://richmolj.github.io/t/guides">Guides</a>, or dive right in with the <a href="https://richmolj.github.io/t/quickstart">Quickstart</a> or <a href="https://richmolj.github.io/t/tutorial">Tutorial</a>. If
+<a href="http://localhost:4000/guides">Guides</a>, or dive right in with the <a href="http://localhost:4000/quickstart">Quickstart</a> or <a href="http://localhost:4000/tutorial">Tutorial</a>. If
 things get tricky, ask for help in our <a href="https://join.slack.com/t/graphiti-api/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg">Slack Chat</a>. Reach out to me
 directly at <a href="mailto:richmolj@gmail.com">richmolj@gmail.com</a> or <a href="https://twitter.com/richmolj">@richmolj</a> on Twitter.</p>
 
@@ -901,13 +936,13 @@ to do.</p>
         <h3>Overview</h3>
         <ul>
           <li>
-            <a href="https://richmolj.github.io/t/quickstart">Quickstart</a>
+            <a href="http://localhost:4000/quickstart">Quickstart</a>
           </li>
           <li>
-            <a href="https://richmolj.github.io/t/tutorial">Tutorial</a>
+            <a href="http://localhost:4000/tutorial">Tutorial</a>
           </li>
           <li>
-            <a href="https://richmolj.github.io/t/guides">Guides</a>
+            <a href="http://localhost:4000/guides">Guides</a>
           </li>
         </ul>
       </div>
