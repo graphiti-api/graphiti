@@ -87,6 +87,13 @@ module Graphiti
           end
         end
 
+        def after_commit(only: [:create, :update, :destroy], &blk)
+          Array(only).each do |verb|
+            config[:after_commit][verb] ||= []
+            config[:after_commit][verb] << blk
+          end
+        end
+
         def attribute(name, type, options = {}, &blk)
           raise Errors::TypeNotFound.new(self, name, type) unless Types[type]
           attribute_option(options, :readable)

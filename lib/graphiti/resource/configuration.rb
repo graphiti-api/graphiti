@@ -181,6 +181,7 @@ module Graphiti
               sorts: {},
               pagination: nil,
               before_commit: {},
+              after_commit: {},
               attributes: {},
               extra_attributes: {},
               sideloads: {},

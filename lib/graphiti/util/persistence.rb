@@ -63,7 +63,9 @@ class Graphiti::Util::Persistence
     post_process(persisted, parents)
     post_process(persisted, children)
     before_commit = -> { @resource.before_commit(persisted, metadata) }
-    add_hook(before_commit)
+    add_hook(before_commit, :before_commit)
+    after_commit = -> { @resource.after_commit(persisted, metadata) }
+    add_hook(after_commit, :after_commit)
     persisted
   end
 
@@ -83,8 +85,8 @@ class Graphiti::Util::Persistence
     end
   end
 
-  def add_hook(prc)
-    ::Graphiti::Util::Hooks.add(prc)
+  def add_hook(prc, lifecycle_event)
+    ::Graphiti::Util::TransactionHooksRecorder.add(prc, lifecycle_event)
   end
 
   # The child's attributes should be modified to nil-out the
@@ -215,7 +217,7 @@ class Graphiti::Util::Persistence
       group.group_by { |g| g[:sideload] }.each_pair do |sideload, members|
         objects = members.map { |x| x[:object] }
         hook = -> { sideload.fire_hooks!(caller_model, objects, method) }
-        add_hook(hook)
+        add_hook(hook, :before_commit)
       end
     end
   end

@@ -114,7 +114,7 @@ module Graphiti
     end
 
     def destroy
-      validator = @resource.transaction do
+      transaction_response = @resource.transaction do
         metadata = { method: :destroy }
         model = @resource.destroy(@query.filters[:id], metadata)
         model.instance_variable_set(:@__serializer_klass, @resource.serializer)
@@ -122,9 +122,10 @@ module Graphiti
           model, @payload
         validator.validate!
         @resource.before_commit(model, metadata)
-        validator
+
+        { result: validator }
       end
-      @data, success = validator.to_a
+      @data, success = transaction_response[:result].to_a
       success
     end
 
@@ -154,8 +155,8 @@ module Graphiti
     private
 
     def persist
-      @resource.transaction do
-        ::Graphiti::Util::Hooks.record do
+      transaction_response = @resource.transaction do
+        ::Graphiti::Util::TransactionHooksRecorder.record do
           model = yield
           validator = ::Graphiti::Util::ValidationResponse.new \
             model, @payload
@@ -163,6 +164,15 @@ module Graphiti
           validator
         end
       end
+
+      data, success = transaction_response[:result].to_a
+      if success
+        transaction_response[:after_commit_hooks].each do |hook|
+          hook.call
+        end
+      end
+
+      transaction_response[:result]
     end
   end
 end
