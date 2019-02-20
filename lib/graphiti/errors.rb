@@ -94,7 +94,7 @@ The adapter #{@adapter.class} does not implement method '#{@method}', which was 
 
       def message
         <<-MSG
-#{@resource.class}: Tried to persist sideload #{@sideload.name.inspect} but marked writable: false
+#{@resource.class}: Tried to persist association #{@sideload.name.inspect} but marked writable: false
         MSG
       end
     end

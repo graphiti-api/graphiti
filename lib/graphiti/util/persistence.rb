@@ -5,12 +5,15 @@ class Graphiti::Util::Persistence
   # @param [Hash] meta see (Deserializer#meta)
   # @param [Hash] attributes see (Deserializer#attributes)
   # @param [Hash] relationships see (Deserializer#relationships)
-  def initialize(resource, meta, attributes, relationships, caller_model)
+  # @param [Model] caller_model The persisted parent object in the request graph
+  # @param [Symbol] foreign_key Attribute assigned by parent object in graph
+  def initialize(resource, meta, attributes, relationships, caller_model, foreign_key = nil)
     @resource      = resource
     @meta          = meta
     @attributes    = attributes
     @relationships = relationships
     @caller_model  = caller_model
+    @foreign_key   = foreign_key
 
     # Find the correct child resource for a given jsonapi type
     if meta_type = @meta[:type].try(:to_sym)
@@ -19,9 +22,7 @@ class Graphiti::Util::Persistence
       end
     end
 
-    @attributes.each_pair do |key, value|
-      @attributes[key] = @resource.typecast(key, value, :writable)
-    end
+    typecast_attributes
   end
 
   # Perform the actual save logic.
@@ -67,6 +68,20 @@ class Graphiti::Util::Persistence
   end
 
   private
+
+  # In the case where we're sideposting in order to associate 2 nodes
+  # in the graph, the foreign key gets merged into the child's attributes
+  # This attribute should *not* need to be marked writable, as that
+  # would allow writing as a straight attribute instead of just an association
+  def typecast_attributes
+    @attributes.each_pair do |key, value|
+      if @foreign_key == key
+        @attributes[key] = value
+      else
+        @attributes[key] = @resource.typecast(key, value, :writable)
+      end
+    end
+  end
 
   def add_hook(prc)
     ::Graphiti::Util::Hooks.add(prc)
@@ -170,7 +185,9 @@ class Graphiti::Util::Persistence
 
         if x[:sideload].writable?
           x[:object] = x[:resource]
-            .persist_with_relationships(x[:meta], x[:attributes], x[:relationships], caller_model)
+            .persist_with_relationships(x[:meta], x[:attributes], x[:relationships], caller_model, x[:foreign_key])
+        else
+          raise Graphiti::Errors::UnwritableRelationship.new(@resource, x[:sideload])
         end
 
         processed << x
