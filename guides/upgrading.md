@@ -105,6 +105,11 @@ end
 If you have manual sideloading logic with scope, it is **highly
 recommended** you rewriting using `params` - see [relationship docs]({{site.github.url}}/guides/concepts/resources#relationships). If you **do** still need `scope`, it now yields the parent ids as the first argument and the actual parent models as the second.
 
+Finally, you are encouraged to avoid overriding `create/update/destroy`
+directly. Instead, override `build`, `save`, and `delete`, and use
+[Persistence Lifecycle
+Hooks]({{site.github.url}}/guides/concepts/resources#persistence-lifecycle-hooks).
+
 At this point, get all your `spec/legacy` specs passing.
 
 When you're done, generate the new [Resource and API Specs]({{site.github.url}}/guides/concepts/testing). Note that much of this is syntax changes, you can copy/paste large amounts of logic from `spec/legacy`. To ease this process, try `rails g graphiti:api_test PostResource` and `rails g graphiti:resource_test PostResource`.

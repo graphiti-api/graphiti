@@ -32,8 +32,8 @@ exclude:
 
 github:
   #url: 'http://localhost:4000'
-  #url: 'https://graphiti-api.github.io/graphiti'
-  url: 'https://richmolj.github.io/t'
+  url: 'https://graphiti-api.github.io/graphiti'
+  #url: 'https://richmolj.github.io/t'
 defaults:
   - scope:
       path: "assets/img"

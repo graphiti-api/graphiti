@@ -39,6 +39,7 @@ Resources
   * [polymorphic_has_many](#polymorphichasmany)
 * 6 [Generators](#generators)
 * 7 [Persisting](#persisting)
+  * [Lifecycle Hooks](#persistence-lifecycle-hooks)
   * [Side Effects](#side-effects)
   * [Sideposting](#sideposting)
     * [Create](#create)
