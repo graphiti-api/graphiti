@@ -2,13 +2,8 @@
 layout: page
 ---
 
-<div markdown="1" class="toc col-md-3">
 Usage Without ActiveRecord
 ==========================
-
-* [Resource Overrides](#resource-overrides)
-* [Adapters](#adapters)
-</div>
 
 Graphiti was build to be used with any ORM or datastore, from PostgreSQL
 to elasticsearch to `Net::HTTP`. In fact, Graphiti itself is tested with
