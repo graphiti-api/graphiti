@@ -1,6 +1,10 @@
 EMPLOYEE_CONTROLLER_BLOCK = lambda do |*args|
+  def resource
+    EmployeeResource
+  end
+
   def create
-    employee = EmployeeResource.build(params)
+    employee = resource.build(params)
 
     if employee.save
       render jsonapi: employee
@@ -16,7 +20,7 @@ EMPLOYEE_CONTROLLER_BLOCK = lambda do |*args|
   end
 
   def update
-    employee = EmployeeResource.find(params)
+    employee = resource.find(params)
 
     if employee.update_attributes
       render jsonapi: employee
@@ -26,7 +30,7 @@ EMPLOYEE_CONTROLLER_BLOCK = lambda do |*args|
   end
 
   def destroy
-    employee = EmployeeResource.find(params)
+    employee = resource.find(params)
 
     if employee.destroy
       render json: { meta: {} }
