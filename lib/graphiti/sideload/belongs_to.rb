@@ -10,14 +10,6 @@ class Graphiti::Sideload::BelongsTo < Graphiti::Sideload
     end
   end
 
-  def load(parents, query, graph_parent)
-    if ids_for_parents(parents).empty?
-      []
-    else
-      super
-    end
-  end
-
   def base_filter(parents)
     parent_ids = ids_for_parents(parents)
     { primary_key => parent_ids.join(',') }

@@ -190,6 +190,7 @@ module Graphiti
     def load(parents, query, graph_parent)
       params = load_params(parents, query)
       params_proc.call(params, parents) if params_proc
+      return [] if blank_query?(params)
       opts = load_options(parents, query)
       opts[:sideload] = self
       opts[:parent] = graph_parent
@@ -325,6 +326,15 @@ module Graphiti
     end
 
     private
+
+    def blank_query?(params)
+      if filter = params[:filter]
+        if filter.values == ['']
+          return true
+        end
+      end
+      false
+    end
 
     def validate_options!(opts)
       if opts[:remote]

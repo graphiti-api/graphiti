@@ -685,6 +685,74 @@ RSpec.describe 'sideloading' do
         expect(included('positions').map(&:id)).to match_array([1, 2])
       end
 
+      context 'but primary key is nil' do
+        let(:has_many_opts) do
+          {
+            resource: position_resource,
+            primary_key: :classification_id
+          }
+        end
+
+        before do
+          resource.has_many :positions, has_many_opts
+        end
+
+        it 'does not fire the query' do
+          expect(position_resource).to_not receive(:_all)
+          render
+        end
+
+        context 'but params customization' do
+          before do
+            ids = [position1.id, position2.id]
+            resource.has_many :positions, has_many_opts do
+              _ids = ids
+              params do |hash|
+                hash[:filter] = { id: _ids }
+              end
+
+              assign do |employees, positions|
+                employees[0].positions = positions
+              end
+            end
+          end
+
+          it 'works' do
+            render
+            sl = d[0].sideload(:positions)
+            expect(sl.map(&:id)).to eq([position1.id, position2.id])
+          end
+        end
+      end
+
+      context 'but primary key is []' do
+        before do
+          resource.has_many :positions,
+            resource: position_resource,
+            primary_key: :classification_id
+          employee.update_attributes(classification_id: [])
+        end
+
+        it 'does not fire the query' do
+          expect(position_resource).to_not receive(:_all)
+          render
+        end
+      end
+
+      context 'but primary key is [""]' do
+        before do
+          resource.has_many :positions,
+            resource: position_resource,
+            primary_key: :classification_id
+          employee.update_attributes(classification_id: [''])
+        end
+
+        it 'does not fire the query' do
+          expect(position_resource).to_not receive(:_all)
+          render
+        end
+      end
+
       context 'and params customization' do
         before do
           resource.has_many :positions, resource: position_resource do
@@ -753,6 +821,47 @@ RSpec.describe 'sideloading' do
           render
           expect(d[0].sideload('department')).to be_nil
           expect(d[1].sideload('department')).to be_nil
+        end
+
+        context 'but params customization' do
+          let!(:department) { PORO::Department.create }
+          let(:filter_param) do
+            ->(id) { { id: id } }
+          end
+
+          before do
+            _id = department.id
+            _param = filter_param
+            position_resource.belongs_to :department, resource: department_resource do
+              __id = _id
+              __param = _param
+              params do |hash|
+                hash[:filter] = __param.call(__id)
+              end
+
+              assign_each do |position, departments|
+                position.department = departments[0]
+              end
+            end
+          end
+
+          it 'works' do
+            render
+            sl = d[0].sideload(:department)
+            expect(sl.id).to eq(department.id)
+          end
+
+          context 'with nested filter' do
+            let(:filter_param) do
+              ->(id) { { id: { eq: id } } }
+            end
+
+            it 'works' do
+              render
+              sl = d[0].sideload(:department)
+              expect(sl.id).to eq(department.id)
+              end
+          end
         end
       end
 
