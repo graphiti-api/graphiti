@@ -121,6 +121,13 @@ module Graphiti
       end
     end
 
+    def after_commit(model, metadata)
+      hooks = self.class.config[:after_commit][metadata[:method]] || []
+      hooks.each do |hook|
+        instance_exec(model, metadata, &hook)
+      end
+    end
+
     def transaction
       response = nil
       begin
@@ -128,7 +135,7 @@ module Graphiti
           response = yield
         end
       rescue Errors::ValidationError => e
-        response = e.validation_response
+        response = { result: e.validation_response }
       end
       response
     end
