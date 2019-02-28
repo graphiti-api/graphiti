@@ -10,6 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["richmolj@gmail.com"]
 
   spec.summary       = %q{Easily build jsonapi.org-compatible APIs}
+  spec.homepage      = 'https://github.com/graphiti-api/graphiti'
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
