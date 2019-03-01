@@ -3,9 +3,10 @@
 /Gemfile.lock
 /_yardoc/
 /coverage/
+/lib/
 /pkg/
-/spec/reports/
-/gemfiles/*.lock
+/spec/
+/gemfiles/
 /tmp/
 .byebug_history
 spec/dummy/log/*
@@ -13,4 +14,5 @@ spec/dummy/log/*
 /_site/gemfiles
 /_site/pkg
 .sass-cache
-*.gem
+*.gem/bin/
+/exe/
