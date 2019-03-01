@@ -12,3 +12,5 @@ spec/dummy/log/*
 .sass-cache
 /_site/gemfiles
 /_site/pkg
+.sass-cache
+*.gem
