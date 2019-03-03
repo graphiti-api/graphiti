@@ -4,7 +4,7 @@
 
 Stylish Graph APIs.
 
-[View Official Documentation](https://graphiti-api.github.io/graphiti/guides/)
+[View Official Documentation](https://www.graphiti.dev/guides/)
 
 [Join the Slack Channel](https://join.slack.com/t/graphiti-api/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg)
 
