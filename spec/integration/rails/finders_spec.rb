@@ -4,13 +4,17 @@ if ENV['APPRAISAL_INITIALIZED']
 
     controller(ApplicationController) do
       def index
-        authors = Legacy::AuthorResource.all(params)
-        render jsonapi: authors
+        records = resource.all(params)
+        render jsonapi: records
       end
 
       def show
-        author = Legacy::AuthorResource.find(params)
-        render jsonapi: author
+        record = resource.find(params)
+        render jsonapi: record
+      end
+
+      def resource
+        Legacy::AuthorResource
       end
     end
 
@@ -1093,6 +1097,71 @@ if ENV['APPRAISAL_INITIALIZED']
           do_index({ include: 'hobbies' })
           expect(included('hobbies').map(&:id))
             .to eq([other_table_hobby1.id, other_table_hobby2.id])
+        end
+      end
+
+      context 'when polymorphic many-to-many' do
+        let(:tag1) { Legacy::Tag.create!(name: 'One') }
+        let(:tag2) { Legacy::Tag.create!(name: 'Two') }
+
+        context 'when authors' do
+          before do
+            author1.tags << tag1
+            author2.tags << tag1
+            author2.tags << tag2
+          end
+
+          it 'still works' do
+            do_index({ include: 'tags' })
+            sl = d[0].sideload(:tags)
+            expect(sl.map(&:id)).to eq([tag1.id])
+            sl = d[1].sideload(:tags)
+            expect(sl.map(&:id)).to eq([tag1.id, tag2.id])
+          end
+        end
+
+        context 'when books' do
+          before do
+            book1.tags << tag1
+            book1.tags << tag2
+            book2.tags << tag1
+          end
+
+          it 'still works' do
+            allow(Legacy::BookResource).to receive(:validate_endpoints?) { false }
+            allow(controller).to receive(:resource) { Legacy::BookResource }
+            do_index({ include: 'tags' })
+            sl = d[0].sideload(:tags)
+            expect(sl.map(&:id)).to eq([tag1.id, tag2.id])
+            sl = d[1].sideload(:tags)
+            expect(sl.map(&:id)).to eq([tag1.id])
+          end
+        end
+
+        if ::Rails::VERSION::MAJOR >= 5
+          context 'when both' do
+            let(:tag3) { Legacy::Tag.create!(name: 'Three') }
+
+            before do
+              author1.tags << tag1
+              book2.tags << tag2
+              book2.tags << tag3
+            end
+
+            it 'still works' do
+              allow(Legacy::TagResource).to receive(:validate_endpoints?) { false }
+              allow(controller).to receive(:resource) { Legacy::TagResource }
+              do_index({
+                filter: {
+                  taggable_id: [
+                    { id: author1.id, type: author1.class.name }.to_json,
+                    { id: book2.id, type: book2.class.name }.to_json
+                  ]
+                }
+              })
+              expect(d.map(&:name)).to eq(%w(One Two Three))
+            end
+          end
         end
       end
     end

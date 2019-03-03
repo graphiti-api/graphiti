@@ -348,16 +348,6 @@ module Graphiti
       end
     end
 
-    def apply_belongs_to_many_filter
-      _self = self
-      fk_type = parent_resource_class.attributes[:id][:type]
-      resource_class.filter true_foreign_key, fk_type do
-        eq do |scope, value|
-          _self.belongs_to_many_filter(scope, value)
-        end
-      end
-    end
-
     def load_options(parents, query)
       {}.tap do |opts|
         opts[:default_paginate] = false
