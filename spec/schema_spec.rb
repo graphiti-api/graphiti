@@ -737,7 +737,7 @@ RSpec.describe Graphiti::Schema do
       allow(FileUtils).to receive(:mkdir_p).with("/schema/path")
       allow(File).to receive(:write)
       allow(File).to receive(:read).with("/schema/path/schema.json") { old_schema }
-      allow(File).to receive(:exists?)
+      allow(File).to receive(:exist?)
         .with("/schema/path/schema.json") { true }
       allow(described_class).to receive(:generate) { new_schema }
       allow(Graphiti.config)
@@ -753,7 +753,7 @@ RSpec.describe Graphiti::Schema do
 
     context "when prior schema does not exist" do
       before do
-        allow(File).to receive(:exists?)
+        allow(File).to receive(:exist?)
           .with("/schema/path/schema.json") { false }
       end
 
@@ -775,7 +775,7 @@ RSpec.describe Graphiti::Schema do
 
     context "when prior schema exists" do
       before do
-        allow(File).to receive(:exists?)
+        allow(File).to receive(:exist?)
           .with("/schema/path/schema.json") { true }
       end
 

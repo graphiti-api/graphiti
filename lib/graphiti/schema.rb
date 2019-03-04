@@ -153,7 +153,6 @@ module Graphiti
     end
 
     def flag(value)
-      value
       if value.is_a?(Symbol)
         "guarded"
       else
