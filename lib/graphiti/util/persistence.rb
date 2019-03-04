@@ -16,7 +16,7 @@ class Graphiti::Util::Persistence
     @foreign_key   = foreign_key
 
     # Find the correct child resource for a given jsonapi type
-    if meta_type = @meta[:type].try(:to_sym)
+    if (meta_type = @meta[:type].try(:to_sym))
       if @resource.type != meta_type && @resource.polymorphic?
         @resource = @resource.class.resource_for_type(meta_type).new
       end

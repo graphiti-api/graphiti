@@ -277,7 +277,7 @@ module Graphiti
 
       def column_for(scope, name)
         table = scope.klass.arel_table
-        if other = scope.attribute_alias(name)
+        if (other = scope.attribute_alias(name))
           table[other]
         else
           table[name]

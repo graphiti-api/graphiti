@@ -159,7 +159,8 @@ module PORO
     end
 
     def save
-      if record = DB.data[self.class.type].find { |r| r[:id] == id }
+      record = DB.data[self.class.type].find { |r| r[:id] == id }
+      if record
         update_attributes(attributes)
       else
         record = self.class.create(attributes)

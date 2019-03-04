@@ -45,7 +45,7 @@ module Graphiti
           sl = super
           if !polymorphic_child? && sl.nil?
             children.each do |c|
-              break if sl = c.sideloads[name]
+              break if (sl = c.sideloads[name])
             end
           end
           sl

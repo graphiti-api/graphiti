@@ -13,7 +13,7 @@ module Graphiti
           relationship_option(opts, :readable)
           relationship_option(opts, :writable)
           sideload = klass.new(name, opts)
-          if parent = opts[:parent]
+          if (parent = opts[:parent])
             parent.children[name] = sideload
           else
             config[:sideloads][name] = sideload

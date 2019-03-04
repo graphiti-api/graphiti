@@ -36,7 +36,7 @@ module Graphiti
         {}.tap do |headers|
           if defined?(Rails) && context
             raw = context.request.headers.to_h
-            if auth = raw["HTTP_AUTHORIZATION"]
+            if (auth = raw["HTTP_AUTHORIZATION"])
               headers["Authorization"] = auth
             end
           end

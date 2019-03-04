@@ -7,7 +7,7 @@ module Graphiti
         @linkable = true
 
         if @sideload.type == :polymorphic_belongs_to
-          if type = @model.send(@sideload.grouper.field_name)
+          if (type = @model.send(@sideload.grouper.field_name))
             @sideload = @sideload.children.values.find { |c|
               c.group_name == type.to_sym
             }

@@ -326,7 +326,7 @@ module Graphiti
     private
 
     def blank_query?(params)
-      if filter = params[:filter]
+      if (filter = params[:filter])
         if filter.values == [""]
           return true
         end

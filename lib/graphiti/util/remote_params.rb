@@ -18,7 +18,7 @@ module Graphiti
       end
 
       def generate
-        if include_hash = @query.include_hash.presence
+        if (include_hash = @query.include_hash.presence)
           @params[:include] = trim_sideloads(include_hash)
         end
         collect_params(@query, @resource)
@@ -75,11 +75,11 @@ module Graphiti
 
       def process_pagination(page, chain)
         return unless page.present?
-        if size = page[:size]
+        if (size = page[:size])
           key = (chain + [:size]).join(".")
           @pagination[key.to_sym] = size
         end
-        if number = page[:number]
+        if (number = page[:number])
           key = (chain + [:number]).join(".")
           @pagination[key.to_sym] = number
         end

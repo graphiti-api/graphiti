@@ -32,7 +32,7 @@ module Graphiti
     def missing_dependent_filters
       [].tap do |arr|
         filter_param.each_pair do |key, value|
-          if df = dependent_filters[key]
+          if (df = dependent_filters[key])
             missing = df[:dependencies] - filter_param.keys
             unless missing.length.zero?
               arr << {filter: df, missing: missing}

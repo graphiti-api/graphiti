@@ -30,7 +30,7 @@ module Graphiti
         unless payload[:exception_object].instance_variable_get(:@__graphiti_debug)
           add_chunk do |logs, json|
             logs << ["\n=== Graphiti Debug ERROR", :red, true]
-            if sideload = payload[:sideload]
+            if (sideload = payload[:sideload])
               logs << ["#{sideload.parent_resource.class}: Sideload \"#{sideload.name}\"", :red, true]
               json[:parent_resource] = sideload.parent_resource.class.name
               json[:sideload] = sideload.name
@@ -155,7 +155,7 @@ module Graphiti
 
       def graph_statements
         @chunks.each do |chunk|
-          if parent = chunk[:parent]
+          if (parent = chunk[:parent])
             relevant = chunks.find { |c| c[:resource] == parent }
             relevant[:children].unshift(chunk) if relevant
           end

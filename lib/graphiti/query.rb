@@ -228,7 +228,7 @@ module Graphiti
       return false if name.to_s.include?(".") # nested
       return true if @resource.remote?
 
-      if att = @resource.get_attr(name, flag, request: true)
+      if (att = @resource.get_attr(name, flag, request: true))
         return att
       else
         not_associated_name = !@resource.class.association_names.include?(name)

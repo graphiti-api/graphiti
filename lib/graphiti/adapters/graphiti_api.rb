@@ -23,7 +23,7 @@ module Graphiti
 
       def handle_remote_error(url, json)
         errors = json["errors"].map { |error|
-          if raw = error["meta"].try(:[], "__raw_error__")
+          if (raw = error["meta"].try(:[], "__raw_error__"))
             {message: raw["message"], backtrace: raw["backtrace"]}
           else
             {message: "#{error["title"]} - #{error["detail"]}"}
@@ -56,7 +56,7 @@ module Graphiti
       def process_relationships(entity, json, relationship_json)
         entity._relationships = {}
         relationship_json.each_pair do |name, hash|
-          if data = hash["data"]
+          if (data = hash["data"])
             if data.is_a?(Array)
               data.each do |d|
                 rel = find_entity(json, d["id"], d["type"])

@@ -6,7 +6,7 @@ module Graphiti
 
     module Overrides
       def endpoint
-        if endpoint = super
+        if (endpoint = super)
           endpoint
         else
           self.endpoint = infer_endpoint

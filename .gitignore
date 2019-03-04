@@ -10,3 +10,4 @@
 .byebug_history
 spec/dummy/log/*
 *~
+.vscode/

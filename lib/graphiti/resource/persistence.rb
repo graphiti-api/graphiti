@@ -142,7 +142,7 @@ module Graphiti
       end
 
       def fire_callbacks(kind, lifecycle, action, *args)
-        if callbacks = self.class.config[:callbacks][kind]
+        if (callbacks = self.class.config[:callbacks][kind])
           callbacks = callbacks[lifecycle] || []
           callbacks.each do |config|
             callback = config[:callback]

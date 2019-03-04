@@ -49,7 +49,7 @@ module Graphiti
 
     def compare_attributes(old_resource, new_resource)
       old_resource[:attributes].each_pair do |name, old_att|
-        unless new_att = new_resource[:attributes][name]
+        unless (new_att = new_resource[:attributes][name])
           @errors << "#{old_resource[:name]}: attribute #{name.inspect} was removed."
           next
         end
@@ -90,7 +90,7 @@ module Graphiti
 
     def compare_relationships(old_resource, new_resource)
       old_resource[:relationships].each_pair do |name, old_rel|
-        unless new_rel = new_resource[:relationships][name]
+        unless (new_rel = new_resource[:relationships][name])
           @errors << "#{old_resource[:name]}: relationship #{name.inspect} was removed."
           next
         end
@@ -112,7 +112,7 @@ module Graphiti
 
     def compare_extra_attributes(old_resource, new_resource)
       old_resource[:extra_attributes].each_pair do |name, old_att|
-        unless new_att = new_resource[:extra_attributes][name]
+        unless (new_att = new_resource[:extra_attributes][name])
           @errors << "#{old_resource[:name]}: extra attribute #{name.inspect} was removed."
           next
         end
@@ -123,7 +123,7 @@ module Graphiti
 
     def compare_sorts(old_resource, new_resource)
       old_resource[:sorts].each_pair do |name, old_sort|
-        unless new_sort = new_resource[:sorts][name]
+        unless (new_sort = new_resource[:sorts][name])
           @errors << "#{old_resource[:name]}: sort #{name.inspect} was removed."
           next
         end
@@ -146,7 +146,7 @@ module Graphiti
 
     def compare_filters(old_resource, new_resource)
       old_resource[:filters].each_pair do |name, old_filter|
-        unless new_filter = new_resource[:filters][name]
+        unless (new_filter = new_resource[:filters][name])
           @errors << "#{old_resource[:name]}: filter #{name.inspect} was removed."
           next
         end
@@ -206,13 +206,13 @@ module Graphiti
 
     def compare_endpoints
       @old[:endpoints].each_pair do |path, old_endpoint|
-        unless new_endpoint = @new[:endpoints][path]
+        unless (new_endpoint = @new[:endpoints][path])
           @errors << "Endpoint \"#{path}\" was removed."
           next
         end
 
         old_endpoint[:actions].each_pair do |name, old_action|
-          unless new_action = new_endpoint[:actions][name]
+          unless (new_action = new_endpoint[:actions][name])
             @errors << "Endpoint \"#{path}\" removed action #{name.inspect}."
             next
           end
@@ -236,7 +236,7 @@ module Graphiti
 
     def compare_types
       @old[:types].each_pair do |name, old_type|
-        unless new_type = @new[:types][name]
+        unless (new_type = @new[:types][name])
           @errors << "Type #{name.inspect} was removed."
           next
         end

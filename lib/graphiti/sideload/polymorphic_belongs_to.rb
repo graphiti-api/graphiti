@@ -98,7 +98,7 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
       next if group_name.nil? || grouper.ignore?(group_name)
 
       match = ->(c) { c.group_name == group_name.to_sym }
-      if sideload = children.values.find(&match)
+      if (sideload = children.values.find(&match))
         query = remove_invalid_sideloads(sideload.resource, query)
         sideload.resolve(group, query, graph_parent)
       else

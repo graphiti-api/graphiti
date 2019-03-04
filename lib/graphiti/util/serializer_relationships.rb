@@ -55,7 +55,7 @@ module Graphiti
           data { instance_eval(&_data_proc) }
 
           if _link
-            if _links = @proxy.query.links?
+            if (_links = @proxy.query.links?)
               _self.send(:validate_link!) unless _self.send(:eagerly_validate_links?)
 
               link(:related) do
@@ -71,7 +71,7 @@ module Graphiti
       def data_proc
         _sl = @sideload
         ->(_) {
-          if records = @object.public_send(_sl.association_name)
+          if (records = @object.public_send(_sl.association_name))
             if records.respond_to?(:to_ary)
               records.each { |r| _sl.resource.decorate_record(r) }
             else

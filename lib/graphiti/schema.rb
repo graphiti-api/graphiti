@@ -52,16 +52,16 @@ module Graphiti
           r.endpoints.each do |e|
             actions = {}
             e[:actions].each do |a|
-              next unless ctx = context_for(e[:full_path], a)
+              next unless (ctx = context_for(e[:full_path], a))
 
               existing = endpoints[e[:full_path]]
-              if existing && config = existing[:actions][a]
+              if existing && (config = existing[:actions][a])
                 raise Errors::ResourceEndpointConflict.new \
                   e[:full_path], a, r.name, config[:resource]
               end
 
               actions[a] = {resource: r.name}
-              if allowlist = ctx.sideload_allowlist
+              if (allowlist = ctx.sideload_allowlist)
                 if allowlist[a]
                   actions[a].merge!(sideload_allowlist: allowlist[a])
                 end

@@ -62,7 +62,7 @@ module Graphiti
         # Re-raise the error with correct stacktrace
         # OPTION** to avoid failing here?? if so need serializable patch
         # to avoid loading data when association not loaded
-        if rejected = promises.find(&:rejected?)
+        if (rejected = promises.find(&:rejected?))
           raise rejected.reason
         end
       end

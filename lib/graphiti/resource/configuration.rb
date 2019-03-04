@@ -23,7 +23,7 @@ module Graphiti
         end
 
         def type=(val)
-          if val = super
+          if (val = super)
             serializer.type(val)
           end
         end
@@ -43,7 +43,7 @@ module Graphiti
         def model
           klass = super
           unless klass || abstract_class?
-            if klass = infer_model
+            if (klass = infer_model)
               self.model = klass
             else
               raise Errors::ModelNotFound.new(self)
@@ -124,7 +124,7 @@ module Graphiti
         end
 
         def abstract_class=(val)
-          if @abstract_class = val
+          if (@abstract_class = val)
             self.serializer = nil
             self.type = nil
           end
