@@ -66,7 +66,7 @@ module Graphiti
           foreign_key: sideload.foreign_key,
           attributes: relationship_payload[:attributes],
           meta: relationship_payload[:meta],
-          relationships: relationship_payload[:relationships]
+          relationships: relationship_payload[:relationships],
         }
       end
     end

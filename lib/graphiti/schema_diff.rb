@@ -255,11 +255,11 @@ module Graphiti
       end
 
       [:readable, :writable].each do |flag|
-        if [true, 'guarded'].include?(old_att[flag]) && new_att[flag] == false
+        if [true, "guarded"].include?(old_att[flag]) && new_att[flag] == false
           @errors << "#{resource_name}: #{prefix} #{att_name.inspect} changed flag #{flag.inspect} from #{old_att[flag].inspect} to #{new_att[flag].inspect}."
         end
 
-        if new_att[flag] == 'guarded' && old_att[flag] == true
+        if new_att[flag] == "guarded" && old_att[flag] == true
           @errors << "#{resource_name}: #{prefix} #{att_name.inspect} changed flag #{flag.inspect} from #{old_att[flag].inspect} to #{new_att[flag].inspect}."
         end
       end

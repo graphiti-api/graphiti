@@ -15,7 +15,7 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
   class Grouper
     attr_reader :field_name
 
-    def initialize(field_name, opts={})
+    def initialize(field_name, opts = {})
       @field_name = field_name
       @groups = []
       @except = Array(opts[:except]).map(&:to_sym)
@@ -50,10 +50,10 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
           args = call[1]
           opts = args.extract_options!
           opts.merge! as: sideload.name,
-            parent: sideload,
-            group_name: group.name,
-            polymorphic_child: true
-          if !sideload.resource.class.abstract_class?
+                      parent: sideload,
+                      group_name: group.name,
+                      polymorphic_child: true
+          unless sideload.resource.class.abstract_class?
             opts[:foreign_key] ||= sideload.foreign_key
             opts[:primary_key] ||= sideload.primary_key
           end
@@ -76,9 +76,9 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
     :"#{name}_id"
   end
 
-  def self.group_by(name, opts={}, &blk)
+  def self.group_by(name, opts = {}, &blk)
     self.grouper = Grouper.new(name, opts)
-    self.grouper.instance_eval(&blk)
+    grouper.instance_eval(&blk)
   end
 
   def initialize(name, opts)

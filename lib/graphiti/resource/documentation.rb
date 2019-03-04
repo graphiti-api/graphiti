@@ -49,7 +49,7 @@ module Graphiti
         private
 
         def underscored_resource_name
-          self.name.gsub(/Resource$/, '').underscore
+          name.gsub(/Resource$/, "").underscore
         end
 
         def i18n_resource_scope

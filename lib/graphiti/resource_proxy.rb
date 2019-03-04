@@ -8,12 +8,12 @@ module Graphiti
       payload: nil,
       single: false,
       raise_on_missing: false)
-        @resource = resource
-        @scope = scope
-        @query = query
-        @payload = payload
-        @single = single
-        @raise_on_missing = raise_on_missing
+      @resource = resource
+      @scope = scope
+      @query = query
+      @payload = payload
+      @single = single
+      @raise_on_missing = raise_on_missing
     end
 
     def single?
@@ -62,7 +62,7 @@ module Graphiti
         records
       end
     end
-    alias :to_a :data
+    alias to_a data
 
     def each(&blk)
       to_a.each(&blk)
@@ -90,12 +90,12 @@ module Graphiti
       original = Graphiti.context[:namespace]
       begin
         Graphiti.context[:namespace] = action
-        validator = persist do
+        validator = persist {
           @resource.persist_with_relationships \
             @payload.meta(action: action),
             @payload.attributes,
             @payload.relationships
-        end
+        }
       ensure
         Graphiti.context[:namespace] = original
       end
@@ -115,7 +115,7 @@ module Graphiti
 
     def destroy
       transaction_response = @resource.transaction do
-        metadata = { method: :destroy }
+        metadata = {method: :destroy}
         model = @resource.destroy(@query.filters[:id], metadata)
         model.instance_variable_set(:@__serializer_klass, @resource.serializer)
         validator = ::Graphiti::Util::ValidationResponse.new \
@@ -123,7 +123,7 @@ module Graphiti
         validator.validate!
         @resource.before_commit(model, metadata)
 
-        { result: validator }
+        {result: validator}
       end
       @data, success = transaction_response[:result].to_a
       success

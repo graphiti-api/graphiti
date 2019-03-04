@@ -28,13 +28,13 @@ module Graphiti
       @pagination_links_on_demand = false
       @pagination_links = false
       @typecast_reads = true
-      self.debug = ENV.fetch('GRAPHITI_DEBUG', true)
-      self.debug_models = ENV.fetch('GRAPHITI_DEBUG_MODELS', false)
+      self.debug = ENV.fetch("GRAPHITI_DEBUG", true)
+      self.debug_models = ENV.fetch("GRAPHITI_DEBUG_MODELS", false)
 
       if defined?(::Rails)
-        if File.exists?("#{::Rails.root}/.graphiticfg.yml")
+        if File.exist?("#{::Rails.root}/.graphiticfg.yml")
           cfg = YAML.load_file("#{::Rails.root}/.graphiticfg.yml")
-          @schema_path = "#{::Rails.root}/public#{cfg['namespace']}/schema.json"
+          @schema_path = "#{::Rails.root}/public#{cfg["namespace"]}/schema.json"
         else
           @schema_path = "#{::Rails.root}/public/schema.json"
         end
@@ -44,7 +44,7 @@ module Graphiti
     end
 
     def schema_path
-      @schema_path ||= raise('No schema_path defined! Set Graphiti.config.schema_path to save your schema.')
+      @schema_path ||= raise("No schema_path defined! Set Graphiti.config.schema_path to save your schema.")
     end
 
     def debug=(val)
@@ -58,13 +58,11 @@ module Graphiti
     end
 
     def with_option(key, value)
-      begin
-        original = send(key)
-        send(:"#{key}=", value)
-        yield
-      ensure
-        send(:"#{key}=", original)
-      end
+      original = send(key)
+      send(:"#{key}=", value)
+      yield
+    ensure
+      send(:"#{key}=", original)
     end
   end
 end

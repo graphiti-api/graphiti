@@ -1,9 +1,9 @@
-require 'spec_helper'
+require "spec_helper"
 
-RSpec.describe 'pagination' do
-  include_context 'resource testing'
+RSpec.describe "pagination" do
+  include_context "resource testing"
   let(:resource) { Class.new(PORO::EmployeeResource) }
-  let(:base_scope) { { type: :employees } }
+  let(:base_scope) { {type: :employees} }
 
   subject(:ids) { records.map(&:id) }
 
@@ -14,67 +14,67 @@ RSpec.describe 'pagination' do
     PORO::Employee.create
   end
 
-  it 'applies default pagination' do
+  it "applies default pagination" do
     resource.class_eval do
       self.default_page_size = 2
     end
     expect(ids.length).to eq(2)
   end
 
-  context 'when pagination disabled' do
+  context "when pagination disabled" do
     before do
       resource.class_eval do
         self.default_page_size = 2
       end
     end
 
-    context 'via string query param' do
+    context "via string query param" do
       before do
-        params[:paginate] = 'false'
+        params[:paginate] = "false"
       end
 
-      it 'does not attempt to paginate' do
+      it "does not attempt to paginate" do
         expect(ids.length).to eq(4)
       end
     end
 
-    context 'via boolean query param' do
+    context "via boolean query param" do
       before do
         params[:paginate] = false
       end
 
-      it 'does not attempt to paginate' do
+      it "does not attempt to paginate" do
         expect(ids.length).to eq(4)
       end
     end
   end
 
-  context 'when requested size > 1000' do
+  context "when requested size > 1000" do
     before do
-      params[:page] = { size: 1_001 }
+      params[:page] = {size: 1_001}
     end
 
-    it 'raises an error' do
+    it "raises an error" do
       expect {
         records
       }.to raise_error(Graphiti::Errors::UnsupportedPageSize)
     end
   end
 
-  it 'limits by size, offsets by number' do
-    params[:page] = { number: 2, size: 2 }
+  it "limits by size, offsets by number" do
+    params[:page] = {number: 2, size: 2}
     expect(ids).to eq([3, 4])
   end
 
   # for metadata
-  context 'with page size 0' do
-    it 'should return empty array' do
-      params[:page] = { size: 0 }
+  context "with page size 0" do
+    it "should return empty array" do
+      params[:page] = {size: 0}
       expect(ids).to eq([])
     end
   end
 
-  context 'when a custom pagination function is given' do
+  context "when a custom pagination function is given" do
     before do
       resource.class_eval do
         paginate do |scope, page, per_page|
@@ -83,11 +83,11 @@ RSpec.describe 'pagination' do
       end
     end
 
-    it 'uses the custom pagination function' do
+    it "uses the custom pagination function" do
       expect(ids).to eq([])
     end
 
-    context 'and it accesses runtime context' do
+    context "and it accesses runtime context" do
       before do
         resource.class_eval do
           paginate do |scope, page, per_page, ctx|
@@ -96,7 +96,7 @@ RSpec.describe 'pagination' do
         end
       end
 
-      it 'works' do
+      it "works" do
         ctx = double(runtime_limit: 2).as_null_object
         Graphiti.with_context(ctx, {}) do
           expect(ids.length).to eq(2)

@@ -22,7 +22,7 @@ module Graphiti
       :link_proc
 
     def initialize(name, opts)
-      @name                  = name
+      @name = name
       validate_options!(opts)
       @parent_resource_class = opts[:parent_resource]
       @resource_class        = opts[:resource]
@@ -82,12 +82,12 @@ module Graphiti
 
     def create_remote_resource
       _remote = @remote
-      klass = Class.new(Graphiti::Resource) do
+      klass = Class.new(Graphiti::Resource) {
         self.adapter = Graphiti::Adapters::GraphitiAPI
         self.model = OpenStruct
         self.remote = _remote
         self.validate_endpoints = false
-      end
+      }
       name = "#{parent_resource_class.name}.#{@name}.remote"
       klass.class_eval("def self.name;'#{name}';end")
       klass
@@ -163,7 +163,7 @@ module Graphiti
     end
 
     def assign_each(parent, children)
-      raise 'Override #assign_each in subclass'
+      raise "Override #assign_each in subclass"
     end
 
     def type
@@ -171,7 +171,7 @@ module Graphiti
     end
 
     def load_params(parents, query)
-      raise 'Override #load_params in subclass'
+      raise "Override #load_params in subclass"
     end
 
     def description
@@ -189,13 +189,13 @@ module Graphiti
 
     def load(parents, query, graph_parent)
       params = load_params(parents, query)
-      params_proc.call(params, parents) if params_proc
+      params_proc&.call(params, parents)
       return [] if blank_query?(params)
       opts = load_options(parents, query)
       opts[:sideload] = self
       opts[:parent] = graph_parent
       proxy = resource.class._all(params, opts, base_scope)
-      pre_load_proc.call(proxy, parents) if pre_load_proc
+      pre_load_proc&.call(proxy, parents)
       proxy.to_a
     end
 
@@ -203,7 +203,7 @@ module Graphiti
     def infer_foreign_key
       model = parent_resource_class.model
       namespace = namespace_for(model)
-      model_name = model.name.gsub("#{namespace}::", '')
+      model_name = model.name.gsub("#{namespace}::", "")
       :"#{model_name.underscore}_id"
     end
 
@@ -223,10 +223,10 @@ module Graphiti
       end
 
       parents.each do |parent|
-        if performant_assign?
-          relevant_children = children_for(parent, map) || []
+        relevant_children = if performant_assign?
+          children_for(parent, map) || []
         else
-          relevant_children = fire_assign_each(parent, children)
+          fire_assign_each(parent, children)
         end
 
         if relevant_children.is_a?(Array)
@@ -317,19 +317,17 @@ module Graphiti
 
     # @api private
     def resource_class_loaded?
-      begin
-        resource_class
-        true
-      rescue Graphiti::Errors::ResourceNotFound
-        false
-      end
+      resource_class
+      true
+    rescue Graphiti::Errors::ResourceNotFound
+      false
     end
 
     private
 
     def blank_query?(params)
       if filter = params[:filter]
-        if filter.values == ['']
+        if filter.values == [""]
           return true
         end
       end
@@ -339,11 +337,11 @@ module Graphiti
     def validate_options!(opts)
       if opts[:remote]
         if opts[:resource]
-          raise Errors::SideloadConfig.new(@name, opts[:parent_resource], 'cannot pass :remote and :resource options together')
+          raise Errors::SideloadConfig.new(@name, opts[:parent_resource], "cannot pass :remote and :resource options together")
         end
 
         if opts[:link]
-          raise Errors::SideloadConfig.new(@name, opts[:parent_resource], 'remote sideloads do not currently support :link')
+          raise Errors::SideloadConfig.new(@name, opts[:parent_resource], "remote sideloads do not currently support :link")
         end
       end
     end
@@ -381,7 +379,7 @@ module Graphiti
         instance_exec(parent_ids, parents, &self.class.scope_proc)
       else
         method = method(:scope)
-        if [2,-2].include?(method.arity)
+        if [2, -2].include?(method.arity)
           scope(parent_ids, parents)
         else
           scope(parent_ids)

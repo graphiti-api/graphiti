@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.describe Graphiti::Sideload::HasMany do
   let(:parent_resource_class) { PORO::EmployeeResource }
@@ -10,13 +10,13 @@ RSpec.describe Graphiti::Sideload::HasMany do
   let(:opts) do
     {
       parent_resource: parent_resource_class,
-      resource: resource_class
+      resource: resource_class,
     }
   end
   let(:name) { :positions }
   let(:instance) { described_class.new(name, opts) }
 
-  describe '#assign' do
+  describe "#assign" do
     let!(:employee1) { PORO::Employee.new(id: 1) }
     let!(:employee2) { PORO::Employee.new(id: 2) }
     let!(:position1) { PORO::Position.new(id: 1, employee_id: 1) }
@@ -25,14 +25,14 @@ RSpec.describe Graphiti::Sideload::HasMany do
     let!(:employees) { [employee1, employee2] }
     let!(:positions) { [position1, position2, position3] }
 
-    it 'associates correctly' do
+    it "associates correctly" do
       instance.assign(employees, positions)
       expect(employee1.positions).to eq([position1, position3])
       expect(employee2.positions).to eq([position2])
     end
   end
 
-  describe '#load_params' do
+  describe "#load_params" do
     let(:params) { {} }
     let(:query) { Graphiti::Query.new(instance.resource, params) }
     let(:parents) { [double(foo_id: 8), double(foo_id: 9)] }
@@ -43,20 +43,20 @@ RSpec.describe Graphiti::Sideload::HasMany do
       allow(instance.resource).to receive(:_all) { [] }
     end
 
-    it 'adds primary key filter' do
+    it "adds primary key filter" do
       params = instance.load_params(parents, query)
       expect(params).to eq({
-        filter: { bar_id: '8,9' }
+        filter: {bar_id: "8,9"},
       })
     end
 
-    it 'includes deep query params' do
+    it "includes deep query params" do
       resource_class.attribute :a, :string
-      params.merge!(filter: { a: 'b' }, sort: '-id')
+      params.merge!(filter: {a: "b"}, sort: "-id")
       result = instance.load_params(parents, query)
       expect(result).to eq({
-        filter: { bar_id: '8,9', a: 'b' },
-        sort: [{ id: :desc }]
+        filter: {bar_id: "8,9", a: "b"},
+        sort: [{id: :desc}],
       })
     end
   end

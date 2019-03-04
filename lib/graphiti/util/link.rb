@@ -8,9 +8,9 @@ module Graphiti
 
         if @sideload.type == :polymorphic_belongs_to
           if type = @model.send(@sideload.grouper.field_name)
-            @sideload = @sideload.children.values.find do |c|
+            @sideload = @sideload.children.values.find { |c|
               c.group_name == type.to_sym
-            end
+            }
           else
             @linkable = false
           end
@@ -27,7 +27,7 @@ module Graphiti
 
       def linkable?
         if @sideload.type == :belongs_to
-          not @model.send(@sideload.foreign_key).nil?
+          !@model.send(@sideload.foreign_key).nil?
         else
           @linkable
         end
@@ -48,10 +48,10 @@ module Graphiti
       def on_demand_links(url)
         return url unless Graphiti.config.links_on_demand
 
-        if url.include?('?')
-          url << '&links=true'
+        url << if url.include?("?")
+          "&links=true"
         else
-          url << '?links=true'
+          "?links=true"
         end
         url
       end
@@ -62,19 +62,17 @@ module Graphiti
             params[:filter] = @sideload.base_filter([@model])
           end
 
-          if @sideload.params_proc
-            @sideload.params_proc.call(params, [@model])
-          end
+          @sideload.params_proc&.call(params, [@model])
         end
       end
 
       def path
         @path ||=
           path = @sideload.resource.endpoint[:url].to_s
-          if @sideload.type == :belongs_to
-            path = "#{path}/#{@model.send(@sideload.foreign_key)}"
-          end
-          path
+        if @sideload.type == :belongs_to
+          path = "#{path}/#{@model.send(@sideload.foreign_key)}"
+        end
+        path
       end
     end
   end

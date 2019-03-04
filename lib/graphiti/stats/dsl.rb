@@ -30,7 +30,7 @@ module Graphiti
       # @param [Adapters::Abstract] adapter the Resource adapter
       # @param [Symbol, Hash] config example: +:total+ or +{ total: [:count] }+
       def initialize(adapter, config)
-        config = { config => [] } if config.is_a?(Symbol)
+        config = {config => []} if config.is_a?(Symbol)
 
         @adapter = adapter
         @calculations = {}

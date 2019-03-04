@@ -44,7 +44,7 @@ module Graphiti
     private
 
     def requested?
-      not [page_param[:size], page_param[:number]].all?(&:nil?)
+      ![page_param[:size], page_param[:number]].all?(&:nil?)
     end
 
     def page_param

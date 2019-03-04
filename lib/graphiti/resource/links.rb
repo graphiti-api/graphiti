@@ -34,12 +34,12 @@ module Graphiti
       def infer_endpoint
         return unless name
 
-        path = "/#{name.gsub('Resource', '').pluralize.underscore}".to_sym
+        path = "/#{name.gsub("Resource", "").pluralize.underscore}".to_sym
         {
           path: path,
           full_path: full_path_for(path),
           url: url_for(path),
-          actions: DEFAULT_ACTIONS.dup
+          actions: DEFAULT_ACTIONS.dup,
         }
       end
 
@@ -49,7 +49,7 @@ module Graphiti
           path: path,
           full_path: full_path_for(path),
           url: url_for(path),
-          actions: actions
+          actions: actions,
         }
       end
 
@@ -60,7 +60,7 @@ module Graphiti
           path: path,
           full_path: full_path_for(path),
           url: url_for(path),
-          actions: actions
+          actions: actions,
         }]
       end
 
@@ -69,15 +69,15 @@ module Graphiti
       end
 
       def allow_request?(path, params, action)
-        path = path.split('.')[0]
+        path = path.split(".")[0]
 
         endpoints.any? do |e|
           has_id = params[:id] || params[:data].try(:[], :id)
           _path = path
           if [:update, :show, :destroy].include?(context_namespace) && has_id
-            _path = path.split('/')
+            _path = path.split("/")
             _path.pop
-            _path = _path.join('/')
+            _path = _path.join("/")
           end
           e[:full_path].to_s == _path && e[:actions].include?(context_namespace)
         end
@@ -86,11 +86,11 @@ module Graphiti
       private
 
       def full_path_for(path)
-        [endpoint_namespace, path].join('').to_sym
+        [endpoint_namespace, path].join("").to_sym
       end
 
       def url_for(path)
-        [base_url, full_path_for(path)].join('').to_sym
+        [base_url, full_path_for(path)].join("").to_sym
       end
     end
   end

@@ -52,9 +52,9 @@ module Graphiti
         end
 
         def children
-          @children ||= polymorphic.map do |klass|
+          @children ||= polymorphic.map { |klass|
             klass.is_a?(String) ? klass.safe_constantize : klass
-          end
+          }
         end
 
         def resource_for_type(type)

@@ -67,13 +67,13 @@ module Graphiti
 
       # Defines how to call/apply the default scoping logic
       def apply_standard_scope
-        raise 'override in subclass'
+        raise "override in subclass"
       end
 
       # Defines how to call/apply the custom scoping logic provided by the
       # user.
       def apply_custom_scope
-        raise 'override in subclass'
+        raise "override in subclass"
       end
 
       private
@@ -81,10 +81,10 @@ module Graphiti
       # If the user customized (by providing a block in the Resource DSL)
       # then call the custom proc. Else, call the default proc.
       def apply_standard_or_override
-        if apply_standard_scope?
-          @scope = apply_standard_scope
+        @scope = if apply_standard_scope?
+          apply_standard_scope
         else
-          @scope = apply_custom_scope
+          apply_custom_scope
         end
 
         @scope

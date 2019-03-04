@@ -10,12 +10,12 @@ module Graphiti
       end
 
       def links
-        @links ||= {  }.tap do |links|
+        @links ||= {}.tap do |links|
           links[:first] = pagination_link(1)
           links[:last] = pagination_link(last_page)
           links[:prev] = pagination_link(current_page - 1) unless current_page == 1
           links[:next] = pagination_link(current_page + 1) unless current_page == last_page
-        end.select{|k,v| !v.nil? }
+        end.select {|k, v| !v.nil? }
       end
 
       private
@@ -27,11 +27,11 @@ module Graphiti
 
         # Overwrite the pagination query params with the desired page
         uri.query = @proxy.query.hash.merge({
-                                             page: {
-                                               number: page,
-                                               size: page_size
-                                             }
-                                           }).to_query
+          page: {
+            number: page,
+            size: page_size,
+          },
+        }).to_query
         uri.to_s
       end
 
@@ -50,7 +50,7 @@ module Graphiti
         begin
           return @item_count if @item_count
           @item_count = @proxy.resource.stat(:total, :count).call(@proxy.scope.unpaginated_object, :total)
-          unless @item_count.kind_of?(Numeric)
+          unless @item_count.is_a?(Numeric)
             raise TypeError, "#{@proxy.resource}.stat(:total, :count) returned an invalid value #{@item_count}"
           end
         rescue => e

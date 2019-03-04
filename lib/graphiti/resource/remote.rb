@@ -36,8 +36,8 @@ module Graphiti
         {}.tap do |headers|
           if defined?(Rails) && context
             raw = context.request.headers.to_h
-            if auth = raw['HTTP_AUTHORIZATION']
-              headers['Authorization'] = auth
+            if auth = raw["HTTP_AUTHORIZATION"]
+              headers["Authorization"] = auth
             end
           end
         end
@@ -49,7 +49,7 @@ module Graphiti
 
       def make_request(url)
         headers = request_headers.dup
-        headers['Content-Type'] = 'application/vnd.api+json'
+        headers["Content-Type"] = "application/vnd.api+json"
         faraday.get(url, nil, headers) do |req|
           yield req if block_given? # for super do ... end
           req.options.timeout = timeout if timeout

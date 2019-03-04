@@ -45,7 +45,7 @@ class Graphiti::Adapters::ActiveRecord::ManyToManySideload < Graphiti::Sideload:
     if polymorphic? && type
       where[foreign_type_column] = type
     end
-    { through_table_name => where }
+    {through_table_name => where}
   end
 
   def foreign_type_column
@@ -73,6 +73,6 @@ class Graphiti::Adapters::ActiveRecord::ManyToManySideload < Graphiti::Sideload:
   def infer_foreign_key
     key = parent_reflection.options[:through]
     value = through_reflection.foreign_key.to_sym
-    { key => value }
+    {key => value}
   end
 end

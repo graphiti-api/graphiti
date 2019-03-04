@@ -20,7 +20,7 @@ module Graphiti
         # @param [Hash] options Normal .attribute options
         def boolean_attribute(name, options = {}, &blk)
           blk ||= proc { @object.public_send(name) }
-          field_name = :"is_#{name.to_s.gsub('?', '')}"
+          field_name = :"is_#{name.to_s.delete("?")}"
           attribute field_name, options, &blk
         end
       end

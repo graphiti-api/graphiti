@@ -22,7 +22,7 @@ module Graphiti
           @params[:include] = trim_sideloads(include_hash)
         end
         collect_params(@query, @resource)
-        @params[:sort] = @sorts.join(',') if @sorts.present?
+        @params[:sort] = @sorts.join(",") if @sorts.present?
         @params[:filter] = @filters if @filters.present?
         @params[:page] = @pagination if @pagination.present?
         @params[:fields] = @fields if @fields.present?
@@ -45,7 +45,7 @@ module Graphiti
           end
           immediate_parent = query.parents.reverse[0]
           # This is not currently checking that it is a remote of the same API
-          chain << query.association_name if immediate_parent && immediate_parent.resource.remote
+          chain << query.association_name if immediate_parent&.resource&.remote
           chain.compact
         end.compact
       end
@@ -70,17 +70,17 @@ module Graphiti
 
       def process_stats(stats)
         return unless stats.present?
-        @stats = { stats.keys.first => stats.values.join(',') }
+        @stats = {stats.keys.first => stats.values.join(",")}
       end
 
       def process_pagination(page, chain)
         return unless page.present?
         if size = page[:size]
-          key = (chain + [:size]).join('.')
+          key = (chain + [:size]).join(".")
           @pagination[key.to_sym] = size
         end
         if number = page[:number]
-          key = (chain + [:number]).join('.')
+          key = (chain + [:number]).join(".")
           @pagination[key.to_sym] = number
         end
       end
@@ -88,7 +88,7 @@ module Graphiti
       def process_filters(filters, chain)
         return unless filters.present?
         filters.each_pair do |att, config|
-          att = (chain + [att]).join('.')
+          att = (chain + [att]).join(".")
           @filters[att.to_sym] = config
         end
       end
@@ -97,7 +97,7 @@ module Graphiti
         return unless fields
 
         fields.each_pair do |type, attrs|
-          @fields[type] = attrs.join(',')
+          @fields[type] = attrs.join(",")
         end
       end
 
@@ -105,7 +105,7 @@ module Graphiti
         return unless fields
 
         fields.each_pair do |type, attrs|
-          @extra_fields[type] = attrs.join(',')
+          @extra_fields[type] = attrs.join(",")
         end
       end
 
@@ -116,7 +116,7 @@ module Graphiti
           @sorts << sorts
         else
           sorts.each do |s|
-            sort = (chain + [s.keys.first]).join('.')
+            sort = (chain + [s.keys.first]).join(".")
             sort = "-#{sort}" if s.values.first == :desc
             @sorts << sort
           end

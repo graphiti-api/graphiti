@@ -37,7 +37,7 @@ module Graphiti
       end
 
       def maybe_raise(opts = {})
-        default = { request: request, exists: true }
+        default = {request: request, exists: true}
         opts = default.merge(opts)
         if raise_error?(opts[:exists])
           raise error_class.new(resource, name, flag, opts)

@@ -16,9 +16,9 @@ module Graphiti
 
       def self.namespace_for(klass)
         namespace = klass.name
-        return '' unless namespace
-        split = namespace.split('::')
-        split[0,split.length-1].join('::')
+        return "" unless namespace
+        split = namespace.split("::")
+        split[0, split.length - 1].join("::")
       end
     end
   end

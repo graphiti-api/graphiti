@@ -17,7 +17,7 @@ module Graphiti
           belongs_to: ::Graphiti::Sideload::BelongsTo,
           has_one: ::Graphiti::Sideload::HasOne,
           many_to_many: ::Graphiti::Sideload::ManyToMany,
-          polymorphic_belongs_to: ::Graphiti::Sideload::PolymorphicBelongsTo
+          polymorphic_belongs_to: ::Graphiti::Sideload::PolymorphicBelongsTo,
         }
       end
 
@@ -33,7 +33,7 @@ module Graphiti
             :suffix,
             :not_suffix,
             :match,
-            :not_match
+            :not_match,
           ],
           uuid: [:eq, :not_eq],
           integer_id: numerical_operators,
@@ -44,7 +44,7 @@ module Graphiti
           date: numerical_operators,
           datetime: numerical_operators,
           hash: [:eq],
-          array: [:eq]
+          array: [:eq],
         }
       end
 
@@ -233,7 +233,7 @@ module Graphiti
       end
 
       def base_scope(model)
-        raise 'you must override #base_scope in an adapter subclass'
+        raise "you must override #base_scope in an adapter subclass"
       end
 
       # @param scope The scope object we are chaining
@@ -246,7 +246,7 @@ module Graphiti
       #     scope.order(attribute => direction)
       #   end
       def order(scope, attribute, direction)
-        raise 'you must override #order in an adapter subclass'
+        raise "you must override #order in an adapter subclass"
       end
 
       # @param scope The scope object we are chaining
@@ -260,7 +260,7 @@ module Graphiti
       #     scope.page(current_page).per(per_page)
       #   end
       def paginate(scope, current_page, per_page)
-        raise 'you must override #paginate in an adapter subclass'
+        raise "you must override #paginate in an adapter subclass"
       end
 
       # @param scope the scope object we are chaining
@@ -272,7 +272,7 @@ module Graphiti
       #     scope.uniq.count(column)
       #   end
       def count(scope, attr)
-        raise 'you must override #count in an adapter subclass'
+        raise "you must override #count in an adapter subclass"
       end
 
       # @param scope the scope object we are chaining
@@ -283,7 +283,7 @@ module Graphiti
       #     scope.average(attr).to_f
       #   end
       def average(scope, attr)
-        raise 'you must override #average in an adapter subclass'
+        raise "you must override #average in an adapter subclass"
       end
 
       # @param scope the scope object we are chaining
@@ -294,7 +294,7 @@ module Graphiti
       #     scope.sum(attr)
       #   end
       def sum(scope, attr)
-        raise 'you must override #sum in an adapter subclass'
+        raise "you must override #sum in an adapter subclass"
       end
 
       # @param scope the scope object we are chaining
@@ -305,7 +305,7 @@ module Graphiti
       #     scope.maximum(attr)
       #   end
       def maximum(scope, attr)
-        raise 'you must override #maximum in an adapter subclass'
+        raise "you must override #maximum in an adapter subclass"
       end
 
       # @param scope the scope object we are chaining
@@ -316,7 +316,7 @@ module Graphiti
       #     scope.maximum(attr)
       #   end
       def minimum(scope, attr)
-        raise 'you must override #maximum in an adapter subclass'
+        raise "you must override #maximum in an adapter subclass"
       end
 
       # This method must +yield+ the code to run within the transaction.
@@ -332,7 +332,7 @@ module Graphiti
       #
       # @see Resource.model
       def transaction(model_class)
-        raise 'you must override #transaction in an adapter subclass, it must yield'
+        raise "you must override #transaction in an adapter subclass, it must yield"
       end
 
       # Resolve the scope. This is where you'd actually fire SQL,
@@ -359,7 +359,7 @@ module Graphiti
       end
 
       def belongs_to_many_filter(sideload, scope, value)
-        raise 'You must implement #belongs_to_many_filter in an adapter subclass'
+        raise "You must implement #belongs_to_many_filter in an adapter subclass"
       end
 
       def associate_all(parent, children, association_name, association_type)
@@ -391,7 +391,7 @@ module Graphiti
       end
 
       def disassociate(parent, child, association_name, association_type)
-        raise 'you must override #disassociate in an adapter subclass'
+        raise "you must override #disassociate in an adapter subclass"
       end
 
       def build(model_class)
@@ -406,11 +406,11 @@ module Graphiti
       end
 
       def save(model_instance)
-        raise 'you must override #save in an adapter subclass'
+        raise "you must override #save in an adapter subclass"
       end
 
       def destroy(model_instance)
-        raise 'you must override #destroy in an adapter subclass'
+        raise "you must override #destroy in an adapter subclass"
       end
 
       private

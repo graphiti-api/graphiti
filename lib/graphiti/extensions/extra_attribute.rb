@@ -1,4 +1,4 @@
-require 'jsonapi/serializable/resource/conditional_fields'
+require "jsonapi/serializable/resource/conditional_fields"
 
 module Graphiti
   module Extensions

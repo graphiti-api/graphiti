@@ -51,10 +51,10 @@ module Graphiti
         end
 
         def polymorphic_belongs_to(name, opts = {}, &blk)
-          opts[:resource] ||= Class.new(::Graphiti::Resource) do
+          opts[:resource] ||= Class.new(::Graphiti::Resource) {
             self.polymorphic = []
             self.abstract_class = true
-          end
+          }
           # adapters *probably* don't need to override this, but it's allowed
           opts[:class] ||= adapter.sideloading_classes[:polymorphic_belongs_to]
           opts[:class] ||= ::Graphiti::Sideload::PolymorphicBelongsTo

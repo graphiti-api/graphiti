@@ -1,20 +1,20 @@
 $:.unshift File.dirname(__FILE__)
-require 'generator_mixin'
+require "generator_mixin"
 
 module Graphiti
   class ApiTestGenerator < ::Rails::Generators::Base
     include GeneratorMixin
 
-    source_root File.expand_path('../templates', __FILE__)
+    source_root File.expand_path("../templates", __FILE__)
 
     argument :resource, type: :string
-    class_option :'actions',
+    class_option :actions,
       type: :array,
       default: nil,
-      aliases: ['--actions', '-a'],
+      aliases: ["--actions", "-a"],
       desc: 'Array of controller actions, e.g. "index show destroy"'
 
-    desc 'Generates rspec request specs at spec/api'
+    desc "Generates rspec request specs at spec/api"
     def generate
       generate_api_specs
     end
@@ -26,33 +26,33 @@ module Graphiti
     end
 
     def dir
-      @resource.gsub('Resource', '').underscore.pluralize
+      @resource.gsub("Resource", "").underscore.pluralize
     end
 
     def generate_api_specs
-      if actions?('index')
+      if actions?("index")
         to = File.join("spec", ApplicationResource.endpoint_namespace, dir, "index_spec.rb")
-        template('index_request_spec.rb.erb', to)
+        template("index_request_spec.rb.erb", to)
       end
 
-      if actions?('show')
+      if actions?("show")
         to = File.join("spec", ApplicationResource.endpoint_namespace, dir, "show_spec.rb")
-        template('show_request_spec.rb.erb', to)
+        template("show_request_spec.rb.erb", to)
       end
 
-      if actions?('create')
+      if actions?("create")
         to = File.join("spec", ApplicationResource.endpoint_namespace, dir, "create_spec.rb")
-        template('create_request_spec.rb.erb', to)
+        template("create_request_spec.rb.erb", to)
       end
 
-      if actions?('update')
+      if actions?("update")
         to = File.join("spec", ApplicationResource.endpoint_namespace, dir, "update_spec.rb")
-        template('update_request_spec.rb.erb', to)
+        template("update_request_spec.rb.erb", to)
       end
 
-      if actions?('destroy')
+      if actions?("destroy")
         to = File.join("spec", ApplicationResource.endpoint_namespace, dir, "destroy_spec.rb")
-        template('destroy_request_spec.rb.erb', to)
+        template("destroy_request_spec.rb.erb", to)
       end
     end
 

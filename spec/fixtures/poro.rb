@@ -16,7 +16,7 @@ module PORO
             mastercards: [],
             visa_rewards: [],
             books: [],
-            states: []
+            states: [],
           }
       end
 
@@ -39,17 +39,17 @@ module PORO
           mastercards: PORO::Mastercard,
           visa_rewards: PORO::VisaReward,
           books: PORO::Book,
-          states: PORO::State
+          states: PORO::State,
         }
       end
 
       def all(params)
         type = params[:type]
-        records = data.select { |k,v| Array(type).include?(k) }
+        records = data.select { |k, v| Array(type).include?(k) }
         return [] unless records
-        records = records.map do |type, _records|
+        records = records.map { |type, _records|
           _records.map { |attrs| klasses[type].new(attrs) }
-        end.flatten
+        }.flatten
         records = apply_filtering(records, params)
         records = apply_sorting(records, params)
         records = apply_pagination(records, params)
@@ -80,7 +80,7 @@ module PORO
       def apply_sorting(records, params)
         return records if params[:sort].nil?
 
-        params[:sort].reverse.each do |sort|
+        params[:sort].reverse_each do |sort|
           records.sort! do |a, b|
             att = sort.keys[0]
             a.send(att) <=> b.send(att)
@@ -93,8 +93,8 @@ module PORO
       def apply_pagination(records, params)
         return records unless params[:per]
 
-        start_at = (params[:page]-1)*(params[:per])
-        end_at = (params[:page] * params[:per]) -1
+        start_at = (params[:page] - 1) * (params[:per])
+        end_at = (params[:page] * params[:per]) - 1
         return [] if end_at < 0
         records[start_at..end_at]
       end
@@ -108,7 +108,7 @@ module PORO
     def self.create(attrs = {})
       if (record = new(attrs)).valid?
         id = attrs[:id] || DB.data[type].length + 1
-        attrs.merge!(id: id)
+        attrs[:id] = id
         record.id = id
         DB.data[type] << attrs
         record
@@ -123,11 +123,11 @@ module PORO
     end
 
     def self.type
-      name.underscore.pluralize.split('/').last.to_sym
+      name.underscore.pluralize.split("/").last.to_sym
     end
 
     def initialize(attrs = {})
-      attrs.each_pair { |k,v| send(:"#{k}=", v) }
+      attrs.each_pair { |k, v| send(:"#{k}=", v) }
     end
 
     def update_attributes(attrs)
@@ -150,8 +150,8 @@ module PORO
     def attributes
       {}.tap do |attrs|
         instance_variables.each do |iv|
-          key = iv.to_s.gsub('@', '').to_sym
-          next if key.to_s.starts_with?('__')
+          key = iv.to_s.delete("@").to_sym
+          next if key.to_s.starts_with?("__")
           value = instance_variable_get(iv)
           attrs[key] = value
         end
@@ -261,7 +261,7 @@ module PORO
   class Adapter < Graphiti::Adapters::Null
     def order(scope, att, dir)
       scope[:sort] ||= []
-      scope[:sort] << { att => dir }
+      scope[:sort] << {att => dir}
       scope
     end
 
@@ -275,22 +275,22 @@ module PORO
 
     def filter(scope, name, value)
       scope[:conditions] ||= {}
-      scope[:conditions].merge!(name => value)
+      scope[:conditions][name] = value
       scope
     end
-    alias :filter_integer_eq :filter
-    alias :filter_string_eq :filter
-    alias :filter_big_decimal_eq :filter
-    alias :filter_float_eq :filter
-    alias :filter_date_eq :filter
-    alias :filter_datetime_eq :filter
-    alias :filter_boolean_eq :filter
-    alias :filter_hash_eq :filter
-    alias :filter_array_eq :filter
+    alias filter_integer_eq filter
+    alias filter_string_eq filter
+    alias filter_big_decimal_eq filter
+    alias filter_float_eq filter
+    alias filter_date_eq filter
+    alias filter_datetime_eq filter
+    alias filter_boolean_eq filter
+    alias filter_hash_eq filter
+    alias filter_array_eq filter
 
     # No need for actual logic to fire
     def count(scope, attr)
-       "poro_count_#{attr}"
+      "poro_count_#{attr}"
     end
 
     def sum(scope, attr)
@@ -333,7 +333,7 @@ module PORO
       rand(999)
     end
 
-    is_admin = proc { |c| @context && @context.current_user == 'admin' }
+    is_admin = proc { |c| @context && @context.current_user == "admin" }
     extra_attribute :admin_stack_ranking, if: is_admin do
       rand(999)
     end
@@ -348,7 +348,7 @@ module PORO
     self.abstract_class = true
 
     def base_scope
-      { type: self.model.name.demodulize.underscore.pluralize.to_sym }
+      {type: model.name.demodulize.underscore.pluralize.to_sym}
     end
   end
 
@@ -367,10 +367,10 @@ module PORO
       100_000
     end
     has_many :positions
-    many_to_many :teams, foreign_key: { employee_teams: :employee_id }
+    many_to_many :teams, foreign_key: {employee_teams: :employee_id}
 
     def admin?
-      context && context.current_user == 'admin'
+      context && context.current_user == "admin"
     end
   end
 
@@ -395,10 +395,10 @@ module PORO
   end
 
   class CreditCardResource < ApplicationResource
-    self.polymorphic = %w(PORO::VisaResource PORO::MastercardResource)
+    self.polymorphic = %w[PORO::VisaResource PORO::MastercardResource]
 
     def base_scope
-      { type: [:visas, :mastercards] }
+      {type: [:visas, :mastercards]}
     end
 
     attribute :number, :integer
@@ -407,14 +407,14 @@ module PORO
 
   class VisaResource < CreditCardResource
     attribute :description, :string do
-      'visa description'
+      "visa description"
     end
     attribute :visa_only_attr, :string do
-      'visa only'
+      "visa only"
     end
 
     def base_scope
-      { type: :visas }
+      {type: :visas}
     end
 
     has_many :visa_rewards
@@ -422,11 +422,11 @@ module PORO
 
   class MastercardResource < CreditCardResource
     attribute :description, :string do
-      'mastercard description'
+      "mastercard description"
     end
 
     def base_scope
-      { type: :mastercards }
+      {type: :mastercards}
     end
   end
 
@@ -435,7 +435,7 @@ module PORO
     attribute :points, :integer
 
     def base_scope
-      { type: :visa_rewards }
+      {type: :visa_rewards}
     end
   end
 
@@ -443,7 +443,7 @@ module PORO
     attribute :account_id, :integer
 
     def base_scope
-      { type: :paypals }
+      {type: :paypals}
     end
   end
 

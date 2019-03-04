@@ -1,12 +1,12 @@
-require 'spec_helper'
+require "spec_helper"
 
-RSpec.describe 'persistence' do
+RSpec.describe "persistence" do
   let(:payload) do
     {
       data: {
-        type: 'employees',
-        attributes: { first_name: 'Jane' }
-      }
+        type: "employees",
+        attributes: {first_name: "Jane"},
+      },
     }
   end
   let(:klass) do
@@ -14,7 +14,7 @@ RSpec.describe 'persistence' do
       self.model = PORO::Employee
 
       def self.name
-        'PORO::EmployeeResource'
+        "PORO::EmployeeResource"
       end
     end
   end
@@ -25,14 +25,14 @@ RSpec.describe 'persistence' do
     end
   end
 
-  it 'can persist single entities' do
+  it "can persist single entities" do
     employee = klass.build(payload)
     expect(employee.save).to eq(true)
     expect(employee.data.id).to_not be_nil
-    expect(employee.data.first_name).to eq('Jane')
+    expect(employee.data.first_name).to eq("Jane")
   end
 
-  describe 'overrides' do
+  describe "overrides" do
     before do
       klass.class_eval do
         class << self
@@ -41,7 +41,7 @@ RSpec.describe 'persistence' do
       end
     end
 
-    describe '#build' do
+    describe "#build" do
       before do
         klass.class_eval do
           def build(model_class)
@@ -54,21 +54,21 @@ RSpec.describe 'persistence' do
       let(:payload) do
         {
           data: {
-            type: 'employees',
-            attributes: { first_name: 'Jane' }
-          }
+            type: "employees",
+            attributes: {first_name: "Jane"},
+          },
         }
       end
 
-      it 'overrides correctly' do
+      it "overrides correctly" do
         e = klass.build(payload)
         e.save
         expect(klass.overridden).to be(true)
-        expect(PORO::Employee.find(e.data.id).first_name).to eq('Jane')
+        expect(PORO::Employee.find(e.data.id).first_name).to eq("Jane")
       end
     end
 
-    describe '#assign_attributes' do
+    describe "#assign_attributes" do
       before do
         klass.class_eval do
           def assign_attributes(model, attrs)
@@ -81,21 +81,21 @@ RSpec.describe 'persistence' do
       let(:payload) do
         {
           data: {
-            type: 'employees',
-            attributes: { first_name: 'Jane' }
-          }
+            type: "employees",
+            attributes: {first_name: "Jane"},
+          },
         }
       end
 
-      it 'overrides correctly' do
+      it "overrides correctly" do
         e = klass.build(payload)
         e.save
         expect(klass.overridden).to be(true)
-        expect(PORO::Employee.find(e.data.id).first_name).to eq('Jane')
+        expect(PORO::Employee.find(e.data.id).first_name).to eq("Jane")
       end
     end
 
-    describe '#delete' do
+    describe "#delete" do
       before do
         klass.class_eval do
           def delete(model_instance)
@@ -105,8 +105,8 @@ RSpec.describe 'persistence' do
         end
       end
 
-      it 'overrides correctly' do
-        employee = PORO::Employee.create(first_name: 'Jane')
+      it "overrides correctly" do
+        employee = PORO::Employee.create(first_name: "Jane")
         klass.find(id: employee.id).destroy
         expect(klass.overridden).to be(true)
         expect(PORO::Employee.find(employee.id)).to be_nil
@@ -114,7 +114,7 @@ RSpec.describe 'persistence' do
     end
   end
 
-  describe 'lifecycle hooks' do
+  describe "lifecycle hooks" do
     before do
       klass.class_eval do
         class << self
@@ -124,7 +124,7 @@ RSpec.describe 'persistence' do
       end
     end
 
-    RSpec.shared_context 'create hooks' do
+    RSpec.shared_context "create hooks" do
       subject(:employee) do
         proxy = klass.build(payload)
         proxy.save
@@ -132,7 +132,7 @@ RSpec.describe 'persistence' do
       end
     end
 
-    RSpec.shared_context 'update hooks' do
+    RSpec.shared_context "update hooks" do
       subject(:employee) do
         proxy = klass.find(payload)
         proxy.update_attributes
@@ -145,8 +145,8 @@ RSpec.describe 'persistence' do
       end
     end
 
-    RSpec.shared_context 'destroy hooks' do
-      include_context 'update hooks'
+    RSpec.shared_context "destroy hooks" do
+      include_context "update hooks"
 
       subject(:employee) do
         proxy = klass.find(payload)
@@ -155,8 +155,8 @@ RSpec.describe 'persistence' do
       end
     end
 
-    describe '.before_attributes' do
-      RSpec.shared_examples 'before attributes' do |opts|
+    describe ".before_attributes" do
+      RSpec.shared_examples "before attributes" do |opts|
         opts ||= {}
 
         before do
@@ -164,7 +164,7 @@ RSpec.describe 'persistence' do
             def do_before_attributes(attributes)
               self.class.calls << {
                 name: :do_before_attributes,
-                args: [attributes.dup]
+                args: [attributes.dup],
               }
               attributes[:last_name] = attributes.delete(:first_name)
             end
@@ -172,81 +172,81 @@ RSpec.describe 'persistence' do
         end
 
         if opts[:only_update]
-          context 'when creating' do
-            include_context 'create hooks'
+          context "when creating" do
+            include_context "create hooks"
 
-            it 'does not fire' do
+            it "does not fire" do
               employee
               expect(klass.calls.length).to eq(0)
             end
           end
         else
-          context 'when creating' do
-            include_context 'create hooks'
+          context "when creating" do
+            include_context "create hooks"
 
-            it 'yields attributes' do
+            it "yields attributes" do
               employee
-              expect(klass.calls[0][:args]).to eq([{ first_name: 'Jane' }])
+              expect(klass.calls[0][:args]).to eq([{first_name: "Jane"}])
             end
 
-            it 'can modify attributes' do
-              expect(employee.last_name).to eq('Jane')
+            it "can modify attributes" do
+              expect(employee.last_name).to eq("Jane")
             end
           end
         end
 
-        context 'when updating' do
-          include_context 'update hooks'
+        context "when updating" do
+          include_context "update hooks"
 
-          it 'yields attributes' do
+          it "yields attributes" do
             employee
-            expect(klass.calls[0][:args]).to eq([{ first_name: 'Jane' }])
+            expect(klass.calls[0][:args]).to eq([{first_name: "Jane"}])
           end
 
-          it 'can modify attributes' do
-            expect(employee.last_name).to eq('Jane')
+          it "can modify attributes" do
+            expect(employee.last_name).to eq("Jane")
           end
         end
 
-        context 'when destroying' do
-          include_context 'destroy hooks'
+        context "when destroying" do
+          include_context "destroy hooks"
 
-          it 'does not fire' do
+          it "does not fire" do
             employee
             expect(klass.calls.length).to be_zero
           end
         end
       end
 
-      context 'when registering via proc' do
+      context "when registering via proc" do
         before do
           klass.before_attributes do |attrs|
             do_before_attributes(attrs)
           end
         end
 
-        include_examples 'before attributes'
+        include_examples "before attributes"
       end
 
-      context 'when registering via method' do
+      context "when registering via method" do
         before do
           klass.before_attributes :do_before_attributes
         end
 
-        include_examples 'before attributes'
+        include_examples "before attributes"
       end
 
-      context 'when limiting to update' do
+      context "when limiting to update" do
         before do
           klass.before_attributes :do_before_attributes, only: [:update]
         end
 
-        include_examples 'before attributes', only_update: true
+        include_examples "before attributes", only_update: true
       end
     end
 
-    describe '.after_attributes' do
-      RSpec.shared_examples 'after attributes' do |opts|
+    describe ".after_attributes" do
+      RSpec.shared_examples "after attributes" do |opts|
         opts ||= {}
 
         before do
@@ -254,7 +254,7 @@ RSpec.describe 'persistence' do
             def do_after_attributes(model)
               self.class.calls << {
                 name: :do_after_attributes,
-                args: [model.dup]
+                args: [model.dup],
               }
               model.last_name = model.first_name
             end
@@ -262,81 +262,81 @@ RSpec.describe 'persistence' do
         end
 
         if opts[:only_update]
-          context 'when creating' do
-            include_context 'create hooks'
+          context "when creating" do
+            include_context "create hooks"
 
-            it 'does not fire' do
+            it "does not fire" do
               employee
               expect(klass.calls.length).to eq(0)
             end
           end
         else
-          context 'when creating' do
-            include_context 'create hooks'
+          context "when creating" do
+            include_context "create hooks"
 
-            it 'is passed model' do
+            it "is passed model" do
               employee
               expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
             end
 
-            it 'can modify the model' do
-              expect(employee.last_name).to eq('Jane')
+            it "can modify the model" do
+              expect(employee.last_name).to eq("Jane")
             end
           end
         end
 
-        context 'when updating' do
-          include_context 'update hooks'
+        context "when updating" do
+          include_context "update hooks"
 
-          it 'is passed model' do
+          it "is passed model" do
             employee
             expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
           end
 
-          it 'can modify the model' do
-            expect(employee.last_name).to eq('Jane')
+          it "can modify the model" do
+            expect(employee.last_name).to eq("Jane")
           end
         end
 
-        context 'when destroying' do
-          include_context 'destroy hooks'
+        context "when destroying" do
+          include_context "destroy hooks"
 
-          it 'does not fire' do
+          it "does not fire" do
             employee
             expect(klass.calls.length).to be_zero
           end
         end
       end
 
-      context 'when registering via proc' do
+      context "when registering via proc" do
         before do
           klass.after_attributes do |model|
             do_after_attributes(model)
           end
         end
 
-        include_examples 'after attributes'
+        include_examples "after attributes"
       end
 
-      context 'when registering via method' do
+      context "when registering via method" do
         before do
           klass.after_attributes :do_after_attributes
         end
 
-        include_examples 'after attributes'
+        include_examples "after attributes"
       end
 
-      context 'when limiting to update' do
+      context "when limiting to update" do
         before do
           klass.after_attributes :do_after_attributes, only: [:update]
         end
 
-        include_examples 'after attributes', only_update: true
+        include_examples "after attributes", only_update: true
       end
     end
 
-    describe '.around_attributes' do
-      RSpec.shared_examples 'around attributes' do |opts|
+    describe ".around_attributes" do
+      RSpec.shared_examples "around attributes" do |opts|
         opts ||= {}
 
         before do
@@ -344,90 +344,90 @@ RSpec.describe 'persistence' do
             def do_around_attributes(attributes)
               self.class.calls << {
                 name: :do_around_attributes,
-                args: [attributes.dup]
+                args: [attributes.dup],
               }
               attributes[:last_name] = attributes.delete(:first_name)
               model_instance = yield attributes
-              model_instance.first_name = 'after yield'
+              model_instance.first_name = "after yield"
             end
           end
         end
 
         if opts[:only_update]
-          context 'when creating' do
-            include_context 'create hooks'
+          context "when creating" do
+            include_context "create hooks"
 
-            it 'does not fire' do
+            it "does not fire" do
               employee
               expect(klass.calls.length).to eq(0)
             end
           end
         else
-          context 'when creating' do
-            include_context 'create hooks'
+          context "when creating" do
+            include_context "create hooks"
 
-            it 'is passed attributes' do
+            it "is passed attributes" do
               employee
-              expect(klass.calls[0][:args]).to eq([{ first_name: 'Jane' }])
+              expect(klass.calls[0][:args]).to eq([{first_name: "Jane"}])
             end
 
-            it 'can modify the attribute hash' do
-              expect(employee.first_name).to eq('after yield')
+            it "can modify the attribute hash" do
+              expect(employee.first_name).to eq("after yield")
             end
 
-            it 'can modify the resulting model' do
-              expect(employee.last_name).to eq('Jane')
+            it "can modify the resulting model" do
+              expect(employee.last_name).to eq("Jane")
             end
           end
         end
 
-        context 'when updating' do
-          include_context 'update hooks'
+        context "when updating" do
+          include_context "update hooks"
 
-          it 'is passed attributes' do
+          it "is passed attributes" do
             employee
-            expect(klass.calls[0][:args]).to eq([{ first_name: 'Jane' }])
+            expect(klass.calls[0][:args]).to eq([{first_name: "Jane"}])
           end
 
-          it 'can modify the attribute hash' do
-            expect(employee.first_name).to eq('after yield')
+          it "can modify the attribute hash" do
+            expect(employee.first_name).to eq("after yield")
           end
 
-          it 'can modify the resulting model' do
-            expect(employee.last_name).to eq('Jane')
+          it "can modify the resulting model" do
+            expect(employee.last_name).to eq("Jane")
           end
         end
       end
 
-      context 'when registering via method' do
+      context "when registering via method" do
         before do
           klass.around_attributes :do_around_attributes
         end
 
-        include_examples 'around attributes'
+        include_examples "around attributes"
       end
 
-      context 'when registering via proc' do
-        it 'raises error' do
+      context "when registering via proc" do
+        it "raises error" do
           expect {
             klass.around_attributes do
-              'dontgethere'
+              "dontgethere"
             end
           }.to raise_error(Graphiti::Errors::AroundCallbackProc, /around_attributes/)
         end
       end
 
-      context 'when limiting actions' do
+      context "when limiting actions" do
         before do
           klass.around_attributes :do_around_attributes, only: [:update]
         end
 
-        include_examples 'around attributes', only_update: true
+        include_examples "around attributes", only_update: true
       end
     end
 
-    describe '.before_save' do
-      RSpec.shared_examples 'before save' do |opts|
+    describe ".before_save" do
+      RSpec.shared_examples "before save" do |opts|
         opts ||= {}
 
         before do
@@ -435,89 +435,89 @@ RSpec.describe 'persistence' do
             def do_before_save(model)
               self.class.calls << {
                 name: :do_before_save,
-                args: [model.dup]
+                args: [model.dup],
               }
-              model.first_name = 'b4 save'
+              model.first_name = "b4 save"
             end
           end
         end
 
         if opts[:only_update]
-          context 'when creating' do
-            include_context 'create hooks'
+          context "when creating" do
+            include_context "create hooks"
 
-            it 'does not fire' do
+            it "does not fire" do
               employee
               expect(klass.calls.length).to eq(0)
             end
           end
         else
-          context 'when creating' do
-            include_context 'create hooks'
+          context "when creating" do
+            include_context "create hooks"
 
-            it 'yields model instance' do
+            it "yields model instance" do
               employee
               expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
             end
 
-            it 'can modify the model instance' do
-              expect(employee.first_name).to eq('b4 save')
+            it "can modify the model instance" do
+              expect(employee.first_name).to eq("b4 save")
             end
           end
         end
 
-        context 'when updating' do
-          include_context 'update hooks'
+        context "when updating" do
+          include_context "update hooks"
 
-          it 'yields model instance' do
+          it "yields model instance" do
             employee
             expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
           end
 
-          it 'can modify the model instance' do
-            expect(employee.first_name).to eq('b4 save')
+          it "can modify the model instance" do
+            expect(employee.first_name).to eq("b4 save")
           end
         end
 
-        context 'when destroying' do
-          include_context 'destroy hooks'
+        context "when destroying" do
+          include_context "destroy hooks"
 
-          it 'does not fire' do
+          it "does not fire" do
             employee
             expect(klass.calls.length).to be_zero
           end
         end
       end
 
-      context 'when registering via proc' do
+      context "when registering via proc" do
         before do
           klass.before_save do |model|
             do_before_save(model)
           end
         end
 
-        include_examples 'before save'
+        include_examples "before save"
       end
 
-      context 'when registering via method' do
+      context "when registering via method" do
         before do
           klass.before_save :do_before_save
         end
 
-        include_examples 'before save'
+        include_examples "before save"
       end
 
-      context 'when limiting actions' do
+      context "when limiting actions" do
         before do
           klass.before_save :do_before_save, only: [:update]
         end
 
-        include_examples 'before save', only_update: true
+        include_examples "before save", only_update: true
       end
     end
 
-    describe '.after_save' do
-      RSpec.shared_examples 'after save' do |opts|
+    describe ".after_save" do
+      RSpec.shared_examples "after save" do |opts|
         opts ||= {}
 
         before do
@@ -525,65 +525,65 @@ RSpec.describe 'persistence' do
             def do_after_save(model)
               self.class.calls << {
                 name: :do_after_save,
-                args: [model.dup]
+                args: [model.dup],
               }
-              model.first_name = 'after save'
+              model.first_name = "after save"
             end
           end
         end
 
         if opts[:only_update]
-          context 'when creating' do
-            include_context 'create hooks'
+          context "when creating" do
+            include_context "create hooks"
 
-            it 'does not fire' do
+            it "does not fire" do
               employee
               expect(klass.calls.length).to eq(0)
             end
           end
         else
-          context 'when creating' do
-            include_context 'create hooks'
+          context "when creating" do
+            include_context "create hooks"
 
-            it 'is passed the model instance' do
+            it "is passed the model instance" do
               employee
               expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
             end
 
-            it 'can modify the model instance, but would not persist' do
-              expect(employee.first_name).to eq('after save')
+            it "can modify the model instance, but would not persist" do
+              expect(employee.first_name).to eq("after save")
               reloaded = PORO::Employee.find(employee.id)
-              expect(reloaded.first_name).to eq('Jane')
+              expect(reloaded.first_name).to eq("Jane")
             end
           end
         end
 
-        context 'when updating' do
-          include_context 'update hooks'
+        context "when updating" do
+          include_context "update hooks"
 
-          it 'is passed the model instance' do
+          it "is passed the model instance" do
             employee
             expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
           end
 
-          it 'can modify the model instance, but would not persist' do
-            expect(employee.first_name).to eq('after save')
+          it "can modify the model instance, but would not persist" do
+            expect(employee.first_name).to eq("after save")
             reloaded = PORO::Employee.find(employee.id)
-            expect(reloaded.first_name).to eq('Jane')
+            expect(reloaded.first_name).to eq("Jane")
           end
         end
 
-        context 'when destroying' do
-          include_context 'destroy hooks'
+        context "when destroying" do
+          include_context "destroy hooks"
 
-          it 'does not fire' do
+          it "does not fire" do
             employee
             expect(klass.calls.length).to be_zero
           end
         end
       end
 
-      context 'when registering via proc' do
+      context "when registering via proc" do
         before do
           klass.class_eval do
             after_save do |model|
@@ -592,30 +592,30 @@ RSpec.describe 'persistence' do
           end
         end
 
-        include_examples 'after save'
+        include_examples "after save"
       end
 
-      context 'when registering via method' do
+      context "when registering via method" do
         before do
           klass.class_eval do
             after_save :do_after_save
           end
         end
 
-        include_examples 'after save'
+        include_examples "after save"
       end
 
-      context 'when limiting actions' do
+      context "when limiting actions" do
         before do
           klass.after_save :do_after_save, only: [:update]
         end
 
-        include_examples 'after save', only_update: true
+        include_examples "after save", only_update: true
       end
     end
 
-    describe '.around_persistence' do
-      RSpec.shared_examples 'around persistence' do |opts|
+    describe ".around_persistence" do
+      RSpec.shared_examples "around persistence" do |opts|
         opts ||= {}
 
         before do
@@ -625,7 +625,7 @@ RSpec.describe 'persistence' do
             end
 
             def do_around_persistence(attributes)
-              attributes[:first_name] = 'b4'
+              attributes[:first_name] = "b4"
               model = yield
               model.update_attributes(first_name: "#{model.first_name}after")
               model
@@ -635,64 +635,64 @@ RSpec.describe 'persistence' do
         end
 
         if opts[:only_update]
-          context 'when creating' do
-            include_context 'create hooks'
+          context "when creating" do
+            include_context "create hooks"
 
-            it 'does not fire' do
+            it "does not fire" do
               employee
               expect(klass.calls.length).to eq(0)
             end
           end
         else
-          context 'when creating' do
-            include_context 'create hooks'
+          context "when creating" do
+            include_context "create hooks"
 
-            it 'can modify attributes and the saved model' do
+            it "can modify attributes and the saved model" do
               reloaded = PORO::Employee.find(employee.id)
-              expect(reloaded.first_name).to eq('b4midafter')
+              expect(reloaded.first_name).to eq("b4midafter")
             end
           end
         end
 
-        context 'when updating' do
-          include_context 'update hooks'
+        context "when updating" do
+          include_context "update hooks"
 
-          it 'can modify attributes and the saved model' do
+          it "can modify attributes and the saved model" do
             reloaded = PORO::Employee.find(employee.id)
-            expect(reloaded.first_name).to eq('b4midafter')
+            expect(reloaded.first_name).to eq("b4midafter")
           end
         end
       end
 
-      context 'when registering via method' do
+      context "when registering via method" do
         before do
           klass.around_persistence :do_around_persistence
         end
 
-        include_examples 'around persistence'
+        include_examples "around persistence"
       end
 
-      context 'when registering via proc' do
-        it 'raises error' do
+      context "when registering via proc" do
+        it "raises error" do
           expect {
             klass.around_persistence do
-              'dontgethere'
+              "dontgethere"
             end
           }.to raise_error(Graphiti::Errors::AroundCallbackProc, /around_persistence/)
         end
       end
 
-      context 'when limiting actions' do
+      context "when limiting actions" do
         before do
           klass.around_persistence :do_around_persistence, only: [:update]
         end
 
-        include_examples 'around persistence', only_update: true
+        include_examples "around persistence", only_update: true
       end
     end
 
-    describe '.around_save' do
-      RSpec.shared_examples 'around save' do |opts|
+    describe ".around_save" do
+      RSpec.shared_examples "around save" do |opts|
         opts ||= {}
 
         before do
@@ -700,308 +700,308 @@ RSpec.describe 'persistence' do
             def do_around_save(model)
               self.class.calls << {
                 name: :do_around_save,
-                args: [model.dup]
+                args: [model.dup],
               }
-              model.first_name = 'b4 yield'
+              model.first_name = "b4 yield"
               model_instance = yield model
-              model_instance.first_name = 'after yield'
+              model_instance.first_name = "after yield"
             end
           end
         end
 
         if opts[:only_update]
-          context 'when creating' do
-            include_context 'create hooks'
+          context "when creating" do
+            include_context "create hooks"
 
-            it 'does not fire' do
+            it "does not fire" do
               employee
               expect(klass.calls.length).to eq(0)
             end
           end
         else
-          context 'when creating' do
-            include_context 'create hooks'
+          context "when creating" do
+            include_context "create hooks"
 
-            it 'yields the model' do
+            it "yields the model" do
               employee
               expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
             end
 
-            it 'can modify the model before yielding' do
-              expect(employee.first_name).to eq('after yield')
+            it "can modify the model before yielding" do
+              expect(employee.first_name).to eq("after yield")
             end
 
-            it 'can modify the model with unpersisted changes after yielding' do
+            it "can modify the model with unpersisted changes after yielding" do
               reloaded = PORO::Employee.find(employee.id)
-              expect(reloaded.first_name).to eq('b4 yield')
+              expect(reloaded.first_name).to eq("b4 yield")
             end
           end
         end
 
-        context 'when updating' do
-          include_context 'update hooks'
+        context "when updating" do
+          include_context "update hooks"
 
-          it 'yields the model' do
+          it "yields the model" do
             employee
             expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
           end
 
-          it 'can modify the model before yielding' do
-            expect(employee.first_name).to eq('after yield')
+          it "can modify the model before yielding" do
+            expect(employee.first_name).to eq("after yield")
           end
 
-          it 'can modify the model with unpersisted changes after yielding' do
+          it "can modify the model with unpersisted changes after yielding" do
             reloaded = PORO::Employee.find(employee.id)
-            expect(reloaded.first_name).to eq('b4 yield')
+            expect(reloaded.first_name).to eq("b4 yield")
           end
         end
       end
 
-      context 'when registering via method' do
+      context "when registering via method" do
         before do
           klass.around_save :do_around_save
         end
 
-        include_examples 'around save'
+        include_examples "around save"
       end
 
-      context 'when registering via proc' do
-        it 'raises error' do
+      context "when registering via proc" do
+        it "raises error" do
           expect {
             klass.around_save :do_around_save do
-              'dontgethere'
+              "dontgethere"
             end
           }.to raise_error(Graphiti::Errors::AroundCallbackProc, /around_save/)
         end
       end
 
-      context 'when limiting actions' do
+      context "when limiting actions" do
         before do
           klass.around_save :do_around_save, only: [:update]
         end
 
-        include_examples 'around save', only_update: true
+        include_examples "around save", only_update: true
       end
     end
 
-    describe '.before_destroy' do
-      RSpec.shared_examples 'before_destroy' do
+    describe ".before_destroy" do
+      RSpec.shared_examples "before_destroy" do
         before do
           klass.class_eval do
             def do_before_destroy(model)
-              model.first_name = 'updated b4 destroy'
+              model.first_name = "updated b4 destroy"
               self.class.calls << {
                 name: :do_before_destroy,
-                args: [model.dup]
+                args: [model.dup],
               }
             end
           end
         end
 
-        context 'when creating' do
-          include_context 'create hooks'
+        context "when creating" do
+          include_context "create hooks"
 
-          it 'is not called' do
+          it "is not called" do
             employee
             expect(klass.calls.length).to be_zero
           end
         end
 
-        context 'when updating' do
-          include_context 'update hooks'
+        context "when updating" do
+          include_context "update hooks"
 
-          it 'is not called' do
+          it "is not called" do
             employee
             expect(klass.calls.length).to be_zero
           end
         end
 
-        context 'when destroying' do
-          include_context 'destroy hooks'
+        context "when destroying" do
+          include_context "destroy hooks"
 
-          it 'is called, yielding the model instance' do
+          it "is called, yielding the model instance" do
             employee
             expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
-            expect(klass.calls[0][:args][0].first_name).to eq('updated b4 destroy')
+            expect(klass.calls[0][:args][0].first_name).to eq("updated b4 destroy")
           end
         end
       end
 
-      context 'when registering via proc' do
+      context "when registering via proc" do
         before do
           klass.before_destroy do |model|
             do_before_destroy(model)
           end
         end
 
-        include_examples 'before_destroy'
+        include_examples "before_destroy"
       end
 
-      context 'when registering via method' do
+      context "when registering via method" do
         before do
           klass.before_destroy :do_before_destroy
         end
 
-        include_examples 'before_destroy'
+        include_examples "before_destroy"
       end
     end
 
-    describe '.after_destroy' do
-      RSpec.shared_examples 'after_destroy' do
+    describe ".after_destroy" do
+      RSpec.shared_examples "after_destroy" do
         before do
           klass.class_eval do
             def do_after_destroy(model)
-              model.first_name = 'updated after destroy'
+              model.first_name = "updated after destroy"
               self.class.calls << {
                 name: :do_after_destroy,
-                args: [model.dup]
+                args: [model.dup],
               }
             end
           end
         end
 
-        context 'when creating' do
-          include_context 'create hooks'
+        context "when creating" do
+          include_context "create hooks"
 
-          it 'is not called' do
+          it "is not called" do
             employee
             expect(klass.calls.length).to be_zero
           end
         end
 
-        context 'when updating' do
-          include_context 'update hooks'
+        context "when updating" do
+          include_context "update hooks"
 
-          it 'is not called' do
+          it "is not called" do
             employee
             expect(klass.calls.length).to be_zero
           end
         end
 
-        context 'when destroying' do
-          include_context 'destroy hooks'
+        context "when destroying" do
+          include_context "destroy hooks"
 
-          it 'is called, yielding the model instance' do
+          it "is called, yielding the model instance" do
             employee
             expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
-            expect(klass.calls[0][:args][0].first_name).to eq('updated after destroy')
+            expect(klass.calls[0][:args][0].first_name).to eq("updated after destroy")
           end
         end
       end
 
-      context 'when registering via proc' do
+      context "when registering via proc" do
         before do
           klass.after_destroy do |model|
             do_after_destroy(model)
           end
         end
 
-        include_examples 'after_destroy'
+        include_examples "after_destroy"
       end
 
-      context 'when registering via method' do
+      context "when registering via method" do
         before do
           klass.after_destroy :do_after_destroy
         end
 
-        include_examples 'after_destroy'
+        include_examples "after_destroy"
       end
     end
 
-    describe '.around_destroy' do
-      RSpec.shared_examples 'around_destroy' do
+    describe ".around_destroy" do
+      RSpec.shared_examples "around_destroy" do
         before do
           klass.class_eval do
             def do_around_destroy(model)
-              model.first_name = 'updated b4 destroy'
+              model.first_name = "updated b4 destroy"
               self.class.calls << {
                 name: :do_around_destroy,
-                args: [model.dup]
+                args: [model.dup],
               }
               if PORO::Employee.find(model.id).nil?
-                raise 'something went wrong'
+                raise "something went wrong"
               end
               yield model
               unless PORO::Employee.find(model.id).nil?
-                raise 'something went wrong'
+                raise "something went wrong"
               end
             end
           end
         end
 
-        context 'when creating' do
-          include_context 'create hooks'
+        context "when creating" do
+          include_context "create hooks"
 
-          it 'is not called' do
+          it "is not called" do
             employee
             expect(klass.calls.length).to be_zero
           end
         end
 
-        context 'when updating' do
-          include_context 'update hooks'
+        context "when updating" do
+          include_context "update hooks"
 
-          it 'is not called' do
+          it "is not called" do
             employee
             expect(klass.calls.length).to be_zero
           end
         end
 
-        context 'when destroying' do
-          include_context 'destroy hooks'
+        context "when destroying" do
+          include_context "destroy hooks"
 
-          it 'is called, yielding the model instance' do
+          it "is called, yielding the model instance" do
             employee
             expect(klass.calls[0][:args][0]).to be_a(PORO::Employee)
-            expect(klass.calls[0][:args][0].first_name).to eq('updated b4 destroy')
+            expect(klass.calls[0][:args][0].first_name).to eq("updated b4 destroy")
             expect(PORO::Employee.find(employee.id)).to eq(nil)
           end
         end
       end
 
-      context 'when registering via proc' do
-        it 'raises error' do
+      context "when registering via proc" do
+        it "raises error" do
           expect {
             klass.around_destroy do |model|
-              'dontgethere'
+              "dontgethere"
             end
           }.to raise_error(Graphiti::Errors::AroundCallbackProc, /around_destroy/)
         end
       end
 
-      context 'when registering via method' do
+      context "when registering via method" do
         before do
           klass.around_destroy :do_around_destroy
         end
 
-        include_examples 'around_destroy'
+        include_examples "around_destroy"
       end
     end
 
-    describe 'stacking callbacks' do
+    describe "stacking callbacks" do
       before do
         klass.before_attributes do |attrs|
-          attrs[:first_name] << '_b4attrsA'
+          attrs[:first_name] << "_b4attrsA"
         end
 
         klass.before_attributes do |attrs|
-          attrs[:first_name] << '_b4attrsB'
+          attrs[:first_name] << "_b4attrsB"
         end
 
         klass.before_attributes only: [:update] do |attrs|
-          attrs[:first_name] << '_b4attrsC'
+          attrs[:first_name] << "_b4attrsC"
         end
 
         klass.after_attributes do |model|
-          model.first_name << '_afterattrsA'
+          model.first_name << "_afterattrsA"
         end
 
         klass.after_attributes do |model|
-          model.first_name << '_afterattrsB'
+          model.first_name << "_afterattrsB"
         end
 
         klass.after_attributes only: [:update] do |model|
-          model.first_name << '_afterattrsC'
+          model.first_name << "_afterattrsC"
         end
 
         klass.around_attributes :around_attrs_a
@@ -1009,27 +1009,27 @@ RSpec.describe 'persistence' do
         klass.around_attributes :around_attrs_c, only: [:update]
 
         klass.before_save do |model|
-          model.first_name << '_b4saveA'
+          model.first_name << "_b4saveA"
         end
 
         klass.before_save do |model|
-          model.first_name << '_b4saveB'
+          model.first_name << "_b4saveB"
         end
 
         klass.before_save only: [:update] do |model|
-          model.first_name << '_b4saveC'
+          model.first_name << "_b4saveC"
         end
 
         klass.after_save do |model|
-          model.first_name << '_aftersaveA'
+          model.first_name << "_aftersaveA"
         end
 
         klass.after_save do |model|
-          model.first_name << '_aftersaveB'
+          model.first_name << "_aftersaveB"
         end
 
         klass.after_save only: [:update] do |model|
-          model.first_name << '_aftersaveC'
+          model.first_name << "_aftersaveC"
         end
 
         klass.around_save :around_save_a
@@ -1042,132 +1042,132 @@ RSpec.describe 'persistence' do
 
         klass.class_eval do
           def around_attrs_a(attrs)
-            attrs[:first_name] << '_aroundattrsA1'
+            attrs[:first_name] << "_aroundattrsA1"
             yield attrs
-            attrs[:first_name] << '_aroundattrsA2'
+            attrs[:first_name] << "_aroundattrsA2"
           end
 
           def around_attrs_b(attrs)
-            attrs[:first_name] << '_aroundattrsB1'
+            attrs[:first_name] << "_aroundattrsB1"
             yield attrs
-            attrs[:first_name] << '_aroundattrsB2'
+            attrs[:first_name] << "_aroundattrsB2"
           end
 
           def around_attrs_c(attrs)
-            attrs[:first_name] << '_aroundattrsC1'
+            attrs[:first_name] << "_aroundattrsC1"
             yield attrs
-            attrs[:first_name] << '_aroundattrsC2'
+            attrs[:first_name] << "_aroundattrsC2"
           end
 
           def around_save_a(model)
-            model.first_name << '_aroundsaveA1'
+            model.first_name << "_aroundsaveA1"
             yield model
-            model.first_name << '_aroundsaveA2'
+            model.first_name << "_aroundsaveA2"
           end
 
           def around_save_b(model)
-            model.first_name << '_aroundsaveB1'
+            model.first_name << "_aroundsaveB1"
             yield model
-            model.first_name << '_aroundsaveB2'
+            model.first_name << "_aroundsaveB2"
           end
 
           def around_save_c(model)
-            model.first_name << '_aroundsaveC1'
+            model.first_name << "_aroundsaveC1"
             yield model
-            model.first_name << '_aroundsaveC2'
+            model.first_name << "_aroundsaveC2"
           end
 
           def around_persistence_a(attrs)
-            attrs[:first_name] << '_aroundpersA1'
+            attrs[:first_name] << "_aroundpersA1"
             model = yield attrs
-            model.first_name << '_aroundpersA2'
+            model.first_name << "_aroundpersA2"
           end
 
           def around_persistence_b(attrs)
-            attrs[:first_name] << '_aroundpersB1'
+            attrs[:first_name] << "_aroundpersB1"
             model = yield attrs
-            model.first_name << '_aroundpersB2'
+            model.first_name << "_aroundpersB2"
           end
 
           def around_persistence_c(attrs)
-            attrs[:first_name] << '_aroundpersC1'
+            attrs[:first_name] << "_aroundpersC1"
             model = yield attrs
-            model.first_name << '_aroundpersC2'
+            model.first_name << "_aroundpersC2"
           end
         end
       end
 
-      it 'can stack multiple callbacks on create' do
+      it "can stack multiple callbacks on create" do
         proxy = klass.build(payload)
         proxy.save
-        expect(proxy.data.first_name.split('_')).to eq([
-          'Jane',
-          'aroundpersA1',
-          'aroundpersB1',
-          'aroundattrsA1',
-          'aroundattrsB1',
-          'b4attrsA',
-          'b4attrsB',
-          'afterattrsA',
-          'afterattrsB',
-          'aroundattrsB2',
-          'aroundattrsA2',
-          'aroundsaveA1',
-          'aroundsaveB1',
-          'b4saveA',
-          'b4saveB',
-          'aftersaveA',
-          'aftersaveB',
-          'aroundsaveB2',
-          'aroundsaveA2',
-          'aroundpersB2',
-          'aroundpersA2'
+        expect(proxy.data.first_name.split("_")).to eq([
+          "Jane",
+          "aroundpersA1",
+          "aroundpersB1",
+          "aroundattrsA1",
+          "aroundattrsB1",
+          "b4attrsA",
+          "b4attrsB",
+          "afterattrsA",
+          "afterattrsB",
+          "aroundattrsB2",
+          "aroundattrsA2",
+          "aroundsaveA1",
+          "aroundsaveB1",
+          "b4saveA",
+          "b4saveB",
+          "aftersaveA",
+          "aftersaveB",
+          "aroundsaveB2",
+          "aroundsaveA2",
+          "aroundpersB2",
+          "aroundpersA2",
         ])
       end
 
-      it 'can stack multiple callbacks on update' do
+      it "can stack multiple callbacks on update" do
         employee = PORO::Employee.create
         payload[:data][:id] = employee.id
         proxy = klass.find(payload)
         proxy.update_attributes
-        expect(proxy.data.first_name.split('_')).to eq([
-          'Jane',
-          'aroundpersA1',
-          'aroundpersB1',
-          'aroundpersC1',
-          'aroundattrsA1',
-          'aroundattrsB1',
-          'aroundattrsC1',
-          'b4attrsA',
-          'b4attrsB',
-          'b4attrsC',
-          'afterattrsA',
-          'afterattrsB',
-          'afterattrsC',
-          'aroundattrsC2',
-          'aroundattrsB2',
-          'aroundattrsA2',
-          'aroundsaveA1',
-          'aroundsaveB1',
-          'aroundsaveC1',
-          'b4saveA',
-          'b4saveB',
-          'b4saveC',
-          'aftersaveA',
-          'aftersaveB',
-          'aftersaveC',
-          'aroundsaveC2',
-          'aroundsaveB2',
-          'aroundsaveA2',
-          'aroundpersC2',
-          'aroundpersB2',
-          'aroundpersA2'
+        expect(proxy.data.first_name.split("_")).to eq([
+          "Jane",
+          "aroundpersA1",
+          "aroundpersB1",
+          "aroundpersC1",
+          "aroundattrsA1",
+          "aroundattrsB1",
+          "aroundattrsC1",
+          "b4attrsA",
+          "b4attrsB",
+          "b4attrsC",
+          "afterattrsA",
+          "afterattrsB",
+          "afterattrsC",
+          "aroundattrsC2",
+          "aroundattrsB2",
+          "aroundattrsA2",
+          "aroundsaveA1",
+          "aroundsaveB1",
+          "aroundsaveC1",
+          "b4saveA",
+          "b4saveB",
+          "b4saveC",
+          "aftersaveA",
+          "aftersaveB",
+          "aftersaveC",
+          "aroundsaveC2",
+          "aroundsaveB2",
+          "aroundsaveA2",
+          "aroundpersC2",
+          "aroundpersB2",
+          "aroundpersA2",
         ])
       end
     end
   end
 
-  context 'when in need of meta information in a hook' do
+  context "when in need of meta information in a hook" do
     subject(:save) do
       instance = klass.build(payload)
       instance.save
@@ -1177,23 +1177,23 @@ RSpec.describe 'persistence' do
     let(:payload) do
       {
         data: {
-          type: 'employees',
-          attributes: { first_name: 'Jane' },
+          type: "employees",
+          attributes: {first_name: "Jane"},
           relationships: {
             positions: {
               data: [{
-                type: 'positions', :'temp-id' => 'abc123', method: 'create'
-              }]
-            }
-          }
+                type: "positions", 'temp-id': "abc123", method: "create",
+              }],
+            },
+          },
         },
         included: [
           {
-            type: 'positions',
-            :'temp-id' => 'abc123',
-            attributes: { title: 'Engineer' }
-          }
-        ]
+            type: "positions",
+            'temp-id': "abc123",
+            attributes: {title: "Engineer"},
+          },
+        ],
       }
     end
 
@@ -1203,7 +1203,9 @@ RSpec.describe 'persistence' do
           attr_accessor :meta
         end
 
-        def self.name;'PORO::PositionResource';end
+        def self.name
+          "PORO::PositionResource"
+        end
 
         attribute :employee_id, :integer
       end
@@ -1220,29 +1222,29 @@ RSpec.describe 'persistence' do
 
     def assert_meta
       expect(klass.meta[:method]).to eq(:create)
-      expect(klass.meta[:attributes]).to eq(first_name: 'Jane')
+      expect(klass.meta[:attributes]).to eq(first_name: "Jane")
       expect(klass.meta[:relationships]).to eq({
         positions: [{
-          attributes: { employee_id: 1, title: 'Engineer' },
+          attributes: {employee_id: 1, title: "Engineer"},
           meta: {
-            jsonapi_type: 'positions',
+            jsonapi_type: "positions",
             method: :create,
-            temp_id: 'abc123'
+            temp_id: "abc123",
           },
-          relationships: {}
-        }]
+          relationships: {},
+        }],
       })
 
       meta = position_resource.meta
       expect(meta[:method]).to eq(:create)
-      expect(meta[:temp_id]).to eq('abc123')
+      expect(meta[:temp_id]).to eq("abc123")
       expect(meta[:caller_model]).to be_a(PORO::Employee)
-      expect(meta[:attributes]).to eq(employee_id: 1, title: 'Engineer')
+      expect(meta[:attributes]).to eq(employee_id: 1, title: "Engineer")
       expect(meta[:relationships]).to eq({})
     end
 
-    context 'when before_attributes' do
-      context 'via proc' do
+    context "when before_attributes" do
+      context "via proc" do
         before do
           klass.class_eval do
             before_attributes do |attrs, meta|
@@ -1257,13 +1259,13 @@ RSpec.describe 'persistence' do
           end
         end
 
-        it 'works' do
+        it "works" do
           save
           assert_meta
         end
       end
 
-      context 'via method' do
+      context "via method" do
         before do
           klass.class_eval do
             before_attributes :do_meta
@@ -1282,15 +1284,15 @@ RSpec.describe 'persistence' do
           end
         end
 
-        it 'works' do
+        it "works" do
           save
           assert_meta
         end
       end
     end
 
-    context 'when after_attributes' do
-      context 'via proc' do
+    context "when after_attributes" do
+      context "via proc" do
         before do
           klass.class_eval do
             after_attributes do |model, meta|
@@ -1305,13 +1307,13 @@ RSpec.describe 'persistence' do
           end
         end
 
-        it 'works' do
+        it "works" do
           save
           assert_meta
         end
       end
 
-      context 'via method name' do
+      context "via method name" do
         before do
           klass.class_eval do
             after_attributes :do_after_attributes
@@ -1330,14 +1332,14 @@ RSpec.describe 'persistence' do
           end
         end
 
-        it 'works' do
+        it "works" do
           save
           assert_meta
         end
       end
     end
 
-    context 'when around_attributes' do
+    context "when around_attributes" do
       before do
         klass.class_eval do
           around_attributes :do_around_attributes
@@ -1358,14 +1360,14 @@ RSpec.describe 'persistence' do
         end
       end
 
-      it 'works' do
+      it "works" do
         save
         assert_meta
       end
     end
 
-    context 'when before_save' do
-      context 'when registered via proc' do
+    context "when before_save" do
+      context "when registered via proc" do
         before do
           klass.class_eval do
             before_save do |model, meta|
@@ -1380,13 +1382,13 @@ RSpec.describe 'persistence' do
           end
         end
 
-        it 'works' do
+        it "works" do
           save
           assert_meta
         end
       end
 
-      context 'when registered via method' do
+      context "when registered via method" do
         before do
           klass.class_eval do
             before_save :do_before_save
@@ -1405,15 +1407,15 @@ RSpec.describe 'persistence' do
           end
         end
 
-        it 'works' do
+        it "works" do
           save
           assert_meta
         end
       end
     end
 
-    context 'after_save' do
-      context 'when registered via proc' do
+    context "after_save" do
+      context "when registered via proc" do
         before do
           klass.class_eval do
             after_save do |model, meta|
@@ -1428,13 +1430,13 @@ RSpec.describe 'persistence' do
           end
         end
 
-        it 'works' do
+        it "works" do
           save
           assert_meta
         end
       end
 
-      context 'when registered via method' do
+      context "when registered via method" do
         before do
           klass.class_eval do
             after_save :do_after_save
@@ -1453,14 +1455,14 @@ RSpec.describe 'persistence' do
           end
         end
 
-        it 'works' do
+        it "works" do
           save
           assert_meta
         end
       end
     end
 
-    context 'around_save' do
+    context "around_save" do
       before do
         klass.class_eval do
           around_save :do_around_save
@@ -1481,13 +1483,13 @@ RSpec.describe 'persistence' do
         end
       end
 
-      it 'works' do
+      it "works" do
         save
         assert_meta
       end
     end
 
-    context 'around_persistence' do
+    context "around_persistence" do
       before do
         klass.class_eval do
           around_persistence :do_around_persistence
@@ -1508,14 +1510,14 @@ RSpec.describe 'persistence' do
         end
       end
 
-      it 'works' do
+      it "works" do
         save
         assert_meta
       end
     end
 
-    context 'before_destroy' do
-      context 'when registered via proc' do
+    context "before_destroy" do
+      context "when registered via proc" do
         before do
           klass.class_eval do
             before_destroy do |model, meta|
@@ -1524,14 +1526,14 @@ RSpec.describe 'persistence' do
           end
         end
 
-        it 'works' do
-          employee = PORO::Employee.create(first_name: 'Jane')
+        it "works" do
+          employee = PORO::Employee.create(first_name: "Jane")
           klass.find(id: employee.id).destroy
           expect(klass.meta).to eq(method: :destroy)
         end
       end
 
-      context 'when registered via method' do
+      context "when registered via method" do
         before do
           klass.class_eval do
             before_destroy :do_before_destroy
@@ -1542,32 +1544,32 @@ RSpec.describe 'persistence' do
           end
         end
 
-        it 'works' do
-          employee = PORO::Employee.create(first_name: 'Jane')
+        it "works" do
+          employee = PORO::Employee.create(first_name: "Jane")
           klass.find(id: employee.id).destroy
           expect(klass.meta).to eq(method: :destroy)
         end
       end
 
-      context 'when sideposted' do
-        let(:employee) { PORO::Employee.create(first_name: 'Jane') }
-        let(:position) { PORO::Position.create(title: 'foo') }
+      context "when sideposted" do
+        let(:employee) { PORO::Employee.create(first_name: "Jane") }
+        let(:position) { PORO::Position.create(title: "foo") }
 
         let(:payload) do
           {
             data: {
-              type: 'employees',
+              type: "employees",
               id: employee.id,
               relationships: {
                 positions: {
                   data: [{
                     id: position.id.to_s,
-                    type: 'positions',
-                    method: :destroy
-                  }]
-                }
-              }
-            }
+                    type: "positions",
+                    method: :destroy,
+                  }],
+                },
+              },
+            },
           }
         end
 
@@ -1576,7 +1578,9 @@ RSpec.describe 'persistence' do
             class << self
               attr_accessor :meta
             end
-            def self.name;'PORO::PositionResource';end
+            def self.name
+              "PORO::PositionResource"
+            end
             attribute :employee_id, :integer
             before_destroy do |model, meta|
               self.class.meta = meta
@@ -1588,21 +1592,21 @@ RSpec.describe 'persistence' do
           klass.has_many :positions, resource: position_resource
         end
 
-        it 'works' do
+        it "works" do
           klass.find(payload).save
           expect(position_resource.meta.except(:caller_model)).to eq({
             method: :destroy,
-            attributes: { employee_id: nil, id: 1 },
+            attributes: {employee_id: nil, id: 1},
             relationships: {},
-            temp_id: nil
+            temp_id: nil,
           })
           expect(position_resource.meta[:caller_model]).to be_a(PORO::Employee)
         end
       end
     end
 
-    context 'after_destroy' do
-      context 'when registered via proc' do
+    context "after_destroy" do
+      context "when registered via proc" do
         before do
           klass.class_eval do
             after_destroy do |model, meta|
@@ -1611,14 +1615,14 @@ RSpec.describe 'persistence' do
           end
         end
 
-        it 'works' do
-          employee = PORO::Employee.create(first_name: 'Jane')
+        it "works" do
+          employee = PORO::Employee.create(first_name: "Jane")
           klass.find(id: employee.id).destroy
           expect(klass.meta).to eq(method: :destroy)
         end
       end
 
-      context 'when registered via method' do
+      context "when registered via method" do
         before do
           klass.class_eval do
             after_destroy :do_after_destroy
@@ -1629,15 +1633,15 @@ RSpec.describe 'persistence' do
           end
         end
 
-        it 'works' do
-          employee = PORO::Employee.create(first_name: 'Jane')
+        it "works" do
+          employee = PORO::Employee.create(first_name: "Jane")
           klass.find(id: employee.id).destroy
           expect(klass.meta).to eq(method: :destroy)
         end
       end
     end
 
-    context 'around_destroy' do
+    context "around_destroy" do
       before do
         klass.class_eval do
           around_destroy :do_around_destroy
@@ -1649,14 +1653,14 @@ RSpec.describe 'persistence' do
         end
       end
 
-      it 'works' do
-        employee = PORO::Employee.create(first_name: 'Jane')
+      it "works" do
+        employee = PORO::Employee.create(first_name: "Jane")
         klass.find(id: employee.id).destroy
         expect(klass.meta).to eq(method: :destroy)
       end
     end
 
-    context '#build' do
+    context "#build" do
       before do
         klass.class_eval do
           def build(model_class, meta)
@@ -1673,13 +1677,13 @@ RSpec.describe 'persistence' do
         end
       end
 
-      it 'works' do
+      it "works" do
         save
         assert_meta
       end
     end
 
-    context '#save' do
+    context "#save" do
       before do
         klass.class_eval do
           def save(model, meta)
@@ -1696,13 +1700,13 @@ RSpec.describe 'persistence' do
         end
       end
 
-      it 'works' do
+      it "works" do
         save
         assert_meta
       end
     end
 
-    context '#assign_attributes' do
+    context "#assign_attributes" do
       before do
         klass.class_eval do
           def assign_attributes(model, attrs, meta)
@@ -1719,13 +1723,13 @@ RSpec.describe 'persistence' do
         end
       end
 
-      it 'works' do
+      it "works" do
         save
         assert_meta
       end
     end
 
-    context '#delete' do
+    context "#delete" do
       before do
         klass.class_eval do
           def delete(model, meta)
@@ -1735,68 +1739,68 @@ RSpec.describe 'persistence' do
         end
       end
 
-      it 'works' do
-        employee = PORO::Employee.create(first_name: 'Jane')
+      it "works" do
+        employee = PORO::Employee.create(first_name: "Jane")
         klass.find(id: employee.id).destroy
         expect(klass.meta).to eq(method: :destroy)
       end
     end
   end
 
-  context 'when given an attribute that does not exist' do
+  context "when given an attribute that does not exist" do
     before do
-      payload[:data][:attributes] = { foo: 'bar' }
+      payload[:data][:attributes] = {foo: "bar"}
     end
 
-    it 'raises appropriate error' do
+    it "raises appropriate error" do
       employee = klass.build(payload)
       expect {
         employee.save
-      }.to raise_error(Graphiti::Errors::AttributeError, 'PORO::EmployeeResource: Tried to write attribute :foo, but could not find an attribute with that name.')
+      }.to raise_error(Graphiti::Errors::AttributeError, "PORO::EmployeeResource: Tried to write attribute :foo, but could not find an attribute with that name.")
     end
   end
 
-  context 'when given an attribute that is not writable' do
+  context "when given an attribute that is not writable" do
     before do
       klass.attribute :foo, :string, writable: false
-      payload[:data][:attributes] = { foo: 'bar' }
+      payload[:data][:attributes] = {foo: "bar"}
     end
 
-    it 'raises appropriate error' do
+    it "raises appropriate error" do
       employee = klass.build(payload)
       expect {
         employee.save
-      }.to raise_error(Graphiti::Errors::AttributeError, 'PORO::EmployeeResource: Tried to write attribute :foo, but the attribute was marked :writable => false.')
+      }.to raise_error(Graphiti::Errors::AttributeError, "PORO::EmployeeResource: Tried to write attribute :foo, but the attribute was marked :writable => false.")
     end
   end
 
-  context 'when given a writable attribute of the wrong type' do
+  context "when given a writable attribute of the wrong type" do
     before do
       klass.attribute :foo, :integer
-      payload[:data][:attributes] = { foo: 'bar' }
+      payload[:data][:attributes] = {foo: "bar"}
     end
 
-    it 'raises helpful error' do
+    it "raises helpful error" do
       employee = klass.build(payload)
       expect {
         employee.save
       }.to raise_error(Graphiti::Errors::TypecastFailed, /Failed typecasting :foo! Given "bar" but the following error was raised/)
     end
 
-    context 'and it can coerce' do
+    context "and it can coerce" do
       before do
-        payload[:data][:attributes] = { first_name: 1 }
+        payload[:data][:attributes] = {first_name: 1}
       end
 
-      it 'works' do
+      it "works" do
         employee = klass.build(payload)
         expect(employee.save).to eq(true)
-        expect(employee.data.first_name).to eq('1')
+        expect(employee.data.first_name).to eq("1")
       end
     end
   end
 
-  describe 'types' do
+  describe "types" do
     def save(value)
       payload[:data][:attributes][:age] = value
       employee = klass.build(payload)
@@ -1804,39 +1808,39 @@ RSpec.describe 'persistence' do
       employee.data.age
     end
 
-    context 'when string' do
+    context "when string" do
       let!(:value) { 1 }
 
       before do
         klass.attribute :age, :string
       end
 
-      it 'coerces' do
-        expect(save(1)).to eq('1')
+      it "coerces" do
+        expect(save(1)).to eq("1")
       end
     end
 
-    context 'when integer' do
+    context "when integer" do
       before do
         klass.attribute :age, :integer
       end
 
-      it 'coerces strings' do
-        expect(save('1')).to eq(1)
+      it "coerces strings" do
+        expect(save("1")).to eq(1)
       end
 
-      it 'allows nils' do
+      it "allows nils" do
         expect(save(nil)).to eq(nil)
       end
 
-      it 'does not coerce blank string to 0' do
+      it "does not coerce blank string to 0" do
         expect {
-          save('')
+          save("")
         }.to raise_error(Graphiti::Errors::TypecastFailed)
       end
 
-      context 'when cannot coerce' do
-        it 'raises error' do
+      context "when cannot coerce" do
+        it "raises error" do
           expect {
             save({})
           }.to raise_error(Graphiti::Errors::TypecastFailed)
@@ -1844,25 +1848,25 @@ RSpec.describe 'persistence' do
       end
     end
 
-    context 'when decimal' do
+    context "when decimal" do
       before do
         klass.attribute :age, :big_decimal
       end
 
-      it 'coerces integers' do
+      it "coerces integers" do
         expect(save(1)).to eq(BigDecimal(1))
       end
 
-      it 'coerces strings' do
-        expect(save('1')).to eq(BigDecimal(1))
+      it "coerces strings" do
+        expect(save("1")).to eq(BigDecimal(1))
       end
 
-      it 'allows nils' do
+      it "allows nils" do
         expect(save(nil)).to eq(nil)
       end
 
-      context 'when cannot coerce' do
-        it 'raises error' do
+      context "when cannot coerce" do
+        it "raises error" do
           expect {
             save({})
           }.to raise_error(Graphiti::Errors::TypecastFailed)
@@ -1870,25 +1874,25 @@ RSpec.describe 'persistence' do
       end
     end
 
-    context 'when float' do
+    context "when float" do
       before do
         klass.attribute :age, :float
       end
 
-      it 'coerces strings' do
-        expect(save('1.1')).to eq(1.1)
+      it "coerces strings" do
+        expect(save("1.1")).to eq(1.1)
       end
 
-      it 'coerces integers' do
+      it "coerces integers" do
         expect(save(1)).to eq(1.0)
       end
 
-      it 'allows nils' do
+      it "allows nils" do
         expect(save(nil)).to eq(nil)
       end
 
-      context 'when cannot coerce' do
-        it 'raises error' do
+      context "when cannot coerce" do
+        it "raises error" do
           expect {
             save({})
           }.to raise_error(Graphiti::Errors::TypecastFailed)
@@ -1896,25 +1900,25 @@ RSpec.describe 'persistence' do
       end
     end
 
-    context 'when boolean' do
+    context "when boolean" do
       before do
         klass.attribute :age, :boolean
       end
 
-      it 'coerces strings' do
-        expect(save('true')).to eq(true)
+      it "coerces strings" do
+        expect(save("true")).to eq(true)
       end
 
-      it 'coerces integers' do
+      it "coerces integers" do
         expect(save(1)).to eq(true)
       end
 
-      it 'allows nils' do
+      it "allows nils" do
         expect(save(nil)).to eq(nil)
       end
 
-      context 'when cannot coerce' do
-        it 'raises error' do
+      context "when cannot coerce" do
+        it "raises error" do
           expect {
             save({})
           }.to raise_error(Graphiti::Errors::TypecastFailed)
@@ -1922,37 +1926,37 @@ RSpec.describe 'persistence' do
       end
     end
 
-    context 'when date' do
+    context "when date" do
       before do
         klass.attribute :age, :date
       end
 
-      it 'coerces Date strings to correct format' do
-        expect(save('2018/01/06')).to eq(Date.parse('2018-01-06'))
+      it "coerces Date strings to correct format" do
+        expect(save("2018/01/06")).to eq(Date.parse("2018-01-06"))
       end
 
-      it 'coerces Time strings to correct format' do
-        time = Time.parse('2018/01/06 4:36pm EST')
-        expect(save(time.iso8601)).to eq(Date.parse('2018-01-06'))
+      it "coerces Time strings to correct format" do
+        time = Time.parse("2018/01/06 4:36pm EST")
+        expect(save(time.iso8601)).to eq(Date.parse("2018-01-06"))
       end
 
-      it 'coerces Time to correct date format' do
-        time = Time.parse('2018/01/06 4:36pm EST')
-        expect(save(time)).to eq(Date.parse('2018-01-06'))
+      it "coerces Time to correct date format" do
+        time = Time.parse("2018/01/06 4:36pm EST")
+        expect(save(time)).to eq(Date.parse("2018-01-06"))
       end
 
-      it 'allows nils' do
+      it "allows nils" do
         expect(save(nil)).to eq(nil)
       end
 
-      context 'when only month' do
-        it 'defaults to first of the month' do
-          expect(save('2018/01')).to eq(Date.parse('2018-01-01'))
+      context "when only month" do
+        it "defaults to first of the month" do
+          expect(save("2018/01")).to eq(Date.parse("2018-01-01"))
         end
       end
 
-      context 'when cannot coerce' do
-        it 'raises error' do
+      context "when cannot coerce" do
+        it "raises error" do
           expect {
             save({})
           }.to raise_error(Graphiti::Errors::TypecastFailed)
@@ -1960,48 +1964,48 @@ RSpec.describe 'persistence' do
       end
     end
 
-    context 'when datetime' do
+    context "when datetime" do
       before do
         klass.attribute :age, :datetime
       end
 
-      it 'coerces Time correctly' do
-        time = Time.parse('2018-01-06 4:36pm PST')
-        expect(save(time)).to eq(DateTime.parse('2018-01-06 4:36pm PST'))
+      it "coerces Time correctly" do
+        time = Time.parse("2018-01-06 4:36pm PST")
+        expect(save(time)).to eq(DateTime.parse("2018-01-06 4:36pm PST"))
       end
 
-      it 'coerces Date correctly' do
-        date = Date.parse('2018-01-06')
-        expect(save(date)).to eq(DateTime.parse('2018-01-06'))
+      it "coerces Date correctly" do
+        date = Date.parse("2018-01-06")
+        expect(save(date)).to eq(DateTime.parse("2018-01-06"))
       end
 
-      it 'coerces date strings correctly' do
-        expect(save('2018-01-06')).to eq(DateTime.parse('2018-01-06'))
+      it "coerces date strings correctly" do
+        expect(save("2018-01-06")).to eq(DateTime.parse("2018-01-06"))
       end
 
-      it 'preserves date string zones' do
-        result = save('2018-01-06 4:36pm PST')
-        expect(result.zone).to eq('-08:00')
+      it "preserves date string zones" do
+        result = save("2018-01-06 4:36pm PST")
+        expect(result.zone).to eq("-08:00")
       end
 
-      it 'coerces time strings correctly' do
-        str = '2018-01-06 4:36pm PST'
+      it "coerces time strings correctly" do
+        str = "2018-01-06 4:36pm PST"
         time = Time.parse(str)
         expect(save(time.iso8601)).to eq(DateTime.parse(str))
       end
 
-      it 'preserves time string zones' do
-        time = Time.parse('2018-01-06 4:36pm PST')
+      it "preserves time string zones" do
+        time = Time.parse("2018-01-06 4:36pm PST")
         result = save(time.iso8601)
-        expect(result.zone).to eq('-08:00')
+        expect(result.zone).to eq("-08:00")
       end
 
-      it 'allows nils' do
+      it "allows nils" do
         expect(save(nil)).to eq(nil)
       end
 
-      context 'when cannot coerce' do
-        it 'raises error' do
+      context "when cannot coerce" do
+        it "raises error" do
           expect {
             save({})
           }.to raise_error(Graphiti::Errors::TypecastFailed)
@@ -2009,22 +2013,22 @@ RSpec.describe 'persistence' do
       end
     end
 
-    context 'when hash' do
+    context "when hash" do
       before do
         klass.attribute :age, :hash
       end
 
-      it 'works' do
-        expect(save({ foo: 'bar' })).to eq(foo: 'bar')
+      it "works" do
+        expect(save({foo: "bar"})).to eq(foo: "bar")
       end
 
       # I'm OK with eventually coercing to symbols, but this seems fine
-      it 'allows string keys' do
-        expect(save({ 'foo' => 'bar' })).to eq('foo' => 'bar')
+      it "allows string keys" do
+        expect(save({"foo" => "bar"})).to eq("foo" => "bar")
       end
 
-      context 'when cannot coerce' do
-        it 'raises error' do
+      context "when cannot coerce" do
+        it "raises error" do
           expect {
             save([:foo, :bar])
           }.to raise_error(Graphiti::Errors::TypecastFailed)
@@ -2032,29 +2036,29 @@ RSpec.describe 'persistence' do
       end
     end
 
-    context 'when array' do
+    context "when array" do
       before do
         klass.attribute :age, :array
       end
 
-      it 'works' do
+      it "works" do
         expect(save([:foo, :bar])).to eq([:foo, :bar])
       end
 
-      it 'raises error on single values' do
+      it "raises error on single values" do
         expect {
           save(:foo)
         }.to raise_error(Graphiti::Errors::TypecastFailed)
       end
 
-      it 'does NOT allow nils' do
+      it "does NOT allow nils" do
         expect {
           save(nil)
         }.to raise_error(Graphiti::Errors::TypecastFailed)
       end
 
-      context 'when cannot coerce' do
-        it 'raises error' do
+      context "when cannot coerce" do
+        it "raises error" do
           expect {
             save({})
           }.to raise_error(Graphiti::Errors::TypecastFailed)
@@ -2063,33 +2067,33 @@ RSpec.describe 'persistence' do
     end
 
     # test for all array_of_*
-    context 'when array_of_integers' do
+    context "when array_of_integers" do
       before do
         klass.attribute :age, :array_of_integers
       end
 
-      it 'works' do
+      it "works" do
         expect(save([1, 2])).to eq([1, 2])
       end
 
-      it 'applies basic coercion' do
-        expect(save(['1', '2'])).to eq([1, 2])
+      it "applies basic coercion" do
+        expect(save(["1", "2"])).to eq([1, 2])
       end
 
-      it 'raises error on single values' do
+      it "raises error on single values" do
         expect {
           save(1)
         }.to raise_error(Graphiti::Errors::TypecastFailed)
       end
 
-      it 'raises error on nils' do
+      it "raises error on nils" do
         expect {
           save(nil)
         }.to raise_error(Graphiti::Errors::TypecastFailed)
       end
 
-      context 'when cannot coerce' do
-        it 'raises error' do
+      context "when cannot coerce" do
+        it "raises error" do
           expect {
             save({})
           }.to raise_error(Graphiti::Errors::TypecastFailed)
@@ -2097,19 +2101,19 @@ RSpec.describe 'persistence' do
       end
     end
 
-    context 'when custom type' do
+    context "when custom type" do
       before do
         type = Dry::Types::Definition
           .new(nil)
           .constructor { |input|
-            'custom!'
+            "custom!"
           }
         Graphiti::Types[:custom] = {
           write: type,
           read: type,
           params: type,
-          description: 'test',
-          kind: 'scalar'
+          description: "test",
+          kind: "scalar",
         }
         klass.attribute :age, :custom
       end
@@ -2118,36 +2122,36 @@ RSpec.describe 'persistence' do
         Graphiti::Types.map.delete(:custom)
       end
 
-      it 'works' do
-        expect(save('foo')).to eq('custom!')
+      it "works" do
+        expect(save("foo")).to eq("custom!")
       end
     end
   end
 
-  describe 'nested writes' do
-    describe 'has_many' do
+  describe "nested writes" do
+    describe "has_many" do
       let(:payload) do
         {
           data: {
-            type: 'employees',
-            attributes: { first_name: 'Jane' },
+            type: "employees",
+            attributes: {first_name: "Jane"},
             relationships: {
               positions: {
                 data: [{
-                  type: 'positions',
-                  :'temp-id' => 'abc123',
-                  method: 'create'
-                }]
-              }
-            }
+                  type: "positions",
+                  'temp-id': "abc123",
+                  method: "create",
+                }],
+              },
+            },
           },
           included: [
             {
-              type: 'positions',
-              :'temp-id' => 'abc123',
-              attributes: { title: 'mytitle' }
-            }
-          ]
+              type: "positions",
+              'temp-id': "abc123",
+              attributes: {title: "mytitle"},
+            },
+          ],
         }
       end
 
@@ -2156,7 +2160,7 @@ RSpec.describe 'persistence' do
           validates :title, presence: true
 
           def self.name
-            'PORO::Position'
+            "PORO::Position"
           end
         end
       end
@@ -2169,7 +2173,7 @@ RSpec.describe 'persistence' do
           attribute :title, :string
 
           def self.name
-            'PORO::PositionResource'
+            "PORO::PositionResource"
           end
         end
       end
@@ -2178,24 +2182,24 @@ RSpec.describe 'persistence' do
         klass.has_many :positions, resource: position_resource
       end
 
-      it 'works' do
+      it "works" do
         employee = klass.build(payload)
         expect(employee.save).to eq(true)
         data = employee.data
         expect(data.id).to be_present
-        expect(data.first_name).to eq('Jane')
+        expect(data.first_name).to eq("Jane")
         expect(data.positions.length).to eq(1)
         positions = data.positions
         expect(positions[0].id).to be_present
-        expect(positions[0].title).to eq('mytitle')
+        expect(positions[0].title).to eq("mytitle")
       end
 
-      context 'when a nested validation error' do
+      context "when a nested validation error" do
         before do
           payload[:included][0].delete(:attributes)
         end
 
-        it 'responds correctly' do
+        it "responds correctly" do
           employee = klass.build(payload)
           expect(employee.save).to eq(false)
           expect(employee.data.positions[0].errors.full_messages)
@@ -2204,28 +2208,28 @@ RSpec.describe 'persistence' do
       end
     end
 
-    describe 'belongs_to' do
+    describe "belongs_to" do
       let(:payload) do
         {
           data: {
-            type: 'employees',
+            type: "employees",
             relationships: {
               classification: {
                 data: {
-                  type: 'classifications',
-                  :'temp-id' => 'abc123',
-                  method: 'create'
-                }
-              }
-            }
+                  type: "classifications",
+                  'temp-id': "abc123",
+                  method: "create",
+                },
+              },
+            },
           },
           included: [
             {
-              :'temp-id' => 'abc123',
-              type: 'classifications',
-              attributes: { description: 'classy' }
-            }
-          ]
+              'temp-id': "abc123",
+              type: "classifications",
+              attributes: {description: "classy"},
+            },
+          ],
         }
       end
 
@@ -2234,7 +2238,7 @@ RSpec.describe 'persistence' do
           validates :description, presence: true
 
           def self.name
-            'PORO::Classification'
+            "PORO::Classification"
           end
         end
       end
@@ -2246,7 +2250,7 @@ RSpec.describe 'persistence' do
           attribute :description, :string
 
           def self.name
-            'PORO::ClassificationResource'
+            "PORO::ClassificationResource"
           end
         end
       end
@@ -2256,22 +2260,22 @@ RSpec.describe 'persistence' do
         klass.belongs_to :classification, resource: classification_resource
       end
 
-      it 'works' do
+      it "works" do
         employee = klass.build(payload)
         expect(employee.save).to eq(true)
         data = employee.data
         expect(data.id).to be_present
         expect(data.classification).to be_a(classification_model)
         expect(data.classification.id).to be_present
-        expect(data.classification.description).to eq('classy')
+        expect(data.classification.description).to eq("classy")
       end
 
-      context 'when a nested validation error' do
+      context "when a nested validation error" do
         before do
           payload[:included][0].delete(:attributes)
         end
 
-        it 'responds correctly' do
+        it "responds correctly" do
           employee = klass.build(payload)
           expect(employee.save).to eq(false)
           expect(employee.data.classification.errors.full_messages)
@@ -2280,29 +2284,29 @@ RSpec.describe 'persistence' do
       end
     end
 
-    describe 'has_one' do
+    describe "has_one" do
       let(:payload) do
         {
           data: {
-            type: 'employees',
-            attributes: { first_name: 'Jane' },
+            type: "employees",
+            attributes: {first_name: "Jane"},
             relationships: {
               bio: {
                 data: {
-                  type: 'bios',
-                  :'temp-id' => 'abc123',
-                  method: 'create'
-                }
-              }
-            }
+                  type: "bios",
+                  'temp-id': "abc123",
+                  method: "create",
+                },
+              },
+            },
           },
           included: [
             {
-              type: 'bios',
-              :'temp-id' => 'abc123',
-              attributes: { text: 'mytext' }
-            }
-          ]
+              type: "bios",
+              'temp-id': "abc123",
+              attributes: {text: "mytext"},
+            },
+          ],
         }
       end
 
@@ -2311,7 +2315,7 @@ RSpec.describe 'persistence' do
           validates :text, presence: true
 
           def self.name
-            'PORO::Bio'
+            "PORO::Bio"
           end
         end
       end
@@ -2324,7 +2328,7 @@ RSpec.describe 'persistence' do
           attribute :text, :string
 
           def self.name
-            'PORO::BioResource'
+            "PORO::BioResource"
           end
         end
       end
@@ -2333,22 +2337,22 @@ RSpec.describe 'persistence' do
         klass.has_one :bio, resource: bio_resource
       end
 
-      it 'works' do
+      it "works" do
         employee = klass.build(payload)
         expect(employee.save).to eq(true)
         data = employee.data
         expect(data.id).to be_present
-        expect(data.first_name).to eq('Jane')
+        expect(data.first_name).to eq("Jane")
         expect(data.bio.id).to be_present
-        expect(data.bio.text).to eq('mytext')
+        expect(data.bio.text).to eq("mytext")
       end
 
-      context 'when a nested validation error' do
+      context "when a nested validation error" do
         before do
           payload[:included][0].delete(:attributes)
         end
 
-        it 'responds correctly' do
+        it "responds correctly" do
           employee = klass.build(payload)
           expect(employee.save).to eq(false)
           expect(employee.data.bio.errors.full_messages)
@@ -2357,29 +2361,29 @@ RSpec.describe 'persistence' do
       end
     end
 
-    describe 'many_to_many' do
+    describe "many_to_many" do
       let(:payload) do
         {
           data: {
-            type: 'employees',
-            attributes: { first_name: 'Jane' },
+            type: "employees",
+            attributes: {first_name: "Jane"},
             relationships: {
               teams: {
                 data: [{
-                  type: 'teams',
-                  :'temp-id' => 'abc123',
-                  method: 'create'
-                }]
-              }
-            }
+                  type: "teams",
+                  'temp-id': "abc123",
+                  method: "create",
+                }],
+              },
+            },
           },
           included: [
             {
-              type: 'teams',
-              :'temp-id' => 'abc123',
-              attributes: { name: 'ip' }
-            }
-          ]
+              type: "teams",
+              'temp-id': "abc123",
+              attributes: {name: "ip"},
+            },
+          ],
         }
       end
 
@@ -2388,7 +2392,7 @@ RSpec.describe 'persistence' do
           validates :name, presence: true
 
           def self.name
-            'PORO::Team'
+            "PORO::Team"
           end
         end
       end
@@ -2400,7 +2404,7 @@ RSpec.describe 'persistence' do
           attribute :name, :string
 
           def self.name
-            'PORO::TeamResource'
+            "PORO::TeamResource"
           end
         end
       end
@@ -2408,25 +2412,25 @@ RSpec.describe 'persistence' do
       before do
         klass.many_to_many :teams,
           resource: team_resource,
-          foreign_key: { team_memberships: :team_id }
+          foreign_key: {team_memberships: :team_id}
       end
 
-      it 'works' do
+      it "works" do
         employee = klass.build(payload)
         expect(employee.save).to eq(true)
         data = employee.data
         expect(data.id).to be_present
-        expect(data.first_name).to eq('Jane')
+        expect(data.first_name).to eq("Jane")
         expect(data.teams.length).to eq(1)
-        expect(data.teams[0].name).to eq('ip')
+        expect(data.teams[0].name).to eq("ip")
       end
 
-      context 'when a nested validation error' do
+      context "when a nested validation error" do
         before do
           payload[:included][0].delete(:attributes)
         end
 
-        it 'responds correctly' do
+        it "responds correctly" do
           employee = klass.build(payload)
           expect(employee.save).to eq(false)
           expect(employee.data.teams[0].errors.full_messages)
@@ -2435,28 +2439,28 @@ RSpec.describe 'persistence' do
       end
     end
 
-    describe 'polymorphic_belongs_to' do
+    describe "polymorphic_belongs_to" do
       let(:payload) do
         {
           data: {
-            type: 'employees',
+            type: "employees",
             relationships: {
               credit_card: {
                 data: {
-                  type: 'visas',
-                  :'temp-id' => 'abc123',
-                  method: 'create'
-                }
-              }
-            }
+                  type: "visas",
+                  'temp-id': "abc123",
+                  method: "create",
+                },
+              },
+            },
           },
           included: [
             {
-              :'temp-id' => 'abc123',
-              type: 'visas',
-              attributes: { number: 123456 }
-            }
-          ]
+              'temp-id': "abc123",
+              type: "visas",
+              attributes: {number: 123456},
+            },
+          ],
         }
       end
 
@@ -2465,7 +2469,7 @@ RSpec.describe 'persistence' do
           validates :number, presence: true
 
           def self.name
-            'PORO::Visa'
+            "PORO::Visa"
           end
         end
       end
@@ -2478,7 +2482,7 @@ RSpec.describe 'persistence' do
           attribute :number, :integer
 
           def self.name
-            'PORO::VisaResource'
+            "PORO::VisaResource"
           end
         end
       end
@@ -2492,7 +2496,7 @@ RSpec.describe 'persistence' do
         end
       end
 
-      it 'works' do
+      it "works" do
         employee = klass.build(payload)
         expect(employee.save).to eq(true)
         data = employee.data
@@ -2504,43 +2508,43 @@ RSpec.describe 'persistence' do
       end
     end
 
-    context 'when multiple levels' do
+    context "when multiple levels" do
       let(:payload) do
         {
           data: {
-            type: 'employees',
-            attributes: { first_name: 'Jane' },
+            type: "employees",
+            attributes: {first_name: "Jane"},
             relationships: {
               positions: {
                 data: [{
-                  type: 'positions',
-                  :'temp-id' => 'abc123',
-                  method: 'create'
-                }]
-              }
-            }
+                  type: "positions",
+                  'temp-id': "abc123",
+                  method: "create",
+                }],
+              },
+            },
           },
           included: [
             {
-              type: 'positions',
-              :'temp-id' => 'abc123',
-              attributes: { title: 'mytitle' },
+              type: "positions",
+              'temp-id': "abc123",
+              attributes: {title: "mytitle"},
               relationships: {
                 department: {
                   data: {
-                    type: 'departments',
-                    :'temp-id' => 'abc456',
-                    method: 'create'
-                  }
-                }
-              }
+                    type: "departments",
+                    'temp-id': "abc456",
+                    method: "create",
+                  },
+                },
+              },
             },
             {
-              type: 'departments',
-              :'temp-id' => 'abc456',
-              attributes: { name: 'mydept' }
-            }
-          ]
+              type: "departments",
+              'temp-id': "abc456",
+              attributes: {name: "mydept"},
+            },
+          ],
         }
       end
 
@@ -2551,9 +2555,8 @@ RSpec.describe 'persistence' do
           attribute :department_id, :integer, only: [:writable]
           attribute :title, :string
 
-
           def self.name
-            'PORO::PositionResource'
+            "PORO::PositionResource"
           end
         end
       end
@@ -2571,7 +2574,7 @@ RSpec.describe 'persistence' do
         klass.has_many :positions, resource: position_resource
       end
 
-      it 'still works' do
+      it "still works" do
         employee = klass.build(payload)
         expect(employee.save).to eq(true)
         data = employee.data
@@ -2579,10 +2582,10 @@ RSpec.describe 'persistence' do
         expect(data.positions.length).to eq(1)
         expect(data.positions[0]).to be_a(PORO::Position)
         expect(data.positions[0].id).to be_present
-        expect(data.positions[0].title).to eq('mytitle')
+        expect(data.positions[0].title).to eq("mytitle")
         expect(data.positions[0].department).to be_a(PORO::Department)
         expect(data.positions[0].department.id).to be_present
-        expect(data.positions[0].department.name).to eq('mydept')
+        expect(data.positions[0].department.name).to eq("mydept")
       end
     end
   end

@@ -29,8 +29,8 @@ module Graphiti
             result = yield
             run(:before_commit)
 
-            unless result.kind_of?(::Hash)
-              result = { result: result }
+            unless result.is_a?(::Hash)
+              result = {result: result}
             end
 
             result.tap do |r|
@@ -52,6 +52,7 @@ module Graphiti
         end
 
         private
+
         def _hooks
           Thread.current[:_graphiti_hooks]
         end

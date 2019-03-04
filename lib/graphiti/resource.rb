@@ -71,7 +71,7 @@ module Graphiti
         type_name = filters[name][:type]
       end
       type = Graphiti::Types[type_name]
-      return if value.nil? && type[:kind] != 'array'
+      return if value.nil? && type[:kind] != "array"
       begin
         flag = :read if flag == :readable
         flag = :write if flag == :writable
@@ -135,7 +135,7 @@ module Graphiti
           response = yield
         end
       rescue Errors::ValidationError => e
-        response = { result: e.validation_response }
+        response = {result: e.validation_response}
       end
       response
     end

@@ -28,10 +28,10 @@ module Graphiti
           raise Errors::UnsupportedSort.new resource,
             attribute, sort[:only], direction
         else
-          if sort[:proc]
-            @scope = sort[:proc].call(@scope, direction)
+          @scope = if sort[:proc]
+            sort[:proc].call(@scope, direction)
           else
-            @scope = resource.adapter.order(@scope, attribute, direction)
+            resource.adapter.order(@scope, attribute, direction)
           end
         end
       end
@@ -70,17 +70,17 @@ module Graphiti
 
     def normalize(sort)
       return sort if sort.is_a?(Array)
-      sorts = sort.split(',')
+      sorts = sort.split(",")
       sorts.map do |s|
         sort_hash(s)
       end
     end
 
     def sort_hash(attr)
-      value = attr[0] == '-' ? :desc : :asc
-      key   = attr.sub('-', '').to_sym
+      value = attr[0] == "-" ? :desc : :asc
+      key   = attr.sub("-", "").to_sym
 
-      { key => value }
+      {key => value}
     end
   end
 end

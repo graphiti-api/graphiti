@@ -54,9 +54,9 @@ class Graphiti::Util::Persistence
 
     associate_parents(persisted, parents)
 
-    children = process_has_many(@relationships, persisted) do |x|
+    children = process_has_many(@relationships, persisted) { |x|
       update_foreign_key(persisted, x[:attributes], x)
-    end
+    }
 
     associate_children(persisted, children) unless @meta[:method] == :destroy
 
@@ -77,10 +77,10 @@ class Graphiti::Util::Persistence
   # would allow writing as a straight attribute instead of just an association
   def typecast_attributes
     @attributes.each_pair do |key, value|
-      if @foreign_key == key
-        @attributes[key] = value
+      @attributes[key] = if @foreign_key == key
+        value
       else
-        @attributes[key] = @resource.typecast(key, value, :writable)
+        @resource.typecast(key, value, :writable)
       end
     end
   end
@@ -243,7 +243,7 @@ class Graphiti::Util::Persistence
       temp_id: @meta[:temp_id],
       caller_model: @caller_model,
       attributes: @attributes,
-      relationships: @relationships
+      relationships: @relationships,
     }
   end
 
