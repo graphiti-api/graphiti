@@ -143,7 +143,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         it "responds with correct error payload" do
           expect {
             do_destroy({id: employee.id})
-          }.to_not change { Employee.count }
+          }.to_not(change { Employee.count })
           expect(json["error"]).to eq("base" => ["Forced validation error"])
         end
       end
@@ -570,7 +570,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         it "rolls back the entire transaction" do
           expect {
             make_request
-          }.to_not change { Employee.count + Position.count + Department.count }
+          }.to_not(change { Employee.count + Position.count + Department.count })
           expect(json["errors"]["positions"])
             .to eq([{"title" => ["can't be blank"]}, {}])
         end
@@ -591,7 +591,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         it "rolls back the entire transaction" do
           expect {
             make_request
-          }.to_not change { Employee.count + Position.count + Department.count }
+          }.to_not(change { Employee.count + Position.count + Department.count })
           expect(json["errors"]["departments"])
             .to eq([{"name" => ["can't be blank"]}])
         end
@@ -776,13 +776,13 @@ if ENV["APPRAISAL_INITIALIZED"]
         it "belongs_to: updates the foreign key on child" do
           expect {
             make_request
-          }.to change { position.reload.department_id }.to(nil)
+          }.to(change { position.reload.department_id }.to(nil))
         end
 
         it "has_many: updates the foreign key on the child" do
           expect {
             make_request
-          }.to change { position.reload.employee_id }.to(nil)
+          }.to(change { position.reload.employee_id }.to(nil))
         end
 
         it "does not delete the objects" do

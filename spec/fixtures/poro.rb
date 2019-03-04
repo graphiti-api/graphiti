@@ -44,11 +44,11 @@ module PORO
       end
 
       def all(params)
-        type = params[:type]
-        records = data.select { |k, v| Array(type).include?(k) }
+        target_types = params[:type]
+        records = data.select { |k, v| Array(target_types).include?(k) }
         return [] unless records
-        records = records.map { |type, _records|
-          _records.map { |attrs| klasses[type].new(attrs) }
+        records = records.map { |type, records_for_type|
+          records_for_type.map { |attrs| klasses[type].new(attrs) }
         }.flatten
         records = apply_filtering(records, params)
         records = apply_sorting(records, params)

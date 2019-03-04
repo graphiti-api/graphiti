@@ -675,13 +675,13 @@ RSpec.describe Graphiti::Schema do
       end
 
       before do
-        _house = house_resource
-        _condo = condo_resource
+        house_res = house_resource
+        condo_res = condo_resource
         employee_resource.class_eval do
           polymorphic_belongs_to :dwelling do
             group_by(:dwelling_type) do
-              on(:House).belongs_to(:adf, resource: _house)
-              on(:Condo).belongs_to(:condo, resource: _condo)
+              on(:House).belongs_to(:adf, resource: house_res)
+              on(:Condo).belongs_to(:condo, resource: condo_res)
             end
           end
         end

@@ -4,14 +4,10 @@ module Graphiti
     TYPES = [:has_many, :belongs_to, :has_one, :many_to_many]
 
     attr_reader :name,
-      :resource_class,
       :parent_resource_class,
-      :foreign_key,
-      :primary_key,
       :parent,
       :group_name,
       :link,
-      :description,
       :polymorphic_as
 
     class_attribute :scope_proc,

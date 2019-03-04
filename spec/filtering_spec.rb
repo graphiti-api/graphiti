@@ -1001,11 +1001,11 @@ RSpec.describe "filtering" do
   context "when custom filtering" do
     context "and the attribute exists" do
       before do
-        _2 = employee2.id
+        id2 = employee2.id
         resource.attribute :foo, :string
         resource.filter :foo do
           eq do |scope, value|
-            scope[:conditions][:id] = _2
+            scope[:conditions][:id] = id2
             scope
           end
         end
@@ -1049,10 +1049,10 @@ RSpec.describe "filtering" do
 
     context "and the attribute does not exist" do
       before do
-        _2 = employee2.id
+        id2 = employee2.id
         resource.filter :foo, :string do
           eq do |scope, value|
-            scope[:conditions][:id] = _2
+            scope[:conditions][:id] = id2
             scope
           end
         end
@@ -1340,10 +1340,10 @@ RSpec.describe "filtering" do
       context "and it is filterable" do
         before do
           resource.extra_attribute :foo, :string, filterable: true
-          _3 = employee3.id
+          id3 = employee3.id
           resource.filter :foo do
             eq do |scope, value|
-              scope[:conditions] = {id: _3}
+              scope[:conditions] = {id: id3}
               scope
             end
           end

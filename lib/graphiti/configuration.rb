@@ -10,13 +10,15 @@ module Graphiti
 
     attr_accessor :respond_to
     attr_accessor :context_for_endpoint
-    attr_accessor :schema_path
     attr_accessor :links_on_demand
     attr_accessor :pagination_links_on_demand
     attr_accessor :pagination_links
     attr_accessor :typecast_reads
-    attr_accessor :debug
-    attr_accessor :debug_models
+
+    attr_reader :debug,
+                :debug_models
+
+    attr_writer :schema_path
 
     # Set defaults
     # @api private

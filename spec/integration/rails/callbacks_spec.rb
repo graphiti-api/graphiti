@@ -220,7 +220,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           it "rolls back the transaction" do
             expect {
               expect { post :create, params: payload }.to raise_error("test")
-            }.to_not change { Employee.count }
+            }.to_not(change { Employee.count })
           end
         end
       end

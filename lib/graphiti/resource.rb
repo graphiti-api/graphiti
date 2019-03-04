@@ -8,8 +8,6 @@ module Graphiti
     include Documentation
     include Persistence
 
-    attr_reader :context
-
     def around_scoping(scope, query_hash)
       extra_fields = query_hash[:extra_fields] || {}
       extra_fields = extra_fields[type] || []
@@ -77,7 +75,7 @@ module Graphiti
         flag = :write if flag == :writable
         flag = :params if [:sortable, :filterable].include?(flag)
         type[flag][value]
-      rescue Exception => e
+      rescue => e
         raise Errors::TypecastFailed.new(self, name, value, e)
       end
     end

@@ -1,6 +1,6 @@
 module Graphiti
   class Query
-    attr_reader :resource, :include_hash, :association_name, :params
+    attr_reader :resource, :association_name, :params
 
     def initialize(resource, params, association_name = nil, nested_include = nil, parents = [])
       @resource = resource

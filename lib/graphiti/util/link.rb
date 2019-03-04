@@ -40,7 +40,7 @@ module Graphiti
           if params.empty?
             path
           else
-            "#{path}?#{URI.unescape(params.to_query)}"
+            "#{path}?#{CGI.unescape(params.to_query)}"
           end
         end
       end

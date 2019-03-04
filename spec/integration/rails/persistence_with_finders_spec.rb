@@ -308,7 +308,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           it "updates only the provided objects" do
             expect {
               make_request
-            }.not_to change { employee.teams }
+            }.not_to(change { employee.teams })
 
             employee.reload
             expect(employee.first_name).to eq("updated first name")

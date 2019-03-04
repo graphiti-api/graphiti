@@ -4,4 +4,4 @@ parallel: true
 ignore:
   - 'vendor/**/*'
   - 'spec/**/*':
-    - Lint/UnderscorePrefixedVariableName
+    - Lint/DuplicateMethods

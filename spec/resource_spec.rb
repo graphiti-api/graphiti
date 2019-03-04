@@ -668,7 +668,7 @@ RSpec.describe Graphiti::Resource do
         it "still overrides" do
           expect {
             klass.attribute :foo, :integer
-          }.to change { klass.filters[:foo] }
+          }.to(change { klass.filters[:foo] })
         end
       end
     end

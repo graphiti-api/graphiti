@@ -628,7 +628,6 @@ RSpec.describe "persistence" do
               attributes[:first_name] = "b4"
               model = yield
               model.update_attributes(first_name: "#{model.first_name}after")
-              model
               1 # return value shouldnt matter
             end
           end

@@ -258,11 +258,6 @@ module Graphiti
         instance
       end
 
-      def destroy(model)
-        model.destroy
-        model
-      end
-
       def save(model_instance)
         model_instance.save
         model_instance

@@ -120,18 +120,6 @@ module Graphiti
         raise Errors::AdapterNotImplemented.new(self, attribute, :filter_integer_lte)
       end
 
-      def filter_datetime_eq(scope, attribute, value)
-        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_datetime_eq)
-      end
-
-      def filter_datetime_not_eq(scope, attribute, value)
-        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_datetime_not_eq)
-      end
-
-      def filter_datetime_lte(scope, attribute, value)
-        raise Errors::AdapterNotImplemented.new(self, attribute, :filter_datetime_lte)
-      end
-
       def filter_float_eq(scope, attribute, value)
         raise Errors::AdapterNotImplemented.new(self, attribute, :filter_float_eq)
       end
@@ -413,11 +401,11 @@ module Graphiti
         raise "you must override #destroy in an adapter subclass"
       end
 
-      private
-
       def self.numerical_operators
-        [:eq, :not_eq, :gt, :gte, :lt, :lte]
+        [:eq, :not_eq, :gt, :gte, :lt, :lte].freeze
       end
+
+      private
 
       def activerecord_adapter
         @activerecord_adapter ||=

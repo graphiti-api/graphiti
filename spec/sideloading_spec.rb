@@ -563,10 +563,10 @@ RSpec.describe "sideloading" do
       end
 
       before do
-        _resource = special_visa_resource
+        special_visa = special_visa_resource
         resource.polymorphic_belongs_to :credit_card do
           group_by(:credit_card_type, except: [:Paypal]) do
-            on(:Visa).belongs_to :visa, resource: _resource
+            on(:Visa).belongs_to :visa, resource: special_visa
             on(:Mastercard)
           end
         end
@@ -707,9 +707,8 @@ RSpec.describe "sideloading" do
           before do
             ids = [position1.id, position2.id]
             resource.has_many :positions, has_many_opts do
-              _ids = ids
               params do |hash|
-                hash[:filter] = {id: _ids}
+                hash[:filter] = {id: ids}
               end
 
               assign do |employees, positions|
@@ -833,13 +832,11 @@ RSpec.describe "sideloading" do
           end
 
           before do
-            _id = department.id
-            _param = filter_param
+            dept_id = department.id
+            param = filter_param
             position_resource.belongs_to :department, resource: department_resource do
-              __id = _id
-              __param = _param
               params do |hash|
-                hash[:filter] = __param.call(__id)
+                hash[:filter] = param.call(dept_id)
               end
 
               assign_each do |position, departments|

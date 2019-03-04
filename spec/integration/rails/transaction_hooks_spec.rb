@@ -3,21 +3,21 @@ if ENV["APPRAISAL_INITIALIZED"]
     class Callbacks
       class << self
         attr_accessor :fired, :in_transaction_during, :entities
-      end
 
-      def self.add(name, object)
-        fired[name] = object
-        in_transaction_during[name] = in_transaction?
-        entities << name
-      end
+        def add(name, object)
+          fired[name] = object
+          in_transaction_during[name] = in_transaction?
+          entities << name
+        end
 
-      private
+        private
 
-      def self.in_transaction?
-        # The test harness wraps everything in a transaction, so we know
-        # we are inside a transaction from the library itself if we have 2
-        # or more open transactions
-        ActiveRecord::Base.connection.open_transactions > 1
+        def in_transaction?
+          # The test harness wraps everything in a transaction, so we know
+          # we are inside a transaction from the library itself if we have 2
+          # or more open transactions
+          ActiveRecord::Base.connection.open_transactions > 1
+        end
       end
     end
 
