@@ -55,9 +55,9 @@ module Graphiti
       end
 
       def guard
-        _method = @attr[:readable]
+        guard_method = @attr[:readable]
         instance = @resource.new
-        -> { instance.instance_eval(&_method) }
+        -> { instance.instance_eval(&guard_method) }
       end
 
       def guard?
@@ -71,26 +71,25 @@ module Graphiti
       end
 
       def typecast(type)
-        _resource = @resource
-        _name = @name
-        _type = type
+        resource_ref = @resource
+        name_ref = @name
+        type_ref = type
         ->(value) {
           begin
-            _type[value] unless value.nil?
-          rescue Exception => e
-            raise Errors::TypecastFailed.new(_resource, _name, value, e)
+            type_ref[value] unless value.nil?
+          rescue => e
+            raise Errors::TypecastFailed.new(resource_ref, name_ref, value, e)
           end
         }
       end
 
       def default_proc
-        _name = @name
-        _resource = @resource.new
-        _typecast = typecast(Graphiti::Types[@attr[:type]][:read])
+        name_ref = @name
+        typecast_ref = typecast(Graphiti::Types[@attr[:type]][:read])
         ->(_) {
-          val = @object.send(_name)
+          val = @object.send(name_ref)
           if Graphiti.config.typecast_reads
-            _typecast.call(val)
+            typecast_ref.call(val)
           else
             val
           end
@@ -98,13 +97,11 @@ module Graphiti
       end
 
       def wrap_proc(inner)
-        _resource = @resource.new
-        _name = @name
-        _typecast = typecast(Graphiti::Types[@attr[:type]][:read])
+        typecast_ref = typecast(Graphiti::Types[@attr[:type]][:read])
         ->(serializer_instance = nil) {
           val = serializer_instance.instance_eval(&inner)
           if Graphiti.config.typecast_reads
-            _typecast.call(val)
+            typecast_ref.call(val)
           else
             val
           end

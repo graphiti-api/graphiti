@@ -1126,12 +1126,12 @@ RSpec.describe "serialization" do
         end
 
         def define_relationship
-          _mastercard_resource = mastercard_resource
+          mc_resource = mastercard_resource
           resource.polymorphic_belongs_to :credit_card do
             group_by(:credit_card_type) do
               on(:Visa).belongs_to :visa
               on(:Mastercard).belongs_to :mastercard,
-                resource: _mastercard_resource
+                resource: mc_resource
             end
           end
         end

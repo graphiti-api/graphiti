@@ -2,8 +2,8 @@ module Graphiti
   module SerializableHash
     def to_hash(fields: nil, include: {})
       {}.tap do |hash|
-        _fields = fields[jsonapi_type] if fields
-        attrs = requested_attributes(_fields).each_with_object({}) { |(k, v), h|
+        fields_list = fields[jsonapi_type] if fields
+        attrs = requested_attributes(fields_list).each_with_object({}) { |(k, v), h|
           h[k] = instance_eval(&v)
         }
         rels = @_relationships.select { |k, v| !!include[k] }

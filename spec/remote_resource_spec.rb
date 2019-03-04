@@ -709,12 +709,12 @@ RSpec.describe "remote resources" do
       PORO::Employee.create(first_name: "Jane", credit_card_id: 789, credit_card_type: "Mastercard")
       PORO::Employee.create(first_name: "Joe", credit_card_id: 567, credit_card_type: "Visa")
 
-      _mastercard = mastercard_resource
+      mc_resource = mastercard_resource
       klass.class_eval do
         polymorphic_belongs_to :credit_card do
           group_by :credit_card_type do
             on(:Visa).belongs_to :visa, resource: PORO::CreditCardResource
-            on(:Mastercard).belongs_to :mastercard, resource: _mastercard
+            on(:Mastercard).belongs_to :mastercard, resource: mc_resource
             # on(:engineering).belongs_to :e,
             # remote: 'http://foo.com/api/v1/departments'
           end
@@ -743,11 +743,11 @@ RSpec.describe "remote resources" do
 
     context "when manipulating params" do
       before do
-        _mastercard = mastercard_resource
+        mc_resource = mastercard_resource
         klass.class_eval do
           polymorphic_belongs_to :credit_card do
             group_by :credit_card_type do
-              on(:Mastercard).belongs_to :mastercard, resource: _mastercard do
+              on(:Mastercard).belongs_to :mastercard, resource: mc_resource do
                 params do |hash|
                   hash[:filter][:number] = 1
                 end

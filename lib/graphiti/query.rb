@@ -90,9 +90,9 @@ module Graphiti
 
             if sideload || @resource.remote?
               sl_resource = resource_for_sideload(sideload)
-              _parents = parents + [self]
+              query_parents = parents + [self]
               sub_hash = sub_hash[:include] if sub_hash.key?(:include)
-              hash[key] = Query.new(sl_resource, @params, key, sub_hash, _parents)
+              hash[key] = Query.new(sl_resource, @params, key, sub_hash, query_parents)
             else
               handle_missing_sideload(key)
             end

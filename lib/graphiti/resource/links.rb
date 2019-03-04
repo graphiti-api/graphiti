@@ -68,18 +68,18 @@ module Graphiti
         ([endpoint] + secondary_endpoints).compact
       end
 
-      def allow_request?(path, params, action)
-        path = path.split(".")[0]
+      def allow_request?(request_path, params, action)
+        request_path = request_path.split(".")[0]
 
         endpoints.any? do |e|
           has_id = params[:id] || params[:data].try(:[], :id)
-          _path = path
+          path = request_path
           if [:update, :show, :destroy].include?(context_namespace) && has_id
-            _path = path.split("/")
-            _path.pop
-            _path = _path.join("/")
+            path = request_path.split("/")
+            path.pop
+            path = path.join("/")
           end
-          e[:full_path].to_s == _path && e[:actions].include?(context_namespace)
+          e[:full_path].to_s == path && e[:actions].include?(context_namespace)
         end
       end
 

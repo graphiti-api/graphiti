@@ -65,10 +65,10 @@ module Graphiti
           as = opts.delete(:as)
           opts[:foreign_key] ||= :"#{as}_id"
           opts[:polymorphic_as] ||= as
-          _model = model
+          model_ref = model
           has_many name, opts do
             params do |hash|
-              hash[:filter][:"#{as}_type"] = _model.name
+              hash[:filter][:"#{as}_type"] = model_ref.name
             end
 
             instance_eval(&blk) if block_given?

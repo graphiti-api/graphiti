@@ -44,23 +44,23 @@ module Graphiti
       private
 
       def block
-        _link = link?
-        _resource_class = @resource_class
-        _sl = @sideload
-        _data_proc = data_proc
-        _self = self
+        link_ref = link?
+        resource_class_ref = @resource_class
+        sideload_ref = @sideload
+        data_proc_ref = data_proc
+        self_ref = self
         validate_link! if eagerly_validate_links?
 
         proc do
-          data { instance_eval(&_data_proc) }
+          data { instance_eval(&data_proc_ref) }
 
-          if _link
-            if (_links = @proxy.query.links?)
-              _self.send(:validate_link!) unless _self.send(:eagerly_validate_links?)
+          if link_ref
+            if (links_ref = @proxy.query.links?)
+              self_ref.send(:validate_link!) unless self_ref.send(:eagerly_validate_links?)
 
               link(:related) do
-                if _links
-                  ::Graphiti::Util::Link.new(_sl, @object).generate
+                if self_ref
+                  ::Graphiti::Util::Link.new(sideload_ref, @object).generate
                 end
               end
             end
@@ -69,13 +69,13 @@ module Graphiti
       end
 
       def data_proc
-        _sl = @sideload
+        sideload_ref = @sideload
         ->(_) {
-          if (records = @object.public_send(_sl.association_name))
+          if (records = @object.public_send(sideload_ref.association_name))
             if records.respond_to?(:to_ary)
-              records.each { |r| _sl.resource.decorate_record(r) }
+              records.each { |r| sideload_ref.resource.decorate_record(r) }
             else
-              _sl.resource.decorate_record(records)
+              sideload_ref.resource.decorate_record(records)
             end
 
             records
@@ -102,14 +102,14 @@ module Graphiti
 
         if @sideload.type == :polymorphic_belongs_to
           @sideload.children.each_pair do |name, sideload|
-            _validate_link!(sideload)
+            validate_link_for_sideload!(sideload)
           end
         else
-          _validate_link!(@sideload)
+          validate_link_for_sideload!(@sideload)
         end
       end
 
-      def _validate_link!(sideload)
+      def validate_link_for_sideload!(sideload)
         action = sideload.type == :belongs_to ? :show : :index
         cache_key = :"#{@sideload.object_id}-#{action}"
         return if self.class.validated_link_cache.include?(cache_key)

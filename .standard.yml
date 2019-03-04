@@ -1,0 +1,7 @@
+fix: true
+parallel: true
+
+ignore:
+  - 'vendor/**/*'
+  - 'spec/**/*':
+    - Lint/UnderscorePrefixedVariableName

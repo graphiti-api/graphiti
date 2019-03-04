@@ -81,11 +81,11 @@ module Graphiti
     end
 
     def create_remote_resource
-      _remote = @remote
+      remote_url = @remote
       klass = Class.new(Graphiti::Resource) {
         self.adapter = Graphiti::Adapters::GraphitiAPI
         self.model = OpenStruct
-        self.remote = _remote
+        self.remote = remote_url
         self.validate_endpoints = false
       }
       name = "#{parent_resource_class.name}.#{@name}.remote"
