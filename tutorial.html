@@ -6,7 +6,7 @@
 
       // Strip the /graphiti url namespace from the page
       if (path.startsWith("/graphiti/")) {
-        path.replace(/^\/graphiti/, '')
+        path = path.replace(/^\/graphiti/, '')
         window.location.pathname = path
       } else {
         window.location.href = 'https://www.graphiti.dev'
