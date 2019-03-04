@@ -18,6 +18,7 @@ module Graphiti
             desc ||= ::I18n.t :description,
               scope: i18n_type_scope,
               default: nil
+            desc
           end
         end
 
@@ -43,6 +44,7 @@ module Graphiti
             desc ||= ::I18n.t :description,
               scope: [*i18n_resource_scope, field_type, name],
               default: nil
+            desc
           end
         end
 

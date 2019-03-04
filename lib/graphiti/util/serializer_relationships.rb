@@ -45,7 +45,6 @@ module Graphiti
 
       def block
         link_ref = link?
-        resource_class_ref = @resource_class
         sideload_ref = @sideload
         data_proc_ref = data_proc
         self_ref = self
@@ -55,7 +54,7 @@ module Graphiti
           data { instance_eval(&data_proc_ref) }
 
           if link_ref
-            if (links_ref = @proxy.query.links?)
+            if @proxy.query.links?
               self_ref.send(:validate_link!) unless self_ref.send(:eagerly_validate_links?)
 
               link(:related) do

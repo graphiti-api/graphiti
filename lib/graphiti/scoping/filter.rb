@@ -137,9 +137,9 @@ module Graphiti
         if value.include?("},{")
           value = value.split("},{").map { |v|
             if v.starts_with?("{") && !v.ends_with?("}")
-              v = "#{v}}"
+              "#{v}}"
             elsif v.ends_with?("}") && !v.starts_with?("{")
-              v = "{#{v}"
+              "{#{v}"
             else
               "{#{v}}"
             end

@@ -165,7 +165,7 @@ module Graphiti
         end
       end
 
-      data, success = transaction_response[:result].to_a
+      _, success = transaction_response[:result].to_a
       if success
         transaction_response[:after_commit_hooks].each do |hook|
           hook.call

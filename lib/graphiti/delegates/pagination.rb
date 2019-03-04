@@ -53,7 +53,7 @@ module Graphiti
           unless @item_count.is_a?(Numeric)
             raise TypeError, "#{@proxy.resource}.stat(:total, :count) returned an invalid value #{@item_count}"
           end
-        rescue => e
+        rescue
           # FIXME: Unable to log because of how rspec mocks were
           # created for the logger. In other words, logging here will
           # break tests.
