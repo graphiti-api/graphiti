@@ -106,15 +106,16 @@ module PORO
     attr_accessor :id
 
     def self.create(attrs = {})
-      if (record = new(attrs)).valid?
+      record = new(attrs)
+
+      if record.valid?
         id = attrs[:id] || DB.data[type].length + 1
         attrs[:id] = id
         record.id = id
         DB.data[type] << attrs
-        record
-      else
-        record
       end
+
+      record
     end
 
     def self.find(id)

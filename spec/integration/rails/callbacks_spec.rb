@@ -1,3 +1,5 @@
+# rubocop: disable Style/GlobalVars
+
 if ENV["APPRAISAL_INITIALIZED"]
   RSpec.describe "persistence callbacks", type: :controller do
     before do
@@ -242,3 +244,5 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
   end
 end
+
+# rubocop: enable Style/GlobalVars

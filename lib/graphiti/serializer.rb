@@ -43,6 +43,10 @@ module Graphiti
       end
     end
 
+    def respond_to_missing?(method_name, include_private = true)
+      @resource.respond_to?(method_name, include_private) || super
+    end
+
     private
 
     def strip_relationships!(hash)

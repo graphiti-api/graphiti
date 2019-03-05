@@ -365,16 +365,14 @@ module Graphiti
         if activerecord_associate?(parent, child, association_name)
           activerecord_adapter.associate \
             parent, child, association_name, association_type
-        else
-          if [:has_many, :many_to_many].include?(association_type)
-            if parent.send(:"#{association_name}").nil?
-              parent.send(:"#{association_name}=", [child])
-            else
-              parent.send(:"#{association_name}") << child
-            end
+        elsif [:has_many, :many_to_many].include?(association_type)
+          if parent.send(:"#{association_name}").nil?
+            parent.send(:"#{association_name}=", [child])
           else
-            parent.send(:"#{association_name}=", child)
+            parent.send(:"#{association_name}") << child
           end
+        else
+          parent.send(:"#{association_name}=", child)
         end
       end
 

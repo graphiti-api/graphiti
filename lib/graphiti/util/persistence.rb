@@ -134,16 +134,12 @@ class Graphiti::Util::Persistence
           else
             x[:sideload].disassociate(x[:object], object)
           end
+        elsif x[:sideload].type == :belongs_to
+          x[:sideload].associate(object, x[:object])
+        elsif [:has_many, :many_to_many].include?(x[:sideload].type)
+          x[:sideload].associate_all(object, Array(x[:object]))
         else
-          if x[:sideload].type == :belongs_to
-            x[:sideload].associate(object, x[:object])
-          else
-            if [:has_many, :many_to_many].include?(x[:sideload].type)
-              x[:sideload].associate_all(object, Array(x[:object]))
-            else
-              x[:sideload].associate(x[:object], object)
-            end
-          end
+          x[:sideload].associate(x[:object], object)
         end
       end
     end
@@ -157,13 +153,12 @@ class Graphiti::Util::Persistence
         elsif x[:meta][:method] == :destroy
           if x[:sideload].type == :many_to_many
             x[:sideload].disassociate(object, x[:object])
-          end # otherwise, no need to disassociate destroyed objects
-        else
-          if [:has_many, :many_to_many].include?(x[:sideload].type)
-            x[:sideload].associate_all(object, Array(x[:object]))
-          else
-            x[:sideload].associate(object, x[:object])
           end
+          # otherwise, no need to disassociate destroyed objects
+        elsif [:has_many, :many_to_many].include?(x[:sideload].type)
+          x[:sideload].associate_all(object, Array(x[:object]))
+        else
+          x[:sideload].associate(object, x[:object])
         end
       end
     end

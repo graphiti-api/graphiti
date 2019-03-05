@@ -36,12 +36,10 @@ module Graphiti
       def raw_url
         if @sideload.link_proc
           @sideload.link_proc.call(@model)
+        elsif params.empty?
+          path
         else
-          if params.empty?
-            path
-          else
-            "#{path}?#{CGI.unescape(params.to_query)}"
-          end
+          "#{path}?#{CGI.unescape(params.to_query)}"
         end
       end
 

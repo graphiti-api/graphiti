@@ -15,14 +15,12 @@ module Graphiti
 
         if payload[:exception]
           on_data_exception(payload, params)
-        else
-          if payload[:sideload]
-            if payload[:results]
-              on_sideload_data(payload, params, took)
-            end
-          else
-            on_primary_data(payload, params, took)
+        elsif payload[:sideload]
+          if payload[:results]
+            on_sideload_data(payload, params, took)
           end
+        else
+          on_primary_data(payload, params, took)
         end
       end
 
@@ -39,12 +37,12 @@ module Graphiti
               query = "#{payload[:resource].class.name}.all(#{JSON.pretty_generate(params)}).data"
               logs << [query, :cyan, true]
               logs << ["The error occurred when running the above query. Copy/paste it into a rake task or Rails console session to reproduce. Keep in mind you may have to set context.", :yellow, true]
-              json[:query] = query
             else
               query = "This sideload is done manually via .scope - no debug information available."
               logs << [query, :cyan, true]
-              json[:query] = query
             end
+            json[:query] = query
+
             logs << "\n\n"
             payload[:exception_object]&.instance_variable_set(:@__graphiti_debug, json)
           end

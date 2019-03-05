@@ -85,7 +85,7 @@ module Graphiti
         self.validate_endpoints = false
       }
       name = "#{parent_resource_class.name}.#{@name}.remote"
-      klass.class_eval("def self.name;'#{name}';end")
+      klass.class_eval("def self.name;'#{name}';end", __FILE__, __LINE__)
       klass
     end
 

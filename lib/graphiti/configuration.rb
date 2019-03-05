@@ -15,8 +15,7 @@ module Graphiti
     attr_accessor :pagination_links
     attr_accessor :typecast_reads
 
-    attr_reader :debug,
-                :debug_models
+    attr_reader :debug, :debug_models
 
     attr_writer :schema_path
 

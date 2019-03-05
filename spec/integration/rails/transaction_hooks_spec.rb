@@ -1,3 +1,5 @@
+# rubocop: disable Style/GlobalVars
+
 if ENV["APPRAISAL_INITIALIZED"]
   RSpec.describe "before_ & after_commit hooks", type: :controller do
     class Callbacks
@@ -405,3 +407,5 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
   end
 end
+
+# rubocop: enable Style/GlobalVars

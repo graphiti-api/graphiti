@@ -455,12 +455,12 @@ RSpec.describe Graphiti::Resource do
 
   describe ".association_names" do
     it "collects nested + resource sideloads" do
-      position_resource = Class.new(PORO::PositionResource) {
+      position_resource = Class.new(PORO::PositionResource) do
         belongs_to :department
         def self.name
           "PORO::PositionResource"
         end
-      }
+      end
       klass.has_many :positions, resource: position_resource
       expect(klass.association_names)
         .to match_array([:positions, :department])

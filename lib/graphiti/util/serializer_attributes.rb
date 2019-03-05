@@ -16,15 +16,13 @@ module Graphiti
           @serializer.id(&proc)
         elsif @attr[:proc]
           @serializer.send(_method, @name, serializer_options, &proc)
+        elsif @serializer.attribute_blocks[@name].nil?
+          @serializer.send(_method, @name, serializer_options, &proc)
         else
-          if @serializer.attribute_blocks[@name].nil?
-            @serializer.send(_method, @name, serializer_options, &proc)
-          else
-            unless @serializer.send(applied_method).include?(@name)
-              inner = @serializer.attribute_blocks.delete(@name)
-              wrapped = wrap_proc(inner)
-              @serializer.send(_method, @name, serializer_options, &wrapped)
-            end
+          unless @serializer.send(applied_method).include?(@name)
+            inner = @serializer.attribute_blocks.delete(@name)
+            wrapped = wrap_proc(inner)
+            @serializer.send(_method, @name, serializer_options, &wrapped)
           end
         end
 
