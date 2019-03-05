@@ -1,40 +1,40 @@
 module Graphiti
   module Adapters
     class ActiveRecord < ::Graphiti::Adapters::Abstract
-      require 'graphiti/adapters/active_record/inferrence'
-      require 'graphiti/adapters/active_record/has_many_sideload'
-      require 'graphiti/adapters/active_record/belongs_to_sideload'
-      require 'graphiti/adapters/active_record/has_one_sideload'
-      require 'graphiti/adapters/active_record/many_to_many_sideload'
+      require "graphiti/adapters/active_record/inferrence"
+      require "graphiti/adapters/active_record/has_many_sideload"
+      require "graphiti/adapters/active_record/belongs_to_sideload"
+      require "graphiti/adapters/active_record/has_one_sideload"
+      require "graphiti/adapters/active_record/many_to_many_sideload"
 
       def self.sideloading_classes
         {
           has_many: Graphiti::Adapters::ActiveRecord::HasManySideload,
           has_one: Graphiti::Adapters::ActiveRecord::HasOneSideload,
           belongs_to: Graphiti::Adapters::ActiveRecord::BelongsToSideload,
-          many_to_many: Graphiti::Adapters::ActiveRecord::ManyToManySideload
+          many_to_many: Graphiti::Adapters::ActiveRecord::ManyToManySideload,
         }
       end
 
       def filter_eq(scope, attribute, value)
         scope.where(attribute => value)
       end
-      alias :filter_integer_eq :filter_eq
-      alias :filter_float_eq :filter_eq
-      alias :filter_big_decimal_eq :filter_eq
-      alias :filter_date_eq :filter_eq
-      alias :filter_boolean_eq :filter_eq
-      alias :filter_uuid_eq :filter_eq
+      alias filter_integer_eq filter_eq
+      alias filter_float_eq filter_eq
+      alias filter_big_decimal_eq filter_eq
+      alias filter_date_eq filter_eq
+      alias filter_boolean_eq filter_eq
+      alias filter_uuid_eq filter_eq
 
       def filter_not_eq(scope, attribute, value)
         scope.where.not(attribute => value)
       end
-      alias :filter_integer_not_eq :filter_not_eq
-      alias :filter_float_not_eq :filter_not_eq
-      alias :filter_big_decimal_not_eq :filter_not_eq
-      alias :filter_date_not_eq :filter_not_eq
-      alias :filter_boolean_not_eq :filter_not_eq
-      alias :filter_uuid_not_eq :filter_not_eq
+      alias filter_integer_not_eq filter_not_eq
+      alias filter_float_not_eq filter_not_eq
+      alias filter_big_decimal_not_eq filter_not_eq
+      alias filter_date_not_eq filter_not_eq
+      alias filter_boolean_not_eq filter_not_eq
+      alias filter_uuid_not_eq filter_not_eq
 
       def filter_string_eq(scope, attribute, value, is_not: false)
         column = column_for(scope, attribute)
@@ -43,7 +43,7 @@ module Graphiti
       end
 
       def filter_string_eql(scope, attribute, value, is_not: false)
-        clause = { attribute => value }
+        clause = {attribute => value}
         is_not ? scope.where.not(clause) : scope.where(clause)
       end
 
@@ -92,45 +92,45 @@ module Graphiti
         column = column_for(scope, attribute)
         scope.where(column.gt_any(value))
       end
-      alias :filter_integer_gt :filter_gt
-      alias :filter_float_gt :filter_gt
-      alias :filter_big_decimal_gt :filter_gt
-      alias :filter_datetime_gt :filter_gt
-      alias :filter_date_gt :filter_gt
+      alias filter_integer_gt filter_gt
+      alias filter_float_gt filter_gt
+      alias filter_big_decimal_gt filter_gt
+      alias filter_datetime_gt filter_gt
+      alias filter_date_gt filter_gt
 
       def filter_gte(scope, attribute, value)
         column = column_for(scope, attribute)
         scope.where(column.gteq_any(value))
       end
-      alias :filter_integer_gte :filter_gte
-      alias :filter_float_gte :filter_gte
-      alias :filter_big_decimal_gte :filter_gte
-      alias :filter_datetime_gte :filter_gte
-      alias :filter_date_gte :filter_gte
+      alias filter_integer_gte filter_gte
+      alias filter_float_gte filter_gte
+      alias filter_big_decimal_gte filter_gte
+      alias filter_datetime_gte filter_gte
+      alias filter_date_gte filter_gte
 
       def filter_lt(scope, attribute, value)
         column = column_for(scope, attribute)
         scope.where(column.lt_any(value))
       end
-      alias :filter_integer_lt :filter_lt
-      alias :filter_float_lt :filter_lt
-      alias :filter_big_decimal_lt :filter_lt
-      alias :filter_datetime_lt :filter_lt
-      alias :filter_date_lt :filter_lt
+      alias filter_integer_lt filter_lt
+      alias filter_float_lt filter_lt
+      alias filter_big_decimal_lt filter_lt
+      alias filter_datetime_lt filter_lt
+      alias filter_date_lt filter_lt
 
       def filter_lte(scope, attribute, value)
         column = column_for(scope, attribute)
         scope.where(column.lteq_any(value))
       end
-      alias :filter_integer_lte :filter_lte
-      alias :filter_float_lte :filter_lte
-      alias :filter_big_decimal_lte :filter_lte
-      alias :filter_date_lte :filter_lte
+      alias filter_integer_lte filter_lte
+      alias filter_float_lte filter_lte
+      alias filter_big_decimal_lte filter_lte
+      alias filter_date_lte filter_lte
 
       # Ensure fractional seconds don't matter
       def filter_datetime_eq(scope, attribute, value, is_not: false)
-        ranges = value.map { |v| (v..v+1.second-0.00000001) }
-        clause = { attribute => ranges }
+        ranges = value.map { |v| (v..v + 1.second - 0.00000001) }
+        clause = {attribute => ranges}
         is_not ? scope.where.not(clause) : scope.where(clause)
       end
 
@@ -139,7 +139,7 @@ module Graphiti
       end
 
       def filter_datetime_lte(scope, attribute, value)
-        value = value.map { |v| v + 1.second-0.00000001 }
+        value = value.map { |v| v + 1.second - 0.00000001 }
         column = scope.klass.arel_table[attribute]
         scope.where(column.lteq_any(value))
       end
@@ -239,9 +239,8 @@ module Graphiti
       def disassociate(parent, child, association_name, association_type)
         if association_type == :many_to_many
           parent.send(association_name).delete(child)
-        else
-          # Nothing to do here, happened when we merged foreign key
         end
+        # Nothing to do in the else case, happened when we merged foreign key
       end
 
       # (see Adapters::Abstract#create)
@@ -258,11 +257,6 @@ module Graphiti
         instance
       end
 
-      def destroy(model)
-        model.destroy
-        model
-      end
-
       def save(model_instance)
         model_instance.save
         model_instance
@@ -277,7 +271,7 @@ module Graphiti
 
       def column_for(scope, name)
         table = scope.klass.arel_table
-        if other = scope.attribute_alias(name)
+        if (other = scope.attribute_alias(name))
           table[other]
         else
           table[name]

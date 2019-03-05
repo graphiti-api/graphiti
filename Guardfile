@@ -16,12 +16,12 @@ guard :rspec, cmd: "bundle exec rspec --color --format documentation" do
   dsl.watch_spec_files_for(ruby.lib_files)
 
   # Rails files
-  rails = dsl.rails(view_extensions: %w(erb haml slim))
+  rails = dsl.rails(view_extensions: %w[erb haml slim])
 
   watch(rails.controllers) do |m|
     [
       rspec.spec.call("controllers/#{m[1]}_controller"),
-      rspec.spec.call("api/#{m[1]}")
+      rspec.spec.call("api/#{m[1]}"),
     ]
   end
 

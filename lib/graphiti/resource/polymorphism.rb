@@ -45,16 +45,16 @@ module Graphiti
           sl = super
           if !polymorphic_child? && sl.nil?
             children.each do |c|
-              break if sl = c.sideloads[name]
+              break if (sl = c.sideloads[name])
             end
           end
           sl
         end
 
         def children
-          @children ||= polymorphic.map do |klass|
+          @children ||= polymorphic.map { |klass|
             klass.is_a?(String) ? klass.safe_constantize : klass
-          end
+          }
         end
 
         def resource_for_type(type)

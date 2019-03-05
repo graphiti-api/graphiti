@@ -1,6 +1,6 @@
-require 'spec_helper'
+require "spec_helper"
 
-RSpec.describe '.boolean_attribute' do
+RSpec.describe ".boolean_attribute" do
   let(:klass) do
     Class.new(Graphiti::Serializer) do
       type :authors
@@ -20,15 +20,15 @@ RSpec.describe '.boolean_attribute' do
 
   it { is_expected.to eq(is_celebrity: true) }
 
-  context 'when supplied a block' do
+  context "when supplied a block" do
     before do
       klass.class_eval do
         boolean_attribute :alive? do
-          'yesss'
+          "yesss"
         end
       end
     end
 
-    it { is_expected.to include(is_alive: 'yesss') }
+    it { is_expected.to include(is_alive: "yesss") }
   end
 end

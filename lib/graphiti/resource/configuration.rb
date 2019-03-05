@@ -23,8 +23,8 @@ module Graphiti
         end
 
         def type=(val)
-          if val = super
-            self.serializer.type(val)
+          if (val = super)
+            serializer.type(val)
           end
         end
 
@@ -43,7 +43,7 @@ module Graphiti
         def model
           klass = super
           unless klass || abstract_class?
-            if klass = infer_model
+            if (klass = infer_model)
               self.model = klass
             else
               raise Errors::ModelNotFound.new(self)
@@ -86,11 +86,7 @@ module Graphiti
           klass.adapter ||= Adapters::Abstract
           klass.max_page_size ||= DEFAULT_MAX_PAGE_SIZE
           # re-assigning causes a new Class.new
-          if klass.serializer
-            klass.serializer = klass.serializer
-          else
-            klass.serializer = klass.infer_serializer_superclass
-          end
+          klass.serializer = (klass.serializer || klass.infer_serializer_superclass)
           klass.type ||= klass.infer_type
           default(klass, :attributes_readable_by_default, true)
           default(klass, :attributes_writable_by_default, true)
@@ -114,7 +110,7 @@ module Graphiti
         end
 
         def get_attr(name, flag, opts = {})
-          defaults = { request: false }
+          defaults = {request: false}
           opts = defaults.merge(opts)
           new.get_attr(name, flag, opts)
         end
@@ -128,7 +124,7 @@ module Graphiti
         end
 
         def abstract_class=(val)
-          if @abstract_class = val
+          if (@abstract_class = val)
             self.serializer = nil
             self.type = nil
           end
@@ -136,14 +132,14 @@ module Graphiti
 
         def infer_type
           if name.present?
-            name.demodulize.gsub('Resource','').underscore.pluralize.to_sym
+            name.demodulize.gsub("Resource", "").underscore.pluralize.to_sym
           else
             :undefined_jsonapi_type
           end
         end
 
         def infer_model
-          name.gsub('Resource', '').safe_constantize if name
+          name&.gsub("Resource", "")&.safe_constantize
         end
 
         # @api private
@@ -185,7 +181,7 @@ module Graphiti
               attributes: {},
               extra_attributes: {},
               sideloads: {},
-              callbacks: {}
+              callbacks: {},
             }
         end
 

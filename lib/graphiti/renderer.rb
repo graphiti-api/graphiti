@@ -1,6 +1,6 @@
 module Graphiti
   class Renderer
-    CONTENT_TYPE = 'application/vnd.api+json'
+    CONTENT_TYPE = "application/vnd.api+json"
 
     attr_reader :proxy, :options
 
@@ -46,7 +46,7 @@ module Graphiti
         options[:include] = proxy.include_hash
         options[:links] = proxy.pagination.links if proxy.pagination.links?
         options[:meta] ||= {}
-        options[:meta].merge!(stats: proxy.stats) unless proxy.stats.empty?
+        options[:meta][:stats] = proxy.stats unless proxy.stats.empty?
         options[:meta][:debug] = Debugger.to_a if debug_json?
 
         renderer.render(records, options)

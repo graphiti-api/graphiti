@@ -25,7 +25,7 @@ module Graphiti
         def _find(params = {}, base_scope = nil)
           id = params[:data].try(:[], :id) || params.delete(:id)
           params[:filter] ||= {}
-          params[:filter].merge!(id: id) if id
+          params[:filter][:id] = id if id
 
           runner = Runner.new(self, params)
           runner.proxy(base_scope, single: true, raise_on_missing: true)
@@ -42,8 +42,8 @@ module Graphiti
         def validate!(params)
           return unless validate_endpoints?
 
-          if context && context.respond_to?(:request)
-            path = context.request.env['PATH_INFO']
+          if context&.respond_to?(:request)
+            path = context.request.env["PATH_INFO"]
             unless allow_request?(path, params, context_namespace)
               raise Errors::InvalidEndpoint.new(self, path, context_namespace)
             end

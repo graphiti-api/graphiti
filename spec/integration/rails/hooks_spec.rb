@@ -1,12 +1,12 @@
 if ENV["APPRAISAL_INITIALIZED"]
-  RSpec.describe 'persistence lifecycle hooks', type: :controller do
+  RSpec.describe "persistence lifecycle hooks", type: :controller do
     class Callbacks
-      def self.fired
-        @fired
+      class << self
+        attr_reader :fired
       end
 
-      def self.fired=(val)
-        @fired = val
+      class << self
+        attr_writer :fired
       end
     end
 
@@ -75,7 +75,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         if author.save
           render jsonapi: author
         else
-          raise 'whoops'
+          raise "whoops"
         end
       end
 
@@ -84,15 +84,15 @@ if ENV["APPRAISAL_INITIALIZED"]
       def params
         @params ||= begin
           hash = super.to_unsafe_h.with_indifferent_access
-          hash = hash[:params] if hash.has_key?(:params)
+          hash = hash[:params] if hash.key?(:params)
           hash
         end
       end
     end
 
     before do
-      @request.headers['Accept'] = Mime[:json]
-      @request.headers['Content-Type'] = Mime[:json].to_s
+      @request.headers["Accept"] = Mime[:json]
+      @request.headers["Content-Type"] = Mime[:json].to_s
 
       routes.draw {
         post "create" => "anonymous#create"
@@ -103,11 +103,10 @@ if ENV["APPRAISAL_INITIALIZED"]
       allow(controller.request.env).to receive(:[])
         .with(anything).and_call_original
       allow(controller.request.env).to receive(:[])
-        .with('PATH_INFO') { path }
+        .with("PATH_INFO") { path }
     end
 
-    let(:path) { '/integration_hooks/authors' }
-
+    let(:path) { "/integration_hooks/authors" }
 
     def json
       JSON.parse(response.body)
@@ -125,82 +124,82 @@ if ENV["APPRAISAL_INITIALIZED"]
     let(:payload) do
       {
         data: {
-          type: 'authors',
-          attributes: { first_name: 'Stephen', last_name: 'King' },
+          type: "authors",
+          attributes: {first_name: "Stephen", last_name: "King"},
           relationships: {
-            books: { data: book_data },
-            state: { data: state_data }
-          }
+            books: {data: book_data},
+            state: {data: state_data},
+          },
         },
-        included: (book_included + state_included)
+        included: (book_included + state_included),
       }
     end
 
-    context 'after_save' do
+    context "after_save" do
       before do
-        book_data << { :'temp-id' => 'abc123', type: 'books', method: 'create' }
-        book_included << { :'temp-id' => 'abc123', type: 'books', attributes: { title: 'one' } }
-        book_data << { id: update_book.id.to_s, type: 'books', method: 'update' }
-        book_included << { id: update_book.id.to_s, type: 'books', attributes: { title: 'updated!' } }
+        book_data << {'temp-id': "abc123", type: "books", method: "create"}
+        book_included << {'temp-id': "abc123", type: "books", attributes: {title: "one"}}
+        book_data << {id: update_book.id.to_s, type: "books", method: "update"}
+        book_included << {id: update_book.id.to_s, type: "books", attributes: {title: "updated!"}}
       end
     end
 
-    context 'after_create' do
+    context "after_create" do
       before do
-        book_data << { :'temp-id' => 'abc123', type: 'books', method: 'create' }
-        book_included << { :'temp-id' => 'abc123', type: 'books', attributes: { title: 'one' } }
-        book_data << { :'temp-id' => 'abc456', type: 'books', method: 'create' }
-        book_included << { :'temp-id' => 'abc456', type: 'books', attributes: { title: 'two' } }
+        book_data << {'temp-id': "abc123", type: "books", method: "create"}
+        book_included << {'temp-id': "abc123", type: "books", attributes: {title: "one"}}
+        book_data << {'temp-id': "abc456", type: "books", method: "create"}
+        book_included << {'temp-id': "abc456", type: "books", attributes: {title: "two"}}
       end
 
-      it 'fires hooks correctly' do
+      it "fires hooks correctly" do
         do_create(payload)
 
         expect(Callbacks.fired.keys).to match_array([:after_create, :after_save])
         author, books = Callbacks.fired[:after_create]
         expect(author).to be_a(Legacy::Author)
-        expect(author.first_name).to eq('Stephen')
-        expect(author.last_name).to eq('King')
+        expect(author.first_name).to eq("Stephen")
+        expect(author.last_name).to eq("King")
 
         expect(books).to all(be_a(Legacy::Book))
-        expect(books.map(&:title)).to match_array(%w(one two))
+        expect(books.map(&:title)).to match_array(%w[one two])
       end
     end
 
-    context 'after_update' do
+    context "after_update" do
       before do
-        book_data << { id: update_book.id.to_s, type: 'books', method: 'update' }
-        book_included << { id: update_book.id.to_s, type: 'books', attributes: { title: 'updated!' } }
+        book_data << {id: update_book.id.to_s, type: "books", method: "update"}
+        book_included << {id: update_book.id.to_s, type: "books", attributes: {title: "updated!"}}
       end
 
-      it 'fires hooks correctly' do
+      it "fires hooks correctly" do
         do_create(payload)
 
         expect(Callbacks.fired.keys)
           .to match_array([:after_update, :after_save])
         author, books = Callbacks.fired[:after_update]
         expect(author).to be_a(Legacy::Author)
-        expect(author.first_name).to eq('Stephen')
-        expect(author.last_name).to eq('King')
+        expect(author.first_name).to eq("Stephen")
+        expect(author.last_name).to eq("King")
 
         book = books[0]
-        expect(book.title).to eq('updated!')
+        expect(book.title).to eq("updated!")
       end
     end
 
-    context 'after_destroy' do
+    context "after_destroy" do
       before do
-        book_data << { id: destroy_book.id.to_s, type: 'books', method: 'destroy' }
+        book_data << {id: destroy_book.id.to_s, type: "books", method: "destroy"}
       end
 
-      it 'fires hooks correctly' do
+      it "fires hooks correctly" do
         do_create(payload)
 
         expect(Callbacks.fired.keys).to match_array([:after_destroy, :after_save])
         author, books = Callbacks.fired[:after_destroy]
         expect(author).to be_a(Legacy::Author)
-        expect(author.first_name).to eq('Stephen')
-        expect(author.last_name).to eq('King')
+        expect(author.first_name).to eq("Stephen")
+        expect(author.last_name).to eq("King")
 
         book = books[0]
         expect(book).to be_a(Legacy::Book)
@@ -209,19 +208,19 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
-    context 'after_disassociate' do
+    context "after_disassociate" do
       before do
-        book_data << { id: disassociate_book.id.to_s, type: 'books', method: 'disassociate' }
+        book_data << {id: disassociate_book.id.to_s, type: "books", method: "disassociate"}
       end
 
-      it 'fires hooks correctly' do
+      it "fires hooks correctly" do
         do_create(payload)
 
         expect(Callbacks.fired.keys).to match_array([:after_disassociate, :after_save])
         author, books = Callbacks.fired[:after_disassociate]
         expect(author).to be_a(Legacy::Author)
-        expect(author.first_name).to eq('Stephen')
-        expect(author.last_name).to eq('King')
+        expect(author.first_name).to eq("Stephen")
+        expect(author.last_name).to eq("King")
 
         book = books[0]
         expect(book).to be_a(Legacy::Book)
@@ -230,24 +229,24 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
-    context 'belongs_to' do
-      let(:state_data) { { :'temp-id' => 'abc123', type: 'states', method: 'create' } }
+    context "belongs_to" do
+      let(:state_data) { {'temp-id': "abc123", type: "states", method: "create"} }
 
       before do
-        state_included << { :'temp-id' => 'abc123', type: 'states', attributes: { name: 'New York' } }
+        state_included << {'temp-id': "abc123", type: "states", attributes: {name: "New York"}}
       end
 
-      it 'also works' do
+      it "also works" do
         do_create(payload)
 
         expect(Callbacks.fired.keys).to match_array([:state_after_create])
         author, states = Callbacks.fired[:state_after_create]
         state = states[0]
         expect(author).to be_a(Legacy::Author)
-        expect(author.first_name).to eq('Stephen')
-        expect(author.last_name).to eq('King')
+        expect(author.first_name).to eq("Stephen")
+        expect(author.last_name).to eq("King")
         expect(state).to be_a(Legacy::State)
-        expect(state.name).to eq('New York')
+        expect(state.name).to eq("New York")
       end
     end
   end

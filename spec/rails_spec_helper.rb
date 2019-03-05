@@ -5,11 +5,11 @@
 #
 # It is also good to know what is the bare minimum to get
 # Rails booted up.
-require 'bundler/setup' unless defined?(Bundler)
-require 'rails'
-require 'action_controller'
-require 'graphiti/rails'
-require 'graphiti/railtie'
+require "bundler/setup" unless defined?(Bundler)
+require "rails"
+require "action_controller"
+require "graphiti/rails"
+require "graphiti/railtie"
 
 module BasicRailsApp
   module_function
@@ -17,16 +17,16 @@ module BasicRailsApp
   # Make a very basic app, without creating the whole directory structure.
   # Is faster and simpler than generating a Rails app in a temp directory
   def generate
-    @app = Class.new(Rails::Application) do
+    @app = Class.new(Rails::Application) {
       config.eager_load = false
-      config.session_store :cookie_store, key: '_myapp_session'
+      config.session_store :cookie_store, key: "_myapp_session"
       config.active_support.deprecation = :log
       config.root = File.dirname(__FILE__)
       config.log_level = :info
       # Set a fake logger to avoid creating the log directory automatically
       fake_logger = Logger.new(nil)
       config.logger = fake_logger
-      Rails.application.routes.default_url_options = { host: 'example.com' }
+      Rails.application.routes.default_url_options = {host: "example.com"}
 
       # fix railties 5.2.0 issue with secret_key_base
       # https://github.com/rails/rails/commit/7419a4f9 should take care of it
@@ -34,12 +34,12 @@ module BasicRailsApp
       if Rails::VERSION::MAJOR == 5
         if Rails::VERSION::MINOR >= 2
           def secret_key_base
-            '3b7cd727ee24e8444053437c36cc66c4'
+            "3b7cd727ee24e8444053437c36cc66c4"
           end
         end
       end
-    end
-    @app.respond_to?(:secrets) && @app.secrets.secret_key_base = '3b7cd727ee24e8444053437c36cc66c4'
+    }
+    @app.respond_to?(:secrets) && @app.secrets.secret_key_base = "3b7cd727ee24e8444053437c36cc66c4"
 
     yield @app if block_given?
     @app.initialize!
@@ -53,7 +53,7 @@ class ApplicationController < ActionController::Base
   include Graphiti::Rails
 end
 
-require 'rspec/rails'
+require "rspec/rails"
 
 RSpec.configure do |config|
   config.include UniversalControllerSpecHelper
@@ -61,8 +61,8 @@ end
 
 # Get Rails 4 and ruby 2.6 working in CI
 # https://github.com/rails/rails/issues/34790
-if RUBY_VERSION>='2.6.0'
-  if Rails.version < '5'
+if RUBY_VERSION >= "2.6.0"
+  if Rails.version < "5"
     class ActionController::TestResponse < ActionDispatch::TestResponse
       def recycle!
         # hack to avoid MonitorMixin double-initialize error:

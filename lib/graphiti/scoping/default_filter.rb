@@ -47,7 +47,7 @@ module Graphiti
     private
 
     def overridden?(name)
-      if found = find_filter(name)
+      if (found = find_filter(name))
         found_aliases = found[name][:aliases]
         filter_param.keys.any? { |k| found_aliases.include?(k.to_sym) }
       else

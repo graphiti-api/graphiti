@@ -7,7 +7,7 @@ module Graphiti
 
         {}.tap do |parsed|
           params.each_pair do |key, value|
-            parsed[key.to_sym] = value.split(',').map(&:to_sym)
+            parsed[key.to_sym] = value.split(",").map(&:to_sym)
           end
         end
       end

@@ -43,18 +43,22 @@ module Graphiti
       end
     end
 
+    def respond_to_missing?(method_name, include_private = true)
+      @resource.respond_to?(method_name, include_private) || super
+    end
+
     private
 
     def strip_relationships!(hash)
-      hash[:relationships].select! do |name, payload|
-        payload.has_key?(:data)
-      end if hash[:relationships]
+      hash[:relationships]&.select! do |name, payload|
+        payload.key?(:data)
+      end
     end
 
     def strip_relationships?
       return false unless Graphiti.config.links_on_demand
       params = Graphiti.context[:object].params || {}
-      [false, nil, 'false'].include?(params[:links])
+      [false, nil, "false"].include?(params[:links])
     end
   end
 end

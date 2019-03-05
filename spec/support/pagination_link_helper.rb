@@ -1,7 +1,10 @@
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.shared_context "pagination_context", shared_context: :metadata do
-  let(:proxy)      { double(resource: resource, query: query, scope: scope); Graphiti::ResourceProxy.new(resource, scope, query) }
+  let(:proxy) do
+    double(resource: resource, query: query, scope: scope)
+    Graphiti::ResourceProxy.new(resource, scope, query)
+  end
   let(:resource)   { double(endpoint: endpoint, default_page_size: nil) }
   let(:query)      { double(hash: params) }
   let(:scope)      { double(object: collection, pagination: double(size: current_per_page)) }
@@ -13,20 +16,20 @@ RSpec.shared_context "pagination_context", shared_context: :metadata do
            current_per_page: current_per_page)
   end
   let(:total_pages) { 3 }
-  let(:prev_page){ 1 }
-  let(:next_page){ 3 }
-  let(:current_per_page){ 200 }
-  let(:current_page){ 2 }
+  let(:prev_page) { 1 }
+  let(:next_page) { 3 }
+  let(:current_per_page) { 200 }
+  let(:current_page) { 2 }
   let(:params) do
     {
       pagination_links: true,
       filter: {
-        deprecated: "1"
+        deprecated: "1",
       },
       page: {
         number: current_page,
-        size: current_per_page
-      }
+        size: current_per_page,
+      },
     }
   end
   let(:endpoint) do
@@ -34,7 +37,7 @@ RSpec.shared_context "pagination_context", shared_context: :metadata do
       path: "/foos",
       full_path: "/api/v2/foos",
       url: "http://localhost:3000/api/v2/foos",
-      actions: [:index, :show, :create, :update, :destroy]
+      actions: [:index, :show, :create, :update, :destroy],
     }
   end
 end

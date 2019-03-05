@@ -11,7 +11,7 @@ module Graphiti
     # @api private
     def find_filter!(name)
       resource.class.get_attr!(name, :filterable, request: true)
-      { name => resource.filters[name] }
+      {name => resource.filters[name]}
     end
 
     # @api private
@@ -24,18 +24,18 @@ module Graphiti
     end
 
     def required_filters
-      resource.filters.map do |k, v|
+      resource.filters.map { |k, v|
         k if v[:required]
-      end.compact
+      }.compact
     end
 
     def missing_dependent_filters
       [].tap do |arr|
         filter_param.each_pair do |key, value|
-          if df = dependent_filters[key]
+          if (df = dependent_filters[key])
             missing = df[:dependencies] - filter_param.keys
             unless missing.length.zero?
-              arr << { filter: df, missing: missing }
+              arr << {filter: df, missing: missing}
             end
           end
         end

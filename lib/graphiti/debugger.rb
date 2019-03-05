@@ -10,19 +10,17 @@ module Graphiti
 
     class << self
       def on_data(name, start, stop, id, payload)
-        took = ((stop-start)*1000.0).round(2)
+        took = ((stop - start) * 1000.0).round(2)
         params = scrub_params(payload[:params])
 
         if payload[:exception]
           on_data_exception(payload, params)
-        else
-          if payload[:sideload]
-            if payload[:results]
-              on_sideload_data(payload, params, took)
-            end
-          else
-            on_primary_data(payload, params, took)
+        elsif payload[:sideload]
+          if payload[:results]
+            on_sideload_data(payload, params, took)
           end
+        else
+          on_primary_data(payload, params, took)
         end
       end
 
@@ -30,7 +28,7 @@ module Graphiti
         unless payload[:exception_object].instance_variable_get(:@__graphiti_debug)
           add_chunk do |logs, json|
             logs << ["\n=== Graphiti Debug ERROR", :red, true]
-            if sideload = payload[:sideload]
+            if (sideload = payload[:sideload])
               logs << ["#{sideload.parent_resource.class}: Sideload \"#{sideload.name}\"", :red, true]
               json[:parent_resource] = sideload.parent_resource.class.name
               json[:sideload] = sideload.name
@@ -39,22 +37,20 @@ module Graphiti
               query = "#{payload[:resource].class.name}.all(#{JSON.pretty_generate(params)}).data"
               logs << [query, :cyan, true]
               logs << ["The error occurred when running the above query. Copy/paste it into a rake task or Rails console session to reproduce. Keep in mind you may have to set context.", :yellow, true]
-              json[:query] = query
             else
               query = "This sideload is done manually via .scope - no debug information available."
               logs << [query, :cyan, true]
-              json[:query] = query
             end
+            json[:query] = query
+
             logs << "\n\n"
-            if payload[:exception_object]
-              payload[:exception_object].instance_variable_set(:@__graphiti_debug, json)
-            end
+            payload[:exception_object]&.instance_variable_set(:@__graphiti_debug, json)
           end
         end
       end
 
       def results(raw_results)
-        raw_results.map { |r| "[#{r.class.name}, #{r.id.inspect}]" }.join(', ')
+        raw_results.map { |r| "[#{r.class.name}, #{r.id.inspect}]" }.join(", ")
       end
 
       def on_sideload_data(payload, params, took)
@@ -94,7 +90,7 @@ module Graphiti
 
       def on_render(name, start, stop, id, payload)
         add_chunk do |logs|
-          took = ((stop-start)*1000.0).round(2)
+          took = ((stop - start) * 1000.0).round(2)
           logs << [""]
           logs << ["=== Graphiti Debug", :green, true]
           logs << ["Rendering:", :green, true]
@@ -109,7 +105,7 @@ module Graphiti
             yield
           ensure
             flush
-            self.chunks = [] unless self.preserve
+            self.chunks = [] unless preserve
           end
         else
           yield
@@ -125,7 +121,7 @@ module Graphiti
       end
 
       def flush
-        Graphiti.broadcast('debug.flush', {}) do |payload|
+        Graphiti.broadcast("debug.flush", {}) do |payload|
           payload[:chunks] = chunks
           graph_statements.each do |chunk|
             flush_chunk(chunk)
@@ -138,26 +134,26 @@ module Graphiti
       def scrub_params(params)
         params ||= {}
         params = params.to_unsafe_h if params.respond_to?(:to_unsafe_h)
-        params.reject! { |k,v| [:controller, :action, :format, :debug].include?(k.to_sym) }
-        params.reject! { |k,v| k.to_sym == :include }
+        params.reject! { |k, v| [:controller, :action, :format, :debug].include?(k.to_sym) }
+        params.reject! { |k, v| k.to_sym == :include }
         params.deep_symbolize_keys
       end
 
       def add_chunk(resource = nil, parent = nil)
         logs, json = [], {}
         yield(logs, json)
-        self.chunks << {
+        chunks << {
           resource: resource,
           parent: parent,
           logs: logs,
           json: json,
-          children: []
+          children: [],
         }
       end
 
       def graph_statements
         @chunks.each do |chunk|
-          if parent = chunk[:parent]
+          if (parent = chunk[:parent])
             relevant = chunks.find { |c| c[:resource] == parent }
             relevant[:children].unshift(chunk) if relevant
           end
@@ -179,7 +175,7 @@ module Graphiti
 
       def flush_chunk(chunk, depth = 0)
         chunk[:logs].each do |args|
-          indent = '   ' * depth
+          indent = "   " * depth
           args[0] = "#{indent}#{args[0]}"
           Graphiti.log(*args)
         end
@@ -191,8 +187,8 @@ module Graphiti
     end
 
     ActiveSupport::Notifications.subscribe \
-      'graphiti.data', method(:on_data)
+      "graphiti.data", method(:on_data)
     ActiveSupport::Notifications.subscribe \
-      'graphiti.render', method(:on_render)
+      "graphiti.render", method(:on_render)
   end
 end

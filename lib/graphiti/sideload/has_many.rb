@@ -11,7 +11,7 @@ class Graphiti::Sideload::HasMany < Graphiti::Sideload
   end
 
   def base_filter(parents)
-    { foreign_key => ids_for_parents(parents).join(',') }
+    {foreign_key => ids_for_parents(parents).join(",")}
   end
 
   private

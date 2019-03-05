@@ -1,12 +1,12 @@
-require 'thor'
-require 'net/http'
-require 'graphiti'
+require "thor"
+require "net/http"
+require "graphiti"
 
 Thor::Base.shell = Thor::Shell::Color
 
 module Graphiti
   class CLI < Thor
-    desc 'schema_check OLD_SCHEMA NEW_SCHEMA', 'Diff 2 schemas for backwards incompatibilities. Pass file path or URL. If your app relies on JSON Web Tokens, you can set GRAPHITI_TOKEN for authentication'
+    desc "schema_check OLD_SCHEMA NEW_SCHEMA", "Diff 2 schemas for backwards incompatibilities. Pass file path or URL. If your app relies on JSON Web Tokens, you can set GRAPHITI_TOKEN for authentication"
     def schema_check(old, new)
       old = schema_for(old)
       new = schema_for(new)
@@ -25,7 +25,7 @@ module Graphiti
     private
 
     def schema_for(input)
-      if input.starts_with?('http')
+      if input.starts_with?("http")
         JSON.parse(fetch_remote_schema(input))
       else
         JSON.parse(File.read(input))
@@ -35,9 +35,9 @@ module Graphiti
     def fetch_remote_schema(path)
       uri = URI(path)
       http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true if uri.scheme == 'https'
+      http.use_ssl = true if uri.scheme == "https"
       req = Net::HTTP::Get.new(uri)
-      req['Authorization'] = "Token token=\"#{ENV['GRAPHITI_TOKEN']}\""
+      req["Authorization"] = "Token token=\"#{ENV["GRAPHITI_TOKEN"]}\""
       res = http.request(req)
       res.body
     end

@@ -1,0 +1,14 @@
+fix: true
+parallel: true
+ruby_version: 2.4
+
+ignore:
+  - 'vendor/**/*'
+  - 'spec/**/*':
+    # There are some false hits when doing repeated
+    # Class.new blocks in different test cases
+    - Lint/DuplicateMethods
+    # This was causing many tests to be harder to read.
+    # Ongoing discussion with StandardRB team in
+    # https://github.com/testdouble/standard/issues/94
+    - Standard/SemanticBlocks

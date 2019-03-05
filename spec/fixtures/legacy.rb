@@ -1,4 +1,4 @@
-ActiveRecord::Schema.define(:version => 1) do
+ActiveRecord::Schema.define(version: 1) do
   create_table :authors do |t|
     t.boolean :active, default: true
     t.string :first_name
@@ -108,15 +108,15 @@ module Legacy
     # This logic should not ever fire
     has_many :special_books,
       -> { where(id: 9999) },
-      class_name: 'Legacy::Book'
+      class_name: "Legacy::Book"
     belongs_to :special_state,
       -> { where(id: 9999) },
-      class_name: 'Legacy::State'
+      class_name: "Legacy::State"
   end
 
   class Organization < ApplicationRecord
-    belongs_to :parent, class_name: 'Organization', foreign_key: :parent_id
-    has_many :children, class_name: 'Organization', foreign_key: :parent_id
+    belongs_to :parent, class_name: "Organization", foreign_key: :parent_id
+    has_many :children, class_name: "Organization", foreign_key: :parent_id
   end
 
   class Condo < ApplicationRecord
@@ -193,7 +193,7 @@ module Legacy
     end
 
     extra_attribute :alternate_title, :string do
-      'alt title'
+      "alt title"
     end
 
     belongs_to :genre
@@ -203,7 +203,7 @@ module Legacy
   class StateResource < ApplicationResource
     attribute :name, :string
     attribute :abbreviation, :string do
-      'abbr'
+      "abbr"
     end
 
     extra_attribute :population, :integer do
@@ -239,7 +239,7 @@ module Legacy
     attribute :name, :string
 
     attribute :house_description, :string do
-      'house desc'
+      "house desc"
     end
 
     extra_attribute :house_price, :integer do
@@ -253,7 +253,7 @@ module Legacy
     attribute :name, :string
 
     attribute :condo_description, :string do
-      'condo desc'
+      "condo desc"
     end
 
     extra_attribute :condo_price, :integer do
@@ -274,10 +274,10 @@ module Legacy
   class HobbyResource < ApplicationResource
     attribute :name, :string
     attribute :description, :string do
-      'hobby desc'
+      "hobby desc"
     end
     extra_attribute :reason, :string do
-      'hobby reason'
+      "hobby reason"
     end
   end
 

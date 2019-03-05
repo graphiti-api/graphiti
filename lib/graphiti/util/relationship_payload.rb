@@ -21,7 +21,7 @@ module Graphiti
 
       def iterate
         payload.each_pair do |relationship_name, relationship_payload|
-          if sl = resource.class.sideload(relationship_name.to_sym)
+          if (sl = resource.class.sideload(relationship_name.to_sym))
             if should_yield?(sl.type)
               if relationship_payload.is_a?(Array)
                 relationship_payload.each do |rp|
@@ -66,7 +66,7 @@ module Graphiti
           foreign_key: sideload.foreign_key,
           attributes: relationship_payload[:attributes],
           meta: relationship_payload[:meta],
-          relationships: relationship_payload[:relationships]
+          relationships: relationship_payload[:relationships],
         }
       end
     end

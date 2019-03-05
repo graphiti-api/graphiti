@@ -11,7 +11,7 @@ module Graphiti
     included do
       class_attribute :sideload_allowlist
       self.sideload_allowlist = {}
-      class << self;prepend Overrides;end
+      class << self; prepend Overrides; end
     end
   end
 end

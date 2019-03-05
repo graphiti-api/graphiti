@@ -15,8 +15,8 @@ module Graphiti
           model.to_h.each_pair do |key, value|
             if key == :_relationships
               add_relationships(value)
-            else
-              @serializer.attribute(key) if add_attribute?(model, key)
+            elsif add_attribute?(model, key)
+              @serializer.attribute(key)
             end
           end
         end

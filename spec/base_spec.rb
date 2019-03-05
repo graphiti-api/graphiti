@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.describe Graphiti do
   let(:klass) do
@@ -18,12 +18,12 @@ RSpec.describe Graphiti do
 
   let(:instance) { klass.new }
 
-  describe '#wrap_context' do
+  describe "#wrap_context" do
     before do
-      allow(instance).to receive(:action_name) { 'index' }
+      allow(instance).to receive(:action_name) { "index" }
     end
 
-    it 'wraps in the resource context' do
+    it "wraps in the resource context" do
       instance.wrap_context do
         expect(instance.jsonapi_resource.context).to eq(instance)
         expect(instance.jsonapi_resource.context_namespace).to eq(:index)
@@ -31,29 +31,29 @@ RSpec.describe Graphiti do
     end
   end
 
-  describe '#jsonapi_context' do
-    let(:ctx) { double('context') }
+  describe "#jsonapi_context" do
+    let(:ctx) { double("context") }
 
     before do
       allow(instance).to receive(:jsonapi_context) { ctx }
-      allow(instance).to receive(:action_name) { 'index' }
+      allow(instance).to receive(:action_name) { "index" }
     end
 
-    it 'sets the context to the given override' do
+    it "sets the context to the given override" do
       instance.wrap_context do
         expect(instance.jsonapi_resource.context).to eq(ctx)
       end
     end
   end
 
-  describe '#proxy' do
-    it 'returns a proxy with access to records, stats, and query' do
-      scope = double(resolve: ['resolved'])
-      expect(instance).to receive(:jsonapi_scope).with('foo', {}) { scope }
-      proxy = instance.proxy('foo')
+  describe "#proxy" do
+    it "returns a proxy with access to records, stats, and query" do
+      scope = double(resolve: ["resolved"])
+      expect(instance).to receive(:jsonapi_scope).with("foo", {}) { scope }
+      proxy = instance.proxy("foo")
       expect(proxy).to be_a(Graphiti::ResourceProxy)
       expect(proxy.query).to be_a(Graphiti::Query)
-      expect(proxy.to_a).to eq(['resolved'])
+      expect(proxy.to_a).to eq(["resolved"])
       expect(proxy.stats).to eq({})
     end
   end
