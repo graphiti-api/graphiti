@@ -815,10 +815,12 @@ RSpec.describe Graphiti::Schema do
 
         context "but FORCE_SCHEMA set" do
           around do |e|
-            ENV["FORCE_SCHEMA"] = "true"
-            e.run
-          ensure
-            ENV["FORCE_SCHEMA"] = nil
+            begin
+              ENV["FORCE_SCHEMA"] = "true"
+              e.run
+            ensure
+              ENV["FORCE_SCHEMA"] = nil
+            end
           end
 
           it "writes the file" do

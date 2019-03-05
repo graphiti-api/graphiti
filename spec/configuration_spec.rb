@@ -15,9 +15,12 @@ RSpec.describe Graphiti::Configuration do
   around do |e|
     orig = Graphiti.instance_variable_get(:@config)
     Graphiti.instance_variable_set(:@config, nil)
-    e.run
-  ensure
-    Graphiti.instance_variable_set(:@config, orig)
+
+    begin
+      e.run
+    ensure
+      Graphiti.instance_variable_set(:@config, orig)
+    end
   end
 
   describe "when rails is defined" do

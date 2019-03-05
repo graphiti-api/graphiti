@@ -557,10 +557,12 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       context "when a has_many relationship has validation error" do
         around do |e|
-          Position.validates :title, presence: true
-          e.run
-        ensure
-          Position.clear_validators!
+          begin
+            Position.validates :title, presence: true
+            e.run
+          ensure
+            Position.clear_validators!
+          end
         end
 
         before do
@@ -578,10 +580,12 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       context "when a belongs_to relationship has a validation error" do
         around do |e|
-          Department.validates :name, presence: true
-          e.run
-        ensure
-          Department.clear_validators!
+          begin
+            Department.validates :name, presence: true
+            e.run
+          ensure
+            Department.clear_validators!
+          end
         end
 
         before do
