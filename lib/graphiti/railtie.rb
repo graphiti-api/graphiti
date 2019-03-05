@@ -56,10 +56,10 @@ module Graphiti
         ::ActionController::Renderers.add(:jsonapi) do |proxy, options|
           self.content_type ||= Mime[:jsonapi]
 
-          opts = {}
-          if respond_to?(:default_jsonapi_render_options)
-            opts = default_jsonapi_render_options
-          end
+          # opts = {}
+          # if respond_to?(:default_jsonapi_render_options)
+          #   opts = default_jsonapi_render_options
+          # end
 
           if proxy.is_a?(Hash) # for destroy
             render(options.merge(json: proxy))
