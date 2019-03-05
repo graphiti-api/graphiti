@@ -9,20 +9,42 @@ class Graphiti::Adapters::ActiveRecord::ManyToManySideload < Graphiti::Sideload:
   end
 
   def belongs_to_many_filter(scope, value)
-    scope
-      .includes(through_relationship_name)
-      .where(belongs_to_many_clause(value))
+    if polymorphic?
+      clauses = value.group_by { |v| v['type'] }.map do |group|
+        ids = group[1].map { |g| g['id'] }
+        filter_for(scope, ids, group[0])
+      end
+      scope = clauses.shift
+      clauses.each { |c| scope = scope.or(c) }
+      scope
+    else
+      filter_for(scope, value)
+    end
+  end
+
+  def ids_for_parents(parents)
+    if polymorphic?
+      parents.group_by(&:class).map do |group|
+        { id: super(group[1]), type: group[0].name }.to_json
+      end
+    else
+      super
+    end
   end
 
   private
 
-  def belongs_to_many_clause(value)
-    where = { true_foreign_key => value }.tap do |c|
-      if polymorphic?
-        c[foreign_type_column] = foreign_type_value
-      end
-    end
+  def filter_for(scope, value, type = nil)
+    scope
+      .includes(through_relationship_name)
+      .where(belongs_to_many_clause(value, type))
+  end
 
+  def belongs_to_many_clause(value, type)
+    where = { true_foreign_key => value }
+    if polymorphic? && type
+      where[foreign_type_column] = type
+    end
     { through_table_name => where }
   end
 

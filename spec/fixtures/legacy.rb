@@ -71,11 +71,15 @@ ActiveRecord::Schema.define(:version => 1) do
     t.timestamps
   end
 
-  #create_table :tags do |t|
-    #t.string :name
-    #t.integer :book_id
-    #t.timestamps
-  #end
+  create_table :taggings do |t|
+    t.integer :tag_id
+    t.integer :taggable_id
+    t.string :taggable_type
+  end
+
+  create_table :tags do |t|
+    t.string :name
+  end
 end
 
 module Legacy
@@ -95,6 +99,8 @@ module Legacy
     has_many :author_hobbies
     has_many :hobbies, through: :author_hobbies
     has_one :bio
+    has_many :taggings, as: :taggable
+    has_many :tags, through: :taggings
 
     alias_attribute :fname, :first_name
     alias_attribute :birthdays, :age
@@ -145,14 +151,21 @@ module Legacy
     has_many :books
   end
 
-  #class Tag < LegacyApplicationRecord
-    #belongs_to :book
-  #end
-
   class Book < ApplicationRecord
     belongs_to :author
     belongs_to :genre
-    #has_many :tags
+    has_many :taggings, as: :taggable
+    has_many :tags, through: :taggings
+  end
+
+  class Tag < ApplicationRecord
+    has_many :taggings
+    has_many :taggables, through: :taggings
+  end
+
+  class Tagging < ApplicationRecord
+    belongs_to :taggable, polymorphic: true
+    belongs_to :tag
   end
 
   class LegacyApplicationSerializer < Graphiti::Serializer
@@ -164,6 +177,10 @@ module Legacy
   end
 
   class GenreResource < ApplicationResource
+    attribute :name, :string
+  end
+
+  class TagResource < ApplicationResource
     attribute :name, :string
   end
 
@@ -180,6 +197,7 @@ module Legacy
     end
 
     belongs_to :genre
+    many_to_many :tags
   end
 
   class StateResource < ApplicationResource
@@ -280,6 +298,7 @@ module Legacy
     belongs_to :organization
     has_one :bio
     many_to_many :hobbies
+    many_to_many :tags
 
     polymorphic_belongs_to :dwelling do
       group_by(:dwelling_type) do
