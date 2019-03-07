@@ -12,20 +12,20 @@ module Graphiti
     class_option :'omit-comments',
       type: :boolean,
       default: false,
-      aliases: ['--omit-comments', '-c'],
-      desc: 'Generate without documentation comments'
+      aliases: ["--omit-comments", "-c"],
+      desc: "Generate without documentation comments"
 
-    class_option :'actions',
+    class_option :actions,
       type: :array,
       default: nil,
       aliases: ["--actions", "-a"],
       desc: 'Array of controller actions to support, e.g. "index show destroy"'
 
     class_option :'attributes-from',
-      banner: 'Model',
+      banner: "Model",
       type: :string,
       aliases: ["--model", "-m"],
-      desc: 'Specify to use attributes from a particular model'
+      desc: "Specify to use attributes from a particular model"
 
     desc "This generator creates a resource file at app/resources, as well as corresponding controller/specs/route/etc"
     def generate_all
@@ -68,12 +68,12 @@ module Graphiti
     def attributes_class
       return @attributes_class if @attributes_class
 
-      case @options['attributes-from']
-           # thor will set the value to the key if no value is specified
+      case @options["attributes-from"]
+      # thor will set the value to the key if no value is specified
       when "attributes-from"
         klass = class_name
       when :kind_of?, String
-        klass = @options['attributes-from'].classify
+        klass = @options["attributes-from"].classify
       else
         # return nil if attributes-from isn't set or has an invalid value
         return
@@ -90,12 +90,12 @@ module Graphiti
     # the +attributes_class+ columns.
     ##
     def default_attributes
-      unless attributes_class.kind_of?(Class) && attributes_class <= ApplicationRecord
+      unless attributes_class.is_a?(Class) && attributes_class <= ApplicationRecord
         raise "Unable to set #{self} default_attributes from #{attributes_class}. #{attributes_class} must be a kind of ApplicationRecord"
       end
       if attributes_class.table_exists?
         return attributes_class.columns.map do |c|
-          OpenStruct.new({ name: c.name.to_sym, type: c.type })
+          OpenStruct.new({name: c.name.to_sym, type: c.type})
         end
       else
         raise "#{attributes_class} table must exist. Please run migrations."
