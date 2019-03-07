@@ -22,7 +22,7 @@ module Graphiti
     private
 
     def filter_scope(filter, operator, value)
-      if custom_scope = filter.values[0][:operators][operator]
+      if (custom_scope = filter.values[0][:operators][operator])
         custom_scope.call(@scope, value, resource.context)
       else
         filter_via_adapter(filter, operator, value)
@@ -46,7 +46,7 @@ module Graphiti
       filter_param.each_pair do |param_name, param_value|
         filter = find_filter!(param_name)
         value, operator = normalize_param(filter, param_value)
-        operator = operator.to_s.gsub('!', 'not_').to_sym
+        operator = operator.to_s.gsub("!", "not_").to_sym
         validate_operator(filter, operator)
         unless filter.values[0][:type] == :hash || !value.is_a?(String)
           value = parse_string_value(filter.values[0], value)
@@ -62,7 +62,7 @@ module Graphiti
 
     def coerce_types(filter, name, value)
       type_name = filter[:type]
-      is_array = type_name.to_s.starts_with?('array_of') ||
+      is_array = type_name.to_s.starts_with?("array_of") ||
         Types[type_name][:canonical_name] == :array
 
       if is_array
@@ -75,7 +75,7 @@ module Graphiti
 
     def normalize_param(filter, param_value)
       unless param_value.is_a?(Hash) && param_value.present?
-        param_value = { eq: param_value }
+        param_value = {eq: param_value}
       end
       value = param_value.values.first
       operator = param_value.keys.first
@@ -106,7 +106,7 @@ module Graphiti
 
     def validate_allowlist(resource, filter, values)
       values.each do |v|
-        if allow = filter.values[0][:allow]
+        if (allow = filter.values[0][:allow])
           unless allow.include?(v)
             raise Errors::InvalidFilterValue.new(resource, filter, v)
           end
@@ -116,7 +116,7 @@ module Graphiti
 
     def validate_denylist(resource, filter, values)
       values.each do |v|
-        if deny = filter.values[0][:deny]
+        if (deny = filter.values[0][:deny])
           if deny.include?(v)
             raise Errors::InvalidFilterValue.new(resource, filter, v)
           end
@@ -131,19 +131,19 @@ module Graphiti
       end
 
       if value.is_a?(String)
-        value = value.gsub('{{{', '{').gsub('}}}', '}')
+        value = value.gsub("{{{", "{").gsub("}}}", "}")
 
-        # Accomodate array of hashes
-        if value.include?('},{')
-          value = value.split('},{').map do |v|
-            if v.starts_with?('{') && !v.ends_with?('}')
-              v = "#{v}}"
-            elsif v.ends_with?('}') && !v.starts_with?('{')
-              v = "{#{v}"
+        # Accommodate array of hashes
+        if value.include?("},{")
+          value = value.split("},{").map { |v|
+            if v.starts_with?("{") && !v.ends_with?("}")
+              "#{v}}"
+            elsif v.ends_with?("}") && !v.starts_with?("{")
+              "{#{v}"
             else
               "{#{v}}"
             end
-          end
+          }
         end
       end
 
@@ -157,16 +157,18 @@ module Graphiti
     # JSON of
     # {{{ "id": 1 }}} becomes { 'id' => 1 }
     def parse_string_value(filter, value)
+      return value if !!filter[:single]
+
       type = Graphiti::Types[filter[:type]]
       array_or_string = [:string, :array].include?(type[:canonical_name])
       if (arr = value.scan(/\[.*?\]/)).present? && array_or_string
-        value = arr.map do |json|
+        value = arr.map { |json|
           begin
             JSON.parse(json)
           rescue
             raise Errors::InvalidJSONArray.new(resource, value)
           end
-        end
+        }
         value = value[0] if value.length == 1
       else
         value = parse_string_arrays(value)
@@ -178,11 +180,11 @@ module Graphiti
       # Find the quoted strings
       quotes = value.scan(/{{.*?}}/)
       # remove them from the rest
-      quotes.each { |q| value.gsub!(q, '') }
+      quotes.each { |q| value.gsub!(q, "") }
       # remove the quote characters from the quoted strings
-      quotes.each { |q| q.gsub!('{{', '').gsub!('}}', '') }
+      quotes.each { |q| q.gsub!("{{", "").gsub!("}}", "") }
       # merge everything back together into an array
-      value = Array(value.split(',')) + quotes
+      value = Array(value.split(",")) + quotes
       # remove any blanks that are left
       value.reject! { |v| v.length.zero? }
       value = value[0] if value.length == 1

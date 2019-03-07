@@ -1,7 +1,7 @@
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.describe Graphiti::Configuration do
-  RSpec.shared_context 'with config' do |name|
+  RSpec.shared_context "with config" do |name|
     around do |e|
       orig = Graphiti.config.send(name)
       begin
@@ -13,22 +13,23 @@ RSpec.describe Graphiti::Configuration do
   end
 
   around do |e|
+    orig = Graphiti.instance_variable_get(:@config)
+    Graphiti.instance_variable_set(:@config, nil)
+
     begin
-      orig = Graphiti.instance_variable_get(:@config)
-      Graphiti.instance_variable_set(:@config, nil)
       e.run
     ensure
       Graphiti.instance_variable_set(:@config, orig)
     end
   end
 
-  describe 'when rails is defined' do
+  describe "when rails is defined" do
     let(:rails) do
-      double(root: '/foo/bar', logger: OpenStruct.new(level: 1))
+      double(root: "/foo/bar", logger: OpenStruct.new(level: 1))
     end
 
     before do
-      stub_const('::Rails', rails)
+      stub_const("::Rails", rails)
       Graphiti.instance_variable_set(:@config, nil)
     end
 
@@ -36,17 +37,17 @@ RSpec.describe Graphiti::Configuration do
       Graphiti.instance_variable_set(:@config, nil)
     end
 
-    describe '#schema_path' do
-      it 'defaults' do
+    describe "#schema_path" do
+      it "defaults" do
         expect(Graphiti.config.schema_path)
-          .to eq('/foo/bar/public/schema.json')
+          .to eq("/foo/bar/public/schema.json")
       end
     end
 
-    describe '#debug' do
+    describe "#debug" do
       subject { Graphiti.config.debug }
 
-      context 'when rails logger is debug level' do
+      context "when rails logger is debug level" do
         before do
           rails.logger.level = 0
         end
@@ -54,19 +55,19 @@ RSpec.describe Graphiti::Configuration do
         it { is_expected.to eq(true) }
       end
 
-      context 'when rails logger is not debug level' do
+      context "when rails logger is not debug level" do
         it { is_expected.to eq(false) }
       end
     end
 
-    it 'sets the graphiti logger to the rails logger' do
+    it "sets the graphiti logger to the rails logger" do
       Graphiti.config
       expect(Graphiti.logger).to eq(rails.logger)
     end
   end
 
-  describe '#debug=' do
-    it 'toggles Debugger.enabled' do
+  describe "#debug=" do
+    it "toggles Debugger.enabled" do
       Graphiti.config.debug = true
       expect(Graphiti::Debugger.enabled).to eq(true)
       Graphiti.config.debug = false
@@ -74,8 +75,8 @@ RSpec.describe Graphiti::Configuration do
     end
   end
 
-  describe '#debug_models=' do
-    it 'toggles Debugger.enabled' do
+  describe "#debug_models=" do
+    it "toggles Debugger.enabled" do
       Graphiti.config.debug_models = true
       expect(Graphiti::Debugger.debug_models).to eq(true)
       Graphiti.config.debug_models = false
@@ -83,45 +84,45 @@ RSpec.describe Graphiti::Configuration do
     end
   end
 
-  describe '#schema_path' do
+  describe "#schema_path" do
     after do
       Graphiti.config.schema_path = nil
     end
 
-    it 'raises error when not set' do
+    it "raises error when not set" do
       expect {
         Graphiti.config.schema_path
       }.to raise_error(/No schema_path defined/)
     end
 
-    it 'returns value when value set' do
-      Graphiti.config.schema_path = 'foo'
-      expect(Graphiti.config.schema_path).to eq('foo')
+    it "returns value when value set" do
+      Graphiti.config.schema_path = "foo"
+      expect(Graphiti.config.schema_path).to eq("foo")
     end
 
-    context 'when Rails is defined' do
+    context "when Rails is defined" do
       before do
-        rails = double(root: '/foo/bar', logger: double.as_null_object)
-        stub_const('::Rails', rails)
+        rails = double(root: "/foo/bar", logger: double.as_null_object)
+        stub_const("::Rails", rails)
         Graphiti.instance_variable_set(:@config, nil)
       end
 
-      it 'defaults' do
+      it "defaults" do
         expect(Graphiti.config.schema_path)
-          .to eq('/foo/bar/public/schema.json')
+          .to eq("/foo/bar/public/schema.json")
       end
     end
   end
 
-  describe '#respond_to' do
-    include_context 'with config', :respond_to
+  describe "#respond_to" do
+    include_context "with config", :respond_to
 
-    it 'defaults' do
+    it "defaults" do
       expect(Graphiti.config.respond_to)
         .to match_array([:json, :jsonapi, :xml])
     end
 
-    it 'is overridable' do
+    it "is overridable" do
       Graphiti.configure do |c|
         c.respond_to = [:foo]
       end
@@ -129,14 +130,14 @@ RSpec.describe Graphiti::Configuration do
     end
   end
 
-  describe '#concurrency' do
-    include_context 'with config', :concurrency
+  describe "#concurrency" do
+    include_context "with config", :concurrency
 
-    it 'defaults' do
+    it "defaults" do
       expect(Graphiti.config.concurrency).to eq(false)
     end
 
-    it 'is overridable' do
+    it "is overridable" do
       Graphiti.configure do |c|
         c.concurrency = true
       end
@@ -144,14 +145,14 @@ RSpec.describe Graphiti::Configuration do
     end
   end
 
-  describe '#raise_on_missing_sideload' do
-    include_context 'with config', :raise_on_missing_sideload
+  describe "#raise_on_missing_sideload" do
+    include_context "with config", :raise_on_missing_sideload
 
-    it 'defaults' do
+    it "defaults" do
       expect(Graphiti.config.raise_on_missing_sideload).to eq(true)
     end
 
-    it 'is overridable' do
+    it "is overridable" do
       Graphiti.configure do |c|
         c.raise_on_missing_sideload = false
       end

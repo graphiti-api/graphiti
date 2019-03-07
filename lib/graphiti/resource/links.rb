@@ -6,7 +6,7 @@ module Graphiti
 
     module Overrides
       def endpoint
-        if endpoint = super
+        if (endpoint = super)
           endpoint
         else
           self.endpoint = infer_endpoint
@@ -34,12 +34,12 @@ module Graphiti
       def infer_endpoint
         return unless name
 
-        path = "/#{name.gsub('Resource', '').pluralize.underscore}".to_sym
+        path = "/#{name.gsub("Resource", "").pluralize.underscore}".to_sym
         {
           path: path,
           full_path: full_path_for(path),
           url: url_for(path),
-          actions: DEFAULT_ACTIONS.dup
+          actions: DEFAULT_ACTIONS.dup,
         }
       end
 
@@ -49,7 +49,7 @@ module Graphiti
           path: path,
           full_path: full_path_for(path),
           url: url_for(path),
-          actions: actions
+          actions: actions,
         }
       end
 
@@ -60,7 +60,7 @@ module Graphiti
           path: path,
           full_path: full_path_for(path),
           url: url_for(path),
-          actions: actions
+          actions: actions,
         }]
       end
 
@@ -68,29 +68,29 @@ module Graphiti
         ([endpoint] + secondary_endpoints).compact
       end
 
-      def allow_request?(path, params, action)
-        path = path.split('.')[0]
+      def allow_request?(request_path, params, action)
+        request_path = request_path.split(".")[0]
 
         endpoints.any? do |e|
           has_id = params[:id] || params[:data].try(:[], :id)
-          _path = path
+          path = request_path
           if [:update, :show, :destroy].include?(context_namespace) && has_id
-            _path = path.split('/')
-            _path.pop
-            _path = _path.join('/')
+            path = request_path.split("/")
+            path.pop
+            path = path.join("/")
           end
-          e[:full_path].to_s == _path && e[:actions].include?(context_namespace)
+          e[:full_path].to_s == path && e[:actions].include?(context_namespace)
         end
       end
 
       private
 
       def full_path_for(path)
-        [endpoint_namespace, path].join('').to_sym
+        [endpoint_namespace, path].join("").to_sym
       end
 
       def url_for(path)
-        [base_url, full_path_for(path)].join('').to_sym
+        [base_url, full_path_for(path)].join("").to_sym
       end
     end
   end

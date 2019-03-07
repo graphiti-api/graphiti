@@ -8,18 +8,18 @@ module Graphiti
     initializer "graphiti.require_activerecord_adapter" do
       config.after_initialize do |app|
         ActiveSupport.on_load(:active_record) do
-          require 'graphiti/adapters/active_record'
+          require "graphiti/adapters/active_record"
         end
       end
     end
 
-    initializer 'graphti.logger' do
+    initializer "graphti.logger" do
       config.after_initialize do
         Graphiti.logger = ::Rails.logger
       end
     end
 
-    initializer 'graphiti.init' do
+    initializer "graphiti.init" do
       if ::Rails.application.config.eager_load
         config.after_initialize do |app|
           ::Rails.application.reload_routes!
@@ -28,7 +28,7 @@ module Graphiti
       end
 
       if Mime[:jsonapi].nil? # rails 4
-        Mime::Type.register('application/vnd.api+json', :jsonapi)
+        Mime::Type.register("application/vnd.api+json", :jsonapi)
       end
       register_parameter_parser
       register_renderers
@@ -56,10 +56,10 @@ module Graphiti
         ::ActionController::Renderers.add(:jsonapi) do |proxy, options|
           self.content_type ||= Mime[:jsonapi]
 
-          opts = {}
-          if respond_to?(:default_jsonapi_render_options)
-            opts = default_jsonapi_render_options
-          end
+          # opts = {}
+          # if respond_to?(:default_jsonapi_render_options)
+          #   opts = default_jsonapi_render_options
+          # end
 
           if proxy.is_a?(Hash) # for destroy
             render(options.merge(json: proxy))
@@ -77,7 +77,7 @@ module Graphiti
             proxy.data, proxy.payload.relationships
 
           render \
-            json: { errors: validation.errors },
+            json: {errors: validation.errors},
             status: :unprocessable_entity
         end
       end
@@ -103,7 +103,11 @@ module Graphiti
             method = :DELETE
         end
 
-        route = ::Rails.application.routes.recognize_path(path, method: method) rescue nil
+        route = begin
+                  ::Rails.application.routes.recognize_path(path, method: method)
+                rescue
+                  nil
+                end
         "#{route[:controller]}_controller".classify.safe_constantize if route
       }
     end

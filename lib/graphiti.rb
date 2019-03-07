@@ -1,16 +1,16 @@
-require 'json'
-require 'forwardable'
-require 'active_support/core_ext/string'
-require 'active_support/core_ext/enumerable'
-require 'active_support/core_ext/class/attribute'
-require 'active_support/core_ext/hash/conversions' # to_xml
-require 'active_support/concern'
-require 'active_support/time'
+require "json"
+require "forwardable"
+require "active_support/core_ext/string"
+require "active_support/core_ext/enumerable"
+require "active_support/core_ext/class/attribute"
+require "active_support/core_ext/hash/conversions" # to_xml
+require "active_support/concern"
+require "active_support/time"
 
-require 'dry-types'
-require 'graphiti_errors'
+require "dry-types"
+require "graphiti_errors"
 
-require 'jsonapi/serializable'
+require "jsonapi/serializable"
 
 require "graphiti/version"
 require "graphiti/jsonapi_serializable_ext"
@@ -61,7 +61,7 @@ require "graphiti/util/relationship_payload"
 require "graphiti/util/persistence"
 require "graphiti/util/validation_response"
 require "graphiti/util/sideload"
-require "graphiti/util/hooks"
+require "graphiti/util/transaction_hooks_recorder"
 require "graphiti/util/attribute_check"
 require "graphiti/util/serializer_attributes"
 require "graphiti/util/serializer_relationships"
@@ -69,8 +69,8 @@ require "graphiti/util/class"
 require "graphiti/util/link"
 require "graphiti/util/remote_serializer"
 require "graphiti/util/remote_params"
-require 'graphiti/adapters/null'
-require 'graphiti/adapters/graphiti_api'
+require "graphiti/adapters/null"
+require "graphiti/adapters/graphiti_api"
 require "graphiti/extensions/extra_attribute"
 require "graphiti/extensions/boolean_attribute"
 require "graphiti/extensions/temp_id"
@@ -78,17 +78,17 @@ require "graphiti/serializer"
 require "graphiti/debugger"
 
 if defined?(ActiveRecord)
-  require 'graphiti/adapters/active_record'
+  require "graphiti/adapters/active_record"
 end
 
 if defined?(Rails)
-  require 'graphiti/railtie'
-  require 'graphiti/rails'
-  require 'graphiti/responders'
+  require "graphiti/railtie"
+  require "graphiti/rails"
+  require "graphiti/responders"
 end
 
 module Graphiti
-  autoload :Base, 'graphiti/base'
+  autoload :Base, "graphiti/base"
 
   def self.included(klass)
     klass.instance_eval do
@@ -108,13 +108,11 @@ module Graphiti
 
   # @api private
   def self.with_context(obj, namespace = nil)
-    begin
-      prior = self.context
-      self.context = { object: obj, namespace: namespace }
-      yield
-    ensure
-      self.context = prior
-    end
+    prior = context
+    self.context = {object: obj, namespace: namespace}
+    yield
+  ensure
+    self.context = prior
   end
 
   def self.config
@@ -192,7 +190,7 @@ module InstanceVariableOverride
     values = super
     if @__graphiti_serializer
       values.reject! do |v|
-        ['__graphiti_serializer', '__graphiti_resource'].include?(v)
+        ["__graphiti_serializer", "__graphiti_resource"].include?(v)
       end
     end
     values

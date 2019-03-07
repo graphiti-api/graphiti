@@ -68,18 +68,6 @@ module Graphiti
         scope
       end
 
-      def filter_datetime_eq(scope, attribute, value)
-        scope
-      end
-
-      def filter_datetime_not_eq(scope, attribute, value)
-        scope
-      end
-
-      def filter_datetime_lte(scope, attribute, value)
-        scope
-      end
-
       def filter_float_eq(scope, attribute, value)
         scope
       end

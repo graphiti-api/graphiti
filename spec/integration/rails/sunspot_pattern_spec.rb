@@ -1,4 +1,4 @@
-if ENV['APPRAISAL_INITIALIZED']
+if ENV["APPRAISAL_INITIALIZED"]
   # This tests the 'Sunspot Pattern':
   # Querying using ElasticSearch, Solr, etc, but returning ActiveRecord objects
   #
@@ -8,7 +8,7 @@ if ENV['APPRAISAL_INITIALIZED']
   # have adverse side-effects because of AR magic.
   #
   # This scenario is likely specific to ActiveRecord.
-  RSpec.describe 'a non-ActiveRecord adapter that returns ActiveRecord models', type: :controller do
+  RSpec.describe "a non-ActiveRecord adapter that returns ActiveRecord models", type: :controller do
     include GraphitiSpecHelpers
 
     controller(ApplicationController) do
@@ -19,28 +19,28 @@ if ENV['APPRAISAL_INITIALIZED']
     end
 
     let!(:author) do
-      Legacy::Author.create!(first_name: 'Stephen', state: state)
+      Legacy::Author.create!(first_name: "Stephen", state: state)
     end
-    let!(:book) { Legacy::Book.create!(title: 'Foo', author: author) }
-    let!(:state) { Legacy::State.create!(name: 'Maine') }
+    let!(:book) { Legacy::Book.create!(title: "Foo", author: author) }
+    let!(:state) { Legacy::State.create!(name: "Maine") }
 
     before do
       allow(controller.request.env).to receive(:[])
         .with(anything).and_call_original
       allow(controller.request.env).to receive(:[])
-        .with('PATH_INFO') { path }
+        .with("PATH_INFO") { path }
     end
 
-    let(:path) { '/legacy/author_searches' }
+    let(:path) { "/legacy/author_searches" }
 
-    it 'works' do
-      do_index({ include: 'special_books' })
+    it "works" do
+      do_index({include: "special_books"})
       expect(d[0].sideload(:special_books).map(&:id)).to eq([book.id])
     end
 
-    context 'belongs_to' do
-      it 'works' do
-        do_index({ include: 'special_state' })
+    context "belongs_to" do
+      it "works" do
+        do_index({include: "special_state"})
         expect(d[0].sideload(:special_state).id).to eq(state.id)
       end
     end

@@ -30,7 +30,7 @@ module Graphiti
       # @param [Adapters::Abstract] adapter the Resource adapter
       # @param [Symbol, Hash] config example: +:total+ or +{ total: [:count] }+
       def initialize(adapter, config)
-        config = { config => [] } if config.is_a?(Symbol)
+        config = {config => []} if config.is_a?(Symbol)
 
         @adapter = adapter
         @calculations = {}
@@ -46,8 +46,14 @@ module Graphiti
       #
       # ...will hit +method_missing+ and store the proc for future reference.
       # @api private
+      # rubocop: disable Style/MethodMissingSuper
       def method_missing(meth, *args, &blk)
         @calculations[meth] = blk
+      end
+      # rubocop: enable Style/MethodMissingSuper
+
+      def respond_to_missing?(*args)
+        true
       end
 
       # Grab a calculation proc. Raises error if no corresponding stat

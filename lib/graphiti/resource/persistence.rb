@@ -30,7 +30,7 @@ module Graphiti
 
         def around_attributes(method = nil, only: [:create, :update], &blk)
           if blk
-            raise Errors::AroundCallbackProc.new(self, 'around_attributes')
+            raise Errors::AroundCallbackProc.new(self, "around_attributes")
           else
             add_callback(:attributes, :around, method, only, &blk)
           end
@@ -38,7 +38,7 @@ module Graphiti
 
         def around_save(method = nil, only: [:create, :update], &blk)
           if blk
-            raise Errors::AroundCallbackProc.new(self, 'around_save')
+            raise Errors::AroundCallbackProc.new(self, "around_save")
           else
             add_callback(:save, :around, method, only, &blk)
           end
@@ -46,7 +46,7 @@ module Graphiti
 
         def around_persistence(method = nil, only: [:create, :update], &blk)
           if blk
-            raise Errors::AroundCallbackProc.new(self, 'around_persistence')
+            raise Errors::AroundCallbackProc.new(self, "around_persistence")
           else
             add_callback(:persistence, :around, method, only, &blk)
           end
@@ -54,7 +54,7 @@ module Graphiti
 
         def around_destroy(method = nil, &blk)
           if blk
-            raise Errors::AroundCallbackProc.new(self, 'around_destroy')
+            raise Errors::AroundCallbackProc.new(self, "around_destroy")
           else
             add_callback(:destroy, :around, method, [:destroy], &blk)
           end
@@ -62,10 +62,10 @@ module Graphiti
 
         private
 
-        def add_callback(kind, lifecycle, method = nil, only, &blk)
+        def add_callback(kind, lifecycle, method, only, &blk)
           config[:callbacks][kind] ||= {}
           config[:callbacks][kind][lifecycle] ||= []
-          config[:callbacks][kind][lifecycle] << { callback: (method || blk), only: Array(only) }
+          config[:callbacks][kind][lifecycle] << {callback: (method || blk), only: Array(only)}
         end
       end
 
@@ -136,13 +136,13 @@ module Graphiti
         fire_around_callbacks(kind, action, *args) do |*yieldargs|
           fire_callbacks(kind, :before, action, *yieldargs)
           result = yield(*yieldargs)
-          fire_callbacks(kind, :after, action, *[result, args.last])
+          fire_callbacks(kind, :after, action, result, args.last)
           result
         end
       end
 
       def fire_callbacks(kind, lifecycle, action, *args)
-        if callbacks = self.class.config[:callbacks][kind]
+        if (callbacks = self.class.config[:callbacks][kind])
           callbacks = callbacks[lifecycle] || []
           callbacks.each do |config|
             callback = config[:callback]
@@ -187,7 +187,7 @@ module Graphiti
             r = nil
             args = args[0..0] if method(method_name).arity == 1
             send(method_name, *args) do |r2|
-              wrapped = around_callback_proc(callbacks, index+1, r2, &blk)
+              wrapped = around_callback_proc(callbacks, index + 1, r2, &blk)
               r = instance_exec(r2, &wrapped)
             end
             r

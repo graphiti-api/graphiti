@@ -8,26 +8,24 @@ module Graphiti
       @query     = query
       @opts      = opts
 
-      @object = @resource.around_scoping(@object, @query.hash) do |scope|
+      @object = @resource.around_scoping(@object, @query.hash) { |scope|
         apply_scoping(scope, opts)
-      end
+      }
     end
 
     def resolve
       if @query.zero_results?
         []
       else
-        resolved = broadcast_data do |payload|
+        resolved = broadcast_data { |payload|
           @object = @resource.before_resolve(@object, @query)
           payload[:results] = @resource.resolve(@object)
           payload[:results]
-        end
+        }
         resolved.compact!
         assign_serializer(resolved)
         yield resolved if block_given?
-        if @opts[:after_resolve]
-          @opts[:after_resolve].call(resolved)
-        end
+        @opts[:after_resolve]&.call(resolved)
         resolve_sideloads(resolved) unless @query.sideloads.empty?
         resolved
       end
@@ -42,11 +40,11 @@ module Graphiti
       @query.sideloads.each_pair do |name, q|
         sideload = @resource.class.sideload(name)
         next if sideload.nil? || sideload.shared_remote?
-        _parent = @resource
-        _context = Graphiti.context
+        parent_resource = @resource
+        graphiti_context = Graphiti.context
         resolve_sideload = -> {
-          Graphiti.context = _context
-          sideload.resolve(results, q, _parent)
+          Graphiti.context = graphiti_context
+          sideload.resolve(results, q, parent_resource)
           if concurrent && defined?(ActiveRecord)
             ActiveRecord::Base.clear_active_connections!
           end
@@ -60,13 +58,11 @@ module Graphiti
 
       if concurrent
         # Wait for all promises to finish
-        while !promises.all? { |p| p.fulfilled? || p.rejected? }
-          sleep 0.01
-        end
+        sleep 0.01 until promises.all? { |p| p.fulfilled? || p.rejected? }
         # Re-raise the error with correct stacktrace
         # OPTION** to avoid failing here?? if so need serializable patch
         # to avoid loading data when association not loaded
-        if rejected = promises.find(&:rejected?)
+        if (rejected = promises.find(&:rejected?))
           raise rejected.reason
         end
       end
@@ -79,7 +75,7 @@ module Graphiti
         resource: @resource,
         params: @opts[:params],
         sideload: @opts[:sideload],
-        parent: @opts[:parent]
+        parent: @opts[:parent],
       }
       Graphiti.broadcast("data", opts) do |payload|
         yield payload

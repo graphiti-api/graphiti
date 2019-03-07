@@ -8,7 +8,7 @@ module Graphiti
           opts = args.extract_options!
           type_override = args[0]
 
-          if att = get_attr(name, :filterable, raise_error: :only_unsupported)
+          if (att = get_attr(name, :filterable, raise_error: :only_unsupported))
             aliases = [name, opts[:aliases]].flatten.compact
             operators = FilterOperators.build(self, att[:type], opts, &blk)
 
@@ -26,15 +26,13 @@ module Graphiti
               single: !!opts[:single],
               dependencies: opts[:dependent],
               required: required,
-              operators: operators.to_hash
+              operators: operators.to_hash,
             }
+          elsif (type = args[0])
+            attribute name, type, only: [:filterable]
+            filter(name, opts, &blk)
           else
-            if type = args[0]
-              attribute name, type, only: [:filterable]
-              filter(name, opts, &blk)
-            else
-              raise Errors::ImplicitFilterTypeMissing.new(self, name)
-            end
+            raise Errors::ImplicitFilterTypeMissing.new(self, name)
           end
         end
 
@@ -51,15 +49,13 @@ module Graphiti
 
           if get_attr(name, :sortable, raise_error: :only_unsupported)
             config[:sorts][name] = {
-              proc: blk
+              proc: blk,
             }.merge(opts.slice(:only))
+          elsif (type = args[0])
+            attribute name, type, only: [:sortable]
+            sort(name, opts, &blk)
           else
-            if type = args[0]
-              attribute name, type, only: [:sortable]
-              sort(name, opts, &blk)
-            else
-              raise Errors::ImplicitSortTypeMissing.new(self, name)
-            end
+            raise Errors::ImplicitSortTypeMissing.new(self, name)
           end
         end
 
@@ -76,7 +72,7 @@ module Graphiti
         def default_filter(name = nil, &blk)
           name ||= :__default
           config[:default_filters][name.to_sym] = {
-            filter: blk
+            filter: blk,
           }
         end
 
@@ -84,6 +80,13 @@ module Graphiti
           Array(only).each do |verb|
             config[:before_commit][verb] ||= []
             config[:before_commit][verb] << blk
+          end
+        end
+
+        def after_commit(only: [:create, :update, :destroy], &blk)
+          Array(only).each do |verb|
+            config[:after_commit][verb] ||= []
+            config[:after_commit][verb] << blk
           end
         end
 
@@ -109,7 +112,7 @@ module Graphiti
             readable: true,
             writable: false,
             sortable: false,
-            filterable: false
+            filterable: false,
           }
           options = defaults.merge(options)
           config[:extra_attributes][name] = options
@@ -140,19 +143,19 @@ module Graphiti
 
         def attribute_option(options, name)
           if options[name] != false
-            default = if only = options[:only]
-                        Array(only).include?(name) ? true : false
-                      elsif except = options[:except]
-                        Array(except).include?(name) ? false : true
-                      else
-                        send(:"attributes_#{name}_by_default")
-                      end
+            default = if (only = options[:only])
+              Array(only).include?(name) ? true : false
+            elsif (except = options[:except])
+              Array(except).include?(name) ? false : true
+            else
+              send(:"attributes_#{name}_by_default")
+            end
             options[name] ||= default
           end
         end
         private :attribute_option
 
-       def relationship_option(options, name)
+        def relationship_option(options, name)
           if options[name] != false
             options[name] ||= send(:"relationships_#{name}_by_default")
           end

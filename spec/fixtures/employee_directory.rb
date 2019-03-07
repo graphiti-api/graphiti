@@ -1,4 +1,4 @@
-ActiveRecord::Schema.define(:version => 1) do
+ActiveRecord::Schema.define(version: 1) do
   create_table :classifications do |t|
     t.string :description
   end
@@ -76,7 +76,7 @@ class ApplicationRecord < ActiveRecord::Base
   end
 
   def add_validation_error
-    errors.add(:base, 'Forced validation error')
+    errors.add(:base, "Forced validation error")
   end
 end
 
@@ -179,7 +179,7 @@ class PositionResource < ApplicationResource
 end
 
 class TaskResource < ApplicationResource
-  self.polymorphic = %w(BugResource FeatureResource)
+  self.polymorphic = %w[BugResource FeatureResource]
   attribute :name, :string
   attribute :employee_id, :string, only: [:writable]
 end

@@ -47,7 +47,7 @@
 class Graphiti::Deserializer
   def initialize(payload)
     @payload = payload
-    @payload = @payload[:_jsonapi] if @payload.has_key?(:_jsonapi)
+    @payload = @payload[:_jsonapi] if @payload.key?(:_jsonapi)
   end
 
   def params
@@ -73,9 +73,7 @@ class Graphiti::Deserializer
 
   # Override the attributes
   # # @see #attributes
-  def attributes=(attrs)
-    @attributes = attrs
-  end
+  attr_writer :attributes
 
   # 'meta' information about this resource. Includes:
   #
@@ -88,7 +86,7 @@ class Graphiti::Deserializer
     {
       type: data[:type],
       temp_id: data[:'temp-id'],
-      method: action
+      method: action,
     }
   end
 
@@ -164,12 +162,12 @@ class Graphiti::Deserializer
 
   def process_relationship_datum(datum)
     temp_id = datum[:'temp-id']
-    included_object = included.find do |i|
+    included_object = included.find { |i|
       next unless i[:type] == datum[:type]
 
       (i[:id] && i[:id] == datum[:id]) ||
         (i[:'temp-id'] && i[:'temp-id'] == temp_id)
-    end
+    }
     included_object ||= {}
     included_object[:relationships] ||= {}
 
@@ -183,10 +181,10 @@ class Graphiti::Deserializer
       meta: {
         jsonapi_type: datum[:type],
         temp_id: temp_id,
-        method: method
+        method: method,
       },
       attributes: attributes,
-      relationships: relationships
+      relationships: relationships,
     }
   end
 

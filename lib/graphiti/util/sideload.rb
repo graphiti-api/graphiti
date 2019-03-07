@@ -22,7 +22,7 @@ module Graphiti
       #
       # @api private
       def self.namespace(a, b)
-        if a.to_s.split('.')[0] == b.to_s
+        if a.to_s.split(".")[0] == b.to_s
           :"#{a}.#{b}"
         else
           b

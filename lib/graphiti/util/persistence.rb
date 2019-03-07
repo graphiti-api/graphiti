@@ -5,23 +5,24 @@ class Graphiti::Util::Persistence
   # @param [Hash] meta see (Deserializer#meta)
   # @param [Hash] attributes see (Deserializer#attributes)
   # @param [Hash] relationships see (Deserializer#relationships)
-  def initialize(resource, meta, attributes, relationships, caller_model)
+  # @param [Model] caller_model The persisted parent object in the request graph
+  # @param [Symbol] foreign_key Attribute assigned by parent object in graph
+  def initialize(resource, meta, attributes, relationships, caller_model, foreign_key = nil)
     @resource      = resource
     @meta          = meta
     @attributes    = attributes
     @relationships = relationships
     @caller_model  = caller_model
+    @foreign_key   = foreign_key
 
     # Find the correct child resource for a given jsonapi type
-    if meta_type = @meta[:type].try(:to_sym)
+    if (meta_type = @meta[:type].try(:to_sym))
       if @resource.type != meta_type && @resource.polymorphic?
         @resource = @resource.class.resource_for_type(meta_type).new
       end
     end
 
-    @attributes.each_pair do |key, value|
-      @attributes[key] = @resource.typecast(key, value, :writable)
-    end
+    typecast_attributes
   end
 
   # Perform the actual save logic.
@@ -53,23 +54,39 @@ class Graphiti::Util::Persistence
 
     associate_parents(persisted, parents)
 
-    children = process_has_many(@relationships, persisted) do |x|
+    children = process_has_many(@relationships, persisted) { |x|
       update_foreign_key(persisted, x[:attributes], x)
-    end
+    }
 
     associate_children(persisted, children) unless @meta[:method] == :destroy
 
     post_process(persisted, parents)
     post_process(persisted, children)
     before_commit = -> { @resource.before_commit(persisted, metadata) }
-    add_hook(before_commit)
+    add_hook(before_commit, :before_commit)
+    after_commit = -> { @resource.after_commit(persisted, metadata) }
+    add_hook(after_commit, :after_commit)
     persisted
   end
 
   private
 
-  def add_hook(prc)
-    ::Graphiti::Util::Hooks.add(prc)
+  # In the case where we're sideposting in order to associate 2 nodes
+  # in the graph, the foreign key gets merged into the child's attributes
+  # This attribute should *not* need to be marked writable, as that
+  # would allow writing as a straight attribute instead of just an association
+  def typecast_attributes
+    @attributes.each_pair do |key, value|
+      @attributes[key] = if @foreign_key == key
+        value
+      else
+        @resource.typecast(key, value, :writable)
+      end
+    end
+  end
+
+  def add_hook(prc, lifecycle_event)
+    ::Graphiti::Util::TransactionHooksRecorder.add(prc, lifecycle_event)
   end
 
   # The child's attributes should be modified to nil-out the
@@ -117,16 +134,12 @@ class Graphiti::Util::Persistence
           else
             x[:sideload].disassociate(x[:object], object)
           end
+        elsif x[:sideload].type == :belongs_to
+          x[:sideload].associate(object, x[:object])
+        elsif [:has_many, :many_to_many].include?(x[:sideload].type)
+          x[:sideload].associate_all(object, Array(x[:object]))
         else
-          if x[:sideload].type == :belongs_to
-            x[:sideload].associate(object, x[:object])
-          else
-            if [:has_many, :many_to_many].include?(x[:sideload].type)
-              x[:sideload].associate_all(object, Array(x[:object]))
-            else
-              x[:sideload].associate(x[:object], object)
-            end
-          end
+          x[:sideload].associate(x[:object], object)
         end
       end
     end
@@ -140,13 +153,12 @@ class Graphiti::Util::Persistence
         elsif x[:meta][:method] == :destroy
           if x[:sideload].type == :many_to_many
             x[:sideload].disassociate(object, x[:object])
-          end # otherwise, no need to disassociate destroyed objects
-        else
-          if [:has_many, :many_to_many].include?(x[:sideload].type)
-            x[:sideload].associate_all(object, Array(x[:object]))
-          else
-            x[:sideload].associate(object, x[:object])
           end
+          # otherwise, no need to disassociate destroyed objects
+        elsif [:has_many, :many_to_many].include?(x[:sideload].type)
+          x[:sideload].associate_all(object, Array(x[:object]))
+        else
+          x[:sideload].associate(object, x[:object])
         end
       end
     end
@@ -170,7 +182,9 @@ class Graphiti::Util::Persistence
 
         if x[:sideload].writable?
           x[:object] = x[:resource]
-            .persist_with_relationships(x[:meta], x[:attributes], x[:relationships], caller_model)
+            .persist_with_relationships(x[:meta], x[:attributes], x[:relationships], caller_model, x[:foreign_key])
+        else
+          raise Graphiti::Errors::UnwritableRelationship.new(@resource, x[:sideload])
         end
 
         processed << x
@@ -198,7 +212,7 @@ class Graphiti::Util::Persistence
       group.group_by { |g| g[:sideload] }.each_pair do |sideload, members|
         objects = members.map { |x| x[:object] }
         hook = -> { sideload.fire_hooks!(caller_model, objects, method) }
-        add_hook(hook)
+        add_hook(hook, :before_commit)
       end
     end
   end
@@ -224,7 +238,7 @@ class Graphiti::Util::Persistence
       temp_id: @meta[:temp_id],
       caller_model: @caller_model,
       attributes: @attributes,
-      relationships: @relationships
+      relationships: @relationships,
     }
   end
 

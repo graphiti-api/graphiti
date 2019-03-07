@@ -8,13 +8,11 @@ module Graphiti
     include Documentation
     include Persistence
 
-    attr_reader :context
-
     def around_scoping(scope, query_hash)
       extra_fields = query_hash[:extra_fields] || {}
       extra_fields = extra_fields[type] || []
       extra_fields.each do |name|
-        if config = self.class.config[:extra_attributes][name]
+        if (config = self.class.config[:extra_attributes][name])
           scope = instance_exec(scope, &config[:hook]) if config[:hook]
         end
       end
@@ -71,13 +69,13 @@ module Graphiti
         type_name = filters[name][:type]
       end
       type = Graphiti::Types[type_name]
-      return if value.nil? && type[:kind] != 'array'
+      return if value.nil? && type[:kind] != "array"
       begin
         flag = :read if flag == :readable
         flag = :write if flag == :writable
         flag = :params if [:sortable, :filterable].include?(flag)
         type[flag][value]
-      rescue Exception => e
+      rescue => e
         raise Errors::TypecastFailed.new(self, name, value, e)
       end
     end
@@ -94,9 +92,9 @@ module Graphiti
       adapter.disassociate(parent, child, association_name, type)
     end
 
-    def persist_with_relationships(meta, attributes, relationships, caller_model = nil)
+    def persist_with_relationships(meta, attributes, relationships, caller_model = nil, foreign_key = nil)
       persistence = Graphiti::Util::Persistence \
-        .new(self, meta, attributes, relationships, caller_model)
+        .new(self, meta, attributes, relationships, caller_model, foreign_key)
       persistence.run
     end
 
@@ -121,6 +119,13 @@ module Graphiti
       end
     end
 
+    def after_commit(model, metadata)
+      hooks = self.class.config[:after_commit][metadata[:method]] || []
+      hooks.each do |hook|
+        instance_exec(model, metadata, &hook)
+      end
+    end
+
     def transaction
       response = nil
       begin
@@ -128,7 +133,7 @@ module Graphiti
           response = yield
         end
       rescue Errors::ValidationError => e
-        response = e.validation_response
+        response = {result: e.validation_response}
       end
       response
     end

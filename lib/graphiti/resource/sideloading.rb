@@ -13,7 +13,7 @@ module Graphiti
           relationship_option(opts, :readable)
           relationship_option(opts, :writable)
           sideload = klass.new(name, opts)
-          if parent = opts[:parent]
+          if (parent = opts[:parent])
             parent.children[name] = sideload
           else
             config[:sideloads][name] = sideload
@@ -51,23 +51,24 @@ module Graphiti
         end
 
         def polymorphic_belongs_to(name, opts = {}, &blk)
-          opts[:resource] ||= Class.new(::Graphiti::Resource) do
+          opts[:resource] ||= Class.new(::Graphiti::Resource) {
             self.polymorphic = []
             self.abstract_class = true
-          end
+          }
           # adapters *probably* don't need to override this, but it's allowed
           opts[:class] ||= adapter.sideloading_classes[:polymorphic_belongs_to]
           opts[:class] ||= ::Graphiti::Sideload::PolymorphicBelongsTo
           allow_sideload(name, opts, &blk)
         end
 
-        def polymorphic_has_many(name, opts = {}, as:, &blk)
+        def polymorphic_has_many(name, opts = {}, &blk)
+          as = opts.delete(:as)
           opts[:foreign_key] ||= :"#{as}_id"
           opts[:polymorphic_as] ||= as
-          _model = model
+          model_ref = model
           has_many name, opts do
             params do |hash|
-              hash[:filter][:"#{as}_type"] = _model.name
+              hash[:filter][:"#{as}_type"] = model_ref.name
             end
 
             instance_eval(&blk) if block_given?

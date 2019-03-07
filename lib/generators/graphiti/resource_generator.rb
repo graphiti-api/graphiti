@@ -1,11 +1,11 @@
 $:.unshift File.dirname(__FILE__)
-require 'generator_mixin'
+require "generator_mixin"
 
 module Graphiti
   class ResourceGenerator < ::Rails::Generators::NamedBase
     include GeneratorMixin
 
-    source_root File.expand_path('../templates', __FILE__)
+    source_root File.expand_path("../templates", __FILE__)
 
     argument :attributes, type: :array, default: [], banner: "field[:type][:index] field[:type][:index]"
 
@@ -18,7 +18,7 @@ module Graphiti
     class_option :'actions',
       type: :array,
       default: nil,
-      aliases: ['--actions', '-a'],
+      aliases: ["--actions", "-a"],
       desc: 'Array of controller actions to support, e.g. "index show destroy"'
 
     class_option :'attributes-from',
@@ -62,7 +62,7 @@ module Graphiti
     end
 
     def omit_comments?
-      @options['omit-comments']
+      @options["omit-comments"]
     end
 
     def attributes_class
@@ -118,28 +118,28 @@ module Graphiti
     end
 
     def generate_controller
-      to = File.join('app/controllers', class_path, "#{file_name.pluralize}_controller.rb")
-      template('controller.rb.erb', to)
+      to = File.join("app/controllers", class_path, "#{file_name.pluralize}_controller.rb")
+      template("controller.rb.erb", to)
     end
 
     def generate_application_resource
-      to = File.join('app/resources', class_path, "application_resource.rb")
-      template('application_resource.rb.erb', to)
+      to = File.join("app/resources", class_path, "application_resource.rb")
+      template("application_resource.rb.erb", to)
       require "#{::Rails.root}/#{to}"
     end
 
     def application_resource_defined?
-      'ApplicationResource'.safe_constantize.present?
+      "ApplicationResource".safe_constantize.present?
     end
 
     def generate_route
       # Rails 5.2 adds `plural_route_name`, fallback to `plural_table_name`
-      plural_name = self.try(:plural_route_name) || plural_table_name
+      plural_name = try(:plural_route_name) || plural_table_name
 
       code = "resources :#{plural_name}"
-      code << %{, only: [#{actions.map { |a| ":#{a}" }.join(', ')}]} if actions.length < 5
+      code << %(, only: [#{actions.map { |a| ":#{a}" }.join(", ")}]) if actions.length < 5
       code << "\n"
-      inject_into_file 'config/routes.rb', after: /ApplicationResource.*$\n/ do
+      inject_into_file "config/routes.rb", after: /ApplicationResource.*$\n/ do
         indent(code, 4)
       end
     end
@@ -147,18 +147,18 @@ module Graphiti
     def generate_resource_specs
       opts = {}
       opts[:actions] = @options[:actions] if @options[:actions]
-      invoke 'graphiti:resource_test', [resource_klass], opts
+      invoke "graphiti:resource_test", [resource_klass], opts
     end
 
     def generate_api_specs
       opts = {}
       opts[:actions] = @options[:actions] if @options[:actions]
-      invoke 'graphiti:api_test', [resource_klass], opts
+      invoke "graphiti:api_test", [resource_klass], opts
     end
 
     def generate_resource
-      to = File.join('app/resources', class_path, "#{file_name}_resource.rb")
-      template('resource.rb.erb', to)
+      to = File.join("app/resources", class_path, "#{file_name}_resource.rb")
+      template("resource.rb.erb", to)
       require "#{::Rails.root}/#{to}" if create?
     end
 

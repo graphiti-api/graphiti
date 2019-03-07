@@ -1,6 +1,6 @@
 module Graphiti
   module Errors
-    class Base < StandardError;end
+    class Base < StandardError; end
 
     class AdapterNotImplemented < Base
       def initialize(adapter, attribute, method)
@@ -10,8 +10,8 @@ module Graphiti
       end
 
       def message
-        <<-MSG
-The adapter #{@adapter.class} does not implement method '#{@method}', which was requested for attribute '#{@attribute}'. Add this method to your adapter to support this filter operator.
+        <<~MSG
+          The adapter #{@adapter.class} does not implement method '#{@method}', which was requested for attribute '#{@attribute}'. Add this method to your adapter to support this filter operator.
         MSG
       end
     end
@@ -24,8 +24,8 @@ The adapter #{@adapter.class} does not implement method '#{@method}', which was 
       end
 
       def message
-        <<-MSG
-#{@parent_resource_class} sideload :#{@name} - #{@message}
+        <<~MSG
+          #{@parent_resource_class} sideload :#{@name} - #{@message}
         MSG
       end
     end
@@ -53,8 +53,8 @@ The adapter #{@adapter.class} does not implement method '#{@method}', which was 
       end
 
       def message
-        <<-MSG
-#{@resource_class}: Tried to pass block to .#{@method_name}, which only accepts a method name.
+        <<~MSG
+          #{@resource_class}: Tried to pass block to .#{@method_name}, which only accepts a method name.
         MSG
       end
     end
@@ -65,8 +65,8 @@ The adapter #{@adapter.class} does not implement method '#{@method}', which was 
       end
 
       def message
-        <<-MSG
-#{@resource_class}: Tried to perform write operation. Writes are not supported for remote resources - hit the endpoint directly.
+        <<~MSG
+          #{@resource_class}: Tried to perform write operation. Writes are not supported for remote resources - hit the endpoint directly.
         MSG
       end
     end
@@ -80,8 +80,8 @@ The adapter #{@adapter.class} does not implement method '#{@method}', which was 
       end
 
       def message
-        <<-MSG
-#{@resource.class}: Tried to filter #{@filter_name.inspect} on operator #{@operator.inspect}, but not supported! Supported operators are #{@supported}.
+        <<~MSG
+          #{@resource.class}: Tried to filter #{@filter_name.inspect} on operator #{@operator.inspect}, but not supported! Supported operators are #{@supported}.
         MSG
       end
     end
@@ -93,8 +93,8 @@ The adapter #{@adapter.class} does not implement method '#{@method}', which was 
       end
 
       def message
-        <<-MSG
-#{@resource.class}: Tried to persist sideload #{@sideload.name.inspect} but marked writable: false
+        <<~MSG
+          #{@resource.class}: Tried to persist association #{@sideload.name.inspect} but marked writable: false
         MSG
       end
     end
@@ -106,14 +106,14 @@ The adapter #{@adapter.class} does not implement method '#{@method}', which was 
       end
 
       def message
-        <<-MSG
-#{@sideload.parent_resource.class.name}: tried to sideload #{@sideload.name.inspect}, but more than one #{@sideload.parent_resource.model.name} was passed!
+        <<~MSG
+          #{@sideload.parent_resource.class.name}: tried to sideload #{@sideload.name.inspect}, but more than one #{@sideload.parent_resource.model.name} was passed!
 
-This is because you marked the sideload #{@sideload.name.inspect} with single: true
+          This is because you marked the sideload #{@sideload.name.inspect} with single: true
 
-You might have done this because the sideload can only be loaded from a :show endpoint, and :index would be too expensive.
+          You might have done this because the sideload can only be loaded from a :show endpoint, and :index would be too expensive.
 
-Remove the single: true option to bypass this error.
+          Remove the single: true option to bypass this error.
         MSG
       end
     end
@@ -127,8 +127,8 @@ Remove the single: true option to bypass this error.
       end
 
       def message
-        <<-MSG
-#{@resource.class.name}: tried to sort on attribute #{@attribute.inspect}, but passed #{@direction.inspect} when only #{@allowlist.inspect} is supported.
+        <<~MSG
+          #{@resource.class.name}: tried to sort on attribute #{@attribute.inspect}, but passed #{@direction.inspect} when only #{@allowlist.inspect} is supported.
         MSG
       end
     end
@@ -140,8 +140,8 @@ Remove the single: true option to bypass this error.
       end
 
       def message
-        <<-MSG
-#{@resource_class.name}: called .on_extra_attribute #{@name.inspect}, but extra attribute #{@name.inspect} does not exist!
+        <<~MSG
+          #{@resource_class.name}: called .on_extra_attribute #{@name.inspect}, but extra attribute #{@name.inspect} does not exist!
         MSG
       end
     end
@@ -156,8 +156,8 @@ Remove the single: true option to bypass this error.
       def message
         allow = @filter.values[0][:allow]
         deny = @filter.values[0][:deny]
-        msg = <<-MSG
-#{@resource.class.name}: tried to filter on #{@filter.keys[0].inspect}, but passed invalid value #{@value.inspect}.
+        msg = <<~MSG
+          #{@resource.class.name}: tried to filter on #{@filter.keys[0].inspect}, but passed invalid value #{@value.inspect}.
         MSG
         msg << "\nAllowlist: #{allow.inspect}" if allow
         msg << "\nDenylist: #{deny.inspect}" if deny
@@ -173,12 +173,12 @@ Remove the single: true option to bypass this error.
       end
 
       def message
-        <<-MSG
-#{@resource_class.name}: Cannot link to sideload #{@sideload.name.inspect}!
+        <<~MSG
+          #{@resource_class.name}: Cannot link to sideload #{@sideload.name.inspect}!
 
-Make sure the endpoint "#{@sideload.resource.endpoint[:full_path]}" exists with action #{@action.inspect}, or customize the endpoint for #{@sideload.resource.class.name}.
+          Make sure the endpoint "#{@sideload.resource.endpoint[:full_path]}" exists with action #{@action.inspect}, or customize the endpoint for #{@sideload.resource.class.name}.
 
-If you do not wish to generate a link, pass link: false or set self.relationship_links_by_default = false.
+          If you do not wish to generate a link, pass link: false or set self.relationship_links_by_default = false.
         MSG
       end
     end
@@ -191,10 +191,10 @@ If you do not wish to generate a link, pass link: false or set self.relationship
       end
 
       def message
-        <<-MSG
-#{@resource.class.name}: passed multiple values to filter #{@filter.keys[0].inspect}, which was marked single: true.
+        <<~MSG
+          #{@resource.class.name}: passed multiple values to filter #{@filter.keys[0].inspect}, which was marked single: true.
 
-Value was: #{@value.inspect}
+          Value was: #{@value.inspect}
         MSG
       end
     end
@@ -206,12 +206,12 @@ Value was: #{@value.inspect}
       end
 
       def message
-        <<-MSG
-#{@resource_class.name}: Tried to link sideload #{@sideload.name.inspect}, but cannot generate links!
+        <<~MSG
+          #{@resource_class.name}: Tried to link sideload #{@sideload.name.inspect}, but cannot generate links!
 
-Graphiti.config.context_for_endpoint must be set to enable link generation:
+          Graphiti.config.context_for_endpoint must be set to enable link generation:
 
-Graphiti.config.context_for_endpoint = ->(path, action) { ... }
+          Graphiti.config.context_for_endpoint = ->(path, action) { ... }
         MSG
       end
     end
@@ -236,17 +236,17 @@ Graphiti.config.context_for_endpoint = ->(path, action) { ... }
       def action
         if @request
           {
-            sortable: 'sort on',
-            filterable: 'filter on',
-            readable: 'read',
-            writable: 'write'
+            sortable: "sort on",
+            filterable: "filter on",
+            readable: "read",
+            writable: "write",
           }[@flag]
         else
           {
-            sortable: 'add sort',
-            filterable: 'add filter',
-            readable: 'read',
-            writable: 'write'
+            sortable: "add sort",
+            filterable: "add filter",
+            readable: "read",
+            writable: "write",
           }[@flag]
         end
       end
@@ -257,19 +257,19 @@ Graphiti.config.context_for_endpoint = ->(path, action) { ... }
         else
           @resource.name
         end
-        name || 'AnonymousResourceClass'
+        name || "AnonymousResourceClass"
       end
 
       def message
         msg = "#{resource_name}: Tried to #{action} attribute #{@name.inspect}"
-        if @exists
+        msg << if @exists
           if @guard
-            msg << ", but the guard #{@guard.inspect} did not pass."
+            ", but the guard #{@guard.inspect} did not pass."
           else
-            msg << ", but the attribute was marked #{@flag.inspect} => false."
+            ", but the attribute was marked #{@flag.inspect} => false."
           end
         else
-          msg << ", but could not find an attribute with that name."
+          ", but could not find an attribute with that name."
         end
         msg
       end
@@ -282,8 +282,8 @@ Graphiti.config.context_for_endpoint = ->(path, action) { ... }
       end
 
       def message
-        <<-MSG
-#{@resource.class.name}: passed filter with value #{@value.inspect}, and failed attempting to parse as JSON array.
+        <<~MSG
+          #{@resource.class.name}: passed filter with value #{@value.inspect}, and failed attempting to parse as JSON array.
         MSG
       end
     end
@@ -296,18 +296,18 @@ Graphiti.config.context_for_endpoint = ->(path, action) { ... }
       end
 
       def message
-        <<-MSG
-#{@resource_class.name} cannot be called directly from endpoint #{@path}##{@action}!
+        <<~MSG
+          #{@resource_class.name} cannot be called directly from endpoint #{@path}##{@action}!
 
-Either set a primary endpoint for this resource:
+          Either set a primary endpoint for this resource:
 
-primary_endpoint '/my/url', [:index, :show, :create]
+          primary_endpoint '/my/url', [:index, :show, :create]
 
-Or whitelist a secondary endpoint:
+          Or whitelist a secondary endpoint:
 
-secondary_endoint '/my_url', [:index, :update]
+          secondary_endoint '/my_url', [:index, :update]
 
-The current endpoints allowed for this resource are: #{@resource_class.endpoints.inspect}
+          The current endpoints allowed for this resource are: #{@resource_class.endpoints.inspect}
         MSG
       end
     end
@@ -332,10 +332,10 @@ The current endpoints allowed for this resource are: #{@resource_class.endpoints
       end
 
       def message
-        <<-MSG
-Both '#{@resource_a}' and '#{@resource_b}' are associated to endpoint #{@path}##{@action}!
+        <<~MSG
+          Both '#{@resource_a}' and '#{@resource_b}' are associated to endpoint #{@path}##{@action}!
 
-Only one resource can be associated to a given url/verb combination.
+          Only one resource can be associated to a given url/verb combination.
         MSG
       end
     end
@@ -352,24 +352,24 @@ Only one resource can be associated to a given url/verb combination.
       end
 
       def model_message
-        <<-MSG
-#{@resource_class}: Tried to find Resource subclass with model #{@model.class}, but nothing found!
+        <<~MSG
+          #{@resource_class}: Tried to find Resource subclass with model #{@model.class}, but nothing found!
 
-Make sure all your child classes are assigned and associated to the right models:
+          Make sure all your child classes are assigned and associated to the right models:
 
-# One of these should be assocated to model #{@model.class}:
-self.polymorphic = ['Subclass1Resource', 'Subclass2Resource']
+          # One of these should be assocated to model #{@model.class}:
+          self.polymorphic = ['Subclass1Resource', 'Subclass2Resource']
         MSG
       end
 
       def type_message
-        <<-MSG
-#{@resource_class}: Tried to find Resource subclass with model #{@model.class}, but nothing found!
+        <<~MSG
+          #{@resource_class}: Tried to find Resource subclass with model #{@model.class}, but nothing found!
 
-Make sure all your child classes are assigned and associated to the right models:
+          Make sure all your child classes are assigned and associated to the right models:
 
-# One of these should be assocated to model #{@model.class}:
-self.polymorphic = ['Subclass1Resource', 'Subclass2Resource']
+          # One of these should be assocated to model #{@model.class}:
+          self.polymorphic = ['Subclass1Resource', 'Subclass2Resource']
         MSG
       end
     end
@@ -389,14 +389,14 @@ self.polymorphic = ['Subclass1Resource', 'Subclass2Resource']
       end
 
       def message
-        <<-MSG
-Tried to add filter-only attribute #{@name.inspect}, but type was missing!
+        <<~MSG
+          Tried to add filter-only attribute #{@name.inspect}, but type was missing!
 
-If you are adding a filter that does not have a corresponding attribute, you must pass a type:
+          If you are adding a filter that does not have a corresponding attribute, you must pass a type:
 
-filter :name, :string do <--- like this
-  # ... code ...
-end
+          filter :name, :string do <--- like this
+            # ... code ...
+          end
         MSG
       end
     end
@@ -408,14 +408,14 @@ end
       end
 
       def message
-        <<-MSG
-Tried to add sort-only attribute #{@name.inspect}, but type was missing!
+        <<~MSG
+          Tried to add sort-only attribute #{@name.inspect}, but type was missing!
 
-If you are adding a sort that does not have a corresponding attribute, you must pass a type:
+          If you are adding a sort that does not have a corresponding attribute, you must pass a type:
 
-sort :name, :string do <--- like this
-  # ... code ...
-end
+          sort :name, :string do <--- like this
+            # ... code ...
+          end
         MSG
       end
     end
@@ -429,12 +429,12 @@ end
       end
 
       def message
-        <<-MSG
-#{@resource.class}: Failed typecasting #{@name.inspect}! Given #{@value.inspect} but the following error was raised:
+        <<~MSG
+          #{@resource.class}: Failed typecasting #{@name.inspect}! Given #{@value.inspect} but the following error was raised:
 
-#{@error.message}
+          #{@error.message}
 
-#{@error.backtrace.join("\n")}
+          #{@error.backtrace.join("\n")}
         MSG
       end
     end
@@ -445,10 +445,10 @@ end
       end
 
       def message
-        <<-MSG
-Could not find model for Resource '#{@resource_class}'
+        <<~MSG
+          Could not find model for Resource '#{@resource_class}'
 
-Manually set model (self.model = MyModel) if it does not match name of the Resource.
+          Manually set model (self.model = MyModel) if it does not match name of the Resource.
         MSG
       end
     end
@@ -461,10 +461,10 @@ Manually set model (self.model = MyModel) if it does not match name of the Resou
       end
 
       def message
-        <<-MSG
-Could not find type #{@type.inspect}! This was specified on attribute #{@attribute.inspect} within resource #{@resource.name}
+        <<~MSG
+          Could not find type #{@type.inspect}! This was specified on attribute #{@attribute.inspect} within resource #{@resource.name}
 
-Valid types are: #{Graphiti::Types.map.keys.inspect}
+          Valid types are: #{Graphiti::Types.map.keys.inspect}
         MSG
       end
     end
@@ -476,17 +476,17 @@ Valid types are: #{Graphiti::Types.map.keys.inspect}
       end
 
       def message
-        <<-MSG
-#{@sideload.parent_resource}: Found record with #{@sideload.grouper.field_name.inspect} == #{@name.inspect}, which is not registered!
+        <<~MSG
+          #{@sideload.parent_resource}: Found record with #{@sideload.grouper.field_name.inspect} == #{@name.inspect}, which is not registered!
 
-Register the behavior of different types like so:
+          Register the behavior of different types like so:
 
-polymorphic_belongs_to #{@sideload.name.inspect} do
-  group_by(#{@sideload.grouper.field_name.inspect}) do
-    on(#{@name.to_sym.inspect}) <---- this is what's missing
-    on(:foo).belongs_to :foo, resource: FooResource (long-hand example)
-  end
-end
+          polymorphic_belongs_to #{@sideload.name.inspect} do
+            group_by(#{@sideload.grouper.field_name.inspect}) do
+              on(#{@name.to_sym.inspect}) <---- this is what's missing
+              on(:foo).belongs_to :foo, resource: FooResource (long-hand example)
+            end
+          end
         MSG
       end
     end
@@ -499,10 +499,10 @@ end
       end
 
       def message
-        <<-MSG
-#{@resource_class.name}: sideload #{@sideload.name.inspect} is associated with resource #{@sideload.resource.class.name}, but it does not have corresponding filter.
+        <<~MSG
+          #{@resource_class.name}: sideload #{@sideload.name.inspect} is associated with resource #{@sideload.resource.class.name}, but it does not have corresponding filter.
 
-Expecting filter #{@filter.inspect} on #{@sideload.resource.class.name}.
+          Expecting filter #{@filter.inspect} on #{@sideload.resource.class.name}.
         MSG
       end
     end
@@ -530,34 +530,34 @@ Expecting filter #{@filter.inspect} on #{@sideload.resource.class.name}.
       end
 
       def message
-        <<-MSG
-Could not find resource class for sideload '#{@sideload_name}' on Resource '#{@resource_class.name}'!
+        <<~MSG
+          Could not find resource class for sideload '#{@sideload_name}' on Resource '#{@resource_class.name}'!
 
-Tried to find classes: #{@tried.join(', ')}
+          Tried to find classes: #{@tried.join(", ")}
 
-If this follows a non-standard naming convention, use the :resource option to pass it directly:
+          If this follows a non-standard naming convention, use the :resource option to pass it directly:
 
-has_many :comments, resource: SpecialCommentResource
+          has_many :comments, resource: SpecialCommentResource
         MSG
       end
     end
 
     class UnsupportedPagination < Base
       def message
-        <<-MSG
-It looks like you are requesting pagination of a sideload, but there are > 1 parents.
+        <<~MSG
+          It looks like you are requesting pagination of a sideload, but there are > 1 parents.
 
-This is not supported. In other words, you can do
+          This is not supported. In other words, you can do
 
-/employees/1?include=positions&page[positions][size]=2
+          /employees/1?include=positions&page[positions][size]=2
 
-But not
+          But not
 
-/employees?include=positions&page[positions][size]=2
+          /employees?include=positions&page[positions][size]=2
 
-This is a limitation of most datastores; the same issue exists in ActiveRecord.
+          This is a limitation of most datastores; the same issue exists in ActiveRecord.
 
-Consider using a named relationship instead, e.g. 'has_one :top_comment'
+          Consider using a named relationship instead, e.g. 'has_one :top_comment'
         MSG
       end
     end
@@ -579,7 +579,7 @@ Consider using a named relationship instead, e.g. 'has_one :top_comment'
       end
 
       def message
-"#{@resource.class.name}: The requested included relationship \"#{@relationship}\" is not supported."
+        "#{@resource.class.name}: The requested included relationship \"#{@relationship}\" is not supported."
       end
     end
 
@@ -615,7 +615,7 @@ Consider using a named relationship instead, e.g. 'has_one :top_comment'
 
       def message
         if @attributes.length > 1
-          "The required filters \"#{@attributes.join(', ')}\" on resource #{@resource.class} were not provided"
+          "The required filters \"#{@attributes.join(", ")}\" on resource #{@resource.class} were not provided"
         else
           "The required filter \"#{@attributes[0]}\" on resource #{@resource.class} was not provided"
         end

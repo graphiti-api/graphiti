@@ -1,12 +1,12 @@
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.describe Graphiti::Sideload::HasOne do
   let(:parent_resource_class) { PORO::EmployeeResource }
-  let(:opts) { { parent_resource: parent_resource_class } }
+  let(:opts) { {parent_resource: parent_resource_class} }
   let(:name) { :bio }
   let(:instance) { described_class.new(name, opts) }
 
-  describe '#assign' do
+  describe "#assign" do
     let!(:employee1) { PORO::Employee.new(id: 1) }
     let!(:employee2) { PORO::Employee.new(id: 2) }
     let!(:bio1) { PORO::Bio.new(id: 1, employee_id: 2) }
@@ -15,7 +15,7 @@ RSpec.describe Graphiti::Sideload::HasOne do
     let!(:employees) { [employee1, employee2] }
     let!(:bios) { [bio1, bio2, bio3] }
 
-    it 'associates correctly' do
+    it "associates correctly" do
       instance.assign(employees, bios)
       expect(employee1.bio).to eq(bio2)
       expect(employee2.bio).to eq(bio1)

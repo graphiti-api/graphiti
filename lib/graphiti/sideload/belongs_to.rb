@@ -10,17 +10,9 @@ class Graphiti::Sideload::BelongsTo < Graphiti::Sideload
     end
   end
 
-  def load(parents, query, graph_parent)
-    if ids_for_parents(parents).empty?
-      []
-    else
-      super
-    end
-  end
-
   def base_filter(parents)
     parent_ids = ids_for_parents(parents)
-    { primary_key => parent_ids.join(',') }
+    {primary_key => parent_ids.join(",")}
   end
 
   def ids_for_parents(parents)
@@ -36,7 +28,7 @@ class Graphiti::Sideload::BelongsTo < Graphiti::Sideload
     else
       model = resource.model
       namespace = namespace_for(model)
-      model_name = model.name.gsub("#{namespace}::", '')
+      model_name = model.name.gsub("#{namespace}::", "")
       :"#{model_name.underscore}_id"
     end
   end

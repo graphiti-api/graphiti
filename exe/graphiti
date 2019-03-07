@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'graphiti/cli'
+require "graphiti/cli"
 
 Graphiti::CLI.start(ARGV)

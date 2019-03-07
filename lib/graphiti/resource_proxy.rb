@@ -8,12 +8,12 @@ module Graphiti
       payload: nil,
       single: false,
       raise_on_missing: false)
-        @resource = resource
-        @scope = scope
-        @query = query
-        @payload = payload
-        @single = single
-        @raise_on_missing = raise_on_missing
+      @resource = resource
+      @scope = scope
+      @query = query
+      @payload = payload
+      @single = single
+      @raise_on_missing = raise_on_missing
     end
 
     def single?
@@ -62,7 +62,7 @@ module Graphiti
         records
       end
     end
-    alias :to_a :data
+    alias to_a data
 
     def each(&blk)
       to_a.each(&blk)
@@ -90,12 +90,12 @@ module Graphiti
       original = Graphiti.context[:namespace]
       begin
         Graphiti.context[:namespace] = action
-        validator = persist do
+        validator = persist {
           @resource.persist_with_relationships \
             @payload.meta(action: action),
             @payload.attributes,
             @payload.relationships
-        end
+        }
       ensure
         Graphiti.context[:namespace] = original
       end
@@ -114,17 +114,18 @@ module Graphiti
     end
 
     def destroy
-      validator = @resource.transaction do
-        metadata = { method: :destroy }
+      transaction_response = @resource.transaction do
+        metadata = {method: :destroy}
         model = @resource.destroy(@query.filters[:id], metadata)
         model.instance_variable_set(:@__serializer_klass, @resource.serializer)
         validator = ::Graphiti::Util::ValidationResponse.new \
           model, @payload
         validator.validate!
         @resource.before_commit(model, metadata)
-        validator
+
+        {result: validator}
       end
-      @data, success = validator.to_a
+      @data, success = transaction_response[:result].to_a
       success
     end
 
@@ -154,8 +155,8 @@ module Graphiti
     private
 
     def persist
-      @resource.transaction do
-        ::Graphiti::Util::Hooks.record do
+      transaction_response = @resource.transaction do
+        ::Graphiti::Util::TransactionHooksRecorder.record do
           model = yield
           validator = ::Graphiti::Util::ValidationResponse.new \
             model, @payload
@@ -163,6 +164,15 @@ module Graphiti
           validator
         end
       end
+
+      _data, success = transaction_response[:result].to_a
+      if success
+        transaction_response[:after_commit_hooks].each do |hook|
+          hook.call
+        end
+      end
+
+      transaction_response[:result]
     end
   end
 end

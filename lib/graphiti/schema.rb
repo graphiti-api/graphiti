@@ -12,12 +12,12 @@ module Graphiti
     def self.generate!(resources = nil)
       schema = generate(resources)
 
-      if ENV['FORCE_SCHEMA'] != 'true' && File.exists?(Graphiti.config.schema_path)
+      if ENV["FORCE_SCHEMA"] != "true" && File.exist?(Graphiti.config.schema_path)
         old = JSON.parse(File.read(Graphiti.config.schema_path))
         errors = Graphiti::SchemaDiff.new(old, schema).compare
         return errors if errors.any?
       end
-      FileUtils.mkdir_p(Graphiti.config.schema_path.gsub('/schema.json', ''))
+      FileUtils.mkdir_p(Graphiti.config.schema_path.gsub("/schema.json", ""))
       File.write(Graphiti.config.schema_path, JSON.pretty_generate(schema))
       []
     end
@@ -32,7 +32,7 @@ module Graphiti
       {
         resources: generate_resources,
         endpoints: generate_endpoints,
-        types: generate_types
+        types: generate_types,
       }
     end
 
@@ -52,16 +52,16 @@ module Graphiti
           r.endpoints.each do |e|
             actions = {}
             e[:actions].each do |a|
-              next unless ctx = context_for(e[:full_path], a)
+              next unless (ctx = context_for(e[:full_path], a))
 
               existing = endpoints[e[:full_path]]
-              if existing && config = existing[:actions][a]
+              if existing && (config = existing[:actions][a])
                 raise Errors::ResourceEndpointConflict.new \
                   e[:full_path], a, r.name, config[:resource]
               end
 
-              actions[a] = { resource: r.name }
-              if allowlist = ctx.sideload_allowlist
+              actions[a] = {resource: r.name}
+              if (allowlist = ctx.sideload_allowlist)
                 if allowlist[a]
                   actions[a].merge!(sideload_allowlist: allowlist[a])
                 end
@@ -69,7 +69,7 @@ module Graphiti
             end
 
             unless actions.empty?
-              endpoints[e[:full_path]] ||= { actions: {} }
+              endpoints[e[:full_path]] ||= {actions: {}}
               endpoints[e[:full_path]][:actions].merge!(actions)
             end
           end
@@ -82,7 +82,7 @@ module Graphiti
     end
 
     def generate_resources
-      arr = @local_resources.map do |r|
+      arr = @local_resources.map { |r|
         config = {
           name: r.name,
           type: r.type.to_s,
@@ -91,13 +91,13 @@ module Graphiti
           extra_attributes: extra_attributes(r),
           sorts: sorts(r),
           filters: filters(r),
-          relationships: relationships(r)
+          relationships: relationships(r),
         }
 
         if r.default_sort
-          default_sort = r.default_sort.map do |s|
-            { s.keys.first.to_s => s.values.first.to_s }
-          end
+          default_sort = r.default_sort.map { |s|
+            {s.keys.first.to_s => s.values.first.to_s}
+          }
           config[:default_sort] = default_sort
         end
 
@@ -106,20 +106,21 @@ module Graphiti
         end
 
         if r.polymorphic?
-          config.merge!(polymorphic: true, children: r.children.map(&:name))
+          config[:polymorphic] = true
+          config[:children] = r.children.map(&:name)
         end
 
         config
-      end
+      }
 
-      arr |= @remote_resources.map do |r|
+      arr |= @remote_resources.map { |r|
         {
           name: r.name,
           description: r.description,
           remote: r.remote_url,
-          relationships: relationships(r)
+          relationships: relationships(r),
         }
-      end
+      }
 
       arr
     end
@@ -129,9 +130,9 @@ module Graphiti
         resource.attributes.each_pair do |name, config|
           if config.values_at(:readable, :writable).any?
             attrs[name] = {
-              type:       config[:type].to_s,
-              readable:   flag(config[:readable]),
-              writable:   flag(config[:writable]),
+              type: config[:type].to_s,
+              readable: flag(config[:readable]),
+              writable: flag(config[:writable]),
               description: resource.attribute_description(name),
             }
           end
@@ -143,7 +144,7 @@ module Graphiti
       {}.tap do |attrs|
         resource.extra_attributes.each_pair do |name, config|
           attrs[name] = {
-            type:     config[:type].to_s,
+            type: config[:type].to_s,
             readable: flag(config[:readable]),
             description: resource.attribute_description(name),
           }
@@ -151,9 +152,9 @@ module Graphiti
       end
     end
 
-    def flag(value)value
+    def flag(value)
       if value.is_a?(Symbol)
-        'guarded'
+        "guarded"
       else
         !!value
       end
@@ -178,7 +179,7 @@ module Graphiti
         resource.filters.each_pair do |name, filter|
           config = {
             type: filter[:type].to_s,
-            operators: filter[:operators].keys.map(&:to_s)
+            operators: filter[:operators].keys.map(&:to_s),
           }
 
           config[:single] = true if filter[:single]
@@ -202,7 +203,7 @@ module Graphiti
     def relationships(resource)
       {}.tap do |r|
         resource.sideloads.each_pair do |name, config|
-          schema = { type: config.type.to_s, description: config.description }
+          schema = {type: config.type.to_s, description: config.description}
           if config.type == :polymorphic_belongs_to
             schema[:resources] = config.children.values
               .map(&:resource).map(&:class).map(&:name)
