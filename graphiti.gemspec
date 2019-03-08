@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = "~> 2.3"
 
   # Pinning this version until backwards-incompatibility is addressed
-  spec.add_dependency "jsonapi-serializable", "~> 0.3.0"
+  spec.add_dependency "jsonapi-serializable", "= 0.3.0"
   spec.add_dependency "dry-types", "~> 0.13"
   spec.add_dependency "graphiti_errors", "~> 1.0.beta.1"
   spec.add_dependency "concurrent-ruby", "~> 1.0"
