@@ -28,6 +28,10 @@ module BasicRailsApp
       config.logger = fake_logger
       Rails.application.routes.default_url_options = {host: "example.com"}
 
+      if Rails::VERSION::MAJOR >= 6
+        Rails.application.config.hosts << "www.example.com"
+      end
+
       # fix railties 5.2.0 issue with secret_key_base
       # https://github.com/rails/rails/commit/7419a4f9 should take care of it
       # in the future.
