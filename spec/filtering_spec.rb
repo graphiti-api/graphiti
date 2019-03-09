@@ -113,6 +113,36 @@ RSpec.describe "filtering" do
     end
   end
 
+  context "when filter is custom hash schema" do
+    before do
+      foo = Dry::Types["hash"].schema(foo: Dry::Types["strict.string"])
+      Graphiti::Types[:custom] = {
+        params: foo,
+        read: foo,
+        write: foo,
+        kind: "record",
+        canonical_name: :hash,
+        description: "Foo",
+      }
+      resource.filter :blah, :custom do
+        eq do |scope, hash|
+          scope[:conditions][:id] = 2 if hash[0][:foo] == "bar"
+          scope
+        end
+      end
+
+      params[:filter] = {blah: {foo: "bar"}}
+    end
+
+    after do
+      Graphiti::Types.map.delete(:custom)
+    end
+
+    it "works" do
+      expect(records.map(&:id)).to eq([employee2.id])
+    end
+  end
+
   context "when filter is a {{string}} with a comma" do
     before do
       params[:filter] = {first_name: "{{foo,bar}}"}
