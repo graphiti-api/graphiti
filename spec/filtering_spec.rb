@@ -67,6 +67,50 @@ RSpec.describe "filtering" do
           .to eq([employee2.id, employee3.id, employee4.id])
       end
     end
+
+    context "and marked single:true" do
+      before do
+        resource.filter :by_json, :hash, single: true do
+          eq do |scope, value|
+            ids = [value["id"], value["id2"]].flatten
+            scope[:conditions][:id] = ids
+            scope
+          end
+        end
+        params[:filter] = {by_json: '{ "id": 2, "id2": 3 }'}
+      end
+
+      it "does not attempt to split json into arrays" do
+        expect(Graphiti::Util::Hash).to_not receive(:split_json)
+        expect(records.map(&:id)).to eq([employee2.id, employee3.id])
+      end
+    end
+
+    context "and it is a complex hash" do
+      before do
+        resource.filter :by_json, :hash do
+          eq do |scope, value|
+            ids = value.map do |v|
+              [v["id"][0]["a"], v["id"][1]["b"]]
+            end.flatten
+            scope[:conditions][:id] = ids
+            scope
+          end
+        end
+
+        params[:filter] = {
+          by_json: [
+            {id: [{a: 2}, {b: 3}]}.to_json,
+            {id: [{a: 2}, {b: 3}]}.to_json,
+          ].join(","),
+        }
+      end
+
+      it "still works" do
+        expect(Graphiti::Util::Hash).to receive(:split_json).and_call_original
+        expect(records.map(&:id)).to eq([employee2.id, employee3.id])
+      end
+    end
   end
 
   context "when filter is a {{string}} with a comma" do

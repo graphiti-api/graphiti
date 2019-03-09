@@ -62,6 +62,24 @@ module Graphiti
           end
         end
       end
+
+      def self.split_json(string)
+        start, opens, closes, index = 0, 0, 0, -1
+        [].tap do |jsons|
+          string[0..string.length].each_char do |char|
+            index += 1
+            opens += 1 if char == "{"
+            if char == "}"
+              closes += 1
+
+              if opens == closes
+                jsons << string.slice(start..index)
+                start = index + 2
+              end
+            end
+          end
+        end
+      end
     end
   end
 end

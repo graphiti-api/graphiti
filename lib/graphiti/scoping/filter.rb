@@ -133,17 +133,8 @@ module Graphiti
       if value.is_a?(String)
         value = value.gsub("{{{", "{").gsub("}}}", "}")
 
-        # Accommodate array of hashes
-        if value.include?("},{")
-          value = value.split("},{").map { |v|
-            if v.starts_with?("{") && !v.ends_with?("}")
-              "#{v}}"
-            elsif v.ends_with?("}") && !v.starts_with?("{")
-              "{#{v}"
-            else
-              "{#{v}}"
-            end
-          }
+        if value.include?("},{") && !filter.values[0][:single]
+          value = Util::Hash.split_json(value)
         end
       end
 
