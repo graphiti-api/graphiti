@@ -48,7 +48,9 @@ module Graphiti
         value, operator = normalize_param(filter, param_value)
         operator = operator.to_s.gsub("!", "not_").to_sym
         validate_operator(filter, operator)
-        unless filter.values[0][:type] == :hash || !value.is_a?(String)
+
+        type = Types[filter.values[0][:type]]
+        unless type[:canonical_name] == :hash || !value.is_a?(String)
           value = parse_string_value(filter.values[0], value)
         end
         validate_singular(resource, filter, value)
@@ -80,7 +82,7 @@ module Graphiti
       value = param_value.values.first
       operator = param_value.keys.first
 
-      if filter.values[0][:type] == :hash
+      if Types[filter.values[0][:type]][:canonical_name] == :hash
         value, operator = \
           parse_hash_value(filter, param_value, value, operator)
       else
