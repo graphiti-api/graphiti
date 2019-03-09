@@ -35,9 +35,23 @@ module Graphiti
       end
     end
 
+    # See above comment
+    module ResourceForOverride
+      def resource_for(object, options, inferrer)
+        resource = object.instance_variable_get(:@__graphiti_resource)
+        klass = object.instance_variable_get(:@__graphiti_serializer)
+        klass.new(options.merge(object: object, resource: resource))
+      end
+    end
+
     JSONAPI::Serializable::Relationship
       .send(:prepend, RelationshipOverrides)
-    JSONAPI::Serializable::Renderer
-      .send(:prepend, RendererOverrides)
+
+    if JSONAPI::Serializable.methods.include?(:resource_for)
+      JSONAPI::Serializable.singleton_class.send(:prepend, ResourceForOverride)
+    else
+      JSONAPI::Serializable::Renderer
+        .send(:prepend, RendererOverrides)
+    end
   end
 end
