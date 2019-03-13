@@ -110,6 +110,14 @@ if ENV["APPRAISAL_INITIALIZED"]
                                created_at_date: 1.day.from_now.to_date
       end
 
+      context "when multiple operators" do
+        let(:filter) { { age: { gte: 50, lte: 70 }} }
+
+        it "works" do
+          expect(ids).to eq([author1.id, author2.id])
+        end
+      end
+
       context "when an integer_id" do
         let(:filter) { {id: value} }
 

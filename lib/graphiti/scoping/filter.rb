@@ -45,20 +45,22 @@ module Graphiti
     def each_filter
       filter_param.each_pair do |param_name, param_value|
         filter = find_filter!(param_name)
-        value, operator = normalize_param(filter, param_value)
-        operator = operator.to_s.gsub("!", "not_").to_sym
-        validate_operator(filter, operator)
 
-        type = Types[filter.values[0][:type]]
-        unless type[:canonical_name] == :hash || !value.is_a?(String)
-          value = parse_string_value(filter.values[0], value)
+        normalize_param(filter, param_value).each do |operator, value|
+          operator = operator.to_s.gsub("!", "not_").to_sym
+          validate_operator(filter, operator)
+
+          type = Types[filter.values[0][:type]]
+          unless type[:canonical_name] == :hash || !value.is_a?(String)
+            value = parse_string_value(filter.values[0], value)
+          end
+          validate_singular(resource, filter, value)
+          value = coerce_types(filter.values[0], param_name.to_sym, value)
+          validate_allowlist(resource, filter, value)
+          validate_denylist(resource, filter, value)
+          value = value[0] if filter.values[0][:single]
+          yield filter, operator, value
         end
-        validate_singular(resource, filter, value)
-        value = coerce_types(filter.values[0], param_name.to_sym, value)
-        validate_allowlist(resource, filter, value)
-        validate_denylist(resource, filter, value)
-        value = value[0] if filter.values[0][:single]
-        yield filter, operator, value
       end
     end
 
@@ -79,17 +81,16 @@ module Graphiti
       unless param_value.is_a?(Hash) && param_value.present?
         param_value = {eq: param_value}
       end
-      value = param_value.values.first
-      operator = param_value.keys.first
 
-      if Types[filter.values[0][:type]][:canonical_name] == :hash
-        value, operator = \
-          parse_hash_value(filter, param_value, value, operator)
-      else
-        value = param_value.values.first
+      param_value.map do |operator, value|
+        if Types[filter.values[0][:type]][:canonical_name] == :hash
+          value, operator = \
+            parse_hash_value(filter, param_value, value, operator)
+        end
+
+        [operator, value]
       end
 
-      [value, operator]
     end
 
     def validate_operator(filter, operator)
