@@ -236,6 +236,33 @@ RSpec.describe "filtering" do
     end
   end
 
+  context "when filter contains multiple operators" do
+    before do
+      params[:filter] = { age: { gte: 40, lte: 60 }}
+
+      resource.attribute :age, :integer
+      resource.filter :age do
+        gte do |scope, value|
+          scope[:conditions][:age] = [42, 52]
+          scope
+        end
+        lte do |scope, value|
+          scope[:conditions][:age] = [42, 52]
+          scope
+        end
+      end
+
+      employee1.update_attributes(age: 32)
+      employee2.update_attributes(age: 42)
+      employee3.update_attributes(age: 52)
+      employee4.update_attributes(age: 62)
+    end
+
+    it "works" do
+      expect(records.map(&:id)).to eq([employee2.id, employee3.id])
+    end
+  end
+
   context "when filter overrides attribute type" do
     before do
       resource.attribute :foo, :string
