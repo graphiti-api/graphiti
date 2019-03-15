@@ -33,7 +33,6 @@ module Graphiti
     end
 
     def jsonapi_render_options(opts = {})
-      opts[:meta]   ||= {}
       opts[:expose] ||= {}
       opts[:expose][:context] = Graphiti.context[:object]
       opts
@@ -63,6 +62,10 @@ module Graphiti
       end
     end
     alias to_a data
+
+    def meta
+      @meta ||= data.respond_to?(:meta) ? data.meta : {}
+    end
 
     def each(&blk)
       to_a.each(&blk)

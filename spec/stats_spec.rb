@@ -156,11 +156,11 @@ RSpec.describe "stats" do
         before do
           resource.class_eval do
             stat :age do
-              second { |_, _, _, data| data.meta }
+              second { |_, _, _, data| data.meta[:stats][:age] }
             end
 
             def resolve(scope)
-              Results.new(super, meta: "from meta!")
+              Results.new(super, meta: { stats: { age: "from meta!" } })
             end
           end
         end

@@ -101,6 +101,30 @@ RSpec.describe "serialization" do
       expect(position["department"]).to be_nil
     end
 
+    class RenderResults < SimpleDelegator
+      attr_accessor :meta
+
+      def initialize(array, meta:)
+        super(array)
+        @meta = meta
+      end
+    end
+
+    context 'when resolved data has meta' do
+      before do
+        resource.class_eval do
+          def resolve(scope)
+            RenderResults.new(super, meta: { foo: 'bar' })
+          end
+        end
+      end
+
+      it 'is returned in the response' do
+        json = JSON.parse(proxy.to_jsonapi)
+        expect(json['meta']).to eq({ 'foo' => 'bar' })
+      end
+    end
+
     context "when sideloading" do
       it "works" do
         expect(json[0]["positions"]).to eq([
