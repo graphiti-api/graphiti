@@ -53,9 +53,17 @@ module Graphiti
       end
 
       def guard
-        guard_method = @attr[:readable]
+        method_name = @attr[:readable]
         instance = @resource.new
-        -> { instance.instance_eval(&guard_method) }
+
+        -> {
+          method = instance.method(method_name)
+          if method.arity.zero?
+            instance.instance_eval(&method_name)
+          else
+            instance.instance_exec(@object, &method)
+          end
+        }
       end
 
       def guard?
