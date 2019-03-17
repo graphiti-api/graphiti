@@ -772,6 +772,21 @@ RSpec.describe "serialization" do
           expect(json["data"][0]["attributes"]).to_not have_key("foo")
         end
       end
+
+      context 'and the guard accepts an argument' do
+        before do
+          resource.class_eval do
+            def admin?(object)
+              object.is_a?(PORO::Employee)
+            end
+          end
+        end
+
+        it 'is passed the model instance as argument' do
+          render
+          expect(json["data"][0]["attributes"]["foo"]).to eq("bar")
+        end
+      end
     end
   end
 
