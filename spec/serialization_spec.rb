@@ -773,7 +773,7 @@ RSpec.describe "serialization" do
         end
       end
 
-      context 'and the guard accepts an argument' do
+      context "and the guard accepts an argument" do
         before do
           resource.class_eval do
             def admin?(object)
@@ -782,7 +782,7 @@ RSpec.describe "serialization" do
           end
         end
 
-        it 'is passed the model instance as argument' do
+        it "is passed the model instance as argument" do
           render
           expect(json["data"][0]["attributes"]["foo"]).to eq("bar")
         end

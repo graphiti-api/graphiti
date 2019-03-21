@@ -110,18 +110,18 @@ RSpec.describe "serialization" do
       end
     end
 
-    context 'when resolved data has meta' do
+    context "when resolved data has meta" do
       before do
         resource.class_eval do
           def resolve(scope)
-            RenderResults.new(super, meta: { foo: 'bar' })
+            RenderResults.new(super, meta: {foo: "bar"})
           end
         end
       end
 
-      it 'is returned in the response' do
+      it "is returned in the response" do
         json = JSON.parse(proxy.to_jsonapi)
-        expect(json['meta']).to eq({ 'foo' => 'bar' })
+        expect(json["meta"]).to eq({"foo" => "bar"})
       end
     end
 

@@ -238,7 +238,7 @@ RSpec.describe "filtering" do
 
   context "when filter contains multiple operators" do
     before do
-      params[:filter] = { age: { gte: 40, lte: 60 }}
+      params[:filter] = {age: {gte: 40, lte: 60}}
 
       resource.attribute :age, :integer
       resource.filter :age do

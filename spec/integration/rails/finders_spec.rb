@@ -111,7 +111,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       context "when multiple operators" do
-        let(:filter) { { age: { gte: 50, lte: 70 }} }
+        let(:filter) { {age: {gte: 50, lte: 70}} }
 
         it "works" do
           expect(ids).to eq([author1.id, author2.id])
@@ -1081,6 +1081,30 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(included("hobbies").size).to eq(2)
         expect(author1_hobbies.size).to eq(2)
         expect(author2_hobbies.size).to eq(1)
+      end
+
+      context "when configured as a has_many association" do
+        before do
+          @orig_sideload = Legacy::AuthorResource.sideloads.delete(:hobbies)
+          @orig_filter = Legacy::HobbyResource.filters.delete(:author_id)
+          @orig_attr = Legacy::HobbyResource.attributes.delete(:author_id)
+
+          Legacy::AuthorResource.class_eval do
+            has_many :hobbies
+          end
+        end
+
+        after do
+          Legacy::AuthorResource.sideloads[:hobbies] = @orig_sideload
+          Legacy::AuthorResource.filters[:author_id] = @orig_filter
+          Legacy::AuthorResource.attributes[:author_id] = @orig_attr
+        end
+
+        it "derives the foreign key directly" do
+          expect {
+            do_index({include: "hobbies"})
+          }.to raise_error(Graphiti::Errors::AttributeError, /author_id/)
+        end
       end
 
       context "when the table name does not match the association name" do
