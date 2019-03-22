@@ -90,7 +90,6 @@ module Graphiti
 
         [operator, value]
       end
-
     end
 
     def validate_operator(filter, operator)

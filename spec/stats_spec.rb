@@ -160,7 +160,7 @@ RSpec.describe "stats" do
             end
 
             def resolve(scope)
-              Results.new(super, meta: { stats: { age: "from meta!" } })
+              Results.new(super, meta: {stats: {age: "from meta!"}})
             end
           end
         end
