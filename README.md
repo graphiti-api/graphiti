@@ -1,11 +1,11 @@
-<p align="center">
-  <img " src="https://www.graphiti.dev/assets/img/logo.png" />
-</p>
-
 ![Build Status](https://travis-ci.org/graphiti-api/graphiti.svg?branch=master)
 [![Gem Version](https://badge.fury.io/rb/graphiti.svg)](https://badge.fury.io/rb/graphiti)
 [![Ruby Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://github.com/testdouble/standard)
 
+<p align="center">
+  <img " src="https://www.graphiti.dev/assets/img/logo.png" />
+</p>
+                                                           
 Stylish Graph APIs.
 
 [View Official Documentation](https://www.graphiti.dev/guides/)
