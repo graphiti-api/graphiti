@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="https://www.graphiti.dev/guides">
-    <img " src="https://www.graphiti.dev/assets/img/logo.png" />
+    <img " src="https://user-images.githubusercontent.com/55264/54884080-30cc9500-4e43-11e9-9f56-a7bfa1024b22.png" />
   </a>                                                       
 </p>
                                                            
