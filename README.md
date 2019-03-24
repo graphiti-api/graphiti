@@ -3,12 +3,14 @@
 [![Ruby Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://github.com/testdouble/standard)
 
 <p align="center">
-  <img " src="https://www.graphiti.dev/assets/img/logo.png" />
+  <a href="https://www.graphiti.dev/guides">
+    <img " src="https://www.graphiti.dev/assets/img/logo.png" />
+  </a>                                                       
 </p>
                                                            
 Stylish Graph APIs.
 
-[View Official Documentation](https://www.graphiti.dev/guides/)
+[Website](https://www.graphiti.dev/guides/)
 
 [Join the Slack Channel](https://join.slack.com/t/graphiti-api/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg)
 
