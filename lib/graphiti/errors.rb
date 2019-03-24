@@ -10,7 +10,7 @@ module Graphiti
       end
 
       def message
-        <<~MSG
+        <<-MSG
           The adapter #{@adapter.class} does not implement method '#{@method}', which was requested for attribute '#{@attribute}'. Add this method to your adapter to support this filter operator.
         MSG
       end
@@ -24,7 +24,7 @@ module Graphiti
       end
 
       def message
-        <<~MSG
+        <<-MSG
           #{@parent_resource_class} sideload :#{@name} - #{@message}
         MSG
       end
@@ -53,7 +53,7 @@ module Graphiti
       end
 
       def message
-        <<~MSG
+        <<-MSG
           #{@resource_class}: Tried to pass block to .#{@method_name}, which only accepts a method name.
         MSG
       end
@@ -65,7 +65,7 @@ module Graphiti
       end
 
       def message
-        <<~MSG
+        <<-MSG
           #{@resource_class}: Tried to perform write operation. Writes are not supported for remote resources - hit the endpoint directly.
         MSG
       end
@@ -80,7 +80,7 @@ module Graphiti
       end
 
       def message
-        <<~MSG
+        <<-MSG
           #{@resource.class}: Tried to filter #{@filter_name.inspect} on operator #{@operator.inspect}, but not supported! Supported operators are #{@supported}.
         MSG
       end
@@ -93,7 +93,7 @@ module Graphiti
       end
 
       def message
-        <<~MSG
+        <<-MSG
           #{@resource.class}: Tried to persist association #{@sideload.name.inspect} but marked writable: false
         MSG
       end
@@ -106,7 +106,7 @@ module Graphiti
       end
 
       def message
-        <<~MSG
+        <<-MSG
           #{@sideload.parent_resource.class.name}: tried to sideload #{@sideload.name.inspect}, but more than one #{@sideload.parent_resource.model.name} was passed!
 
           This is because you marked the sideload #{@sideload.name.inspect} with single: true
@@ -127,7 +127,7 @@ module Graphiti
       end
 
       def message
-        <<~MSG
+        <<-MSG
           #{@resource.class.name}: tried to sort on attribute #{@attribute.inspect}, but passed #{@direction.inspect} when only #{@allowlist.inspect} is supported.
         MSG
       end
@@ -140,7 +140,7 @@ module Graphiti
       end
 
       def message
-        <<~MSG
+        <<-MSG
           #{@resource_class.name}: called .on_extra_attribute #{@name.inspect}, but extra attribute #{@name.inspect} does not exist!
         MSG
       end
@@ -156,7 +156,7 @@ module Graphiti
       def message
         allow = @filter.values[0][:allow]
         deny = @filter.values[0][:deny]
-        msg = <<~MSG
+        msg = <<-MSG
           #{@resource.class.name}: tried to filter on #{@filter.keys[0].inspect}, but passed invalid value #{@value.inspect}.
         MSG
         msg << "\nAllowlist: #{allow.inspect}" if allow
@@ -173,7 +173,7 @@ module Graphiti
       end
 
       def message
-        <<~MSG
+        <<-MSG
           #{@resource_class.name}: Cannot link to sideload #{@sideload.name.inspect}!
 
           Make sure the endpoint "#{@sideload.resource.endpoint[:full_path]}" exists with action #{@action.inspect}, or customize the endpoint for #{@sideload.resource.class.name}.
@@ -191,7 +191,7 @@ module Graphiti
       end
 
       def message
-        <<~MSG
+        <<-MSG
           #{@resource.class.name}: passed multiple values to filter #{@filter.keys[0].inspect}, which was marked single: true.
 
           Value was: #{@value.inspect}
@@ -206,12 +206,80 @@ module Graphiti
       end
 
       def message
-        <<~MSG
+        <<-MSG
           #{@resource_class.name}: Tried to link sideload #{@sideload.name.inspect}, but cannot generate links!
 
           Graphiti.config.context_for_endpoint must be set to enable link generation:
 
           Graphiti.config.context_for_endpoint = ->(path, action) { ... }
+        MSG
+      end
+    end
+
+    class SideloadParamsError < Base
+      def initialize(resource_class, sideload_name)
+        @resource_class = resource_class
+        @sideload_name = sideload_name
+      end
+
+      def message
+        <<-MSG
+          #{@resource_class.name}: error occurred while sideloading "#{@sideload_name}"!
+
+          The error was raised while attempting to build query parameters for the associated Resource.
+          Read more about sideload scoping here: www.graphiti.dev/guides/concepts/resources#customizing-scope
+
+          A good way to debug is to put a debugger within the 'params' block.
+
+          Here's the original, underlying error:
+
+          #{cause.class.name}: #{cause}
+          #{cause.backtrace.join("\n")}
+        MSG
+      end
+    end
+
+    class SideloadQueryBuildingError < Base
+      def initialize(resource_class, sideload_name)
+        @resource_class = resource_class
+        @sideload_name = sideload_name
+      end
+
+      def message
+        <<-MSG
+          #{@resource_class.name}: error occurred while sideloading "#{@sideload_name}"!
+
+          The error was raised while attempting to build the scope for the associated Resource.
+
+          Read more about sideload scoping here: www.graphiti.dev/guides/concepts/resources#customizing-scope
+
+          Here's the original, underlying error:
+
+          #{cause.class.name}: #{cause.message}
+          #{cause.backtrace.join("\n")}
+        MSG
+      end
+    end
+
+    class SideloadAssignError < Base
+      def initialize(resource_class, sideload_name)
+        @resource_class = resource_class
+        @sideload_name = sideload_name
+      end
+
+      def message
+        <<-MSG
+          #{@resource_class.name}: error occurred while sideloading "#{@sideload_name}"!
+
+          The error was raised while attempting to assign relevant model instances. Read
+          more about sideload assignment here: www.graphiti.dev/guides/concepts/resources#customizing-assignment
+
+          A good way to debug is to put a debugger within the 'assign' block.
+
+          Here's the original, underlying error:
+
+          #{cause.class.name}: #{cause.message}
+          #{cause.backtrace.join("\n")}
         MSG
       end
     end
@@ -282,7 +350,7 @@ module Graphiti
       end
 
       def message
-        <<~MSG
+        <<-MSG
           #{@resource.class.name}: passed filter with value #{@value.inspect}, and failed attempting to parse as JSON array.
         MSG
       end
@@ -296,7 +364,7 @@ module Graphiti
       end
 
       def message
-        <<~MSG
+        <<-MSG
           #{@resource_class.name} cannot be called directly from endpoint #{@path}##{@action}!
 
           Either set a primary endpoint for this resource:
