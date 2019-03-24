@@ -1,4 +1,6 @@
-### Graphiti
+<p align="center">
+  <img " src="https://www.graphiti.dev/assets/img/logo.png" />
+</p>
 
 ![Build Status](https://travis-ci.org/graphiti-api/graphiti.svg?branch=master)
 [![Gem Version](https://badge.fury.io/rb/graphiti.svg)](https://badge.fury.io/rb/graphiti)
