@@ -1072,7 +1072,7 @@ RSpec.describe "filtering" do
 
     context "when custom type" do
       before do
-        type = Dry::Types::Definition
+        type = Dry::Types::Nominal
           .new(nil)
           .constructor { |input|
             "custom!"
