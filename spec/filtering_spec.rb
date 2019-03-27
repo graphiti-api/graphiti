@@ -395,15 +395,30 @@ RSpec.describe "filtering" do
     end
 
     context "when allow list is omitted" do
-      it "raises an error at load time" do
-        expect {
-          resource.filter :enum_age, :integer_enum do
-            eq do |scope, value|
-              scope[:conditions][:age] = value
-              scope
+      context 'when using a string_enum field' do
+        it "raises an error at load time" do
+          expect {
+            resource.filter :enum_first_name, :string_enum do
+              eq do |scope, value|
+                scope[:conditions][:first_name] = value
+                scope
+              end
             end
-          end
-        }.to raise_error(Graphiti::Errors::MissingEnumAllowList, /integer_enum/)
+          }.to raise_error(Graphiti::Errors::MissingEnumAllowList, /string_enum/)
+        end
+      end
+
+      context 'when using an integer_enum field' do
+        it "raises an error at load time" do
+          expect {
+            resource.filter :enum_age, :integer_enum do
+              eq do |scope, value|
+                scope[:conditions][:age] = value
+                scope
+              end
+            end
+          }.to raise_error(Graphiti::Errors::MissingEnumAllowList, /integer_enum/)
+        end
       end
     end
   end
