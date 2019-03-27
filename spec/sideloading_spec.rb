@@ -419,6 +419,31 @@ RSpec.describe "sideloading" do
       end
     end
 
+    context 'when linking unknown type' do
+      before do
+        Graphiti::Resource.autolink = true
+        params.delete(:include)
+        params[:links] = true
+        resource.polymorphic_belongs_to :credit_card do
+          group_by(:credit_card_type) do
+            on(:Visa)
+            on(:Mastercard)
+          end
+        end
+      end
+
+      after do
+        Graphiti::Resource.autolink = false
+      end
+
+      it 'does not blow up' do
+        render
+        expect(d[0].link(:credit_card, :related)).to be_present
+        expect(d[1].link(:credit_card, :related)).to be_present
+        expect(d[2].link(:credit_card, :related)).to be_nil
+      end
+    end
+
     context "with except option specified" do
       before do
         resource.polymorphic_belongs_to :credit_card do
