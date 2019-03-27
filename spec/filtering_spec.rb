@@ -375,6 +375,54 @@ RSpec.describe "filtering" do
     end
   end
 
+  context "when filtering on an enum field" do
+    context "when allowed values are provided" do
+      before do
+        resource.filter :enum_age, :integer_enum, allow: [1, 3, 5] do
+          eq do |scope, value|
+            scope[:conditions][:age] = value
+            scope
+          end
+        end
+      end
+
+      it "rejects values not in the allowlist" do
+        params[:filter] = {enum_age: {eq: 2}}
+        expect {
+          records
+        }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Allowlist: \[1, 3, 5]/)
+      end
+    end
+
+    context "when allow list is omitted" do
+      context 'when using a string_enum field' do
+        it "raises an error at load time" do
+          expect {
+            resource.filter :enum_first_name, :string_enum do
+              eq do |scope, value|
+                scope[:conditions][:first_name] = value
+                scope
+              end
+            end
+          }.to raise_error(Graphiti::Errors::MissingEnumAllowList, /string_enum/)
+        end
+      end
+
+      context 'when using an integer_enum field' do
+        it "raises an error at load time" do
+          expect {
+            resource.filter :enum_age, :integer_enum do
+              eq do |scope, value|
+                scope[:conditions][:age] = value
+                scope
+              end
+            end
+          }.to raise_error(Graphiti::Errors::MissingEnumAllowList, /integer_enum/)
+        end
+      end
+    end
+  end
+
   context "when only allowing single values" do
     before do
       resource.filter :first_name, :string, single: true do

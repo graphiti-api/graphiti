@@ -12,8 +12,13 @@ module Graphiti
             aliases = [name, opts[:aliases]].flatten.compact
             operators = FilterOperators.build(self, att[:type], opts, &blk)
 
-            if Graphiti::Types[att[:type]][:canonical_name] == :boolean
+            case Graphiti::Types[att[:type]][:canonical_name]
+            when :boolean
               opts[:single] = true
+            when :enum
+              if opts[:allow].blank?
+                raise Errors::MissingEnumAllowList.new(self, name, att[:type])
+              end
             end
 
             required = att[:filterable] == :required || !!opts[:required]
@@ -29,7 +34,7 @@ module Graphiti
               operators: operators.to_hash,
             }
           elsif (type = args[0])
-            attribute name, type, only: [:filterable]
+            attribute name, type, only: [:filterable], allow: opts[:allow]
             filter(name, opts, &blk)
           else
             raise Errors::ImplicitFilterTypeMissing.new(self, name)
@@ -100,8 +105,13 @@ module Graphiti
           options[:proc] = blk
           config[:attributes][name] = options
           apply_attributes_to_serializer
-          options[:filterable] ? filter(name) : config[:filters].delete(name)
           options[:sortable] ? sort(name) : config[:sorts].delete(name)
+
+          if options[:filterable]
+            filter(name, allow: options[:allow])
+          else
+            config[:filters].delete(name)
+          end
         end
 
         def extra_attribute(name, type, options = {}, &blk)

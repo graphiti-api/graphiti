@@ -85,6 +85,14 @@ RSpec.describe Graphiti::Schema do
             description: "Base Type. Like a normal string, but by default only eq/!eq and case-sensitive.",
             kind: "scalar",
           },
+          string_enum: {
+            description: "String enum type. Like a normal string, but only eq/!eq and case-sensitive. Limited to only the allowed values.",
+            kind: "scalar",
+          },
+          integer_enum: {
+            description: "Integer enum type. Like a normal integer, but only eq/!eq filters. Limited to only the allowed values.",
+            kind: "scalar"
+          },
           integer: {
             kind: "scalar",
             description: "Base Type.",
@@ -126,6 +134,14 @@ RSpec.describe Graphiti::Schema do
             description: "Base Type.",
           },
           array_of_uuids: {
+            description: "Base Type.",
+            kind: "array",
+          },
+          array_of_string_enums: {
+            description: "Base Type.",
+            kind: "array",
+          },
+          array_of_integer_enums: {
             description: "Base Type.",
             kind: "array",
           },
@@ -433,6 +449,19 @@ RSpec.describe Graphiti::Schema do
 
       it "is marked as such" do
         expect(schema[:resources][0][:filters][:first_name][:allow])
+          .to eq(["foo"])
+      end
+    end
+
+    context "when the attribute is a string enum" do
+      before do
+        employee_resource.class_eval do
+          attribute :enum_first_name, :string_enum, allow: [:foo]
+        end
+      end
+
+      it "reflects the values in the filters" do
+        expect(schema[:resources][0][:filters][:enum_first_name][:allow])
           .to eq(["foo"])
       end
     end

@@ -671,6 +671,23 @@ RSpec.describe Graphiti::Resource do
           }.to(change { klass.filters[:foo] })
         end
       end
+
+      context 'when the attribute is of type "enum"' do
+        context "and an allow list is passed in" do
+          it "correctly adds to the filter allowlist" do
+            klass.attribute :foo, :string_enum, allow: ["bar", "baz"]
+            expect(klass.filters[:foo][:allow]).to eq ["bar", "baz"]
+          end
+        end
+
+        context "and an allow list omitted" do
+          it "raises a helpful error" do
+            expect {
+              klass.attribute :foo, :string_enum
+            }.to raise_error(Graphiti::Errors::MissingEnumAllowList, /string_enum/)
+          end
+        end
+      end
     end
 
     context "when not filterable" do

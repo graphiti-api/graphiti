@@ -165,6 +165,30 @@ module Graphiti
       end
     end
 
+    class MissingEnumAllowList < Base
+      def initialize(resource_class, filter_name, enum_type)
+        @resource_class = resource_class
+        @filter_name = filter_name
+        @enum_type = enum_type
+      end
+
+      def message
+        <<-MSG
+          #{@resource_class.name} You declared an attribute or filter of type "#{@enum_type}" without providing a list of permitted values, which is required.
+
+          When declaring an attribute:
+
+          attribute :status, :#{@enum_type}, allow: ['published', 'draft']
+
+          When declaring a filter:
+
+          filter :status, :#{@enum_type}, allow: ['published', 'draft'] do
+            # ...
+          end
+        MSG
+      end
+    end
+
     class InvalidLink < Base
       def initialize(resource_class, sideload, action)
         @resource_class = resource_class
