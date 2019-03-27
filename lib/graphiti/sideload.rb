@@ -184,14 +184,22 @@ module Graphiti
     end
 
     def load(parents, query, graph_parent)
-      params = load_params(parents, query)
-      params_proc&.call(params, parents)
-      return [] if blank_query?(params)
-      opts = load_options(parents, query)
-      opts[:sideload] = self
-      opts[:parent] = graph_parent
-      proxy = resource.class._all(params, opts, base_scope)
-      pre_load_proc&.call(proxy, parents)
+      params, opts, proxy = nil, nil, nil
+
+      with_error_handling Errors::SideloadParamsError do
+        params = load_params(parents, query)
+        params_proc&.call(params, parents)
+        return [] if blank_query?(params)
+        opts = load_options(parents, query)
+        opts[:sideload] = self
+        opts[:parent] = graph_parent
+      end
+
+      with_error_handling(Errors::SideloadQueryBuildingError) do
+        proxy = resource.class._all(params, opts, base_scope)
+        pre_load_proc&.call(proxy, parents)
+      end
+
       proxy.to_a
     end
 
@@ -362,11 +370,22 @@ module Graphiti
     end
 
     def fire_assign(parents, children)
-      if self.class.assign_proc
-        instance_exec(parents, children, &self.class.assign_proc)
-      else
-        assign(parents, children)
+      with_error_handling Errors::SideloadAssignError do
+        if self.class.assign_proc
+          instance_exec(parents, children, &self.class.assign_proc)
+        else
+          assign(parents, children)
+        end
       end
+    end
+
+    def with_error_handling(error_class)
+      begin
+        result = yield
+      rescue
+        raise error_class.new(parent_resource_class, name)
+      end
+      result
     end
 
     def fire_scope(parents)

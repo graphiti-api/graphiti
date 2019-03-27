@@ -871,7 +871,11 @@ if ENV["APPRAISAL_INITIALIZED"]
         context "and > 1 parents" do
           it "raises error" do
             expect {
-              request
+              begin
+                request
+              rescue => e
+                raise e.cause
+              end
             }.to raise_error(Graphiti::Errors::UnsupportedPagination)
           end
         end
@@ -1102,7 +1106,11 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         it "derives the foreign key directly" do
           expect {
-            do_index({include: "hobbies"})
+            begin
+              do_index({include: "hobbies"})
+            rescue => e
+              raise e.cause
+            end
           }.to raise_error(Graphiti::Errors::AttributeError, /author_id/)
         end
       end
