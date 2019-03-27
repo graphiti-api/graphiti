@@ -684,7 +684,7 @@ RSpec.describe Graphiti::Resource do
           it "raises a helpful error" do
             expect {
               klass.attribute :foo, :string_enum
-            }.to raise_error(Graphiti::Errors::MissingEnumAllowList)
+            }.to raise_error(Graphiti::Errors::MissingEnumAllowList, /string_enum/)
           end
         end
       end

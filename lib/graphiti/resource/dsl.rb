@@ -17,7 +17,7 @@ module Graphiti
               opts[:single] = true
             when :enum
               if opts[:allow].blank?
-                raise Errors::MissingEnumAllowList.new(self, name)
+                raise Errors::MissingEnumAllowList.new(self, name, att[:type])
               end
             end
 

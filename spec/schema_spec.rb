@@ -89,6 +89,10 @@ RSpec.describe Graphiti::Schema do
             description: "String enum type. Like a normal string, but only eq/!eq and case-sensitive. Limited to only the allowed values.",
             kind: "scalar",
           },
+          integer_enum: {
+            description: "Integer enum type. Like a normal integer, but only eq/!eq filters. Limited to only the allowed values.",
+            kind: "scalar"
+          },
           integer: {
             kind: "scalar",
             description: "Base Type.",
@@ -134,6 +138,10 @@ RSpec.describe Graphiti::Schema do
             kind: "array",
           },
           array_of_string_enums: {
+            description: "Base Type.",
+            kind: "array",
+          },
+          array_of_integer_enums: {
             description: "Base Type.",
             kind: "array",
           },

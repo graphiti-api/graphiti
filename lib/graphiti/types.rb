@@ -109,6 +109,14 @@ module Graphiti
             kind: "scalar",
             description: "String enum type. Like a normal string, but only eq/!eq and case-sensitive. Limited to only the allowed values.",
           },
+          integer_enum: {
+            canonical_name: :enum,
+            params: Dry::Types["coercible.integer"],
+            read: Dry::Types["coercible.integer"],
+            write: Dry::Types["coercible.integer"],
+            kind: "scalar",
+            description: "Integer enum type. Like a normal integer, but only eq/!eq filters. Limited to only the allowed values.",
+          },
           string: {
             params: Dry::Types["coercible.string"],
             read: Dry::Types["coercible.string"],
