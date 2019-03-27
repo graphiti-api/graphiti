@@ -101,6 +101,14 @@ module Graphiti
             kind: "scalar",
             description: "Base Type. Like a normal string, but by default only eq/!eq and case-sensitive.",
           },
+          string_enum: {
+            canonical_name: :enum,
+            params: Dry::Types["coercible.string"],
+            read: Dry::Types["coercible.string"],
+            write: Dry::Types["coercible.string"],
+            kind: "scalar",
+            description: "String enum type. Like a normal string, but only eq/!eq and case-sensitive. Limited to only the allowed values.",
+          },
           string: {
             params: Dry::Types["coercible.string"],
             read: Dry::Types["coercible.string"],

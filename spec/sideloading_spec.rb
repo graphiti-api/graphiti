@@ -419,7 +419,7 @@ RSpec.describe "sideloading" do
       end
     end
 
-    context 'when linking unknown type' do
+    context "when linking unknown type" do
       before do
         Graphiti::Resource.autolink = true
         params.delete(:include)
@@ -436,7 +436,7 @@ RSpec.describe "sideloading" do
         Graphiti::Resource.autolink = false
       end
 
-      it 'does not blow up' do
+      it "does not blow up" do
         render
         expect(d[0].link(:credit_card, :related)).to be_present
         expect(d[1].link(:credit_card, :related)).to be_present
