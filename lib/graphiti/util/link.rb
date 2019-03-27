@@ -11,6 +11,7 @@ module Graphiti
             @sideload = @sideload.children.values.find { |c|
               c.group_name == type.to_sym
             }
+            @polymorphic_sideload_not_found = true unless @sideload
           else
             @linkable = false
           end
@@ -26,6 +27,8 @@ module Graphiti
       private
 
       def linkable?
+        return false if @polymorphic_sideload_not_found
+
         if @sideload.type == :belongs_to
           !@model.send(@sideload.foreign_key).nil?
         else
