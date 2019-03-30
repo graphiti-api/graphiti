@@ -38,6 +38,12 @@ module Graphiti
         def remote=(val)
           super
           include ::Graphiti::Resource::Remote
+          self.endpoint = {
+            path: val,
+            full_path: val,
+            url: val,
+            actions: [:index, :show],
+          }
         end
 
         def model

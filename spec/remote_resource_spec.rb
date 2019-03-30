@@ -777,10 +777,32 @@ RSpec.describe "remote resources" do
     end
 
     context "when updating" do
-      it "raises error" do
-        expect {
-          klass.find(id: 1, data: {type: "employees"}).update_attributes
-        }.to raise_error(Graphiti::Errors::RemoteWrite, /not supported/)
+      let(:payload) do
+        {
+          data: {
+            type: "employees",
+            id: "123",
+            attributes: {last_name: "Jane"},
+          },
+        }
+      end
+
+      context "and only associating to a remote parent" do
+        before do
+          payload[:data].delete(:attributes)
+        end
+
+        it "works" do
+          klass.find(payload).update_attributes
+        end
+      end
+
+      context "and passing more attributes than simple association" do
+        it "raises error" do
+          expect {
+            klass.find(payload).update_attributes
+          }.to raise_error(Graphiti::Errors::RemoteWrite, /not supported/)
+        end
       end
     end
 

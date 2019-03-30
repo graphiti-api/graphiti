@@ -18,8 +18,12 @@ module Graphiti
         end
       end
 
-      def save(*args)
-        raise Errors::RemoteWrite.new(self.class)
+      def save(model, meta)
+        if meta[:attributes] == {} && meta[:method] == :update
+          model
+        else
+          raise Errors::RemoteWrite.new(self.class)
+        end
       end
 
       def destroy(*args)

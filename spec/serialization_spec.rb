@@ -1029,6 +1029,18 @@ RSpec.describe "serialization" do
             .to eq("/poro/positions?filter[employee_id]=1")
         end
 
+        context "that is remote" do
+          before do
+            resource.has_many :positions, remote: "http://foo.com/positions"
+          end
+
+          it "links correctly" do
+            render
+            expect(positions["links"]["related"])
+              .to eq("http://foo.com/positions?filter[employee_id]=1")
+          end
+        end
+
         context "opting-out of linking" do
           before do
             resource.has_many :positions, link: false
@@ -1159,6 +1171,24 @@ RSpec.describe "serialization" do
             .to eq("/poro/mastercards/789")
         end
 
+        context "that is remote" do
+          before do
+            resource.polymorphic_belongs_to :credit_card do
+              group_by(:credit_card_type) do
+                on(:Mastercard).belongs_to :mastercard,
+                  remote: "http://foo.com/mastercards"
+              end
+            end
+          end
+
+          it "links correctly" do
+            render
+            credit_card = json["data"][0]["relationships"]["credit_card"]
+            expect(credit_card["links"]["related"])
+              .to eq("http://foo.com/mastercards/789")
+          end
+        end
+
         context "but one child does not have an endpoint" do
           before do
             mastercard_resource.endpoint = nil
@@ -1212,14 +1242,23 @@ RSpec.describe "serialization" do
       end
 
       context "and a has_one relationship" do
-        before do
-          resource.has_one :bio
-        end
-
         it "links to index endpoint" do
+          resource.has_one :bio
           render
           expect(json["data"][0]["relationships"]["bio"]["links"]["related"])
             .to eq("/poro/bios?filter[employee_id]=#{employee.id}")
+        end
+
+        context "that is remote" do
+          before do
+            resource.has_one :bio, remote: "http://foo.com/bios"
+          end
+
+          it "links correctly" do
+            render
+            expect(json["data"][0]["relationships"]["bio"]["links"]["related"])
+              .to eq("http://foo.com/bios?filter[employee_id]=#{employee.id}")
+          end
         end
       end
 
@@ -1303,6 +1342,16 @@ RSpec.describe "serialization" do
 
         context "with runtime params" do
           xit "links correctly" do
+          end
+        end
+
+        context "when remote" do
+          it "links correctly" do
+            resource.belongs_to :classification,
+              remote: "http://foo.com/classifications"
+            render
+            expect(classification["links"]["related"])
+              .to eq("http://foo.com/classifications/789")
           end
         end
       end

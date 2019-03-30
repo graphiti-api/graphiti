@@ -126,8 +126,9 @@ RSpec.describe Graphiti::SchemaDiff do
         end
       end
 
-      it "does not diff" do
-        expect(diff).to eq([])
+      it "notes only the newly-missing missing endpoint" do
+        expect(diff)
+          .to eq(["Endpoint \"/schema_diff/employees\" was removed."])
       end
     end
 
