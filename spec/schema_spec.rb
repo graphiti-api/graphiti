@@ -91,7 +91,7 @@ RSpec.describe Graphiti::Schema do
           },
           integer_enum: {
             description: "Integer enum type. Like a normal integer, but only eq/!eq filters. Limited to only the allowed values.",
-            kind: "scalar"
+            kind: "scalar",
           },
           integer: {
             kind: "scalar",
@@ -587,6 +587,16 @@ RSpec.describe Graphiti::Schema do
         expect(endpoint[:actions][:index][:sideload_allowlist]).to eq({
           positions: {department: {}},
         })
+      end
+    end
+
+    context "when a resource is remote" do
+      before do
+        employee_resource.remote = "http://foo.com/employees"
+      end
+
+      it "does not add endpoints to the schema" do
+        expect(schema[:endpoints]).to eq({})
       end
     end
 

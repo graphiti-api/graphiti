@@ -49,6 +49,8 @@ module Graphiti
     def generate_endpoints
       {}.tap do |endpoints|
         @resources.each do |r|
+          next if r.remote?
+
           r.endpoints.each do |e|
             actions = {}
             e[:actions].each do |a|

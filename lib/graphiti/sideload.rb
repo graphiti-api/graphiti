@@ -47,7 +47,6 @@ module Graphiti
       end
 
       if remote?
-        @link = false
         @resource_class = create_remote_resource
       end
     end

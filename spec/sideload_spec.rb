@@ -208,6 +208,59 @@ RSpec.describe Graphiti::Sideload do
         expect(instance.infer_foreign_key).to eq(:sideload_spec_employee_id)
       end
     end
+
+    context "when the resource is remote" do
+      let(:name) { "positions" }
+
+      context "via the sideload :remote option" do
+        it "is inferred correctly from the parent resource" do
+          opts.delete(:resource)
+          opts[:remote] = "http://foo.com/positions"
+          expect(instance.infer_foreign_key).to eq(:employee_id)
+        end
+
+        context "and belongs_to" do
+          let(:instance) { Class.new(Graphiti::Sideload::BelongsTo).new(name, opts) }
+
+          before do
+            opts[:type] = :belongs_to
+          end
+
+          it "works" do
+            opts.delete(:resource)
+            opts[:remote] = "http://foo.com/positions"
+            expect(instance.infer_foreign_key).to eq(:position_id)
+          end
+        end
+      end
+
+      context "via resource class" do
+        before do
+          opts[:resource] = Class.new(Graphiti::Resource) do
+            self.remote = "http://foo.com"
+            def self.name
+              "PORO::PositionResource"
+            end
+          end
+        end
+
+        it "is inferred correctly from the parent resource" do
+          expect(instance.infer_foreign_key).to eq(:employee_id)
+        end
+
+        context "and belongs_to" do
+          let(:instance) { Class.new(Graphiti::Sideload::BelongsTo).new(name, opts) }
+
+          before do
+            opts[:type] = :belongs_to
+          end
+
+          it "works" do
+            expect(instance.infer_foreign_key).to eq(:position_id)
+          end
+        end
+      end
+    end
   end
 
   describe "#ids_for_parents" do

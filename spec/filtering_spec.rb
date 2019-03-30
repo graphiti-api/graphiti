@@ -395,7 +395,7 @@ RSpec.describe "filtering" do
     end
 
     context "when allow list is omitted" do
-      context 'when using a string_enum field' do
+      context "when using a string_enum field" do
         it "raises an error at load time" do
           expect {
             resource.filter :enum_first_name, :string_enum do
@@ -408,7 +408,7 @@ RSpec.describe "filtering" do
         end
       end
 
-      context 'when using an integer_enum field' do
+      context "when using an integer_enum field" do
         it "raises an error at load time" do
           expect {
             resource.filter :enum_age, :integer_enum do

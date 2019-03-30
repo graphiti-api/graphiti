@@ -109,6 +109,8 @@ module Graphiti
       end
 
       def validate_link_for_sideload!(sideload)
+        return if sideload.resource.remote?
+
         action = sideload.type == :belongs_to ? :show : :index
         cache_key = :"#{@sideload.object_id}-#{action}"
         return if self.class.validated_link_cache.include?(cache_key)

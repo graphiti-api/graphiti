@@ -23,8 +23,17 @@ class Graphiti::Sideload::BelongsTo < Graphiti::Sideload
   end
 
   def infer_foreign_key
-    if polymorphic_child?
-      parent.foreign_key
+    return parent.foreign_key if polymorphic_child?
+
+    if resource.remote?
+      namespace = namespace_for(resource.class)
+      resource_name = resource.class.name
+        .gsub("#{namespace}::", "")
+        .gsub("Resource", "")
+      if resource_name.include?(".remote")
+        resource_name = resource_name.split(".remote")[0].split(".")[1]
+      end
+      :"#{resource_name.singularize.underscore}_id"
     else
       model = resource.model
       namespace = namespace_for(model)
