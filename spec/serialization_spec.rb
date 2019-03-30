@@ -47,7 +47,7 @@ RSpec.describe "serialization" do
 
     context "when id is custom type" do
       before do
-        type = Dry::Types::Definition.new(String).constructor { |input|
+        type = Dry::Types::Nominal.new(String).constructor { |input|
           "custom!"
         }
         Graphiti::Types[:custom] = {
@@ -555,7 +555,7 @@ RSpec.describe "serialization" do
 
       context "when custom type" do
         before do
-          type = Dry::Types::Definition
+          type = Dry::Types::Nominal
             .new(nil)
             .constructor { |input|
               "custom!"

@@ -1,7 +1,7 @@
 module Graphiti
   class Types
     def self.create(primitive, &blk)
-      definition = Dry::Types::Definition.new(primitive)
+      definition = Dry::Types::Nominal.new(primitive)
       definition.constructor(&blk)
     end
 
