@@ -390,7 +390,7 @@ RSpec.describe "filtering" do
         params[:filter] = {enum_age: {eq: 2}}
         expect {
           records
-        }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Allowlist: \[1, 3, 5]/)
+        }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Allowlist: \[1, 3, 5\]/)
       end
     end
 

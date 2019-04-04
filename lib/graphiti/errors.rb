@@ -561,6 +561,28 @@ module Graphiti
       end
     end
 
+    class PolymorphicSideloadTypeNotFound < Base
+      def initialize(sideload, name)
+        @sideload = sideload
+        @name = name
+      end
+
+      def message
+        <<~MSG
+          #{@sideload.parent_resource}: Tried to find a Resource with type '#{@name.inspect}', but did not find one!
+
+          This is because either a Resource with that type doesn't exist, or it's not registered on the sideload. The below example shows how to register a Resource with this sideload. Make sure one of the registered Resources has type '#{@name.inspect}'
+
+          polymorphic_belongs_to #{@sideload.name.inspect} do
+            group_by(#{@sideload.grouper.field_name.inspect}) do
+              on(:foo)
+              on(:foo).belongs_to :foo, resource: FooResource # (long-hand example)
+            end
+          end
+        MSG
+      end
+    end
+
     class PolymorphicSideloadChildNotFound < Base
       def initialize(sideload, name)
         @sideload = sideload

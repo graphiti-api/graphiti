@@ -2439,6 +2439,7 @@ RSpec.describe "persistence" do
     end
 
     describe "polymorphic_belongs_to" do
+      let(:jsonapi_type) { "visas" }
       let(:payload) do
         {
           data: {
@@ -2446,7 +2447,7 @@ RSpec.describe "persistence" do
             relationships: {
               credit_card: {
                 data: {
-                  type: "visas",
+                  type: jsonapi_type,
                   'temp-id': "abc123",
                   method: "create",
                 },
@@ -2456,7 +2457,7 @@ RSpec.describe "persistence" do
           included: [
             {
               'temp-id': "abc123",
-              type: "visas",
+              type: jsonapi_type,
               attributes: {number: 123456},
             },
           ],
@@ -2504,6 +2505,16 @@ RSpec.describe "persistence" do
         expect(data.credit_card.id).to be_present
         expect(data.credit_card.number).to eq(123456)
         expect(data.credit_card_type).to eq(:Visa)
+      end
+
+      context "when unknown jsonapi type" do
+        let(:jsonapi_type) { "foos" }
+
+        it "raises helpful error" do
+          expect {
+            klass.build(payload).save
+          }.to raise_error(Graphiti::Errors::PolymorphicSideloadTypeNotFound)
+        end
       end
     end
 

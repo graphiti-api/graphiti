@@ -47,7 +47,7 @@ module Graphiti
 
         # For polymorphic *sideloads*, grab the correct child sideload
         if sideload.resource.type != type && sideload.type == :polymorphic_belongs_to
-          sideload = sideload.child_for_type(type)
+          sideload = sideload.child_for_type!(type)
         end
 
         # For polymorphic *resources*, grab the correct child resource
