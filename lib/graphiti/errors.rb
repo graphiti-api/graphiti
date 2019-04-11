@@ -320,9 +320,7 @@ module Graphiti
         @resource = resource
         @name = name
         @flag = flag
-        @exists = opts[:exists] || false
         @request = opts[:request] || false
-        @guard = opts[:guard]
       end
 
       def action
@@ -353,17 +351,33 @@ module Graphiti
       end
 
       def message
-        msg = "#{resource_name}: Tried to #{action} attribute #{@name.inspect}"
-        msg << if @exists
-          if @guard
-            ", but the guard #{@guard.inspect} did not pass."
-          else
-            ", but the attribute was marked #{@flag.inspect} => false."
-          end
+        "#{resource_name}: Tried to #{action} attribute #{@name.inspect}"
+      end
+    end
+
+    class InvalidAttributeAccess < AttributeError
+      def initialize(resource, name, flag, **opts)
+        super
+        @guard = opts[:guard]
+      end
+
+      def message
+        msg = super
+
+        msg << if @guard
+          ", but the guard #{@guard.inspect} did not pass."
         else
-          ", but could not find an attribute with that name."
+          ", but the attribute was marked #{@flag.inspect} => false."
         end
+
         msg
+      end
+    end
+
+    class UnknownAttribute < AttributeError
+
+      def message
+        "#{super}, but could not find an attribute with that name."
       end
     end
 
