@@ -45,7 +45,7 @@
 #
 #   { type: 'authors', method: :create, temp_id: 'abc123' }
 class Graphiti::Deserializer
-  def initialize(payload)
+  def initialize(payload = {})
     @payload = payload
     @payload = @payload[:_jsonapi] if @payload.key?(:_jsonapi)
   end
@@ -56,7 +56,7 @@ class Graphiti::Deserializer
 
   # @return [Hash] the raw :data value of the payload
   def data
-    @payload[:data]
+    @payload.fetch(:data, {})
   end
 
   # @return [String] the raw :id value of the payload
@@ -189,18 +189,10 @@ class Graphiti::Deserializer
   end
 
   def raw_attributes
-    if data
-      data[:attributes] || {}
-    else
-      {}
-    end
+    data.fetch(:attributes, {})
   end
 
   def raw_relationships
-    if data
-      data[:relationships] || {}
-    else
-      {}
-    end
+    data.fetch(:relationships, {})
   end
 end
