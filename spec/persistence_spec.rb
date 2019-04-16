@@ -1229,6 +1229,7 @@ RSpec.describe "persistence" do
             jsonapi_type: "positions",
             method: :create,
             temp_id: "abc123",
+            payload_path: ["included", 0],
           },
           relationships: {},
         }],

@@ -375,7 +375,6 @@ module Graphiti
     end
 
     class UnknownAttribute < AttributeError
-
       def message
         "#{super}, but could not find an attribute with that name."
       end
@@ -527,11 +526,14 @@ module Graphiti
     end
 
     class TypecastFailed < Base
-      def initialize(resource, name, value, error)
+      attr_reader :name, :type_name
+
+      def initialize(resource, name, value, error, type_name)
         @resource = resource
         @name = name
         @value = value
         @error = error
+        @type_name = type_name
       end
 
       def message

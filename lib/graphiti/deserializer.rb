@@ -87,6 +87,7 @@ class Graphiti::Deserializer
       type: data[:type],
       temp_id: data[:'temp-id'],
       method: action,
+      payload_path: ["data"],
     }
   end
 
@@ -168,6 +169,8 @@ class Graphiti::Deserializer
       (i[:id] && i[:id] == datum[:id]) ||
         (i[:'temp-id'] && i[:'temp-id'] == temp_id)
     }
+    included_idx = included.index(included_object)
+
     included_object ||= {}
     included_object[:relationships] ||= {}
 
@@ -182,6 +185,7 @@ class Graphiti::Deserializer
         jsonapi_type: datum[:type],
         temp_id: temp_id,
         method: method,
+        payload_path: ["included", included_idx],
       },
       attributes: attributes,
       relationships: relationships,

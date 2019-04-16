@@ -84,7 +84,7 @@ module Graphiti
           begin
             type_ref[value] unless value.nil?
           rescue => e
-            raise Errors::TypecastFailed.new(resource_ref, name_ref, value, e)
+            raise Errors::TypecastFailed.new(resource_ref, name_ref, value, e, type_ref)
           end
         }
       end

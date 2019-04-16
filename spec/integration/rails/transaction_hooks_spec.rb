@@ -383,6 +383,7 @@ if ENV["APPRAISAL_INITIALIZED"]
                 jsonapi_type: "positions",
                 temp_id: "abc123",
                 method: :create,
+                payload_path: ["included", 0]
               },
               attributes: {
                 "title" => "foo",
