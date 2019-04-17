@@ -41,6 +41,8 @@ module Graphiti
         payload = normalized_params
         if payload[:data] && payload[:data][:type]
           Graphiti::Deserializer.new(payload)
+        else
+          Graphiti::Deserializer.new
         end
       end
     end

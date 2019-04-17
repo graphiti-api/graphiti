@@ -60,11 +60,17 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         it "returns validation error response" do
           make_request
-          expect(json["errors"]).to eq({
-            "employee" => {"first_name" => ["can't be blank"]},
-            "departments" => [],
-            "positions" => [],
-          })
+          expect(json["errors"].first).to match(
+                                            'code'   => 'unprocessable_entity',
+                                            'status' => '422',
+                                            'source' => { 'pointer' => '/data/attributes/first_name' },
+                                            'detail' => "First name can't be blank",
+                                            'title'  => 'Validation Error',
+                                            'meta'   => hash_including(
+                                              'attribute' => 'first_name',
+                                              'message'   => "can't be blank"
+                                            )
+                                          )
         end
       end
     end
@@ -107,7 +113,17 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         it "responds with error" do
           make_request
-          expect(json["error"]).to eq("first_name" => ["can't be blank"])
+          expect(json["errors"].first).to match(
+                                            'code'   => 'unprocessable_entity',
+                                            'status' => '422',
+                                            'source' => { 'pointer' => '/data/attributes/first_name' },
+                                            'detail' => "First name can't be blank",
+                                            'title'  => 'Validation Error',
+                                            'meta'   => hash_including(
+                                              'attribute' => 'first_name',
+                                              'message'   => "can't be blank"
+                                            )
+                                          )
         end
       end
     end
@@ -144,7 +160,17 @@ if ENV["APPRAISAL_INITIALIZED"]
           expect {
             do_destroy({id: employee.id})
           }.to_not(change { Employee.count })
-          expect(json["error"]).to eq("base" => ["Forced validation error"])
+          expect(json["errors"].first).to match(
+                                            'code'   => 'unprocessable_entity',
+                                            'status' => '422',
+                                            'source' => { 'pointer' => nil },
+                                            'detail' => "Forced validation error",
+                                            'title'  => 'Validation Error',
+                                            'meta'   => hash_including(
+                                              'attribute' => 'base',
+                                              'message'   => "Forced validation error"
+                                            )
+                                          )
         end
       end
     end
@@ -573,8 +599,26 @@ if ENV["APPRAISAL_INITIALIZED"]
           expect {
             make_request
           }.to_not(change { Employee.count + Position.count + Department.count })
-          expect(json["errors"]["positions"])
-            .to eq([{"title" => ["can't be blank"]}, {}])
+          error = json['errors'].select do |err|
+            err.fetch('meta', {}).fetch('relationship', {}).fetch('type', nil) == 'positions'
+          end.first
+
+          expect(error).to match(
+                             'code'   => 'unprocessable_entity',
+                             'detail' => "Title can't be blank",
+                             'meta'   => {
+                               'relationship' => hash_including(
+                                 'attribute' => 'title',
+                                 'message'   => "can't be blank",
+                                 'name'      => 'positions',
+                                 'temp-id'   => 'pos1',
+                                 'type'      => 'positions'
+                               )
+                             },
+                             'source' => { 'pointer' => '/data/attributes/title' },
+                             'status' => '422',
+                             'title'  => 'Validation Error'
+                           )
         end
       end
 
@@ -596,8 +640,26 @@ if ENV["APPRAISAL_INITIALIZED"]
           expect {
             make_request
           }.to_not(change { Employee.count + Position.count + Department.count })
-          expect(json["errors"]["departments"])
-            .to eq([{"name" => ["can't be blank"]}])
+          error = json['errors'].select do |err|
+            err.fetch('meta', {}).fetch('relationship', {}).fetch('type', nil) == 'departments'
+          end.first
+
+          expect(error).to match(
+                             'code'   => 'unprocessable_entity',
+                             'detail' => "Name can't be blank",
+                             'meta'   => {
+                               'relationship' => hash_including(
+                                 'attribute' => 'name',
+                                 'message'   => "can't be blank",
+                                 'name'      => 'department',
+                                 'temp-id'   => 'dep1',
+                                 'type'      => 'departments'
+                               )
+                             },
+                             'source' => { 'pointer' => '/data/attributes/name' },
+                             'status' => '422',
+                             'title'  => 'Validation Error'
+                           )
         end
       end
 
@@ -856,6 +918,51 @@ if ENV["APPRAISAL_INITIALIZED"]
         }
       end
 
+      let(:expected) do
+        [
+          {
+            'code'   => 'unprocessable_entity',
+            'detail' => 'Forced validation error',
+            'meta'   => hash_including( 'attribute' => 'base', 'message' => 'Forced validation error' ),
+            'source' => { 'pointer' => nil },
+            'status' => '422',
+            'title'  => 'Validation Error'
+          },
+          {
+            'code'   => 'unprocessable_entity',
+            'detail' => 'Forced validation error',
+            'meta'   => {
+              'relationship' => hash_including(
+                'attribute' => 'base',
+                'message'   => 'Forced validation error',
+                'name'      => 'positions',
+                'temp-id'   => 'a',
+                'type'      => 'positions'
+              )
+            },
+            'source' => { 'pointer' => nil },
+            'status' => '422',
+            'title'  => 'Validation Error'
+          },
+          {
+            'code'   => 'unprocessable_entity',
+            'detail' => 'Forced validation error',
+            'meta'   => {
+              'relationship' => hash_including(
+                'attribute' => 'base',
+                'message'   => 'Forced validation error',
+                'name'      => 'department',
+                'temp-id'   => 'b',
+                'type'      => 'departments'
+              )
+            },
+            'source'  => { 'pointer' => nil },
+            'status'  => '422',
+            'title'   => 'Validation Error'
+          }
+        ]
+      end
+
       before do
         allow_any_instance_of(Employee)
           .to receive(:force_validation_error)
@@ -870,13 +977,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       it "displays validation errors for each nested object" do
         do_create(payload)
-        expect(json).to eq({
-          "errors" => {
-            "employee" => {"base" => ["Forced validation error"]},
-            "positions" => [{"base" => ["Forced validation error"]}],
-            "departments" => [{"base" => ["Forced validation error"]}],
-          },
-        })
+        expect(json['errors']).to match_array(expected)
       end
     end
 
