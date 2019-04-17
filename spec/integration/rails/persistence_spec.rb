@@ -66,11 +66,10 @@ if ENV["APPRAISAL_INITIALIZED"]
                                             'source' => { 'pointer' => '/data/attributes/first_name' },
                                             'detail' => "First name can't be blank",
                                             'title'  => 'Validation Error',
-                                            'meta'   => {
+                                            'meta'   => hash_including(
                                               'attribute' => 'first_name',
-                                              'code'      => 'blank',
                                               'message'   => "can't be blank"
-                                            }
+                                            )
                                           )
         end
       end
@@ -120,11 +119,10 @@ if ENV["APPRAISAL_INITIALIZED"]
                                             'source' => { 'pointer' => '/data/attributes/first_name' },
                                             'detail' => "First name can't be blank",
                                             'title'  => 'Validation Error',
-                                            'meta'   => {
+                                            'meta'   => hash_including(
                                               'attribute' => 'first_name',
-                                              'code'      => 'blank',
                                               'message'   => "can't be blank"
-                                            }
+                                            )
                                           )
         end
       end
@@ -168,11 +166,10 @@ if ENV["APPRAISAL_INITIALIZED"]
                                             'source' => { 'pointer' => nil },
                                             'detail' => "Forced validation error",
                                             'title'  => 'Validation Error',
-                                            'meta'   => {
+                                            'meta'   => hash_including(
                                               'attribute' => 'base',
-                                              'code'      => 'Forced validation error',
                                               'message'   => "Forced validation error"
-                                            }
+                                            )
                                           )
         end
       end
@@ -610,14 +607,13 @@ if ENV["APPRAISAL_INITIALIZED"]
                              'code'   => 'unprocessable_entity',
                              'detail' => "Title can't be blank",
                              'meta'   => {
-                               'relationship' => {
+                               'relationship' => hash_including(
                                  'attribute' => 'title',
-                                 'code'      => 'blank',
                                  'message'   => "can't be blank",
                                  'name'      => 'positions',
                                  'temp-id'   => 'pos1',
                                  'type'      => 'positions'
-                               }
+                               )
                              },
                              'source' => { 'pointer' => '/data/attributes/title' },
                              'status' => '422',
@@ -652,14 +648,13 @@ if ENV["APPRAISAL_INITIALIZED"]
                              'code'   => 'unprocessable_entity',
                              'detail' => "Name can't be blank",
                              'meta'   => {
-                               'relationship' => {
+                               'relationship' => hash_including(
                                  'attribute' => 'name',
-                                 'code'      => 'blank',
                                  'message'   => "can't be blank",
                                  'name'      => 'department',
                                  'temp-id'   => 'dep1',
                                  'type'      => 'departments'
-                               }
+                               )
                              },
                              'source' => { 'pointer' => '/data/attributes/name' },
                              'status' => '422',
@@ -923,6 +918,51 @@ if ENV["APPRAISAL_INITIALIZED"]
         }
       end
 
+      let(:expected) do
+        [
+          {
+            'code'   => 'unprocessable_entity',
+            'detail' => 'Forced validation error',
+            'meta'   => hash_including( 'attribute' => 'base', 'message' => 'Forced validation error' ),
+            'source' => { 'pointer' => nil },
+            'status' => '422',
+            'title'  => 'Validation Error'
+          },
+          {
+            'code'   => 'unprocessable_entity',
+            'detail' => 'Forced validation error',
+            'meta'   => {
+              'relationship' => hash_including(
+                'attribute' => 'base',
+                'message'   => 'Forced validation error',
+                'name'      => 'positions',
+                'temp-id'   => 'a',
+                'type'      => 'positions'
+              )
+            },
+            'source' => { 'pointer' => nil },
+            'status' => '422',
+            'title'  => 'Validation Error'
+          },
+          {
+            'code'   => 'unprocessable_entity',
+            'detail' => 'Forced validation error',
+            'meta'   => {
+              'relationship' => hash_including(
+                'attribute' => 'base',
+                'message'   => 'Forced validation error',
+                'name'      => 'department',
+                'temp-id'   => 'b',
+                'type'      => 'departments'
+              )
+            },
+            'source'  => { 'pointer' => nil },
+            'status'  => '422',
+            'title'   => 'Validation Error'
+          }
+        ]
+      end
+
       before do
         allow_any_instance_of(Employee)
           .to receive(:force_validation_error)
@@ -937,54 +977,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       it "displays validation errors for each nested object" do
         do_create(payload)
-        expect(json['errors']).to match_array([
-                                                {
-                                                  'code'   => 'unprocessable_entity',
-                                                  'detail' => 'Forced validation error',
-                                                  'meta'   => {
-                                                    'attribute' => 'base',
-                                                    'code'      => 'Forced validation error',
-                                                    'message'   => 'Forced validation error'
-                                                  },
-                                                  'source' => { 'pointer' => nil },
-                                                  'status' => '422',
-                                                  'title'  => 'Validation Error'
-                                                },
-                                                {
-                                                  'code'   => 'unprocessable_entity',
-                                                  'detail' => 'Forced validation error',
-                                                  'meta'   => {
-                                                    'relationship' => {
-                                                      'attribute' => 'base',
-                                                      'code'      => 'Forced validation error',
-                                                      'message'   => 'Forced validation error',
-                                                      'name'      => 'positions',
-                                                      'temp-id'   => 'a',
-                                                      'type'      => 'positions'
-                                                    }
-                                                  },
-                                                  'source' => { 'pointer' => nil },
-                                                  'status' => '422',
-                                                  'title'  => 'Validation Error'
-                                                },
-                                                {
-                                                  'code'   => 'unprocessable_entity',
-                                                  'detail' => 'Forced validation error',
-                                                  'meta'   => {
-                                                    'relationship' => {
-                                                      'attribute' => 'base',
-                                                      'code'      => 'Forced validation error',
-                                                      'message'   => 'Forced validation error',
-                                                      'name'      => 'department',
-                                                      'temp-id'   => 'b',
-                                                      'type'      => 'departments'
-                                                    }
-                                                  },
-                                                  'source' => { 'pointer' => nil },
-                                                  'status' => '422',
-                                                  'title'  => 'Validation Error'
-                                                }
-                                              ])
+        expect(json['errors']).to match_array(expected)
       end
     end
 
