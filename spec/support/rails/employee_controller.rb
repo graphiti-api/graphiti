@@ -9,13 +9,7 @@ EMPLOYEE_CONTROLLER_BLOCK = lambda do |*args|
     if employee.save
       render jsonapi: employee
     else
-      render json: {
-        errors: {
-          employee: employee.errors,
-          positions: employee.data.positions.map(&:errors),
-          departments: employee.data.positions.map(&:department).compact.map(&:errors),
-        },
-      }
+      render jsonapi_errors: employee
     end
   end
 
@@ -25,7 +19,7 @@ EMPLOYEE_CONTROLLER_BLOCK = lambda do |*args|
     if employee.update_attributes
       render jsonapi: employee
     else
-      render json: {error: employee.errors}
+      render jsonapi_errors: employee
     end
   end
 
@@ -35,7 +29,7 @@ EMPLOYEE_CONTROLLER_BLOCK = lambda do |*args|
     if employee.destroy
       render json: {meta: {}}
     else
-      render json: {error: employee.errors}
+      render jsonapi_errors: employee
     end
   end
 end
