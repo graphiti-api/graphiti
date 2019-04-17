@@ -10,7 +10,6 @@ module Graphiti
           if val
             if super(Class.new(val))
               apply_attributes_to_serializer
-              apply_sideloads_to_serializer
             end
           else
             super
