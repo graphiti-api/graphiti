@@ -1,8 +1,15 @@
+## 1.0.2
+
+Fixes:
+
+- [#125](https://github.com/graphiti-api/graphiti/pull/125) Fix destroy
+  with validation errors (@mihaimuntenas)
+
 ## 1.0.1
 
-- [#2288](https://github.com/graphiti-api/graphiti/pull/127)
-  Avoid Rails eager loading edge case with polymorphic resources
-(@richmolj)
+Fixes:
+
+- [#127](https://github.com/graphiti-api/graphiti/pull/127) Avoid Rails eager loading edge case with polymorphic resources (@richmolj)
 
 ### master (unreleased)
 
