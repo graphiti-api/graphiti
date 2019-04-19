@@ -99,6 +99,15 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
     end
   end
 
+  def child_for_type!(type)
+    if (child = child_for_type(type))
+      child
+    else
+      err = ::Graphiti::Errors::PolymorphicSideloadTypeNotFound
+      raise err.new(self, type)
+    end
+  end
+
   def resolve(parents, query, graph_parent)
     parents.group_by(&grouper.field_name).each_pair do |group_name, group|
       next if group_name.nil? || grouper.ignore?(group_name)
