@@ -383,11 +383,11 @@ if ENV["APPRAISAL_INITIALIZED"]
                 jsonapi_type: "positions",
                 temp_id: "abc123",
                 method: :create,
-                payload_path: ["included", 0]
+                payload_path: ["included", 0],
               },
               attributes: {
                 "title" => "foo",
-                "employee_id" => "1",
+                "employee_id" => 1,
               },
               relationships: {},
             },
@@ -398,7 +398,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           temp_id: "abc123",
           attributes: {
             "title" => "foo",
-            "employee_id" => "1",
+            "employee_id" => 1,
           },
           relationships: {},
         })

@@ -9,16 +9,18 @@ module Graphiti
 
       validator = RequestValidator.new(jsonapi_resource, params)
 
-      @deserialized_payload = validator.deserialized_payload
+      if validator.validate
+        @deserialized_payload = validator.deserialized_payload
+      else
+        raise Graphiti::Errors::InvalidRequest, validator.errors
+      end
     end
 
     def jsonapi_resource
       @jsonapi_resource ||= @resource_class.new
     end
 
-    def deserialized_payload
-      @deserialized_payload
-    end
+    attr_reader :deserialized_payload
 
     # Typically, this is 'self' of a controller
     # We're overriding here so we can do stuff like
@@ -42,10 +44,6 @@ module Graphiti
       Graphiti.with_context(jsonapi_context, action_name.to_sym) do
         yield
       end
-    end
-
-    def jsonapi_context
-      self
     end
 
     def jsonapi_scope(scope, opts = {})

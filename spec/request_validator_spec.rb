@@ -42,7 +42,7 @@ RSpec.describe Graphiti::RequestValidator do
     end
   end
 
-  context 'when empty payload' do
+  context "when empty payload" do
     let(:payload) { {} }
 
     it "validates correctly" do
@@ -150,6 +150,28 @@ RSpec.describe Graphiti::RequestValidator do
 
           expect(instance.deserialized_payload.attributes[:age]).to eq 34
         end
+      end
+    end
+
+    context "when the resource is a polymorphic parent" do
+      let(:root_resource_class) { PORO::CreditCardResource }
+
+      let(:payload) do
+        {
+          data: {
+            type: "visas",
+            attributes: {
+              number: "4222222222222222",
+              visa_only_attr: "TestInheritance",
+            },
+          },
+        }
+      end
+
+      it "recognizes the unique attributes of the child class" do
+        validate
+
+        expect(instance.errors).to be_blank
       end
     end
   end

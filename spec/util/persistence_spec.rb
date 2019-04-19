@@ -12,14 +12,6 @@ RSpec.describe Graphiti::Util::Persistence do
           )
         ).to be_a(described_class)
       end
-      it "fails for unknown attributes" do
-        expect {
-          described_class.new(
-            PORO::CreditCardResource.new, {type: "visas"},
-            {random_attr: "RandomValue"}, {}, nil
-          )
-        }.to raise_error(Graphiti::Errors::AttributeError)
-      end
     end
   end
 end

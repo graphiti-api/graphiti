@@ -21,8 +21,6 @@ class Graphiti::Util::Persistence
         @resource = @resource.class.resource_for_type(meta_type).new
       end
     end
-
-    typecast_attributes
   end
 
   # Perform the actual save logic.
@@ -70,20 +68,6 @@ class Graphiti::Util::Persistence
   end
 
   private
-
-  # In the case where we're sideposting in order to associate 2 nodes
-  # in the graph, the foreign key gets merged into the child's attributes
-  # This attribute should *not* need to be marked writable, as that
-  # would allow writing as a straight attribute instead of just an association
-  def typecast_attributes
-    @attributes.each_pair do |key, value|
-      @attributes[key] = if @foreign_key == key
-        value
-      else
-        @resource.typecast(key, value, :writable)
-      end
-    end
-  end
 
   def add_hook(prc, lifecycle_event)
     ::Graphiti::Util::TransactionHooksRecorder.add(prc, lifecycle_event)
@@ -180,12 +164,8 @@ class Graphiti::Util::Persistence
       iterate(except: [:polymorphic_belongs_to, :belongs_to]) do |x|
         yield x
 
-        if x[:sideload].writable?
-          x[:object] = x[:resource]
-            .persist_with_relationships(x[:meta], x[:attributes], x[:relationships], caller_model, x[:foreign_key])
-        else
-          raise Graphiti::Errors::UnwritableRelationship.new(@resource, x[:sideload])
-        end
+        x[:object] = x[:resource]
+          .persist_with_relationships(x[:meta], x[:attributes], x[:relationships], caller_model, x[:foreign_key])
 
         processed << x
       end
@@ -195,12 +175,8 @@ class Graphiti::Util::Persistence
   def process_belongs_to(relationships)
     [].tap do |processed|
       iterate(only: [:polymorphic_belongs_to, :belongs_to]) do |x|
-        if x[:sideload].writable?
-          x[:object] = x[:resource]
-            .persist_with_relationships(x[:meta], x[:attributes], x[:relationships])
-        else
-          raise Graphiti::Errors::UnwritableRelationship.new(@resource, x[:sideload])
-        end
+        x[:object] = x[:resource]
+          .persist_with_relationships(x[:meta], x[:attributes], x[:relationships])
         processed << x
       end
     end

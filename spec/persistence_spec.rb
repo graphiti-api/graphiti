@@ -1753,10 +1753,12 @@ RSpec.describe "persistence" do
     end
 
     it "raises appropriate error" do
-      employee = klass.build(payload)
       expect {
-        employee.save
-      }.to raise_error(Graphiti::Errors::AttributeError, "PORO::EmployeeResource: Tried to write attribute :foo, but could not find an attribute with that name.")
+        klass.build(payload)
+      }.to(raise_error {|e|
+        expect(e).to be_a Graphiti::Errors::InvalidRequest
+        expect(e.errors.full_messages).to eq ["data.attributes.foo is an unknown attribute"]
+      })
     end
   end
 
@@ -1767,10 +1769,12 @@ RSpec.describe "persistence" do
     end
 
     it "raises appropriate error" do
-      employee = klass.build(payload)
       expect {
-        employee.save
-      }.to raise_error(Graphiti::Errors::AttributeError, "PORO::EmployeeResource: Tried to write attribute :foo, but the attribute was marked :writable => false.")
+        klass.build(payload)
+      }.to(raise_error {|e|
+        expect(e).to be_a Graphiti::Errors::InvalidRequest
+        expect(e.errors.full_messages).to eq ["data.attributes.foo cannot be written"]
+      })
     end
   end
 
@@ -1781,10 +1785,12 @@ RSpec.describe "persistence" do
     end
 
     it "raises helpful error" do
-      employee = klass.build(payload)
       expect {
-        employee.save
-      }.to raise_error(Graphiti::Errors::TypecastFailed, /Failed typecasting :foo! Given "bar" but the following error was raised/)
+        klass.build(payload)
+      }.to(raise_error {|e|
+        expect(e).to be_a Graphiti::Errors::InvalidRequest
+        expect(e.errors.full_messages).to eq ["data.attributes.foo should be type integer"]
+      })
     end
 
     context "and it can coerce" do
@@ -1836,14 +1842,20 @@ RSpec.describe "persistence" do
       it "does not coerce blank string to 0" do
         expect {
           save("")
-        }.to raise_error(Graphiti::Errors::TypecastFailed)
+        }.to(raise_error {|e|
+          expect(e).to be_a Graphiti::Errors::InvalidRequest
+          expect(e.errors.full_messages).to eq ["data.attributes.age should be type integer"]
+        })
       end
 
       context "when cannot coerce" do
         it "raises error" do
           expect {
             save({})
-          }.to raise_error(Graphiti::Errors::TypecastFailed)
+          }.to(raise_error {|e|
+            expect(e).to be_a Graphiti::Errors::InvalidRequest
+            expect(e.errors.full_messages).to eq ["data.attributes.age should be type integer"]
+          })
         end
       end
     end
@@ -1869,7 +1881,10 @@ RSpec.describe "persistence" do
         it "raises error" do
           expect {
             save({})
-          }.to raise_error(Graphiti::Errors::TypecastFailed)
+          }.to(raise_error {|e|
+            expect(e).to be_a Graphiti::Errors::InvalidRequest
+            expect(e.errors.full_messages).to eq ["data.attributes.age should be type big_decimal"]
+          })
         end
       end
     end
@@ -1895,7 +1910,10 @@ RSpec.describe "persistence" do
         it "raises error" do
           expect {
             save({})
-          }.to raise_error(Graphiti::Errors::TypecastFailed)
+          }.to(raise_error {|e|
+            expect(e).to be_a Graphiti::Errors::InvalidRequest
+            expect(e.errors.full_messages).to eq ["data.attributes.age should be type float"]
+          })
         end
       end
     end
@@ -1921,7 +1939,10 @@ RSpec.describe "persistence" do
         it "raises error" do
           expect {
             save({})
-          }.to raise_error(Graphiti::Errors::TypecastFailed)
+          }.to(raise_error {|e|
+            expect(e).to be_a Graphiti::Errors::InvalidRequest
+            expect(e.errors.full_messages).to eq ["data.attributes.age should be type boolean"]
+          })
         end
       end
     end
@@ -1959,7 +1980,10 @@ RSpec.describe "persistence" do
         it "raises error" do
           expect {
             save({})
-          }.to raise_error(Graphiti::Errors::TypecastFailed)
+          }.to(raise_error {|e|
+            expect(e).to be_a Graphiti::Errors::InvalidRequest
+            expect(e.errors.full_messages).to eq ["data.attributes.age should be type date"]
+          })
         end
       end
     end
@@ -2008,7 +2032,10 @@ RSpec.describe "persistence" do
         it "raises error" do
           expect {
             save({})
-          }.to raise_error(Graphiti::Errors::TypecastFailed)
+          }.to(raise_error {|e|
+            expect(e).to be_a Graphiti::Errors::InvalidRequest
+            expect(e.errors.full_messages).to eq ["data.attributes.age should be type datetime"]
+          })
         end
       end
     end
@@ -2031,7 +2058,10 @@ RSpec.describe "persistence" do
         it "raises error" do
           expect {
             save([:foo, :bar])
-          }.to raise_error(Graphiti::Errors::TypecastFailed)
+          }.to(raise_error {|e|
+            expect(e).to be_a Graphiti::Errors::InvalidRequest
+            expect(e.errors.full_messages).to eq ["data.attributes.age should be type hash"]
+          })
         end
       end
     end
@@ -2048,20 +2078,29 @@ RSpec.describe "persistence" do
       it "raises error on single values" do
         expect {
           save(:foo)
-        }.to raise_error(Graphiti::Errors::TypecastFailed)
+        }.to(raise_error {|e|
+          expect(e).to be_a Graphiti::Errors::InvalidRequest
+          expect(e.errors.full_messages).to eq ["data.attributes.age should be type array"]
+        })
       end
 
       it "does NOT allow nils" do
         expect {
           save(nil)
-        }.to raise_error(Graphiti::Errors::TypecastFailed)
+        }.to(raise_error {|e|
+          expect(e).to be_a Graphiti::Errors::InvalidRequest
+          expect(e.errors.full_messages).to eq ["data.attributes.age should be type array"]
+        })
       end
 
       context "when cannot coerce" do
         it "raises error" do
           expect {
             save({})
-          }.to raise_error(Graphiti::Errors::TypecastFailed)
+          }.to(raise_error {|e|
+            expect(e).to be_a Graphiti::Errors::InvalidRequest
+            expect(e.errors.full_messages).to eq ["data.attributes.age should be type array"]
+          })
         end
       end
     end
@@ -2083,20 +2122,29 @@ RSpec.describe "persistence" do
       it "raises error on single values" do
         expect {
           save(1)
-        }.to raise_error(Graphiti::Errors::TypecastFailed)
+        }.to(raise_error {|e|
+          expect(e).to be_a Graphiti::Errors::InvalidRequest
+          expect(e.errors.full_messages).to eq ["data.attributes.age should be type array_of_integers"]
+        })
       end
 
       it "raises error on nils" do
         expect {
           save(nil)
-        }.to raise_error(Graphiti::Errors::TypecastFailed)
+        }.to(raise_error {|e|
+          expect(e).to be_a Graphiti::Errors::InvalidRequest
+          expect(e.errors.full_messages).to eq ["data.attributes.age should be type array_of_integers"]
+        })
       end
 
       context "when cannot coerce" do
         it "raises error" do
           expect {
             save({})
-          }.to raise_error(Graphiti::Errors::TypecastFailed)
+          }.to(raise_error {|e|
+            expect(e).to be_a Graphiti::Errors::InvalidRequest
+            expect(e.errors.full_messages).to eq ["data.attributes.age should be type array_of_integers"]
+          })
         end
       end
     end

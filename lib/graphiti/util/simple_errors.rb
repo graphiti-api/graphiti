@@ -73,12 +73,12 @@ module Graphiti
         messages[attribute].map { |message| full_message(attribute, message) }
       end
 
-      private
-
       def full_message(attribute, message)
         return message if attribute == :base
         "#{attribute} #{message}"
       end
+
+      private
 
       def apply_default_array(hash)
         hash.default_proc = proc { |h, key| h[key] = [] }

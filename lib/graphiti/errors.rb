@@ -751,5 +751,21 @@ module Graphiti
         end
       end
     end
+
+    class InvalidRequest < Base
+      attr_reader :errors
+
+      def initialize(errors)
+        @errors = errors
+      end
+
+      def message
+        <<-MSG
+          There were one or more errors with your request:
+
+          #{errors.full_messages.join("\n")}
+        MSG
+      end
+    end
   end
 end

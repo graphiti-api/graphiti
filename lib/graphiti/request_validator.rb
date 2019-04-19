@@ -9,8 +9,15 @@ module Graphiti
     end
 
     def validate
-      typecast_attributes(@root_resource, deserialized_payload.attributes, deserialized_payload.meta[:payload_path])
-      process_relationships(@root_resource, deserialized_payload.relationships, deserialized_payload.meta[:payload_path])
+      resource = @root_resource
+      if (meta_type = deserialized_payload.meta[:type].try(:to_sym))
+        if @root_resource.type != meta_type && @root_resource.polymorphic?
+          resource = @root_resource.class.resource_for_type(meta_type).new
+        end
+      end
+
+      typecast_attributes(resource, deserialized_payload.attributes, deserialized_payload.meta[:payload_path])
+      process_relationships(resource, deserialized_payload.relationships, deserialized_payload.meta[:payload_path])
 
       errors.blank?
     end
@@ -55,7 +62,7 @@ module Graphiti
         begin
           attributes[key] = resource.typecast(key, value, :writable)
         rescue Graphiti::Errors::UnknownAttribute
-          @errors.add(fully_qualified_key(key, payload_path), :unknown_attribute)
+          @errors.add(fully_qualified_key(key, payload_path), :unknown_attribute, message: "is an unknown attribute")
         rescue Graphiti::Errors::InvalidAttributeAccess
           @errors.add(fully_qualified_key(key, payload_path), :unwritable_attribute, message: "cannot be written")
         rescue Graphiti::Errors::TypecastFailed => e
