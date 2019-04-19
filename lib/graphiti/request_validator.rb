@@ -9,19 +9,22 @@ module Graphiti
     end
 
     def validate
-      @normalized_payload = {
-        attributes: deserialized_params.attributes,
-        meta: deserialized_params.meta,
-        relationships: deserialized_params.relationships,
-      }
-
-      typecast_attributes(@root_resource, @normalized_payload[:attributes], @normalized_payload[:meta][:payload_path])
-      process_relationships(@root_resource, @normalized_payload[:relationships], @normalized_payload[:meta][:payload_path])
+      typecast_attributes(@root_resource, deserialized_payload.attributes, deserialized_payload.meta[:payload_path])
+      process_relationships(@root_resource, deserialized_payload.relationships, deserialized_payload.meta[:payload_path])
 
       errors.blank?
     end
 
-    attr_reader :normalized_payload
+    def deserialized_payload
+      @deserialized_payload ||= begin
+        payload = normalized_params
+        if payload[:data] && payload[:data][:type]
+          Graphiti::Deserializer.new(payload)
+        else
+          Graphiti::Deserializer.new({})
+        end
+      end
+    end
 
     private
 
@@ -67,15 +70,6 @@ module Graphiti
         normalized = normalized.to_unsafe_h.deep_symbolize_keys
       end
       normalized
-    end
-
-    def deserialized_params
-      @deserialized_params ||= begin
-        payload = normalized_params
-        if payload[:data] && payload[:data][:type]
-          Graphiti::Deserializer.new(payload)
-        end
-      end
     end
 
     def fully_qualified_key(key, path, attributes_or_relationships = :attributes)

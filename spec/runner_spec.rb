@@ -1,35 +1,9 @@
 require "spec_helper"
 
-RSpec.describe Graphiti do
-  let(:klass) do
-    Class.new do
-      attr_accessor :params
-      include Graphiti::Base
-
-      def jsonapi_resource
-        PORO::EmployeeResource.new
-      end
-
-      def params
-        @params || {}
-      end
-    end
-  end
-
-  let(:instance) { klass.new }
-
-  describe "#wrap_context" do
-    before do
-      allow(instance).to receive(:action_name) { "index" }
-    end
-
-    it "wraps in the resource context" do
-      instance.wrap_context do
-        expect(instance.jsonapi_resource.context).to eq(instance)
-        expect(instance.jsonapi_resource.context_namespace).to eq(:index)
-      end
-    end
-  end
+RSpec.describe Graphiti::Runner do
+  let(:resource_class) { PORO::EmployeeResource }
+  let(:params) { {} }
+  let(:instance) { described_class.new(resource_class, params) }
 
   describe "#jsonapi_context" do
     let(:ctx) { double("context") }

@@ -42,7 +42,16 @@ RSpec.describe Graphiti::RequestValidator do
     end
   end
 
-  describe "single level resource payload" do
+  context 'when empty payload' do
+    let(:payload) { {} }
+
+    it "validates correctly" do
+      expect(validate).to eq true
+      expect(instance.errors).to be_blank
+    end
+  end
+
+  context "when a single level resource payload" do
     let(:payload) do
       {
         data: {
@@ -139,14 +148,14 @@ RSpec.describe Graphiti::RequestValidator do
         it "correctly typecasts the fields" do
           validate
 
-          expect(instance.normalized_payload[:attributes][:age]).to eq 34
+          expect(instance.deserialized_payload.attributes[:age]).to eq 34
         end
       end
     end
   end
 
-  describe "nested resource payload" do
-    describe "when has_many" do
+  context "when a nested resource payload" do
+    context "when has_many" do
       before do
         root_resource_class.has_many :positions, resource: nested_resource_class
       end

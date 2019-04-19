@@ -90,14 +90,6 @@ if defined?(Rails)
 end
 
 module Graphiti
-  autoload :Base, "graphiti/base"
-
-  def self.included(klass)
-    klass.instance_eval do
-      include Base
-    end
-  end
-
   # @api private
   def self.context
     Thread.current[:context] ||= {}
