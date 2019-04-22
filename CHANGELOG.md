@@ -13,6 +13,10 @@ Fixes:
 
 ### master (unreleased)
 
+Features:
+
+- [#126](https://github.com/graphiti-api/graphiti/pull/126) Render helpful user-facing errors when a write payload is invalid (@wadetandy)
+
 Misc:
 
 - [#123](https://github.com/graphiti-api/graphiti/pull/123) Throw
