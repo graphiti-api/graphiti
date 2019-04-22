@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "jsonapi-serializable", "~> 0.3.0"
   spec.add_dependency "dry-types", "~> 0.15"
-  spec.add_dependency "graphiti_errors", "~> 1.0.beta.1"
+  spec.add_dependency "graphiti_errors", "~> 1.1.0"
   spec.add_dependency "concurrent-ruby", "~> 1.0"
   spec.add_dependency "activesupport", [">= 4.1", "< 6"]
 
