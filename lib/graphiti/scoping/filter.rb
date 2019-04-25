@@ -23,7 +23,7 @@ module Graphiti
 
     def filter_scope(filter, operator, value)
       if (custom_scope = filter.values[0][:operators][operator])
-        custom_scope.call(@scope, value, resource.context)
+        @resource.instance_exec(@scope, value, resource.context, &custom_scope)
       else
         filter_via_adapter(filter, operator, value)
       end
