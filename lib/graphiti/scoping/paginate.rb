@@ -38,7 +38,7 @@ module Graphiti
 
     # Apply the custom pagination proc
     def apply_custom_scope
-      custom_scope.call(@scope, number, size, resource.context)
+      resource.instance_exec(@scope, number, size, resource.context, &custom_scope)
     end
 
     private

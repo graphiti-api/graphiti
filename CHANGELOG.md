@@ -1,3 +1,10 @@
+## 1.0.3
+
+Fixes:
+
+- [#130](https://github.com/graphiti-api/graphiti/pull/130) Run query
+  blocks in resource context.
+
 ## 1.0.2
 
 Fixes:

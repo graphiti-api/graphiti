@@ -38,7 +38,7 @@ module Graphiti
     def apply
       resource.default_filters.each_pair do |name, opts|
         next if overridden?(name)
-        @scope = opts[:filter].call(@scope, resource.context)
+        @scope = resource.instance_exec(@scope, resource.context, &opts[:filter])
       end
 
       @scope

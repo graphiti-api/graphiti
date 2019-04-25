@@ -29,7 +29,7 @@ module Graphiti
             attribute, sort[:only], direction
         else
           @scope = if sort[:proc]
-            sort[:proc].call(@scope, direction)
+            resource.instance_exec(@scope, direction, &sort[:proc])
           else
             resource.adapter.order(@scope, attribute, direction)
           end
