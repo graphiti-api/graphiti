@@ -8,8 +8,7 @@ RSpec.describe "<%= type %>#create", type: :request do
   describe 'basic create' do
     let(:params) do
       <%- if defined?(FactoryBot) -%>
-      attributes_for(:<%= type.to_s.singularize %>).
-        except("created_at", "updated_at")
+      attributes_for(:<%= type.to_s.singularize %>)
       <%- else -%>
       {
         # ... your attrs here
