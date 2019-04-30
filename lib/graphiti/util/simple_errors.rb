@@ -36,9 +36,7 @@ module Graphiti
       alias count size
 
       def values
-        messages.select { |key, value|
-          !value.empty?
-        }.values
+        messages.values.reject(&:empty?)
       end
 
       def keys

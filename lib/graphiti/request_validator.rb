@@ -22,6 +22,14 @@ module Graphiti
       errors.blank?
     end
 
+    def validate!
+      unless validate
+        raise Graphiti::Errors::InvalidRequest, self.errors
+      end
+
+      true
+    end
+
     def deserialized_payload
       @deserialized_payload ||= begin
         payload = normalized_params

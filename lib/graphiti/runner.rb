@@ -1,6 +1,7 @@
 module Graphiti
   class Runner
     attr_reader :params
+    attr_reader :deserialized_payload
 
     def initialize(resource_class, params, query = nil)
       @resource_class = resource_class
@@ -9,18 +10,14 @@ module Graphiti
 
       validator = RequestValidator.new(jsonapi_resource, params)
 
-      if validator.validate
-        @deserialized_payload = validator.deserialized_payload
-      else
-        raise Graphiti::Errors::InvalidRequest, validator.errors
-      end
+      validator.validate!
+
+      @deserialized_payload = validator.deserialized_payload
     end
 
     def jsonapi_resource
       @jsonapi_resource ||= @resource_class.new
     end
-
-    attr_reader :deserialized_payload
 
     # Typically, this is 'self' of a controller
     # We're overriding here so we can do stuff like
