@@ -320,9 +320,7 @@ module Graphiti
         @resource = resource
         @name = name
         @flag = flag
-        @exists = opts[:exists] || false
         @request = opts[:request] || false
-        @guard = opts[:guard]
       end
 
       def action
@@ -353,17 +351,32 @@ module Graphiti
       end
 
       def message
-        msg = "#{resource_name}: Tried to #{action} attribute #{@name.inspect}"
-        msg << if @exists
-          if @guard
-            ", but the guard #{@guard.inspect} did not pass."
-          else
-            ", but the attribute was marked #{@flag.inspect} => false."
-          end
+        "#{resource_name}: Tried to #{action} attribute #{@name.inspect}"
+      end
+    end
+
+    class InvalidAttributeAccess < AttributeError
+      def initialize(resource, name, flag, **opts)
+        super
+        @guard = opts[:guard]
+      end
+
+      def message
+        msg = super
+
+        msg << if @guard
+          ", but the guard #{@guard.inspect} did not pass."
         else
-          ", but could not find an attribute with that name."
+          ", but the attribute was marked #{@flag.inspect} => false."
         end
+
         msg
+      end
+    end
+
+    class UnknownAttribute < AttributeError
+      def message
+        "#{super}, but could not find an attribute with that name."
       end
     end
 
@@ -513,11 +526,14 @@ module Graphiti
     end
 
     class TypecastFailed < Base
-      def initialize(resource, name, value, error)
+      attr_reader :name, :type_name
+
+      def initialize(resource, name, value, error, type_name)
         @resource = resource
         @name = name
         @value = value
         @error = error
+        @type_name = type_name
       end
 
       def message
@@ -733,6 +749,22 @@ module Graphiti
         else
           "The required filter \"#{@attributes[0]}\" on resource #{@resource.class} was not provided"
         end
+      end
+    end
+
+    class InvalidRequest < Base
+      attr_reader :errors
+
+      def initialize(errors)
+        @errors = errors
+      end
+
+      def message
+        <<-MSG
+          There were one or more errors with your request:
+
+          #{errors.full_messages.join("\n")}
+        MSG
       end
     end
   end

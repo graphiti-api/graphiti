@@ -39,6 +39,10 @@ module Graphiti
       def maybe_raise(opts = {})
         default = {request: request, exists: true}
         opts = default.merge(opts)
+        error_class = opts[:exists] ?
+          Graphiti::Errors::InvalidAttributeAccess :
+          Graphiti::Errors::UnknownAttribute
+
         if raise_error?(opts[:exists])
           raise error_class.new(resource, name, flag, opts)
         else
@@ -54,10 +58,6 @@ module Graphiti
         request? &&
           attribute[flag].is_a?(Symbol) &&
           attribute[flag] != :required
-      end
-
-      def error_class
-        Errors::AttributeError
       end
 
       def supported?

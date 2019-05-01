@@ -38,6 +38,7 @@ require "graphiti/sideload/many_to_many"
 require "graphiti/sideload/polymorphic_belongs_to"
 require "graphiti/resource"
 require "graphiti/resource_proxy"
+require "graphiti/request_validator"
 require "graphiti/query"
 require "graphiti/scope"
 require "graphiti/deserializer"
@@ -61,6 +62,7 @@ require "graphiti/util/relationship_payload"
 require "graphiti/util/persistence"
 require "graphiti/util/validation_response"
 require "graphiti/util/sideload"
+require "graphiti/util/simple_errors"
 require "graphiti/util/transaction_hooks_recorder"
 require "graphiti/util/attribute_check"
 require "graphiti/util/serializer_attributes"
@@ -88,14 +90,6 @@ if defined?(Rails)
 end
 
 module Graphiti
-  autoload :Base, "graphiti/base"
-
-  def self.included(klass)
-    klass.instance_eval do
-      include Base
-    end
-  end
-
   # @api private
   def self.context
     Thread.current[:context] ||= {}

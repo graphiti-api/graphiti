@@ -38,7 +38,8 @@ module Graphiti
       private
 
       def should_yield?(type)
-        (@only.length > 0 && @only.include?(type)) ||
+        (@only.length == 0 && @except.length == 0) ||
+          (@only.length > 0 && @only.include?(type)) ||
           (@except.length > 0 && !@except.include?(type))
       end
 

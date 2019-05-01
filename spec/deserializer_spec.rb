@@ -33,6 +33,14 @@ RSpec.describe Graphiti::Deserializer do
     end
   end
 
+  describe "#meta" do
+    subject { instance.meta }
+
+    it "has the correct payload path" do
+      expect(subject[:payload_path]).to eq ["data"]
+    end
+  end
+
   describe "#relationships" do
     subject { instance.relationships }
 
@@ -66,6 +74,7 @@ RSpec.describe Graphiti::Deserializer do
               temp_id: "abc123",
               method: :create,
               jsonapi_type: "positions",
+              payload_path: ["included", 0],
             },
             attributes: {title: "specialist"},
             relationships: {},
@@ -109,6 +118,7 @@ RSpec.describe Graphiti::Deserializer do
                 temp_id: "abc123",
                 method: :create,
                 jsonapi_type: "positions",
+                payload_path: ["included", 0],
               },
               attributes: {title: "specialist"},
               relationships: {
@@ -117,6 +127,7 @@ RSpec.describe Graphiti::Deserializer do
                     jsonapi_type: "departments",
                     temp_id: "def456",
                     method: :create,
+                    payload_path: ["included", 1],
                   },
                   attributes: {name: "safety"},
                   relationships: {},

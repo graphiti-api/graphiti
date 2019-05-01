@@ -37,9 +37,9 @@ matrix:
       rvm: 2.6
 
 script:
-  - bundle exec $COMMAND
+  - bundle _1.17.3_ exec $COMMAND
 
-install: bundle install --retry=3 --jobs=3
+install: bundle _1.17.3_ install --retry=3 --jobs=3
 before_install:
 - gem install bundler -v '1.17.3'
 deploy:

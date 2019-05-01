@@ -76,7 +76,7 @@ module Graphiti
         flag = :params if [:sortable, :filterable].include?(flag)
         type[flag][value]
       rescue => e
-        raise Errors::TypecastFailed.new(self, name, value, e)
+        raise Errors::TypecastFailed.new(self, name, value, e, type_name)
       end
     end
 

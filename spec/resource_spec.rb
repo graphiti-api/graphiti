@@ -67,17 +67,17 @@ RSpec.describe Graphiti::Resource do
         expect(klass.relationships_writable_by_default).to eq(true)
       end
 
-      context 'when rails' do
+      context "when rails" do
         before do
           rails = double \
             application: double(config: double(eager_load: eager_load))
-          stub_const('Rails', rails)
+          stub_const("Rails", rails)
         end
 
-        context 'and eager loading' do
+        context "and eager loading" do
           let(:eager_load) { true }
 
-          it 'does NOT assign relationships to the serializer' do
+          it "does NOT assign relationships to the serializer" do
             klass.has_many :positions, resource: PORO::PositionResource
             expect(klass.serializer.relationship_blocks).to be_blank
             Graphiti.setup!
@@ -85,10 +85,10 @@ RSpec.describe Graphiti::Resource do
           end
         end
 
-        context 'and NOT eager loading' do
+        context "and NOT eager loading" do
           let(:eager_load) { false }
 
-          it 'assigns relationships to the serializer' do
+          it "assigns relationships to the serializer" do
             klass.has_many :positions, resource: PORO::PositionResource
             expect(klass.serializer.relationship_blocks).to_not be_blank
           end
