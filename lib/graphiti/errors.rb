@@ -410,7 +410,7 @@ module Graphiti
 
           Or whitelist a secondary endpoint:
 
-          secondary_endoint '/my_url', [:index, :update]
+          secondary_endpoint '/my_url', [:index, :update]
 
           The current endpoints allowed for this resource are: #{@resource_class.endpoints.inspect}
         MSG
