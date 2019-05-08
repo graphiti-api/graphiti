@@ -86,19 +86,6 @@ module Graphiti
       end
     end
 
-    class UnwritableRelationship < Base
-      def initialize(resource, sideload)
-        @resource = resource
-        @sideload = sideload
-      end
-
-      def message
-        <<-MSG
-          #{@resource.class}: Tried to persist association #{@sideload.name.inspect} but marked writable: false
-        MSG
-      end
-    end
-
     class SingularSideload < Base
       def initialize(sideload, parent_length)
         @sideload = sideload
