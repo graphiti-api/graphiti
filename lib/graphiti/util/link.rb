@@ -59,7 +59,7 @@ module Graphiti
 
       def params
         @params ||= {}.tap do |params|
-          if @sideload.type != :belongs_to
+          if @sideload.type != :belongs_to || @sideload.remote?
             params[:filter] = @sideload.base_filter([@model])
           end
 
@@ -70,7 +70,7 @@ module Graphiti
       def path
         @path ||=
           path = @sideload.resource.endpoint[:url].to_s
-        if @sideload.type == :belongs_to
+        if @sideload.type == :belongs_to && !@sideload.remote?
           path = "#{path}/#{@model.send(@sideload.foreign_key)}"
         end
         path
