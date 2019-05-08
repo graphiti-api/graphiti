@@ -1,9 +1,18 @@
-## 1.0.4
+## 1.1.0
+
+Features:
+
+- [#126](https://github.com/graphiti-api/graphiti/pull/126) Render helpful user-facing errors when a write payload is invalid (@wadetandy)
 
 Fixes:
 
 - [#136](https://github.com/graphiti-api/graphiti/pull/136) Fix remote
   belongs_to links (@richmolj)
+
+Misc:
+
+- [#123](https://github.com/graphiti-api/graphiti/pull/123) Throw
+  better error when polymorphic type not found.
 
 ## 1.0.3
 
@@ -26,15 +35,6 @@ Fixes:
 - [#127](https://github.com/graphiti-api/graphiti/pull/127) Avoid Rails eager loading edge case with polymorphic resources (@richmolj)
 
 ### master (unreleased)
-
-Features:
-
-- [#126](https://github.com/graphiti-api/graphiti/pull/126) Render helpful user-facing errors when a write payload is invalid (@wadetandy)
-
-Misc:
-
-- [#123](https://github.com/graphiti-api/graphiti/pull/123) Throw
-  better error when polymorphic type not found.
 
 <!-- ### [version (YYYY-MM-DD)](diff_link) -->
 <!-- Breaking changes:-->
