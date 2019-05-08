@@ -1,9 +1,16 @@
+## 1.0.4
+
+Fixes:
+
+- [#136](https://github.com/graphiti-api/graphiti/pull/136) Fix remote
+  belongs_to links (@richmolj)
+
 ## 1.0.3
 
 Fixes:
 
 - [#130](https://github.com/graphiti-api/graphiti/pull/130) Run query
-  blocks in resource context.
+  blocks in resource context (@richmolj)
 
 ## 1.0.2
 
