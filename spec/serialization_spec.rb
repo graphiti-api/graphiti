@@ -1185,7 +1185,7 @@ RSpec.describe "serialization" do
             render
             credit_card = json["data"][0]["relationships"]["credit_card"]
             expect(credit_card["links"]["related"])
-              .to eq("http://foo.com/mastercards/789")
+              .to eq("http://foo.com/mastercards?filter[id]=789")
           end
         end
 
@@ -1351,7 +1351,25 @@ RSpec.describe "serialization" do
               remote: "http://foo.com/classifications"
             render
             expect(classification["links"]["related"])
-              .to eq("http://foo.com/classifications/789")
+              .to eq("http://foo.com/classifications?filter[id]=789")
+          end
+
+          # Special case because we hit index with a filter
+          context 'and params are customized' do
+            before do
+              resource.belongs_to :classification,
+                remote: "http://foo.com/classifications" do
+                  params do |hash|
+                    hash[:filter][:foo] = 'bar'
+                  end
+                end
+            end
+
+            it 'links correctly' do
+              render
+              expect(classification["links"]["related"])
+                .to eq("http://foo.com/classifications?filter[foo]=bar&filter[id]=789")
+            end
           end
         end
       end
