@@ -6,6 +6,7 @@ gem "rails", "~> 5.2"
 gem "rspec-rails"
 gem "sqlite3", "~> 1.3.6"
 gem "database_cleaner"
+gem "graphiti-rails", git: "https://github.com/wagenet/graphiti-rails.git", branch: "railtie"
 
 group :test do
   gem "pry"

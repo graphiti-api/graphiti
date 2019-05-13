@@ -10,6 +10,7 @@ appraise "rails-5" do
   gem "rspec-rails"
   gem "sqlite3", "~> 1.3.6"
   gem "database_cleaner"
+  gem "graphiti-rails", git: "https://github.com/wagenet/graphiti-rails.git", branch: "railtie"
 end
 
 appraise "rails-6" do
@@ -17,4 +18,5 @@ appraise "rails-6" do
   gem "rspec-rails"
   gem "sqlite3", "~> 1.4.0"
   gem "database_cleaner"
+  gem "graphiti-rails", git: "https://github.com/wagenet/graphiti-rails.git", branch: "railtie"
 end
