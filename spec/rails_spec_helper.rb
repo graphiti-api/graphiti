@@ -8,8 +8,15 @@
 require "bundler/setup" unless defined?(Bundler)
 require "rails"
 require "action_controller"
+
 require "graphiti/rails"
-require "graphiti/railtie"
+
+# graphiti-rails has own Railtie
+begin
+  require "graphiti-rails"
+rescue LoadError
+  require "graphiti/railtie"
+end
 
 module BasicRailsApp
   module_function
@@ -23,9 +30,9 @@ module BasicRailsApp
       config.active_support.deprecation = :log
       config.root = File.dirname(__FILE__)
       config.log_level = :info
-      # Set a fake logger to avoid creating the log directory automatically
-      fake_logger = Logger.new(nil)
-      config.logger = fake_logger
+      # Set a logger to avoid creating the log directory automatically
+      config.logger = Logger.new(ENV['DEBUG'] ? $stdout : nil)
+      config.logger.level = Logger::DEBUG
       Rails.application.routes.default_url_options = {host: "example.com"}
 
       if Rails::VERSION::MAJOR >= 6
@@ -54,6 +61,7 @@ end
 
 class ApplicationController < ActionController::Base
   include Rails.application.routes.url_helpers
+  # FIXME: Don't always include
   include Graphiti::Rails
 end
 
@@ -61,6 +69,13 @@ require "rspec/rails"
 
 RSpec.configure do |config|
   config.include UniversalControllerSpecHelper
+
+  if defined?(RescueRegistry)
+    config.after  do
+      # Normally this happens in a standard Rails middleware, but most of our tests bypass middleware
+      RescueRegistry.context = nil
+    end
+  end
 end
 
 # Get Rails 4 and ruby 2.6 working in CI

@@ -83,8 +83,9 @@ module Graphiti
       end
 
       def eagerly_validate_links?
-        if defined?(::Rails)
-          ::Rails.application.config.eager_load
+        # TODO: Maybe handle this in graphiti-rails
+        if defined?(::Rails) && (app = ::Rails.application)
+          app.config.eager_load
         else
           true
         end

@@ -1,8 +1,13 @@
 module Graphiti
   class Railtie < ::Rails::Railtie
     rake_tasks do
-      path = File.expand_path(__dir__)
-      load "#{path}/tasks.rb"
+      load File.expand_path("deprecated_tasks.rb", __dir__)
+    end
+
+    generators do
+      Dir[File.expand_path("../../deprecated_generators/**/*.rb", __dir__)].each do |f|
+        require f
+      end
     end
 
     initializer "graphiti.require_activerecord_adapter" do

@@ -32,15 +32,20 @@ module Graphiti
       self.debug = ENV.fetch("GRAPHITI_DEBUG", true)
       self.debug_models = ENV.fetch("GRAPHITI_DEBUG_MODELS", false)
 
-      if defined?(::Rails)
-        if File.exist?("#{::Rails.root}/.graphiticfg.yml")
-          cfg = YAML.load_file("#{::Rails.root}/.graphiticfg.yml")
-          @schema_path = "#{::Rails.root}/public#{cfg["namespace"]}/schema.json"
+      # FIXME: Don't duplicate graphiti-rails efforts
+      if (root = ::Rails.root)
+        config_file = root.join(".graphiticfg.yml")
+        if config_file.exist?
+          cfg = YAML.load_file(config_file)
+          @schema_path = root.join("public#{cfg["namespace"]}/schema.json")
         else
-          @schema_path = "#{::Rails.root}/public/schema.json"
+          @schema_path = root.join("/public/schema.json")
         end
-        self.debug = ::Rails.logger.level.zero?
-        Graphiti.logger = ::Rails.logger
+
+        if (logger = ::Rails.logger)
+          self.debug = logger.level.zero?
+          Graphiti.logger = logger
+        end
       end
     end
 
@@ -66,4 +71,7 @@ module Graphiti
       send(:"#{key}=", original)
     end
   end
+
+  msg = "Use graphiti-rails's `config.graphiti.respond_to_formats`"
+  DEPRECATOR.deprecate_methods(Configuration, respond_to: msg, "respond_to=": msg)
 end

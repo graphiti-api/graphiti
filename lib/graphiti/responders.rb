@@ -4,6 +4,8 @@ module Graphiti
     extend ActiveSupport::Concern
 
     included do
+      backtrace = ::Rails::VERSION::MAJOR == 4 ? caller(2) : caller_locations(2)
+      DEPRECATOR.deprecation_warning("Including Graphiti::Responders", "Use graphiti-rails instead. See https://www.graphiti.dev/guides/graphiti-rails-migration for details.", backtrace)
       include ActionController::MimeResponds
       respond_to(*Graphiti.config.respond_to)
     end

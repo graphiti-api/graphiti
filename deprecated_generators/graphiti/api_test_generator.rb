@@ -1,11 +1,10 @@
-$:.unshift File.dirname(__FILE__)
-require "generator_mixin"
+require_relative "generator_mixin"
 
 module Graphiti
   class ApiTestGenerator < ::Rails::Generators::Base
     include GeneratorMixin
 
-    source_root File.expand_path("../templates", __FILE__)
+    source_root File.expand_path("templates", __dir__)
 
     argument :resource, type: :string
     class_option :actions,

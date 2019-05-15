@@ -3,6 +3,7 @@ module Graphiti
     attr_reader :resources
 
     def self.generate(resources = nil)
+      # TODO: Maybe handle this in graphiti-rails
       ::Rails.application.eager_load! if defined?(::Rails)
       resources ||= Graphiti.resources.reject(&:abstract_class?)
       resources.reject! { |r| r.name.nil? }
@@ -17,7 +18,7 @@ module Graphiti
         errors = Graphiti::SchemaDiff.new(old, schema).compare
         return errors if errors.any?
       end
-      FileUtils.mkdir_p(Graphiti.config.schema_path.gsub("/schema.json", ""))
+      FileUtils.mkdir_p(Graphiti.config.schema_path.to_s.gsub("/schema.json", ""))
       File.write(Graphiti.config.schema_path, JSON.pretty_generate(schema))
       []
     end

@@ -23,6 +23,7 @@ RSpec.describe Graphiti::Configuration do
     end
   end
 
+  # FIXME: Deprecated
   describe "when rails is defined" do
     let(:rails) do
       double(root: "/foo/bar", logger: OpenStruct.new(level: 1))
@@ -47,6 +48,7 @@ RSpec.describe Graphiti::Configuration do
     describe "#debug" do
       subject { Graphiti.config.debug }
 
+      # FIXME: Deprecated
       context "when rails logger is debug level" do
         before do
           rails.logger.level = 0
@@ -55,6 +57,7 @@ RSpec.describe Graphiti::Configuration do
         it { is_expected.to eq(true) }
       end
 
+      # FIXME: Deprecated
       context "when rails logger is not debug level" do
         it { is_expected.to eq(false) }
       end
@@ -100,6 +103,7 @@ RSpec.describe Graphiti::Configuration do
       expect(Graphiti.config.schema_path).to eq("foo")
     end
 
+    # FIXME: Deprecated
     context "when Rails is defined" do
       before do
         rails = double(root: "/foo/bar", logger: double.as_null_object)
