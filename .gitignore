@@ -8,6 +8,7 @@
 /gemfiles/*.lock
 /tmp/
 .byebug_history
+spec/.rspec-examples
 spec/dummy/log/*
 *~
 .vscode/

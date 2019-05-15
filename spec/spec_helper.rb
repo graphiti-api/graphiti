@@ -34,6 +34,8 @@ RSpec.configure do |config|
   end
 
   config.filter_run_when_matching :focus
+
+  config.example_status_persistence_file_path = File.expand_path(".rspec-examples", __dir__)
 end
 
 # We test rails through appraisal
