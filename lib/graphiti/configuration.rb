@@ -33,13 +33,13 @@ module Graphiti
       self.debug_models = ENV.fetch("GRAPHITI_DEBUG_MODELS", false)
 
       # FIXME: Don't duplicate graphiti-rails efforts
-      if (root = ::Rails.root)
+      if defined?(::Rails.root) && (root = ::Rails.root)
         config_file = root.join(".graphiticfg.yml")
         if config_file.exist?
           cfg = YAML.load_file(config_file)
           @schema_path = root.join("public#{cfg["namespace"]}/schema.json")
         else
-          @schema_path = root.join("/public/schema.json")
+          @schema_path = root.join("public/schema.json")
         end
 
         if (logger = ::Rails.logger)

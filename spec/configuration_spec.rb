@@ -26,7 +26,7 @@ RSpec.describe Graphiti::Configuration do
   # FIXME: Deprecated
   describe "when rails is defined" do
     let(:rails) do
-      double(root: "/foo/bar", logger: OpenStruct.new(level: 1))
+      double(root: Pathname.new("/foo/bar"), logger: OpenStruct.new(level: 1))
     end
 
     before do
@@ -40,7 +40,7 @@ RSpec.describe Graphiti::Configuration do
 
     describe "#schema_path" do
       it "defaults" do
-        expect(Graphiti.config.schema_path)
+        expect(Graphiti.config.schema_path.to_s)
           .to eq("/foo/bar/public/schema.json")
       end
     end
@@ -106,13 +106,13 @@ RSpec.describe Graphiti::Configuration do
     # FIXME: Deprecated
     context "when Rails is defined" do
       before do
-        rails = double(root: "/foo/bar", logger: double.as_null_object)
+        rails = double(root: Pathname.new("/foo/bar"), logger: double.as_null_object)
         stub_const("::Rails", rails)
         Graphiti.instance_variable_set(:@config, nil)
       end
 
       it "defaults" do
-        expect(Graphiti.config.schema_path)
+        expect(Graphiti.config.schema_path.to_s)
           .to eq("/foo/bar/public/schema.json")
       end
     end
