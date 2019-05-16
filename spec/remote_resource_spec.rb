@@ -55,7 +55,7 @@ RSpec.describe "remote resources" do
   context "when basic query" do
     it "hits remote endpoint" do
       expect(Faraday).to receive(:get)
-        .with("http://foo.com/api/v1/employees", anything, anything)
+        .with("http://foo.com/api/v1/employees?page[size]=999", anything, anything)
         .and_return(response_object)
       get_data
     end
@@ -94,7 +94,7 @@ RSpec.describe "remote resources" do
 
       it "is used" do
         expect(Faraday).to receive(:get)
-          .with("http://all-about-that-base.com/api/v1/employees", anything, anything)
+          .with("http://all-about-that-base.com/api/v1/employees?page[size]=999", anything, anything)
           .and_return(response_object)
         get_data
       end
@@ -241,7 +241,7 @@ RSpec.describe "remote resources" do
       end
 
       it "queries correctly" do
-        assert_params("sort=-first_name,last_name")
+        assert_params("page[size]=999&sort=-first_name,last_name")
       end
     end
 
@@ -251,7 +251,7 @@ RSpec.describe "remote resources" do
       end
 
       it "queries correctly" do
-        assert_params("filter[age][gt]=1&filter[first_name][suffix]=foo")
+        assert_params("filter[age][gt]=1&filter[first_name][suffix]=foo&page[size]=999")
       end
     end
 
@@ -271,7 +271,7 @@ RSpec.describe "remote resources" do
       end
 
       it "queries correctly" do
-        assert_params("fields[employees]=first_name,age")
+        assert_params("fields[employees]=first_name,age&page[size]=999")
       end
     end
 
@@ -281,7 +281,7 @@ RSpec.describe "remote resources" do
       end
 
       it "queries correctly" do
-        assert_params("extra_fields[employees]=foo,bar")
+        assert_params("extra_fields[employees]=foo,bar&page[size]=999")
       end
     end
 
@@ -291,7 +291,7 @@ RSpec.describe "remote resources" do
       end
 
       it "queries correctly" do
-        assert_params("stats[total]=count")
+        assert_params("page[size]=999&stats[total]=count")
       end
     end
 
@@ -313,7 +313,7 @@ RSpec.describe "remote resources" do
         end
 
         it "does not pass to the remote api" do
-          assert_params("include=teams")
+          assert_params("include=teams&page[size]=999")
         end
 
         context "but the local association is a remote resource with the same remote_base_url" do
@@ -332,7 +332,7 @@ RSpec.describe "remote resources" do
           it "passes the include to the remote, and does not query locally" do
             expect(position_resource).to_not receive(:all)
             expect(position_resource).to_not receive(:_all)
-            assert_params("include=positions.department,teams")
+            assert_params("include=positions.department,teams&page[size]=999")
           end
         end
       end
@@ -362,7 +362,7 @@ RSpec.describe "remote resources" do
         end
 
         it "is passed to the remote API" do
-          assert_params("include=positions.department,teams")
+          assert_params("include=positions.department,teams&page[size]=999")
         end
 
         it "assigns associated models as relationships" do
@@ -384,7 +384,7 @@ RSpec.describe "remote resources" do
           end
 
           it "is passed to the remote API" do
-            assert_params("include=positions.department,teams&sort=-positions.department.name")
+            assert_params("include=positions.department,teams&page[size]=999&sort=-positions.department.name")
           end
         end
 
@@ -394,7 +394,7 @@ RSpec.describe "remote resources" do
           end
 
           it "is passed to the remote API" do
-            assert_params("include=positions.department,teams&page[positions.number]=2&page[positions.size]=5")
+            assert_params("include=positions.department,teams&page[positions.number]=2&page[positions.size]=5&page[size]=999")
           end
         end
 
@@ -404,7 +404,7 @@ RSpec.describe "remote resources" do
           end
 
           it "is passed to the remote API" do
-            assert_params("filter[positions.title][suffix]=a&include=positions.department,teams")
+            assert_params("filter[positions.title][suffix]=a&include=positions.department,teams&page[size]=999")
           end
         end
 
@@ -414,7 +414,7 @@ RSpec.describe "remote resources" do
           end
 
           it "is passed to the remote API" do
-            assert_params("fields[positions]=foo,bar&include=positions.department,teams")
+            assert_params("fields[positions]=foo,bar&include=positions.department,teams&page[size]=999")
           end
         end
 
@@ -424,7 +424,7 @@ RSpec.describe "remote resources" do
           end
 
           it "is passed to the remote API" do
-            assert_params("extra_fields[positions]=foo,bar&include=positions.department,teams")
+            assert_params("extra_fields[positions]=foo,bar&include=positions.department,teams&page[size]=999")
           end
         end
 
@@ -434,7 +434,7 @@ RSpec.describe "remote resources" do
           end
 
           it "is passed to the remote API" do
-            assert_params("include=positions.department,teams&stats[total]=count")
+            assert_params("include=positions.department,teams&page[size]=999&stats[total]=count")
           end
         end
       end
@@ -492,7 +492,7 @@ RSpec.describe "remote resources" do
       end
 
       it "passes sorts correctly" do
-        assert_params("filter[id]=444&include=teams&sort=name,-teams.id")
+        assert_params("filter[id]=444&include=teams&page[size]=999&sort=name,-teams.id")
       end
     end
 
@@ -518,7 +518,7 @@ RSpec.describe "remote resources" do
       end
 
       it "passes filters correctly" do
-        assert_params("filter[id]=444&filter[name]=foo&filter[teams.id]=4&include=teams")
+        assert_params("filter[id]=444&filter[name]=foo&filter[teams.id]=4&include=teams&page[size]=999")
       end
     end
 
@@ -528,7 +528,7 @@ RSpec.describe "remote resources" do
       end
 
       it "passes fields correctly" do
-        assert_params("fields[departments]=foo,bar&fields[teams]=baz,bax&filter[id]=444&include=teams")
+        assert_params("fields[departments]=foo,bar&fields[teams]=baz,bax&filter[id]=444&include=teams&page[size]=999")
       end
     end
 
@@ -538,7 +538,7 @@ RSpec.describe "remote resources" do
       end
 
       it "passes extra fields correctly" do
-        assert_params("extra_fields[departments]=foo,bar&extra_fields[teams]=baz,bax&filter[id]=444&include=teams")
+        assert_params("extra_fields[departments]=foo,bar&extra_fields[teams]=baz,bax&filter[id]=444&include=teams&page[size]=999")
       end
     end
   end
@@ -553,7 +553,7 @@ RSpec.describe "remote resources" do
     end
 
     it "is honored" do
-      assert_params("sort=-id")
+      assert_params("page[size]=999&sort=-id")
     end
   end
 
@@ -589,7 +589,7 @@ RSpec.describe "remote resources" do
     end
 
     it "queries correctly" do
-      url = "http://foo.com/api/v1/positions?filter[employee_id]=1"
+      url = "http://foo.com/api/v1/positions?filter[employee_id]=1&page[size]=999"
       expect(Faraday).to receive(:get).with(url, anything, anything)
       klass.all(include: "positions").data
     end
@@ -620,7 +620,7 @@ RSpec.describe "remote resources" do
 
         it "queries correctly" do
           assert_remote_url \
-            "http://foo.com/api/v1/positions?filter[employee_id]=1&include=department&sort=-department.name"
+            "http://foo.com/api/v1/positions?filter[employee_id]=1&include=department&page[size]=999&sort=-department.name"
         end
       end
 
@@ -632,7 +632,7 @@ RSpec.describe "remote resources" do
 
         it "queries correctly" do
           assert_remote_url \
-            "http://foo.com/api/v1/positions?filter[department.name]=foo&filter[employee_id]=1&include=department"
+            "http://foo.com/api/v1/positions?filter[department.name]=foo&filter[employee_id]=1&include=department&page[size]=999"
         end
       end
 
@@ -644,7 +644,7 @@ RSpec.describe "remote resources" do
 
         it "queries correctly" do
           assert_remote_url \
-            "http://foo.com/api/v1/positions?filter[employee_id]=1&include=department&page[department.size]=2"
+            "http://foo.com/api/v1/positions?filter[employee_id]=1&include=department&page[department.size]=2&page[size]=999"
         end
       end
     end
@@ -723,7 +723,7 @@ RSpec.describe "remote resources" do
     end
 
     it "executes correct HTTP request" do
-      url = "http://foo.com/api/v1/mastercards?filter[id]=789"
+      url = "http://foo.com/api/v1/mastercards?filter[id]=789&page[size]=999"
       expect(Faraday).to receive(:get)
         .with(url, anything, anything)
       klass.all(include: "credit_card").data
