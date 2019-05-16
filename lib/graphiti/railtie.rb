@@ -1,4 +1,5 @@
 module Graphiti
+  # @deprecated Use graphiti-rails's Graphiti::Rails::Railtie
   class Railtie < ::Rails::Railtie
     rake_tasks do
       load File.expand_path("deprecated_tasks.rb", __dir__)
