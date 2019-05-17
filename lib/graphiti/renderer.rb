@@ -38,7 +38,8 @@ module Graphiti
     private
 
     def render(renderer)
-      Graphiti.broadcast(:render, records: records, options: options) do
+      Graphiti.broadcast(:render, records: records, proxy: proxy, options: options) do
+        # TODO: If these aren't expensive to compute, set them before the broadcast block
         options[:fields] = proxy.fields
         options[:expose] ||= {}
         options[:expose][:extra_fields] = proxy.extra_fields

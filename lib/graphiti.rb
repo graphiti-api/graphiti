@@ -128,7 +128,9 @@ module Graphiti
   end
 
   def self.broadcast(name, payload)
-    name = "graphiti.#{name}"
+    # AS::N prefers domain naming format with more specific towards end
+    name = "#{name}.graphiti"
+
     ActiveSupport::Notifications.instrument(name, payload) do
       yield payload if block_given?
     end
