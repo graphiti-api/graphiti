@@ -122,7 +122,7 @@ module Graphiti
       end
 
       def flush
-        Graphiti.broadcast("debug.flush", {}) do |payload|
+        Graphiti.broadcast(:flush_debug, {}) do |payload|
           payload[:chunks] = chunks
           graph_statements.each do |chunk|
             flush_chunk(chunk)
@@ -188,8 +188,8 @@ module Graphiti
     end
 
     ActiveSupport::Notifications.subscribe \
-      "graphiti.data", method(:on_data)
+      "data.graphiti", method(:on_data)
     ActiveSupport::Notifications.subscribe \
-      "graphiti.render", method(:on_render)
+      "render.graphiti", method(:on_render)
   end
 end
