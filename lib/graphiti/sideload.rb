@@ -249,19 +249,16 @@ module Graphiti
       end
 
       if self.class.scope_proc
-        Graphiti.broadcast("data", resource_class: resource.class, sideload: self) do |payload|
-          sideload_scope = fire_scope(parents)
-          sideload_scope = Scope.new sideload_scope,
-            resource,
-            query,
-            parent: graph_parent,
-            sideload: self,
-            sideload_parent_length: parents.length,
-            default_paginate: false
-          sideload_scope.resolve do |sideload_results|
-            payload[:results] = sideload_results
-            fire_assign(parents, sideload_results)
-          end
+        sideload_scope = fire_scope(parents)
+        sideload_scope = Scope.new sideload_scope,
+          resource,
+          query,
+          parent: graph_parent,
+          sideload: self,
+          sideload_parent_length: parents.length,
+          default_paginate: false
+        sideload_scope.resolve do |sideload_results|
+          fire_assign(parents, sideload_results)
         end
       else
         load(parents, query, graph_parent)
