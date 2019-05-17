@@ -76,6 +76,8 @@ module Graphiti
         params: @opts[:params],
         sideload: @opts[:sideload],
         parent: @opts[:parent],
+        # Set once data is resolved within block
+        #   results: ...
       }
       Graphiti.broadcast(:resolve, opts) do |payload|
         yield payload
