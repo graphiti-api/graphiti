@@ -188,7 +188,7 @@ module Graphiti
     end
 
     ActiveSupport::Notifications.subscribe \
-      "data.graphiti", method(:on_data)
+      "resolve.graphiti", method(:on_data)
     ActiveSupport::Notifications.subscribe \
       "render.graphiti", method(:on_render)
   end

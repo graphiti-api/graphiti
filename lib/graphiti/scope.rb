@@ -77,7 +77,7 @@ module Graphiti
         sideload: @opts[:sideload],
         parent: @opts[:parent],
       }
-      Graphiti.broadcast("data", opts) do |payload|
+      Graphiti.broadcast(:resolve, opts) do |payload|
         yield payload
       end
     end
