@@ -18,7 +18,7 @@ appraise "rails-5-graphiti-rails" do
   gem "sqlite3", "~> 1.3.6"
   gem "database_cleaner"
   gem "rescue_registry", git: "https://github.com/wagenet/rescue_registry.git", branch: "master"
-  gem "graphiti-rails", git: "https://github.com/wagenet/graphiti-rails.git", branch: "railtie"
+  gem "graphiti-rails", git: "https://github.com/wagenet/graphiti-rails.git", branch: "master"
 end
 
 appraise "rails-6" do
@@ -34,5 +34,5 @@ appraise "rails-6-graphiti-rails" do
   gem "sqlite3", "~> 1.4.0"
   gem "database_cleaner"
   gem "rescue_registry", git: "https://github.com/wagenet/rescue_registry.git", branch: "master"
-  gem "graphiti-rails", git: "https://github.com/wagenet/graphiti-rails.git", branch: "railtie"
+  gem "graphiti-rails", git: "https://github.com/wagenet/graphiti-rails.git", branch: "master"
 end
