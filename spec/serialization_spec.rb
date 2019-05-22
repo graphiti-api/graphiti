@@ -703,6 +703,7 @@ RSpec.describe "serialization" do
     context "when a sideload is not readable" do
       before do
         resource.allow_sideload :hidden, readable: false, type: :has_many
+        Graphiti.setup!
       end
 
       it "is not applied to the serializer" do
@@ -714,6 +715,7 @@ RSpec.describe "serialization" do
     context "when a sideload macro not readable" do
       before do
         resource.belongs_to :hidden, readable: false
+        Graphiti.setup!
       end
 
       it "is not applied to the serializer" do
