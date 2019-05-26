@@ -8,6 +8,7 @@ module Graphiti
       #
       # ```ruby
       # TransactionHooksRecorder.record do
+      #   TransactionHooksRecorder.add(->{ do_some_stuff() }, :before_validation)
       #   TransactionHooksRecorder.add(->{ do_stuff() }, :before_commit)
       #   TransactionHooksRecorder.add(->{ do_more_stuff() }, :after_commit)
       #   {
@@ -27,6 +28,7 @@ module Graphiti
 
           begin
             result = yield
+            run(:before_validation)
             run(:before_commit)
 
             unless result.is_a?(::Hash)
@@ -59,6 +61,7 @@ module Graphiti
 
         def reset_hooks
           Thread.current[:_graphiti_hooks] = {
+            before_validation: [],
             before_commit: [],
             after_commit: [],
           }

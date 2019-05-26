@@ -81,6 +81,13 @@ module Graphiti
           }
         end
 
+        def before_validation(only: [:create, :update, :destroy], &blk)
+          Array(only).each do |verb|
+            config[:before_validation][verb] ||= []
+            config[:before_validation][verb] << blk
+          end
+        end
+
         def before_commit(only: [:create, :update, :destroy], &blk)
           Array(only).each do |verb|
             config[:before_commit][verb] ||= []

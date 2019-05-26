@@ -112,6 +112,13 @@ module Graphiti
       adapter.resolve(scope)
     end
 
+    def before_validation(model, metadata)
+      hooks = self.class.config[:before_validation][metadata[:method]] || []
+      hooks.each do |hook|
+        instance_exec(model, metadata, &hook)
+      end
+    end
+
     def before_commit(model, metadata)
       hooks = self.class.config[:before_commit][metadata[:method]] || []
       hooks.each do |hook|

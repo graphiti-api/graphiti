@@ -60,6 +60,8 @@ class Graphiti::Util::Persistence
 
     post_process(persisted, parents)
     post_process(persisted, children)
+    before_validation = -> { @resource.before_validation(persisted, metadata) }
+    add_hook(before_validation, :before_validation)
     before_commit = -> { @resource.before_commit(persisted, metadata) }
     add_hook(before_commit, :before_commit)
     after_commit = -> { @resource.after_commit(persisted, metadata) }

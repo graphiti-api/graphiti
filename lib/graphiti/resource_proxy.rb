@@ -124,6 +124,8 @@ module Graphiti
         validator = ::Graphiti::Util::ValidationResponse.new \
           model, @payload
         validator.validate!
+        # FIXME: I don't know in which scenarios the following line is needed!
+        # @resource.before_validation(model, metadata)
         @resource.before_commit(model, metadata)
 
         {result: validator}
