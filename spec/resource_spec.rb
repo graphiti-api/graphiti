@@ -71,7 +71,7 @@ RSpec.describe Graphiti::Resource do
         before do
           rails = double \
             application: double(config: double(eager_load: eager_load))
-          stub_const("Rails", rails)
+          stub_const("Rails", rails.as_null_object)
         end
 
         context "and eager loading" do

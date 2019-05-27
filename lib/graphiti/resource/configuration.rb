@@ -104,6 +104,11 @@ module Graphiti
             klass.attribute :id, :integer_id
           end
           klass.stat total: [:count]
+
+          if defined?(::Rails) && ::Rails.env.development?
+            # Avoid adding dupe resources when re-autoloading
+            Graphiti.resources.reject! { |r| r.name == klass.name }
+          end
           Graphiti.resources << klass
         end
       end
