@@ -9,6 +9,8 @@ gemfile:
   - gemfiles/rails_4.gemfile
   - gemfiles/rails_5.gemfile
   - gemfiles/rails_6.gemfile
+  - gemfiles/rails_5_graphiti_rails.gemfile
+  - gemfiles/rails_6_graphiti_rails.gemfile
 env:
   - COMMAND=standardrb --no-fix --format progress
   - COMMAND=rspec
@@ -21,6 +23,10 @@ matrix:
       gemfile: gemfiles/rails_5.gemfile
     - env: COMMAND=standardrb --no-fix --format progress
       gemfile: gemfiles/rails_6.gemfile
+    - env: COMMAND=standardrb --no-fix --format progress
+      gemfile: gemfiles/rails_5_graphiti_rails.gemfile
+    - env: COMMAND=standardrb --no-fix --format progress
+      gemfile: gemfiles/rails_6_graphiti_rails.gemfile
     - env: COMMAND=rspec APPRAISAL_INITIALIZED=true
       gemfile: Gemfile
     - env: COMMAND=rspec
@@ -29,7 +35,13 @@ matrix:
       gemfile: gemfiles/rails_5.gemfile
     - env: COMMAND=rspec
       gemfile: gemfiles/rails_6.gemfile
+    - env: COMMAND=rspec
+      gemfile: gemfiles/rails_5_graphiti_rails.gemfile
+    - env: COMMAND=rspec
+      gemfile: gemfiles/rails_6_graphiti_rails.gemfile
     - gemfile: gemfiles/rails_6.gemfile
+      rvm: 2.4
+    - gemfile: gemfiles/rails_6_graphiti_rails.gemfile
       rvm: 2.4
     - gemfile: gemfiles/rails_4.gemfile
       rvm: 2.5

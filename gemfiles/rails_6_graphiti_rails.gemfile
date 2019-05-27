@@ -6,6 +6,8 @@ gem "rails", "~> 6.0.0.rc1"
 gem "rspec-rails"
 gem "sqlite3", "~> 1.4.0"
 gem "database_cleaner"
+gem "rescue_registry", git: "https://github.com/wagenet/rescue_registry.git", branch: "master"
+gem "graphiti-rails", git: "https://github.com/wagenet/graphiti-rails.git", branch: "master"
 
 group :test do
   gem "pry"

@@ -38,6 +38,7 @@ module Graphiti
       # Forward all headers
       def request_headers
         {}.tap do |headers|
+          # TODO: Maybe handle this in graphiti-rails
           if defined?(Rails) && context
             raw = context.request.headers.to_h
             if (auth = raw["HTTP_AUTHORIZATION"])

@@ -1,5 +1,4 @@
-$:.unshift File.dirname(__FILE__)
-require "generator_mixin"
+require_relative "generator_mixin"
 
 module Graphiti
   class ResourceTestGenerator < ::Rails::Generators::Base

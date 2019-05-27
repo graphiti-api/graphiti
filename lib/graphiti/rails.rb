@@ -8,6 +8,9 @@ module Graphiti
   # @see Base#wrap_context
   module Rails
     def self.included(klass)
+      backtrace = ::Rails::VERSION::MAJOR == 4 ? caller(2) : caller_locations(2)
+      Graphiti::DEPRECATOR.deprecation_warning("Including Graphiti::Rails", "Use graphiti-rails instead. See https://www.graphiti.dev/guides/graphiti-rails-migration for details.", backtrace)
+
       klass.class_eval do
         include Graphiti::Context
         include GraphitiErrors
