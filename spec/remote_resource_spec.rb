@@ -208,7 +208,7 @@ RSpec.describe "remote resources" do
 
     context "when Rails" do
       before do
-        stub_const("Rails", true)
+        stub_const("Rails", double.as_null_object)
       end
 
       it "forwards Authorization header to the remote endpoint" do
