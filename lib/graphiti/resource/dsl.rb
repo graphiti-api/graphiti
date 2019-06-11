@@ -32,6 +32,7 @@ module Graphiti
               dependencies: opts[:dependent],
               required: required,
               operators: operators.to_hash,
+              allow_nil: opts.fetch(:allow_nil, filters_accept_nil_by_default)
             }
           elsif (type = args[0])
             attribute name, type, only: [:filterable], allow: opts[:allow]

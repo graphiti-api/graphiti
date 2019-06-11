@@ -80,7 +80,8 @@ module Graphiti
           :attributes_filterable_by_default,
           :attributes_schema_by_default,
           :relationships_readable_by_default,
-          :relationships_writable_by_default
+          :relationships_writable_by_default,
+          :filters_accept_nil_by_default
 
         class << self
           prepend Overrides
@@ -101,6 +102,7 @@ module Graphiti
           default(klass, :attributes_schema_by_default, true)
           default(klass, :relationships_readable_by_default, true)
           default(klass, :relationships_writable_by_default, true)
+          default(klass, :filters_accept_nil_by_default, false)
 
           unless klass.config[:attributes][:id]
             klass.attribute :id, :integer_id
