@@ -1,3 +1,10 @@
+## Unreleased
+
+Features:
+
+- [157](https://github.com/graphiti-api/graphiti/pull/157) Using attribute option schema: false.
+  This option is default true and is not effected by only and except options. (@zeisler)
+
 ## 1.1.0
 
 Features:

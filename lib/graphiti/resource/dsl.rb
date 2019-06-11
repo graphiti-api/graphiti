@@ -101,6 +101,7 @@ module Graphiti
           attribute_option(options, :writable)
           attribute_option(options, :sortable)
           attribute_option(options, :filterable)
+          attribute_option(options, :schema, true)
           options[:type] = type
           options[:proc] = blk
           config[:attributes][name] = options
@@ -151,11 +152,11 @@ module Graphiti
           Util::SerializerAttributes.new(self, extra_attributes, true).apply
         end
 
-        def attribute_option(options, name)
+        def attribute_option(options, name, exclusive = false)
           if options[name] != false
-            default = if (only = options[:only])
+            default = if (only = options[:only]) && !exclusive
               Array(only).include?(name) ? true : false
-            elsif (except = options[:except])
+            elsif (except = options[:except]) && !exclusive
               Array(except).include?(name) ? false : true
             else
               send(:"attributes_#{name}_by_default")
