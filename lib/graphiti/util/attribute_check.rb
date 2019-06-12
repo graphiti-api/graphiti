@@ -17,37 +17,18 @@ module Graphiti
       end
 
       def run
-        if attribute?
-          if supported?
-            if guarded?
-              if guard_passes?
-                attribute
-              else
-                maybe_raise(request: true, guard: attribute[flag])
-              end
-            else
-              attribute
-            end
-          else
-            maybe_raise(exists: true)
-          end
-        else
-          maybe_raise(exists: false)
-        end
+        return attribute if guard_check! && attribute_check! && supported_check!
+
+        false
       end
 
       def maybe_raise(opts = {})
-        default = {request: request, exists: true}
-        opts = default.merge(opts)
-        error_class = opts[:exists] ?
-          Graphiti::Errors::InvalidAttributeAccess :
-          Graphiti::Errors::UnknownAttribute
+        default     = { request: request, exists: true }
+        opts        = default.merge(opts)
+        exists      = opts[:exists]
+        error_class = error_class(exists)
 
-        if raise_error?(opts[:exists])
-          raise error_class.new(resource, name, flag, opts)
-        else
-          false
-        end
+        raise error_class.new(resource, name, flag, opts) if raise_error?(exists)
       end
 
       def guard_passes?
@@ -56,12 +37,13 @@ module Graphiti
 
       def guarded?
         request? &&
+          attribute? &&
           attribute[flag].is_a?(Symbol) &&
           attribute[flag] != :required
       end
 
       def supported?
-        attribute[flag] != false
+        attribute? && attribute[flag] != false
       end
 
       def attribute
@@ -74,14 +56,45 @@ module Graphiti
 
       def raise_error?(exists)
         if raise_error == :only_unsupported
-          exists ? true : false
+          exists
         else
-          !!raise_error
+          raise_error
         end
       end
 
       def request?
         !!request
+      end
+
+      private
+
+      def guard_check!
+        return maybe_raise(guard: attribute[flag]) if guarded? && !guard_passes?
+
+        true
+      end
+
+      def attribute_check!
+        return maybe_raise(exists: false) if !attribute? && !attribute_missing?
+
+        true
+      end
+
+      def attribute_missing?
+        resource.attribute_missing(name)
+        attribute?
+      end
+
+      def supported_check!
+        return maybe_raise unless supported?
+
+        true
+      end
+
+      def error_class(exists)
+        exists ?
+          Graphiti::Errors::InvalidAttributeAccess :
+          Graphiti::Errors::UnknownAttribute
       end
     end
   end

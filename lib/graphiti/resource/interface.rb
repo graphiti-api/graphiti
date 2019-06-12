@@ -3,6 +3,9 @@ module Graphiti
     module Interface
       extend ActiveSupport::Concern
 
+      def attribute_missing(attr)
+      end
+
       class_methods do
         def all(params = {}, base_scope = nil)
           validate!(params)

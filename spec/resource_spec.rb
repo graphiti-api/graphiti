@@ -1580,6 +1580,25 @@ RSpec.describe Graphiti::Resource do
         expect(att).to eq(klass.attributes[:foo])
       end
     end
+
+    context "when attribute goes through attribute_missing" do
+      before do
+        klass.redefine_method(:attribute_missing) do |attr|
+          self.class.attribute attr, :string if attr == :foobar
+        end
+      end
+
+      it "returns the attribute when handled by attribute_missing" do
+        att = instance.get_attr!(:foobar, :sortable, request: true)
+        expect(att).to eq(klass.attributes[:foobar])
+      end
+
+      it "raises helpful error when not handled by attribute_missing" do
+        expect {
+          instance.get_attr!(:bar, :sortable, request: true)
+        }.to raise_error(Graphiti::Errors::UnknownAttribute)
+      end
+    end
   end
 
   describe "#typecast" do
