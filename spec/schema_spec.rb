@@ -185,7 +185,7 @@ RSpec.describe Graphiti::Schema do
         self.description = "An employee of the organization"
 
         attribute :first_name, :string, description: "The employee's first name"
-
+        attribute :hidden_attribute, :string, schema: false
         extra_attribute :net_sales, :float, description: "The total value of the employee's sales"
 
         filter :title, :string do
@@ -270,8 +270,6 @@ RSpec.describe Graphiti::Schema do
         expect(schema[:resources][0][:name]).to eq("Schema::PositionResource")
       end
     end
-
-    context
 
     context "when attribute is not readable" do
       before do
@@ -487,6 +485,19 @@ RSpec.describe Graphiti::Schema do
       it "reflects them in the schema" do
         expect(schema[:resources][0][:filters][:first_name][:dependencies])
           .to eq(["foo"])
+      end
+    end
+
+    context "when attribute changes to schema true" do
+      before do
+        employee_resource.class_eval do
+          attribute :hidden_attribute, :string, schema: true
+        end
+      end
+
+      it "is readable" do
+        expect(schema[:resources][0][:attributes][:hidden_attribute][:readable])
+          .to eq(true)
       end
     end
 

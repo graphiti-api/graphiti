@@ -78,6 +78,7 @@ module Graphiti
           :attributes_writable_by_default,
           :attributes_sortable_by_default,
           :attributes_filterable_by_default,
+          :attributes_schema_by_default,
           :relationships_readable_by_default,
           :relationships_writable_by_default
 
@@ -97,6 +98,7 @@ module Graphiti
           default(klass, :attributes_writable_by_default, true)
           default(klass, :attributes_sortable_by_default, true)
           default(klass, :attributes_filterable_by_default, true)
+          default(klass, :attributes_schema_by_default, true)
           default(klass, :relationships_readable_by_default, true)
           default(klass, :relationships_writable_by_default, true)
 

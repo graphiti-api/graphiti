@@ -21,6 +21,7 @@ RSpec.describe Graphiti::Resource do
         expect(klass.attributes_writable_by_default).to eq(true)
         expect(klass.attributes_sortable_by_default).to eq(true)
         expect(klass.attributes_filterable_by_default).to eq(true)
+        expect(klass.attributes_schema_by_default).to eq(true)
         expect(klass.relationships_readable_by_default).to eq(true)
         expect(klass.relationships_writable_by_default).to eq(true)
       end
@@ -63,6 +64,7 @@ RSpec.describe Graphiti::Resource do
         expect(klass.attributes_writable_by_default).to eq(true)
         expect(klass.attributes_sortable_by_default).to eq(true)
         expect(klass.attributes_filterable_by_default).to eq(true)
+        expect(klass.attributes_schema_by_default).to eq(true)
         expect(klass.relationships_readable_by_default).to eq(true)
         expect(klass.relationships_writable_by_default).to eq(true)
       end
@@ -147,6 +149,7 @@ RSpec.describe Graphiti::Resource do
             self.attributes_writable_by_default = false
             self.attributes_sortable_by_default = false
             self.attributes_filterable_by_default = false
+            self.attributes_schema_by_default = false
             self.relationships_readable_by_default = false
             self.relationships_writable_by_default = false
           end
@@ -160,6 +163,7 @@ RSpec.describe Graphiti::Resource do
           expect(klass.attributes_writable_by_default).to eq(false)
           expect(klass.attributes_sortable_by_default).to eq(false)
           expect(klass.attributes_filterable_by_default).to eq(false)
+          expect(klass.attributes_schema_by_default).to eq(false)
           expect(klass.relationships_readable_by_default).to eq(false)
           expect(klass.relationships_writable_by_default).to eq(false)
         end
@@ -288,6 +292,7 @@ RSpec.describe Graphiti::Resource do
             self.attributes_writable_by_default = false
             self.attributes_sortable_by_default = false
             self.attributes_filterable_by_default = false
+            self.attributes_schema_by_default = false
             self.relationships_readable_by_default = false
             self.relationships_writable_by_default = false
           end
@@ -301,6 +306,7 @@ RSpec.describe Graphiti::Resource do
           expect(klass2.attributes_writable_by_default).to eq(false)
           expect(klass2.attributes_sortable_by_default).to eq(false)
           expect(klass2.attributes_filterable_by_default).to eq(false)
+          expect(klass2.attributes_schema_by_default).to eq(false)
           expect(klass2.relationships_readable_by_default).to eq(false)
           expect(klass2.relationships_writable_by_default).to eq(false)
         end
@@ -564,6 +570,7 @@ RSpec.describe Graphiti::Resource do
       expect(attribute[:writable]).to eq(true)
       expect(attribute[:sortable]).to eq(true)
       expect(attribute[:filterable]).to eq(true)
+      expect(attribute[:schema]).to eq(true)
     end
 
     context "when :only passed" do
@@ -578,6 +585,7 @@ RSpec.describe Graphiti::Resource do
           expect(att[:readable]).to eq(false)
           expect(att[:sortable]).to eq(false)
           expect(att[:writable]).to eq(false)
+          expect(att[:schema]).to eq(true)
         end
       end
 
@@ -592,6 +600,7 @@ RSpec.describe Graphiti::Resource do
           expect(att[:readable]).to eq(false)
           expect(att[:sortable]).to eq(true)
           expect(att[:writable]).to eq(false)
+          expect(att[:schema]).to eq(true)
         end
       end
 
@@ -607,6 +616,7 @@ RSpec.describe Graphiti::Resource do
           expect(att[:readable]).to eq(false)
           expect(att[:sortable]).to eq(false)
           expect(att[:writable]).to eq(false)
+          expect(att[:schema]).to eq(true)
         end
       end
     end
@@ -623,6 +633,7 @@ RSpec.describe Graphiti::Resource do
           expect(att[:readable]).to eq(true)
           expect(att[:sortable]).to eq(true)
           expect(att[:writable]).to eq(false)
+          expect(att[:schema]).to eq(true)
         end
       end
 
@@ -637,6 +648,7 @@ RSpec.describe Graphiti::Resource do
           expect(att[:readable]).to eq(true)
           expect(att[:sortable]).to eq(false)
           expect(att[:writable]).to eq(false)
+          expect(att[:schema]).to eq(true)
         end
       end
     end
@@ -652,6 +664,7 @@ RSpec.describe Graphiti::Resource do
         expect(att[:readable]).to eq(true)
         expect(att[:sortable]).to eq(:admin?)
         expect(att[:writable]).to eq(false)
+        expect(att[:schema]).to eq(true)
       end
     end
 
@@ -737,6 +750,7 @@ RSpec.describe Graphiti::Resource do
           self.attributes_writable_by_default = false
           self.attributes_sortable_by_default = false
           self.attributes_filterable_by_default = false
+          self.attributes_schema_by_default = false
         end
       end
 
@@ -747,6 +761,7 @@ RSpec.describe Graphiti::Resource do
         expect(attribute[:writable]).to eq(false)
         expect(attribute[:sortable]).to eq(false)
         expect(attribute[:filterable]).to eq(false)
+        expect(attribute[:schema]).to eq(false)
       end
     end
 
@@ -809,6 +824,17 @@ RSpec.describe Graphiti::Resource do
       it "overrides the default" do
         attribute = klass.config[:attributes][:foo]
         expect(attribute[:filterable]).to eq(false)
+      end
+    end
+
+    context "when explicit schema flag" do
+      before do
+        klass.attribute :foo, :string, schema: false
+      end
+
+      it "overrides the default" do
+        attribute = klass.config[:attributes][:foo]
+        expect(attribute[:schema]).to eq(false)
       end
     end
 

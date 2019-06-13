@@ -240,6 +240,20 @@ RSpec.describe Graphiti::SchemaDiff do
       it { is_expected.to eq([]) }
     end
 
+    context "when attribute goes schema true to false" do
+      before do
+        resource_b.attribute :first_name, :string, schema: false
+      end
+
+      it "returns error" do
+        expect(diff).to eq([
+                             "SchemaDiff::EmployeeResource: attribute :first_name was removed.",
+                             "SchemaDiff::EmployeeResource: sort :first_name was removed.",
+                             "SchemaDiff::EmployeeResource: filter :first_name was removed."
+                           ])
+      end
+    end
+
     context "when attribute is removed" do
       before do
         resource_b

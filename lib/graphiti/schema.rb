@@ -131,7 +131,7 @@ module Graphiti
     def attributes(resource)
       {}.tap do |attrs|
         resource.attributes.each_pair do |name, config|
-          if config.values_at(:readable, :writable).any?
+          if config.values_at(:readable, :writable).any? && config[:schema]
             attrs[name] = {
               type: config[:type].to_s,
               readable: flag(config[:readable]),
@@ -166,6 +166,8 @@ module Graphiti
     def sorts(resource)
       {}.tap do |s|
         resource.sorts.each_pair do |name, sort|
+          next unless resource.attributes[name][:schema]
+
           config = {}
           config[:only] = sort[:only] if sort[:only]
           attr = resource.attributes[name]
@@ -180,6 +182,8 @@ module Graphiti
     def filters(resource)
       {}.tap do |f|
         resource.filters.each_pair do |name, filter|
+          next unless resource.attributes[name][:schema]
+
           config = {
             type: filter[:type].to_s,
             operators: filter[:operators].keys.map(&:to_s),
