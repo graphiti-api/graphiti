@@ -54,6 +54,7 @@ module Graphiti
           unless type[:canonical_name] == :hash || !value.is_a?(String)
             value = parse_string_value(filter.values[0], value)
           end
+          value = parse_string_null(filter.values[0], value)
           validate_singular(resource, filter, value)
           value = coerce_types(filter.values[0], param_name.to_sym, value)
           validate_allowlist(resource, filter, value)
@@ -181,6 +182,12 @@ module Graphiti
       # remove any blanks that are left
       value.reject! { |v| v.length.zero? }
       value = value[0] if value.length == 1
+      value
+    end
+
+    def parse_string_null(filter, value)
+      return if value == "null" && filter[:allow_nil]
+
       value
     end
   end

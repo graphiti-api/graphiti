@@ -202,6 +202,48 @@ RSpec.describe "filtering" do
     end
   end
 
+  context "when passed null and filter marked allow_nil: true" do
+    context "with string type" do
+      before do
+        resource.filter :first_name, allow_nil: true
+        employee2.update_attributes(first_name: nil)
+        params[:filter] = { first_name: "null" }
+      end
+
+      it "works" do
+        expect(records.map(&:id)).to eq([employee2.id])
+      end
+    end
+
+    context "with integer type" do
+      before do
+        resource.attribute :age, :integer
+        resource.filter :age, allow_nil: true
+        employee1.update_attributes(age: 20)
+        employee2.update_attributes(age: nil)
+        employee3.update_attributes(age: 30)
+        employee4.update_attributes(age: 40)
+        params[:filter] = { age: "null" }
+      end
+
+      it "works" do
+        expect(records.map(&:id)).to eq([employee2.id])
+      end
+    end
+  end
+
+  context "when passed null" do
+    before do
+      resource.filter :first_name
+      employee2.update_attributes(first_name: "null")
+      params[:filter] = {first_name: "null"}
+    end
+
+    it "defaults to a string" do
+      expect(records.map(&:id)).to eq([employee2.id])
+    end
+  end
+
   context "when passed comma, but filter marked single: true" do
     before do
       resource.filter :first_name, single: true

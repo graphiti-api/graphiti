@@ -67,6 +67,7 @@ RSpec.describe Graphiti::Resource do
         expect(klass.attributes_schema_by_default).to eq(true)
         expect(klass.relationships_readable_by_default).to eq(true)
         expect(klass.relationships_writable_by_default).to eq(true)
+        expect(klass.filters_accept_nil_by_default).to eq(false)
       end
 
       context "when rails" do
@@ -152,6 +153,7 @@ RSpec.describe Graphiti::Resource do
             self.attributes_schema_by_default = false
             self.relationships_readable_by_default = false
             self.relationships_writable_by_default = false
+            self.filters_accept_nil_by_default = false
           end
         end
 
@@ -166,6 +168,7 @@ RSpec.describe Graphiti::Resource do
           expect(klass.attributes_schema_by_default).to eq(false)
           expect(klass.relationships_readable_by_default).to eq(false)
           expect(klass.relationships_writable_by_default).to eq(false)
+          expect(klass.filters_accept_nil_by_default).to eq(false)
         end
       end
 
@@ -295,6 +298,7 @@ RSpec.describe Graphiti::Resource do
             self.attributes_schema_by_default = false
             self.relationships_readable_by_default = false
             self.relationships_writable_by_default = false
+            self.filters_accept_nil_by_default = false
           end
         end
 
@@ -309,6 +313,7 @@ RSpec.describe Graphiti::Resource do
           expect(klass2.attributes_schema_by_default).to eq(false)
           expect(klass2.relationships_readable_by_default).to eq(false)
           expect(klass2.relationships_writable_by_default).to eq(false)
+          expect(klass2.filters_accept_nil_by_default).to eq(false)
         end
       end
 

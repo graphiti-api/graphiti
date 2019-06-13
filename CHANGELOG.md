@@ -2,6 +2,9 @@
 
 Features:
 
+- [158](https://github.com/graphiti-api/graphiti/pull/158) Filters options `allow_nil: true`
+  Option can be set at the resource level `Resource.filters_accept_nil_by_default = true`. 
+  By default this is set to false. (@zeisler)
 - [157](https://github.com/graphiti-api/graphiti/pull/157) Using attribute option schema: false.
   This option is default true and is not effected by only and except options. (@zeisler)
 
