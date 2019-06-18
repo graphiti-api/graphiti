@@ -81,10 +81,10 @@ module Graphiti
           }
         end
 
-        def before_validation(only: [:create, :update, :destroy], &blk)
+        def after_graph_persist(only: [:create, :update, :destroy], &blk)
           Array(only).each do |verb|
-            config[:before_validation][verb] ||= []
-            config[:before_validation][verb] << blk
+            config[:after_graph_persist][verb] ||= []
+            config[:after_graph_persist][verb] << blk
           end
         end
 

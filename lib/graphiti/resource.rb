@@ -112,8 +112,8 @@ module Graphiti
       adapter.resolve(scope)
     end
 
-    def before_validation(model, metadata)
-      hooks = self.class.config[:before_validation][metadata[:method]] || []
+    def after_graph_persist(model, metadata)
+      hooks = self.class.config[:after_graph_persist][metadata[:method]] || []
       hooks.each do |hook|
         instance_exec(model, metadata, &hook)
       end
