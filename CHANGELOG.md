@@ -36,6 +36,11 @@ Fixes:
 
 ### master (unreleased)
 
+Features:
+
+- [#153](https://github.com/graphiti-api/graphiti/pull/153) Add after_graph_persist hook.
+  This hook fires after the graph of resources is persisted and before validation. (@A-Boudi)
+
 <!-- ### [version (YYYY-MM-DD)](diff_link) -->
 <!-- Breaking changes:-->
 <!-- Features:-->
