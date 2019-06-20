@@ -60,6 +60,8 @@ class Graphiti::Util::Persistence
 
     post_process(persisted, parents)
     post_process(persisted, children)
+    after_graph_persist = -> { @resource.after_graph_persist(persisted, metadata) }
+    add_hook(after_graph_persist, :after_graph_persist)
     before_commit = -> { @resource.before_commit(persisted, metadata) }
     add_hook(before_commit, :before_commit)
     after_commit = -> { @resource.after_commit(persisted, metadata) }

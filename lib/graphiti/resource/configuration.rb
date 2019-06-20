@@ -190,6 +190,7 @@ module Graphiti
               sort_all: nil,
               sorts: {},
               pagination: nil,
+              after_graph_persist: {},
               before_commit: {},
               after_commit: {},
               attributes: {},

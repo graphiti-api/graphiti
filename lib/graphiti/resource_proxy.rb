@@ -121,6 +121,7 @@ module Graphiti
         metadata = {method: :destroy}
         model = @resource.destroy(@query.filters[:id], metadata)
         model.instance_variable_set(:@__serializer_klass, @resource.serializer)
+        @resource.after_graph_persist(model, metadata)
         validator = ::Graphiti::Util::ValidationResponse.new \
           model, @payload
         validator.validate!
@@ -161,6 +162,7 @@ module Graphiti
       transaction_response = @resource.transaction do
         ::Graphiti::Util::TransactionHooksRecorder.record do
           model = yield
+          ::Graphiti::Util::TransactionHooksRecorder.run_graph_persist_hooks
           validator = ::Graphiti::Util::ValidationResponse.new \
             model, @payload
           validator.validate!

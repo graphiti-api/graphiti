@@ -82,6 +82,13 @@ module Graphiti
           }
         end
 
+        def after_graph_persist(only: [:create, :update, :destroy], &blk)
+          Array(only).each do |verb|
+            config[:after_graph_persist][verb] ||= []
+            config[:after_graph_persist][verb] << blk
+          end
+        end
+
         def before_commit(only: [:create, :update, :destroy], &blk)
           Array(only).each do |verb|
             config[:before_commit][verb] ||= []

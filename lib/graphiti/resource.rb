@@ -112,6 +112,13 @@ module Graphiti
       adapter.resolve(scope)
     end
 
+    def after_graph_persist(model, metadata)
+      hooks = self.class.config[:after_graph_persist][metadata[:method]] || []
+      hooks.each do |hook|
+        instance_exec(model, metadata, &hook)
+      end
+    end
+
     def before_commit(model, metadata)
       hooks = self.class.config[:before_commit][metadata[:method]] || []
       hooks.each do |hook|

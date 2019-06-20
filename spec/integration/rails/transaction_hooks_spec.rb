@@ -1,7 +1,7 @@
 # rubocop: disable Style/GlobalVars
 
 if ENV["APPRAISAL_INITIALIZED"]
-  RSpec.describe "before_ & after_commit hooks", type: :controller do
+  RSpec.describe "after_graph_persist, before_ & after_commit hooks", type: :controller do
     class Callbacks
       class << self
         attr_accessor :fired, :in_transaction_during, :entities
@@ -27,6 +27,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       Callbacks.fired = {}
       Callbacks.in_transaction_during = {}
       Callbacks.entities = []
+      $raise_on_after_graph_persist = {employee: false}
       $raise_on_before_commit = {employee: true}
     end
 
@@ -63,7 +64,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         before_commit do |position|
           Callbacks.add(:before_position, position)
           if $raise_on_before_commit[:position]
-            raise "rollitback_book"
+            raise "rollitback_position"
           end
         end
 
@@ -74,6 +75,13 @@ if ENV["APPRAISAL_INITIALIZED"]
         self.model = ::Employee
 
         attribute :first_name, :string
+
+        after_graph_persist do |employee|
+          Callbacks.add(:after_graph_persist, employee)
+          if $raise_on_after_graph_persist[:employee]
+            raise "rollitback"
+          end
+        end
 
         before_commit only: [:create] do |employee|
           Callbacks.add(:before_create, employee)
@@ -191,7 +199,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           post :create, params: payload
         }.to raise_error("rollitback")
         expect(Employee.count).to be_zero
-        expect(Callbacks.entities.length).to eq(1)
+        expect(Callbacks.entities.length).to eq(2)
         expect(Callbacks.fired[:before_create]).to be_a(Employee)
       end
 
@@ -218,7 +226,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           expect {
             post :create, params: payload
           }.to raise_error("whoops")
-          expect(Callbacks.entities).to be_empty
+          expect(Callbacks.entities).to include(:after_graph_persist)
         end
       end
 
@@ -230,11 +238,29 @@ if ENV["APPRAISAL_INITIALIZED"]
         it "fires all before and after_commit hooks" do
           post :create, params: payload
           expect(Callbacks.entities).to eq([
+            :after_graph_persist,
             :before_create,
             :stacked_before_create,
             :employee_after_create,
             :employee_after_create_eval_test,
           ])
+        end
+      end
+
+      context "when an error is raised after_graph_persist" do
+        before do
+          $raise_on_after_graph_persist = {employee: true}
+        end
+
+        it "does not run before_commit callbacks" do
+          expect_any_instance_of(Graphiti::Util::ValidationResponse)
+            .to_not receive(:validate!)
+          expect {
+            post :create, params: payload
+          }.to raise_error("rollitback")
+          expect(Employee.count).to be_zero
+          expect(Callbacks.entities.length).to eq(1)
+          expect(Callbacks.fired[:after_graph_persist]).to be_a(Employee)
         end
       end
     end
@@ -281,6 +307,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         post :create, params: payload
 
         expect(Callbacks.entities).to eq([
+          :after_graph_persist,
           :before_create,
           :stacked_before_create,
           :before_position,
@@ -308,6 +335,12 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(Callbacks.fired[:employee_after_create]).to be_a(Employee)
         expect(Callbacks.in_transaction_during[:employee_after_create]).to eq false
         expect(Callbacks.fired[:employee_after_create_eval_test]).to be_a(IntegrationHooks::EmployeeResource)
+      end
+
+      it "can access children resources from after_graph_persist" do
+        post :create, params: payload
+        expect(Callbacks.fired[:employee_after_create].positions.length).to eq(1)
+        expect(Callbacks.fired[:employee_after_create].positions[0]).to be_a(Position)
       end
     end
 

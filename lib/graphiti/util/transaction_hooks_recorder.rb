@@ -41,6 +41,10 @@ module Graphiti
           end
         end
 
+        def run_graph_persist_hooks
+          run(:after_graph_persist)
+        end
+
         # Because hooks will be added from the outer edges of
         # the graph, working inwards
         def add(prc, lifecycle_event)
@@ -59,6 +63,7 @@ module Graphiti
 
         def reset_hooks
           Thread.current[:_graphiti_hooks] = {
+            after_graph_persist: [],
             before_commit: [],
             after_commit: [],
           }

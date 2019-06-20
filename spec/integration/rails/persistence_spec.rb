@@ -276,6 +276,94 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
+    describe "after graph persisted validation" do
+      subject(:make_request) { do_update(payload) }
+
+      let(:klass) do
+        Class.new(EmployeeResource) do
+          self.validate_endpoints = false
+
+          after_graph_persist do |model|
+            model.valid?(:after_graph_persisted)
+          end
+        end
+      end
+
+      let(:polyvalentEmployee) do
+        Class.new(Employee) do
+          def self.model_name
+            ActiveModel::Name.new(self, nil, 'PolyvalentEmployee')
+          end
+          validates :positions, length: { minimum: 2, too_short: 'too short, minimum is 2' }, on: :after_graph_persisted
+        end
+      end
+
+      let(:employee) { Employee.create!(first_name: "Jane") }
+
+      let(:payload) do
+        {
+          data: {
+            type: "employees",
+            id: employee.id.to_s,
+            relationships: {
+              positions: {
+                data: [
+                  { 'temp-id': "pos1", type: "positions", method: "create" },
+                  { 'temp-id': "pos2", type: "positions", method: "create" },
+                ],
+              },
+            },
+          },
+          included: [
+            {
+              'temp-id': "pos1",
+              type: "positions",
+              attributes: {title: "foo"},
+            },
+            {
+              'temp-id': "pos2",
+              type: "positions",
+              attributes: {title: "bar"},
+            },
+          ],
+        }
+      end
+
+      before do
+        klass.model = polyvalentEmployee
+        allow(controller).to receive(:resource) { klass }
+      end
+
+      context "when valid" do
+        it "responds with the persisted data" do
+          make_request
+          expect(jsonapi_included.count).to eq(2)
+          expect(jsonapi_included.map { |inc| inc.attributes["title"] }).to eq(["foo", "bar"])
+        end
+      end
+
+      context "when validation error" do
+        before do
+          payload[:data][:relationships][:positions][:data].pop
+        end
+
+        it "returns validation error response" do
+          make_request
+          expect(json["errors"].first).to match(
+            "code" => "unprocessable_entity",
+            "status" => "422",
+            "source" => {"pointer" => "/data/relationships/positions"},
+            "detail" => "Positions too short, minimum is 2",
+            "title" => "Validation Error",
+            "meta" => hash_including(
+              "attribute" => "positions",
+              "message" => "too short, minimum is 2"
+            )
+          )
+        end
+      end
+    end
+
     describe "non-writable foreign keys" do
       subject(:make_request) { do_update(payload) }
 
