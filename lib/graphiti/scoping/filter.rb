@@ -151,8 +151,6 @@ module Graphiti
     # JSON of
     # {{{ "id": 1 }}} becomes { 'id' => 1 }
     def parse_string_value(filter, value)
-      return value if !!filter[:single]
-
       type = Graphiti::Types[filter[:type]]
       array_or_string = [:string, :array].include?(type[:canonical_name])
       if (arr = value.scan(/\[.*?\]/)).present? && array_or_string
@@ -165,12 +163,12 @@ module Graphiti
         }
         value = value[0] if value.length == 1
       else
-        value = parse_string_arrays(value)
+        value = parse_string_arrays(value, !!filter[:single])
       end
       value
     end
 
-    def parse_string_arrays(value)
+    def parse_string_arrays(value, singular_filter)
       # Find the quoted strings
       quotes = value.scan(/{{.*?}}/)
       # remove them from the rest
@@ -178,7 +176,11 @@ module Graphiti
       # remove the quote characters from the quoted strings
       quotes.each { |q| q.gsub!("{{", "").gsub!("}}", "") }
       # merge everything back together into an array
-      value = Array(value.split(",")) + quotes
+      if singular_filter
+        value = Array(value) + quotes
+      else
+        value = Array(value.split(",")) + quotes
+      end
       # remove any blanks that are left
       value.reject! { |v| v.length.zero? }
       value = value[0] if value.length == 1
