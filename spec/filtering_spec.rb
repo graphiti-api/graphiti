@@ -200,6 +200,16 @@ RSpec.describe "filtering" do
         expect(records.map(&:id)).to eq([employee2.id])
       end
     end
+
+    context 'and the filter is marked single: true' do
+      before do
+        resource.filter :first_name, :string, single: true
+      end
+
+      it 'works' do
+        expect(records.map(&:id)).to eq([employee2.id])
+      end
+    end
   end
 
   context "when passed null and filter marked allow_nil: true" do
