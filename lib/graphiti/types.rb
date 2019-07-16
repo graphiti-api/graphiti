@@ -13,7 +13,7 @@ module Graphiti
           ::DateTime.parse(input.to_s)
         end
       end
-      input = Dry::Types["json.date_time"][input]
+      input = Dry::Types["json.date_time"][input] if input.is_a?(::String)
       Dry::Types["strict.date_time"][input] if input
     }
 
@@ -25,7 +25,8 @@ module Graphiti
           ::DateTime.parse(input.to_s)
         end
       end
-      input = Dry::Types["json.date_time"][input]
+
+      input = Dry::Types["json.date_time"][input] if input.is_a?(::String)
       Dry::Types["strict.date_time"][input].iso8601 if input
     }
 
@@ -36,13 +37,13 @@ module Graphiti
 
     Date = create(::Date) { |input|
       input = ::Date.parse(input.to_s) if input.is_a?(::Time)
-      input = Dry::Types["json.date"][input]
+      input = Dry::Types["json.date"][input] if input.is_a?(::String)
       Dry::Types["strict.date"][input] if input
     }
 
     PresentDate = create(::Date) { |input|
       input = ::Date.parse(input.to_s) if input.is_a?(::Time)
-      input = Dry::Types["json.date"][input]
+      input = Dry::Types["json.date"][input] if input.is_a?(::String)
       Dry::Types["strict.date"][input]
     }
 
