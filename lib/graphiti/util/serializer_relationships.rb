@@ -49,9 +49,12 @@ module Graphiti
         data_proc_ref = data_proc
         self_ref = self
         validate_link! if eagerly_validate_links?
-
         proc do
           data { instance_eval(&data_proc_ref) }
+
+          # include relationship links for belongs_to relationships
+          # https://github.com/graphiti-api/graphiti/issues/167
+          linkage always: true if sideload_ref.type == :belongs_to
 
           if link_ref
             if @proxy.query.links?
