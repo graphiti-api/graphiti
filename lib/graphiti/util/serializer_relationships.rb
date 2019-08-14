@@ -54,7 +54,7 @@ module Graphiti
 
           # include relationship links for belongs_to relationships
           # https://github.com/graphiti-api/graphiti/issues/167
-          linkage always: true if sideload_ref.type == :belongs_to
+          linkage always: sideload_ref.linkage_always?
 
           if link_ref
             if @proxy.query.links?

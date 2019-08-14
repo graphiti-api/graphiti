@@ -42,6 +42,14 @@ module Graphiti
       @group_name            = opts[:group_name]
       @polymorphic_child     = opts[:polymorphic_child]
       @parent                = opts[:parent]
+
+      @linkage_always        = if opts[:linkage_always].nil?
+                                 # option not provided, use default
+                                 type == :belongs_to
+                               else
+                                 !!opts[:linkage_always]
+                               end
+
       if polymorphic_child?
         parent.resource.polymorphic << resource_class
       end
@@ -110,6 +118,10 @@ module Graphiti
 
     def polymorphic_has_many?
       !!@polymorphic_as
+    end
+
+    def linkage_always?
+      !!@linkage_always
     end
 
     def link?
