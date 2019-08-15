@@ -215,14 +215,36 @@ RSpec.describe "sideloading" do
   end
 
   describe "has_many macro" do
-    context "with includes" do
+    before do
+      resource.class_eval do
+        has_many :positions do
+          scope do |employee_ids|
+            {
+              type: :positions,
+              conditions: {employee_id: employee_ids},
+            }
+          end
+        end
+      end
+      params[:include] = "positions"
+    end
+
+    it "works" do
+      render
+      expect(included("positions").map(&:id)).to eq([1, 2])
+    end
+
+    context "when custom foreign key given" do
       before do
+        PORO::DB.data[:positions][0] = {id: 1, e_id: 1}
+        PORO::DB.data[:positions][1] = {id: 2, e_id: 1}
+
         resource.class_eval do
-          has_many :positions do
+          has_many :positions, foreign_key: :e_id do
             scope do |employee_ids|
               {
                 type: :positions,
-                conditions: {employee_id: employee_ids},
+                conditions: {e_id: employee_ids},
               }
             end
           end
@@ -230,113 +252,9 @@ RSpec.describe "sideloading" do
         params[:include] = "positions"
       end
 
-      it "works" do
+      it "is used" do
         render
         expect(included("positions").map(&:id)).to eq([1, 2])
-      end
-
-      it "includes relationship linkage" do
-        render
-        jsonapi_data.each do |record|
-          data = record.relationships["positions"]["data"]
-          expect(data.pluck(:type).uniq).to match_array(["positions"])
-          expect(data.pluck(:id).uniq).to match_array(["1", "2"])
-        end
-      end
-
-      context "when custom foreign key given" do
-        before do
-          PORO::DB.data[:positions][0] = {id: 1, e_id: 1}
-          PORO::DB.data[:positions][1] = {id: 2, e_id: 1}
-
-          resource.class_eval do
-            has_many :positions, foreign_key: :e_id do
-              scope do |employee_ids|
-                {
-                  type: :positions,
-                  conditions: {e_id: employee_ids},
-                }
-              end
-            end
-          end
-          params[:include] = "positions"
-        end
-
-        it "is used" do
-          render
-          expect(included("positions").map(&:id)).to eq([1, 2])
-        end
-      end
-    end
-
-    context "without includes and default linkage" do
-      before do
-        resource.class_eval do
-          has_many :positions do
-            scope do |employee_ids|
-              {
-                type: :positions,
-                conditions: {employee_id: employee_ids},
-              }
-            end
-          end
-        end
-        render
-      end
-
-      it "does not include anything" do
-        expect {
-          included("positions")
-        }.to raise_error(GraphitiSpecHelpers::Errors::NoSideloads)
-      end
-
-      it "specifies meta[:included] = false" do
-        jsonapi_data.each do |record|
-          expect(record.relationships["positions"]["meta"]["included"]).to eq(false)
-        end
-      end
-
-      it "does not includes relationship linkage" do
-        jsonapi_data.each do |record|
-          data = record.relationships["positions"]["data"]
-          expect(data).to be_nil
-        end
-      end
-    end
-
-    context "without includes and linkage always: true" do
-      before do
-        resource.class_eval do
-          has_many :positions, linkage_always: true do
-            scope do |employee_ids|
-              {
-                type: :positions,
-                conditions: {employee_id: employee_ids},
-              }
-            end
-          end
-        end
-        render
-      end
-
-      it "does not include anything" do
-        expect {
-          included("positions")
-        }.to raise_error(GraphitiSpecHelpers::Errors::NoSideloads)
-      end
-
-      it "does not have meta[:included] = false" do
-        jsonapi_data.each do |record|
-          expect(record.relationships["positions"].dig("meta", "included")).to be_nil
-        end
-      end
-
-      it "includes relationship linkage" do
-        jsonapi_data.each do |record|
-          data = record.relationships["positions"]["data"]
-          expect(data.pluck(:type).uniq).to match_array(["positions"])
-          expect(data.pluck(:id).uniq).to match_array(["1", "2"])
-        end
       end
     end
   end
@@ -352,92 +270,23 @@ RSpec.describe "sideloading" do
 
     let(:base_scope) { {type: :positions} }
 
-    context "with includes" do
-      before do
-        resource.class_eval do
-          belongs_to :employee do
-            scope do |employee_ids|
-              {
-                type: :employees,
-                conditions: {id: employee_ids},
-              }
-            end
+    before do
+      resource.class_eval do
+        belongs_to :employee do
+          scope do |employee_ids|
+            {
+              type: :employees,
+              conditions: {id: employee_ids},
+            }
           end
         end
-        params[:include] = "employee"
       end
-
-      it "works" do
-        render
-        expect(included("employees").map(&:id)).to eq([1])
-      end
-
-      it "has relationship linkage" do
-        render
-
-        jsonapi_data.each do |record|
-          data = record.relationships["employee"]["data"]
-
-          expect(data[:type]).to eq("employees")
-          expect(data[:id]).to eq("1")
-        end
-      end
+      params[:include] = "employee"
     end
 
-    context "with default linkage" do
-      before do
-        resource.class_eval do
-          belongs_to :employee do
-            scope do |employee_ids|
-              {
-                type: :employees,
-                conditions: {id: employee_ids},
-              }
-            end
-          end
-        end
-      end
-
-      it "has relationship linkage" do
-        render
-
-        jsonapi_data.each do |record|
-          data = record.relationships["employee"]["data"]
-
-          expect(data[:type]).to eq("employees")
-          expect(data[:id]).to eq("1")
-        end
-      end
-    end
-
-    context "with linkage: false" do
-      before do
-        resource.class_eval do
-          belongs_to :employee, linkage_always: false do
-            scope do |employee_ids|
-              {
-                type: :employees,
-                conditions: {id: employee_ids},
-              }
-            end
-          end
-        end
-      end
-
-      it "works" do
-        render
-        expect(included("employees").map(&:id)).to eq([1])
-      end
-
-      it "has no relationship linkage" do
-        render
-
-        jsonapi_data.each do |record|
-          data = record.relationships["employee"]
-
-          expect(data.keys).to_not include('data')
-        end
-      end
+    it "works" do
+      render
+      expect(included("employees").map(&:id)).to eq([1])
     end
   end
 

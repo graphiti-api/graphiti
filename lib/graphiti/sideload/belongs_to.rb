@@ -1,4 +1,9 @@
 class Graphiti::Sideload::BelongsTo < Graphiti::Sideload
+  def initialize(name, opts)
+    opts = { always_include_resource_ids: true }.merge(opts)
+    super(name, opts)
+  end
+
   def type
     :belongs_to
   end
