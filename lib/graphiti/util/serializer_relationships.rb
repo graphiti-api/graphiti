@@ -62,9 +62,7 @@ module Graphiti
               self_ref.send(:validate_link!) unless self_ref.send(:eagerly_validate_links?)
 
               link(:related) do
-                if self_ref
-                  ::Graphiti::Util::Link.new(sideload_ref, @object).generate
-                end
+                ::Graphiti::Util::Link.new(sideload_ref, @object).generate
               end
             end
           end
