@@ -53,6 +53,10 @@ module Graphiti
         proc do
           data { instance_eval(&data_proc_ref) }
 
+          # include relationship links for belongs_to relationships
+          # https://github.com/graphiti-api/graphiti/issues/167
+          linkage always: sideload_ref.always_include_resource_ids?
+
           if link_ref
             if @proxy.query.links?
               self_ref.send(:validate_link!) unless self_ref.send(:eagerly_validate_links?)
