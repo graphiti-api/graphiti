@@ -189,7 +189,7 @@ module Graphiti
 
           Make sure the endpoint "#{@sideload.resource.endpoint[:full_path]}" exists with action #{@action.inspect}, or customize the endpoint for #{@sideload.resource.class.name}.
 
-          If you do not wish to generate a link, pass link: false or set self.relationship_links_by_default = false.
+          If you do not wish to generate a link, pass link: false or set self.autolink = false.
         MSG
       end
     end
