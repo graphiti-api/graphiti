@@ -128,7 +128,9 @@ module Graphiti
     end
 
     def parse_hash_value(filter, param_value, value, operator)
-      if operator != :eq
+      has_filter = filter.values[0][:operators][operator].present?
+
+      if operator != :eq && !has_filter
         operator = :eq
         value = param_value
       end

@@ -45,6 +45,23 @@ RSpec.describe "filtering" do
       expect(records.map(&:id)).to eq([employee2.id])
     end
 
+    context "with a hash containing custom operators" do
+      before do
+        resource.filter :data, :hash do
+          match do |scope, value|
+            criteria = value[0].transform_keys(&:to_sym)
+            scope[:conditions][:id] = [1] if criteria[:title] == "freedom"
+            scope
+          end
+        end
+        params[:filter]= { data: { match: { title: "freedom" }.to_json } }
+      end
+
+      it "works" do
+        expect(records.map(&:id)).to eq([employee1.id])
+      end
+    end
+
     context "and the hash has multiple keys" do
       before do
         params[:filter] = {by_json: '{ "id": 2, "id2": 3 }'}
