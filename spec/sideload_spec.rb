@@ -64,7 +64,7 @@ RSpec.describe Graphiti::Sideload do
       end
     end
 
-    context "with symbols" do
+    context "with symbols and stings" do
       let(:resource_class) do
         Class.new(PORO::PositionResource) do
           self.model = PORO::Position
@@ -82,8 +82,14 @@ RSpec.describe Graphiti::Sideload do
         end
       end
 
-      it "works" do
+      it "works with symbols" do
         instance = Class.new(described_class).new(name, opts.merge(readable: :user_can_read?, writable: :user_can_write?))
+        expect(instance).not_to be_readable
+        expect(instance).to be_writable
+      end
+
+      it "works with strings" do
+        instance = Class.new(described_class).new(name, opts.merge(readable: "user_can_read?", writable: "user_can_write?"))
         expect(instance).not_to be_readable
         expect(instance).to be_writable
       end
