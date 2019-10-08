@@ -26,8 +26,8 @@ module Graphiti
       @foreign_key                   = opts[:foreign_key]
       @type                          = opts[:type]
       @base_scope                    = opts[:base_scope]
-      @readable                      = opts[:readable]
-      @writable                      = opts[:writable]
+      @readable                      = evaluate_flag(opts[:readable])
+      @writable                      = evaluate_flag(opts[:writable])
       @as                            = opts[:as]
       @link                          = opts[:link]
       @single                        = opts[:single]
@@ -410,6 +410,21 @@ module Graphiti
 
     def namespace_for(klass)
       Util::Class.namespace_for(klass)
+    end
+
+    def evaluate_flag(flag)
+      return false if flag.blank?
+
+      case flag.class.name
+      when "Symbol"
+        resource.send(flag)
+      when "Proc"
+        flag.call
+      when "String"
+        resource.send(flag)
+      else
+        !!flag
+      end
     end
   end
 end

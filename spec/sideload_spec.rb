@@ -51,6 +51,53 @@ RSpec.describe Graphiti::Sideload do
     end
   end
 
+  describe "reading and writing" do
+    context "with booleans" do
+      it "works" do
+        instance = Class.new(described_class).new(name, opts.merge(readable: true, writable: true))
+        expect(instance).to be_readable
+        expect(instance).to be_writable
+
+        instance = Class.new(described_class).new(name, opts.merge(readable: false, writable: false))
+        expect(instance).not_to be_readable
+        expect(instance).not_to be_writable
+      end
+    end
+
+    context "with symbols" do
+      let(:resource_class) do
+        Class.new(PORO::PositionResource) do
+          self.model = PORO::Position
+          def self.name
+            "PORO::PositionResource"
+          end
+
+          def user_can_read?
+            false
+          end
+
+          def user_can_write?
+            true
+          end
+        end
+      end
+
+      it "works" do
+        instance = Class.new(described_class).new(name, opts.merge(readable: :user_can_read?, writable: :user_can_write?))
+        expect(instance).not_to be_readable
+        expect(instance).to be_writable
+      end
+    end
+
+    context "with procs" do
+      it "works" do
+        instance = Class.new(described_class).new(name, opts.merge(readable: lambda{ false }, writable: lambda{ true }))
+        expect(instance).not_to be_readable
+        expect(instance).to be_writable
+      end
+    end
+  end
+
   describe "#primary_key" do
     it "defaults to id" do
       expect(instance.primary_key).to eq(:id)
