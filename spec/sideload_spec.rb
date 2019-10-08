@@ -51,6 +51,77 @@ RSpec.describe Graphiti::Sideload do
     end
   end
 
+  describe "reading and writing" do
+    context "with booleans" do
+      it "works" do
+        instance = Class.new(described_class).new(name, opts.merge(readable: true, writable: true))
+        expect(instance).to be_readable
+        expect(instance).to be_writable
+
+        instance = Class.new(described_class).new(name, opts.merge(readable: false, writable: false))
+        expect(instance).not_to be_readable
+        expect(instance).not_to be_writable
+      end
+    end
+
+    context "with symbols and stings" do
+      let(:resource_class) do
+        Class.new(PORO::PositionResource) do
+          self.model = PORO::Position
+          def self.name
+            "PORO::PositionResource"
+          end
+
+          def user_can_read?
+            false
+          end
+
+          def user_can_write?
+            true
+          end
+        end
+      end
+
+      it "works with symbols" do
+        instance = Class.new(described_class).new(name, opts.merge(readable: :user_can_read?, writable: :user_can_write?))
+        expect(instance).not_to be_readable
+        expect(instance).to be_writable
+      end
+
+      it "works with strings" do
+        instance = Class.new(described_class).new(name, opts.merge(readable: "user_can_read?", writable: "user_can_write?"))
+        expect(instance).not_to be_readable
+        expect(instance).to be_writable
+      end
+    end
+
+    context "with procs" do
+      let(:resource_class) do
+        Class.new(PORO::PositionResource) do
+          self.model = PORO::Position
+          def self.name
+            "PORO::PositionResource"
+          end
+
+          def user_can_read?
+            false
+          end
+
+          def user_can_write?
+            true
+          end
+        end
+      end
+
+      it "works" do
+        options = opts.merge(readable: lambda { user_can_read? }, writable: lambda{ true })
+        instance = Class.new(described_class).new(name, options)
+        expect(instance).not_to be_readable
+        expect(instance).to be_writable
+      end
+    end
+  end
+
   describe "#primary_key" do
     it "defaults to id" do
       expect(instance.primary_key).to eq(:id)
