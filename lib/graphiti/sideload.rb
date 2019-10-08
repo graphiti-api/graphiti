@@ -419,7 +419,7 @@ module Graphiti
       when "Symbol","String"
         resource.send(flag)
       when "Proc"
-        flag.call
+        self.resource.instance_exec(&flag)
       else
         !!flag
       end

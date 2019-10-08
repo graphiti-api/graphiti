@@ -96,8 +96,26 @@ RSpec.describe Graphiti::Sideload do
     end
 
     context "with procs" do
+      let(:resource_class) do
+        Class.new(PORO::PositionResource) do
+          self.model = PORO::Position
+          def self.name
+            "PORO::PositionResource"
+          end
+
+          def user_can_read?
+            false
+          end
+
+          def user_can_write?
+            true
+          end
+        end
+      end
+
       it "works" do
-        instance = Class.new(described_class).new(name, opts.merge(readable: lambda{ false }, writable: lambda{ true }))
+        options = opts.merge(readable: lambda { user_can_read? }, writable: lambda{ true })
+        instance = Class.new(described_class).new(name, options)
         expect(instance).not_to be_readable
         expect(instance).to be_writable
       end
