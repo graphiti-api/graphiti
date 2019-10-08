@@ -416,12 +416,10 @@ module Graphiti
       return false if flag.blank?
 
       case flag.class.name
-      when "Symbol"
+      when "Symbol","String"
         resource.send(flag)
       when "Proc"
         flag.call
-      when "String"
-        resource.send(flag)
       else
         !!flag
       end
