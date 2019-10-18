@@ -5,9 +5,9 @@ module Graphiti
     attr_reader :resource, :query, :scope, :payload
 
     def initialize(resource, scope, query,
-      payload: nil,
-      single: false,
-      raise_on_missing: false)
+                   payload: nil,
+                   single: false,
+                   raise_on_missing: false)
       @resource = resource
       @scope = scope
       @query = query
@@ -53,13 +53,13 @@ module Graphiti
 
     def data
       @data ||= begin
-        records = @scope.resolve
-        if records.empty? && raise_on_missing?
-          raise Graphiti::Errors::RecordNotFound
-        end
-        records = records[0] if single?
-        records
-      end
+                  records = @scope.resolve
+                  if records.empty? && raise_on_missing?
+                    raise Graphiti::Errors::RecordNotFound
+                  end
+                  records = records[0] if single?
+                  records
+                end
     end
     alias to_a data
 
@@ -73,14 +73,14 @@ module Graphiti
 
     def stats
       @stats ||= if @query.hash[:stats]
-        payload = Stats::Payload.new @resource,
-          @query,
-          @scope.unpaginated_object,
-          data
-        payload.generate
-      else
-        {}
-      end
+                   payload = Stats::Payload.new @resource,
+                   @query,
+                   @scope.unpaginated_object,
+                   data
+                   payload.generate
+                 else
+                   {}
+                 end
     end
 
     def pagination
@@ -95,9 +95,9 @@ module Graphiti
         Graphiti.context[:namespace] = action
         validator = persist {
           @resource.persist_with_relationships \
-            @payload.meta(action: action),
-            @payload.attributes,
-            @payload.relationships
+                      @payload.meta(action: action),
+          @payload.attributes,
+          @payload.relationships
         }
       ensure
         Graphiti.context[:namespace] = original
@@ -123,7 +123,7 @@ module Graphiti
         model.instance_variable_set(:@__serializer_klass, @resource.serializer)
         @resource.after_graph_persist(model, metadata)
         validator = ::Graphiti::Util::ValidationResponse.new \
-          model, @payload
+                                                           model, @payload
         validator.validate!
         @resource.before_commit(model, metadata)
 
@@ -139,9 +139,9 @@ module Graphiti
 
     def include_hash
       @include_hash ||= begin
-        base = @payload ? @payload.include_hash : {}
-        base.deep_merge(@query.include_hash)
-      end
+                          base = @payload ? @payload.include_hash : {}
+                          base.deep_merge(@query.include_hash)
+                        end
     end
 
     def fields
@@ -159,25 +159,32 @@ module Graphiti
     private
 
     def persist
-      transaction_response = @resource.transaction do
-        ::Graphiti::Util::TransactionHooksRecorder.record do
-          model = yield
-          ::Graphiti::Util::TransactionHooksRecorder.run_graph_persist_hooks
-          validator = ::Graphiti::Util::ValidationResponse.new \
-            model, @payload
-          validator.validate!
-          validator
-        end
-      end
+      model = nil
+      begin
+        transaction_response = @resource.transaction do
+          ::Graphiti::Util::TransactionHooksRecorder.record do
+            model = yield
+            ::Graphiti::Util::TransactionHooksRecorder.run_graph_persist_hooks
 
-      _data, success = transaction_response[:result].to_a
-      if success
-        transaction_response[:after_commit_hooks].each do |hook|
-          hook.call
+            ::Graphiti::RequestValidator.new(@resource, @payload.params).validate!
+            validator = ::Graphiti::Util::ValidationResponse.new \
+                                                               model, @payload
+            validator.validate!
+            validator
+          end
         end
-      end
 
-      transaction_response[:result]
+        _data, success = transaction_response[:result].to_a
+        if success
+          transaction_response[:after_commit_hooks].each do |hook|
+            hook.call
+          end
+        end
+
+        transaction_response[:result]
+      rescue Graphiti::Errors::InvalidRequest => e
+        [e, false]
+      end
     end
   end
 end

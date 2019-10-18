@@ -126,6 +126,27 @@ if ENV["APPRAISAL_INITIALIZED"]
           )
         end
       end
+
+      context "when there is an invalid request payload" do
+        before do
+          payload[:data] = nil
+        end
+
+        it "responds with error" do
+          make_request
+          expect(json["errors"].first).to match(
+            "code" => "unprocessable_entity",
+            "status" => "422",
+            "source" => {"pointer" => "/data/attributes/first_name"},
+            "detail" => "First name can't be blank",
+            "title" => "Validation Error",
+            "meta" => hash_including(
+              "attribute" => "first_name",
+              "message" => "can't be blank"
+            )
+          )
+        end
+      end
     end
 
     describe "basic destroy" do
@@ -1328,7 +1349,8 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         it "associates workspace as home office" do
           make_request
-
+          puts payload
+          binding.pry
           employee = Employee.first
           expect(employee.workspace).to be_a(HomeOffice)
         end

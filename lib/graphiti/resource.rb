@@ -140,7 +140,7 @@ module Graphiti
           response = yield
         end
       rescue Errors::ValidationError => e
-        response = {result: e.validation_response}
+        response = { result: e.validation_response }
       end
       response
     end
