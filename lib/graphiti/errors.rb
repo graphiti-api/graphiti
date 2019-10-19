@@ -754,5 +754,8 @@ module Graphiti
         MSG
       end
     end
+
+    class ConflictRequest < InvalidRequest
+    end
   end
 end

@@ -2,7 +2,8 @@
 
 source "https://rubygems.org"
 
-gem "rails", "~> 6.0.0"
+gem "graphiti_errors", path: "../../graphiti_errors"
+gem "rails", "~> 6.0.0.rc1"
 gem "rspec-rails"
 gem "sqlite3", "~> 1.4.0"
 gem "database_cleaner"

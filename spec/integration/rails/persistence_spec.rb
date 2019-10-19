@@ -129,22 +129,13 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       context "when there is an invalid request payload" do
         before do
-          payload[:data] = nil
+          payload[:data][:type] = ""
         end
 
-        it "responds with error" do
-          make_request
-          expect(json["errors"].first).to match(
-            "code" => "unprocessable_entity",
-            "status" => "422",
-            "source" => {"pointer" => "/data/attributes/first_name"},
-            "detail" => "First name can't be blank",
-            "title" => "Validation Error",
-            "meta" => hash_including(
-              "attribute" => "first_name",
-              "message" => "can't be blank"
-            )
-          )
+        it "raises a Graphiti::Errors::ConflictRequest" do
+          expect{
+            make_request
+          }.to raise_error(Graphiti::Errors::ConflictRequest)
         end
       end
     end
@@ -1349,8 +1340,6 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         it "associates workspace as home office" do
           make_request
-          puts payload
-          binding.pry
           employee = Employee.first
           expect(employee.workspace).to be_a(HomeOffice)
         end
@@ -1367,7 +1356,9 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     describe "delete nested item" do
-      subject(:make_request) { do_update(payload) }
+      subject(:make_request) {
+        do_update(payload)
+      }
 
       let!(:employee)   { Employee.create!(first_name: "original", positions: [position1, position2, position3]) }
       let!(:position1)  { Position.create!(title: "pos1") }

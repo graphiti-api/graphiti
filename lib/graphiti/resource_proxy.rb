@@ -93,6 +93,7 @@ module Graphiti
       original = Graphiti.context[:namespace]
       begin
         Graphiti.context[:namespace] = action
+        ::Graphiti::RequestValidator.new(@resource, @payload.params).validate!
         validator = persist {
           @resource.persist_with_relationships \
                       @payload.meta(action: action),
@@ -166,7 +167,6 @@ module Graphiti
             model = yield
             ::Graphiti::Util::TransactionHooksRecorder.run_graph_persist_hooks
 
-            ::Graphiti::RequestValidator.new(@resource, @payload.params).validate!
             validator = ::Graphiti::Util::ValidationResponse.new \
                                                                model, @payload
             validator.validate!
