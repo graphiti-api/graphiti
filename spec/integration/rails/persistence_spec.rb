@@ -1356,9 +1356,7 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     describe "delete nested item" do
-      subject(:make_request) {
-        do_update(payload)
-      }
+      subject(:make_request) { do_update(payload) }
 
       let!(:employee)   { Employee.create!(first_name: "original", positions: [position1, position2, position3]) }
       let!(:position1)  { Position.create!(title: "pos1") }
