@@ -159,8 +159,13 @@ module Graphiti
           attribute_mismatch([:data, :id])
         end
 
+
         meta_type = @raw_params.dig(:data, :type)
-        if @root_resource.type != meta_type
+
+        # NOTE: calling #to_s and comparing 2 strings is slower than
+        # calling #to_sym and comparing 2 symbols. But pre ruby-2.2
+        # #to_sym on user supplied data would lead to a memory leak.
+        if @root_resource.type.to_s != meta_type
           if @root_resource.polymorphic?
             begin
               @root_resource.class.resource_for_type(meta_type).new

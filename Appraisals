@@ -3,7 +3,6 @@ appraise "rails-4" do
   gem "rspec-rails"
   gem "sqlite3", "~> 1.3.6"
   gem "database_cleaner"
-  gem "graphiti_errors", path: "../graphiti_errors" # "~> 1.1.0" #
 end
 
 appraise "rails-5" do
@@ -11,7 +10,6 @@ appraise "rails-5" do
   gem "rspec-rails"
   gem "sqlite3", "~> 1.3.6"
   gem "database_cleaner"
-  gem "graphiti_errors", path: "../graphiti_errors" # "~> 1.1.0" #
 end
 
 appraise "rails-5-graphiti-rails" do
@@ -21,7 +19,6 @@ appraise "rails-5-graphiti-rails" do
   gem "database_cleaner"
   gem "rescue_registry", git: "https://github.com/wagenet/rescue_registry.git", branch: "master"
   gem "graphiti-rails", git: "https://github.com/wagenet/graphiti-rails.git", branch: "master"
-  gem "graphiti_errors", path: "../graphiti_errors" # "~> 1.1.0" #
 end
 
 appraise "rails-6" do
@@ -29,7 +26,6 @@ appraise "rails-6" do
   gem "rspec-rails"
   gem "sqlite3", "~> 1.4.0"
   gem "database_cleaner"
-  gem "graphiti_errors", path: "../graphiti_errors" # "~> 1.1.0" #
 end
 
 appraise "rails-6-graphiti-rails" do
@@ -39,5 +35,4 @@ appraise "rails-6-graphiti-rails" do
   gem "database_cleaner"
   gem "rescue_registry", git: "https://github.com/wagenet/rescue_registry.git", branch: "master"
   gem "graphiti-rails", git: "https://github.com/wagenet/graphiti-rails.git", branch: "master"
-  gem "graphiti_errors", path: "../graphiti_errors" # "~> 1.1.0" #
 end
