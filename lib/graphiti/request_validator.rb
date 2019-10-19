@@ -1,6 +1,6 @@
 module Graphiti
   class RequestValidator
-    delegate :vaildate,
+    delegate :validate,
              :validate!,
              :errors,
              :deserialized_payload,
