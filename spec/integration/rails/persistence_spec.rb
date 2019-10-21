@@ -1340,6 +1340,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         it "associates workspace as home office" do
           make_request
+
           employee = Employee.first
           expect(employee.workspace).to be_a(HomeOffice)
         end
