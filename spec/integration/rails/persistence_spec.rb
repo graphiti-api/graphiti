@@ -693,9 +693,9 @@ if ENV["APPRAISAL_INITIALIZED"]
           expect {
             make_request
           }.to_not(change { Employee.count + Position.count + Department.count })
-          error = json["errors"].select do |err|
+          error = json["errors"].find do |err|
             err.fetch("meta", {}).fetch("relationship", {}).fetch("type", nil) == "positions"
-          end.first
+          end
 
           expect(error).to match(
             "code" => "unprocessable_entity",
@@ -734,9 +734,9 @@ if ENV["APPRAISAL_INITIALIZED"]
           expect {
             make_request
           }.to_not(change { Employee.count + Position.count + Department.count })
-          error = json["errors"].select do |err|
+          error = json["errors"].find do |err|
             err.fetch("meta", {}).fetch("relationship", {}).fetch("type", nil) == "departments"
-          end.first
+          end
 
           expect(error).to match(
             "code" => "unprocessable_entity",
