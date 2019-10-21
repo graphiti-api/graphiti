@@ -114,8 +114,8 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
 
       match = ->(c) { c.group_name == group_name.to_sym }
       if (sideload = children.values.find(&match))
-        query = remove_invalid_sideloads(sideload.resource, query)
-        sideload.resolve(group, query, graph_parent)
+        duped = remove_invalid_sideloads(sideload.resource, query)
+        sideload.resolve(group, duped, graph_parent)
       else
         err = ::Graphiti::Errors::PolymorphicSideloadChildNotFound
         raise err.new(self, group_name)
@@ -127,14 +127,16 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
 
   # We may be requesting a relationship that some subclasses support,
   # but not others. Remove anything we don't support.
+  # TODO: spec to ensure this dupe logic doesn't mutate the original
   def remove_invalid_sideloads(resource, query)
-    query = query.dup
-    query.instance_variable_set(:@hash, nil)
-    query.sideloads.each_pair do |key, value|
+    duped = query.dup
+    duped.instance_variable_set(:@hash, nil)
+    duped.instance_variable_set(:@sideloads, ::Graphiti::Util::Hash.deep_dup(query.sideloads))
+    duped.sideloads.each_pair do |key, value|
       unless resource.class.sideload(key)
-        query.sideloads.delete(key)
+        duped.sideloads.delete(key)
       end
     end
-    query
+    duped
   end
 end
