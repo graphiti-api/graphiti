@@ -126,6 +126,18 @@ if ENV["APPRAISAL_INITIALIZED"]
           )
         end
       end
+
+      context "when there is an invalid request payload" do
+        before do
+          payload[:data][:type] = ""
+        end
+
+        it "raises a Graphiti::Errors::ConflictRequest" do
+          expect{
+            make_request
+          }.to raise_error(Graphiti::Errors::ConflictRequest)
+        end
+      end
     end
 
     describe "basic destroy" do
