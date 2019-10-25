@@ -224,6 +224,11 @@ module Graphiti
       @parent_resource ||= parent_resource_class.new
     end
 
+    def clear_resources
+      @resource = nil
+      @parent_resource = nil
+    end
+
     def assign(parents, children)
       track_associated = type == :has_one
       associated = [] if track_associated
