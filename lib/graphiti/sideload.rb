@@ -224,6 +224,7 @@ module Graphiti
       @parent_resource ||= parent_resource_class.new
     end
 
+    # See https://github.com/graphiti-api/graphiti/issues/186
     def clear_resources
       @resource = nil
       @parent_resource = nil
