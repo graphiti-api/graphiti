@@ -1044,6 +1044,21 @@ RSpec.describe "sideloading" do
         render
       }.to_not raise_error
     end
+
+    describe "across requests" do
+      it "uses a different sideloaded resource" do
+        ctx = double(current_user: :admin)
+        sl1 = Graphiti.with_context ctx do
+          resource.all(params).query.sideloads.values[0].resource
+        end
+
+        sl2 = Graphiti.with_context ctx do
+          resource.all(params).query.sideloads.values[0].resource
+        end
+
+        expect(sl1).to_not be sl2
+      end
+    end
   end
 
   context "when a required filter on the sideloaded resource" do

@@ -32,6 +32,10 @@ module Graphiti
     yield
   ensure
     self.context = prior
+
+    resources.each { |resource_class|
+      resource_class.sideloads.values.each(&:clear_resources)
+    }
   end
 
   def self.config
