@@ -22,6 +22,7 @@ module Graphiti
         end
 
         def type=(val)
+          val = val && val.to_sym
           if (val = super)
             serializer.type(val)
           end

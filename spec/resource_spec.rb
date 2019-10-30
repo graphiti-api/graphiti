@@ -195,6 +195,18 @@ RSpec.describe Graphiti::Resource do
           expect(klass.type).to eq(:blahs)
         end
       end
+
+      context "when manually setting type as string" do
+        let(:klass) do
+          Class.new(app_resource) do
+            self.type = "blahs"
+          end
+        end
+
+        it "works" do
+          expect(klass.type).to eq(:blahs)
+        end
+      end
     end
 
     describe "a descendent of a non-abstract Resource" do
