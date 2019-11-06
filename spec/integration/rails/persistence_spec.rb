@@ -106,6 +106,33 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(jsonapi_data["first_name"]).to eq("Jane")
       end
 
+      context 'when reserved parameter used' do
+        before do
+          resource = Class.new(EmployeeResource) do
+            self.validate_endpoints = false
+            attribute :page, :integer
+          end
+          allow(controller).to receive(:resource) { resource }
+          Employee.class_eval do
+            attr_accessor :page
+          end
+          payload[:data][:attributes].merge!(page: 1)
+        end
+
+        after do
+          Employee.class_eval do
+            undef :page
+            undef :page=
+          end
+        end
+
+        it 'works as normal' do
+          expect {
+            make_request
+          }.to change { employee.reload.first_name }.from("Joe").to("Jane")
+        end
+      end
+
       context "when there is a validation error" do
         before do
           payload[:data][:attributes][:first_name] = nil

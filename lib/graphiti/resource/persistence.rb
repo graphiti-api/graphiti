@@ -93,7 +93,7 @@ module Graphiti
 
         run_callbacks :persistence, :update, update_params, meta do
           run_callbacks :attributes, :update, update_params, meta do |params|
-            model_instance = self.class._find(params.merge(id: id)).data
+            model_instance = self.class._find(id: id).data
             call_with_meta(:assign_attributes, model_instance, params, meta)
             model_instance
           end
