@@ -79,12 +79,18 @@ module Graphiti
     end
 
     def normalize_param(filter, param_value)
-      unless param_value.is_a?(Hash) && param_value.present?
-        param_value = {eq: param_value}
+      type = Types[filter.values[0][:type]][:canonical_name]
+      if param_value.is_a?(Hash) && type == :hash
+        operators_keys = filter.values[0][:operators].keys
+        unless param_value.keys.all? {|k| operators_keys.include?(k)}
+          param_value = { eq: param_value }
+        end
+      elsif !param_value.is_a?(Hash) || param_value.empty?
+        param_value = { eq: param_value }
       end
 
       param_value.map do |operator, value|
-        if Types[filter.values[0][:type]][:canonical_name] == :hash
+        if type == :hash
           value, operator = \
             parse_hash_value(filter, param_value, value, operator)
         end
@@ -136,7 +142,7 @@ module Graphiti
       end
 
       if value.is_a?(String)
-        value = value.gsub("{{{", "{").gsub("}}}", "}")
+        value = value.gsub("{{{", "{").gsub("}}}", "}") unless filter.values[0][:single]
 
         if value.include?("},{") && !filter.values[0][:single]
           value = Util::Hash.split_json(value)
