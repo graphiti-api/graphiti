@@ -101,6 +101,29 @@ RSpec.describe "filtering" do
         expect(Graphiti::Util::Hash).to_not receive(:split_json)
         expect(records.map(&:id)).to eq([employee2.id, employee3.id])
       end
+
+      context "and it is a deeply nested hash" do
+        before do
+          resource.filter :by_json, :hash, single: true do
+            eq do |scope, value|
+              ids = [value["users"]["update"]["id"]["a"], value["admins"]["update"]["id"]["b"]]
+              scope[:conditions][:id] = ids
+              scope
+            end
+          end
+
+          params[:filter] = {
+            by_json: {
+                       users:  { update: { id: { a: 2, b: 3 } } },
+                       admins: { update: { id: { a: 2, b: 3 } } }
+                     }.to_json,
+          }
+        end
+
+        it "still works" do
+          expect(records.map(&:id)).to eq([employee2.id, employee3.id])
+        end
+      end
     end
 
     context "and it is a complex hash" do
@@ -125,6 +148,25 @@ RSpec.describe "filtering" do
 
       it "still works" do
         expect(Graphiti::Util::Hash).to receive(:split_json).and_call_original
+        expect(records.map(&:id)).to eq([employee2.id, employee3.id])
+      end
+    end
+
+    context "when a Ruby Hash is passed" do
+      it "only calls filter once" do
+        eq_filter = double(:eq_filter, call: nil)
+        resource.filter :by_json, :hash, single: true do
+          eq(&eq_filter.method(:call))
+        end
+
+        allow(eq_filter).to receive(:call) do |scope, value|
+          ids = [value[:id], value[:id2]].flatten
+          scope[:conditions][:id] = ids
+          scope
+        end
+
+        expect(eq_filter).to receive(:call).once
+        params[:filter] = {by_json: { "id" => 2, "id2" => 3 }}
         expect(records.map(&:id)).to eq([employee2.id, employee3.id])
       end
     end
