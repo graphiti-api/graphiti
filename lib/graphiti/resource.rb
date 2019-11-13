@@ -20,7 +20,7 @@ module Graphiti
       yield scope
     end
 
-    def after_filters(scope)
+    def after_filtering(scope)
       scope
     end
 

@@ -1678,10 +1678,10 @@ RSpec.describe "filtering" do
     end
   end
 
-  context "when calling #after_filters hook" do
+  context "when calling #after_filtering hook" do
     before do
       resource.class_eval do
-        def after_filters(scope)
+        def after_filtering(scope)
           scope[:conditions][:first_name][0].capitalize!
           scope
         end
