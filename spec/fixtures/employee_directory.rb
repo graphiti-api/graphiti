@@ -59,6 +59,13 @@ ActiveRecord::Schema.define(version: 1) do
     t.decimal :base_rate
     t.decimal :overtime_rate
   end
+
+  create_table :locations do |t|
+    t.integer :locatable_id
+    t.string :locatable_type
+    t.string :latitude
+    t.string :longitude
+  end
 end
 
 class ApplicationRecord < ActiveRecord::Base
@@ -122,6 +129,7 @@ class Employee < ApplicationRecord
   has_many :bugs
   has_many :features
   has_many :notes, as: :notable
+  has_one :location, as: :locatable
   validates :first_name, presence: true
   validates :delete_confirmation,
     presence: true,
@@ -154,6 +162,10 @@ end
 
 class Salary < ApplicationRecord
   belongs_to :employee
+end
+
+class Location < ApplicationRecord
+  belongs_to :locatable, polymorphic: true
 end
 
 class ApplicationResource < Graphiti::Resource
@@ -223,6 +235,7 @@ class EmployeeResource < ApplicationResource
   belongs_to :classification
   many_to_many :teams, description: "Teams the employee belongs to"
   polymorphic_has_many :notes, as: :notable
+  polymorphic_has_one :location, as: :locatable
   polymorphic_belongs_to :workspace, description: "The employee's primary work area" do
     group_by(:workspace_type) do
       on(:Office)
@@ -241,4 +254,11 @@ class EmployeeSearchResource < ApplicationResource
   attribute :first_name, :string
   attribute :last_name, :string
   attribute :age, :integer
+end
+
+class LocationResource < ApplicationResource
+  attribute :locatable_id, :integer
+  attribute :locatable_type, :string
+  attribute :latitude, :string
+  attribute :longitude, :string
 end

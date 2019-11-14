@@ -75,6 +75,20 @@ module Graphiti
           end
         end
 
+        def polymorphic_has_one(name, opts = {}, &blk)
+          as = opts.delete(:as)
+          opts[:foreign_key] ||= :"#{as}_id"
+          opts[:polymorphic_as] ||= as
+          model_ref = model
+          has_one name, opts do
+            params do |hash|
+              hash[:filter][:"#{as}_type"] = model_ref.name
+            end
+
+            instance_eval(&blk) if block_given?
+          end
+        end
+
         def sideload(name)
           sideloads[name]
         end

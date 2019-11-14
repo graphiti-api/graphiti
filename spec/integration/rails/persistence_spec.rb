@@ -1232,6 +1232,97 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
+    describe "nested polymorphic_has_one relationship" do
+      subject(:make_request) { do_update(payload) }
+      let!(:employee) { Employee.create!(first_name: "Jane") }
+      let(:path) { "/employees/#{employee.id}" }
+
+      let(:payload) do
+        {
+          data: {
+            type: "employees",
+            id: employee.id,
+            attributes: {first_name: "Jane"},
+            relationships: {
+              location: {
+                data: {
+                  location_id_key => location_id, :type => "locations", :method => method,
+                },
+              },
+            },
+          },
+          included: [
+            {
+              :type => "locations",
+              location_id_key => location_id,
+              :attributes => { latitude: "45.12345", longitude: "24.12345" },
+            },
+          ],
+        }
+      end
+
+      context "when creating" do
+        let(:location_id) { "abc123" }
+        let(:location_id_key) { :'temp-id' }
+        let(:method) { "create" }
+
+        it "works" do
+          make_request
+          expect(employee.reload.location.latitude).to eq("45.12345")
+          expect(employee.reload.location.longitude).to eq("24.12345")
+        end
+      end
+
+      context "when updating" do
+        let!(:location) { Location.create(latitude: "45.12345", longitude: "24.12345") }
+        let(:location_id) { location.id.to_s }
+        let(:location_id_key) { :id }
+        let(:method) { :update }
+
+        it "works" do
+          make_request
+          expect(employee.reload.location.latitude).to eq("45.12345")
+          expect(employee.reload.location.longitude).to eq("24.12345")
+        end
+      end
+
+      context "when destroying" do
+        let!(:location) do
+          Location.create locatable_id: employee.id,
+                      locatable_type: "Employee"
+        end
+        let(:location_id) { location.id.to_s }
+        let(:location_id_key) { :id }
+        let(:method) { :destroy }
+
+        it "works" do
+          make_request
+          expect(employee.reload.location).to be_nil
+        end
+      end
+
+      context "when disassociating" do
+        let!(:location) do
+          Location.create locatable_id: employee.id,
+                      locatable_type: "Employee"
+        end
+        let(:location_id) { location.id.to_s }
+        let(:location_id_key) { :id }
+        let(:method) { :disassociate }
+
+        it "works" do
+          # expect {
+          #   make_request
+          # }.to change { employee.reload.location.count }.by(-1)
+          make_request
+          expect(employee.reload.location).to be_nil
+          expect { location.reload }.to_not raise_error
+          expect(location.locatable_id).to be_nil
+          expect(location.locatable_type).to be_nil
+        end
+      end
+    end
+
     describe "nested polymorphic_has_many relationship" do
       subject(:make_request) { do_update(payload) }
       let!(:employee) { Employee.create!(first_name: "Jane") }
