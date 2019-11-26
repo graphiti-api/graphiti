@@ -1719,4 +1719,23 @@ RSpec.describe "filtering" do
       end
     end
   end
+
+  context "when calling #after_filtering hook" do
+    before do
+      resource.class_eval do
+        def after_filtering(scope)
+          scope[:conditions][:first_name][0].capitalize!
+          scope
+        end
+      end
+
+      resource.attribute :last_name, :string
+    end
+
+    it "allows mutations of the scope" do
+      params[:filter] = {first_name: "agatha"}
+
+      expect(records.map(&:id)).to eq([employee2.id])
+    end
+  end
 end

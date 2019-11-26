@@ -16,7 +16,7 @@ module Graphiti
         @scope = filter_scope(filter, operator, value)
       end
 
-      @scope
+      resource.after_filtering(@scope)
     end
 
     private

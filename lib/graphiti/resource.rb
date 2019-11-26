@@ -20,6 +20,10 @@ module Graphiti
       yield scope
     end
 
+    def after_filtering(scope)
+      scope
+    end
+
     def serializer_for(model)
       serializer
     end
