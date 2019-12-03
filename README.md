@@ -12,7 +12,7 @@ Stylish Graph APIs.
 
 [Website](https://www.graphiti.dev/guides/)
 
-[Join the Slack Channel](https://join.slack.com/t/graphiti-api/shared_invite/enQtMjkyMTA3MDgxNTQzLWVkMDM3NTlmNTIwODY2YWFkMGNiNzUzZGMzOTY3YmNmZjBhYzIyZWZlZTk4YmI1YTI0Y2M0OTZmZGYwN2QxZjg)
+[Join the Slack Channel](https://join.slack.com/t/graphiti-api/shared_invite/enQtMjkyMTA3MDgxNTQzLTU5MDI4MDllNTEzOTE1Nzk0ZGJlNTcxZDYzMGY2ZTczMDY2OWZhM2RmNTU0YWNiOWZhZDhkMmU4MzQ5NzIyNWM)
 
 Direct Contact: richmolj@gmail.com
 
