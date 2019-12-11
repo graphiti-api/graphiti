@@ -1311,9 +1311,6 @@ if ENV["APPRAISAL_INITIALIZED"]
         let(:method) { :disassociate }
 
         it "works" do
-          # expect {
-          #   make_request
-          # }.to change { employee.reload.location.count }.by(-1)
           make_request
           expect(employee.reload.location).to be_nil
           expect { location.reload }.to_not raise_error
