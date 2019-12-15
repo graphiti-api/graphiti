@@ -110,6 +110,10 @@ module Graphiti
       !!@single
     end
 
+    def polymorphic_has_one?
+      !!@polymorphic_as
+    end
+
     def polymorphic_has_many?
       !!@polymorphic_as
     end
