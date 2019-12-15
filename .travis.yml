@@ -1,7 +1,6 @@
 sudo: false
 language: ruby
 rvm:
-- 2.4
 - 2.5
 - 2.6
 gemfile:
@@ -39,10 +38,6 @@ matrix:
       gemfile: gemfiles/rails_5_graphiti_rails.gemfile
     - env: COMMAND=rspec
       gemfile: gemfiles/rails_6_graphiti_rails.gemfile
-    - gemfile: gemfiles/rails_6.gemfile
-      rvm: 2.4
-    - gemfile: gemfiles/rails_6_graphiti_rails.gemfile
-      rvm: 2.4
     - gemfile: gemfiles/rails_4.gemfile
       rvm: 2.5
     - gemfile: gemfiles/rails_4.gemfile
