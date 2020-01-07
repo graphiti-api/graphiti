@@ -79,11 +79,30 @@ module Graphiti
         filter_string_suffix(scope, attribute, value, is_not: true)
       end
 
-      def filter_string_match(scope, attribute, value, is_not: false)
-        column = column_for(scope, attribute)
-        map = value.map { |v| "%#{v.downcase}%" }
-        clause = column.lower.matches_any(map)
-        is_not ? scope.where.not(clause) : scope.where(clause)
+      # Arel has different match escaping behavior before rails 5.
+      # Since rails 4.x does not expose methods to escape LIKE statements
+      # anyway, we just don't support proper LIKE escaping in those versions.
+      if ::ActiveRecord.version >= Gem::Version.new('5.0.0')
+        def filter_string_match(scope, attribute, value, is_not: false)
+          escape_char = '\\'
+          column = column_for(scope, attribute)
+          map = value.map do |v|
+            v = v.downcase
+            v = scope.sanitize_sql_like(v)
+            "%#{v}%"
+          end
+          clause = column.lower.matches_any(map, escape_char, true)
+          is_not ? scope.where.not(clause) : scope.where(clause)
+        end
+      else
+        def filter_string_match(scope, attribute, value, is_not: false)
+          column = column_for(scope, attribute)
+          map = value.map do |v|
+            "%#{v.downcase}%"
+          end
+          clause = column.lower.matches_any(map)
+          is_not ? scope.where.not(clause) : scope.where(clause)
+        end
       end
 
       def filter_string_not_match(scope, attribute, value)
