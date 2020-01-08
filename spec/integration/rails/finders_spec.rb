@@ -263,6 +263,24 @@ if ENV["APPRAISAL_INITIALIZED"]
           it "executes case-insensitive match query" do
             expect(ids).to eq([author2.id, author3.id])
           end
+
+          if ::ActiveRecord.version >= Gem::Version.new("5.0")
+            context 'when match string includes % characters' do
+              let(:value) { {match: "ld%ca"} }
+
+              let!(:author_with_percent) do
+                Legacy::Author.create!(first_name: "Wild%card")
+              end
+
+              let!(:author_with_dash) do
+                Legacy::Author.create!(first_name: "Wild-card")
+              end
+
+              it "does not use the provided % as a wildcard character" do
+                expect(ids).to eq([author_with_percent.id])
+              end
+            end
+          end
         end
 
         context "!match" do
