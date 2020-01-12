@@ -3,7 +3,7 @@ module Graphiti
     include Scoping::Filterable
 
     def apply
-      if missing_required_filters.any?
+      if missing_required_filters.any? && !@opts[:bypass_required_filters]
         raise Errors::RequiredFilter.new(resource, missing_required_filters)
       end
 

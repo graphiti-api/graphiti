@@ -28,7 +28,10 @@ module Graphiti
           params[:filter][:id] = id if id
 
           runner = Runner.new(self, params)
-          runner.proxy(base_scope, single: true, raise_on_missing: true)
+          runner.proxy base_scope,
+            single: true,
+            raise_on_missing: true,
+            bypass_required_filters: true
         end
 
         def build(params, base_scope = nil)

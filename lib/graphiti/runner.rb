@@ -63,7 +63,8 @@ module Graphiti
         :after_resolve,
         :sideload,
         :parent,
-        :params
+        :params,
+        :bypass_required_filters
       scope = jsonapi_scope(base, scope_opts)
       ResourceProxy.new jsonapi_resource,
         scope,

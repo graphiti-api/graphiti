@@ -1702,6 +1702,19 @@ RSpec.describe "filtering" do
           records
         }.to raise_error(Graphiti::Errors::RequiredFilter)
       end
+
+      context 'because it came from .find' do
+        before do
+          resource.filter :id, :integer
+        end
+
+        it 'does not require the filter' do
+          expect {
+            proxy = resource.find(filter: { id: employee2.id })
+            expect(proxy.data.id).to eq(employee2.id)
+          }.to_not raise_error
+        end
+      end
     end
   end
 
