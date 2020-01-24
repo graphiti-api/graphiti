@@ -175,6 +175,20 @@ RSpec.describe Graphiti::RequestValidator do
 
           expect(instance.errors).to be_blank
         end
+
+        context "when updating" do
+          before do
+            payload["action"] = "update"
+            payload[:data][:id] = 1
+            payload[:filter] = { id: 1 }
+          end
+
+          it "accepts the child type" do
+            validate
+
+            expect(instance.errors).to be_blank
+          end
+        end
       end
     end
 
