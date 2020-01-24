@@ -58,7 +58,7 @@ module Graphiti
         end
 
         def resource_for_type(type)
-          resource = children.find { |c| c.type == type }
+          resource = children.find { |c| c.type.to_s == type.to_s }
           if resource.nil?
             raise Errors::PolymorphicResourceChildNotFound.new(self, type: type)
           else
