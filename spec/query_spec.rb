@@ -265,6 +265,17 @@ RSpec.describe Graphiti::Query do
           expect(hash).to eq(expected)
         end
 
+        context 'with multiple filters' do
+          before do
+            params[:filter][:positions][:id] = 4
+          end
+
+          it 'keeps both filters' do
+            expect(hash[:include][:positions][:filter])
+              .to eq(title: 'bar', id: 4)
+          end
+        end
+
         context "with stringified keys" do
           before do
             params.deep_stringify_keys!
