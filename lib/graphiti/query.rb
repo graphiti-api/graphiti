@@ -126,10 +126,13 @@ module Graphiti
             name = name.to_sym
 
             if legacy_nested?(name)
-              filter_name = value.keys.first.to_sym
-              filter_value = value.values.first
-              if @resource.get_attr!(filter_name, :filterable, request: true)
-                hash[filter_name] = filter_value
+              value.keys.each do |key|
+                filter_name = key.to_sym
+                filter_value = value[key]
+
+                if @resource.get_attr!(filter_name, :filterable, request: true)
+                  hash[filter_name] = filter_value
+                end
               end
             elsif nested?(name)
               name = name.to_s.split(".").last.to_sym
