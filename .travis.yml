@@ -3,6 +3,7 @@ language: ruby
 rvm:
 - 2.5
 - 2.6
+- 2.7
 gemfile:
   - Gemfile
   - gemfiles/rails_4.gemfile
@@ -58,6 +59,8 @@ matrix:
       rvm: 2.5
     - gemfile: gemfiles/rails_4.gemfile
       rvm: 2.6
+    - gemfile: gemfiles/rails_4.gemfile
+      rvm: 2.7
 
 script:
   - bundle _1.17.3_ exec $COMMAND
