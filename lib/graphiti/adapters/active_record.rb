@@ -313,7 +313,7 @@ module Graphiti
         column = column_for(scope, attribute)
         map = value.map do |v|
           v = v.downcase
-          v = Sanitizer.sanitize_sql_like(v)
+          v = Sanitizer.sanitize_like(v, escape_char)
           block.call v
         end
 
@@ -322,6 +322,10 @@ module Graphiti
 
       class Sanitizer
         extend ::ActiveRecord::Sanitization::ClassMethods
+
+        def self.sanitize_like(*args)
+          sanitize_sql_like(*args)
+        end
       end
     end
   end
