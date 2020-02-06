@@ -231,6 +231,24 @@ if ENV["APPRAISAL_INITIALIZED"]
           it "executes case-insensitive prefix query" do
             expect(ids).to eq([author2.id, author3.id])
           end
+
+          if ::ActiveRecord.version >= Gem::Version.new("5.0")
+            context 'when match string includes % characters' do
+              let(:value) { {prefix: "%ild"} }
+
+              let!(:author_with_percent) do
+                Legacy::Author.create!(first_name: "%ildcard")
+              end
+
+              let!(:normal_author) do
+                Legacy::Author.create!(first_name: "wildcard")
+              end
+
+              it "does not use the provided % as a wildcard character" do
+                expect(ids).to eq([author_with_percent.id])
+              end
+            end
+          end
         end
 
         context "!prefix" do
@@ -246,6 +264,24 @@ if ENV["APPRAISAL_INITIALIZED"]
 
           it "executes case-insensitive suffix query" do
             expect(ids).to eq([author2.id, author3.id])
+          end
+
+          if ::ActiveRecord.version >= Gem::Version.new("5.0")
+            context 'when match string includes % characters' do
+              let(:value) { {suffix: "car%"} }
+
+              let!(:author_with_percent) do
+                Legacy::Author.create!(first_name: "Wildcar%")
+              end
+
+              let!(:normal_author) do
+                Legacy::Author.create!(first_name: "Wildcard")
+              end
+
+              it "does not use the provided % as a wildcard character" do
+                expect(ids).to eq([author_with_percent.id])
+              end
+            end
           end
         end
 
