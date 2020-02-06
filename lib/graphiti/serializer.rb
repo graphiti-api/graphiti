@@ -25,6 +25,7 @@ module Graphiti
     def as_jsonapi(*)
       super.tap do |hash|
         strip_relationships!(hash) if strip_relationships?
+        hash[:links] = @resource.links(@object) if @resource.links?
       end
     end
 

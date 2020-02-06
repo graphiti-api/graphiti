@@ -148,5 +148,16 @@ module Graphiti
       end
       response
     end
+
+    def links?
+      self.class.links.any?
+    end
+
+    def links(model)
+      self.class.links.inject({}) do |memo, (name, blk)| 
+        memo[name] = instance_exec(model, &blk)
+        memo
+      end
+    end
   end
 end

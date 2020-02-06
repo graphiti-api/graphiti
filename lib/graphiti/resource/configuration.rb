@@ -198,6 +198,7 @@ module Graphiti
               extra_attributes: {},
               sideloads: {},
               callbacks: {},
+              links: {},
             }
         end
 
@@ -235,6 +236,10 @@ module Graphiti
 
         def default_filters
           config[:default_filters]
+        end
+
+        def links
+          config[:links]
         end
       end
 
