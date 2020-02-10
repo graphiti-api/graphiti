@@ -1405,9 +1405,10 @@ RSpec.describe "serialization" do
         resource.link :test_link do |model| nil end
       end
 
-      specify "are omitted" do
+      specify "are still included" do
         render
-        expect(json["data"][0]["links"]).not_to have_key("test_link")
+        expect(json["data"][0]["links"]).to have_key("test_link")
+        expect(json["data"][0]["links"]["test_link"]).to eq(nil)
       end
     end
   end

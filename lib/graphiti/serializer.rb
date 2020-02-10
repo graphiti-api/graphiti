@@ -53,7 +53,7 @@ module Graphiti
     def add_links!(hash)
       return unless @resource.respond_to?(:links?)
 
-      hash[:links] = @resource.links(@object).compact if @resource.links?
+      hash[:links] = @resource.links(@object) if @resource.links?
     end
 
     def strip_relationships!(hash)
