@@ -703,7 +703,7 @@ RSpec.describe Graphiti::Schema do
       it "generates a polymorphic schema for the resource" do
         expect(schema[:resources][0][:polymorphic]).to eq(true)
         expect(schema[:resources][0][:children])
-          .to eq(["PORO::VisaResource", "PORO::MastercardResource"])
+          .to eq(["PORO::VisaResource", "PORO::GoldVisaResource", "PORO::MastercardResource"])
       end
     end
 
