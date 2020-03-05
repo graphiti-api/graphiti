@@ -197,7 +197,7 @@ module Graphiti
 
       with_error_handling Errors::SideloadParamsError do
         params = load_params(parents, query)
-        params_proc&.call(params, parents)
+        params_proc&.call(params, parents, context)
         return [] if blank_query?(params)
         opts = load_options(parents, query)
         opts[:sideload] = self
@@ -433,6 +433,10 @@ module Graphiti
       else
         !!flag
       end
+    end
+
+    def context
+      Graphiti.context[:object]
     end
   end
 end

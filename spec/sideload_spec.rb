@@ -566,16 +566,16 @@ RSpec.describe Graphiti::Sideload do
 
   describe ".params" do
     before do
-      instance.class.params do |hash, parents, query|
+      instance.class.params do |hash, parents, context|
         hash[:parents] = parents
-        hash[:query] = query
+        hash[:context] = context
       end
     end
 
     it "sets params proc" do
-      hash, parents, query = {}, [double("parent")], double("query")
-      instance.params_proc.call(hash, parents, query)
-      expect(hash).to eq(parents: parents, query: query)
+      hash, parents, context = {}, [double("parent")], double("context")
+      instance.params_proc.call(hash, parents, context)
+      expect(hash).to eq(parents: parents, context: context)
     end
   end
 
@@ -655,19 +655,25 @@ RSpec.describe Graphiti::Sideload do
 
     context "when params customization" do
       before do
-        instance.class.params do |hash, parents|
+        instance.class.params do |hash, parents, context|
           hash[:a] = parents
+          hash[:b] = context.current_user
         end
       end
 
       it "is respected" do
+        current_user = double
         expected = {
           foo: "bar",
-          a: parents
+          a: parents,
+          b: current_user
         }
         expect(resource_class).to receive(:_all)
           .with(expected, anything, {type: :positions})
-        instance.load(parents, query, nil)
+
+        Graphiti.with_context(OpenStruct.new(current_user: current_user)) do
+          instance.load(parents, query, nil)
+        end
       end
     end
 

@@ -63,7 +63,7 @@ module Graphiti
             params[:filter] = @sideload.base_filter([@model])
           end
 
-          @sideload.params_proc&.call(params, [@model])
+          @sideload.params_proc&.call(params, [@model], context)
         end
       end
 
@@ -74,6 +74,10 @@ module Graphiti
           path = "#{path}/#{@model.send(@sideload.foreign_key)}"
         end
         path
+      end
+
+      def context
+        Graphiti.context[:object]
       end
     end
   end
