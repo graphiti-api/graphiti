@@ -2330,6 +2330,33 @@ RSpec.describe "persistence" do
             .to eq(["Description can't be blank"])
         end
       end
+
+      context "linking to an non-existing related record" do
+        let(:payload) do
+          {
+            data: {
+              type: "employees",
+              relationships: {
+                classification: {
+                  data: {
+                    type: "classifications",
+                    'id': "123"
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        it "responds correctly" do
+          employee = klass.build(payload)
+          expect { employee.save }.to raise_error(
+            Graphiti::Errors::RecordNotFound,
+            "The referenced resource 'classification' with id '123' could not be found. " \
+            "Referenced at 'relationships/classifications'"
+          )
+        end
+      end
     end
 
     describe "has_one" do
