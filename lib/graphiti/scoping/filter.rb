@@ -54,6 +54,8 @@ module Graphiti
           unless type[:canonical_name] == :hash || !value.is_a?(String)
             value = parse_string_value(filter.values[0], value)
           end
+
+          check_deny_empty_filters!(resource, filter, value)
           value = parse_string_null(filter.values[0], value)
           validate_singular(resource, filter, value)
           value = coerce_types(filter.values[0], param_name.to_sym, value)
@@ -199,6 +201,14 @@ module Graphiti
       return if value == "null" && filter[:allow_nil]
 
       value
+    end
+
+    def check_deny_empty_filters!(resource, filter, value)
+      return unless filter.values[0][:deny_empty]
+
+      if value.nil? || value.empty? || value == "null"
+        raise Errors::InvalidFilterValue.new(resource, filter, "(empty)")
+      end
     end
   end
 end

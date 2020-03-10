@@ -313,6 +313,38 @@ RSpec.describe "filtering" do
     end
   end
 
+  context "when passed an empty value when deny_empty is true" do
+    before do
+      resource.filter :first_name, deny_empty: true
+      employee2.update_attributes(first_name: value)
+      params[:filter] = {first_name: "null"}
+    end
+
+    context 'via explicit string value "null"' do
+      let(:value) { "null" }
+
+      it "raises an invalid filter value error " do
+        expect { records.map(&:id) }.to raise_error(Graphiti::Errors::InvalidFilterValue)
+      end
+    end
+
+    context "via empty value" do
+      let(:value) { "" }
+
+      it "raises an invalid filter value error " do
+        expect { records.map(&:id) }.to raise_error(Graphiti::Errors::InvalidFilterValue)
+      end
+    end
+
+    context "via empty array" do
+      let(:value) { "[]" }
+
+      it "raises an invalid filter value error " do
+        expect { records.map(&:id) }.to raise_error(Graphiti::Errors::InvalidFilterValue)
+      end
+    end
+  end
+
   context "when passed comma, but filter marked single: true" do
     before do
       resource.filter :first_name, single: true

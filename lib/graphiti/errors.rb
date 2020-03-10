@@ -143,8 +143,13 @@ module Graphiti
       def message
         allow = @filter.values[0][:allow]
         deny = @filter.values[0][:deny]
+        value_string = if @value == "(empty)"
+          "empty value"
+        else
+          "value #{@value.inspect}"
+        end
         msg = <<-MSG
-          #{@resource.class.name}: tried to filter on #{@filter.keys[0].inspect}, but passed invalid value #{@value.inspect}.
+          #{@resource.class.name}: tried to filter on #{@filter.keys[0].inspect}, but passed invalid #{value_string}.
         MSG
         msg << "\nAllowlist: #{allow.inspect}" if allow
         msg << "\nDenylist: #{deny.inspect}" if deny
