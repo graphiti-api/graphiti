@@ -15,7 +15,7 @@ module Graphiti
           links[:last] = pagination_link(last_page)
           links[:prev] = pagination_link(current_page - 1) unless current_page == 1
           links[:next] = pagination_link(current_page + 1) unless current_page == last_page
-        end.select {|k, v| !v.nil? }
+        end.select { |k, v| !v.nil? }
       end
 
       private
@@ -29,8 +29,8 @@ module Graphiti
         uri.query = @proxy.query.hash.merge({
           page: {
             number: page,
-            size: page_size,
-          },
+            size: page_size
+          }
         }).to_query
         uri.to_s
       end

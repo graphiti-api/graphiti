@@ -40,9 +40,9 @@ RSpec.describe "remote resources" do
         type: "employees",
         attributes: {
           first_name: "Jane",
-          last_name: "Doe",
-        },
-      ],
+          last_name: "Doe"
+        }
+      ]
     }
   end
 
@@ -79,7 +79,7 @@ RSpec.describe "remote resources" do
       expect(data["attributes"]).to eq({
         "first_name" => "Jane",
         "last_name" => "DOE",
-        "full_name" => "Jane Doe",
+        "full_name" => "Jane Doe"
       })
       expect(json["meta"]).to eq({})
     end
@@ -156,10 +156,10 @@ RSpec.describe "remote resources" do
               meta: {
                 __raw_error__: {
                   message: "foo bar",
-                  backtrace: ["a", "b"],
-                },
-              },
-            }],
+                  backtrace: ["a", "b"]
+                }
+              }
+            }]
           }
         end
 
@@ -175,8 +175,8 @@ RSpec.describe "remote resources" do
           {
             errors: [{
               title: "Error",
-              detail: "On some thing",
-            }],
+              detail: "On some thing"
+            }]
           }
         end
 
@@ -341,8 +341,8 @@ RSpec.describe "remote resources" do
         before do
           response[:data][0][:relationships] = {
             positions: {
-              data: [{id: "456", type: "positions"}],
-            },
+              data: [{id: "456", type: "positions"}]
+            }
           }
           response[:included] = [
             {
@@ -350,14 +350,14 @@ RSpec.describe "remote resources" do
               type: "positions",
               attributes: {title: "foo"},
               relationships: {
-                department: {data: {id: "789", type: "departments"}},
-              },
+                department: {data: {id: "789", type: "departments"}}
+              }
             },
             {
               id: "789",
               type: "departments",
-              attributes: {name: "Safety"},
-            },
+              attributes: {name: "Safety"}
+            }
           ]
         end
 
@@ -373,7 +373,7 @@ RSpec.describe "remote resources" do
         it "serializes associated models in the response" do
           json = JSON.parse(query.to_jsonapi).deep_symbolize_keys
           expect(json[:data][0][:relationships]).to eq({
-            positions: {data: [{type: "positions", id: "456"}]},
+            positions: {data: [{type: "positions", id: "456"}]}
           })
           expect(json[:included]).to eq(response[:included])
         end
@@ -500,7 +500,7 @@ RSpec.describe "remote resources" do
       before do
         params[:page] = {
           'positions.department.size': 3,
-          'positions.department.teams.size': 2,
+          'positions.department.teams.size': 2
         }
       end
 
@@ -513,7 +513,7 @@ RSpec.describe "remote resources" do
       before do
         params[:filter] = {
           'positions.department.name': "foo",
-          'positions.department.teams.id': "4",
+          'positions.department.teams.id': "4"
         }
       end
 
@@ -572,10 +572,10 @@ RSpec.describe "remote resources" do
             type: "positions",
             attributes: {
               title: "My Title",
-              employee_id: 1,
-            },
-          },
-        ],
+              employee_id: 1
+            }
+          }
+        ]
       }
     end
 
@@ -698,9 +698,9 @@ RSpec.describe "remote resources" do
           id: "789",
           type: "mastercards",
           attributes: {
-            number: 2222,
-          },
-        ],
+            number: 2222
+          }
+        ]
       }
     end
 
@@ -782,8 +782,8 @@ RSpec.describe "remote resources" do
           data: {
             type: "employees",
             id: "123",
-            attributes: {last_name: "Jane"},
-          },
+            attributes: {last_name: "Jane"}
+          }
         }
       end
 

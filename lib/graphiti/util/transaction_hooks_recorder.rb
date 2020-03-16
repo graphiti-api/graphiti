@@ -65,7 +65,7 @@ module Graphiti
           Thread.current[:_graphiti_hooks] = {
             after_graph_persist: [],
             before_commit: [],
-            after_commit: [],
+            after_commit: []
           }
         end
 

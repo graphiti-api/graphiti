@@ -5,7 +5,7 @@ RSpec.describe Graphiti::Query do
   let(:position_resource) { Class.new(PORO::PositionResource) }
   let(:department_resource) { Class.new(PORO::DepartmentResource) }
   let(:resource) { employee_resource.new }
-  let(:params)   { {} }
+  let(:params) { {} }
   let(:instance) { described_class.new(resource, params) }
 
   before do
@@ -29,7 +29,7 @@ RSpec.describe Graphiti::Query do
     describe "includes" do
       let(:expected) do
         {
-          positions: {include: {department: {}}},
+          positions: {include: {department: {}}}
         }
       end
 
@@ -81,10 +81,10 @@ RSpec.describe Graphiti::Query do
             include: {
               positions: {
                 include: {
-                  department: {},
-                },
-              },
-            },
+                  department: {}
+                }
+              }
+            }
           })
         end
       end
@@ -200,7 +200,7 @@ RSpec.describe Graphiti::Query do
           params[:filter] = {
             name: "foo",
             positions: {title: "bar"},
-            departments: {description: "baz"},
+            departments: {description: "baz"}
           }
         end
 
@@ -212,11 +212,11 @@ RSpec.describe Graphiti::Query do
                 filter: {title: "bar"},
                 include: {
                   department: {
-                    filter: {description: "baz"},
-                  },
-                },
-              },
-            },
+                    filter: {description: "baz"}
+                  }
+                }
+              }
+            }
           }
         end
 
@@ -241,7 +241,7 @@ RSpec.describe Graphiti::Query do
           params[:filter] = {
             name: "foo",
             positions: {title: "bar"},
-            department: {description: "baz"},
+            department: {description: "baz"}
           }
         end
 
@@ -253,11 +253,11 @@ RSpec.describe Graphiti::Query do
                 filter: {title: "bar"},
                 include: {
                   department: {
-                    filter: {description: "baz"},
-                  },
-                },
-              },
-            },
+                    filter: {description: "baz"}
+                  }
+                }
+              }
+            }
           }
         end
 
@@ -265,14 +265,14 @@ RSpec.describe Graphiti::Query do
           expect(hash).to eq(expected)
         end
 
-        context 'with multiple filters' do
+        context "with multiple filters" do
           before do
             params[:filter][:positions][:id] = 4
           end
 
-          it 'keeps both filters' do
+          it "keeps both filters" do
             expect(hash[:include][:positions][:filter])
-              .to eq(title: 'bar', id: 4)
+              .to eq(title: "bar", id: 4)
           end
         end
 
@@ -298,10 +298,10 @@ RSpec.describe Graphiti::Query do
               positions: {
                 filter: {title: {eq: "asdf"}},
                 include: {
-                  department: {},
-                },
-              },
-            },
+                  department: {}
+                }
+              }
+            }
           }
         end
 
@@ -320,11 +320,11 @@ RSpec.describe Graphiti::Query do
                 positions: {
                   include: {
                     department: {
-                      filter: {name: {eq: "asdf"}},
-                    },
-                  },
-                },
-              },
+                      filter: {name: {eq: "asdf"}}
+                    }
+                  }
+                }
+              }
             }
           end
 
@@ -438,11 +438,11 @@ RSpec.describe Graphiti::Query do
                 sort: [{title: :asc}, {rank: :desc}],
                 include: {
                   department: {
-                    sort: [{description: :desc}],
-                  },
-                },
-              },
-            },
+                    sort: [{description: :desc}]
+                  }
+                }
+              }
+            }
           }
         end
 
@@ -474,11 +474,11 @@ RSpec.describe Graphiti::Query do
                 sort: [{title: :asc}, {rank: :desc}],
                 include: {
                   department: {
-                    sort: [{description: :desc}],
-                  },
-                },
-              },
-            },
+                    sort: [{description: :desc}]
+                  }
+                }
+              }
+            }
           }
         end
 
@@ -508,11 +508,11 @@ RSpec.describe Graphiti::Query do
               positions: {
                 include: {
                   department: {
-                    sort: [{name: :desc}],
-                  },
-                },
-              },
-            },
+                    sort: [{name: :desc}]
+                  }
+                }
+              }
+            }
           }
         end
 
@@ -528,7 +528,7 @@ RSpec.describe Graphiti::Query do
           params[:page] = {
             number: 2, size: 1,
             positions: {number: 3, size: 2},
-            departments: {number: 4, size: 3},
+            departments: {number: 4, size: 3}
           }
         end
 
@@ -540,11 +540,11 @@ RSpec.describe Graphiti::Query do
                 page: {number: 3, size: 2},
                 include: {
                   department: {
-                    page: {number: 4, size: 3},
-                  },
-                },
-              },
-            },
+                    page: {number: 4, size: 3}
+                  }
+                }
+              }
+            }
           }
         end
 
@@ -568,7 +568,7 @@ RSpec.describe Graphiti::Query do
           params[:page] = {
             number: 2, size: 1,
             positions: {number: 3, size: 2},
-            department: {number: 4, size: 3},
+            department: {number: 4, size: 3}
           }
         end
 
@@ -580,11 +580,11 @@ RSpec.describe Graphiti::Query do
                 page: {number: 3, size: 2},
                 include: {
                   department: {
-                    page: {number: 4, size: 3},
-                  },
-                },
-              },
-            },
+                    page: {number: 4, size: 3}
+                  }
+                }
+              }
+            }
           }
         end
 
@@ -610,7 +610,7 @@ RSpec.describe Graphiti::Query do
             'positions.size': 2,
             'positions.number': 3,
             'positions.department.size': 3,
-            'positions.department.number': 4,
+            'positions.department.number': 4
           }
         end
 
@@ -622,11 +622,11 @@ RSpec.describe Graphiti::Query do
                 page: {number: 3, size: 2},
                 include: {
                   department: {
-                    page: {number: 4, size: 3},
-                  },
-                },
-              },
-            },
+                    page: {number: 4, size: 3}
+                  }
+                }
+              }
+            }
           }
         end
 
@@ -667,7 +667,7 @@ RSpec.describe Graphiti::Query do
           params[:fields] = {
             employees: "first_name,last_name",
             positions: "title",
-            departments: "description",
+            departments: "description"
           }
         end
 
@@ -676,15 +676,15 @@ RSpec.describe Graphiti::Query do
             fields: {
               employees: [:first_name, :last_name],
               positions: [:title],
-              departments: [:description],
+              departments: [:description]
             },
             include: {
               positions: {
                 include: {
-                  department: {},
-                },
-              },
-            },
+                  department: {}
+                }
+              }
+            }
           }
         end
 
@@ -731,7 +731,7 @@ RSpec.describe Graphiti::Query do
           params[:extra_fields] = {
             employees: "foo,bar",
             positions: "baz",
-            departments: "bax",
+            departments: "bax"
           }
         end
 
@@ -740,15 +740,15 @@ RSpec.describe Graphiti::Query do
             extra_fields: {
               employees: [:foo, :bar],
               positions: [:baz],
-              departments: [:bax],
+              departments: [:bax]
             },
             include: {
               positions: {
                 include: {
-                  department: {},
-                },
-              },
-            },
+                  department: {}
+                }
+              }
+            }
           }
         end
 
@@ -771,28 +771,28 @@ RSpec.describe Graphiti::Query do
     context "when fields are also present" do
       before do
         params[:fields] = {
-          employees: "foo,bar",
+          employees: "foo,bar"
         }
         params[:extra_fields] = {
-          employees: "baz,bax",
+          employees: "baz,bax"
         }
       end
 
       it "adds extra fields to fields" do
         expect(hash).to eq({
           fields: {
-            employees: [:foo, :bar, :baz, :bax],
+            employees: [:foo, :bar, :baz, :bax]
           },
           extra_fields: {
-            employees: [:baz, :bax],
+            employees: [:baz, :bax]
           },
           include: {
             positions: {
               include: {
-                department: {},
-              },
-            },
-          },
+                department: {}
+              }
+            }
+          }
         })
       end
     end
@@ -808,10 +808,10 @@ RSpec.describe Graphiti::Query do
           include: {
             positions: {
               include: {
-                department: {},
-              },
-            },
-          },
+                department: {}
+              }
+            }
+          }
         }
       end
 

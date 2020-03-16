@@ -38,12 +38,12 @@ RSpec.describe "sideloading" do
   let!(:bio2) { PORO::Bio.create(employee_id: employee.id) }
   let!(:team1) do
     PORO::Team.create team_memberships: [
-      PORO::TeamMembership.new(employee_id: employee.id, team_id: 1),
+      PORO::TeamMembership.new(employee_id: employee.id, team_id: 1)
     ]
   end
   let!(:team2) do
     PORO::Team.create team_memberships: [
-      PORO::TeamMembership.new(employee_id: employee.id, team_id: 2),
+      PORO::TeamMembership.new(employee_id: employee.id, team_id: 2)
     ]
   end
 
@@ -54,7 +54,7 @@ RSpec.describe "sideloading" do
           scope do |employee_ids|
             {
               type: :positions,
-              conditions: {employee_id: employee_ids},
+              conditions: {employee_id: employee_ids}
             }
           end
 
@@ -154,7 +154,7 @@ RSpec.describe "sideloading" do
           scope do |employee_ids|
             {
               type: :positions,
-              conditions: {employee_id: employee_ids},
+              conditions: {employee_id: employee_ids}
             }
           end
 
@@ -182,7 +182,7 @@ RSpec.describe "sideloading" do
           scope do |employee_ids|
             {
               type: :positions,
-              conditions: {employee_id: employee_ids},
+              conditions: {employee_id: employee_ids}
             }
           end
 
@@ -221,7 +221,7 @@ RSpec.describe "sideloading" do
           scope do |employee_ids|
             {
               type: :positions,
-              conditions: {employee_id: employee_ids},
+              conditions: {employee_id: employee_ids}
             }
           end
         end
@@ -244,7 +244,7 @@ RSpec.describe "sideloading" do
             scope do |employee_ids|
               {
                 type: :positions,
-                conditions: {e_id: employee_ids},
+                conditions: {e_id: employee_ids}
               }
             end
           end
@@ -276,7 +276,7 @@ RSpec.describe "sideloading" do
           scope do |employee_ids|
             {
               type: :employees,
-              conditions: {id: employee_ids},
+              conditions: {id: employee_ids}
             }
           end
         end
@@ -298,7 +298,7 @@ RSpec.describe "sideloading" do
           scope do |employee_ids|
             {
               type: :bios,
-              conditions: {employee_id: employee_ids},
+              conditions: {employee_id: employee_ids}
             }
           end
         end
@@ -320,7 +320,7 @@ RSpec.describe "sideloading" do
           scope do |employee_ids|
             {
               type: :teams,
-              conditions: {id: [1, 2]},
+              conditions: {id: [1, 2]}
             }
           end
         end
@@ -359,14 +359,14 @@ RSpec.describe "sideloading" do
 
     def assert_correct_response
       expect(credit_card(0)).to eq({
-        "type" => "visas", "id" => "1",
+        "type" => "visas", "id" => "1"
       })
       expect(credit_card(1)).to eq({
-        "type" => "mastercards", "id" => "1",
+        "type" => "mastercards", "id" => "1"
       })
       expect(included[0].jsonapi_type).to eq("visas")
       expect(included[0].relationships).to eq({
-        "visa_rewards" => {"meta" => {"included" => false}},
+        "visa_rewards" => {"meta" => {"included" => false}}
       })
       expect(included[1].jsonapi_type).to eq("mastercards")
       expect(included[1].relationships).to be_nil
@@ -407,7 +407,7 @@ RSpec.describe "sideloading" do
         expect(sl.resource.class).to be_abstract_class
         expect(sl.resource.polymorphic).to match_array([
           sl.children[:visa].resource_class,
-          sl.children[:mastercard].resource_class,
+          sl.children[:mastercard].resource_class
         ])
       end
 
@@ -505,17 +505,17 @@ RSpec.describe "sideloading" do
 
       def assert_correct_response
         expect(credit_card(0)).to eq({
-          "type" => "visas", "id" => "1",
+          "type" => "visas", "id" => "1"
         })
         expect(credit_card(1)).to eq({
-          "type" => "mastercards", "id" => "1",
+          "type" => "mastercards", "id" => "1"
         })
         expect(payment_processor(2)).to eq({
-          "type" => "paypals", "id" => "1",
+          "type" => "paypals", "id" => "1"
         })
         expect(included[0].jsonapi_type).to eq("visas")
         expect(included[0].relationships).to eq({
-          "visa_rewards" => {"meta" => {"included" => false}},
+          "visa_rewards" => {"meta" => {"included" => false}}
         })
         expect(included[1].jsonapi_type).to eq("mastercards")
         expect(included[1].relationships).to be_nil
@@ -600,7 +600,7 @@ RSpec.describe "sideloading" do
       it "is respected" do
         render
         expect(credit_card(0)).to eq({
-          "type" => "special_visas", "id" => "1",
+          "type" => "special_visas", "id" => "1"
         })
       end
     end
@@ -633,7 +633,7 @@ RSpec.describe "sideloading" do
           scope do |department_ids|
             {
               type: :departments,
-              conditions: {id: department_ids},
+              conditions: {id: department_ids}
             }
           end
         end
@@ -656,7 +656,7 @@ RSpec.describe "sideloading" do
       end
       params[:include] = "positions"
       params[:page] = {
-        positions: {size: 1},
+        positions: {size: 1}
       }
     end
 
@@ -675,7 +675,7 @@ RSpec.describe "sideloading" do
       params[:include] = "positions"
       params[:page] = {
         size: 1,
-        positions: {size: 1},
+        positions: {size: 1}
       }
     end
 
@@ -715,7 +715,7 @@ RSpec.describe "sideloading" do
         let(:has_many_opts) do
           {
             resource: position_resource,
-            primary_key: :classification_id,
+            primary_key: :classification_id
           }
         end
 

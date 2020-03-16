@@ -53,7 +53,7 @@ module Graphiti
       def add(attribute, code, message: nil)
         message ||= "is #{code.to_s.humanize.downcase}"
 
-        details[attribute.to_sym]  << {error: code}
+        details[attribute.to_sym] << {error: code}
         messages[attribute.to_sym] << message
       end
 

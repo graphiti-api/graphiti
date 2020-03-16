@@ -93,7 +93,7 @@ module Graphiti
         raise "Unable to set #{self} default_attributes from #{attributes_class}. #{attributes_class} must be a kind of ApplicationRecord"
       end
       if attributes_class.table_exists?
-        return attributes_class.columns.map do |c|
+        attributes_class.columns.map do |c|
           OpenStruct.new({name: c.name.to_sym, type: c.type})
         end
       else

@@ -10,7 +10,7 @@ RSpec.describe Graphiti::Sideload::HasMany do
   let(:opts) do
     {
       parent_resource: parent_resource_class,
-      resource: resource_class,
+      resource: resource_class
     }
   end
   let(:name) { :positions }
@@ -46,7 +46,7 @@ RSpec.describe Graphiti::Sideload::HasMany do
     it "adds primary key filter" do
       params = instance.load_params(parents, query)
       expect(params).to eq({
-        filter: {bar_id: "8,9"},
+        filter: {bar_id: "8,9"}
       })
     end
 
@@ -56,7 +56,7 @@ RSpec.describe Graphiti::Sideload::HasMany do
       result = instance.load_params(parents, query)
       expect(result).to eq({
         filter: {bar_id: "8,9", a: "b"},
-        sort: [{id: :desc}],
+        sort: [{id: :desc}]
       })
     end
   end

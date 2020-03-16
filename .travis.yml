@@ -11,7 +11,7 @@ gemfile:
   - gemfiles/rails_5_graphiti_rails.gemfile
   - gemfiles/rails_6_graphiti_rails.gemfile
 env:
-  - COMMAND=standardrb --no-fix --format progress
+  - COMMAND="standardrb --no-fix --format progress"
   - COMMAND=rspec
   - COMMAND=rspec APPRAISAL_INITIALIZED=true
 matrix:

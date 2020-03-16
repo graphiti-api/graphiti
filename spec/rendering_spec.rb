@@ -78,13 +78,13 @@ RSpec.describe "serialization" do
         "id" => "1",
         "first_name" => "John",
         "last_name" => "Doe",
-        "age" => 33,
+        "age" => 33
       })
       expect(json[1]).to eq({
         "id" => "2",
         "first_name" => "Jane",
         "last_name" => "Dougherty",
-        "age" => 44,
+        "age" => 44
       })
     end
 
@@ -131,13 +131,13 @@ RSpec.describe "serialization" do
           "id" => "1",
           "title" => "title1",
           "rank" => 1,
-          "department" => {"id" => "1", "name" => "dep1"},
+          "department" => {"id" => "1", "name" => "dep1"}
         ])
         expect(json[1]["positions"]).to eq([
           "id" => "2",
           "title" => "title2",
           "rank" => 2,
-          "department" => {"id" => "2", "name" => "dep2"},
+          "department" => {"id" => "2", "name" => "dep2"}
         ])
       end
     end
@@ -179,7 +179,7 @@ RSpec.describe "serialization" do
       it "works" do
         json = JSON.parse(proxy.to_json)
         expect(json["meta"]).to eq({
-          "stats" => {"total" => {"count" => "poro_count_total"}},
+          "stats" => {"total" => {"count" => "poro_count_total"}}
         })
       end
 
@@ -187,7 +187,7 @@ RSpec.describe "serialization" do
         json = JSON.parse(proxy.to_json(meta: {foo: "bar"}))
         expect(json["meta"]).to eq({
           "foo" => "bar",
-          "stats" => {"total" => {"count" => "poro_count_total"}},
+          "stats" => {"total" => {"count" => "poro_count_total"}}
         })
       end
     end
@@ -202,13 +202,13 @@ RSpec.describe "serialization" do
         "id" => "1",
         "first_name" => "John",
         "last_name" => "Doe",
-        "age" => 33,
+        "age" => 33
       })
       expect(xml[1]).to eq({
         "id" => "2",
         "first_name" => "Jane",
         "last_name" => "Dougherty",
-        "age" => 44,
+        "age" => 44
       })
     end
 
@@ -223,13 +223,13 @@ RSpec.describe "serialization" do
           "id" => "1",
           "title" => "title1",
           "rank" => 1,
-          "department" => {"id" => "1", "name" => "dep1"},
+          "department" => {"id" => "1", "name" => "dep1"}
         ])
         expect(xml[1]["positions"]).to eq([
           "id" => "2",
           "title" => "title2",
           "rank" => 2,
-          "department" => {"id" => "2", "name" => "dep2"},
+          "department" => {"id" => "2", "name" => "dep2"}
         ])
       end
     end
@@ -271,7 +271,7 @@ RSpec.describe "serialization" do
       it "works" do
         xml = Hash.from_xml(proxy.to_xml)["data"]
         expect(xml["meta"]).to eq({
-          "stats" => {"total" => {"count" => "poro_count_total"}},
+          "stats" => {"total" => {"count" => "poro_count_total"}}
         })
       end
 
@@ -279,7 +279,7 @@ RSpec.describe "serialization" do
         xml = Hash.from_xml(proxy.to_xml(meta: {foo: "bar"}))["data"]
         expect(xml["meta"]).to eq({
           "foo" => "bar",
-          "stats" => {"total" => {"count" => "poro_count_total"}},
+          "stats" => {"total" => {"count" => "poro_count_total"}}
         })
       end
     end

@@ -5,8 +5,8 @@ RSpec.describe Graphiti::Deserializer do
     {
       data: {
         type: "employees",
-        attributes: {first_name: "Homer", last_name: "Simpson"},
-      },
+        attributes: {first_name: "Homer", last_name: "Simpson"}
+      }
     }
   end
 
@@ -18,7 +18,7 @@ RSpec.describe Graphiti::Deserializer do
     it "deserializes base attributes correctly" do
       expect(subject).to eq({
         first_name: "Homer",
-        last_name: "Simpson",
+        last_name: "Simpson"
       })
     end
 
@@ -51,18 +51,18 @@ RSpec.describe Graphiti::Deserializer do
           relationships: {
             positions: {
               data: [
-                {'temp-id': "abc123", type: "positions", method: "create"},
-              ],
-            },
-          },
+                {'temp-id': "abc123", type: "positions", method: "create"}
+              ]
+            }
+          }
         },
         included: [
           {
             'temp-id': "abc123",
             type: "positions",
-            attributes: {title: "specialist"},
-          },
-        ],
+            attributes: {title: "specialist"}
+          }
+        ]
       }
     end
 
@@ -74,12 +74,12 @@ RSpec.describe Graphiti::Deserializer do
               temp_id: "abc123",
               method: :create,
               jsonapi_type: "positions",
-              payload_path: ["included", 0],
+              payload_path: ["included", 0]
             },
             attributes: {title: "specialist"},
-            relationships: {},
-          },
-        ],
+            relationships: {}
+          }
+        ]
       })
     end
 
@@ -99,14 +99,14 @@ RSpec.describe Graphiti::Deserializer do
         payload[:included][0][:relationships] = {
           department: {
             data: {
-              type: "departments", 'temp-id': "def456", method: "create",
-            },
-          },
+              type: "departments", 'temp-id': "def456", method: "create"
+            }
+          }
         }
         payload[:included] << {
           'temp-id': "def456",
           type: "departments",
-          attributes: {name: "safety"},
+          attributes: {name: "safety"}
         }
       end
 
@@ -118,7 +118,7 @@ RSpec.describe Graphiti::Deserializer do
                 temp_id: "abc123",
                 method: :create,
                 jsonapi_type: "positions",
-                payload_path: ["included", 0],
+                payload_path: ["included", 0]
               },
               attributes: {title: "specialist"},
               relationships: {
@@ -127,14 +127,14 @@ RSpec.describe Graphiti::Deserializer do
                     jsonapi_type: "departments",
                     temp_id: "def456",
                     method: :create,
-                    payload_path: ["included", 1],
+                    payload_path: ["included", 1]
                   },
                   attributes: {name: "safety"},
-                  relationships: {},
-                },
-              },
-            },
-          ],
+                  relationships: {}
+                }
+              }
+            }
+          ]
         })
       end
     end
@@ -149,10 +149,10 @@ RSpec.describe Graphiti::Deserializer do
             positions: {
               data: [
                 {'temp-id': "abc123", type: "positions", method: "create"},
-                {'temp-id': "ghi789", type: "positions", method: "create"},
-              ],
-            },
-          },
+                {'temp-id': "ghi789", type: "positions", method: "create"}
+              ]
+            }
+          }
         },
         included: [
           {
@@ -164,10 +164,10 @@ RSpec.describe Graphiti::Deserializer do
                 data: {
                   'temp-id': "def456",
                   type: "departments",
-                  method: "create",
-                },
-              },
-            },
+                  method: "create"
+                }
+              }
+            }
           },
           {
             type: "positions",
@@ -179,10 +179,10 @@ RSpec.describe Graphiti::Deserializer do
                 data: {
                   'temp-id': "d3p2",
                   method: "create",
-                  type: "departments",
-                },
-              },
-            },
+                  type: "departments"
+                }
+              }
+            }
           },
           {
             type: "departments",
@@ -192,10 +192,10 @@ RSpec.describe Graphiti::Deserializer do
             relationships: {
               tags: {
                 data: [
-                  {'temp-id': "t4g1", type: "tags", method: "create"},
-                ],
-              },
-            },
+                  {'temp-id': "t4g1", type: "tags", method: "create"}
+                ]
+              }
+            }
           },
           {
             type: "departments",
@@ -205,17 +205,17 @@ RSpec.describe Graphiti::Deserializer do
             relationships: {
               tags: {
                 data: [
-                  {'temp-id': "t4g1", type: "tags", method: "destroy"},
-                ],
-              },
-            },
+                  {'temp-id': "t4g1", type: "tags", method: "destroy"}
+                ]
+              }
+            }
           },
           {
             type: "tags",
             'temp-id': "t4g1",
-            attributes: {name: "foo"},
-          },
-        ],
+            attributes: {name: "foo"}
+          }
+        ]
       }
     end
 
@@ -223,9 +223,9 @@ RSpec.describe Graphiti::Deserializer do
       expect(instance.include_hash).to eq({
         positions: {
           department: {
-            tags: {},
-          },
-        },
+            tags: {}
+          }
+        }
       })
     end
   end

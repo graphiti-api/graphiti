@@ -25,9 +25,9 @@ module Graphiti
       # @param [Hash] opts configuration options used by subclasses
       def initialize(resource, query_hash, scope, opts = {})
         @query_hash = query_hash
-        @resource   = resource
-        @scope      = scope
-        @opts       = opts
+        @resource = resource
+        @scope = scope
+        @opts = opts
       end
 
       # Apply this scoping criteria.

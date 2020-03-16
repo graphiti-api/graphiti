@@ -6,7 +6,7 @@ module Graphiti
     end
 
     generators do
-      Dir[File.expand_path("../../deprecated_generators/**/*.rb", __dir__)].each do |f|
+      Dir[File.expand_path("../../deprecated_generators/**/*.rb", __dir__)].sort.each do |f|
         require f
       end
     end

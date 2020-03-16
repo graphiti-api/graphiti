@@ -39,7 +39,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       before do
         controller.class.sideload_allowlist = {
           index: [:books],
-          show: {books: :genre},
+          show: {books: :genre}
         }
       end
 

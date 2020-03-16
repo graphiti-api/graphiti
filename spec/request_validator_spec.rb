@@ -41,7 +41,7 @@ RSpec.describe Graphiti::RequestValidator do
     end
   end
 
-  describe '#validate' do
+  describe "#validate" do
     subject(:validate) { instance.validate }
 
     context "when empty payload" do
@@ -59,9 +59,9 @@ RSpec.describe Graphiti::RequestValidator do
           data: {
             type: "employees",
             attributes: {
-              first_name: "Jane",
-            },
-          },
+              first_name: "Jane"
+            }
+          }
         }
       end
 
@@ -164,9 +164,9 @@ RSpec.describe Graphiti::RequestValidator do
               type: "visas",
               attributes: {
                 number: "4222222222222222",
-                visa_only_attr: "TestInheritance",
-              },
-            },
+                visa_only_attr: "TestInheritance"
+              }
+            }
           }
         end
 
@@ -180,7 +180,7 @@ RSpec.describe Graphiti::RequestValidator do
           before do
             payload["action"] = "update"
             payload[:data][:id] = 1
-            payload[:filter] = { id: 1 }
+            payload[:filter] = {id: 1}
           end
 
           it "accepts the child type" do
@@ -209,31 +209,31 @@ RSpec.describe Graphiti::RequestValidator do
                   data: [{
                     'temp-id': "abc123",
                     type: "positions",
-                    method: "create",
+                    method: "create"
                   }, {
                     'temp-id': "def456",
                     type: "positions",
-                    method: "create",
-                  },],
-                },
-              },
+                    method: "create"
+                  }]
+                }
+              }
             },
             included: [
               {
                 'temp-id': "abc123",
                 type: "positions",
                 attributes: {
-                  title: "foo",
-                },
+                  title: "foo"
+                }
               },
               {
                 'temp-id': "def456",
                 type: "positions",
                 attributes: {
-                  title: "bar",
-                },
-              },
-            ],
+                  title: "bar"
+                }
+              }
+            ]
           }
         end
 
@@ -253,12 +253,12 @@ RSpec.describe Graphiti::RequestValidator do
               data: [{
                 'temp-id': "abc123",
                 type: "positions",
-                method: "create",
+                method: "create"
               }, {
                 'temp-id': "def456",
                 type: "positions",
-                method: "create",
-              },],
+                method: "create"
+              }]
             }
           end
 
@@ -302,30 +302,30 @@ RSpec.describe Graphiti::RequestValidator do
     end
   end
 
-  describe '#validate' do
+  describe "#validate" do
     subject(:validate!) { instance.validate! }
 
-    context 'when there are no request errors' do
+    context "when there are no request errors" do
       let(:payload) { {} }
       it { is_expected.to eq true }
     end
 
-    context 'when there are request errors' do
+    context "when there are request errors" do
       let(:payload) do
         {
           data: {
             type: "employees",
             attributes: {
-              something_unknown: "bad",
-            },
-          },
+              something_unknown: "bad"
+            }
+          }
         }
       end
 
       it "raises an error" do
         expect {
           validate!
-        }.to(raise_error {|e|
+        }.to(raise_error { |e|
           expect(e).to be_kind_of(Graphiti::Errors::InvalidRequest)
           expect(e.errors).to eq instance.errors
         })

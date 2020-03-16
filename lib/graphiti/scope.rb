@@ -3,10 +3,10 @@ module Graphiti
     attr_accessor :object, :unpaginated_object
     attr_reader :pagination
     def initialize(object, resource, query, opts = {})
-      @object    = object
-      @resource  = resource
-      @query     = query
-      @opts      = opts
+      @object = object
+      @resource = resource
+      @query = query
+      @opts = opts
 
       @object = @resource.around_scoping(@object, @query.hash) { |scope|
         apply_scoping(scope, opts)
@@ -75,7 +75,7 @@ module Graphiti
         resource: @resource,
         params: @opts[:params],
         sideload: @opts[:sideload],
-        parent: @opts[:parent],
+        parent: @opts[:parent]
         # Set once data is resolved within block
         #   results: ...
       }

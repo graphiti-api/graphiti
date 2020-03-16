@@ -21,9 +21,9 @@ RSpec.describe "polymorphic resource behavior" do
           type: "visas",
           attributes: {
             number: "4222222222222222",
-            visa_only_attr: "TestInheritance",
-          },
-        },
+            visa_only_attr: "TestInheritance"
+          }
+        }
       }
     end
     context "through derived resource" do
@@ -92,11 +92,11 @@ RSpec.describe "polymorphic resource behavior" do
       expect(json["data"][0]["attributes"]).to eq({
         "number" => 123,
         "description" => "visa description",
-        "visa_only_attr" => "visa only",
+        "visa_only_attr" => "visa only"
       })
       expect(json["data"][1]["attributes"]).to eq({
         "number" => 456,
-        "description" => "mastercard description",
+        "description" => "mastercard description"
       })
     end
   end
@@ -111,13 +111,13 @@ RSpec.describe "polymorphic resource behavior" do
       render
       expect(json["data"][0]["relationships"]).to eq({
         "visa_rewards" => {
-          "data" => [{"type" => "visa_rewards", "id" => "1"}],
-        },
+          "data" => [{"type" => "visa_rewards", "id" => "1"}]
+        }
       })
       expect(json["included"]).to eq([{
         "id" => "1",
         "type" => "visa_rewards",
-        "attributes" => {"points" => 100},
+        "attributes" => {"points" => 100}
       }])
     end
 

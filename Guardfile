@@ -21,12 +21,12 @@ guard :rspec, cmd: "bundle exec rspec --color --format documentation" do
   watch(rails.controllers) do |m|
     [
       rspec.spec.call("controllers/#{m[1]}_controller"),
-      rspec.spec.call("api/#{m[1]}"),
+      rspec.spec.call("api/#{m[1]}")
     ]
   end
 
   # Rails config changes
-  watch(rails.spec_helper)     { rspec.spec_dir }
-  watch(rails.routes)          { "#{rspec.spec_dir}/routing" }
-  watch(rails.app_controller)  { "#{rspec.spec_dir}/controllers" }
+  watch(rails.spec_helper) { rspec.spec_dir }
+  watch(rails.routes) { "#{rspec.spec_dir}/routing" }
+  watch(rails.app_controller) { "#{rspec.spec_dir}/controllers" }
 end

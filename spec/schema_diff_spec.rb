@@ -53,7 +53,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "SchemaDiff::EmployeeResource: attribute :first_name changed flag :#{flag} from true to false.",
+          "SchemaDiff::EmployeeResource: attribute :first_name changed flag :#{flag} from true to false."
         ])
       end
     end
@@ -75,7 +75,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "SchemaDiff::EmployeeResource: attribute :first_name changed flag :#{flag} from true to \"guarded\".",
+          "SchemaDiff::EmployeeResource: attribute :first_name changed flag :#{flag} from true to \"guarded\"."
         ])
       end
     end
@@ -106,7 +106,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "SchemaDiff::EmployeeResource: attribute :first_name changed flag :#{flag} from \"guarded\" to false.",
+          "SchemaDiff::EmployeeResource: attribute :first_name changed flag :#{flag} from \"guarded\" to false."
         ])
       end
     end
@@ -152,7 +152,7 @@ RSpec.describe Graphiti::SchemaDiff do
       it "returns error" do
         expect(diff).to eq([
           "SchemaDiff::EmployeeResource: attribute :first_name changed type from \"string\" to \"integer\".",
-          "SchemaDiff::EmployeeResource: filter :first_name changed type from \"string\" to \"integer\".",
+          "SchemaDiff::EmployeeResource: filter :first_name changed type from \"string\" to \"integer\"."
         ])
       end
     end
@@ -173,7 +173,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
         it "returns error" do
           expect(diff).to eq([
-            "SchemaDiff::EmployeeResource: sort :first_name was removed.",
+            "SchemaDiff::EmployeeResource: sort :first_name was removed."
           ])
         end
       end
@@ -195,7 +195,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
         it "returns error" do
           expect(diff).to eq([
-            "SchemaDiff::EmployeeResource: sort :first_name became guarded.",
+            "SchemaDiff::EmployeeResource: sort :first_name became guarded."
           ])
         end
       end
@@ -226,7 +226,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
         it "returns error" do
           expect(diff).to eq([
-            "SchemaDiff::EmployeeResource: sort :first_name was removed.",
+            "SchemaDiff::EmployeeResource: sort :first_name was removed."
           ])
         end
       end
@@ -247,10 +247,10 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-                             "SchemaDiff::EmployeeResource: attribute :first_name was removed.",
-                             "SchemaDiff::EmployeeResource: sort :first_name was removed.",
-                             "SchemaDiff::EmployeeResource: filter :first_name was removed."
-                           ])
+          "SchemaDiff::EmployeeResource: attribute :first_name was removed.",
+          "SchemaDiff::EmployeeResource: sort :first_name was removed.",
+          "SchemaDiff::EmployeeResource: filter :first_name was removed."
+        ])
       end
     end
 
@@ -264,7 +264,7 @@ RSpec.describe Graphiti::SchemaDiff do
         expect(diff).to eq([
           "SchemaDiff::EmployeeResource: attribute :foo was removed.",
           "SchemaDiff::EmployeeResource: sort :foo was removed.",
-          "SchemaDiff::EmployeeResource: filter :foo was removed.",
+          "SchemaDiff::EmployeeResource: filter :foo was removed."
         ])
       end
     end
@@ -306,7 +306,7 @@ RSpec.describe Graphiti::SchemaDiff do
       it "returns error" do
         expect(diff).to eq([
           "SchemaDiff::AnotherResource was removed.",
-          'Endpoint "/schema_diff/anothers" was removed.',
+          'Endpoint "/schema_diff/anothers" was removed.'
         ])
       end
     end
@@ -319,7 +319,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          'SchemaDiff::EmployeeResource changed type from "employees" to "special_employees".',
+          'SchemaDiff::EmployeeResource changed type from "employees" to "special_employees".'
         ])
       end
     end
@@ -340,7 +340,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "SchemaDiff::EmployeeResource: extra attribute :foo was removed.",
+          "SchemaDiff::EmployeeResource: extra attribute :foo was removed."
         ])
       end
     end
@@ -353,7 +353,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          'SchemaDiff::EmployeeResource: extra attribute :foo changed type from "string" to "integer".',
+          'SchemaDiff::EmployeeResource: extra attribute :foo changed type from "string" to "integer".'
         ])
       end
     end
@@ -375,7 +375,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          'SchemaDiff::EmployeeResource: extra attribute :foo changed flag :readable from true to "guarded".',
+          'SchemaDiff::EmployeeResource: extra attribute :foo changed flag :readable from true to "guarded".'
         ])
       end
     end
@@ -397,7 +397,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          'SchemaDiff::EmployeeResource: extra attribute :foo changed flag :readable from "guarded" to false.',
+          'SchemaDiff::EmployeeResource: extra attribute :foo changed flag :readable from "guarded" to false.'
         ])
       end
     end
@@ -418,7 +418,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "SchemaDiff::EmployeeResource: sort :foo was removed.",
+          "SchemaDiff::EmployeeResource: sort :foo was removed."
         ])
       end
     end
@@ -431,7 +431,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "SchemaDiff::EmployeeResource: sort :foo now limited to only :asc.",
+          "SchemaDiff::EmployeeResource: sort :foo now limited to only :asc."
         ])
       end
     end
@@ -453,7 +453,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "SchemaDiff::EmployeeResource: sort :foo was limited to only :asc, now limited to only :desc.",
+          "SchemaDiff::EmployeeResource: sort :foo was limited to only :asc, now limited to only :desc."
         ])
       end
     end
@@ -465,7 +465,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "SchemaDiff::EmployeeResource: default sort added.",
+          "SchemaDiff::EmployeeResource: default sort added."
         ])
       end
     end
@@ -478,7 +478,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "SchemaDiff::EmployeeResource: default sort removed.",
+          "SchemaDiff::EmployeeResource: default sort removed."
         ])
       end
     end
@@ -491,7 +491,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          'SchemaDiff::EmployeeResource: default sort changed from [{:foo=>"asc"}] to [{:foo=>"desc"}].',
+          'SchemaDiff::EmployeeResource: default sort changed from [{:foo=>"asc"}] to [{:foo=>"desc"}].'
         ])
       end
     end
@@ -503,7 +503,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "SchemaDiff::EmployeeResource: default page size added.",
+          "SchemaDiff::EmployeeResource: default page size added."
         ])
       end
     end
@@ -516,7 +516,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "SchemaDiff::EmployeeResource: default page size removed.",
+          "SchemaDiff::EmployeeResource: default page size removed."
         ])
       end
     end
@@ -529,7 +529,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "SchemaDiff::EmployeeResource: default page size changed from 30 to 10.",
+          "SchemaDiff::EmployeeResource: default page size changed from 30 to 10."
         ])
       end
     end
@@ -550,7 +550,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "SchemaDiff::EmployeeResource: filter :foo was removed.",
+          "SchemaDiff::EmployeeResource: filter :foo was removed."
         ])
       end
     end
@@ -563,7 +563,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          'SchemaDiff::EmployeeResource: filter :foo changed type from "string" to "integer".',
+          'SchemaDiff::EmployeeResource: filter :foo changed type from "string" to "integer".'
         ])
       end
     end
@@ -591,7 +591,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          'SchemaDiff::EmployeeResource: filter :foo removed operator "bar".',
+          'SchemaDiff::EmployeeResource: filter :foo removed operator "bar".'
         ])
       end
     end
@@ -613,7 +613,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "SchemaDiff::EmployeeResource: filter :foo became singular.",
+          "SchemaDiff::EmployeeResource: filter :foo became singular."
         ])
       end
     end
@@ -626,7 +626,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          'SchemaDiff::EmployeeResource: filter :foo allowlist went from ["foo"] to ["foo", "bar"].',
+          'SchemaDiff::EmployeeResource: filter :foo allowlist went from ["foo"] to ["foo", "bar"].'
         ])
       end
     end
@@ -657,7 +657,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          'SchemaDiff::EmployeeResource: filter :foo allowlist went from [] to ["foo"].',
+          'SchemaDiff::EmployeeResource: filter :foo allowlist went from [] to ["foo"].'
         ])
       end
     end
@@ -670,7 +670,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          'SchemaDiff::EmployeeResource: filter :foo denylist went from ["foo"] to ["foo", "bar"].',
+          'SchemaDiff::EmployeeResource: filter :foo denylist went from ["foo"] to ["foo", "bar"].'
         ])
       end
     end
@@ -701,7 +701,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          'SchemaDiff::EmployeeResource: filter :foo denylist went from [] to ["foo"].',
+          'SchemaDiff::EmployeeResource: filter :foo denylist went from [] to ["foo"].'
         ])
       end
     end
@@ -723,7 +723,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "SchemaDiff::EmployeeResource: filter :foo went from optional to required.",
+          "SchemaDiff::EmployeeResource: filter :foo went from optional to required."
         ])
       end
     end
@@ -736,7 +736,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "SchemaDiff::EmployeeResource: filter :foo went from unguarded to guarded.",
+          "SchemaDiff::EmployeeResource: filter :foo went from unguarded to guarded."
         ])
       end
     end
@@ -758,7 +758,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          'SchemaDiff::EmployeeResource: filter :foo added dependencies ["foo"].',
+          'SchemaDiff::EmployeeResource: filter :foo added dependencies ["foo"].'
         ])
       end
     end
@@ -780,7 +780,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          'SchemaDiff::EmployeeResource: filter :foo changed dependencies from ["foo"] to ["bar"].',
+          'SchemaDiff::EmployeeResource: filter :foo changed dependencies from ["foo"] to ["bar"].'
         ])
       end
     end
@@ -801,7 +801,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "SchemaDiff::EmployeeResource: relationship :positions was removed.",
+          "SchemaDiff::EmployeeResource: relationship :positions was removed."
         ])
       end
     end
@@ -817,7 +817,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "SchemaDiff::EmployeeResource: relationship :positions became single: true.",
+          "SchemaDiff::EmployeeResource: relationship :positions became single: true."
         ])
       end
     end
@@ -850,7 +850,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "SchemaDiff::EmployeeResource: relationship :positions changed resource from SchemaDiff::PositionResource to SchemaDiff::PositionResource2.",
+          "SchemaDiff::EmployeeResource: relationship :positions changed resource from SchemaDiff::PositionResource to SchemaDiff::PositionResource2."
         ])
       end
     end
@@ -863,7 +863,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          'SchemaDiff::EmployeeResource: relationship :positions changed type from "has_many" to "belongs_to".',
+          'SchemaDiff::EmployeeResource: relationship :positions changed type from "has_many" to "belongs_to".'
         ])
       end
     end
@@ -875,7 +875,7 @@ RSpec.describe Graphiti::SchemaDiff do
           write: "",
           params: "",
           kind: "",
-          description: "",
+          description: ""
         }
         begin
           e.run
@@ -894,7 +894,7 @@ RSpec.describe Graphiti::SchemaDiff do
           write: "",
           params: "",
           kind: "",
-          description: "",
+          description: ""
         }
         a
         Graphiti::Types.map.delete(:foo)
@@ -902,7 +902,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          "Type :foo was removed.",
+          "Type :foo was removed."
         ])
       end
     end
@@ -914,7 +914,7 @@ RSpec.describe Graphiti::SchemaDiff do
           write: "",
           params: "",
           kind: "scalar",
-          description: "",
+          description: ""
         }
         a
         Graphiti::Types[:foo] = {
@@ -922,7 +922,7 @@ RSpec.describe Graphiti::SchemaDiff do
           write: "",
           params: "",
           kind: "array",
-          description: "",
+          description: ""
         }
         b
         Graphiti::Types.map.delete(:foo)
@@ -930,7 +930,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          'Type :foo changed kind from "scalar" to "array".',
+          'Type :foo changed kind from "scalar" to "array".'
         ])
       end
     end
@@ -963,7 +963,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns true" do
         expect(diff).to eq([
-          'Endpoint "/schema_diff/positions" was removed.',
+          'Endpoint "/schema_diff/positions" was removed.'
         ])
       end
     end
@@ -985,7 +985,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          'Endpoint "/schema_diff/positions" removed action :create.',
+          'Endpoint "/schema_diff/positions" removed action :create.'
         ])
       end
     end
@@ -998,7 +998,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
       it "returns error" do
         expect(diff).to eq([
-          'Endpoint "/schema_diff/employees" added sideload allowlist.',
+          'Endpoint "/schema_diff/employees" added sideload allowlist.'
         ])
       end
     end
@@ -1021,7 +1021,7 @@ RSpec.describe Graphiti::SchemaDiff do
       context "with an addition" do
         before do
           test_context.sideload_allowlist = {
-            index: [:positions],
+            index: [:positions]
           }
           a
           test_context.sideload_allowlist = {index: {positions: :department}}
@@ -1035,8 +1035,8 @@ RSpec.describe Graphiti::SchemaDiff do
           test_context.sideload_allowlist = {
             index: [
               {positions: :department},
-              :same,
-            ],
+              :same
+            ]
           }
           a
           test_context.sideload_allowlist = {index: [:positions, :same]}
@@ -1044,7 +1044,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
         it "returns error" do
           expect(diff).to eq([
-            'Endpoint "/schema_diff/employees" had incompatible sideload allowlist. Was [{:positions=>:department}, :same], now [:positions, :same].',
+            'Endpoint "/schema_diff/employees" had incompatible sideload allowlist. Was [{:positions=>:department}, :same], now [:positions, :same].'
           ])
         end
       end

@@ -1,10 +1,10 @@
 require "spec_helper"
 
 RSpec.describe Graphiti::Stats::Payload do
-  let(:dsl)      { double }
-  let(:query)    { double(stats: {attr1: [:count, :average], attr2: [:maximum]}) }
-  let(:scope)    { double.as_null_object }
-  let(:data)     { double.as_null_object }
+  let(:dsl) { double }
+  let(:query) { double(stats: {attr1: [:count, :average], attr2: [:maximum]}) }
+  let(:scope) { double.as_null_object }
+  let(:data) { double.as_null_object }
   let(:instance) { described_class.new(dsl, query, scope, data) }
 
   describe "#generate" do
@@ -23,7 +23,7 @@ RSpec.describe Graphiti::Stats::Payload do
     it "generates the correct payload for each requested stat" do
       expect(subject).to eq({
         attr1: {count: 2, average: 1},
-        attr2: {maximum: 3},
+        attr2: {maximum: 3}
       })
     end
   end

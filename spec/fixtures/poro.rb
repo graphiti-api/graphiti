@@ -16,7 +16,7 @@ module PORO
             mastercards: [],
             visa_rewards: [],
             books: [],
-            states: [],
+            states: []
           }
       end
 
@@ -39,7 +39,7 @@ module PORO
           mastercards: PORO::Mastercard,
           visa_rewards: PORO::VisaReward,
           books: PORO::Book,
-          states: PORO::State,
+          states: PORO::State
         }
       end
 

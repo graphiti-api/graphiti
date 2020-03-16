@@ -14,7 +14,7 @@ RSpec.describe Graphiti::Types do
           test: "foo",
           write: "foo",
           kind: "foo",
-          description: "foo",
+          description: "foo"
         }
       end
 
@@ -40,7 +40,7 @@ RSpec.describe Graphiti::Types do
             test: "foo",
             write: "foo",
             kind: "foo",
-            description: "foo",
+            description: "foo"
           }
           described_class[:string] = type
           expect(described_class[:string]).to eq(type)
