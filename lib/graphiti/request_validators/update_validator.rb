@@ -5,7 +5,7 @@ module Graphiti
         if required_payload? && payload_matches_endpoint?
           super
         else
-          return false
+          false
         end
       end
 
@@ -35,7 +35,6 @@ module Graphiti
         unless @raw_params.dig(:data, :id) == @raw_params.dig(:filter, :id)
           attribute_mismatch([:data, :id])
         end
-
 
         meta_type = @raw_params.dig(:data, :type)
 

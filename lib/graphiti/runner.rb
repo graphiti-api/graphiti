@@ -50,7 +50,7 @@ module Graphiti
     def jsonapi_render_options
       options = {}
       options.merge!(default_jsonapi_render_options)
-      options[:meta]   ||= {}
+      options[:meta] ||= {}
       options[:expose] ||= {}
       options[:expose][:context] = jsonapi_context
       options

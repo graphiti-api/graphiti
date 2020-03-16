@@ -34,8 +34,8 @@ if ENV["APPRAISAL_INITIALIZED"]
           {
             data: {
               type: "employees",
-              attributes: {first_name: "Joe"},
-            },
+              attributes: {first_name: "Joe"}
+            }
           }
         end
 
@@ -43,8 +43,8 @@ if ENV["APPRAISAL_INITIALIZED"]
           let(:params) do
             {
               stats: {
-                total: "count",
-              },
+                total: "count"
+              }
             }
           end
 
@@ -54,9 +54,9 @@ if ENV["APPRAISAL_INITIALIZED"]
             expect(json["meta"]).to eq({
               "stats" => {
                 "total" => {
-                  "count" => 1,
-                },
-              },
+                  "count" => 1
+                }
+              }
             })
           end
         end
@@ -65,8 +65,8 @@ if ENV["APPRAISAL_INITIALIZED"]
           let(:params) do
             {
               fields: {
-                employees: "first_name",
-              },
+                employees: "first_name"
+              }
             }
           end
 
@@ -76,7 +76,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             expect(jsonapi_data.attributes).to eq({
               "id" => Employee.last.id.to_s,
               "jsonapi_type" => "employees",
-              "first_name" => "Joe",
+              "first_name" => "Joe"
             })
           end
         end
@@ -93,10 +93,10 @@ if ENV["APPRAISAL_INITIALIZED"]
                 positions: {
                   data: [
                     {type: "positions", 'temp-id': "pos1", method: "create"},
-                    {type: "positions", 'temp-id': "pos2", method: "create"},
-                  ],
-                },
-              },
+                    {type: "positions", 'temp-id': "pos2", method: "create"}
+                  ]
+                }
+              }
             },
             included: [
               {
@@ -105,21 +105,21 @@ if ENV["APPRAISAL_INITIALIZED"]
                 attributes: {title: "specialist"},
                 relationships: {
                   department: {
-                    data: {type: "departments", 'temp-id': "dep1", method: "create"},
-                  },
-                },
+                    data: {type: "departments", 'temp-id': "dep1", method: "create"}
+                  }
+                }
               },
               {
                 type: "departments",
                 'temp-id': "dep1",
-                attributes: {name: "safety"},
+                attributes: {name: "safety"}
               },
               {
                 type: "positions",
                 'temp-id': "pos2",
-                attributes: {title: "manager"},
-              },
-            ],
+                attributes: {title: "manager"}
+              }
+            ]
           }
         end
 
@@ -129,8 +129,8 @@ if ENV["APPRAISAL_INITIALIZED"]
               fields: {
                 employees: "first_name",
                 positions: "title",
-                departments: "name",
-              },
+                departments: "name"
+              }
             }
           end
 
@@ -138,7 +138,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             make_request
 
             raw_json = JSON.parse(response.body)
-            includes_temp_ids = raw_json["included"].map {|i| i["temp-id"]}
+            includes_temp_ids = raw_json["included"].map { |i| i["temp-id"] }
 
             expect(raw_json["data"]["temp-id"]).to eq("empl1")
             expect(includes_temp_ids.sort).to eq(["dep1", "pos1", "pos2"])
@@ -157,17 +157,17 @@ if ENV["APPRAISAL_INITIALIZED"]
                 relationships: {
                   positions: {
                     data: {
-                      type: "positions", id: position.id.to_s,
-                    },
-                  },
-                },
-              },
+                      type: "positions", id: position.id.to_s
+                    }
+                  }
+                }
+              }
             }
           end
 
           let(:params) do
             {
-              include: "positions.department",
+              include: "positions.department"
             }
           end
 
@@ -177,7 +177,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             expect(included("departments")[0].attributes).to eq({
               "id" => department.id.to_s,
               "name" => department.name,
-              "jsonapi_type" => "departments",
+              "jsonapi_type" => "departments"
             })
           end
         end
@@ -197,8 +197,8 @@ if ENV["APPRAISAL_INITIALIZED"]
           data: {
             id: employee.id,
             type: "employees",
-            attributes: {first_name: "Jane"},
-          },
+            attributes: {first_name: "Jane"}
+          }
         }
       end
 
@@ -215,12 +215,12 @@ if ENV["APPRAISAL_INITIALIZED"]
           {
             fields: {
               employees: "first_name",
-              salaries: "base_rate",
+              salaries: "base_rate"
             },
             extra_fields: {
-              employees: "nickname",
+              employees: "nickname"
             },
-            include: "salary",
+            include: "salary"
           }
         end
 
@@ -231,7 +231,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             "id" => employee.id.to_s,
             "jsonapi_type" => "employees",
             "first_name" => "Jane",
-            "nickname" => "Slugger",
+            "nickname" => "Slugger"
           })
         end
 
@@ -241,15 +241,15 @@ if ENV["APPRAISAL_INITIALIZED"]
           expect(included("salaries").first.attributes).to eq({
             "id" => salary.id.to_s,
             "jsonapi_type" => "salaries",
-            "base_rate" => 80.0,
+            "base_rate" => 80.0
           })
         end
       end
 
       describe "nested update" do
-        let!(:employee)   { Employee.create!(first_name: "original", positions: [position1, position2], teams: teams) }
-        let!(:position1)  { Position.create!(title: "unchanged") }
-        let!(:position2)  { Position.create!(title: "original", department: department) }
+        let!(:employee) { Employee.create!(first_name: "original", positions: [position1, position2], teams: teams) }
+        let!(:position1) { Position.create!(title: "unchanged") }
+        let!(:position2) { Position.create!(title: "original", department: department) }
         let!(:department) { Department.create!(name: "original") }
         let!(:salary) { Salary.create!(base_rate: 80, overtime_rate: 800, employee: employee) }
         let!(:teams) { [Team.create!(name: "The A Team"), Team.create!(name: "The X Men")] }
@@ -265,13 +265,13 @@ if ENV["APPRAISAL_INITIALIZED"]
               relationships: {
                 positions: {
                   data: [
-                    {type: "positions", id: position2.id.to_s, method: "update"},
-                  ],
+                    {type: "positions", id: position2.id.to_s, method: "update"}
+                  ]
                 },
                 salary: {
-                  data: {type: "salaries", id: salary.id.to_s, method: "update"},
-                },
-              },
+                  data: {type: "salaries", id: salary.id.to_s, method: "update"}
+                }
+              }
             },
             included: [
               {
@@ -280,28 +280,28 @@ if ENV["APPRAISAL_INITIALIZED"]
                 attributes: {title: "updated title"},
                 relationships: {
                   department: {
-                    data: {type: "departments", id: department.id.to_s, method: "update"},
-                  },
-                },
+                    data: {type: "departments", id: department.id.to_s, method: "update"}
+                  }
+                }
               },
               {
                 type: "departments",
                 id: department.id.to_s,
-                attributes: {name: "updated name"},
+                attributes: {name: "updated name"}
               },
               {
                 type: "salaries",
                 id: salary.id.to_s,
-                attributes: {base_rate: 600},
-              },
-            ],
+                attributes: {base_rate: 600}
+              }
+            ]
           }
         end
 
         context "when positions and teams are included in requested output" do
           let(:params) do
             {
-              include: "positions,teams",
+              include: "positions,teams"
             }
           end
 

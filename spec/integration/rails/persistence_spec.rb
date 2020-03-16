@@ -30,8 +30,8 @@ if ENV["APPRAISAL_INITIALIZED"]
         {
           data: {
             type: "employees",
-            attributes: {first_name: "Joe"},
-          },
+            attributes: {first_name: "Joe"}
+          }
         }
       end
 
@@ -83,8 +83,8 @@ if ENV["APPRAISAL_INITIALIZED"]
           data: {
             id: employee.id,
             type: "employees",
-            attributes: {first_name: "Jane"},
-          },
+            attributes: {first_name: "Jane"}
+          }
         }
       end
 
@@ -106,7 +106,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(jsonapi_data["first_name"]).to eq("Jane")
       end
 
-      context 'when reserved parameter used' do
+      context "when reserved parameter used" do
         before do
           resource = Class.new(EmployeeResource) do
             self.validate_endpoints = false
@@ -126,7 +126,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           end
         end
 
-        it 'works as normal' do
+        it "works as normal" do
           expect {
             make_request
           }.to change { employee.reload.first_name }.from("Joe").to("Jane")
@@ -160,7 +160,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         it "raises a Graphiti::Errors::ConflictRequest" do
-          expect{
+          expect {
             make_request
           }.to raise_error(Graphiti::Errors::ConflictRequest)
         end
@@ -242,18 +242,18 @@ if ENV["APPRAISAL_INITIALIZED"]
                   data: [{
                     'temp-id': "abc123",
                     type: "positions",
-                    method: "create",
-                  }],
-                },
-              },
+                    method: "create"
+                  }]
+                }
+              }
             },
             included: [
               {
                 'temp-id': "abc123",
                 type: "positions",
-                attributes: {title: "foo"},
-              },
-            ],
+                attributes: {title: "foo"}
+              }
+            ]
           }
         end
 
@@ -265,7 +265,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         it "raises error" do
           expect {
             make_request
-          }.to(raise_error {|e|
+          }.to(raise_error { |e|
             expect(e).to be_a Graphiti::Errors::InvalidRequest
             expect(e.errors.full_messages).to eq ["data.relationships.positions is unwritable relationship"]
           })
@@ -292,11 +292,11 @@ if ENV["APPRAISAL_INITIALIZED"]
                 classification: {
                   data: {
                     id: classification.id.to_s,
-                    type: "classifications",
-                  },
-                },
-              },
-            },
+                    type: "classifications"
+                  }
+                }
+              }
+            }
           }
         end
 
@@ -307,7 +307,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         it "raises error" do
           expect {
             make_request
-          }.to(raise_error {|e|
+          }.to(raise_error { |e|
             expect(e).to be_a Graphiti::Errors::InvalidRequest
             expect(e.errors.full_messages).to eq ["data.relationships.classification is unwritable relationship"]
           })
@@ -331,9 +331,9 @@ if ENV["APPRAISAL_INITIALIZED"]
       let(:polyvalentEmployee) do
         Class.new(Employee) do
           def self.model_name
-            ActiveModel::Name.new(self, nil, 'PolyvalentEmployee')
+            ActiveModel::Name.new(self, nil, "PolyvalentEmployee")
           end
-          validates :positions, length: { minimum: 2, too_short: 'too short, minimum is 2' }, on: :after_graph_persisted
+          validates :positions, length: {minimum: 2, too_short: "too short, minimum is 2"}, on: :after_graph_persisted
         end
       end
 
@@ -347,24 +347,24 @@ if ENV["APPRAISAL_INITIALIZED"]
             relationships: {
               positions: {
                 data: [
-                  { 'temp-id': "pos1", type: "positions", method: "create" },
-                  { 'temp-id': "pos2", type: "positions", method: "create" },
-                ],
-              },
-            },
+                  {'temp-id': "pos1", type: "positions", method: "create"},
+                  {'temp-id': "pos2", type: "positions", method: "create"}
+                ]
+              }
+            }
           },
           included: [
             {
               'temp-id': "pos1",
               type: "positions",
-              attributes: {title: "foo"},
+              attributes: {title: "foo"}
             },
             {
               'temp-id': "pos2",
               type: "positions",
-              attributes: {title: "bar"},
-            },
-          ],
+              attributes: {title: "bar"}
+            }
+          ]
         }
       end
 
@@ -426,11 +426,11 @@ if ENV["APPRAISAL_INITIALIZED"]
                 classification: {
                   data: {
                     id: classification.id.to_s,
-                    type: "classifications",
-                  },
-                },
-              },
-            },
+                    type: "classifications"
+                  }
+                }
+              }
+            }
           }
         end
 
@@ -471,18 +471,18 @@ if ENV["APPRAISAL_INITIALIZED"]
                   data: [{
                     'temp-id': "abc123",
                     type: "positions",
-                    method: "create",
-                  }],
-                },
-              },
+                    method: "create"
+                  }]
+                }
+              }
             },
             included: [
               {
                 'temp-id': "abc123",
                 type: "positions",
-                attributes: {title: "foo"},
-              },
-            ],
+                attributes: {title: "foo"}
+              }
+            ]
           }
         end
 
@@ -508,17 +508,17 @@ if ENV["APPRAISAL_INITIALIZED"]
               attributes: {
                 first_name: "Joe",
                 last_name: "Smith",
-                age: 30,
+                age: 30
               },
               relationships: {
                 salary: {
                   data: {
                     'temp-id': "abc123",
                     type: "salaries",
-                    method: "create",
-                  },
-                },
-              },
+                    method: "create"
+                  }
+                }
+              }
             },
             included: [
               {
@@ -526,10 +526,10 @@ if ENV["APPRAISAL_INITIALIZED"]
                 type: "salaries",
                 attributes: {
                   base_rate: 15.00,
-                  overtime_rate: 30.00,
-                },
-              },
-            ],
+                  overtime_rate: 30.00
+                }
+              }
+            ]
           }
         end
 
@@ -570,20 +570,20 @@ if ENV["APPRAISAL_INITIALIZED"]
                     data: {
                       id: salary.id,
                       type: "salaries",
-                      method: "update",
-                    },
-                  },
-                },
+                      method: "update"
+                    }
+                  }
+                }
               },
               included: [
                 {
                   id: salary.id,
                   type: "salaries",
                   attributes: {
-                    base_rate: 15.75,
-                  },
-                },
-              ],
+                    base_rate: 15.75
+                  }
+                }
+              ]
             }
           end
 
@@ -607,11 +607,11 @@ if ENV["APPRAISAL_INITIALIZED"]
                     data: {
                       id: salary.id,
                       type: "salaries",
-                      method: "destroy",
-                    },
-                  },
-                },
-              },
+                      method: "destroy"
+                    }
+                  }
+                }
+              }
             }
           end
 
@@ -635,11 +635,11 @@ if ENV["APPRAISAL_INITIALIZED"]
                     data: {
                       id: salary.id,
                       type: "salaries",
-                      method: "disassociate",
-                    },
-                  },
-                },
-              },
+                      method: "disassociate"
+                    }
+                  }
+                }
+              }
             }
           end
 
@@ -669,10 +669,10 @@ if ENV["APPRAISAL_INITIALIZED"]
               positions: {
                 data: [
                   {type: "positions", 'temp-id': "pos1", method: "create"},
-                  {type: "positions", 'temp-id': "pos2", method: "create"},
-                ],
-              },
-            },
+                  {type: "positions", 'temp-id': "pos2", method: "create"}
+                ]
+              }
+            }
           },
           included: [
             {
@@ -681,21 +681,21 @@ if ENV["APPRAISAL_INITIALIZED"]
               attributes: {title: "specialist"},
               relationships: {
                 department: {
-                  data: {type: "departments", 'temp-id': "dep1", method: "create"},
-                },
-              },
+                  data: {type: "departments", 'temp-id': "dep1", method: "create"}
+                }
+              }
             },
             {
               type: "departments",
               'temp-id': "dep1",
-              attributes: {name: "safety"},
+              attributes: {name: "safety"}
             },
             {
               type: "positions",
               'temp-id': "pos2",
-              attributes: {title: "manager"},
-            },
-          ],
+              attributes: {title: "manager"}
+            }
+          ]
         }
       end
 
@@ -746,7 +746,7 @@ if ENV["APPRAISAL_INITIALIZED"]
                 "name" => "positions",
                 "temp-id" => "pos1",
                 "type" => "positions"
-              ),
+              )
             },
             "source" => {"pointer" => "/data/attributes/title"},
             "status" => "422",
@@ -787,7 +787,7 @@ if ENV["APPRAISAL_INITIALIZED"]
                 "name" => "department",
                 "temp-id" => "dep1",
                 "type" => "departments"
-              ),
+              )
             },
             "source" => {"pointer" => "/data/attributes/name"},
             "status" => "422",
@@ -807,11 +807,11 @@ if ENV["APPRAISAL_INITIALIZED"]
               relationships: {
                 classification: {
                   data: {
-                    type: "classifications", id: classification.id.to_s,
-                  },
-                },
-              },
-            },
+                    type: "classifications", id: classification.id.to_s
+                  }
+                }
+              }
+            }
           }
         end
 
@@ -834,10 +834,10 @@ if ENV["APPRAISAL_INITIALIZED"]
               relationships: {
                 positions: {
                   data: [
-                    {type: "positions", id: position.id.to_s},
-                  ],
-                },
-              },
+                    {type: "positions", id: position.id.to_s}
+                  ]
+                }
+              }
             },
             included: [
               {
@@ -845,11 +845,11 @@ if ENV["APPRAISAL_INITIALIZED"]
                 id: position.id.to_s,
                 relationships: {
                   department: {
-                    data: {type: "departments", id: department.id, method: "destroy"},
-                  },
-                },
-              },
-            ],
+                    data: {type: "departments", id: department.id, method: "destroy"}
+                  }
+                }
+              }
+            ]
           }
         end
 
@@ -865,9 +865,9 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     describe "nested update" do
-      let!(:employee)   { Employee.create!(first_name: "original", positions: [position1, position2]) }
-      let!(:position1)  { Position.create!(title: "unchanged") }
-      let!(:position2)  { Position.create!(title: "original", department: department) }
+      let!(:employee) { Employee.create!(first_name: "original", positions: [position1, position2]) }
+      let!(:position1) { Position.create!(title: "unchanged") }
+      let!(:position2) { Position.create!(title: "original", department: department) }
       let!(:department) { Department.create!(name: "original") }
 
       let(:path) { "/employees/#{employee.id}" }
@@ -885,10 +885,10 @@ if ENV["APPRAISAL_INITIALIZED"]
             relationships: {
               positions: {
                 data: [
-                  {type: "positions", id: position2.id.to_s, method: "update"},
-                ],
-              },
-            },
+                  {type: "positions", id: position2.id.to_s, method: "update"}
+                ]
+              }
+            }
           },
           included: [
             {
@@ -897,16 +897,16 @@ if ENV["APPRAISAL_INITIALIZED"]
               attributes: {title: "updated title"},
               relationships: {
                 department: {
-                  data: {type: "departments", id: department.id.to_s, method: "update"},
-                },
-              },
+                  data: {type: "departments", id: department.id.to_s, method: "update"}
+                }
+              }
             },
             {
               type: "departments",
               id: department.id.to_s,
-              attributes: {name: "updated name"},
-            },
-          ],
+              attributes: {name: "updated name"}
+            }
+          ]
         }
       end
 
@@ -929,8 +929,8 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     describe "nested deletes" do
-      let!(:employee)   { Employee.create!(first_name: "Joe") }
-      let!(:position)   { Position.create!(department_id: department.id, employee_id: employee.id) }
+      let!(:employee) { Employee.create!(first_name: "Joe") }
+      let!(:position) { Position.create!(department_id: department.id, employee_id: employee.id) }
       let!(:department) { Department.create! }
 
       subject(:make_request) do
@@ -946,10 +946,10 @@ if ENV["APPRAISAL_INITIALIZED"]
             relationships: {
               positions: {
                 data: [
-                  {type: "positions", id: position.id.to_s, method: method},
-                ],
-              },
-            },
+                  {type: "positions", id: position.id.to_s, method: method}
+                ]
+              }
+            }
           },
           included: [
             {
@@ -958,12 +958,12 @@ if ENV["APPRAISAL_INITIALIZED"]
               relationships: {
                 department: {
                   data: {
-                    type: "departments", id: department.id.to_s, method: method,
-                  },
-                },
-              },
-            },
-          ],
+                    type: "departments", id: department.id.to_s, method: method
+                  }
+                }
+              }
+            }
+          ]
         }
       end
 
@@ -1024,10 +1024,10 @@ if ENV["APPRAISAL_INITIALIZED"]
             relationships: {
               positions: {
                 data: [
-                  {'temp-id': "a", type: "positions", method: "create"},
-                ],
-              },
-            },
+                  {'temp-id': "a", type: "positions", method: "create"}
+                ]
+              }
+            }
           },
           included: [
             {
@@ -1037,17 +1037,17 @@ if ENV["APPRAISAL_INITIALIZED"]
               relationships: {
                 department: {
                   data: {
-                    'temp-id': "b", type: "departments", method: "create",
-                  },
-                },
-              },
+                    'temp-id': "b", type: "departments", method: "create"
+                  }
+                }
+              }
             },
             {
               'temp-id': "b",
               type: "departments",
-              attributes: {},
-            },
-          ],
+              attributes: {}
+            }
+          ]
         }
       end
 
@@ -1059,7 +1059,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             "meta" => hash_including("attribute" => "base", "message" => "Forced validation error"),
             "source" => {"pointer" => nil},
             "status" => "422",
-            "title" => "Validation Error",
+            "title" => "Validation Error"
           },
           {
             "code" => "unprocessable_entity",
@@ -1071,11 +1071,11 @@ if ENV["APPRAISAL_INITIALIZED"]
                 "name" => "positions",
                 "temp-id" => "a",
                 "type" => "positions"
-              ),
+              )
             },
             "source" => {"pointer" => nil},
             "status" => "422",
-            "title" => "Validation Error",
+            "title" => "Validation Error"
           },
           {
             "code" => "unprocessable_entity",
@@ -1087,12 +1087,12 @@ if ENV["APPRAISAL_INITIALIZED"]
                 "name" => "department",
                 "temp-id" => "b",
                 "type" => "departments"
-              ),
+              )
             },
             "source" => {"pointer" => nil},
             "status" => "422",
-            "title" => "Validation Error",
-          },
+            "title" => "Validation Error"
+          }
         ]
       end
 
@@ -1145,27 +1145,27 @@ if ENV["APPRAISAL_INITIALIZED"]
                   {id: prior_team.id.to_s, type: "teams", method: "update"},
                   {id: disassociate_team.id.to_s, type: "teams", method: "disassociate"},
                   {id: destroy_team.id.to_s, type: "teams", method: "destroy"},
-                  {id: associate_team.id.to_s, type: "teams", method: "update"},
-                ],
-              },
-            },
+                  {id: associate_team.id.to_s, type: "teams", method: "update"}
+                ]
+              }
+            }
           },
           included: [
             {
               'temp-id': "abc123",
               type: "teams",
-              attributes: {name: "Team #1"},
+              attributes: {name: "Team #1"}
             },
             {
               id: prior_team.id.to_s,
               type: "teams",
-              attributes: {name: "Updated!"},
+              attributes: {name: "Updated!"}
             },
             {
               id: associate_team.id.to_s,
-              type: "teams",
-            },
-          ],
+              type: "teams"
+            }
+          ]
         }
       end
 
@@ -1204,23 +1204,23 @@ if ENV["APPRAISAL_INITIALIZED"]
               tasks: {
                 data: [
                   {'temp-id': "abc123", type: "features", method: "create"},
-                  {'temp-id': "abc456", type: "bugs", method: "create"},
-                ],
-              },
-            },
+                  {'temp-id': "abc456", type: "bugs", method: "create"}
+                ]
+              }
+            }
           },
           included: [
             {
               'temp-id': "abc123",
               type: "features",
-              attributes: {name: "test feature"},
+              attributes: {name: "test feature"}
             },
             {
               'temp-id': "abc456",
               type: "bugs",
-              attributes: {name: "test bug"},
-            },
-          ],
+              attributes: {name: "test bug"}
+            }
+          ]
         }
       end
 
@@ -1246,18 +1246,18 @@ if ENV["APPRAISAL_INITIALIZED"]
             relationships: {
               location: {
                 data: {
-                  location_id_key => location_id, :type => "locations", :method => method,
-                },
-              },
-            },
+                  location_id_key => location_id, :type => "locations", :method => method
+                }
+              }
+            }
           },
           included: [
             {
               :type => "locations",
               location_id_key => location_id,
-              :attributes => { latitude: "45.12345", longitude: "24.12345" },
-            },
-          ],
+              :attributes => {latitude: "45.12345", longitude: "24.12345"}
+            }
+          ]
         }
       end
 
@@ -1289,7 +1289,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       context "when destroying" do
         let!(:location) do
           Location.create locatable_id: employee.id,
-                      locatable_type: "Employee"
+                          locatable_type: "Employee"
         end
         let(:location_id) { location.id.to_s }
         let(:location_id_key) { :id }
@@ -1304,7 +1304,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       context "when disassociating" do
         let!(:location) do
           Location.create locatable_id: employee.id,
-                      locatable_type: "Employee"
+                          locatable_type: "Employee"
         end
         let(:location_id) { location.id.to_s }
         let(:location_id_key) { :id }
@@ -1334,18 +1334,18 @@ if ENV["APPRAISAL_INITIALIZED"]
             relationships: {
               notes: {
                 data: [{
-                  note_id_key => note_id, :type => "notes", :method => method,
-                }],
-              },
-            },
+                  note_id_key => note_id, :type => "notes", :method => method
+                }]
+              }
+            }
           },
           included: [
             {
               :type => "notes",
               note_id_key => note_id,
-              :attributes => {body: "foo"},
-            },
-          ],
+              :attributes => {body: "foo"}
+            }
+          ]
         }
       end
 
@@ -1424,20 +1424,20 @@ if ENV["APPRAISAL_INITIALIZED"]
             relationships: {
               workspace: {
                 data: {
-                  'temp-id': "work1", type: workspace_type, method: "create",
-                },
-              },
-            },
+                  'temp-id': "work1", type: workspace_type, method: "create"
+                }
+              }
+            }
           },
           included: [
             {
               type: workspace_type,
               'temp-id': "work1",
               attributes: {
-                address: "Fake Workspace Address",
-              },
-            },
-          ],
+                address: "Fake Workspace Address"
+              }
+            }
+          ]
         }
       end
 
@@ -1474,10 +1474,10 @@ if ENV["APPRAISAL_INITIALIZED"]
     describe "delete nested item" do
       subject(:make_request) { do_update(payload) }
 
-      let!(:employee)   { Employee.create!(first_name: "original", positions: [position1, position2, position3]) }
-      let!(:position1)  { Position.create!(title: "pos1") }
-      let!(:position2)  { Position.create!(title: "pos2") }
-      let!(:position3)  { Position.create!(title: "pos3") }
+      let!(:employee) { Employee.create!(first_name: "original", positions: [position1, position2, position3]) }
+      let!(:position1) { Position.create!(title: "pos1") }
+      let!(:position2) { Position.create!(title: "pos2") }
+      let!(:position3) { Position.create!(title: "pos3") }
 
       let(:path) { "/employees/#{employee.id}" }
 
@@ -1490,17 +1490,17 @@ if ENV["APPRAISAL_INITIALIZED"]
             relationships: {
               positions: {
                 data: [
-                  {type: "positions", id: position2.id.to_s, method: "destroy"},
-                ],
-              },
-            },
-          },
+                  {type: "positions", id: position2.id.to_s, method: "destroy"}
+                ]
+              }
+            }
+          }
         }
       end
 
       it "works" do
         expect(employee.positions.count).to eq(3)
-        expect {make_request}.to change { employee.positions.count }.by(-1)
+        expect { make_request }.to change { employee.positions.count }.by(-1)
       end
     end
   end

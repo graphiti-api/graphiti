@@ -1,6 +1,6 @@
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 
-Dir[File.dirname(__FILE__) + "/support/**/*.rb"].each {|f| require f }
+Dir[File.dirname(__FILE__) + "/support/**/*.rb"].sort.each { |f| require f }
 require "pry"
 
 require "active_model"
@@ -61,5 +61,5 @@ if ENV["APPRAISAL_INITIALIZED"]
   ActiveRecord::Migration.verbose = false
   ActiveRecord::Base.establish_connection adapter: "sqlite3",
                                           database: ":memory:"
-  Dir[File.dirname(__FILE__) + "/fixtures/**/*.rb"].each {|f| require f }
+  Dir[File.dirname(__FILE__) + "/fixtures/**/*.rb"].sort.each { |f| require f }
 end

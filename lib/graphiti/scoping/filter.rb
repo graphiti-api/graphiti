@@ -31,7 +31,7 @@ module Graphiti
 
     def filter_via_adapter(filter, operator, value)
       type_name = Types.name_for(filter.values.first[:type])
-      method    = :"filter_#{type_name}_#{operator}"
+      method = :"filter_#{type_name}_#{operator}"
       attribute = filter.keys.first
 
       if resource.adapter.respond_to?(method)
@@ -82,11 +82,11 @@ module Graphiti
       type = Types[filter.values[0][:type]][:canonical_name]
       if param_value.is_a?(Hash) && type == :hash
         operators_keys = filter.values[0][:operators].keys
-        unless param_value.keys.all? {|k| operators_keys.include?(k)}
-          param_value = { eq: param_value }
+        unless param_value.keys.all? { |k| operators_keys.include?(k) }
+          param_value = {eq: param_value}
         end
       elsif !param_value.is_a?(Hash) || param_value.empty?
-        param_value = { eq: param_value }
+        param_value = {eq: param_value}
       end
 
       param_value.map do |operator, value|
@@ -184,10 +184,10 @@ module Graphiti
       # remove the quote characters from the quoted strings
       quotes.each { |q| q.gsub!("{{", "").gsub!("}}", "") }
       # merge everything back together into an array
-      if singular_filter
-        value = Array(value) + quotes
+      value = if singular_filter
+        Array(value) + quotes
       else
-        value = Array(value.split(",")) + quotes
+        Array(value.split(",")) + quotes
       end
       # remove any blanks that are left
       value.reject! { |v| v.length.zero? }

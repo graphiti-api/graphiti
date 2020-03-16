@@ -5,7 +5,7 @@ RSpec.describe Graphiti do
     let(:resources) do
       [
         double(apply_sideloads_to_serializer: nil),
-        double(apply_sideloads_to_serializer: nil),
+        double(apply_sideloads_to_serializer: nil)
       ]
     end
 

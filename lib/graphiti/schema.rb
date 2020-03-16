@@ -33,7 +33,7 @@ module Graphiti
       {
         resources: generate_resources,
         endpoints: generate_endpoints,
-        types: generate_types,
+        types: generate_types
       }
     end
 
@@ -94,7 +94,7 @@ module Graphiti
           extra_attributes: extra_attributes(r),
           sorts: sorts(r),
           filters: filters(r),
-          relationships: relationships(r),
+          relationships: relationships(r)
         }
 
         if r.default_sort
@@ -121,7 +121,7 @@ module Graphiti
           name: r.name,
           description: r.description,
           remote: r.remote_url,
-          relationships: relationships(r),
+          relationships: relationships(r)
         }
       }
 
@@ -136,7 +136,7 @@ module Graphiti
               type: config[:type].to_s,
               readable: flag(config[:readable]),
               writable: flag(config[:writable]),
-              description: resource.attribute_description(name),
+              description: resource.attribute_description(name)
             }
           end
         end
@@ -149,7 +149,7 @@ module Graphiti
           attrs[name] = {
             type: config[:type].to_s,
             readable: flag(config[:readable]),
-            description: resource.attribute_description(name),
+            description: resource.attribute_description(name)
           }
         end
       end
@@ -186,7 +186,7 @@ module Graphiti
 
           config = {
             type: filter[:type].to_s,
-            operators: filter[:operators].keys.map(&:to_s),
+            operators: filter[:operators].keys.map(&:to_s)
           }
 
           config[:single] = true if filter[:single]

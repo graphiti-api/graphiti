@@ -22,7 +22,7 @@ module Graphiti
         end
 
         def type=(val)
-          val = val && val.to_sym
+          val = val&.to_sym
           if (val = super)
             serializer.type(val)
           end
@@ -42,7 +42,7 @@ module Graphiti
             path: val,
             full_path: val,
             url: val,
-            actions: [:index, :show],
+            actions: [:index, :show]
           }
         end
 
@@ -197,7 +197,7 @@ module Graphiti
               attributes: {},
               extra_attributes: {},
               sideloads: {},
-              callbacks: {},
+              callbacks: {}
             }
         end
 

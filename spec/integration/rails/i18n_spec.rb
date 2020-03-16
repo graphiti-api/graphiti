@@ -161,7 +161,7 @@ if ENV["APPRAISAL_INITIALIZED"]
     describe "Schema output" do
       let(:resource_class) { EmployeeResource }
       let(:schema) { Graphiti::Schema.generate([resource_class]) }
-      let(:resource_schema) { schema[:resources].find {|i| i[:name] == resource_class.name } }
+      let(:resource_schema) { schema[:resources].find { |i| i[:name] == resource_class.name } }
 
       describe "Resource descriptions" do
         it "uses the resource description in the schema" do

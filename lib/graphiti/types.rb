@@ -93,14 +93,14 @@ module Graphiti
             read: Dry::Types["coercible.string"],
             write: Dry::Types["coercible.integer"],
             kind: "scalar",
-            description: "Base Type. Query/persist as integer, render as string.",
+            description: "Base Type. Query/persist as integer, render as string."
           },
           uuid: {
             params: Dry::Types["coercible.string"],
             read: Dry::Types["coercible.string"],
             write: Dry::Types["coercible.string"],
             kind: "scalar",
-            description: "Base Type. Like a normal string, but by default only eq/!eq and case-sensitive.",
+            description: "Base Type. Like a normal string, but by default only eq/!eq and case-sensitive."
           },
           string_enum: {
             canonical_name: :enum,
@@ -108,7 +108,7 @@ module Graphiti
             read: Dry::Types["coercible.string"],
             write: Dry::Types["coercible.string"],
             kind: "scalar",
-            description: "String enum type. Like a normal string, but only eq/!eq and case-sensitive. Limited to only the allowed values.",
+            description: "String enum type. Like a normal string, but only eq/!eq and case-sensitive. Limited to only the allowed values."
           },
           integer_enum: {
             canonical_name: :enum,
@@ -116,71 +116,71 @@ module Graphiti
             read: Dry::Types["coercible.integer"],
             write: Dry::Types["coercible.integer"],
             kind: "scalar",
-            description: "Integer enum type. Like a normal integer, but only eq/!eq filters. Limited to only the allowed values.",
+            description: "Integer enum type. Like a normal integer, but only eq/!eq filters. Limited to only the allowed values."
           },
           string: {
             params: Dry::Types["coercible.string"],
             read: Dry::Types["coercible.string"],
             write: Dry::Types["coercible.string"],
             kind: "scalar",
-            description: "Base Type.",
+            description: "Base Type."
           },
           integer: {
             params: PresentInteger,
             read: Integer,
             write: Integer,
             kind: "scalar",
-            description: "Base Type.",
+            description: "Base Type."
           },
           big_decimal: {
             params: ParamDecimal,
             read: Dry::Types["json.decimal"],
             write: Dry::Types["json.decimal"],
             kind: "scalar",
-            description: "Base Type.",
+            description: "Base Type."
           },
           float: {
             params: Dry::Types["coercible.float"],
             read: Float,
             write: Float,
             kind: "scalar",
-            description: "Base Type.",
+            description: "Base Type."
           },
           boolean: {
             params: PresentBool,
             read: Bool,
             write: Bool,
             kind: "scalar",
-            description: "Base Type.",
+            description: "Base Type."
           },
           date: {
             params: PresentDate,
             read: Date,
             write: Date,
             kind: "scalar",
-            description: "Base Type.",
+            description: "Base Type."
           },
           datetime: {
             params: PresentParamsDateTime,
             read: ReadDateTime,
             write: WriteDateTime,
             kind: "scalar",
-            description: "Base Type.",
+            description: "Base Type."
           },
           hash: {
             params: PresentParamsHash,
             read: Dry::Types["strict.hash"],
             write: Dry::Types["strict.hash"],
             kind: "record",
-            description: "Base Type.",
+            description: "Base Type."
           },
           array: {
             params: Dry::Types["strict.array"],
             read: Dry::Types["strict.array"],
             write: Dry::Types["strict.array"],
             kind: "array",
-            description: "Base Type.",
-          },
+            description: "Base Type."
+          }
         }
 
         hash.each_pair do |k, v|
@@ -198,7 +198,7 @@ module Graphiti
             test: Dry::Types["strict.array"].of(map[:test]),
             write: Dry::Types["strict.array"].of(map[:write]),
             kind: "array",
-            description: "Base Type.",
+            description: "Base Type."
           }
         end
         hash.merge!(arrays)

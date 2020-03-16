@@ -13,7 +13,7 @@ require "graphiti_errors"
 require "jsonapi/serializable"
 
 module Graphiti
-  DEPRECATOR = ActiveSupport::Deprecation.new('2.0', 'Graphiti')
+  DEPRECATOR = ActiveSupport::Deprecation.new("2.0", "Graphiti")
 
   # @api private
   def self.context
@@ -33,9 +33,9 @@ module Graphiti
   ensure
     self.context = prior
 
-    resources.each { |resource_class|
+    resources.each do |resource_class|
       resource_class.sideloads.values.each(&:clear_resources)
-    }
+    end
   end
 
   def self.config

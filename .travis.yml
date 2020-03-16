@@ -11,20 +11,20 @@ gemfile:
   - gemfiles/rails_5_graphiti_rails.gemfile
   - gemfiles/rails_6_graphiti_rails.gemfile
 env:
-  - COMMAND=standardrb --no-fix --format progress
+  - COMMAND="standardrb --no-fix --format progress"
   - COMMAND=rspec
   - COMMAND=rspec APPRAISAL_INITIALIZED=true
 matrix:
   exclude:
-    - env: COMMAND=standardrb --no-fix --format progress
+    - env: COMMAND="standardrb --no-fix --format progress"
       gemfile: gemfiles/rails_4.gemfile
-    - env: COMMAND=standardrb --no-fix --format progress
+    - env: COMMAND="standardrb --no-fix --format progress"
       gemfile: gemfiles/rails_5.gemfile
-    - env: COMMAND=standardrb --no-fix --format progress
+    - env: COMMAND="standardrb --no-fix --format progress"
       gemfile: gemfiles/rails_6.gemfile
-    - env: COMMAND=standardrb --no-fix --format progress
+    - env: COMMAND="standardrb --no-fix --format progress"
       gemfile: gemfiles/rails_5_graphiti_rails.gemfile
-    - env: COMMAND=standardrb --no-fix --format progress
+    - env: COMMAND="standardrb --no-fix --format progress"
       gemfile: gemfiles/rails_6_graphiti_rails.gemfile
     - env: COMMAND=rspec APPRAISAL_INITIALIZED=true
       gemfile: Gemfile

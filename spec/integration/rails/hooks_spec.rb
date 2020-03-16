@@ -128,10 +128,10 @@ if ENV["APPRAISAL_INITIALIZED"]
           attributes: {first_name: "Stephen", last_name: "King"},
           relationships: {
             books: {data: book_data},
-            state: {data: state_data},
-          },
+            state: {data: state_data}
+          }
         },
-        included: (book_included + state_included),
+        included: (book_included + state_included)
       }
     end
 

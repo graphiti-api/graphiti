@@ -25,7 +25,7 @@ module Graphiti
 
       def validate!
         unless validate
-          raise @error_class || Graphiti::Errors::InvalidRequest, self.errors
+          raise @error_class || Graphiti::Errors::InvalidRequest, errors
         end
 
         true
@@ -47,7 +47,7 @@ module Graphiti
       def process_relationships(resource, relationships, payload_path)
         opts = {
           resource: resource,
-          relationships: relationships,
+          relationships: relationships
         }
 
         Graphiti::Util::RelationshipPayload.iterate(opts) do |x|

@@ -10,7 +10,7 @@ RSpec.describe Graphiti::Sideload::BelongsTo do
   let(:opts) do
     {
       parent_resource: parent_resource_class,
-      resource: resource_class,
+      resource: resource_class
     }
   end
   let(:name) { :employee }
@@ -149,7 +149,7 @@ RSpec.describe Graphiti::Sideload::BelongsTo do
     it "adds primary key filter" do
       params = instance.load_params(parents, query)
       expect(params).to eq({
-        filter: {foo_id: "7,8"},
+        filter: {foo_id: "7,8"}
       })
     end
 
@@ -159,7 +159,7 @@ RSpec.describe Graphiti::Sideload::BelongsTo do
       result = instance.load_params(parents, query)
       expect(result).to eq({
         filter: {foo_id: "7,8", a: "b"},
-        sort: [{id: :desc}],
+        sort: [{id: :desc}]
       })
     end
   end

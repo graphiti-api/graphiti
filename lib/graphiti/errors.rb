@@ -316,14 +316,14 @@ module Graphiti
             sortable: "sort on",
             filterable: "filter on",
             readable: "read",
-            writable: "write",
+            writable: "write"
           }[@flag]
         else
           {
             sortable: "add sort",
             filterable: "add filter",
             readable: "read",
-            writable: "write",
+            writable: "write"
           }[@flag]
         end
       end

@@ -15,10 +15,10 @@ module Graphiti
     #   }
     class Payload
       def initialize(resource, query, scope, data)
-        @resource   = resource
-        @query      = query
-        @scope      = scope
-        @data       = data
+        @resource = resource
+        @query = query
+        @scope = scope
+        @data = data
       end
 
       # Generate the payload for +{ meta: { stats: { ... } } }+

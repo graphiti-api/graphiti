@@ -39,7 +39,7 @@ module Graphiti
           path: path,
           full_path: full_path_for(path),
           url: url_for(path),
-          actions: DEFAULT_ACTIONS.dup,
+          actions: DEFAULT_ACTIONS.dup
         }
       end
 
@@ -49,7 +49,7 @@ module Graphiti
           path: path,
           full_path: full_path_for(path),
           url: url_for(path),
-          actions: actions,
+          actions: actions
         }
       end
 
@@ -60,7 +60,7 @@ module Graphiti
           path: path,
           full_path: full_path_for(path),
           url: url_for(path),
-          actions: actions,
+          actions: actions
         }]
       end
 

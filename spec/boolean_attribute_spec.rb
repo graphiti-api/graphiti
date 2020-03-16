@@ -9,7 +9,7 @@ RSpec.describe ".boolean_attribute" do
     end
   end
 
-  let(:author)   { double(id: 1) }
+  let(:author) { double(id: 1) }
   let(:resource) { klass.new(object: author) }
 
   subject { resource.as_jsonapi[:attributes] }
