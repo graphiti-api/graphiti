@@ -722,6 +722,21 @@ module Graphiti
     end
 
     class RecordNotFound < Base
+      def initialize(resource = nil, id = nil, path = nil)
+        @resource = resource
+        @id = id
+        @path = path
+      end
+
+      def message
+        if !@resource.nil? && !@id.nil?
+          "The referenced resource '#{@resource}' with id '#{@id}' could not be found.".tap do |msg|
+            msg << " Referenced at '#{@path}'" unless @path.nil?
+          end
+        else
+          "Specified Record Not Found"
+        end
+      end
     end
 
     class RequiredFilter < Base
