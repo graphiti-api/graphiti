@@ -57,41 +57,28 @@ module Graphiti
         filter_string_eql(scope, attribute, value, is_not: true)
       end
 
-      def filter_string_prefix(scope, attribute, value, is_not: false)
-        column = column_for(scope, attribute)
-        map = value.map { |v| "#{v}%" }
-        clause = column.lower.matches_any(map)
-        is_not ? scope.where.not(clause) : scope.where(clause)
-      end
-
-      def filter_string_not_prefix(scope, attribute, value)
-        filter_string_prefix(scope, attribute, value, is_not: true)
-      end
-
-      def filter_string_suffix(scope, attribute, value, is_not: false)
-        column = column_for(scope, attribute)
-        map = value.map { |v| "%#{v}" }
-        clause = column.lower.matches_any(map)
-        is_not ? scope.where.not(clause) : scope.where(clause)
-      end
-
-      def filter_string_not_suffix(scope, attribute, value)
-        filter_string_suffix(scope, attribute, value, is_not: true)
-      end
-
       # Arel has different match escaping behavior before rails 5.
       # Since rails 4.x does not expose methods to escape LIKE statements
       # anyway, we just don't support proper LIKE escaping in those versions.
       if ::ActiveRecord.version >= Gem::Version.new("5.0.0")
         def filter_string_match(scope, attribute, value, is_not: false)
-          escape_char = '\\'
-          column = column_for(scope, attribute)
-          map = value.map { |v|
-            v = v.downcase
-            v = scope.sanitize_sql_like(v)
+          clause = sanitized_like_for(scope, attribute, value) { |v|
             "%#{v}%"
           }
-          clause = column.lower.matches_any(map, escape_char, true)
+          is_not ? scope.where.not(clause) : scope.where(clause)
+        end
+
+        def filter_string_prefix(scope, attribute, value, is_not: false)
+          clause = sanitized_like_for(scope, attribute, value) { |v|
+            "#{v}%"
+          }
+          is_not ? scope.where.not(clause) : scope.where(clause)
+        end
+
+        def filter_string_suffix(scope, attribute, value, is_not: false)
+          clause = sanitized_like_for(scope, attribute, value) { |v|
+            "%#{v}"
+          }
           is_not ? scope.where.not(clause) : scope.where(clause)
         end
       else
@@ -103,6 +90,28 @@ module Graphiti
           clause = column.lower.matches_any(map)
           is_not ? scope.where.not(clause) : scope.where(clause)
         end
+
+        def filter_string_prefix(scope, attribute, value, is_not: false)
+          column = column_for(scope, attribute)
+          map = value.map { |v| "#{v}%" }
+          clause = column.lower.matches_any(map)
+          is_not ? scope.where.not(clause) : scope.where(clause)
+        end
+
+        def filter_string_suffix(scope, attribute, value, is_not: false)
+          column = column_for(scope, attribute)
+          map = value.map { |v| "%#{v}" }
+          clause = column.lower.matches_any(map)
+          is_not ? scope.where.not(clause) : scope.where(clause)
+        end
+      end
+
+      def filter_string_not_prefix(scope, attribute, value)
+        filter_string_prefix(scope, attribute, value, is_not: true)
+      end
+
+      def filter_string_not_suffix(scope, attribute, value)
+        filter_string_suffix(scope, attribute, value, is_not: true)
       end
 
       def filter_string_not_match(scope, attribute, value)
@@ -296,6 +305,26 @@ module Graphiti
           table[other]
         else
           table[name]
+        end
+      end
+
+      def sanitized_like_for(scope, attribute, value, &block)
+        escape_char = '\\'
+        column = column_for(scope, attribute)
+        map = value.map { |v|
+          v = v.downcase
+          v = Sanitizer.sanitize_like(v, escape_char)
+          block.call v
+        }
+
+        column.lower.matches_any(map, escape_char, true)
+      end
+
+      class Sanitizer
+        extend ::ActiveRecord::Sanitization::ClassMethods
+
+        def self.sanitize_like(*args)
+          sanitize_sql_like(*args)
         end
       end
     end
