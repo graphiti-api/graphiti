@@ -62,23 +62,23 @@ module Graphiti
       # anyway, we just don't support proper LIKE escaping in those versions.
       if ::ActiveRecord.version >= Gem::Version.new("5.0.0")
         def filter_string_match(scope, attribute, value, is_not: false)
-          clause = sanitized_like_for(scope, attribute, value) do |v|
+          clause = sanitized_like_for(scope, attribute, value) { |v|
             "%#{v}%"
-          end
+          }
           is_not ? scope.where.not(clause) : scope.where(clause)
         end
 
         def filter_string_prefix(scope, attribute, value, is_not: false)
-          clause = sanitized_like_for(scope, attribute, value) do |v|
+          clause = sanitized_like_for(scope, attribute, value) { |v|
             "#{v}%"
-          end
+          }
           is_not ? scope.where.not(clause) : scope.where(clause)
         end
 
         def filter_string_suffix(scope, attribute, value, is_not: false)
-          clause = sanitized_like_for(scope, attribute, value) do |v|
+          clause = sanitized_like_for(scope, attribute, value) { |v|
             "%#{v}"
-          end
+          }
           is_not ? scope.where.not(clause) : scope.where(clause)
         end
       else
@@ -311,11 +311,11 @@ module Graphiti
       def sanitized_like_for(scope, attribute, value, &block)
         escape_char = '\\'
         column = column_for(scope, attribute)
-        map = value.map do |v|
+        map = value.map { |v|
           v = v.downcase
           v = Sanitizer.sanitize_like(v, escape_char)
           block.call v
-        end
+        }
 
         column.lower.matches_any(map, escape_char, true)
       end

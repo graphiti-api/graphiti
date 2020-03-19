@@ -233,7 +233,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           end
 
           if ::ActiveRecord.version >= Gem::Version.new("5.0")
-            context 'when match string includes % characters' do
+            context "when match string includes % characters" do
               let(:value) { {prefix: "%ild"} }
 
               let!(:author_with_percent) do
@@ -267,7 +267,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           end
 
           if ::ActiveRecord.version >= Gem::Version.new("5.0")
-            context 'when match string includes % characters' do
+            context "when match string includes % characters" do
               let(:value) { {suffix: "car%"} }
 
               let!(:author_with_percent) do

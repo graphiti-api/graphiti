@@ -54,7 +54,7 @@ appraise "rails-5_2-graphiti-rails" do
 end
 
 appraise "rails-6" do
-  gem "rails", "~> 6.0.0.rc1"
+  gem "rails", "~> 6.0"
   gem "rspec-rails"
   gem "sqlite3", "~> 1.4.0"
   gem "database_cleaner"
