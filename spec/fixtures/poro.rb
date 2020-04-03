@@ -36,6 +36,7 @@ module PORO
           teams: PORO::Team,
           paypals: PORO::Paypal,
           visas: PORO::Visa,
+          gold_visas: PORO::GoldVisa,
           mastercards: PORO::Mastercard,
           visa_rewards: PORO::VisaReward,
           books: PORO::Book,
@@ -241,6 +242,9 @@ module PORO
     end
   end
 
+  class GoldVisa < Visa
+  end
+
   class Mastercard < CreditCard
   end
 
@@ -397,7 +401,7 @@ module PORO
   end
 
   class CreditCardResource < ApplicationResource
-    self.polymorphic = %w[PORO::VisaResource PORO::MastercardResource]
+    self.polymorphic = %w[PORO::VisaResource PORO::GoldVisaResource PORO::MastercardResource]
 
     def base_scope
       {type: [:visas, :mastercards]}
@@ -420,6 +424,9 @@ module PORO
     end
 
     has_many :visa_rewards
+  end
+
+  class GoldVisaResource < VisaResource
   end
 
   class MastercardResource < CreditCardResource
