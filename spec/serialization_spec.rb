@@ -56,7 +56,7 @@ RSpec.describe "serialization" do
           read: type,
           write: type,
           kind: "scalar",
-          description: "test",
+          description: "test"
         }
         resource.attribute :id, :custom
       end
@@ -565,7 +565,7 @@ RSpec.describe "serialization" do
             write: type,
             params: type,
             kind: "scalar",
-            description: "test",
+            description: "test"
           }
           resource.attribute :age, :custom
         end
@@ -674,7 +674,7 @@ RSpec.describe "serialization" do
         attributes = data["attributes"]
         expect(attributes).to eq({
           "foo" => "without object",
-          "bar" => "JOHN",
+          "bar" => "JOHN"
         })
       end
     end
@@ -834,7 +834,7 @@ RSpec.describe "serialization" do
       render
       expect(json["data"][0]["attributes"]).to eq({
         "foo" => "bar",
-        "first_name" => "John",
+        "first_name" => "John"
       })
     end
 
@@ -1357,17 +1357,17 @@ RSpec.describe "serialization" do
           end
 
           # Special case because we hit index with a filter
-          context 'and params are customized' do
+          context "and params are customized" do
             before do
               resource.belongs_to :classification,
                 remote: "http://foo.com/classifications" do
                   params do |hash|
-                    hash[:filter][:foo] = 'bar'
+                    hash[:filter][:foo] = "bar"
                   end
                 end
             end
 
-            it 'links correctly' do
+            it "links correctly" do
               render
               expect(classification["links"]["related"])
                 .to eq("http://foo.com/classifications?filter[foo]=bar&filter[id]=789")

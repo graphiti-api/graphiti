@@ -1,10 +1,10 @@
 module Graphiti
   class RequestValidator
     delegate :validate,
-             :validate!,
-             :errors,
-             :deserialized_payload,
-             to: :@validator
+      :validate!,
+      :errors,
+      :deserialized_payload,
+      to: :@validator
 
     def initialize(root_resource, raw_params)
       @validator = ValidatorFactory.create(root_resource, raw_params)

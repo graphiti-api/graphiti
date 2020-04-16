@@ -14,9 +14,9 @@ module Graphiti
 
       def initialize(resource, payload, only: [], except: [])
         @resource = resource
-        @payload  = payload
-        @only     = only
-        @except   = except
+        @payload = payload
+        @only = only
+        @except = except
       end
 
       def iterate
@@ -67,7 +67,7 @@ module Graphiti
           foreign_key: sideload.foreign_key,
           attributes: relationship_payload[:attributes],
           meta: relationship_payload[:meta],
-          relationships: relationship_payload[:relationships],
+          relationships: relationship_payload[:relationships]
         }
       end
     end

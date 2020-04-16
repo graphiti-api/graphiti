@@ -20,7 +20,7 @@ RSpec.describe Graphiti::Sideload do
     {
       type: :has_many,
       parent_resource: parent_resource_class,
-      resource: resource_class,
+      resource: resource_class
     }
   end
   let(:name) { :foo }
@@ -114,7 +114,7 @@ RSpec.describe Graphiti::Sideload do
       end
 
       it "works" do
-        options = opts.merge(readable: lambda { user_can_read? }, writable: lambda{ true })
+        options = opts.merge(readable: lambda { user_can_read? }, writable: lambda { true })
         instance = Class.new(described_class).new(name, options)
         expect(instance).not_to be_readable
         expect(instance).to be_writable
@@ -454,7 +454,7 @@ RSpec.describe Graphiti::Sideload do
       let(:employees) do
         [
           PORO::Employee.new(id: 1),
-          PORO::Employee.new(id: 2),
+          PORO::Employee.new(id: 2)
         ]
       end
 
@@ -462,7 +462,7 @@ RSpec.describe Graphiti::Sideload do
         [
           PORO::Position.new(id: 1, employee_id: 1),
           PORO::Position.new(id: 2, employee_id: 1),
-          PORO::Position.new(id: 3, employee_id: 2),
+          PORO::Position.new(id: 3, employee_id: 2)
         ]
       end
 
@@ -477,7 +477,7 @@ RSpec.describe Graphiti::Sideload do
           [
             PORO::Position.new(id: 1, employee_id: "1"),
             PORO::Position.new(id: 2, employee_id: "1"),
-            PORO::Position.new(id: 3, employee_id: "2"),
+            PORO::Position.new(id: 3, employee_id: "2")
           ]
         end
 
@@ -492,7 +492,7 @@ RSpec.describe Graphiti::Sideload do
         let(:employees) do
           [
             PORO::Employee.new(id: "1"),
-            PORO::Employee.new(id: "2"),
+            PORO::Employee.new(id: "2")
           ]
         end
 
@@ -515,14 +515,14 @@ RSpec.describe Graphiti::Sideload do
       let(:positions) do
         [
           PORO::Position.new(id: 1, department_id: 1),
-          PORO::Position.new(id: 2, department_id: 2),
+          PORO::Position.new(id: 2, department_id: 2)
         ]
       end
 
       let(:departments) do
         [
           PORO::Department.new(id: 1),
-          PORO::Department.new(id: 2),
+          PORO::Department.new(id: 2)
         ]
       end
 
@@ -536,7 +536,7 @@ RSpec.describe Graphiti::Sideload do
         let(:departments) do
           [
             PORO::Department.new(id: "1"),
-            PORO::Department.new(id: "2"),
+            PORO::Department.new(id: "2")
           ]
         end
 
@@ -551,7 +551,7 @@ RSpec.describe Graphiti::Sideload do
         let(:positions) do
           [
             PORO::Position.new(id: 1, department_id: "1"),
-            PORO::Position.new(id: 2, department_id: "2"),
+            PORO::Position.new(id: 2, department_id: "2")
           ]
         end
 
@@ -566,16 +566,16 @@ RSpec.describe Graphiti::Sideload do
 
   describe ".params" do
     before do
-      instance.class.params do |hash, parents, query|
+      instance.class.params do |hash, parents, context|
         hash[:parents] = parents
-        hash[:query] = query
+        hash[:context] = context
       end
     end
 
     it "sets params proc" do
-      hash, parents, query = {}, [double("parent")], double("query")
-      instance.params_proc.call(hash, parents, query)
-      expect(hash).to eq(parents: parents, query: query)
+      hash, parents, context = {}, [double("parent")], double("context")
+      instance.params_proc.call(hash, parents, context)
+      expect(hash).to eq(parents: parents, context: context)
     end
   end
 
@@ -641,7 +641,7 @@ RSpec.describe Graphiti::Sideload do
         parent: "parent",
         sideload: instance,
         query: anything,
-        after_resolve: anything,
+        after_resolve: anything
       }
       expect(resource_class).to receive(:_all)
         .with(anything, expected, {type: :positions})
@@ -655,19 +655,25 @@ RSpec.describe Graphiti::Sideload do
 
     context "when params customization" do
       before do
-        instance.class.params do |hash, parents|
+        instance.class.params do |hash, parents, context|
           hash[:a] = parents
+          hash[:b] = context.current_user
         end
       end
 
       it "is respected" do
+        current_user = double
         expected = {
           foo: "bar",
           a: parents,
+          b: current_user
         }
         expect(resource_class).to receive(:_all)
           .with(expected, anything, {type: :positions})
-        instance.load(parents, query, nil)
+
+        Graphiti.with_context(OpenStruct.new(current_user: current_user)) do
+          instance.load(parents, query, nil)
+        end
       end
     end
 
@@ -689,7 +695,7 @@ RSpec.describe Graphiti::Sideload do
           type: :positions,
           modified: true,
           sort: [{id: :desc}],
-          parents: [],
+          parents: []
         }).and_return([])
         instance.load(parents, query, nil)
       end

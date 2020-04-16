@@ -3,45 +3,74 @@ language: ruby
 rvm:
 - 2.5
 - 2.6
+- 2.7
 gemfile:
   - Gemfile
   - gemfiles/rails_4.gemfile
-  - gemfiles/rails_5.gemfile
+  - gemfiles/rails_5_0.gemfile
+  - gemfiles/rails_5_1.gemfile
+  - gemfiles/rails_5_2.gemfile
   - gemfiles/rails_6.gemfile
-  - gemfiles/rails_5_graphiti_rails.gemfile
+  - gemfiles/rails_5_0_graphiti_rails.gemfile
+  - gemfiles/rails_5_1_graphiti_rails.gemfile
+  - gemfiles/rails_5_2_graphiti_rails.gemfile
   - gemfiles/rails_6_graphiti_rails.gemfile
 env:
-  - COMMAND=standardrb --no-fix --format progress
+  - COMMAND="standardrb --no-fix --format progress"
   - COMMAND=rspec
   - COMMAND=rspec APPRAISAL_INITIALIZED=true
 matrix:
   exclude:
-    - env: COMMAND=standardrb --no-fix --format progress
-      gemfile: gemfiles/rails_4.gemfile
-    - env: COMMAND=standardrb --no-fix --format progress
-      gemfile: gemfiles/rails_5.gemfile
-    - env: COMMAND=standardrb --no-fix --format progress
-      gemfile: gemfiles/rails_6.gemfile
-    - env: COMMAND=standardrb --no-fix --format progress
-      gemfile: gemfiles/rails_5_graphiti_rails.gemfile
-    - env: COMMAND=standardrb --no-fix --format progress
-      gemfile: gemfiles/rails_6_graphiti_rails.gemfile
+    # Don't run the appraisal version of the specs for the base gemfile
     - env: COMMAND=rspec APPRAISAL_INITIALIZED=true
       gemfile: Gemfile
+    # Don't run the standardrb check on any gemfile except the base gemfile
+    # (but run it for each ruby version)
+    - env: COMMAND="standardrb --no-fix --format progress"
+      gemfile: gemfiles/rails_4.gemfile
+    - env: COMMAND="standardrb --no-fix --format progress"
+      gemfile: gemfiles/rails_5_0.gemfile
+    - env: COMMAND="standardrb --no-fix --format progress"
+      gemfile: gemfiles/rails_5_1.gemfile
+    - env: COMMAND="standardrb --no-fix --format progress"
+      gemfile: gemfiles/rails_5_2.gemfile
+    - env: COMMAND="standardrb --no-fix --format progress"
+      gemfile: gemfiles/rails_6.gemfile
+    - env: COMMAND="standardrb --no-fix --format progress"
+      gemfile: gemfiles/rails_5_0_graphiti_rails.gemfile
+    - env: COMMAND="standardrb --no-fix --format progress"
+      gemfile: gemfiles/rails_5_1_graphiti_rails.gemfile
+    - env: COMMAND="standardrb --no-fix --format progress"
+      gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
+    - env: COMMAND="standardrb --no-fix --format progress"
+      gemfile: gemfiles/rails_6_graphiti_rails.gemfile
+    # Don't run the basic versions of the specs for any of the specific gemfiles
     - env: COMMAND=rspec
       gemfile: gemfiles/rails_4.gemfile
     - env: COMMAND=rspec
-      gemfile: gemfiles/rails_5.gemfile
+      gemfile: gemfiles/rails_5_0.gemfile
+    - env: COMMAND=rspec
+      gemfile: gemfiles/rails_5_1.gemfile
+    - env: COMMAND=rspec
+      gemfile: gemfiles/rails_5_2.gemfile
     - env: COMMAND=rspec
       gemfile: gemfiles/rails_6.gemfile
     - env: COMMAND=rspec
-      gemfile: gemfiles/rails_5_graphiti_rails.gemfile
+      gemfile: gemfiles/rails_5_0_graphiti_rails.gemfile
+    - env: COMMAND=rspec
+      gemfile: gemfiles/rails_5_1_graphiti_rails.gemfile
+    - env: COMMAND=rspec
+      gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
     - env: COMMAND=rspec
       gemfile: gemfiles/rails_6_graphiti_rails.gemfile
+
+    # Don't run rails 4 egmfile against any rubies (for some reason?)
     - gemfile: gemfiles/rails_4.gemfile
       rvm: 2.5
     - gemfile: gemfiles/rails_4.gemfile
       rvm: 2.6
+    - gemfile: gemfiles/rails_4.gemfile
+      rvm: 2.7
 
 script:
   - bundle _1.17.3_ exec $COMMAND

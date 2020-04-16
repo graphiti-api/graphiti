@@ -194,8 +194,8 @@ if ENV["APPRAISAL_INITIALIZED"]
       {
         data: {
           type: "employees",
-          attributes: {first_name: "Jane"},
-        },
+          attributes: {first_name: "Jane"}
+        }
       }
     end
 

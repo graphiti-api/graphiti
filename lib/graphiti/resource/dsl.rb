@@ -32,7 +32,8 @@ module Graphiti
               dependencies: opts[:dependent],
               required: required,
               operators: operators.to_hash,
-              allow_nil: opts.fetch(:allow_nil, filters_accept_nil_by_default)
+              allow_nil: opts.fetch(:allow_nil, filters_accept_nil_by_default),
+              deny_empty: opts.fetch(:deny_empty, filters_deny_empty_by_default)
             }
           elsif (type = args[0])
             attribute name, type, only: [:filterable], allow: opts[:allow]
@@ -55,7 +56,7 @@ module Graphiti
 
           if get_attr(name, :sortable, raise_error: :only_unsupported)
             config[:sorts][name] = {
-              proc: blk,
+              proc: blk
             }.merge(opts.slice(:only))
           elsif (type = args[0])
             attribute name, type, only: [:sortable]
@@ -78,7 +79,7 @@ module Graphiti
         def default_filter(name = nil, &blk)
           name ||= :__default
           config[:default_filters][name.to_sym] = {
-            filter: blk,
+            filter: blk
           }
         end
 
@@ -131,7 +132,7 @@ module Graphiti
             readable: true,
             writable: false,
             sortable: false,
-            filterable: false,
+            filterable: false
           }
           options = defaults.merge(options)
           config[:extra_attributes][name] = options

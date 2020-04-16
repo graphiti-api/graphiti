@@ -18,31 +18,31 @@ module Graphiti
       :link_proc
 
     def initialize(name, opts)
-      @name                          = name
+      @name = name
       validate_options!(opts)
-      @parent_resource_class         = opts[:parent_resource]
-      @resource_class                = opts[:resource]
-      @primary_key                   = opts[:primary_key]
-      @foreign_key                   = opts[:foreign_key]
-      @type                          = opts[:type]
-      @base_scope                    = opts[:base_scope]
-      @readable                      = evaluate_flag(opts[:readable])
-      @writable                      = evaluate_flag(opts[:writable])
-      @as                            = opts[:as]
-      @link                          = opts[:link]
-      @single                        = opts[:single]
-      @remote                        = opts[:remote]
+      @parent_resource_class = opts[:parent_resource]
+      @resource_class = opts[:resource]
+      @primary_key = opts[:primary_key]
+      @foreign_key = opts[:foreign_key]
+      @type = opts[:type]
+      @base_scope = opts[:base_scope]
+      @readable = evaluate_flag(opts[:readable])
+      @writable = evaluate_flag(opts[:writable])
+      @as = opts[:as]
+      @link = opts[:link]
+      @single = opts[:single]
+      @remote = opts[:remote]
       apply_belongs_to_many_filter if type == :many_to_many
 
-      @description                   = opts[:description]
+      @description = opts[:description]
 
       # polymorphic has_many
-      @polymorphic_as                = opts[:polymorphic_as]
+      @polymorphic_as = opts[:polymorphic_as]
       # polymorphic_belongs_to-specific
-      @group_name                    = opts[:group_name]
-      @polymorphic_child             = opts[:polymorphic_child]
-      @parent                        = opts[:parent]
-      @always_include_resource_ids   = opts[:always_include_resource_ids]
+      @group_name = opts[:group_name]
+      @polymorphic_child = opts[:polymorphic_child]
+      @parent = opts[:parent]
+      @always_include_resource_ids = opts[:always_include_resource_ids]
 
       if polymorphic_child?
         parent.resource.polymorphic << resource_class
@@ -197,7 +197,7 @@ module Graphiti
 
       with_error_handling Errors::SideloadParamsError do
         params = load_params(parents, query)
-        params_proc&.call(params, parents)
+        params_proc&.call(params, parents, context)
         return [] if blank_query?(params)
         opts = load_options(parents, query)
         opts[:sideload] = self
@@ -426,13 +426,17 @@ module Graphiti
       return false if flag.blank?
 
       case flag.class.name
-      when "Symbol","String"
+      when "Symbol", "String"
         resource.send(flag)
       when "Proc"
-        self.resource.instance_exec(&flag)
+        resource.instance_exec(&flag)
       else
         !!flag
       end
+    end
+
+    def context
+      Graphiti.context[:object]
     end
   end
 end

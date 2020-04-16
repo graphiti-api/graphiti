@@ -8,12 +8,12 @@ class Graphiti::Util::Persistence
   # @param [Model] caller_model The persisted parent object in the request graph
   # @param [Symbol] foreign_key Attribute assigned by parent object in graph
   def initialize(resource, meta, attributes, relationships, caller_model, foreign_key = nil)
-    @resource      = resource
-    @meta          = meta
-    @attributes    = attributes
+    @resource = resource
+    @meta = meta
+    @attributes = attributes
     @relationships = relationships
-    @caller_model  = caller_model
-    @foreign_key   = foreign_key
+    @caller_model = caller_model
+    @foreign_key = foreign_key
 
     # Find the correct child resource for a given jsonapi type
     if (meta_type = @meta[:type].try(:to_sym))
@@ -177,9 +177,15 @@ class Graphiti::Util::Persistence
   def process_belongs_to(relationships)
     [].tap do |processed|
       iterate(only: [:polymorphic_belongs_to, :belongs_to]) do |x|
-        x[:object] = x[:resource]
-          .persist_with_relationships(x[:meta], x[:attributes], x[:relationships])
-        processed << x
+        begin
+          id = x.dig(:attributes, :id)
+          x[:object] = x[:resource]
+            .persist_with_relationships(x[:meta], x[:attributes], x[:relationships])
+          processed << x
+        rescue Graphiti::Errors::RecordNotFound
+          path = "relationships/#{x.dig(:meta, :jsonapi_type)}"
+          raise Graphiti::Errors::RecordNotFound.new(x[:sideload].name, id, path)
+        end
       end
     end
   end
@@ -202,7 +208,7 @@ class Graphiti::Util::Persistence
   def iterate(only: [], except: [])
     opts = {
       resource: @resource,
-      relationships: @relationships,
+      relationships: @relationships
     }.merge(only: only, except: except)
 
     Graphiti::Util::RelationshipPayload.iterate(opts) do |x|
@@ -216,7 +222,7 @@ class Graphiti::Util::Persistence
       temp_id: @meta[:temp_id],
       caller_model: @caller_model,
       attributes: @attributes,
-      relationships: @relationships,
+      relationships: @relationships
     }
   end
 

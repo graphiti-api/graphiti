@@ -143,8 +143,13 @@ module Graphiti
       def message
         allow = @filter.values[0][:allow]
         deny = @filter.values[0][:deny]
+        value_string = if @value == "(empty)"
+          "empty value"
+        else
+          "value #{@value.inspect}"
+        end
         msg = <<-MSG
-          #{@resource.class.name}: tried to filter on #{@filter.keys[0].inspect}, but passed invalid value #{@value.inspect}.
+          #{@resource.class.name}: tried to filter on #{@filter.keys[0].inspect}, but passed invalid #{value_string}.
         MSG
         msg << "\nAllowlist: #{allow.inspect}" if allow
         msg << "\nDenylist: #{deny.inspect}" if deny
@@ -189,7 +194,7 @@ module Graphiti
 
           Make sure the endpoint "#{@sideload.resource.endpoint[:full_path]}" exists with action #{@action.inspect}, or customize the endpoint for #{@sideload.resource.class.name}.
 
-          If you do not wish to generate a link, pass link: false or set self.relationship_links_by_default = false.
+          If you do not wish to generate a link, pass link: false or set self.autolink = false.
         MSG
       end
     end
@@ -316,14 +321,14 @@ module Graphiti
             sortable: "sort on",
             filterable: "filter on",
             readable: "read",
-            writable: "write",
+            writable: "write"
           }[@flag]
         else
           {
             sortable: "add sort",
             filterable: "add filter",
             readable: "read",
-            writable: "write",
+            writable: "write"
           }[@flag]
         end
       end
@@ -722,6 +727,21 @@ module Graphiti
     end
 
     class RecordNotFound < Base
+      def initialize(resource = nil, id = nil, path = nil)
+        @resource = resource
+        @id = id
+        @path = path
+      end
+
+      def message
+        if !@resource.nil? && !@id.nil?
+          "The referenced resource '#{@resource}' with id '#{@id}' could not be found.".tap do |msg|
+            msg << " Referenced at '#{@path}'" unless @path.nil?
+          end
+        else
+          "Specified Record Not Found"
+        end
+      end
     end
 
     class RequiredFilter < Base

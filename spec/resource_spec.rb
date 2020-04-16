@@ -24,6 +24,8 @@ RSpec.describe Graphiti::Resource do
         expect(klass.attributes_schema_by_default).to eq(true)
         expect(klass.relationships_readable_by_default).to eq(true)
         expect(klass.relationships_writable_by_default).to eq(true)
+        expect(klass.filters_accept_nil_by_default).to eq(false)
+        expect(klass.filters_deny_empty_by_default).to eq(false)
       end
 
       it "does not have serializer, type, or model" do
@@ -68,6 +70,7 @@ RSpec.describe Graphiti::Resource do
         expect(klass.relationships_readable_by_default).to eq(true)
         expect(klass.relationships_writable_by_default).to eq(true)
         expect(klass.filters_accept_nil_by_default).to eq(false)
+        expect(klass.filters_deny_empty_by_default).to eq(false)
       end
 
       context "when rails" do
@@ -153,7 +156,8 @@ RSpec.describe Graphiti::Resource do
             self.attributes_schema_by_default = false
             self.relationships_readable_by_default = false
             self.relationships_writable_by_default = false
-            self.filters_accept_nil_by_default = false
+            self.filters_accept_nil_by_default = true
+            self.filters_deny_empty_by_default = true
           end
         end
 
@@ -168,7 +172,8 @@ RSpec.describe Graphiti::Resource do
           expect(klass.attributes_schema_by_default).to eq(false)
           expect(klass.relationships_readable_by_default).to eq(false)
           expect(klass.relationships_writable_by_default).to eq(false)
-          expect(klass.filters_accept_nil_by_default).to eq(false)
+          expect(klass.filters_accept_nil_by_default).to eq(true)
+          expect(klass.filters_deny_empty_by_default).to eq(true)
         end
       end
 
@@ -310,7 +315,8 @@ RSpec.describe Graphiti::Resource do
             self.attributes_schema_by_default = false
             self.relationships_readable_by_default = false
             self.relationships_writable_by_default = false
-            self.filters_accept_nil_by_default = false
+            self.filters_accept_nil_by_default = true
+            self.filters_deny_empty_by_default = true
           end
         end
 
@@ -325,7 +331,8 @@ RSpec.describe Graphiti::Resource do
           expect(klass2.attributes_schema_by_default).to eq(false)
           expect(klass2.relationships_readable_by_default).to eq(false)
           expect(klass2.relationships_writable_by_default).to eq(false)
-          expect(klass2.filters_accept_nil_by_default).to eq(false)
+          expect(klass2.filters_accept_nil_by_default).to eq(true)
+          expect(klass2.filters_deny_empty_by_default).to eq(true)
         end
       end
 
@@ -950,7 +957,7 @@ RSpec.describe Graphiti::Resource do
         path: :'/employees',
         full_path: :'/employees',
         url: :'/employees',
-        actions: [:index, :show, :create, :update, :destroy],
+        actions: [:index, :show, :create, :update, :destroy]
       })
     end
 
@@ -996,7 +1003,7 @@ RSpec.describe Graphiti::Resource do
           path: :'/poro/employees',
           full_path: :'/poro/employees',
           url: :'/poro/employees',
-          actions: [:index, :show, :create, :update, :destroy],
+          actions: [:index, :show, :create, :update, :destroy]
         })
       end
     end
@@ -1017,7 +1024,7 @@ RSpec.describe Graphiti::Resource do
 
     it "defaults actions" do
       expect(instance.endpoint[:actions]).to eq([
-        :index, :show, :create, :update, :destroy,
+        :index, :show, :create, :update, :destroy
       ])
     end
 
@@ -1052,13 +1059,13 @@ RSpec.describe Graphiti::Resource do
         path: :"/employees",
         full_path: :"/employees",
         url: :"/employees",
-        actions: [:index, :show, :create, :update, :destroy],
+        actions: [:index, :show, :create, :update, :destroy]
       })
       expect(klass.endpoints[1]).to eq({
         path: :"/special_employees",
         full_path: :"/special_employees",
         url: :"/special_employees",
-        actions: [:index, :create],
+        actions: [:index, :create]
       })
     end
 
@@ -1145,7 +1152,7 @@ RSpec.describe Graphiti::Resource do
         let(:request) do
           double(env: {
             "PATH_INFO" => path,
-            "REQUEST_METHOD" => "GET",
+            "REQUEST_METHOD" => "GET"
           })
         end
 
@@ -1301,7 +1308,7 @@ RSpec.describe Graphiti::Resource do
         it "returns correct hash" do
           proxy = klass.all(stats: {total: "count"})
           expect(proxy.stats).to eq({
-            total: {count: "poro_count_total"},
+            total: {count: "poro_count_total"}
           })
         end
       end
@@ -1351,7 +1358,7 @@ RSpec.describe Graphiti::Resource do
 
         employees = klass.find({
           id: employee2.id,
-          extra_fields: {employees: "foo"},
+          extra_fields: {employees: "foo"}
         })
         expect(employees.data.id).to eq(3)
       end
@@ -1360,7 +1367,7 @@ RSpec.describe Graphiti::Resource do
         let(:request) do
           double(env: {
             "PATH_INFO" => "/api/v1/employees/#{employee2.id}",
-            "REQUEST_METHOD" => "GET",
+            "REQUEST_METHOD" => "GET"
           })
         end
 
@@ -1395,7 +1402,7 @@ RSpec.describe Graphiti::Resource do
         it "returns correct hash" do
           proxy = klass.find({
             id: employee2.id,
-            stats: {total: "count"},
+            stats: {total: "count"}
           })
           expect(proxy.stats).to eq(total: {count: "poro_count_total"})
         end
@@ -1421,14 +1428,14 @@ RSpec.describe Graphiti::Resource do
           expect(PORO::DB).to receive(:all).with({
             conditions: {first_name: "adsf", id: [1]},
             page: 1,
-            per: 20,
+            per: 20
           }).and_call_original
         end
 
         it "is used" do
           expect {
             klass.find({id: employee1.id}, {
-              conditions: {first_name: "adsf"},
+              conditions: {first_name: "adsf"}
             }).data
           }.to raise_error(Graphiti::Errors::RecordNotFound)
         end
@@ -1449,7 +1456,7 @@ RSpec.describe Graphiti::Resource do
       let(:request) do
         double(env: {
           "PATH_INFO" => "/api/v1/employees",
-          "REQUEST_METHOD" => "GET",
+          "REQUEST_METHOD" => "GET"
         })
       end
 

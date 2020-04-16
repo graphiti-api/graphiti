@@ -17,7 +17,7 @@ module Graphiti
           belongs_to: ::Graphiti::Sideload::BelongsTo,
           has_one: ::Graphiti::Sideload::HasOne,
           many_to_many: ::Graphiti::Sideload::ManyToMany,
-          polymorphic_belongs_to: ::Graphiti::Sideload::PolymorphicBelongsTo,
+          polymorphic_belongs_to: ::Graphiti::Sideload::PolymorphicBelongsTo
         }
       end
 
@@ -33,7 +33,7 @@ module Graphiti
             :suffix,
             :not_suffix,
             :match,
-            :not_match,
+            :not_match
           ],
           uuid: [:eq, :not_eq],
           enum: [:eq, :not_eq],
@@ -45,7 +45,7 @@ module Graphiti
           date: numerical_operators,
           datetime: numerical_operators,
           hash: [:eq],
-          array: [:eq],
+          array: [:eq]
         }
       end
 

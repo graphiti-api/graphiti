@@ -78,7 +78,7 @@ module Graphiti
 
     def sort_hash(attr)
       value = attr[0] == "-" ? :desc : :asc
-      key   = attr.sub("-", "").to_sym
+      key = attr.sub("-", "").to_sym
 
       {key => value}
     end

@@ -87,7 +87,7 @@ class Graphiti::Deserializer
       type: data[:type],
       temp_id: data[:'temp-id'],
       method: action,
-      payload_path: ["data"],
+      payload_path: ["data"]
     }
   end
 
@@ -185,10 +185,10 @@ class Graphiti::Deserializer
         jsonapi_type: datum[:type],
         temp_id: temp_id,
         method: method,
-        payload_path: ["included", included_idx],
+        payload_path: ["included", included_idx]
       },
       attributes: attributes,
-      relationships: relationships,
+      relationships: relationships
     }
   end
 

@@ -190,7 +190,7 @@ RSpec.describe "stats" do
       render
       expect(json["meta"]["stats"]).to eq({
         "total" => {"count" => "poro_count_total"},
-        "age" => {"sum" => "poro_sum_age", "average" => "poro_average_age"},
+        "age" => {"sum" => "poro_sum_age", "average" => "poro_average_age"}
       })
     end
   end
@@ -209,7 +209,7 @@ RSpec.describe "stats" do
     it "works correctly" do
       render
       expect(json["meta"]["stats"]).to eq({
-        "age" => {"sum" => "poro_sum_age"},
+        "age" => {"sum" => "poro_sum_age"}
       })
     end
   end
@@ -224,8 +224,8 @@ RSpec.describe "stats" do
 
   context "when pagination requested" do
     before do
-      params[:page]   = {size: 1, number: 1}
-      params[:stats]  = {total: "count"}
+      params[:page] = {size: 1, number: 1}
+      params[:stats] = {total: "count"}
     end
 
     # TODO: must be integration tested

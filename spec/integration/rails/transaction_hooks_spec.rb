@@ -186,8 +186,8 @@ if ENV["APPRAISAL_INITIALIZED"]
       {
         data: {
           type: "employees",
-          attributes: {first_name: "Jane"},
-        },
+          attributes: {first_name: "Jane"}
+        }
       }
     end
 
@@ -242,7 +242,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             :before_create,
             :stacked_before_create,
             :employee_after_create,
-            :employee_after_create_eval_test,
+            :employee_after_create_eval_test
           ])
         end
       end
@@ -274,10 +274,10 @@ if ENV["APPRAISAL_INITIALIZED"]
             relationships: {
               positions: {
                 data: [
-                  {'temp-id': "a", type: "positions", method: "create"},
-                ],
-              },
-            },
+                  {'temp-id': "a", type: "positions", method: "create"}
+                ]
+              }
+            }
           },
           included: [
             {
@@ -286,16 +286,16 @@ if ENV["APPRAISAL_INITIALIZED"]
               relationships: {
                 department: {
                   data: {
-                    'temp-id': "b", type: "departments", method: "create",
-                  },
-                },
-              },
+                    'temp-id': "b", type: "departments", method: "create"
+                  }
+                }
+              }
             },
             {
               type: "departments",
-              'temp-id': "b",
-            },
-          ],
+              'temp-id': "b"
+            }
+          ]
         }
       end
 
@@ -313,7 +313,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           :before_position,
           :before_department,
           :employee_after_create,
-          :employee_after_create_eval_test,
+          :employee_after_create_eval_test
         ])
       end
 
@@ -383,18 +383,18 @@ if ENV["APPRAISAL_INITIALIZED"]
             relationships: {
               positions: {
                 data: {
-                  type: "positions", 'temp-id': "abc123", method: "create",
-                },
-              },
-            },
+                  type: "positions", 'temp-id': "abc123", method: "create"
+                }
+              }
+            }
           },
           included: [
             {
               type: "positions",
               'temp-id': "abc123",
-              attributes: {title: "foo"},
-            },
-          ],
+              attributes: {title: "foo"}
+            }
+          ]
         }
       end
 
@@ -416,24 +416,24 @@ if ENV["APPRAISAL_INITIALIZED"]
                 jsonapi_type: "positions",
                 temp_id: "abc123",
                 method: :create,
-                payload_path: ["included", 0],
+                payload_path: ["included", 0]
               },
               attributes: {
                 "title" => "foo",
-                "employee_id" => 1,
+                "employee_id" => 1
               },
-              relationships: {},
-            },
-          },
+              relationships: {}
+            }
+          }
         })
         expect(position_resource.meta.except(:caller_model)).to eq({
           method: :create,
           temp_id: "abc123",
           attributes: {
             "title" => "foo",
-            "employee_id" => 1,
+            "employee_id" => 1
           },
-          relationships: {},
+          relationships: {}
         })
 
         expect(position_resource.meta[:caller_model]).to be_a(::Employee)

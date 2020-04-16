@@ -43,7 +43,7 @@ module Graphiti
         end
 
         if (logger = ::Rails.logger)
-          self.debug = logger.level.zero? && self.debug
+          self.debug = logger.level.zero? && debug
           Graphiti.logger = logger
         end
       end

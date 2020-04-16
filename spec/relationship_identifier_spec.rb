@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require "spec_helper"
 
-RSpec.describe 'relationship identifiers' do
-  include_context 'resource testing'
+RSpec.describe "relationship identifiers" do
+  include_context "resource testing"
 
   # let(:base_scope) { { type: :positions } }
   let!(:employee) { PORO::Employee.create }
@@ -31,12 +31,12 @@ RSpec.describe 'relationship identifiers' do
     ]
   end
 
-  describe 'has_many' do
-    context 'with default' do
+  describe "has_many" do
+    context "with default" do
       let(:resource) do
         Class.new(PORO::TeamResource) do
           def self.name
-            'PORO::TeamResource'
+            "PORO::TeamResource"
           end
 
           has_many :employees
@@ -48,37 +48,37 @@ RSpec.describe 'relationship identifiers' do
         render
       end
 
-      it 'does not include anything' do
+      it "does not include anything" do
         expect do
-          included('employees')
+          included("employees")
         end.to raise_error(GraphitiSpecHelpers::Errors::NoSideloads)
       end
 
-      it 'specifies meta[:included] = false' do
+      it "specifies meta[:included] = false" do
         jsonapi_data.each do |record|
-          expect(record.relationships['employees']['meta']['included']).to eq(false)
+          expect(record.relationships["employees"]["meta"]["included"]).to eq(false)
         end
       end
 
-      it 'does not includes relationship identifiers' do
+      it "does not includes relationship identifiers" do
         jsonapi_data.each do |record|
-          data = record.relationships['employees']['data']
+          data = record.relationships["employees"]["data"]
           expect(data).to be_nil
         end
       end
     end
-    context 'with include directive' do
+    context "with include directive" do
       let(:resource) do
         Class.new(PORO::TeamResource) do
           def self.name
-            'PORO::TeamResource'
+            "PORO::TeamResource"
           end
 
           has_many :employees do
             scope do |employee_ids|
               {
                 type: :employees,
-                conditions: { employee_id: employee_ids }
+                conditions: {employee_id: employee_ids}
               }
             end
           end
@@ -86,37 +86,37 @@ RSpec.describe 'relationship identifiers' do
       end
 
       before do
-        params[:include] = 'employees'
+        params[:include] = "employees"
         allow_any_instance_of(PORO::Team).to receive(:employees) { [employee, employee2] }
         render
       end
 
-      it 'includes employees' do
-        expect(included('employees').map(&:id)).to eq([1, 2])
+      it "includes employees" do
+        expect(included("employees").map(&:id)).to eq([1, 2])
       end
 
-      it 'includes relationship identifiers' do
+      it "includes relationship identifiers" do
         jsonapi_data.each do |record|
-          data = record.relationships['employees']['data']
+          data = record.relationships["employees"]["data"]
           expect(data).to_not be_nil
-          expect(data.pluck(:type).uniq).to match_array(['employees'])
+          expect(data.pluck(:type).uniq).to match_array(["employees"])
           expect(data.pluck(:id).uniq).to match_array(%w[1 2])
         end
       end
     end
 
-    context 'without include directive and always_include_resource_ids: true' do
+    context "without include directive and always_include_resource_ids: true" do
       let(:resource) do
         Class.new(PORO::TeamResource) do
           def self.name
-            'PORO::TeamResource'
+            "PORO::TeamResource"
           end
 
           has_many :employees, always_include_resource_ids: true do
             scope do |employee_ids|
               {
                 type: :employees,
-                conditions: { employee_id: employee_ids }
+                conditions: {employee_id: employee_ids}
               }
             end
           end
@@ -128,58 +128,58 @@ RSpec.describe 'relationship identifiers' do
         render
       end
 
-      it 'does not include anything' do
+      it "does not include anything" do
         expect do
-          included('employees')
+          included("employees")
         end.to raise_error(GraphitiSpecHelpers::Errors::NoSideloads)
       end
 
-      it 'includes relationship identifiers' do
+      it "includes relationship identifiers" do
         jsonapi_data.each do |record|
-          data = record.relationships['employees']['data']
+          data = record.relationships["employees"]["data"]
           expect(data).to_not be_nil
-          expect(data.pluck(:type).uniq).to match_array(['employees'])
+          expect(data.pluck(:type).uniq).to match_array(["employees"])
           expect(data.pluck(:id).uniq).to match_array(%w[1 2])
         end
       end
     end
   end
 
-  describe 'belongs_to' do
-    context 'with include directive' do
+  describe "belongs_to" do
+    context "with include directive" do
       let(:resource) do
         Class.new(PORO::PositionResource) do
           def self.name
-            'PORO::PositionResource'
+            "PORO::PositionResource"
           end
 
           belongs_to :employee
         end
       end
       before do
-        params[:include] = 'employee'
+        params[:include] = "employee"
         render
       end
 
-      it 'works' do
-        expect(included('employees').map(&:id)).to eq([1])
+      it "works" do
+        expect(included("employees").map(&:id)).to eq([1])
       end
 
-      it 'has relationship identifiers' do
+      it "has relationship identifiers" do
         jsonapi_data.each do |record|
-          data = record.relationships['employee']['data']
+          data = record.relationships["employee"]["data"]
 
-          expect(data[:type]).to eq('employees')
-          expect(data[:id]).to eq('1')
+          expect(data[:type]).to eq("employees")
+          expect(data[:id]).to eq("1")
         end
       end
     end
 
-    context 'with defaults' do
+    context "with defaults" do
       let(:resource) do
         Class.new(PORO::PositionResource) do
           def self.name
-            'PORO::PositionResource'
+            "PORO::PositionResource"
           end
 
           belongs_to :employee
@@ -192,28 +192,28 @@ RSpec.describe 'relationship identifiers' do
       end
 
       # Currently disabled as causes an N+1
-      xit 'has relationship ids' do
+      xit "has relationship ids" do
         jsonapi_data.each do |record|
-          data = record.relationships['employee']['data']
+          data = record.relationships["employee"]["data"]
 
-          expect(data[:type]).to eq('employees')
-          expect(data[:id]).to eq('1')
+          expect(data[:type]).to eq("employees")
+          expect(data[:id]).to eq("1")
         end
       end
     end
 
-    context 'with always_include_resource_ids: false' do
+    context "with always_include_resource_ids: false" do
       let(:resource) do
         Class.new(PORO::PositionResource) do
           def self.name
-            'PORO::PositionResource'
+            "PORO::PositionResource"
           end
 
           belongs_to :employee, always_include_resource_ids: false do
             scope do |employee_ids|
               {
                 type: :employees,
-                conditions: { id: employee_ids }
+                conditions: {id: employee_ids}
               }
             end
           end
@@ -225,10 +225,10 @@ RSpec.describe 'relationship identifiers' do
         render
       end
 
-      it 'has no relationship identifiers' do
+      it "has no relationship identifiers" do
         jsonapi_data.each do |record|
-          data = record.relationships['employee']
-          expect(data.keys).to_not include('data')
+          data = record.relationships["employee"]
+          expect(data.keys).to_not include("data")
         end
       end
     end

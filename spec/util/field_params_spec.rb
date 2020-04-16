@@ -5,11 +5,11 @@ RSpec.describe Graphiti::Util::FieldParams do
     it "collects and normalizes the payload" do
       parsed = described_class.parse({
         "authors" => "first_name,last_name",
-        "books" => "title",
+        "books" => "title"
       })
       expect(parsed).to eq({
         authors: [:first_name, :last_name],
-        books: [:title],
+        books: [:title]
       })
     end
   end

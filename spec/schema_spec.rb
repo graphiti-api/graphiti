@@ -16,50 +16,50 @@ RSpec.describe Graphiti::Schema do
                 type: "integer_id",
                 readable: true,
                 writable: true,
-                description: nil,
+                description: nil
               },
               first_name: {
                 type: "string",
                 readable: true,
                 writable: true,
-                description: "The employee's first name",
-              },
+                description: "The employee's first name"
+              }
             },
             sorts: {
               id: {},
-              first_name: {},
+              first_name: {}
             },
             filters: {
               id: {
                 type: "integer_id",
-                operators: Graphiti::Adapters::Abstract.default_operators[:integer].map(&:to_s),
+                operators: Graphiti::Adapters::Abstract.default_operators[:integer].map(&:to_s)
               },
               first_name: {
                 type: "string",
-                operators: Graphiti::Adapters::Abstract.default_operators[:string].map(&:to_s),
+                operators: Graphiti::Adapters::Abstract.default_operators[:string].map(&:to_s)
               },
               title: {
                 type: "string",
-                operators: Graphiti::Adapters::Abstract.default_operators[:string].map(&:to_s),
-              },
+                operators: Graphiti::Adapters::Abstract.default_operators[:string].map(&:to_s)
+              }
             },
             extra_attributes: {
               net_sales: {
                 type: "float",
                 readable: true,
-                description: "The total value of the employee's sales",
-              },
+                description: "The total value of the employee's sales"
+              }
             },
             relationships: {
               positions: {
                 resource: "Schema::PositionResource",
                 type: "has_many",
-                description: nil,
+                description: nil
                 # writable: true,
                 # readable: true
-              },
-            },
-          },
+              }
+            }
+          }
         ],
         endpoints: {
           "/api/v1/schema/employees": {
@@ -68,104 +68,104 @@ RSpec.describe Graphiti::Schema do
               show: {resource: "Schema::EmployeeResource"},
               create: {resource: "Schema::EmployeeResource"},
               update: {resource: "Schema::EmployeeResource"},
-              destroy: {resource: "Schema::EmployeeResource"},
-            },
-          },
+              destroy: {resource: "Schema::EmployeeResource"}
+            }
+          }
         },
         types: {
           integer_id: {
             kind: "scalar",
-            description: "Base Type. Query/persist as integer, render as string.",
+            description: "Base Type. Query/persist as integer, render as string."
           },
           string: {
             kind: "scalar",
-            description: "Base Type.",
+            description: "Base Type."
           },
           uuid: {
             description: "Base Type. Like a normal string, but by default only eq/!eq and case-sensitive.",
-            kind: "scalar",
+            kind: "scalar"
           },
           string_enum: {
             description: "String enum type. Like a normal string, but only eq/!eq and case-sensitive. Limited to only the allowed values.",
-            kind: "scalar",
+            kind: "scalar"
           },
           integer_enum: {
             description: "Integer enum type. Like a normal integer, but only eq/!eq filters. Limited to only the allowed values.",
-            kind: "scalar",
+            kind: "scalar"
           },
           integer: {
             kind: "scalar",
-            description: "Base Type.",
+            description: "Base Type."
           },
           big_decimal: {
             kind: "scalar",
-            description: "Base Type.",
+            description: "Base Type."
           },
           float: {
             kind: "scalar",
-            description: "Base Type.",
+            description: "Base Type."
           },
           boolean: {
             kind: "scalar",
-            description: "Base Type.",
+            description: "Base Type."
           },
           date: {
             kind: "scalar",
-            description: "Base Type.",
+            description: "Base Type."
           },
           datetime: {
             kind: "scalar",
-            description: "Base Type.",
+            description: "Base Type."
           },
           hash: {
             kind: "record",
-            description: "Base Type.",
+            description: "Base Type."
           },
           array: {
             kind: "array",
-            description: "Base Type.",
+            description: "Base Type."
           },
           array_of_integer_ids: {
             kind: "array",
-            description: "Base Type.",
+            description: "Base Type."
           },
           array_of_strings: {
             kind: "array",
-            description: "Base Type.",
+            description: "Base Type."
           },
           array_of_uuids: {
             description: "Base Type.",
-            kind: "array",
+            kind: "array"
           },
           array_of_string_enums: {
             description: "Base Type.",
-            kind: "array",
+            kind: "array"
           },
           array_of_integer_enums: {
             description: "Base Type.",
-            kind: "array",
+            kind: "array"
           },
           array_of_integers: {
             kind: "array",
-            description: "Base Type.",
+            description: "Base Type."
           },
           array_of_big_decimals: {
             kind: "array",
-            description: "Base Type.",
+            description: "Base Type."
           },
           array_of_floats: {
             kind: "array",
-            description: "Base Type.",
+            description: "Base Type."
           },
           array_of_dates: {
             kind: "array",
-            description: "Base Type.",
+            description: "Base Type."
           },
           array_of_datetimes: {
             kind: "array",
-            description: "Base Type.",
-          },
-        },
+            description: "Base Type."
+          }
+        }
       }
     end
 
@@ -420,7 +420,7 @@ RSpec.describe Graphiti::Schema do
             "suffix",
             "not_suffix",
             "match",
-            "not_match",
+            "not_match"
           ])
       end
     end
@@ -546,7 +546,7 @@ RSpec.describe Graphiti::Schema do
         expect(schema[:resources][0][:relationships][:foos]).to eq({
           description: nil,
           resource: "Schema::EmployeeResource.foos.remote",
-          type: "has_many",
+          type: "has_many"
         })
       end
     end
@@ -566,9 +566,9 @@ RSpec.describe Graphiti::Schema do
             positions: {
               description: nil,
               resource: "Schema::PositionResource",
-              type: "has_many",
-            },
-          },
+              type: "has_many"
+            }
+          }
         })
       end
     end
@@ -589,14 +589,14 @@ RSpec.describe Graphiti::Schema do
     context "when sideload allowlist" do
       before do
         test_context.sideload_allowlist = {
-          index: {positions: "department"},
+          index: {positions: "department"}
         }
       end
 
       it "is reflected in the schema" do
         endpoint = schema[:endpoints][:"/api/v1/schema/employees"]
         expect(endpoint[:actions][:index][:sideload_allowlist]).to eq({
-          positions: {department: {}},
+          positions: {department: {}}
         })
       end
     end
@@ -659,14 +659,14 @@ RSpec.describe Graphiti::Schema do
               show: {resource: "Schema::EmployeeResource"},
               create: {resource: "Schema::EmployeeResource"},
               update: {resource: "Schema::EmployeeResource"},
-              destroy: {resource: "Schema::EmployeeResource"},
-            },
+              destroy: {resource: "Schema::EmployeeResource"}
+            }
           },
           '/api/v1/special_employees': {
             actions: {
-              index: {resource: "Schema::EmployeeResource"},
-            },
-          },
+              index: {resource: "Schema::EmployeeResource"}
+            }
+          }
         })
       end
     end
@@ -703,7 +703,7 @@ RSpec.describe Graphiti::Schema do
       it "generates a polymorphic schema for the resource" do
         expect(schema[:resources][0][:polymorphic]).to eq(true)
         expect(schema[:resources][0][:children])
-          .to eq(["PORO::VisaResource", "PORO::MastercardResource"])
+          .to eq(["PORO::VisaResource", "PORO::GoldVisaResource", "PORO::MastercardResource"])
       end
     end
 
@@ -741,7 +741,7 @@ RSpec.describe Graphiti::Schema do
         expect(schema[:resources][0][:relationships][:dwelling]).to eq({
           description: nil,
           type: "polymorphic_belongs_to",
-          resources: ["Schema::HouseResource", "Schema::CondoResource"],
+          resources: ["Schema::HouseResource", "Schema::CondoResource"]
         })
       end
     end

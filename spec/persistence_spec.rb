@@ -5,8 +5,8 @@ RSpec.describe "persistence" do
     {
       data: {
         type: "employees",
-        attributes: {first_name: "Jane"},
-      },
+        attributes: {first_name: "Jane"}
+      }
     }
   end
   let(:klass) do
@@ -55,8 +55,8 @@ RSpec.describe "persistence" do
         {
           data: {
             type: "employees",
-            attributes: {first_name: "Jane"},
-          },
+            attributes: {first_name: "Jane"}
+          }
         }
       end
 
@@ -82,8 +82,8 @@ RSpec.describe "persistence" do
         {
           data: {
             type: "employees",
-            attributes: {first_name: "Jane"},
-          },
+            attributes: {first_name: "Jane"}
+          }
         }
       end
 
@@ -164,7 +164,7 @@ RSpec.describe "persistence" do
             def do_before_attributes(attributes)
               self.class.calls << {
                 name: :do_before_attributes,
-                args: [attributes.dup],
+                args: [attributes.dup]
               }
               attributes[:last_name] = attributes.delete(:first_name)
             end
@@ -254,7 +254,7 @@ RSpec.describe "persistence" do
             def do_after_attributes(model)
               self.class.calls << {
                 name: :do_after_attributes,
-                args: [model.dup],
+                args: [model.dup]
               }
               model.last_name = model.first_name
             end
@@ -344,7 +344,7 @@ RSpec.describe "persistence" do
             def do_around_attributes(attributes)
               self.class.calls << {
                 name: :do_around_attributes,
-                args: [attributes.dup],
+                args: [attributes.dup]
               }
               attributes[:last_name] = attributes.delete(:first_name)
               model_instance = yield attributes
@@ -435,7 +435,7 @@ RSpec.describe "persistence" do
             def do_before_save(model)
               self.class.calls << {
                 name: :do_before_save,
-                args: [model.dup],
+                args: [model.dup]
               }
               model.first_name = "b4 save"
             end
@@ -525,7 +525,7 @@ RSpec.describe "persistence" do
             def do_after_save(model)
               self.class.calls << {
                 name: :do_after_save,
-                args: [model.dup],
+                args: [model.dup]
               }
               model.first_name = "after save"
             end
@@ -699,7 +699,7 @@ RSpec.describe "persistence" do
             def do_around_save(model)
               self.class.calls << {
                 name: :do_around_save,
-                args: [model.dup],
+                args: [model.dup]
               }
               model.first_name = "b4 yield"
               model_instance = yield model
@@ -791,7 +791,7 @@ RSpec.describe "persistence" do
               model.first_name = "updated b4 destroy"
               self.class.calls << {
                 name: :do_before_destroy,
-                args: [model.dup],
+                args: [model.dup]
               }
             end
           end
@@ -853,7 +853,7 @@ RSpec.describe "persistence" do
               model.first_name = "updated after destroy"
               self.class.calls << {
                 name: :do_after_destroy,
-                args: [model.dup],
+                args: [model.dup]
               }
             end
           end
@@ -915,7 +915,7 @@ RSpec.describe "persistence" do
               model.first_name = "updated b4 destroy"
               self.class.calls << {
                 name: :do_around_destroy,
-                args: [model.dup],
+                args: [model.dup]
               }
               if PORO::Employee.find(model.id).nil?
                 raise "something went wrong"
@@ -1120,7 +1120,7 @@ RSpec.describe "persistence" do
           "aroundsaveB2",
           "aroundsaveA2",
           "aroundpersB2",
-          "aroundpersA2",
+          "aroundpersA2"
         ])
       end
 
@@ -1160,7 +1160,7 @@ RSpec.describe "persistence" do
           "aroundsaveA2",
           "aroundpersC2",
           "aroundpersB2",
-          "aroundpersA2",
+          "aroundpersA2"
         ])
       end
     end
@@ -1181,18 +1181,18 @@ RSpec.describe "persistence" do
           relationships: {
             positions: {
               data: [{
-                type: "positions", 'temp-id': "abc123", method: "create",
-              }],
-            },
-          },
+                type: "positions", 'temp-id': "abc123", method: "create"
+              }]
+            }
+          }
         },
         included: [
           {
             type: "positions",
             'temp-id': "abc123",
-            attributes: {title: "Engineer"},
-          },
-        ],
+            attributes: {title: "Engineer"}
+          }
+        ]
       }
     end
 
@@ -1229,10 +1229,10 @@ RSpec.describe "persistence" do
             jsonapi_type: "positions",
             method: :create,
             temp_id: "abc123",
-            payload_path: ["included", 0],
+            payload_path: ["included", 0]
           },
-          relationships: {},
-        }],
+          relationships: {}
+        }]
       })
 
       meta = position_resource.meta
@@ -1565,11 +1565,11 @@ RSpec.describe "persistence" do
                   data: [{
                     id: position.id.to_s,
                     type: "positions",
-                    method: :destroy,
-                  }],
-                },
-              },
-            },
+                    method: :destroy
+                  }]
+                }
+              }
+            }
           }
         end
 
@@ -1598,7 +1598,7 @@ RSpec.describe "persistence" do
             method: :destroy,
             attributes: {employee_id: nil, id: 1},
             relationships: {},
-            temp_id: nil,
+            temp_id: nil
           })
           expect(position_resource.meta[:caller_model]).to be_a(PORO::Employee)
         end
@@ -1755,7 +1755,7 @@ RSpec.describe "persistence" do
     it "raises appropriate error" do
       expect {
         klass.build(payload)
-      }.to(raise_error {|e|
+      }.to(raise_error { |e|
         expect(e).to be_a Graphiti::Errors::InvalidRequest
         expect(e.errors.full_messages).to eq ["data.attributes.foo is an unknown attribute"]
       })
@@ -1771,7 +1771,7 @@ RSpec.describe "persistence" do
     it "raises appropriate error" do
       expect {
         klass.build(payload)
-      }.to(raise_error {|e|
+      }.to(raise_error { |e|
         expect(e).to be_a Graphiti::Errors::InvalidRequest
         expect(e.errors.full_messages).to eq ["data.attributes.foo cannot be written"]
       })
@@ -1787,7 +1787,7 @@ RSpec.describe "persistence" do
     it "raises helpful error" do
       expect {
         klass.build(payload)
-      }.to(raise_error {|e|
+      }.to(raise_error { |e|
         expect(e).to be_a Graphiti::Errors::InvalidRequest
         expect(e.errors.full_messages).to eq ["data.attributes.foo should be type integer"]
       })
@@ -1842,7 +1842,7 @@ RSpec.describe "persistence" do
       it "does not coerce blank string to 0" do
         expect {
           save("")
-        }.to(raise_error {|e|
+        }.to(raise_error { |e|
           expect(e).to be_a Graphiti::Errors::InvalidRequest
           expect(e.errors.full_messages).to eq ["data.attributes.age should be type integer"]
         })
@@ -1852,7 +1852,7 @@ RSpec.describe "persistence" do
         it "raises error" do
           expect {
             save({})
-          }.to(raise_error {|e|
+          }.to(raise_error { |e|
             expect(e).to be_a Graphiti::Errors::InvalidRequest
             expect(e.errors.full_messages).to eq ["data.attributes.age should be type integer"]
           })
@@ -1881,7 +1881,7 @@ RSpec.describe "persistence" do
         it "raises error" do
           expect {
             save({})
-          }.to(raise_error {|e|
+          }.to(raise_error { |e|
             expect(e).to be_a Graphiti::Errors::InvalidRequest
             expect(e.errors.full_messages).to eq ["data.attributes.age should be type big_decimal"]
           })
@@ -1910,7 +1910,7 @@ RSpec.describe "persistence" do
         it "raises error" do
           expect {
             save({})
-          }.to(raise_error {|e|
+          }.to(raise_error { |e|
             expect(e).to be_a Graphiti::Errors::InvalidRequest
             expect(e.errors.full_messages).to eq ["data.attributes.age should be type float"]
           })
@@ -1939,7 +1939,7 @@ RSpec.describe "persistence" do
         it "raises error" do
           expect {
             save({})
-          }.to(raise_error {|e|
+          }.to(raise_error { |e|
             expect(e).to be_a Graphiti::Errors::InvalidRequest
             expect(e.errors.full_messages).to eq ["data.attributes.age should be type boolean"]
           })
@@ -1980,7 +1980,7 @@ RSpec.describe "persistence" do
         it "raises error" do
           expect {
             save({})
-          }.to(raise_error {|e|
+          }.to(raise_error { |e|
             expect(e).to be_a Graphiti::Errors::InvalidRequest
             expect(e.errors.full_messages).to eq ["data.attributes.age should be type date"]
           })
@@ -2032,7 +2032,7 @@ RSpec.describe "persistence" do
         it "raises error" do
           expect {
             save({})
-          }.to(raise_error {|e|
+          }.to(raise_error { |e|
             expect(e).to be_a Graphiti::Errors::InvalidRequest
             expect(e.errors.full_messages).to eq ["data.attributes.age should be type datetime"]
           })
@@ -2058,7 +2058,7 @@ RSpec.describe "persistence" do
         it "raises error" do
           expect {
             save([:foo, :bar])
-          }.to(raise_error {|e|
+          }.to(raise_error { |e|
             expect(e).to be_a Graphiti::Errors::InvalidRequest
             expect(e.errors.full_messages).to eq ["data.attributes.age should be type hash"]
           })
@@ -2078,7 +2078,7 @@ RSpec.describe "persistence" do
       it "raises error on single values" do
         expect {
           save(:foo)
-        }.to(raise_error {|e|
+        }.to(raise_error { |e|
           expect(e).to be_a Graphiti::Errors::InvalidRequest
           expect(e.errors.full_messages).to eq ["data.attributes.age should be type array"]
         })
@@ -2087,7 +2087,7 @@ RSpec.describe "persistence" do
       it "does NOT allow nils" do
         expect {
           save(nil)
-        }.to(raise_error {|e|
+        }.to(raise_error { |e|
           expect(e).to be_a Graphiti::Errors::InvalidRequest
           expect(e.errors.full_messages).to eq ["data.attributes.age should be type array"]
         })
@@ -2097,7 +2097,7 @@ RSpec.describe "persistence" do
         it "raises error" do
           expect {
             save({})
-          }.to(raise_error {|e|
+          }.to(raise_error { |e|
             expect(e).to be_a Graphiti::Errors::InvalidRequest
             expect(e.errors.full_messages).to eq ["data.attributes.age should be type array"]
           })
@@ -2122,7 +2122,7 @@ RSpec.describe "persistence" do
       it "raises error on single values" do
         expect {
           save(1)
-        }.to(raise_error {|e|
+        }.to(raise_error { |e|
           expect(e).to be_a Graphiti::Errors::InvalidRequest
           expect(e.errors.full_messages).to eq ["data.attributes.age should be type array_of_integers"]
         })
@@ -2131,7 +2131,7 @@ RSpec.describe "persistence" do
       it "raises error on nils" do
         expect {
           save(nil)
-        }.to(raise_error {|e|
+        }.to(raise_error { |e|
           expect(e).to be_a Graphiti::Errors::InvalidRequest
           expect(e.errors.full_messages).to eq ["data.attributes.age should be type array_of_integers"]
         })
@@ -2141,7 +2141,7 @@ RSpec.describe "persistence" do
         it "raises error" do
           expect {
             save({})
-          }.to(raise_error {|e|
+          }.to(raise_error { |e|
             expect(e).to be_a Graphiti::Errors::InvalidRequest
             expect(e.errors.full_messages).to eq ["data.attributes.age should be type array_of_integers"]
           })
@@ -2161,7 +2161,7 @@ RSpec.describe "persistence" do
           read: type,
           params: type,
           description: "test",
-          kind: "scalar",
+          kind: "scalar"
         }
         klass.attribute :age, :custom
       end
@@ -2188,18 +2188,18 @@ RSpec.describe "persistence" do
                 data: [{
                   type: "positions",
                   'temp-id': "abc123",
-                  method: "create",
-                }],
-              },
-            },
+                  method: "create"
+                }]
+              }
+            }
           },
           included: [
             {
               type: "positions",
               'temp-id': "abc123",
-              attributes: {title: "mytitle"},
-            },
-          ],
+              attributes: {title: "mytitle"}
+            }
+          ]
         }
       end
 
@@ -2266,18 +2266,18 @@ RSpec.describe "persistence" do
                 data: {
                   type: "classifications",
                   'temp-id': "abc123",
-                  method: "create",
-                },
-              },
-            },
+                  method: "create"
+                }
+              }
+            }
           },
           included: [
             {
               'temp-id': "abc123",
               type: "classifications",
-              attributes: {description: "classy"},
-            },
-          ],
+              attributes: {description: "classy"}
+            }
+          ]
         }
       end
 
@@ -2330,6 +2330,33 @@ RSpec.describe "persistence" do
             .to eq(["Description can't be blank"])
         end
       end
+
+      context "linking to an non-existing related record" do
+        let(:payload) do
+          {
+            data: {
+              type: "employees",
+              relationships: {
+                classification: {
+                  data: {
+                    type: "classifications",
+                    'id': "123"
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        it "responds correctly" do
+          employee = klass.build(payload)
+          expect { employee.save }.to raise_error(
+            Graphiti::Errors::RecordNotFound,
+            "The referenced resource 'classification' with id '123' could not be found. " \
+            "Referenced at 'relationships/classifications'"
+          )
+        end
+      end
     end
 
     describe "has_one" do
@@ -2343,18 +2370,18 @@ RSpec.describe "persistence" do
                 data: {
                   type: "bios",
                   'temp-id': "abc123",
-                  method: "create",
-                },
-              },
-            },
+                  method: "create"
+                }
+              }
+            }
           },
           included: [
             {
               type: "bios",
               'temp-id': "abc123",
-              attributes: {text: "mytext"},
-            },
-          ],
+              attributes: {text: "mytext"}
+            }
+          ]
         }
       end
 
@@ -2420,18 +2447,18 @@ RSpec.describe "persistence" do
                 data: [{
                   type: "teams",
                   'temp-id': "abc123",
-                  method: "create",
-                }],
-              },
-            },
+                  method: "create"
+                }]
+              }
+            }
           },
           included: [
             {
               type: "teams",
               'temp-id': "abc123",
-              attributes: {name: "ip"},
-            },
-          ],
+              attributes: {name: "ip"}
+            }
+          ]
         }
       end
 
@@ -2498,18 +2525,18 @@ RSpec.describe "persistence" do
                 data: {
                   type: jsonapi_type,
                   'temp-id': "abc123",
-                  method: "create",
-                },
-              },
-            },
+                  method: "create"
+                }
+              }
+            }
           },
           included: [
             {
               'temp-id': "abc123",
               type: jsonapi_type,
-              attributes: {number: 123456},
-            },
-          ],
+              attributes: {number: 123456}
+            }
+          ]
         }
       end
 
@@ -2578,10 +2605,10 @@ RSpec.describe "persistence" do
                 data: [{
                   type: "positions",
                   'temp-id': "abc123",
-                  method: "create",
-                }],
-              },
-            },
+                  method: "create"
+                }]
+              }
+            }
           },
           included: [
             {
@@ -2593,17 +2620,17 @@ RSpec.describe "persistence" do
                   data: {
                     type: "departments",
                     'temp-id': "abc456",
-                    method: "create",
-                  },
-                },
-              },
+                    method: "create"
+                  }
+                }
+              }
             },
             {
               type: "departments",
               'temp-id': "abc456",
-              attributes: {name: "mydept"},
-            },
-          ],
+              attributes: {name: "mydept"}
+            }
+          ]
         }
       end
 

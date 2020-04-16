@@ -22,7 +22,7 @@ module Graphiti
         end
 
         def type=(val)
-          val = val && val.to_sym
+          val = val&.to_sym
           if (val = super)
             serializer.type(val)
           end
@@ -42,7 +42,7 @@ module Graphiti
             path: val,
             full_path: val,
             url: val,
-            actions: [:index, :show],
+            actions: [:index, :show]
           }
         end
 
@@ -82,7 +82,8 @@ module Graphiti
           :attributes_schema_by_default,
           :relationships_readable_by_default,
           :relationships_writable_by_default,
-          :filters_accept_nil_by_default
+          :filters_accept_nil_by_default,
+          :filters_deny_empty_by_default
 
         class << self
           prepend Overrides
@@ -104,6 +105,7 @@ module Graphiti
           default(klass, :relationships_readable_by_default, true)
           default(klass, :relationships_writable_by_default, true)
           default(klass, :filters_accept_nil_by_default, false)
+          default(klass, :filters_deny_empty_by_default, false)
 
           unless klass.config[:attributes][:id]
             klass.attribute :id, :integer_id

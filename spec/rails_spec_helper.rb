@@ -31,7 +31,7 @@ module BasicRailsApp
       config.root = File.dirname(__FILE__)
       config.log_level = :info
       # Set a logger to avoid creating the log directory automatically
-      config.logger = Logger.new(ENV['DEBUG'] ? $stdout : nil)
+      config.logger = Logger.new(ENV["DEBUG"] ? $stdout : nil)
       config.logger.level = Logger::DEBUG
       Rails.application.routes.default_url_options = {host: "example.com"}
 
@@ -71,7 +71,7 @@ RSpec.configure do |config|
   config.include UniversalControllerSpecHelper
 
   if defined?(RescueRegistry)
-    config.after  do
+    config.after do
       # Normally this happens in a standard Rails middleware, but most of our tests bypass middleware
       RescueRegistry.context = nil
     end

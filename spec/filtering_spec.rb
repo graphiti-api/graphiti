@@ -21,7 +21,7 @@ RSpec.describe "filtering" do
     PORO::Employee.create(first_name: "William", last_name: "Shakesphere")
   end
   let!(:employee4) do
-    PORO::Employee.create(first_name: "Harold",  last_name: "Robbins")
+    PORO::Employee.create(first_name: "Harold", last_name: "Robbins")
   end
 
   it "scopes correctly" do
@@ -54,7 +54,7 @@ RSpec.describe "filtering" do
             scope
           end
         end
-        params[:filter]= { data: { match: { title: "freedom" }.to_json } }
+        params[:filter] = {data: {match: {title: "freedom"}.to_json}}
       end
 
       it "works" do
@@ -75,7 +75,7 @@ RSpec.describe "filtering" do
     context "and an array of json objects passed" do
       before do
         params[:filter] = {
-          by_json: '{ "id": 2, "id2": 3 },{ "id": 4 },{ "id": 5 },{ "id": 6 }',
+          by_json: '{ "id": 2, "id2": 3 },{ "id": 4 },{ "id": 5 },{ "id": 6 }'
         }
       end
 
@@ -114,9 +114,9 @@ RSpec.describe "filtering" do
 
           params[:filter] = {
             by_json: {
-                       users:  { update: { id: { a: 2, b: 3 } } },
-                       admins: { update: { id: { a: 2, b: 3 } } }
-                     }.to_json,
+              users: {update: {id: {a: 2, b: 3}}},
+              admins: {update: {id: {a: 2, b: 3}}}
+            }.to_json
           }
         end
 
@@ -141,8 +141,8 @@ RSpec.describe "filtering" do
         params[:filter] = {
           by_json: [
             {id: [{a: 2}, {b: 3}]}.to_json,
-            {id: [{a: 2}, {b: 3}]}.to_json,
-          ].join(","),
+            {id: [{a: 2}, {b: 3}]}.to_json
+          ].join(",")
         }
       end
 
@@ -166,7 +166,7 @@ RSpec.describe "filtering" do
         end
 
         expect(eq_filter).to receive(:call).once
-        params[:filter] = {by_json: { "id" => 2, "id2" => 3 }}
+        params[:filter] = {by_json: {"id" => 2, "id2" => 3}}
         expect(records.map(&:id)).to eq([employee2.id, employee3.id])
       end
     end
@@ -181,7 +181,7 @@ RSpec.describe "filtering" do
         write: foo,
         kind: "record",
         canonical_name: :hash,
-        description: "Foo",
+        description: "Foo"
       }
       resource.filter :blah, :custom do
         eq do |scope, hash|
@@ -221,7 +221,7 @@ RSpec.describe "filtering" do
         expect(records.map(&:id)).to eq([
           employee1.id,
           employee2.id,
-          employee4.id,
+          employee4.id
         ])
       end
     end
@@ -260,12 +260,12 @@ RSpec.describe "filtering" do
       end
     end
 
-    context 'and the filter is marked single: true' do
+    context "and the filter is marked single: true" do
       before do
         resource.filter :first_name, :string, single: true
       end
 
-      it 'works' do
+      it "works" do
         expect(records.map(&:id)).to eq([employee2.id])
       end
     end
@@ -276,7 +276,7 @@ RSpec.describe "filtering" do
       before do
         resource.filter :first_name, allow_nil: true
         employee2.update_attributes(first_name: nil)
-        params[:filter] = { first_name: "null" }
+        params[:filter] = {first_name: "null"}
       end
 
       it "works" do
@@ -292,7 +292,7 @@ RSpec.describe "filtering" do
         employee2.update_attributes(age: nil)
         employee3.update_attributes(age: 30)
         employee4.update_attributes(age: 40)
-        params[:filter] = { age: "null" }
+        params[:filter] = {age: "null"}
       end
 
       it "works" do
@@ -310,6 +310,38 @@ RSpec.describe "filtering" do
 
     it "defaults to a string" do
       expect(records.map(&:id)).to eq([employee2.id])
+    end
+  end
+
+  context "when passed an empty value when deny_empty is true" do
+    before do
+      resource.filter :first_name, deny_empty: true
+      employee2.update_attributes(first_name: value)
+      params[:filter] = {first_name: "null"}
+    end
+
+    context 'via explicit string value "null"' do
+      let(:value) { "null" }
+
+      it "raises an invalid filter value error " do
+        expect { records.map(&:id) }.to raise_error(Graphiti::Errors::InvalidFilterValue)
+      end
+    end
+
+    context "via empty value" do
+      let(:value) { "" }
+
+      it "raises an invalid filter value error " do
+        expect { records.map(&:id) }.to raise_error(Graphiti::Errors::InvalidFilterValue)
+      end
+    end
+
+    context "via empty array" do
+      let(:value) { "[]" }
+
+      it "raises an invalid filter value error " do
+        expect { records.map(&:id) }.to raise_error(Graphiti::Errors::InvalidFilterValue)
+      end
     end
   end
 
@@ -411,7 +443,7 @@ RSpec.describe "filtering" do
       before do
         params[:filter] = {
           id: employee1.id,
-          'positions.title': "bar",
+          'positions.title': "bar"
         }
         params[:include] = "positions"
       end
@@ -438,7 +470,7 @@ RSpec.describe "filtering" do
       before do
         params[:filter] = {
           id: employee1.id,
-          'positions.department.name': "bar",
+          'positions.department.name': "bar"
         }
         params[:include] = "positions.department"
       end
@@ -730,7 +762,7 @@ RSpec.describe "filtering" do
         params[:filter] = {
           foo: "a",
           bar: "b",
-          baz: "c",
+          baz: "c"
         }
       end
 
@@ -1102,10 +1134,10 @@ RSpec.describe "filtering" do
             "foo" => {
               "eq" => {
                 "bar" => {
-                  "baz" => "blah",
-                },
-              },
-            },
+                  "baz" => "blah"
+                }
+              }
+            }
           }
         end
 
@@ -1242,7 +1274,7 @@ RSpec.describe "filtering" do
           read: type,
           write: type,
           kind: "scalar",
-          description: "test",
+          description: "test"
         }
         resource.attribute :foo, :custom
       end
@@ -1287,7 +1319,7 @@ RSpec.describe "filtering" do
           :suffix,
           :not_suffix,
           :match,
-          :not_match,
+          :not_match
         ])
         expect(resource.filters[:foo][:operators][:eq]).to be_a(Proc)
         expect(resource.filters[:foo][:operators][:suffix]).to be_nil
@@ -1397,7 +1429,7 @@ RSpec.describe "filtering" do
 
         it "limits available operators" do
           expect(resource.filters[:foo][:operators].keys).to eq([
-            :gt, :gte, :lt, :lte, :foo,
+            :gt, :gte, :lt, :lte, :foo
           ])
         end
       end
@@ -1412,7 +1444,7 @@ RSpec.describe "filtering" do
 
         it "limits available operators, adding custom ones" do
           expect(resource.filters[:foo][:operators].keys).to eq([
-            :gt, :gte, :lt, :lte, :foo,
+            :gt, :gte, :lt, :lte, :foo
           ])
         end
       end
@@ -1424,7 +1456,7 @@ RSpec.describe "filtering" do
 
         it "limits available operators" do
           expect(resource.filters[:foo][:operators].keys).to eq([
-            :not_eq, :gt, :gte, :lt, :lte,
+            :not_eq, :gt, :gte, :lt, :lte
           ])
         end
       end
@@ -1703,14 +1735,14 @@ RSpec.describe "filtering" do
         }.to raise_error(Graphiti::Errors::RequiredFilter)
       end
 
-      context 'because it came from .find' do
+      context "because it came from .find" do
         before do
           resource.filter :id, :integer
         end
 
-        it 'does not require the filter' do
+        it "does not require the filter" do
           expect {
-            proxy = resource.find(filter: { id: employee2.id })
+            proxy = resource.find(filter: {id: employee2.id})
             expect(proxy.data.id).to eq(employee2.id)
           }.to_not raise_error
         end

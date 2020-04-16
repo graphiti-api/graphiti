@@ -21,7 +21,7 @@ RSpec.describe Graphiti::Sideload::PolymorphicBelongsTo do
   let(:opts) do
     {
       parent_resource: parent_resource_class,
-      resource: resource_class,
+      resource: resource_class
     }
   end
   let(:name) { :foo }

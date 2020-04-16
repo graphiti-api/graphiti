@@ -46,17 +46,17 @@ if ENV["APPRAISAL_INITIALIZED"]
                              created_at_date: two_days_ago.to_date,
                              identifier: SecureRandom.uuid
     end
-    let!(:book1)   { Legacy::Book.create!(author: author1, genre: genre, title: "The Shining") }
-    let!(:book2)   { Legacy::Book.create!(author: author1, genre: genre, title: "The Stand") }
-    let!(:state)   { Legacy::State.create!(name: "Maine") }
-    let(:org1)     { Legacy::Organization.create!(name: "Org1", children: [org2]) }
-    let(:org2)     { Legacy::Organization.create!(name: "Org2") }
-    let!(:bio)     { Legacy::Bio.create!(author: author1, picture: "imgur", description: "author bio") }
-    let!(:genre)   { Legacy::Genre.create!(name: "Horror") }
-    let!(:hobby1)  { Legacy::Hobby.create!(name: "Fishing", authors: [author1]) }
-    let!(:hobby2)  { Legacy::Hobby.create!(name: "Woodworking", authors: [author1, author2]) }
-    let!(:house)   { Legacy::House.new(name: "Cozy", state: state) }
-    let!(:condo)   { Legacy::Condo.new(name: "Modern") }
+    let!(:book1) { Legacy::Book.create!(author: author1, genre: genre, title: "The Shining") }
+    let!(:book2) { Legacy::Book.create!(author: author1, genre: genre, title: "The Stand") }
+    let!(:state) { Legacy::State.create!(name: "Maine") }
+    let(:org1) { Legacy::Organization.create!(name: "Org1", children: [org2]) }
+    let(:org2) { Legacy::Organization.create!(name: "Org2") }
+    let!(:bio) { Legacy::Bio.create!(author: author1, picture: "imgur", description: "author bio") }
+    let!(:genre) { Legacy::Genre.create!(name: "Horror") }
+    let!(:hobby1) { Legacy::Hobby.create!(name: "Fishing", authors: [author1]) }
+    let!(:hobby2) { Legacy::Hobby.create!(name: "Woodworking", authors: [author1, author2]) }
+    let!(:house) { Legacy::House.new(name: "Cozy", state: state) }
+    let!(:condo) { Legacy::Condo.new(name: "Modern") }
 
     before do
       allow(controller.request.env).to receive(:[])
@@ -231,6 +231,24 @@ if ENV["APPRAISAL_INITIALIZED"]
           it "executes case-insensitive prefix query" do
             expect(ids).to eq([author2.id, author3.id])
           end
+
+          if ::ActiveRecord.version >= Gem::Version.new("5.0")
+            context "when match string includes % characters" do
+              let(:value) { {prefix: "%ild"} }
+
+              let!(:author_with_percent) do
+                Legacy::Author.create!(first_name: "%ildcard")
+              end
+
+              let!(:normal_author) do
+                Legacy::Author.create!(first_name: "wildcard")
+              end
+
+              it "does not use the provided % as a wildcard character" do
+                expect(ids).to eq([author_with_percent.id])
+              end
+            end
+          end
         end
 
         context "!prefix" do
@@ -246,6 +264,24 @@ if ENV["APPRAISAL_INITIALIZED"]
 
           it "executes case-insensitive suffix query" do
             expect(ids).to eq([author2.id, author3.id])
+          end
+
+          if ::ActiveRecord.version >= Gem::Version.new("5.0")
+            context "when match string includes % characters" do
+              let(:value) { {suffix: "car%"} }
+
+              let!(:author_with_percent) do
+                Legacy::Author.create!(first_name: "Wildcar%")
+              end
+
+              let!(:normal_author) do
+                Legacy::Author.create!(first_name: "Wildcard")
+              end
+
+              it "does not use the provided % as a wildcard character" do
+                expect(ids).to eq([author_with_percent.id])
+              end
+            end
           end
         end
 
@@ -265,7 +301,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           end
 
           if ::ActiveRecord.version >= Gem::Version.new("5.0")
-            context 'when match string includes % characters' do
+            context "when match string includes % characters" do
               let(:value) { {match: "ld%ca"} }
 
               let!(:author_with_percent) do
@@ -832,7 +868,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           "birthdays" => 70, # alias
           "float_age" => 70.03,
           "decimal_age" => "70.033",
-          "active" => true,
+          "active" => true
         })
         expect(included.map(&:jsonapi_type).uniq).to match_array(%w[books])
       end
@@ -853,7 +889,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         it "is able to sideload without adding the field" do
           do_index({
             fields: {authors: "first_name"},
-            include: "books",
+            include: "books"
           })
           expect(json["data"][0]["relationships"]).to be_present
           expect(included.map(&:jsonapi_type).uniq).to match_array(%w[books])
@@ -871,7 +907,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         let(:request) do
           do_index({
             include: "books",
-            page: {books: {size: 1, number: 2}},
+            page: {books: {size: 1, number: 2}}
           })
         end
 
@@ -1040,7 +1076,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       it "allows filtering of sideloaded resource" do
         do_index({
           include: "hobbies",
-          filter: {hobbies: {id: hobby2.id}},
+          filter: {hobbies: {id: hobby2.id}}
         })
         expect(included("hobbies").map(&:id)).to eq([hobby2.id])
       end
@@ -1048,7 +1084,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       it "allows extra fields for sideloaded resource" do
         do_index({
           include: "hobbies",
-          extra_fields: {hobbies: "reason"},
+          extra_fields: {hobbies: "reason"}
         })
         hobby = included("hobbies")[0]
         expect(hobby["name"]).to be_present
@@ -1068,7 +1104,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         do_index({
           include: "hobbies",
           fields: {hobbies: "name"},
-          extra_fields: {hobbies: "reason"},
+          extra_fields: {hobbies: "reason"}
         })
         hobby = included("hobbies")[0]
         expect(hobby).to have_key("name")
@@ -1080,7 +1116,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         do_index({
           include: "hobbies,books",
           fields: {hobbies: "name", books: "title"},
-          extra_fields: {hobbies: "reason", books: "alternate_title"},
+          extra_fields: {hobbies: "reason", books: "alternate_title"}
         })
         hobby = included("hobbies")[0]
         book = included("books")[0]
@@ -1148,8 +1184,8 @@ if ENV["APPRAISAL_INITIALIZED"]
           end
         end
 
-        let!(:other_table_hobby1)  { Legacy::Hobby.create!(name: "Fishing", authors: [author1]) }
-        let!(:other_table_hobby2)  { Legacy::Hobby.create!(name: "Woodworking", authors: [author1, author2]) }
+        let!(:other_table_hobby1) { Legacy::Hobby.create!(name: "Fishing", authors: [author1]) }
+        let!(:other_table_hobby2) { Legacy::Hobby.create!(name: "Woodworking", authors: [author1, author2]) }
 
         it "still works" do
           do_index({include: "hobbies"})
@@ -1213,9 +1249,9 @@ if ENV["APPRAISAL_INITIALIZED"]
                 filter: {
                   taggable_id: [
                     {id: author1.id, type: author1.class.name}.to_json,
-                    {id: book2.id, type: book2.class.name}.to_json,
-                  ],
-                },
+                    {id: book2.id, type: book2.class.name}.to_json
+                  ]
+                }
               })
               expect(d.map(&:name)).to eq(%w[One Two Three])
             end
@@ -1251,7 +1287,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         book2.save!
         do_index({
           filter: {books: {id: book1.id}, other_books: {id: book2.id}},
-          include: "books.genre,other_books.genre",
+          include: "books.genre,other_books.genre"
         })
         expect(included("genres").length).to eq(2)
       end
@@ -1261,7 +1297,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       it "allows extra fields for the sideloaded resource" do
         do_index({
           include: "dwelling",
-          extra_fields: {houses: "house_price", condos: "condo_price"},
+          extra_fields: {houses: "house_price", condos: "condo_price"}
         })
         house = included("houses")[0]
         expect(house["name"]).to be_present
@@ -1276,7 +1312,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       it "allows sparse fieldsets for the sideloaded resource" do
         do_index({
           include: "dwelling",
-          fields: {houses: "name", condos: "condo_description"},
+          fields: {houses: "name", condos: "condo_description"}
         })
         house = included("houses")[0]
         expect(house["name"]).to be_present
@@ -1292,7 +1328,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         do_index({
           include: "dwelling",
           fields: {houses: "name", condos: "condo_description"},
-          extra_fields: {houses: "house_price", condos: "condo_price"},
+          extra_fields: {houses: "house_price", condos: "condo_price"}
         })
         house = included("houses")[0]
         condo = included("condos")[0]

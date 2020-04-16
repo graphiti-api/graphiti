@@ -14,6 +14,8 @@ RSpec.describe "polymorphic resources" do
     it "returns the serializer of the child resource associated to the given model" do
       expect(instance.serializer_for(PORO::Visa.new))
         .to eq(PORO::VisaResource.serializer)
+      expect(instance.serializer_for(PORO::GoldVisa.new))
+        .to eq(PORO::GoldVisaResource.serializer)
     end
 
     context "when a polymorphic child" do

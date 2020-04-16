@@ -232,7 +232,7 @@ module Graphiti
       return true if @resource.remote?
 
       if (att = @resource.get_attr(name, flag, request: true))
-        return att
+        att
       else
         not_associated_name = !@resource.class.association_names.include?(name)
         not_associated_type = !@resource.class.association_types.include?(name)
@@ -262,8 +262,8 @@ module Graphiti
     def parse_fieldset(fieldset)
       {}.tap do |hash|
         fieldset.each_pair do |type, fields|
-          type       = type.to_sym
-          fields     = fields.split(",") unless fields.is_a?(Array)
+          type = type.to_sym
+          fields = fields.split(",") unless fields.is_a?(Array)
           hash[type] = fields.map(&:to_sym)
         end
       end
@@ -282,7 +282,7 @@ module Graphiti
 
     def sort_hash(attr)
       value = attr[0] == "-" ? :desc : :asc
-      key   = attr.sub("-", "").to_sym
+      key = attr.sub("-", "").to_sym
 
       {key => value}
     end
