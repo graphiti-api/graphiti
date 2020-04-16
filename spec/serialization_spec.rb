@@ -1390,7 +1390,7 @@ RSpec.describe "serialization" do
 
     context "when specified" do
       before do
-        resource.link :test_link do |model| "#{self.endpoint[:url]}/#{model.id}" end
+        resource.link :test_link do |model| "#{endpoint[:url]}/#{model.id}" end
       end
 
       it "links correctly" do

@@ -200,7 +200,7 @@ module Graphiti
               extra_attributes: {},
               sideloads: {},
               callbacks: {},
-              links: {},
+              links: {}
             }
         end
 

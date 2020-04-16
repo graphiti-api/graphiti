@@ -154,9 +154,8 @@ module Graphiti
     end
 
     def links(model)
-      self.class.links.inject({}) do |memo, (name, blk)| 
+      self.class.links.each_with_object({}) do |(name, blk), memo|
         memo[name] = instance_exec(model, &blk)
-        memo
       end
     end
   end
