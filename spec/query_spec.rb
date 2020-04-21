@@ -917,6 +917,22 @@ RSpec.describe Graphiti::Query do
       it { is_expected.to eq(false) }
     end
 
+    context "when requested as string 'false'" do
+      before do
+        params[:links] = "false"
+      end
+
+      it { is_expected.to eq(false) }
+    end
+
+    context "when requested as boolean false" do
+      before do
+        params[:links] = false
+      end
+
+      it { is_expected.to eq(false) }
+    end
+
     context "when links_on_demand" do
       around do |e|
         original = Graphiti.config.links_on_demand
@@ -929,7 +945,7 @@ RSpec.describe Graphiti::Query do
       end
 
       context "and requested" do
-        context "as string" do
+        context "as string 'true'" do
           before do
             params[:links] = "true"
           end
@@ -937,7 +953,7 @@ RSpec.describe Graphiti::Query do
           it { is_expected.to eq(true) }
         end
 
-        context "as boolean" do
+        context "as boolean true" do
           before do
             params[:links] = true
           end
