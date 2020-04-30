@@ -89,7 +89,8 @@ module Graphiti
 
       def update(update_params, meta = nil)
         model_instance = nil
-        id = update_params.delete(:id)
+        id = update_params[:id]
+        update_params = update_params.except(:id)
 
         run_callbacks :persistence, :update, update_params, meta do
           run_callbacks :attributes, :update, update_params, meta do |params|

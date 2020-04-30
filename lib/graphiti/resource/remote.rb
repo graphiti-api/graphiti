@@ -19,7 +19,7 @@ module Graphiti
       end
 
       def save(model, meta)
-        if meta[:attributes] == {} && meta[:method] == :update
+        if meta[:attributes].except(:id) == {} && meta[:method] == :update
           model
         else
           raise Errors::RemoteWrite.new(self.class)
