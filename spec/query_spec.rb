@@ -747,7 +747,7 @@ RSpec.describe Graphiti::Query do
                 extra_fields: {positions: [:baz]},
                 include: {
                   department: {
-                    extra_fields: {departments: [:bax] }
+                    extra_fields: {departments: [:bax]}
                   }
                 }
               }

@@ -49,9 +49,7 @@ module Graphiti
         h[:page] = pagination
         if association?
           resource_type = @resource.class.type
-          h[:extra_fields] = {
-             resource_type => extra_fields[resource_type]
-           } if extra_fields.key?(resource_type)
+          h[:extra_fields] = {resource_type => extra_fields[resource_type]} if extra_fields.key?(resource_type)
         else
           h[:fields] = fields
           h[:extra_fields] = extra_fields
