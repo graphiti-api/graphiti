@@ -53,6 +53,19 @@ RSpec.describe Graphiti::Delegates::Pagination do
         expect(subject[:first]).to eq(pagination_link(1, size: Graphiti::Scoping::Paginate::DEFAULT_PAGE_SIZE))
       end
     end
+
+    context "with included relationship" do
+      let(:params) {
+        {include: "bar,bazzes", filter: {"bazzes.deprecated" => "foo"}}
+      }
+
+      it "is preserved correctly" do
+        query = URI.decode_www_form(URI(subject[:first]).query).to_h
+        expect(query["include"]).to include("bar")
+        expect(query["include"]).to include("bazzes")
+        expect(query["filter[bazzes.deprecated]"]).to eq("foo")
+      end
+    end
   end
 
   def pagination_link(number, size: current_per_page)

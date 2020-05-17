@@ -26,7 +26,7 @@ module Graphiti
         uri = URI(@proxy.resource.endpoint[:url].to_s)
 
         # Overwrite the pagination query params with the desired page
-        uri.query = @proxy.query.hash.merge({
+        uri.query = @proxy.query.params.merge({
           page: {
             number: page,
             size: page_size
