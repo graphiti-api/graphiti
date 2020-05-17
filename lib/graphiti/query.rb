@@ -47,7 +47,11 @@ module Graphiti
         h[:filter] = filters
         h[:sort] = sorts
         h[:page] = pagination
-        unless association?
+        if association?
+          h[:extra_fields] = {
+             @resource.class.type => extra_fields[@resource.class.type]
+           } if extra_fields.key?(@resource.class.type)
+        else
           h[:fields] = fields
           h[:extra_fields] = extra_fields
         end
