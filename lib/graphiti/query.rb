@@ -44,16 +44,19 @@ module Graphiti
 
     def hash
       @hash ||= {}.tap do |h|
-        h[:filter] = filters unless filters.empty?
-        h[:sort] = sorts unless sorts.empty?
-        h[:page] = pagination unless pagination.empty?
-        unless association?
-          h[:fields] = fields unless fields.empty?
-          h[:extra_fields] = extra_fields unless extra_fields.empty?
+        h[:filter] = filters
+        h[:sort] = sorts
+        h[:page] = pagination
+        if association?
+          resource_type = @resource.class.type
+          h[:extra_fields] = {resource_type => extra_fields[resource_type]} if extra_fields.key?(resource_type)
+        else
+          h[:fields] = fields
+          h[:extra_fields] = extra_fields
         end
-        h[:stats] = stats unless stats.empty?
-        h[:include] = sideload_hash unless sideload_hash.empty?
-      end
+        h[:stats] = stats
+        h[:include] = sideload_hash
+      end.reject { |_, value| value.empty? }
     end
 
     def zero_results?
