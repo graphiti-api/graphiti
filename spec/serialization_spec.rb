@@ -860,7 +860,7 @@ RSpec.describe "serialization" do
     end
   end
 
-  describe "links" do
+  describe "relationship links" do
     let!(:employee) { PORO::Employee.create }
 
     def positions
@@ -1374,6 +1374,41 @@ RSpec.describe "serialization" do
             end
           end
         end
+      end
+    end
+  end
+
+  describe "resource-level links" do
+    let!(:employee) { PORO::Employee.create(id: 123) }
+    context "by default" do
+      specify "are not emitted" do
+        render
+
+        expect(json["data"][0]).not_to have_key("links")
+      end
+    end
+
+    context "when specified" do
+      before do
+        resource.link :test_link do |model| "#{endpoint[:url]}/#{model.id}" end
+      end
+
+      it "links correctly" do
+        render
+        expect(json["data"][0]["links"]["test_link"])
+          .to eq("/poro/employees/123")
+      end
+    end
+
+    context "nil links" do
+      before do
+        resource.link :test_link do |model| nil end
+      end
+
+      specify "are still included" do
+        render
+        expect(json["data"][0]["links"]).to have_key("test_link")
+        expect(json["data"][0]["links"]["test_link"]).to eq(nil)
       end
     end
   end

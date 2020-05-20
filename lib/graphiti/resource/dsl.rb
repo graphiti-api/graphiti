@@ -147,6 +147,10 @@ module Graphiti
           end
         end
 
+        def link(name, &blk)
+          config[:links][name.to_sym] = blk
+        end
+
         def all_attributes
           attributes.merge(extra_attributes)
         end

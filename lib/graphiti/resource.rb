@@ -148,5 +148,15 @@ module Graphiti
       end
       response
     end
+
+    def links?
+      self.class.links.any?
+    end
+
+    def links(model)
+      self.class.links.each_with_object({}) do |(name, blk), memo|
+        memo[name] = instance_exec(model, &blk)
+      end
+    end
   end
 end

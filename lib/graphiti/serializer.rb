@@ -25,6 +25,7 @@ module Graphiti
     def as_jsonapi(*)
       super.tap do |hash|
         strip_relationships!(hash) if strip_relationships?
+        add_links!(hash)
       end
     end
 
@@ -48,6 +49,12 @@ module Graphiti
     end
 
     private
+
+    def add_links!(hash)
+      return unless @resource.respond_to?(:links?)
+
+      hash[:links] = @resource.links(@object) if @resource.links?
+    end
 
     def strip_relationships!(hash)
       hash[:relationships]&.select! do |name, payload|
