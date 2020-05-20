@@ -20,13 +20,17 @@ module Graphiti
 
       private
 
+      def pagination_params
+        @pagination_params ||= @proxy.query.params.reject { |key, _| [:action, :controller, :format].include?(key) }
+      end
+
       def pagination_link(page)
         return nil unless @proxy.resource.endpoint
 
         uri = URI(@proxy.resource.endpoint[:url].to_s)
 
         # Overwrite the pagination query params with the desired page
-        uri.query = @proxy.query.hash.merge({
+        uri.query = pagination_params.merge({
           page: {
             number: page,
             size: page_size

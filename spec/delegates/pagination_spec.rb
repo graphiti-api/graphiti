@@ -53,6 +53,32 @@ RSpec.describe Graphiti::Delegates::Pagination do
         expect(subject[:first]).to eq(pagination_link(1, size: Graphiti::Scoping::Paginate::DEFAULT_PAGE_SIZE))
       end
     end
+
+    context "with included relationship" do
+      let(:params) {
+        {include: "bar,bazzes", filter: {"bazzes.deprecated" => "foo"}}
+      }
+
+      it "preserves include directive and filters on relationships" do
+        query = URI.decode_www_form(URI(subject[:first]).query).to_h
+        expect(query["include"]).to include("bar")
+        expect(query["include"]).to include("bazzes")
+        expect(query["filter[bazzes.deprecated]"]).to eq("foo")
+      end
+    end
+
+    context "with rails parameters" do
+      let(:params) {
+        {controller: "foos", action: "index", format: "jsonapi"}
+      }
+
+      it "removes them" do
+        page_links = subject.values
+        expect(page_links).to all(satisfy { |v| v["controller=foos"].nil? })
+        expect(page_links).to all(satisfy { |v| v["action=index"].nil? })
+        expect(page_links).to all(satisfy { |v| v["format=jsonapi"].nil? })
+      end
+    end
   end
 
   def pagination_link(number, size: current_per_page)
