@@ -654,6 +654,61 @@ RSpec.describe "serialization" do
             expect(attributes["salary"]).to eq(200)
           end
         end
+
+        context "when an extra_attribute is conditionally readable" do
+          before do
+            PORO::Employee.create(salary: "40")
+            resource.class_eval do
+              attribute :first_name, :string
+              extra_attribute :salary, :string, readable: :admin?
+
+              def admin?
+                !!context.admin
+              end
+            end
+          end
+
+          context "and the guard passes" do
+            around do |e|
+              Graphiti.with_context(OpenStruct.new(admin: true)) do
+                e.run
+              end
+            end
+
+            it "is serialized" do
+              render
+              expect(json["data"][0]["attributes"]["salary"]).to eq("40")
+            end
+          end
+
+          context "and the guard fails" do
+            around do |e|
+              Graphiti.with_context(OpenStruct.new(admin: false)) do
+                e.run
+              end
+            end
+
+            it "is not serialized" do
+              render
+              expect(json["data"][0]["attributes"]).to_not have_key("salary")
+            end
+          end
+
+          context "and the guard accepts an argument" do
+            before do
+              resource.class_eval do
+                def admin?(object)
+                  object.is_a?(PORO::Employee)
+                end
+              end
+            end
+
+            it "is passed the model instance as argument" do
+              render
+              expect(json["data"][0]["attributes"]["salary"]).to eq("40")
+            end
+          end
+        end
       end
     end
 
