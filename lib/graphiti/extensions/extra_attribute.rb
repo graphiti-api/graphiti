@@ -43,7 +43,7 @@ module Graphiti
         def extra_attribute(name, options = {}, &blk)
           allow_field = proc {
             if options[:if]
-              next false unless instance_eval(&options[:if])
+              next false unless instance_exec(&options[:if])
             end
 
             @extra_fields &&
