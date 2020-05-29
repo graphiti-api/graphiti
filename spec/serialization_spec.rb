@@ -775,11 +775,26 @@ RSpec.describe "serialization" do
         end
       end
 
-      context "and the guard accepts an argument" do
+      context "and the guard accepts a single argument" do
         before do
           resource.class_eval do
             def admin?(object)
               object.is_a?(PORO::Employee)
+            end
+          end
+        end
+
+        it "is passed the model instance as argument" do
+          render
+          expect(json["data"][0]["attributes"]["foo"]).to eq("bar")
+        end
+      end
+
+      context "and the guard accepts two arguments" do
+        before do
+          resource.class_eval do
+            def admin?(object, attribute)
+              attribute == "foo"
             end
           end
         end
