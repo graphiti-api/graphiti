@@ -713,14 +713,30 @@ RSpec.describe "serialization" do
     end
 
     context "when a sideload macro not readable" do
+      let(:position_resource) do
+        Class.new(PORO::PositionResource) do
+          self.type = :positions
+          def self.name
+            "PORO::PositionResource"
+          end
+
+          def admin?
+            true
+          end
+        end
+      end
+
       before do
-        resource.belongs_to :hidden, readable: false
+        resource.has_many :positions, resource: position_resource, readable: :admin?
         Graphiti.setup!
       end
 
       it "is not applied to the serializer" do
-        expect(resource.serializer.relationship_blocks.keys)
-          .to_not include(:hidden)
+        PORO::Employee.create(first_name: "John")
+        allow_any_instance_of(position_resource).to receive(:admin?).and_return(false)
+        expect(position_resource.new.admin?).to be_falsey
+        render
+        expect(json.dig("data", 0, "relationships", "positions")).to be_falsey
       end
     end
 
