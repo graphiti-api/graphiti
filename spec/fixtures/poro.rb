@@ -304,7 +304,8 @@ module PORO
     end
 
     def average(scope, attr)
-      "poro_average_#{attr}"
+      items = ::PORO::DB.all(scope)
+      items.map(&attr).sum / items.count
     end
 
     def maximum(scope, attr)

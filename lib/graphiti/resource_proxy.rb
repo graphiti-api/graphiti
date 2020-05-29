@@ -83,6 +83,18 @@ module Graphiti
       end
     end
 
+    def nested_stats
+      @nested_stats ||= if @query.hash[:stats]
+        payload = Stats::NestedPayload.new @resource,
+          @query,
+          @scope.unpaginated_object,
+          data
+        payload.generate
+      else
+        {}
+      end
+    end
+
     def pagination
       @pagination ||= Delegates::Pagination.new(self)
     end

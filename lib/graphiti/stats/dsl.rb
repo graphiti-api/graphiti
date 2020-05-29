@@ -25,7 +25,7 @@ module Graphiti
     # @attr_reader [Symbol] name the stat, e.g. :total
     # @attr_reader [Hash] calculations procs for various metrics
     class DSL
-      attr_reader :name, :calculations
+      attr_reader :name, :calculations, :nested_on
 
       # @param [Adapters::Abstract] adapter the Resource adapter
       # @param [Symbol, Hash] config example: +:total+ or +{ total: [:count] }+
@@ -35,6 +35,8 @@ module Graphiti
         @adapter = adapter
         @calculations = {}
         @name = config.keys.first
+        @nested_on = config[:nested_on]
+
         Array(config.values.first).each { |c| send(:"#{c}!") }
       end
 
