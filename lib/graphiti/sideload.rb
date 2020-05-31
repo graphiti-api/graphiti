@@ -27,7 +27,7 @@ module Graphiti
       @type = opts[:type]
       @base_scope = opts[:base_scope]
       @readable = opts[:readable]
-      @writable = opts[:writable]
+      @writable = evaluate_flag(opts[:writable])
       @as = opts[:as]
       @link = opts[:link]
       @single = opts[:single]
