@@ -721,8 +721,14 @@ RSpec.describe "serialization" do
           end
 
           def admin?
-            true
+            !!context.admin
           end
+        end
+      end
+
+      around do |e|
+        Graphiti.with_context(OpenStruct.new(admin: false)) do
+          e.run
         end
       end
 
@@ -733,8 +739,6 @@ RSpec.describe "serialization" do
 
       it "is not applied to the serializer" do
         PORO::Employee.create(first_name: "John")
-        allow_any_instance_of(position_resource).to receive(:admin?).and_return(false)
-        expect(position_resource.new.admin?).to be_falsey
         render
         expect(json.dig("data", 0, "relationships", "positions")).to be_falsey
       end
