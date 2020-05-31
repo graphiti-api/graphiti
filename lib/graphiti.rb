@@ -29,6 +29,14 @@ module Graphiti
   def self.with_context(obj, namespace = nil)
     prior = context
     self.context = {object: obj, namespace: namespace}
+    # conditional reads per request
+    resources.each do |resource_class|
+      resource_class.sideloads.values.each do |sideload|
+        flag = sideload.instance_variable_get(:@readable)
+        evaluated = sideload.send(:evaluate_flag, flag)
+        resource_class.serializer.relationship(sideload.name, if: -> { evaluated })
+      end
+    end
     yield
   ensure
     self.context = prior
