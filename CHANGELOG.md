@@ -1,7 +1,7 @@
 ## Unreleased
 
 Features:
-
+- [242](https://github.com/graphiti-api/graphiti/pull/242) Bump `jsonapi-renderer` to `~0.2.2` now that (https://github.com/jsonapi-rb/jsonapi-renderer/pull/36) is fixed.
 - [158](https://github.com/graphiti-api/graphiti/pull/158) Filters options `allow_nil: true`
   Option can be set at the resource level `Resource.filters_accept_nil_by_default = true`. 
   By default this is set to false. (@zeisler)
