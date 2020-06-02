@@ -99,7 +99,7 @@ module Graphiti
     end
 
     def readable?
-      !!@readable
+      !!evaluate_flag(@readable)
     end
 
     def writable?
