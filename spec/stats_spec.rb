@@ -125,7 +125,8 @@ RSpec.describe "stats" do
         let(:ctx) do
           double "stat context",
             current_user: double.as_null_object,
-            my_stat: 1338
+            my_stat: 1338,
+            admin: true
         end
 
         before do
