@@ -1047,7 +1047,7 @@ RSpec.describe "sideloading" do
 
     describe "across requests" do
       it "uses a different sideloaded resource" do
-        ctx = double(current_user: :admin)
+        ctx = double(current_user: :admin, admin: true)
         sl1 = Graphiti.with_context ctx do
           resource.all(params).query.sideloads.values[0].resource
         end
