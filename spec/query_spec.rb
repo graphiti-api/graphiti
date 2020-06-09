@@ -951,4 +951,47 @@ RSpec.describe Graphiti::Query do
       end
     end
   end
+
+  describe "#action" do
+    subject { instance.action }
+    let(:provided_action) { :create }
+
+    context "when provided explicitly" do
+      let(:instance) { described_class.new(resource, params, nil, nil, [], provided_action) }
+      it { is_expected.to eq(provided_action) }
+
+      context "and the action provided is show" do
+        let(:provided_action) { :show }
+        it { is_expected.to eq(:read) }
+      end
+
+      context "and the action provided is index" do
+        let(:provided_action) { :index }
+        it { is_expected.to eq(:read) }
+      end
+    end
+
+    context "when not provided, but provided as an 'action' parameter" do
+      before { params[:action] = provided_action }
+      it { is_expected.to eq(provided_action) }
+    end
+
+    context "when not provided, it defaults to the context's namespace" do
+      around do |e|
+        Graphiti.with_context nil, provided_action do
+          e.run
+        end
+      end
+      it { is_expected.to eq(provided_action) }
+    end
+
+    describe 'sideloads' do
+      before { params[:include] = "positions" }
+      subject(:sideloads) { instance.sideloads }
+
+      it "does not cascate the action" do
+        expect(sideloads.values.map(&:action)).to eq([:read])
+      end
+    end
+  end
 end

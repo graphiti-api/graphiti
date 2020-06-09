@@ -3,10 +3,11 @@ module Graphiti
     attr_reader :params
     attr_reader :deserialized_payload
 
-    def initialize(resource_class, params, query = nil)
+    def initialize(resource_class, params, query = nil, action = nil)
       @resource_class = resource_class
       @params = params
       @query = query
+      @action = action
 
       validator = RequestValidator.new(jsonapi_resource, params)
 
@@ -30,7 +31,7 @@ module Graphiti
     end
 
     def query
-      @query ||= Query.new(jsonapi_resource, params)
+      @query ||= Query.new(jsonapi_resource, params, nil, nil, [], @action)
     end
 
     def query_hash
