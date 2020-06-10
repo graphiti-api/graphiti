@@ -962,12 +962,12 @@ RSpec.describe Graphiti::Query do
 
       context "and the action provided is show" do
         let(:provided_action) { :show }
-        it { is_expected.to eq(:read) }
+        it { is_expected.to eq(:find) }
       end
 
       context "and the action provided is index" do
         let(:provided_action) { :index }
-        it { is_expected.to eq(:read) }
+        it { is_expected.to eq(:all) }
       end
     end
 
@@ -990,7 +990,7 @@ RSpec.describe Graphiti::Query do
       subject(:sideloads) { instance.sideloads }
 
       it "does not cascate the action" do
-        expect(sideloads.values.map(&:action)).to eq([:read])
+        expect(sideloads.values.map(&:action)).to eq([:all])
       end
     end
   end
