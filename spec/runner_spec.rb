@@ -21,14 +21,32 @@ RSpec.describe Graphiti::Runner do
   end
 
   describe "#proxy" do
+    let(:proxy) { instance.proxy("foo") }
+    let(:scope) { double(resolve: ["resolved"]) }
+    before { allow(instance).to receive(:jsonapi_scope).and_return(scope) }
+
     it "returns a proxy with access to records, stats, and query" do
-      scope = double(resolve: ["resolved"])
       expect(instance).to receive(:jsonapi_scope).with("foo", {}) { scope }
-      proxy = instance.proxy("foo")
       expect(proxy).to be_a(Graphiti::ResourceProxy)
       expect(proxy.query).to be_a(Graphiti::Query)
       expect(proxy.to_a).to eq(["resolved"])
       expect(proxy.stats).to eq({})
+    end
+
+    describe "the proxy's query" do
+      subject(:query) { proxy.query }
+
+      context "when an action is provided" do
+        let(:instance) { described_class.new(resource_class, params, nil, :action) }
+        it { expect(query.action).to eq(:action) }
+      end
+
+      context "when a query is provided" do
+        let(:provided_query) { double(:provided_query) }
+        let(:instance) { described_class.new(resource_class, params, provided_query) }
+
+        it { is_expected.to eq(provided_query) }
+      end
     end
   end
 end

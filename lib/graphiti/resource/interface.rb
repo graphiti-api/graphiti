@@ -11,7 +11,7 @@ module Graphiti
 
         # @api private
         def _all(params, opts, base_scope)
-          runner = Runner.new(self, params, opts.delete(:query))
+          runner = Runner.new(self, params, opts.delete(:query), :all)
           opts[:params] = params
           runner.proxy(base_scope, opts)
         end
@@ -27,7 +27,7 @@ module Graphiti
           params[:filter] ||= {}
           params[:filter][:id] = id if id
 
-          runner = Runner.new(self, params)
+          runner = Runner.new(self, params, nil, :find)
           runner.proxy base_scope,
             single: true,
             raise_on_missing: true,

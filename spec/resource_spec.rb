@@ -1138,6 +1138,11 @@ RSpec.describe Graphiti::Resource do
         expect(employees.map(&:id)).to eq([employee2.id])
       end
 
+      describe "when no arguments are provided" do
+        subject { klass.all.map(&:id) }
+        it { is_expected.to contain_exactly(employee1.id, employee2.id, employee3.id) }
+      end
+
       context "when running within a request context" do
         before do
           klass.class_eval do

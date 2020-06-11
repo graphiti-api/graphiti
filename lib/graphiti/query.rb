@@ -1,8 +1,8 @@
 module Graphiti
   class Query
-    attr_reader :resource, :association_name, :params
+    attr_reader :resource, :association_name, :params, :action
 
-    def initialize(resource, params, association_name = nil, nested_include = nil, parents = [])
+    def initialize(resource, params, association_name = nil, nested_include = nil, parents = [], action = nil)
       @resource = resource
       @association_name = association_name
       @params = params
@@ -11,6 +11,7 @@ module Graphiti
       @params = @params.deep_symbolize_keys
       @include_param = nested_include || @params[:include]
       @parents = parents
+      @action = parse_action(action)
     end
 
     def association?
@@ -95,7 +96,7 @@ module Graphiti
               sl_resource = resource_for_sideload(sideload)
               query_parents = parents + [self]
               sub_hash = sub_hash[:include] if sub_hash.key?(:include)
-              hash[key] = Query.new(sl_resource, @params, key, sub_hash, query_parents)
+              hash[key] = Query.new(sl_resource, @params, key, sub_hash, query_parents, :all)
             else
               handle_missing_sideload(key)
             end
@@ -315,5 +316,18 @@ module Graphiti
         end
       end
     end
+
+    def parse_action(action)
+      action ||= @params.fetch(:action, Graphiti.context[:namespace]).try(:to_sym)
+      case action
+      when :index
+        :all
+      when :show
+        :find
+      else
+        action
+      end
+    end
+
   end
 end
