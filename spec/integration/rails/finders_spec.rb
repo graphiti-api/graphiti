@@ -1234,6 +1234,44 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
       end
 
+      context "when a custom filter_name is provided" do
+        before do
+          Legacy::AuthorResource.class_eval do
+            many_to_many :hobbies, filter_name: :the_id_of_the_author
+          end
+        end
+
+        after do
+          Legacy::AuthorResource.class_eval do
+            many_to_many :hobbies
+          end
+        end
+
+        it "still works" do
+          do_index({include: "hobbies"})
+          expect(included("hobbies").map(&:id)).to eq([hobby1.id, hobby2.id])
+        end
+
+        describe 'filtering relationship' do
+          controller(ApplicationController) do
+            def index
+              records = Legacy::HobbyResource.all(params)
+              render jsonapi: records
+            end
+          end
+
+          before do
+            allow(controller.request.env).to receive(:[])
+              .with("PATH_INFO") { '/legacy/hobbies' }
+          end
+
+          it "can filter the relationship by the custom name" do
+            do_index(filter: { the_id_of_the_author: [author1.id, author2.id].join(',') })
+            expect(d.map(&:id)).to eq([hobby1.id, hobby2.id])
+          end
+        end
+      end
+
       context "when polymorphic many-to-many" do
         let(:tag1) { Legacy::Tag.create!(name: "One") }
         let(:tag2) { Legacy::Tag.create!(name: "Two") }
