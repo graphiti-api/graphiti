@@ -328,6 +328,5 @@ module Graphiti
         action
       end
     end
-
   end
 end

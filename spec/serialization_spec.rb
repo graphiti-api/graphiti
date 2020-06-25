@@ -56,7 +56,7 @@ RSpec.describe "serialization" do
           read: type,
           write: type,
           kind: "scalar",
-          description: "test"
+          description: "test",
         }
         resource.attribute :id, :custom
       end
@@ -565,7 +565,7 @@ RSpec.describe "serialization" do
             write: type,
             params: type,
             kind: "scalar",
-            description: "test"
+            description: "test",
           }
           resource.attribute :age, :custom
         end
@@ -674,7 +674,7 @@ RSpec.describe "serialization" do
         attributes = data["attributes"]
         expect(attributes).to eq({
           "foo" => "without object",
-          "bar" => "JOHN"
+          "bar" => "JOHN",
         })
       end
     end
@@ -834,7 +834,7 @@ RSpec.describe "serialization" do
       render
       expect(json["data"][0]["attributes"]).to eq({
         "foo" => "bar",
-        "first_name" => "John"
+        "first_name" => "John",
       })
     end
 

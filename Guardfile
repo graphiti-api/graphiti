@@ -21,7 +21,7 @@ guard :rspec, cmd: "bundle exec rspec --color --format documentation" do
   watch(rails.controllers) do |m|
     [
       rspec.spec.call("controllers/#{m[1]}_controller"),
-      rspec.spec.call("api/#{m[1]}")
+      rspec.spec.call("api/#{m[1]}"),
     ]
   end
 

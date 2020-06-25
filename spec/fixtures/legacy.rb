@@ -80,6 +80,11 @@ ActiveRecord::Schema.define(version: 1) do
   create_table :tags do |t|
     t.string :name
   end
+
+  create_table :author_mentorships do |t|
+    t.integer :mentor_id
+    t.integer :mentee_id
+  end
 end
 
 module Legacy
@@ -112,6 +117,19 @@ module Legacy
     belongs_to :special_state,
       -> { where(id: 9999) },
       class_name: "Legacy::State"
+
+    has_many :mentor_joins, class_name: "AuthorMentorship",
+                            foreign_key: :mentee_id, inverse_of: :mentee
+    has_many :mentors, through: :mentor_joins, class_name: "Author", source: :mentor
+
+    has_many :mentee_joins, class_name: "AuthorMentorship",
+                            foreign_key: :mentor_id, inverse_of: :mentor
+    has_many :mentees, through: :mentee_joins, class_name: "Author", source: :mentee
+  end
+
+  class AuthorMentorship < ApplicationRecord
+    belongs_to :mentor, class_name: "Author"
+    belongs_to :mentee, class_name: "Author"
   end
 
   class Organization < ApplicationRecord
