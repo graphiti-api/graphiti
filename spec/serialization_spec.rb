@@ -1241,6 +1241,22 @@ RSpec.describe "serialization" do
           expect(json["data"][0]["relationships"]["teams"]["links"]["related"])
             .to eq("/poro/teams?filter[employee_id]=1")
         end
+
+        context 'when the filter_name has been overridden' do
+          def define_relationship
+            resource.many_to_many :teams,
+              filter_name: :the_employee_id,
+              resource: team_resource,
+              foreign_key: {employee_teams: :employee_id}
+          end
+
+          it "uses the overridden name" do
+            define_relationship
+            render
+            expect(json["data"][0]["relationships"]["teams"]["links"]["related"])
+              .to eq("/poro/teams?filter[the_employee_id]=1")
+          end
+        end
       end
 
       context "and a has_one relationship" do
