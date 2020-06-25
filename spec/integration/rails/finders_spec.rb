@@ -1169,6 +1169,46 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
       end
 
+      context "when the association is self-referential" do
+        before do
+          Legacy::AuthorResource.class_eval do
+            many_to_many :mentors,
+              foreign_key: { :mentee_joins => :mentee_id },
+              resource: Legacy::AuthorResource
+
+            many_to_many :mentees,
+              foreign_key: { :mentor_joins => :mentor_id },
+              resource: Legacy::AuthorResource
+          end
+        end
+
+        let!(:author_with_mentors) { Legacy::Author.create!(first_name: 'Fred') }
+        let!(:author_with_mentees) { Legacy::Author.create!(first_name: 'George') }
+        let!(:author_with_both) { Legacy::Author.create!(first_name: 'Alice') }
+
+        before do
+          author_with_mentors.mentors = [author_with_mentees, author_with_both]
+          author_with_mentees.mentees = [author_with_mentors, author_with_both]
+        end
+
+        it 'still works' do
+          do_index({include: "mentors"})
+          target = d.find { |e| e.id == author_with_mentors.id }
+          expect(target.relationships['mentors']).to eq({
+            "data" => [
+              {"type" => "authors", "id" => author_with_mentees.id.to_s},
+              {"type" => "authors", "id" => author_with_both.id.to_s}
+            ]
+          })
+        end
+
+        it 'allows filtering by the association' do
+          do_index({filter: { mentor_id: author_with_mentees.id }})
+
+          expect(d.map(&:id)).to eq([author_with_mentors.id, author_with_both.id])
+        end
+      end
+
       context "when the table name does not match the association name" do
         before do
           Legacy::AuthorHobby.table_name = :author_hobby
