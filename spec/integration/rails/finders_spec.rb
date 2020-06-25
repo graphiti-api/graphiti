@@ -868,7 +868,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           "birthdays" => 70, # alias
           "float_age" => 70.03,
           "decimal_age" => "70.033",
-          "active" => true
+          "active" => true,
         })
         expect(included.map(&:jsonapi_type).uniq).to match_array(%w[books])
       end
@@ -889,7 +889,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         it "is able to sideload without adding the field" do
           do_index({
             fields: {authors: "first_name"},
-            include: "books"
+            include: "books",
           })
           expect(json["data"][0]["relationships"]).to be_present
           expect(included.map(&:jsonapi_type).uniq).to match_array(%w[books])
@@ -907,7 +907,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         let(:request) do
           do_index({
             include: "books",
-            page: {books: {size: 1, number: 2}}
+            page: {books: {size: 1, number: 2}},
           })
         end
 
@@ -1076,7 +1076,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       it "allows filtering of sideloaded resource" do
         do_index({
           include: "hobbies",
-          filter: {hobbies: {id: hobby2.id}}
+          filter: {hobbies: {id: hobby2.id}},
         })
         expect(included("hobbies").map(&:id)).to eq([hobby2.id])
       end
@@ -1084,7 +1084,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       it "allows extra fields for sideloaded resource" do
         do_index({
           include: "hobbies",
-          extra_fields: {hobbies: "reason"}
+          extra_fields: {hobbies: "reason"},
         })
         hobby = included("hobbies")[0]
         expect(hobby["name"]).to be_present
@@ -1104,7 +1104,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         do_index({
           include: "hobbies",
           fields: {hobbies: "name"},
-          extra_fields: {hobbies: "reason"}
+          extra_fields: {hobbies: "reason"},
         })
         hobby = included("hobbies")[0]
         expect(hobby).to have_key("name")
@@ -1116,7 +1116,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         do_index({
           include: "hobbies,books",
           fields: {hobbies: "name", books: "title"},
-          extra_fields: {hobbies: "reason", books: "alternate_title"}
+          extra_fields: {hobbies: "reason", books: "alternate_title"},
         })
         hobby = included("hobbies")[0]
         book = included("books")[0]
@@ -1173,37 +1173,37 @@ if ENV["APPRAISAL_INITIALIZED"]
         before do
           Legacy::AuthorResource.class_eval do
             many_to_many :mentors,
-              foreign_key: { :mentee_joins => :mentee_id },
+              foreign_key: {mentee_joins: :mentee_id},
               resource: Legacy::AuthorResource
 
             many_to_many :mentees,
-              foreign_key: { :mentor_joins => :mentor_id },
+              foreign_key: {mentor_joins: :mentor_id},
               resource: Legacy::AuthorResource
           end
         end
 
-        let!(:author_with_mentors) { Legacy::Author.create!(first_name: 'Fred') }
-        let!(:author_with_mentees) { Legacy::Author.create!(first_name: 'George') }
-        let!(:author_with_both) { Legacy::Author.create!(first_name: 'Alice') }
+        let!(:author_with_mentors) { Legacy::Author.create!(first_name: "Fred") }
+        let!(:author_with_mentees) { Legacy::Author.create!(first_name: "George") }
+        let!(:author_with_both) { Legacy::Author.create!(first_name: "Alice") }
 
         before do
           author_with_mentors.mentors = [author_with_mentees, author_with_both]
           author_with_mentees.mentees = [author_with_mentors, author_with_both]
         end
 
-        it 'still works' do
+        it "still works" do
           do_index({include: "mentors"})
           target = d.find { |e| e.id == author_with_mentors.id }
-          expect(target.relationships['mentors']).to eq({
+          expect(target.relationships["mentors"]).to eq({
             "data" => [
               {"type" => "authors", "id" => author_with_mentees.id.to_s},
-              {"type" => "authors", "id" => author_with_both.id.to_s}
-            ]
+              {"type" => "authors", "id" => author_with_both.id.to_s},
+            ],
           })
         end
 
-        it 'allows filtering by the association' do
-          do_index({filter: { mentor_id: author_with_mentees.id }})
+        it "allows filtering by the association" do
+          do_index({filter: {mentor_id: author_with_mentees.id}})
 
           expect(d.map(&:id)).to eq([author_with_mentors.id, author_with_both.id])
         end
@@ -1289,9 +1289,9 @@ if ENV["APPRAISAL_INITIALIZED"]
                 filter: {
                   taggable_id: [
                     {id: author1.id, type: author1.class.name}.to_json,
-                    {id: book2.id, type: book2.class.name}.to_json
-                  ]
-                }
+                    {id: book2.id, type: book2.class.name}.to_json,
+                  ],
+                },
               })
               expect(d.map(&:name)).to eq(%w[One Two Three])
             end
@@ -1327,7 +1327,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         book2.save!
         do_index({
           filter: {books: {id: book1.id}, other_books: {id: book2.id}},
-          include: "books.genre,other_books.genre"
+          include: "books.genre,other_books.genre",
         })
         expect(included("genres").length).to eq(2)
       end
@@ -1337,7 +1337,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       it "allows extra fields for the sideloaded resource" do
         do_index({
           include: "dwelling",
-          extra_fields: {houses: "house_price", condos: "condo_price"}
+          extra_fields: {houses: "house_price", condos: "condo_price"},
         })
         house = included("houses")[0]
         expect(house["name"]).to be_present
@@ -1352,7 +1352,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       it "allows sparse fieldsets for the sideloaded resource" do
         do_index({
           include: "dwelling",
-          fields: {houses: "name", condos: "condo_description"}
+          fields: {houses: "name", condos: "condo_description"},
         })
         house = included("houses")[0]
         expect(house["name"]).to be_present
@@ -1368,7 +1368,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         do_index({
           include: "dwelling",
           fields: {houses: "name", condos: "condo_description"},
-          extra_fields: {houses: "house_price", condos: "condo_price"}
+          extra_fields: {houses: "house_price", condos: "condo_price"},
         })
         house = included("houses")[0]
         condo = included("condos")[0]
