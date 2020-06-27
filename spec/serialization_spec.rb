@@ -821,21 +821,61 @@ RSpec.describe "serialization" do
   describe "extra attributes" do
     before do
       PORO::Employee.create(first_name: "John")
-      resource.attribute :foo, :string do
-        "bar"
+      resource.class_eval do
+        attribute :foo, :string do
+          "bar"
+        end
+        extra_attribute :first_name, :string
+        extra_attribute :card_id, :string, readable: :admin? do
+          "123"
+        end
+
+        def admin?
+          !!context.admin
+        end
       end
-      resource.extra_attribute :first_name, :string
+
+    end
+
+    context "guard passes" do
+      around do |e|
+        Graphiti.with_context(OpenStruct.new(admin: true)) do
+          e.run
+        end
+      end
+
+      it "is serialized" do
+        params[:extra_fields] = {employees: "card_id"}
+        render
+        expect(json["data"][0]["attributes"]["card_id"]).to eq("123")
+      end
+    end
+
+    context "and the guard fails" do
+      around do |e|
+        Graphiti.with_context(OpenStruct.new(admin: false)) do
+          e.run
+        end
+      end
+      it "is not serialized" do
+        render
+        expect(json["data"][0]["attributes"]).to_not have_key("card_id")
+      end
     end
 
     it "adds extra attributes to the serializer" do
       params[:extra_fields] = {employees: "first_name"}
       expect(resource.serializer.attribute_blocks.keys)
-        .to match_array([:first_name, :foo])
+        .to match_array([:card_id,:first_name, :foo])
       render
       expect(json["data"][0]["attributes"]).to eq({
         "foo" => "bar",
         "first_name" => "John",
       })
+    end
+
+    it "supports guard method" do
+
     end
 
     it "does not render extra attributes if not requested" do
