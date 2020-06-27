@@ -874,10 +874,6 @@ RSpec.describe "serialization" do
       })
     end
 
-    it "supports guard method" do
-
-    end
-
     it "does not render extra attributes if not requested" do
       render
       expect(json["data"][0]["attributes"]).to_not have_key("first_name")

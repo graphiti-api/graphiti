@@ -129,6 +129,7 @@ module Graphiti
           defaults = {
             type: type,
             proc: blk,
+            readable: true,
             writable: false,
             sortable: false,
             filterable: false
