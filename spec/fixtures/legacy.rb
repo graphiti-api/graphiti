@@ -223,6 +223,9 @@ module Legacy
     attribute :name, :string
   end
 
+  class UserResource < ApplicationResource
+  end
+
   class BookResource < ApplicationResource
     attribute :author_id, :integer, only: :filterable
 
@@ -237,11 +240,7 @@ module Legacy
 
     belongs_to :genre
     many_to_many :tags
-    many_to_many :readers
-  end
-
-  class UserResource < ApplicationResource
-    many_to_many :books
+    many_to_many :readers, resource: Legacy::UserResource
   end
 
   class StateResource < ApplicationResource

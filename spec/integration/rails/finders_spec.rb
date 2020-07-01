@@ -1213,6 +1213,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         let!(:reader) { Legacy::User.create!(books: [book2]) }
 
         it "allows filtering by the association" do
+          allow(Legacy::BookResource).to receive(:validate_endpoints?) { false }
           allow(controller).to receive(:resource) { Legacy::BookResource }
           do_index({filter: {reader_id: reader.id}})
 
