@@ -1209,6 +1209,17 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
       end
 
+      context "when association name differs from source name" do
+        let!(:reader) { Legacy::User.create!(books: [book2]) }
+
+        it "allows filtering by the association" do
+          allow(controller).to receive(:resource) { Legacy::BookResource }
+          do_index({filter: {reader_id: reader.id}})
+
+          expect(d.map(&:id)).to eq([book2.id])
+        end
+      end
+
       context "when the table name does not match the association name" do
         before do
           Legacy::AuthorHobby.table_name = :author_hobby
