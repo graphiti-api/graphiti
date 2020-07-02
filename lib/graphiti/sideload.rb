@@ -132,6 +132,10 @@ module Graphiti
       end
     end
 
+    def link_filter(parents)
+      base_filter(parents)
+    end
+
     # The parent resource is a remote,
     # AND the sideload is a remote to the same endpoint
     def shared_remote?
