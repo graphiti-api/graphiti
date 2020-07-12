@@ -821,16 +821,77 @@ RSpec.describe "serialization" do
   describe "extra attributes" do
     before do
       PORO::Employee.create(first_name: "John")
-      resource.attribute :foo, :string do
-        "bar"
+      resource.class_eval do
+        attribute :foo, :string do
+          "bar"
+        end
+        extra_attribute :first_name, :string
+        extra_attribute :credit_card_id, :string, readable: false do
+          "123"
+        end
+        extra_attribute :age, :string, readable: true do
+          "22"
+        end
+        extra_attribute :credit_card_type, :string, readable: :admin? do
+          "type_c"
+        end
+
+        def admin?
+          !!context.admin
+        end
       end
-      resource.extra_attribute :first_name, :string
+
+    end
+
+    context "guard by boolean" do
+      context "if guard passes" do
+        it "is serialized" do
+          params[:extra_fields] = {employees: "age"}
+          render
+          expect(json["data"][0]["attributes"]["age"]).to eq("22")
+        end
+      end
+      context "if guard fails" do
+        it "is not serialized" do
+          params[:extra_fields] = {employees: "credit_cart_id"}
+          render
+          expect(json["data"][0]["attributes"]).to_not have_key("credit_cart_id")
+        end
+      end
+    end
+
+    context "guard by method" do
+      context "if guard passes" do
+        around do |e|
+          Graphiti.with_context(OpenStruct.new(admin: true)) do
+            e.run
+          end
+        end
+
+        it "is serialized" do
+          params[:extra_fields] = {employees: "credit_card_type"}
+          render
+          expect(json["data"][0]["attributes"]["credit_card_type"]).to eq("type_c")
+        end
+      end
+
+      context "if  guard fails" do
+        around do |e|
+          Graphiti.with_context(OpenStruct.new(admin: false)) do
+            e.run
+          end
+        end
+        it "is not serialized" do
+          render
+          expect(json["data"][0]["attributes"]).to_not have_key("credit_card_type")
+        end
+      end
     end
 
     it "adds extra attributes to the serializer" do
       params[:extra_fields] = {employees: "first_name"}
       expect(resource.serializer.attribute_blocks.keys)
-        .to match_array([:first_name, :foo])
+        .to match_array([:first_name, :foo, :age, :credit_card_type])
       render
       expect(json["data"][0]["attributes"]).to eq({
         "foo" => "bar",

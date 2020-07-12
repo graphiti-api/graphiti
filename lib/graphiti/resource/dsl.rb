@@ -135,6 +135,7 @@ module Graphiti
             filterable: false
           }
           options = defaults.merge(options)
+          attribute_option(options, :readable)
           config[:extra_attributes][name] = options
           apply_extra_attributes_to_serializer
         end
