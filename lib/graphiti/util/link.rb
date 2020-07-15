@@ -60,7 +60,7 @@ module Graphiti
       def params
         @params ||= {}.tap do |params|
           if @sideload.type != :belongs_to || @sideload.remote?
-            params[:filter] = @sideload.base_filter([@model])
+            params[:filter] = @sideload.link_filter([@model])
           end
 
           @sideload.params_proc&.call(params, [@model], context)

@@ -968,6 +968,25 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(book).to have_key("alternate_title")
         expect(book).to_not have_key("title")
       end
+
+      context "when a custom inverse_filter is provided" do
+        before do
+          Legacy::AuthorResource.class_eval do
+            has_many :books, inverse_filter: :some_author_id
+          end
+        end
+
+        after do
+          Legacy::AuthorResource.class_eval do
+            has_many :books
+          end
+        end
+
+        it "still works" do
+          do_index({include: "books"})
+          expect(included("books").map(&:id)).to eq([book1.id, book2.id])
+        end
+      end
     end
 
     context "sideloading belongs_to" do
@@ -1234,10 +1253,10 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
       end
 
-      context "when a custom filter_name is provided" do
+      context "when a custom inverse_filter is provided" do
         before do
           Legacy::AuthorResource.class_eval do
-            many_to_many :hobbies, filter_name: :the_id_of_the_author
+            many_to_many :hobbies, inverse_filter: :the_id_of_the_author
           end
         end
 

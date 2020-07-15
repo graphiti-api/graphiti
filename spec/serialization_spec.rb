@@ -1104,6 +1104,18 @@ RSpec.describe "serialization" do
           end
         end
 
+        context "and custom filter name is provided" do
+          before do
+            resource.has_many :positions, inverse_filter: :person_id
+          end
+
+          it "links correctly" do
+            render
+            expect(positions["links"]["related"])
+              .to eq("/poro/positions?filter[person_id]=1")
+          end
+        end
+
         context "opting-out of linking" do
           before do
             resource.has_many :positions, link: false
@@ -1303,10 +1315,10 @@ RSpec.describe "serialization" do
             .to eq("/poro/teams?filter[employee_id]=1")
         end
 
-        context 'when the filter_name has been overridden' do
+        context 'when the inverse_filter has been overridden' do
           def define_relationship
             resource.many_to_many :teams,
-              filter_name: :the_employee_id,
+              inverse_filter: :the_employee_id,
               resource: team_resource,
               foreign_key: {employee_teams: :employee_id}
           end

@@ -1,6 +1,16 @@
 class Graphiti::Sideload::HasMany < Graphiti::Sideload
+  def initialize(name, opts)
+    @inverse_filter = opts[:inverse_filter]
+
+    super(name, opts)
+  end
+
   def type
     :has_many
+  end
+
+  def inverse_filter
+    @inverse_filter || foreign_key
   end
 
   def load_params(parents, query)
@@ -11,10 +21,18 @@ class Graphiti::Sideload::HasMany < Graphiti::Sideload
   end
 
   def base_filter(parents)
-    {foreign_key => ids_for_parents(parents).join(",")}
+    {foreign_key => parent_filter(parents)}
+  end
+
+  def link_filter(parents)
+    {inverse_filter => parent_filter(parents)}
   end
 
   private
+
+  def parent_filter(parents)
+    ids_for_parents(parents).join(",")
+  end
 
   def child_map(children)
     children.group_by(&foreign_key)
