@@ -71,6 +71,11 @@ ActiveRecord::Schema.define(version: 1) do
     t.integer :book_id
   end
 
+  create_table :reviews do |t|
+    t.integer :reviewer_id
+    t.integer :reviewed_id
+  end
+
   create_table :users do |t|
     t.timestamps
   end
@@ -185,16 +190,25 @@ module Legacy
     has_many :tags, through: :taggings
     has_many :readerships
     has_many :readers, through: :readerships, source: :user
+    has_many :reviews, foreign_key: :reviewed_id, inverse_of: :reviewed
+    has_many :reviewers, through: :reviews
   end
 
   class User < ApplicationRecord
     has_many :readerships
     has_many :books, through: :readerships
+    has_many :reviews, foreign_key: :reviewer_id, inverse_of: :reviewer
+    has_many :reviewed, through: :reviews
   end
   
   class Readership < ApplicationRecord
     belongs_to :user
     belongs_to :book
+  end
+
+  class Review < ApplicationRecord
+    belongs_to :reviewer, class_name: 'User'
+    belongs_to :reviewed, class_name: 'Book'
   end
 
   class Tag < ApplicationRecord
@@ -241,6 +255,11 @@ module Legacy
     belongs_to :genre
     many_to_many :tags
     many_to_many :readers, resource: Legacy::UserResource
+    many_to_many :reviewers, resource: Legacy::UserResource
+  end
+
+  class UserResource < ApplicationResource
+    many_to_many :reviewed, resource: Legacy::BookResource
   end
 
   class StateResource < ApplicationResource
