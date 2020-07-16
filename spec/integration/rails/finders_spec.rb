@@ -868,7 +868,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           "birthdays" => 70, # alias
           "float_age" => 70.03,
           "decimal_age" => "70.033",
-          "active" => true,
+          "active" => true
         })
         expect(included.map(&:jsonapi_type).uniq).to match_array(%w[books])
       end
@@ -889,7 +889,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         it "is able to sideload without adding the field" do
           do_index({
             fields: {authors: "first_name"},
-            include: "books",
+            include: "books"
           })
           expect(json["data"][0]["relationships"]).to be_present
           expect(included.map(&:jsonapi_type).uniq).to match_array(%w[books])
@@ -907,7 +907,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         let(:request) do
           do_index({
             include: "books",
-            page: {books: {size: 1, number: 2}},
+            page: {books: {size: 1, number: 2}}
           })
         end
 
@@ -1095,7 +1095,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       it "allows filtering of sideloaded resource" do
         do_index({
           include: "hobbies",
-          filter: {hobbies: {id: hobby2.id}},
+          filter: {hobbies: {id: hobby2.id}}
         })
         expect(included("hobbies").map(&:id)).to eq([hobby2.id])
       end
@@ -1103,7 +1103,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       it "allows extra fields for sideloaded resource" do
         do_index({
           include: "hobbies",
-          extra_fields: {hobbies: "reason"},
+          extra_fields: {hobbies: "reason"}
         })
         hobby = included("hobbies")[0]
         expect(hobby["name"]).to be_present
@@ -1123,7 +1123,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         do_index({
           include: "hobbies",
           fields: {hobbies: "name"},
-          extra_fields: {hobbies: "reason"},
+          extra_fields: {hobbies: "reason"}
         })
         hobby = included("hobbies")[0]
         expect(hobby).to have_key("name")
@@ -1135,7 +1135,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         do_index({
           include: "hobbies,books",
           fields: {hobbies: "name", books: "title"},
-          extra_fields: {hobbies: "reason", books: "alternate_title"},
+          extra_fields: {hobbies: "reason", books: "alternate_title"}
         })
         hobby = included("hobbies")[0]
         book = included("books")[0]
@@ -1216,8 +1216,8 @@ if ENV["APPRAISAL_INITIALIZED"]
           expect(target.relationships["mentors"]).to eq({
             "data" => [
               {"type" => "authors", "id" => author_with_mentees.id.to_s},
-              {"type" => "authors", "id" => author_with_both.id.to_s},
-            ],
+              {"type" => "authors", "id" => author_with_both.id.to_s}
+            ]
           })
         end
 
@@ -1271,7 +1271,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           expect(included("hobbies").map(&:id)).to eq([hobby1.id, hobby2.id])
         end
 
-        describe 'filtering relationship' do
+        describe "filtering relationship" do
           controller(ApplicationController) do
             def index
               records = Legacy::HobbyResource.all(params)
@@ -1281,11 +1281,11 @@ if ENV["APPRAISAL_INITIALIZED"]
 
           before do
             allow(controller.request.env).to receive(:[])
-              .with("PATH_INFO") { '/legacy/hobbies' }
+              .with("PATH_INFO") { "/legacy/hobbies" }
           end
 
           it "can filter the relationship by the custom name" do
-            do_index(filter: { the_id_of_the_author: [author1.id, author2.id].join(',') })
+            do_index(filter: {the_id_of_the_author: [author1.id, author2.id].join(",")})
             expect(d.map(&:id)).to eq([hobby1.id, hobby2.id])
           end
         end
@@ -1346,9 +1346,9 @@ if ENV["APPRAISAL_INITIALIZED"]
                 filter: {
                   taggable_id: [
                     {id: author1.id, type: author1.class.name}.to_json,
-                    {id: book2.id, type: book2.class.name}.to_json,
-                  ],
-                },
+                    {id: book2.id, type: book2.class.name}.to_json
+                  ]
+                }
               })
               expect(d.map(&:name)).to eq(%w[One Two Three])
             end
@@ -1384,7 +1384,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         book2.save!
         do_index({
           filter: {books: {id: book1.id}, other_books: {id: book2.id}},
-          include: "books.genre,other_books.genre",
+          include: "books.genre,other_books.genre"
         })
         expect(included("genres").length).to eq(2)
       end
@@ -1394,7 +1394,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       it "allows extra fields for the sideloaded resource" do
         do_index({
           include: "dwelling",
-          extra_fields: {houses: "house_price", condos: "condo_price"},
+          extra_fields: {houses: "house_price", condos: "condo_price"}
         })
         house = included("houses")[0]
         expect(house["name"]).to be_present
@@ -1409,7 +1409,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       it "allows sparse fieldsets for the sideloaded resource" do
         do_index({
           include: "dwelling",
-          fields: {houses: "name", condos: "condo_description"},
+          fields: {houses: "name", condos: "condo_description"}
         })
         house = included("houses")[0]
         expect(house["name"]).to be_present
@@ -1425,7 +1425,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         do_index({
           include: "dwelling",
           fields: {houses: "name", condos: "condo_description"},
-          extra_fields: {houses: "house_price", condos: "condo_price"},
+          extra_fields: {houses: "house_price", condos: "condo_price"}
         })
         house = included("houses")[0]
         condo = included("condos")[0]

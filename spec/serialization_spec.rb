@@ -56,7 +56,7 @@ RSpec.describe "serialization" do
           read: type,
           write: type,
           kind: "scalar",
-          description: "test",
+          description: "test"
         }
         resource.attribute :id, :custom
       end
@@ -565,7 +565,7 @@ RSpec.describe "serialization" do
             write: type,
             params: type,
             kind: "scalar",
-            description: "test",
+            description: "test"
           }
           resource.attribute :age, :custom
         end
@@ -674,7 +674,7 @@ RSpec.describe "serialization" do
         attributes = data["attributes"]
         expect(attributes).to eq({
           "foo" => "without object",
-          "bar" => "JOHN",
+          "bar" => "JOHN"
         })
       end
     end
@@ -840,7 +840,6 @@ RSpec.describe "serialization" do
           !!context.admin
         end
       end
-
     end
 
     context "guard by boolean" do
@@ -895,7 +894,7 @@ RSpec.describe "serialization" do
       render
       expect(json["data"][0]["attributes"]).to eq({
         "foo" => "bar",
-        "first_name" => "John",
+        "first_name" => "John"
       })
     end
 
@@ -1163,7 +1162,7 @@ RSpec.describe "serialization" do
             it "raises error" do
               expect {
                 resource.has_many :positions
-              }.to raise_error(Graphiti::Errors::InvalidLink, /Make sure the endpoint \"\/poro\/positions\" exists with action :index/)
+              }.to raise_error(Graphiti::Errors::InvalidLink, /Make sure the endpoint "\/poro\/positions" exists with action :index/)
             end
           end
 
@@ -1315,7 +1314,7 @@ RSpec.describe "serialization" do
             .to eq("/poro/teams?filter[employee_id]=1")
         end
 
-        context 'when the inverse_filter has been overridden' do
+        context "when the inverse_filter has been overridden" do
           def define_relationship
             resource.many_to_many :teams,
               inverse_filter: :the_employee_id,
@@ -1414,7 +1413,7 @@ RSpec.describe "serialization" do
             it "raises error" do
               expect {
                 resource.belongs_to :classification
-              }.to raise_error(Graphiti::Errors::InvalidLink, /Make sure the endpoint \"\/poro\/classifications\" exists with action :show/)
+              }.to raise_error(Graphiti::Errors::InvalidLink, /Make sure the endpoint "\/poro\/classifications" exists with action :show/)
             end
           end
 
