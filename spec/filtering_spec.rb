@@ -75,7 +75,7 @@ RSpec.describe "filtering" do
     context "and an array of json objects passed" do
       before do
         params[:filter] = {
-          by_json: '{ "id": 2, "id2": 3 },{ "id": 4 },{ "id": 5 },{ "id": 6 }',
+          by_json: '{ "id": 2, "id2": 3 },{ "id": 4 },{ "id": 5 },{ "id": 6 }'
         }
       end
 
@@ -115,8 +115,8 @@ RSpec.describe "filtering" do
           params[:filter] = {
             by_json: {
               users: {update: {id: {a: 2, b: 3}}},
-              admins: {update: {id: {a: 2, b: 3}}},
-            }.to_json,
+              admins: {update: {id: {a: 2, b: 3}}}
+            }.to_json
           }
         end
 
@@ -141,8 +141,8 @@ RSpec.describe "filtering" do
         params[:filter] = {
           by_json: [
             {id: [{a: 2}, {b: 3}]}.to_json,
-            {id: [{a: 2}, {b: 3}]}.to_json,
-          ].join(","),
+            {id: [{a: 2}, {b: 3}]}.to_json
+          ].join(",")
         }
       end
 
@@ -181,7 +181,7 @@ RSpec.describe "filtering" do
         write: foo,
         kind: "record",
         canonical_name: :hash,
-        description: "Foo",
+        description: "Foo"
       }
       resource.filter :blah, :custom do
         eq do |scope, hash|
@@ -221,7 +221,7 @@ RSpec.describe "filtering" do
         expect(records.map(&:id)).to eq([
           employee1.id,
           employee2.id,
-          employee4.id,
+          employee4.id
         ])
       end
     end
@@ -443,7 +443,7 @@ RSpec.describe "filtering" do
       before do
         params[:filter] = {
           id: employee1.id,
-          'positions.title': "bar",
+          'positions.title': "bar"
         }
         params[:include] = "positions"
       end
@@ -470,7 +470,7 @@ RSpec.describe "filtering" do
       before do
         params[:filter] = {
           id: employee1.id,
-          'positions.department.name': "bar",
+          'positions.department.name': "bar"
         }
         params[:include] = "positions.department"
       end
@@ -604,7 +604,7 @@ RSpec.describe "filtering" do
         params[:filter] = {first_name: {eq: "Harold"}}
         expect {
           records
-        }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Allowlist: \[\"William\"\]/)
+        }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Allowlist: \["William"\]/)
       end
 
       it "accepts values in the allowlist" do
@@ -628,7 +628,7 @@ RSpec.describe "filtering" do
         params[:filter] = {first_name: {eq: "Harold"}}
         expect {
           records
-        }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Denylist: \[\"Harold\"\]/)
+        }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Denylist: \["Harold"\]/)
       end
 
       it "accepts values not in the denylist" do
@@ -701,7 +701,7 @@ RSpec.describe "filtering" do
       params[:filter] = {first_name: {eq: "Harold"}}
       expect {
         records
-      }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Denylist: \[\"Harold\"\]/)
+      }.to raise_error(Graphiti::Errors::InvalidFilterValue, /Denylist: \["Harold"\]/)
     end
 
     it "accepts values not in the denylist" do
@@ -762,7 +762,7 @@ RSpec.describe "filtering" do
         params[:filter] = {
           foo: "a",
           bar: "b",
-          baz: "c",
+          baz: "c"
         }
       end
 
@@ -1134,10 +1134,10 @@ RSpec.describe "filtering" do
             "foo" => {
               "eq" => {
                 "bar" => {
-                  "baz" => "blah",
-                },
-              },
-            },
+                  "baz" => "blah"
+                }
+              }
+            }
           }
         end
 
@@ -1274,7 +1274,7 @@ RSpec.describe "filtering" do
           read: type,
           write: type,
           kind: "scalar",
-          description: "test",
+          description: "test"
         }
         resource.attribute :foo, :custom
       end
@@ -1319,7 +1319,7 @@ RSpec.describe "filtering" do
           :suffix,
           :not_suffix,
           :match,
-          :not_match,
+          :not_match
         ])
         expect(resource.filters[:foo][:operators][:eq]).to be_a(Proc)
         expect(resource.filters[:foo][:operators][:suffix]).to be_nil
@@ -1429,7 +1429,7 @@ RSpec.describe "filtering" do
 
         it "limits available operators" do
           expect(resource.filters[:foo][:operators].keys).to eq([
-            :gt, :gte, :lt, :lte, :foo,
+            :gt, :gte, :lt, :lte, :foo
           ])
         end
       end
@@ -1444,7 +1444,7 @@ RSpec.describe "filtering" do
 
         it "limits available operators, adding custom ones" do
           expect(resource.filters[:foo][:operators].keys).to eq([
-            :gt, :gte, :lt, :lte, :foo,
+            :gt, :gte, :lt, :lte, :foo
           ])
         end
       end
@@ -1456,7 +1456,7 @@ RSpec.describe "filtering" do
 
         it "limits available operators" do
           expect(resource.filters[:foo][:operators].keys).to eq([
-            :not_eq, :gt, :gte, :lt, :lte,
+            :not_eq, :gt, :gte, :lt, :lte
           ])
         end
       end
