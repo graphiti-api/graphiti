@@ -32,6 +32,7 @@ if ENV["APPRAISAL_INITIALIZED"]
                              organization: org1,
                              dwelling: house,
                              created_at: one_day_ago,
+                             last_login: one_day_ago,
                              created_at_date: one_day_ago.to_date,
                              identifier: SecureRandom.uuid
     end
@@ -43,6 +44,7 @@ if ENV["APPRAISAL_INITIALIZED"]
                              decimal_age: 70.011,
                              dwelling: condo,
                              created_at: two_days_ago,
+                             last_login: one_day_ago,
                              created_at_date: two_days_ago.to_date,
                              identifier: SecureRandom.uuid
     end
@@ -106,6 +108,7 @@ if ENV["APPRAISAL_INITIALIZED"]
                                active: true,
                                float_age: 70.05,
                                decimal_age: 70.055,
+                               last_login: nil,
                                created_at: 1.day.from_now,
                                created_at_date: 1.day.from_now.to_date
       end
@@ -585,6 +588,15 @@ if ENV["APPRAISAL_INITIALIZED"]
           it "works" do
             expect(ids).to eq([author2.id])
           end
+
+          context "when value is nil" do
+            let(:filter) { {last_login: value} }
+            let(:value) { {eq: "null"} }
+
+            it "works" do
+              expect(ids).to eq([author3.id])
+            end
+          end
         end
 
         context "!eq" do
@@ -592,6 +604,15 @@ if ENV["APPRAISAL_INITIALIZED"]
 
           it "works" do
             expect(ids).to eq([author1.id, author3.id])
+          end
+
+          context "when value is nil" do
+            let(:filter) { {last_login: value} }
+            let(:value) { {'!eq': "null"} }
+
+            it "works" do
+              expect(ids).to eq([author1.id, author2.id])
+            end
           end
         end
 
