@@ -159,7 +159,7 @@ module Graphiti
 
       # Ensure fractional seconds don't matter
       def filter_datetime_eq(scope, attribute, value, is_not: false)
-        ranges = value.map { |v| (v..v + 1.second - 0.00000001) }
+        ranges = value.map { |v| (v..v + 1.second - 0.00000001) unless v.nil? }
         clause = {attribute => ranges}
         is_not ? scope.where.not(clause) : scope.where(clause)
       end

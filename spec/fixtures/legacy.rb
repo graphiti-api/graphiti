@@ -11,6 +11,7 @@ ActiveRecord::Schema.define(version: 1) do
     t.integer :dwelling_id
     t.integer :organization_id
     t.date :created_at_date
+    t.datetime :last_login
     t.string :identifier
     t.timestamps
   end
@@ -307,9 +308,12 @@ module Legacy
     attribute :float_age, :float
     attribute :decimal_age, :big_decimal
     attribute :active, :boolean
+    attribute :last_login, :datetime, only: [:filterable]
     attribute :created_at, :datetime, only: [:filterable]
     attribute :created_at_date, :date, only: [:filterable]
     attribute :identifier, :uuid
+
+    filter :last_login, allow_nil: true
 
     has_many :books
     belongs_to :state
