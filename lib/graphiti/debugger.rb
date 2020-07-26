@@ -10,6 +10,8 @@ module Graphiti
 
     class << self
       def on_data(name, start, stop, id, payload)
+        return [] unless enabled
+
         took = ((stop - start) * 1000.0).round(2)
         params = scrub_params(payload[:params])
 
@@ -24,7 +26,7 @@ module Graphiti
         end
       end
 
-      def on_data_exception(payload, params)
+      private def on_data_exception(payload, params)
         unless payload[:exception_object].instance_variable_get(:@__graphiti_debug)
           add_chunk do |logs, json|
             logs << ["\n=== Graphiti Debug ERROR", :red, true]
@@ -49,11 +51,11 @@ module Graphiti
         end
       end
 
-      def results(raw_results)
+      private def results(raw_results)
         raw_results.map { |r| "[#{r.class.name}, #{r.id.inspect}]" }.join(", ")
       end
 
-      def on_sideload_data(payload, params, took)
+      private def on_sideload_data(payload, params, took)
         sideload = payload[:sideload]
         results = results(payload[:results])
         add_chunk(payload[:resource], payload[:parent]) do |logs, json|
@@ -72,7 +74,7 @@ module Graphiti
         end
       end
 
-      def on_primary_data(payload, params, took)
+      private def on_primary_data(payload, params, took)
         results = results(payload[:results])
         add_chunk(payload[:resource], payload[:parent]) do |logs, json|
           logs << [""]
@@ -90,6 +92,8 @@ module Graphiti
       end
 
       def on_render(name, start, stop, id, payload)
+        return [] unless enabled
+
         add_chunk do |logs|
           took = ((stop - start) * 1000.0).round(2)
           logs << [""]
