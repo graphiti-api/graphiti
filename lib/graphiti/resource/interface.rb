@@ -36,7 +36,7 @@ module Graphiti
 
         def build(params, base_scope = nil)
           validate!(params)
-          runner = Runner.new(self, params)
+          runner = Runner.new(self, params, nil, :build)
           runner.proxy(base_scope, single: true, raise_on_missing: true)
         end
 

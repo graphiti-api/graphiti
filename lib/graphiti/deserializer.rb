@@ -45,9 +45,27 @@
 #
 #   { type: 'authors', method: :create, temp_id: 'abc123' }
 class Graphiti::Deserializer
-  def initialize(payload = {})
+  CONVERSIONS = {
+    build: :create,
+    find: :update
+  }
+
+  def initialize(payload, action)
     @payload = payload
     @payload = @payload[:_jsonapi] if @payload.key?(:_jsonapi)
+    @action = action.to_sym
+  end
+
+  # We may start off with a build or find payload that then we later learn
+  # are actually create or update. This allows us to make that transition.
+  def convert(new_action)
+    return if new_action == @action
+
+    unless CONVERSIONS[@action] == new_action
+      raise ArgumentError, "can't convert #{@action} to #{new_action}"
+    end
+
+    @action = new_action
   end
 
   def params
@@ -64,11 +82,14 @@ class Graphiti::Deserializer
     data[:id]
   end
 
-  # @return [Hash] the raw :attributes hash + +id+
+  # @return [Hash] the raw :attributes hash + +id+ if creating
   def attributes
-    @attributes ||= raw_attributes.tap do |hash|
-      hash[:id] = id if id
-    end
+    @attributes ||=
+      if id && include_id_in_attributes?
+        raw_attributes.merge(id: id)
+      else
+        raw_attributes
+      end
   end
 
   # Override the attributes
@@ -78,15 +99,15 @@ class Graphiti::Deserializer
   # 'meta' information about this resource. Includes:
   #
   # +type+: the jsonapi type
-  # +method+: create/update/destroy/disassociate. Based on the request env or the +method+ within the +relationships+ hash
+  # +method+: create/update/destroy/disassociate. Based on the type of request or the +method+ within the +relationships+ hash
   # +temp_id+: the +temp-id+, if specified
   #
   # @return [Hash]
-  def meta(action: :update)
+  def meta
     {
       type: data[:type],
       temp_id: data[:'temp-id'],
-      method: action,
+      method: @action,
       payload_path: ["data"]
     }
   end
@@ -107,6 +128,10 @@ class Graphiti::Deserializer
   end
 
   private
+
+  def include_id_in_attributes?
+    [:build, :create].include?(@action)
+  end
 
   def merge_include_hash(memo, name, relationship_payload)
     arrayified = [relationship_payload].flatten

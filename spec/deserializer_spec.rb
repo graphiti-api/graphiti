@@ -10,7 +10,8 @@ RSpec.describe Graphiti::Deserializer do
     }
   end
 
-  let(:instance) { described_class.new(payload) }
+  let(:action) { :find }
+  let(:instance) { described_class.new(payload, action) }
 
   describe "#attributes" do
     subject { instance.attributes }
@@ -27,8 +28,16 @@ RSpec.describe Graphiti::Deserializer do
         payload[:data][:id] = "123"
       end
 
-      it "merges id into attributes" do
-        expect(subject[:id]).to eq("123")
+      it "does not merge into attributes" do
+        expect(subject).to_not have_key(:id)
+      end
+
+      context "when it is a build action" do
+        let(:action) { :build }
+
+        it "merges id into attributes" do
+          expect(subject[:id]).to eq("123")
+        end
       end
     end
   end

@@ -1,7 +1,9 @@
 require "spec_helper"
 
 RSpec.describe Graphiti::RequestValidator do
-  let(:instance) { described_class.new(root_resource, payload) }
+  # TODO: Test other actions
+  let(:action) { :find }
+  let(:instance) { described_class.new(root_resource, payload, action) }
 
   let(:abstract_resource_class) do
     Class.new(Graphiti::Resource) do
@@ -177,8 +179,9 @@ RSpec.describe Graphiti::RequestValidator do
         end
 
         context "when updating" do
+          let(:action) { :update }
+
           before do
-            payload["action"] = "update"
             payload[:data][:id] = 1
             payload[:filter] = {id: 1}
           end

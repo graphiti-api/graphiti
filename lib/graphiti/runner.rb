@@ -3,13 +3,13 @@ module Graphiti
     attr_reader :params
     attr_reader :deserialized_payload
 
-    def initialize(resource_class, params, query = nil, action = nil)
+    def initialize(resource_class, params, query, action)
       @resource_class = resource_class
       @params = params
       @query = query
       @action = action
 
-      validator = RequestValidator.new(jsonapi_resource, params)
+      validator = RequestValidator.new(jsonapi_resource, params, action)
 
       validator.validate!
 
@@ -72,7 +72,8 @@ module Graphiti
         query,
         payload: deserialized_payload,
         single: opts[:single],
-        raise_on_missing: opts[:raise_on_missing]
+        raise_on_missing: opts[:raise_on_missing],
+        action: @action
     end
   end
 end

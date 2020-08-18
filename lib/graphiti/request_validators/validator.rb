@@ -1,12 +1,13 @@
 module Graphiti
   module RequestValidators
     class Validator
-      attr_reader :errors
+      attr_reader :errors, :action
 
-      def initialize(root_resource, raw_params)
+      def initialize(root_resource, raw_params, action)
         @root_resource = root_resource
         @raw_params = raw_params
         @errors = Graphiti::Util::SimpleErrors.new(raw_params)
+        @action = action
       end
 
       def validate
@@ -35,9 +36,9 @@ module Graphiti
         @deserialized_payload ||= begin
                                     payload = normalized_params
                                     if payload[:data] && payload[:data][:type]
-                                      Graphiti::Deserializer.new(payload)
+                                      Graphiti::Deserializer.new(payload, action)
                                     else
-                                      Graphiti::Deserializer.new({})
+                                      Graphiti::Deserializer.new({}, action)
                                     end
                                   end
       end

@@ -3,7 +3,7 @@ require "spec_helper"
 RSpec.describe Graphiti::Runner do
   let(:resource_class) { PORO::EmployeeResource }
   let(:params) { {} }
-  let(:instance) { described_class.new(resource_class, params) }
+  let(:instance) { described_class.new(resource_class, params, nil, :find) }
 
   describe "#jsonapi_context" do
     let(:ctx) { double("context") }
@@ -43,7 +43,7 @@ RSpec.describe Graphiti::Runner do
 
       context "when a query is provided" do
         let(:provided_query) { double(:provided_query) }
-        let(:instance) { described_class.new(resource_class, params, provided_query) }
+        let(:instance) { described_class.new(resource_class, params, provided_query, :find) }
 
         it { is_expected.to eq(provided_query) }
       end

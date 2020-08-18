@@ -1775,7 +1775,7 @@ RSpec.describe Graphiti::Resource do
     it "modifies scope" do
       ctx = OpenStruct.new
       Graphiti.with_context(ctx) do
-        runner = Graphiti::Runner.new(klass, {})
+        runner = Graphiti::Runner.new(klass, {}, nil, :find)
         proxy = runner.proxy(start: true)
         expect(ctx.before).to eq(start: true)
         expect(ctx.middle).to eq(start: true, before: true)

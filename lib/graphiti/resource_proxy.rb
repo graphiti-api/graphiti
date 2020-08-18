@@ -7,13 +7,15 @@ module Graphiti
     def initialize(resource, scope, query,
       payload: nil,
       single: false,
-      raise_on_missing: false)
+      raise_on_missing: false,
+      action:)
       @resource = resource
       @scope = scope
       @query = query
       @payload = payload
       @single = single
       @raise_on_missing = raise_on_missing
+      @action = action
     end
 
     def single?
@@ -87,16 +89,24 @@ module Graphiti
       @pagination ||= Delegates::Pagination.new(self)
     end
 
-    def save(action: :create)
+    def save(action: nil)
+      action ||=
+        case @action
+        when :build then :create
+        when :find then :update
+        else @action
+        end
+
       # TODO: remove this. Only used for persisting many-to-many with AR
       # (see activerecord adapter)
       original = Graphiti.context[:namespace]
       begin
         Graphiti.context[:namespace] = action
-        ::Graphiti::RequestValidator.new(@resource, @payload.params).validate!
+        ::Graphiti::RequestValidator.new(@resource, @payload.params, action).validate!
+        @payload.convert(action)
         validator = persist {
           @resource.persist_with_relationships \
-            @payload.meta(action: action),
+            @payload.meta,
             @payload.attributes,
             @payload.relationships
         }

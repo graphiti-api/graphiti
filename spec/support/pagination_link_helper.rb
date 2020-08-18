@@ -1,8 +1,9 @@
 require "spec_helper"
 
 RSpec.shared_context "pagination_context", shared_context: :metadata do
+  let(:proxy_action) { :find }
   let(:proxy) do
-    Graphiti::ResourceProxy.new(resource, scope, query)
+    Graphiti::ResourceProxy.new(resource, scope, query, action: proxy_action)
   end
 
   let(:resource) do
