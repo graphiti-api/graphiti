@@ -2357,6 +2357,48 @@ RSpec.describe "persistence" do
           )
         end
       end
+
+      context "linking with non-writable association id" do
+        let(:payload) do
+          {
+            data: {
+              type: "positions",
+              relationships: {
+                department: {
+                  data: {
+                    type: "positions",
+                    'id': "123"
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        let(:department_resource) do
+          Class.new(PORO::DepartmentResource) do
+            self.model = PORO::Department
+            attribute :id, :integer, writable: false
+          end
+        end
+
+        let(:klass) do
+          Class.new(PORO::PositionResource) do
+            self.model = PORO::Position
+          end
+        end
+
+        before do
+          PORO::DB.data[:departments] << {id: 123}
+
+          klass.belongs_to :department, resource: department_resource
+        end
+
+        it "responds correctly" do
+          employee = klass.build(payload)
+          expect(employee.save).to eq(true)
+        end
+      end
     end
 
     describe "has_one" do
