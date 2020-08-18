@@ -61,15 +61,15 @@ module Graphiti
             next
           end
 
-          typecast_attributes(x[:resource], x[:attributes], x[:meta][:payload_path])
+          typecast_attributes(x[:resource], x[:attributes], x[:meta][:payload_path], relationship: true)
           process_relationships(x[:resource], x[:relationships], x[:meta][:payload_path])
         end
       end
 
-      def typecast_attributes(resource, attributes, payload_path)
+      def typecast_attributes(resource, attributes, payload_path, relationship: false)
         attributes.each_pair do |key, value|
           begin
-            attributes[key] = resource.typecast(key, value, :writable)
+            attributes[key] = resource.typecast(key, value, relationship ? :readable : :writable)
           rescue Graphiti::Errors::UnknownAttribute
             @errors.add(fully_qualified_key(key, payload_path), :unknown_attribute, message: "is an unknown attribute")
           rescue Graphiti::Errors::InvalidAttributeAccess

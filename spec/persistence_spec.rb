@@ -1596,7 +1596,7 @@ RSpec.describe "persistence" do
           klass.find(payload).save
           expect(position_resource.meta.except(:caller_model)).to eq({
             method: :destroy,
-            attributes: {employee_id: nil, id: 1},
+            attributes: {employee_id: nil, id: "1"},
             relationships: {},
             temp_id: nil
           })
