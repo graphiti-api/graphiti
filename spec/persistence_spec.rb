@@ -206,6 +206,16 @@ RSpec.describe "persistence" do
           it "can modify attributes" do
             expect(employee.last_name).to eq("Jane")
           end
+
+          context "with non-writable id" do
+            before do
+              klass.attribute(:id, :integer, writable: false)
+            end
+
+            it "can modify attributes" do
+              expect(employee.last_name).to eq("Jane")
+            end
+          end
         end
 
         context "when destroying" do
