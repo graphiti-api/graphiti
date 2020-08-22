@@ -6,18 +6,18 @@ module Graphiti
       :deserialized_payload,
       to: :@validator
 
-    def initialize(root_resource, raw_params)
-      @validator = ValidatorFactory.create(root_resource, raw_params)
+    def initialize(root_resource, raw_params, action)
+      @validator = ValidatorFactory.create(root_resource, raw_params, action)
     end
 
     class ValidatorFactory
-      def self.create(root_resource, raw_params)
-        case raw_params["action"]
-        when "update" then
+      def self.create(root_resource, raw_params, action)
+        case action
+        when :update then
           RequestValidators::UpdateValidator
         else
           RequestValidators::Validator
-        end.new(root_resource, raw_params)
+        end.new(root_resource, raw_params, action)
       end
     end
   end

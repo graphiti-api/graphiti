@@ -3,10 +3,11 @@ module Graphiti
     class Validator
       attr_reader :errors
 
-      def initialize(root_resource, raw_params)
+      def initialize(root_resource, raw_params, action)
         @root_resource = root_resource
         @raw_params = raw_params
         @errors = Graphiti::Util::SimpleErrors.new(raw_params)
+        @action = action
       end
 
       def validate
@@ -68,6 +69,11 @@ module Graphiti
 
       def typecast_attributes(resource, attributes, payload_path)
         attributes.each_pair do |key, value|
+          # Only validate id if create action, otherwise it's only used for lookup
+          next if @action != :create &&
+            key == :id &&
+            resource.class.config[:attributes][:id][:writable] == false
+
           begin
             attributes[key] = resource.typecast(key, value, :writable)
           rescue Graphiti::Errors::UnknownAttribute
