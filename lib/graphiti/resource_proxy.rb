@@ -118,6 +118,7 @@ module Graphiti
     end
 
     def destroy
+      data
       transaction_response = @resource.transaction do
         metadata = {method: :destroy}
         model = @resource.destroy(@query.filters[:id], metadata)
@@ -135,6 +136,7 @@ module Graphiti
     end
 
     def update_attributes
+      data
       save(action: :update)
     end
 
