@@ -1788,7 +1788,7 @@ RSpec.describe "persistence" do
 
     it "raises appropriate error" do
       expect {
-        klass.build(payload)
+        klass.build(payload).save
       }.to(raise_error { |e|
         expect(e).to be_a Graphiti::Errors::InvalidRequest
         expect(e.errors.full_messages).to eq ["data.attributes.foo is an unknown attribute"]
@@ -1804,11 +1804,41 @@ RSpec.describe "persistence" do
 
     it "raises appropriate error" do
       expect {
-        klass.build(payload)
+        klass.build(payload).save
       }.to(raise_error { |e|
         expect(e).to be_a Graphiti::Errors::InvalidRequest
         expect(e.errors.full_messages).to eq ["data.attributes.foo cannot be written"]
       })
+    end
+  end
+
+  context "when given an unwritable id" do
+    before do
+      klass.attribute :id, :string, writable: false
+      payload[:data][:id] = "123"
+    end
+
+    context "and it is a create operation" do
+      it "works" do
+        instance = klass.build(payload)
+        expect {
+          instance.save
+        }.to raise_error(Graphiti::Errors::InvalidRequest, /data.attributes.id/)
+      end
+    end
+
+    context "and it is an update operation" do
+      let!(:record) do
+        PORO::Employee.create(id: 123, first_name: "asdf")
+      end
+
+      it "works" do
+        instance = klass.find(payload)
+        expect {
+          expect(instance.update_attributes).to eq(true)
+        }.to change { klass.find(payload).data.first_name }
+          .from("asdf").to("Jane")
+      end
     end
   end
 
@@ -1820,7 +1850,7 @@ RSpec.describe "persistence" do
 
     it "raises helpful error" do
       expect {
-        klass.build(payload)
+        klass.build(payload).save
       }.to(raise_error { |e|
         expect(e).to be_a Graphiti::Errors::InvalidRequest
         expect(e.errors.full_messages).to eq ["data.attributes.foo should be type integer"]
