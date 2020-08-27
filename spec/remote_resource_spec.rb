@@ -3,6 +3,7 @@ require "spec_helper"
 RSpec.describe "remote resources" do
   let(:klass) do
     Class.new(Graphiti::Resource) do
+      self.type = :employees
       self.remote = "http://foo.com/api/v1/employees"
 
       attribute :last_name, :string do # override
