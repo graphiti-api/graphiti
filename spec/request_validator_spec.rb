@@ -1,7 +1,8 @@
 require "spec_helper"
 
 RSpec.describe Graphiti::RequestValidator do
-  let(:instance) { described_class.new(root_resource, payload) }
+  let(:action) { :create }
+  let(:instance) { described_class.new(root_resource, payload, action) }
 
   let(:abstract_resource_class) do
     Class.new(Graphiti::Resource) do
