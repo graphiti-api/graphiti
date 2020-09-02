@@ -366,6 +366,20 @@ module Graphiti
       end
     end
 
+    class UndefinedIDLookup < Base
+      def initialize(resource_class)
+        @resource_class = resource_class
+      end
+
+      def message
+        <<~MSG
+          Tried to resolve #{@resource_class} with an :id filter, but the filter was nil.
+          This can result in unscoping a query, which can cause incorrect values to be
+          returned which may or may not bypass standard access controls.
+        MSG
+      end
+    end
+
     class UnknownAttribute < AttributeError
       def message
         "#{super}, but could not find an attribute with that name."

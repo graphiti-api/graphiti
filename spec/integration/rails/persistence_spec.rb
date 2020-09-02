@@ -542,6 +542,37 @@ if ENV["APPRAISAL_INITIALIZED"]
           expect(salary.base_rate).to eq(15.0)
           expect(salary.overtime_rate).to eq(30.0)
         end
+
+        context "when the association is null" do
+          let(:payload) do
+            {
+              data: {
+                type: "employees",
+                attributes: {
+                  first_name: "Joe",
+                  last_name: "Smith",
+                  age: 30
+                },
+                relationships: {
+                  salary: {
+                    data: {
+                      type: "salaries",
+                      id: nil
+                    }
+                  }
+                }
+              }
+            }
+          end
+
+          let!(:existing_salary) { Salary.create(base_rate: 1, overtime_rate: 2) }
+
+          it "blows up" do
+            expect {
+              do_create(payload)
+            }.to raise_error(Graphiti::Errors::UndefinedIDLookup)
+          end
+        end
       end
 
       context "for existing records" do
