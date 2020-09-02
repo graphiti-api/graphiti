@@ -177,7 +177,7 @@ RSpec.describe Graphiti::Sideload do
       end
     end
 
-    context "when not found by inferrence" do
+    context "when not found by inference" do
       let(:name) { :foo }
 
       it "raises helpful error" do
