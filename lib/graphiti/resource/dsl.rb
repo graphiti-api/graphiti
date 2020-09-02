@@ -5,6 +5,7 @@ module Graphiti
 
       class_methods do
         def filter(name, *args, &blk)
+          name = name.to_sym
           opts = args.extract_options!
           type_override = args[0]
 

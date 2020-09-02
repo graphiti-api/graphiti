@@ -8,6 +8,18 @@ class Graphiti::Adapters::ActiveRecord::ManyToManySideload < Graphiti::Sideload:
     foreign_key.keys.first
   end
 
+  def inverse_filter
+    return @inverse_filter if @inverse_filter
+
+    inferred_name = infer_inverse_association
+
+    if inferred_name
+      "#{inferred_name.to_s.singularize}_id"
+    else
+      super
+    end
+  end
+
   def belongs_to_many_filter(scope, value)
     if polymorphic?
       clauses = value.group_by { |v| v["type"] }.map { |group|
@@ -75,5 +87,12 @@ class Graphiti::Adapters::ActiveRecord::ManyToManySideload < Graphiti::Sideload:
     key = parent_reflection.options[:through]
     value = through_reflection.foreign_key.to_sym
     {key => value}
+  end
+
+  def infer_inverse_association
+    through_class = through_reflection.klass
+
+    foreign_reflection = through_class.reflections[name.to_s.singularize]
+    foreign_reflection && foreign_reflection.options[:inverse_of]
   end
 end

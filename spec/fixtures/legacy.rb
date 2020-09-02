@@ -67,6 +67,15 @@ ActiveRecord::Schema.define(version: 1) do
     t.timestamps
   end
 
+  create_table :readerships do |t|
+    t.integer :user_id
+    t.integer :book_id
+  end
+
+  create_table :users do |t|
+    t.timestamps
+  end
+
   create_table :states do |t|
     t.string :name
     t.timestamps
@@ -175,6 +184,18 @@ module Legacy
     belongs_to :genre
     has_many :taggings, as: :taggable
     has_many :tags, through: :taggings
+    has_many :readerships
+    has_many :readers, through: :readerships, source: :user
+  end
+
+  class User < ApplicationRecord
+    has_many :readerships
+    has_many :books, through: :readerships
+  end
+
+  class Readership < ApplicationRecord
+    belongs_to :user
+    belongs_to :book, inverse_of: :readers
   end
 
   class Tag < ApplicationRecord
@@ -203,6 +224,9 @@ module Legacy
     attribute :name, :string
   end
 
+  class UserResource < ApplicationResource
+  end
+
   class BookResource < ApplicationResource
     attribute :author_id, :integer, only: :filterable
 
@@ -217,6 +241,7 @@ module Legacy
 
     belongs_to :genre
     many_to_many :tags
+    many_to_many :readers, resource: Legacy::UserResource
   end
 
   class StateResource < ApplicationResource

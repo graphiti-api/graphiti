@@ -1249,6 +1249,42 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
       end
 
+      context "when association name differs from source name" do
+        before do
+          Legacy::UserResource.class_eval do
+            many_to_many :books, resource: Legacy::BookResource
+          end
+          allow(Legacy::BookResource).to receive(:validate_endpoints?) { false }
+          allow(controller).to receive(:resource) { Legacy::BookResource }
+        end
+
+        after do
+          Legacy::UserResource.sideloads.delete(:books)
+        end
+
+        let!(:reader) { Legacy::User.create!(books: [book2]) }
+
+        it "correctly infers the filter name for the association from the inverse_of option" do
+          do_index({filter: {reader_id: reader.id}})
+
+          expect(d.map(&:id)).to eq([book2.id])
+        end
+
+        context "when the graphiti association manually sets inverse_filter" do
+          before do
+            Legacy::UserResource.class_eval do
+              many_to_many :books, resource: Legacy::BookResource, inverse_filter: :the_reader_id
+            end
+          end
+
+          it "overrides the inferred one" do
+            do_index({filter: {the_reader_id: reader.id}})
+
+            expect(d.map(&:id)).to eq([book2.id])
+          end
+        end
+      end
+
       context "when the table name does not match the association name" do
         before do
           Legacy::AuthorHobby.table_name = :author_hobby
