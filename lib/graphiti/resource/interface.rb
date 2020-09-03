@@ -23,6 +23,9 @@ module Graphiti
 
         # @api private
         def _find(params = {}, base_scope = nil)
+          guard_nil_id!(params[:data])
+          guard_nil_id!(params)
+
           id = params[:data].try(:[], :id) || params.delete(:id)
           params[:filter] ||= {}
           params[:filter][:id] = id if id
@@ -50,6 +53,13 @@ module Graphiti
             unless allow_request?(path, params, context_namespace)
               raise Errors::InvalidEndpoint.new(self, path, context_namespace)
             end
+          end
+        end
+
+        def guard_nil_id!(params)
+          return unless params
+          if params.key?(:id) && params[:id].nil?
+            raise Errors::UndefinedIDLookup.new(self)
           end
         end
       end

@@ -32,16 +32,16 @@ RSpec.describe "persistence" do
     expect(employee.data.first_name).to eq("Jane")
   end
 
-  describe 'updating' do
-    let!(:employee) { PORO::Employee.create(first_name: 'asdf') }
+  describe "updating" do
+    let!(:employee) { PORO::Employee.create(first_name: "asdf") }
 
     before do
       payload[:data][:id] = employee.id.to_s
     end
 
-    describe 'with scope override' do
-      it 'is honored' do
-        employee = klass.find(payload, { type: 'foo' })
+    describe "with scope override" do
+      it "is honored" do
+        employee = klass.find(payload, {type: "foo"})
         expect {
           employee.update_attributes
         }.to raise_error(Graphiti::Errors::RecordNotFound)
@@ -49,16 +49,16 @@ RSpec.describe "persistence" do
     end
   end
 
-  describe 'destroying' do
-    let!(:employee) { PORO::Employee.create(first_name: 'asdf') }
+  describe "destroying" do
+    let!(:employee) { PORO::Employee.create(first_name: "asdf") }
 
     before do
       payload[:data][:id] = employee.id.to_s
     end
 
-    describe 'with scope override' do
-      it 'is honored' do
-        employee = klass.find(payload, { type: 'foo' })
+    describe "with scope override" do
+      it "is honored" do
+        employee = klass.find(payload, {type: "foo"})
         expect {
           employee.destroy
         }.to raise_error(Graphiti::Errors::RecordNotFound)
