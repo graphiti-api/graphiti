@@ -1,6 +1,6 @@
-module Graphiti::Adapters::ActiveRecord::Inferrence
+module Graphiti::Adapters::ActiveRecord::Inference
   # If going AR to AR, use AR introspection
-  # If going AR to PORO, fall back to normal inferrence
+  # If going AR to PORO, fall back to normal inference
   def infer_foreign_key
     parent_model = parent_resource_class.model
     reflection = parent_model.reflections[association_name.to_s]

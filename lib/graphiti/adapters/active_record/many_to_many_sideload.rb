@@ -48,8 +48,7 @@ class Graphiti::Adapters::ActiveRecord::ManyToManySideload < Graphiti::Sideload:
 
   def filter_for(scope, value, type = nil)
     scope
-      .preload(through_relationship_name)
-      .joins(through_relationship_name)
+      .includes(through_relationship_name)
       .where(belongs_to_many_clause(value, type))
   end
 

@@ -1,5 +1,5 @@
 class Graphiti::Adapters::ActiveRecord::HasManySideload < Graphiti::Sideload::HasMany
-  include Graphiti::Adapters::ActiveRecord::Inferrence
+  include Graphiti::Adapters::ActiveRecord::Inference
 
   def default_base_scope
     resource_class.model.all
