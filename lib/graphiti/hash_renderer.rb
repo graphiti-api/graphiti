@@ -45,10 +45,10 @@ module Graphiti
       {}.tap do |hash|
         hash[:data] = if serializers.is_a?(Array)
           serializers.map do |s|
-            s.to_hash(opts)
+            s.to_hash(**opts)
           end
         else
-          serializers.to_hash(opts)
+          serializers.to_hash(**opts)
         end
       end
     end

@@ -44,7 +44,7 @@ module Graphiti
           Graphiti::Errors::UnknownAttribute
 
         if raise_error?(opts[:exists])
-          raise error_class.new(resource, name, flag, opts)
+          raise error_class.new(resource, name, flag, **opts)
         else
           false
         end

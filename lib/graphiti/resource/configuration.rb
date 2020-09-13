@@ -129,7 +129,7 @@ module Graphiti
         def get_attr(name, flag, opts = {})
           defaults = {request: false}
           opts = defaults.merge(opts)
-          new.get_attr(name, flag, opts)
+          new.get_attr(name, flag, **opts)
         end
 
         def abstract_class?
@@ -247,7 +247,7 @@ module Graphiti
 
       def get_attr!(name, flag, options = {})
         options[:raise_error] = true
-        get_attr(name, flag, options)
+        get_attr(name, flag, **options)
       end
 
       def get_attr(name, flag, request: false, raise_error: false)
