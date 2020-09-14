@@ -22,8 +22,8 @@ module Graphiti
       end
     end
 
-    def as_jsonapi(*)
-      super.tap do |hash|
+    def as_jsonapi(kwargs = {})
+      super(**kwargs).tap do |hash|
         strip_relationships!(hash) if strip_relationships?
         add_links!(hash)
       end

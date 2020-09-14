@@ -211,7 +211,7 @@ class Graphiti::Util::Persistence
       relationships: @relationships
     }.merge(only: only, except: except)
 
-    Graphiti::Util::RelationshipPayload.iterate(opts) do |x|
+    Graphiti::Util::RelationshipPayload.iterate(**opts) do |x|
       yield x
     end
   end

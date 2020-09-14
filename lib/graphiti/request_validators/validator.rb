@@ -51,7 +51,7 @@ module Graphiti
           relationships: relationships
         }
 
-        Graphiti::Util::RelationshipPayload.iterate(opts) do |x|
+        Graphiti::Util::RelationshipPayload.iterate(**opts) do |x|
           sideload_def = x[:sideload]
 
           unless sideload_def.writable?
