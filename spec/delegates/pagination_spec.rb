@@ -147,8 +147,8 @@ RSpec.describe Graphiti::Delegates::Pagination do
     end
 
     context "with stats[total]=count in request" do
-      let(:params) { super().merge!(stats: { total: 'count' }) }
-      let(:stats_map) { { total: { count: expected_item_count } } }
+      let(:params) { super().merge!(stats: {total: "count"}) }
+      let(:stats_map) { {total: {count: expected_item_count}} }
       before { allow(proxy).to receive(:stats).and_return(stats_map) }
 
       it "depends on proxy to get count" do
