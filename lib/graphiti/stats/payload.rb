@@ -31,14 +31,17 @@ module Graphiti
             stats[name] = {}
 
             each_calculation(name, calculation) do |calc, function|
-              args = [@scope, name]
-              args << @resource.context if function.arity >= 3
-              args << @data if function.arity == 4
-
-              stats[name][calc] = function.call(*args)
+              stats[name][calc] = calculate_stat(name, function)
             end
           end
         end
+      end
+
+      def calculate_stat(name, function)
+        args = [@scope, name]
+        args << @resource.context if function.arity >= 3
+        args << @data if function.arity == 4
+        function.call(*args)
       end
 
       private

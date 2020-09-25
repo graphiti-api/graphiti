@@ -27,4 +27,40 @@ RSpec.describe Graphiti::Stats::Payload do
       })
     end
   end
+
+  describe "#calculate_stat" do
+    let(:dsl) { Class.new(Graphiti::Resource).new }
+    let(:name) { :total }
+    let(:function) { dsl.stat(name, :count) }
+    let(:expected_count) { 108 }
+
+    context "with default scope and name argument" do
+      it "returns correct count" do
+        expect_any_instance_of(Graphiti::Adapters::Abstract).to receive(:count).with(scope, :total).and_return(expected_count)
+        expect(instance.calculate_stat(name, function)).to eq expected_count
+      end
+    end
+
+    context "with additional resource-context argument" do
+      let(:function) { double(arity: 3) }
+      let(:context) { double.as_null_object }
+      before { allow(dsl).to receive(:context).and_return(context) }
+
+      it "returns correct count" do
+        expect(function).to receive(:call).with(scope, name, context).and_return(expected_count)
+        expect(instance.calculate_stat(name, function)).to eq expected_count
+      end
+    end
+
+    context "with additional resource-context and data argument" do
+      let(:function) { double(arity: 4) }
+      let(:context) { double.as_null_object }
+      before { allow(dsl).to receive(:context).and_return(context) }
+
+      it "returns correct count" do
+        expect(function).to receive(:call).with(scope, name, context, data).and_return(expected_count)
+        expect(instance.calculate_stat(name, function)).to eq expected_count
+      end
+    end
+  end
 end

@@ -129,16 +129,37 @@ RSpec.describe Graphiti::Delegates::Pagination do
     subject { instance.send(:item_count) }
     let(:expected_item_count) { 1 }
 
-    it "returns 0 if resource.stat(:total, :count) is nil" do
-      expect(proxy.scope).to receive(:unpaginated_object)
-      expect(proxy.resource).to receive(:stat).with(:total, :count).and_return(lambda { |obj, meth| nil })
-      expect(subject).to eq 0
+    context "without stats param in request" do
+      before { allow(proxy).to receive(:stats).and_return({}) }
+      before { allow(proxy).to receive(:data).and_return([]) }
+
+      it "returns 0 if resource.stat(:total, :count) is nil" do
+        expect(proxy.scope).to receive(:unpaginated_object)
+        expect(proxy.resource).to receive(:stat).with(:total, :count).and_return(lambda { |obj, meth| nil })
+        expect(subject).to eq 0
+      end
+
+      it "returns the value of resource.stat(:total, :count)" do
+        expect(proxy.scope).to receive(:unpaginated_object)
+        expect(proxy.resource).to receive(:stat).with(:total, :count).and_return(lambda { |obj, meth| expected_item_count })
+        expect(subject).to eq expected_item_count
+      end
     end
 
-    it "returns the value of resource.stat(:total, :count)" do
-      expect(proxy.scope).to receive(:unpaginated_object)
-      expect(proxy.resource).to receive(:stat).with(:total, :count).and_return(lambda { |obj, meth| expected_item_count })
-      expect(subject).to eq expected_item_count
+    context "with stats[total]=count in request" do
+      let(:params) { super().merge!(stats: { total: 'count' }) }
+      let(:stats_map) { { total: { count: expected_item_count } } }
+      before { allow(proxy).to receive(:stats).and_return(stats_map) }
+
+      it "depends on proxy to get count" do
+        expect(instance).to receive(:item_count_from_proxy).and_call_original
+        expect(instance).not_to receive(:item_count_from_stats)
+        subject
+      end
+
+      it "returns the correct value of item count" do
+        expect(subject).to eq expected_item_count
+      end
     end
   end
 end
