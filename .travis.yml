@@ -19,7 +19,13 @@ env:
   - COMMAND="standardrb --no-fix --format progress"
   - COMMAND=rspec
   - COMMAND=rspec APPRAISAL_INITIALIZED=true
-matrix:
+jobs:
+  allow_failures:
+  - rvm: ruby-head
+  include:
+    - env: COMMAND=rspec
+      gemfile: Gemfile
+      rvm: ruby-head
   exclude:
     # Don't run the appraisal version of the specs for the base gemfile
     - env: COMMAND=rspec APPRAISAL_INITIALIZED=true
