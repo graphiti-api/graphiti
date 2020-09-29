@@ -1,7 +1,7 @@
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 
 Dir[File.dirname(__FILE__) + "/support/**/*.rb"].sort.each { |f| require f }
-require "pry"
+# require "pry"
 
 require "active_model"
 require "graphiti_spec_helpers/rspec"

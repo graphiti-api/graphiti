@@ -1,4 +1,5 @@
 require "spec_helper"
+require "pathname"
 
 RSpec.describe Graphiti::Configuration do
   RSpec.shared_context "with config" do |name|
