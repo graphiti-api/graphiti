@@ -4,6 +4,16 @@ RSpec.describe Graphiti::Delegates::Pagination do
   include_context "pagination_context"
   let(:instance) { described_class.new(proxy) }
 
+  describe "#links?" do
+    context "with empty data" do
+      before { allow(proxy).to receive(:data).and_return([]) }
+
+      it "returns false" do
+        expect(instance.links?).to eq(false)
+      end
+    end
+  end
+
   describe "#links" do
     subject { instance.links }
     before do
