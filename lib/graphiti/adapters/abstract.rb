@@ -1,6 +1,9 @@
 module Graphiti
   module Adapters
     class Abstract
+      require "graphiti/adapters/persistence/associations.rb"
+      include Graphiti::Adapters::Persistence::Associations
+
       attr_reader :resource
 
       def initialize(resource)
@@ -401,6 +404,10 @@ module Graphiti
       end
 
       def close
+      end
+
+      def persistence_attributes(persistance, attributes)
+        attributes
       end
 
       def self.numerical_operators
