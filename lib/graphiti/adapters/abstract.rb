@@ -400,6 +400,9 @@ module Graphiti
         raise "you must override #destroy in an adapter subclass"
       end
 
+      def close
+      end
+
       def self.numerical_operators
         [:eq, :not_eq, :gt, :gte, :lt, :lte].freeze
       end
