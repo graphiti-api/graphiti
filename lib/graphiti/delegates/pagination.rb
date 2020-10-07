@@ -53,7 +53,7 @@ module Graphiti
       def item_count
         begin
           return @item_count if @item_count
-          @item_count = @proxy.resource.stat(:total, :count).call(@proxy.scope.unpaginated_object, :total)
+          @item_count = item_count_from_proxy || item_count_from_stats
           unless @item_count.is_a?(Numeric)
             raise TypeError, "#{@proxy.resource}.stat(:total, :count) returned an invalid value #{@item_count}"
           end
@@ -66,6 +66,15 @@ module Graphiti
           @item_count = 0
         end
         @item_count
+      end
+
+      def item_count_from_proxy
+        @proxy.stats.dig(:total, :count)
+      end
+
+      def item_count_from_stats
+        stats = Stats::Payload.new(@proxy.resource, @proxy.query, @proxy.scope.unpaginated_object, @proxy.data)
+        stats.calculate_stat(:total, @proxy.resource.stat(:total, :count))
       end
 
       def current_page
