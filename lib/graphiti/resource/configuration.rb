@@ -149,14 +149,14 @@ module Graphiti
 
         def infer_type
           if name.present?
-            name.demodulize.gsub("Resource", "").underscore.pluralize.to_sym
+            name.demodulize.sub(/.*\KResource/, "").underscore.pluralize.to_sym
           else
             :undefined_jsonapi_type
           end
         end
 
         def infer_model
-          name&.gsub("Resource", "")&.safe_constantize
+          name&.sub(/.*\KResource/, "")&.safe_constantize
         end
 
         # @api private
