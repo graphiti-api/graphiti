@@ -297,6 +297,10 @@ module Graphiti
         model_instance
       end
 
+      def close
+        ActiveRecord::Base.clear_active_connections!
+      end
+
       private
 
       def column_for(scope, name)

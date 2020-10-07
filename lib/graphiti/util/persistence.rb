@@ -14,6 +14,7 @@ class Graphiti::Util::Persistence
     @relationships = relationships
     @caller_model = caller_model
     @foreign_key = foreign_key
+    @adapter = @resource.adapter
 
     # Find the correct child resource for a given jsonapi type
     if (meta_type = @meta[:type].try(:to_sym))
@@ -43,18 +44,16 @@ class Graphiti::Util::Persistence
   #
   # @return a model instance
   def run
-    parents = process_belongs_to(@relationships)
-    update_foreign_key_for_parents(parents)
+    attributes = @adapter.persistence_attributes(self, @attributes)
 
-    persisted = persist_object(@meta[:method], @attributes)
+    parents = @adapter.process_belongs_to(self, attributes)
+    persisted = persist_object(@meta[:method], attributes)
     @resource.decorate_record(persisted)
     assign_temp_id(persisted, @meta[:temp_id])
 
     associate_parents(persisted, parents)
 
-    children = process_has_many(@relationships, persisted) { |x|
-      update_foreign_key(persisted, x[:attributes], x)
-    }
+    children = @adapter.process_has_many(self, persisted)
 
     associate_children(persisted, children) unless @meta[:method] == :destroy
 
@@ -69,43 +68,21 @@ class Graphiti::Util::Persistence
     persisted
   end
 
+  def iterate(only: [], except: [])
+    opts = {
+      resource: @resource,
+      relationships: @relationships
+    }.merge(only: only, except: except)
+
+    Graphiti::Util::RelationshipPayload.iterate(**opts) do |x|
+      yield x
+    end
+  end
+
   private
 
   def add_hook(prc, lifecycle_event)
     ::Graphiti::Util::TransactionHooksRecorder.add(prc, lifecycle_event)
-  end
-
-  # The child's attributes should be modified to nil-out the
-  # foreign_key when the parent is being destroyed or disassociated
-  #
-  # This is not the case for HABTM, whose "foreign key" is a join table
-  def update_foreign_key(parent_object, attrs, x)
-    return if x[:sideload].type == :many_to_many
-
-    if [:destroy, :disassociate].include?(x[:meta][:method])
-      if x[:sideload].polymorphic_has_one? || x[:sideload].polymorphic_has_many?
-        attrs[:"#{x[:sideload].polymorphic_as}_type"] = nil
-      end
-      attrs[x[:foreign_key]] = nil
-      update_foreign_type(attrs, x, null: true) if x[:is_polymorphic]
-    else
-      if x[:sideload].polymorphic_has_one? || x[:sideload].polymorphic_has_many?
-        attrs[:"#{x[:sideload].polymorphic_as}_type"] = parent_object.class.name
-      end
-      attrs[x[:foreign_key]] = parent_object.send(x[:primary_key])
-      update_foreign_type(attrs, x) if x[:is_polymorphic]
-    end
-  end
-
-  def update_foreign_type(attrs, x, null: false)
-    grouping_field = x[:sideload].parent.grouper.field_name
-    attrs[grouping_field] = null ? nil : x[:sideload].group_name
-  end
-
-  def update_foreign_key_for_parents(parents)
-    parents.each do |x|
-      update_foreign_key(x[:object], @attributes, x)
-    end
   end
 
   def associate_parents(object, parents)
@@ -161,35 +138,6 @@ class Graphiti::Util::Persistence
     end
   end
 
-  def process_has_many(relationships, caller_model)
-    [].tap do |processed|
-      iterate(except: [:polymorphic_belongs_to, :belongs_to]) do |x|
-        yield x
-
-        x[:object] = x[:resource]
-          .persist_with_relationships(x[:meta], x[:attributes], x[:relationships], caller_model, x[:foreign_key])
-
-        processed << x
-      end
-    end
-  end
-
-  def process_belongs_to(relationships)
-    [].tap do |processed|
-      iterate(only: [:polymorphic_belongs_to, :belongs_to]) do |x|
-        begin
-          id = x.dig(:attributes, :id)
-          x[:object] = x[:resource]
-            .persist_with_relationships(x[:meta], x[:attributes], x[:relationships])
-          processed << x
-        rescue Graphiti::Errors::RecordNotFound
-          path = "relationships/#{x.dig(:meta, :jsonapi_type)}"
-          raise Graphiti::Errors::RecordNotFound.new(x[:sideload].name, id, path)
-        end
-      end
-    end
-  end
-
   def post_process(caller_model, processed)
     groups = processed.group_by { |x| x[:meta][:method] }
     groups.each_pair do |method, group|
@@ -203,17 +151,6 @@ class Graphiti::Util::Persistence
 
   def assign_temp_id(object, temp_id)
     object.instance_variable_set(:@_jsonapi_temp_id, temp_id)
-  end
-
-  def iterate(only: [], except: [])
-    opts = {
-      resource: @resource,
-      relationships: @relationships
-    }.merge(only: only, except: except)
-
-    Graphiti::Util::RelationshipPayload.iterate(**opts) do |x|
-      yield x
-    end
   end
 
   def metadata

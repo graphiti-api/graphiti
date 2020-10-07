@@ -93,6 +93,28 @@ RSpec.describe Graphiti::Scope do
         instance.resolve_sideloads(results)
       end
 
+      context "with concurrency" do
+        before { allow(Graphiti.config).to receive(:concurrency).and_return(true) }
+
+        it "closes db connections" do
+          allow(sideload).to receive(:resolve).and_return(sideload)
+
+          expect(resource.adapter).to receive(:close)
+          instance.resolve_sideloads(results)
+        end
+      end
+
+      context "without concurrency" do
+        before { allow(Graphiti.config).to receive(:concurrency).and_return(false) }
+
+        it "does not close db connection" do
+          allow(sideload).to receive(:resolve).and_return(sideload)
+
+          expect(resource.adapter).not_to receive(:close)
+          instance.resolve_sideloads(results)
+        end
+      end
+
       context "but no parents were found" do
         let(:results) { [] }
 
