@@ -1501,7 +1501,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
-    context "when base_scope is set" do
+    context "when select statement is specified" do
       before do
         Legacy::AuthorResource.class_eval do
           def base_scope
