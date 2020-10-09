@@ -191,7 +191,7 @@ module Graphiti
       # (see Adapters::Abstract#count)
       def count(scope, attr)
         if attr.to_sym == :total
-          scope.distinct.count
+          scope.distinct.count(:all)
         else
           scope.distinct.count(attr)
         end

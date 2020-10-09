@@ -1500,5 +1500,20 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(included("states").length).to eq(1)
       end
     end
+
+    context "when base_scope is set" do
+      before do
+        Legacy::AuthorResource.class_eval do
+          def base_scope
+            Legacy::Author.select("*", "id as id_1")
+          end
+        end
+      end
+
+      it "can query stats total count" do
+        do_index({stats: {total: "count"}})
+        expect(d.map(&:id)).to eq([author1.id, author2.id])
+      end
+    end
   end
 end
