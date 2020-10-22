@@ -298,7 +298,7 @@ module Graphiti
       end
 
       def close
-        ActiveRecord::Base.clear_active_connections!
+        ::ActiveRecord::Base.clear_active_connections!
       end
 
       private
