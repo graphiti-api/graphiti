@@ -1194,8 +1194,8 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         after do
           Legacy::AuthorResource.sideloads[:hobbies] = @orig_sideload
-          Legacy::AuthorResource.filters[:author_id] = @orig_filter
-          Legacy::AuthorResource.attributes[:author_id] = @orig_attr
+          Legacy::HobbyResource.filters[:author_id] = @orig_filter
+          Legacy::HobbyResource.attributes[:author_id] = @orig_attr
         end
 
         it "derives the foreign key directly" do
@@ -1287,6 +1287,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       context "when the table name does not match the association name" do
         before do
+          @orig_filter = Legacy::HobbyResource.filters.delete(:author_id)
           Legacy::AuthorHobby.table_name = :author_hobby
           Legacy::AuthorResource.class_eval do
             many_to_many :hobbies
@@ -1294,6 +1295,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         after do
+          Legacy::HobbyResource.filters[:author_id] = @orig_filter
           Legacy::AuthorHobby.table_name = :author_hobbies
           Legacy::AuthorResource.class_eval do
             many_to_many :hobbies
@@ -1307,6 +1309,51 @@ if ENV["APPRAISAL_INITIALIZED"]
           do_index({include: "hobbies"})
           expect(included("hobbies").map(&:id))
             .to eq([other_table_hobby1.id, other_table_hobby2.id])
+        end
+      end
+
+      context "when filter already exists and it is wrong" do
+        let(:existing_filter) {
+          {:aliases=>[:author_id],
+           :name=>:author_id,
+           :type=>:integer_id,
+           :allow=>nil,
+           :deny=>nil,
+           :single=>false,
+           :dependencies=>nil,
+           :required=>false,
+           :operators=>
+             {:eq=>nil, :not_eq=>nil, :gt=>nil, :gte=>nil, :lt=>nil, :lte=>nil},
+                :allow_nil=>false,
+              :deny_empty=>false}
+        }
+
+        before do
+          @orig_filter = Legacy::HobbyResource.filters[:author_id]
+          Legacy::HobbyResource.filters[:author_id] = existing_filter
+          Legacy::AuthorResource.class_eval do
+            many_to_many :hobbies
+          end
+          Legacy::AuthorHobby.class_eval do
+            belongs_to :author
+            belongs_to :hobby
+          end
+          Legacy::AuthorHobby.table_name = :author_hobby
+          Legacy::AuthorResource.class_eval do
+            many_to_many :hobbies
+          end
+        end
+
+        after do
+          Legacy::HobbyResource.filters[:author_id] = @orig_filter
+          Legacy::AuthorHobby.table_name = :author_hobbies
+          Legacy::AuthorResource.class_eval do
+            many_to_many :hobbies
+          end
+        end
+
+        it "does not recreate the filter so it raises an error" do
+          expect { do_index({include: "hobbies"}) }.to raise_error(ActiveRecord::StatementInvalid)
         end
       end
 
