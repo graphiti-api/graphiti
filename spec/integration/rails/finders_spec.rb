@@ -1314,18 +1314,20 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       context "when filter already exists and it is wrong" do
         let(:existing_filter) {
-          {:aliases=>[:author_id],
-           :name=>:author_id,
-           :type=>:integer_id,
-           :allow=>nil,
-           :deny=>nil,
-           :single=>false,
-           :dependencies=>nil,
-           :required=>false,
-           :operators=>
-             {:eq=>nil, :not_eq=>nil, :gt=>nil, :gte=>nil, :lt=>nil, :lte=>nil},
-                :allow_nil=>false,
-              :deny_empty=>false}
+          {
+            aliases: [:author_id],
+            name: :author_id,
+            type: :integer_id,
+            allow: nil,
+            deny: nil,
+            single: false,
+            dependencies: nil,
+            required: false,
+            operators:
+              {eq: nil, not_eq: nil, gt: nil, gte: nil, lt: nil, lte: nil},
+            allow_nil: false,
+            deny_empty: false
+          }
         }
 
         before do
