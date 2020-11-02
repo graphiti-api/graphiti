@@ -36,9 +36,12 @@ class Graphiti::Sideload::ManyToMany < Graphiti::Sideload::HasMany
     self_ref = self
     fk_type = parent_resource_class.attributes[:id][:type]
     fk_type = :hash if polymorphic?
-    resource_class.filter inverse_filter, fk_type do
-      eq do |scope, value|
-        self_ref.belongs_to_many_filter(scope, value)
+    # Do not recreate if filter already exists
+    unless resource_class.config[:filters].has_key?(inverse_filter.to_sym)
+      resource_class.filter inverse_filter, fk_type do
+        eq do |scope, value|
+          self_ref.belongs_to_many_filter(scope, value)
+        end
       end
     end
   end
