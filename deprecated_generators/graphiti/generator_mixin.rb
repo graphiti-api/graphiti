@@ -12,6 +12,7 @@ module Graphiti
     def api_namespace
       @api_namespace ||= begin
         ns = graphiti_config["namespace"]
+        ns.delete_suffix("/")
 
         if ns.blank?
           ns = prompt \
