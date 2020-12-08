@@ -700,7 +700,12 @@ if ENV["APPRAISAL_INITIALIZED"]
               positions: {
                 data: [
                   {type: "positions", 'temp-id': "pos1", method: "create"},
-                  {type: "positions", 'temp-id': "pos2", method: "create"}
+                  {type: "positions", 'temp-id': "pos2", method: "create"},
+                ]
+              },
+              teams: {
+                data: [
+                  {type: "teams", 'temp-id': "team1", method: "create"}
                 ]
               }
             }
@@ -725,6 +730,11 @@ if ENV["APPRAISAL_INITIALIZED"]
               type: "positions",
               'temp-id': "pos2",
               attributes: {title: "manager"}
+            },
+            {
+              type: "teams",
+              'temp-id': "team1",
+              attributes: {name: "team"}
             }
           ]
         }
@@ -737,37 +747,43 @@ if ENV["APPRAISAL_INITIALIZED"]
         employee = Employee.first
         positions = employee.positions
         department = employee.positions[0].department
+        team = employee.teams[0]
 
         expect(employee.first_name).to eq("Joe")
         expect(positions.length).to eq(2)
         expect(positions[0].title).to eq("specialist")
         expect(positions[1].title).to eq("manager")
         expect(department.name).to eq("safety")
+        expect(team.name).to eq("team")
       end
 
       context "when a has_many relationship has validation error" do
         around do |e|
           begin
             Position.validates :title, presence: true
+            Team.validates :name, presence: true
             e.run
           ensure
             Position.clear_validators!
+            Team.clear_validators!
           end
         end
 
         before do
           payload[:included][0][:attributes].delete(:title)
+          payload[:included][3][:attributes].delete(:name)
         end
 
         it "rolls back the entire transaction" do
           expect {
             make_request
-          }.to_not(change { Employee.count + Position.count + Department.count })
-          error = json["errors"].find do |err|
+          }.to_not(change { Employee.count + Position.count + Department.count + Team.count })
+
+          position_error = json["errors"].find do |err|
             err.fetch("meta", {}).fetch("relationship", {}).fetch("type", nil) == "positions"
           end
 
-          expect(error).to match(
+          expect(position_error).to match(
             "code" => "unprocessable_entity",
             "detail" => "Title can't be blank",
             "meta" => {
@@ -780,6 +796,27 @@ if ENV["APPRAISAL_INITIALIZED"]
               )
             },
             "source" => {"pointer" => "/data/attributes/title"},
+            "status" => "422",
+            "title" => "Validation Error"
+          )
+
+          team_error = json["errors"].find do |err|
+            err.fetch("meta", {}).fetch("relationship", {}).fetch("type", nil) == "teams"
+          end
+
+          expect(team_error).to match(
+            "code" => "unprocessable_entity",
+            "detail" => "Name can't be blank",
+            "meta" => {
+              "relationship" => hash_including(
+                "attribute" => "name",
+                "message" => "can't be blank",
+                "name" => "teams",
+                "temp-id" => "team1",
+                "type" => "teams"
+              )
+            },
+            "source" => {"pointer" => "/data/attributes/name"},
             "status" => "422",
             "title" => "Validation Error"
           )

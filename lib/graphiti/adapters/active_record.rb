@@ -241,7 +241,16 @@ module Graphiti
             if association_type == :many_to_many &&
                 [:create, :update].include?(Graphiti.context[:namespace]) &&
                 !parent.send(association_name).exists?(child.id)
-              parent.send(association_name) << child
+              target = parent.send(association_name)
+              if child.persisted?
+                target << child
+              else
+                new_child = target.create(child.attributes)
+
+                child.instance_variables.each do |variable|
+                  new_child.instance_variable_set(variable, child.instance_variable_get(variable))
+                end
+              end
             else
               target = association.instance_variable_get(:@target)
               target |= [child]
