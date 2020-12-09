@@ -700,7 +700,7 @@ if ENV["APPRAISAL_INITIALIZED"]
               positions: {
                 data: [
                   {type: "positions", 'temp-id': "pos1", method: "create"},
-                  {type: "positions", 'temp-id': "pos2", method: "create"},
+                  {type: "positions", 'temp-id': "pos2", method: "create"}
                 ]
               },
               teams: {
