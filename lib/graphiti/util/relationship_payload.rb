@@ -5,14 +5,14 @@ module Graphiti
     class RelationshipPayload
       attr_reader :resource, :payload
 
-      def self.iterate(resource:, relationships: {}, only: [], except: [])
+      def self.iterate(resource:, relationships: {}, only: {}, except: {})
         instance = new(resource, relationships, only: only, except: except)
         instance.iterate do |sideload, relationship_data, sub_relationships|
           yield sideload, relationship_data, sub_relationships
         end
       end
 
-      def initialize(resource, payload, only: [], except: [])
+      def initialize(resource, payload, only: {}, except: {})
         @resource = resource
         @payload = payload
         @only = only
@@ -22,13 +22,17 @@ module Graphiti
       def iterate
         payload.each_pair do |relationship_name, relationship_payload|
           if (sl = resource.class.sideload(relationship_name.to_sym))
-            if should_yield?(sl.type)
+            if should_yield_relationship_type?(sl.type)
               if relationship_payload.is_a?(Array)
                 relationship_payload.each do |rp|
-                  yield payload_for(sl, rp)
+                  if should_yield_method_type?(rp.fetch(:meta, {})[:method] || :update)
+                    yield payload_for(sl, rp)
+                  end
                 end
               else
-                yield payload_for(sl, relationship_payload)
+                if should_yield_method_type?(relationship_payload.fetch(:meta, {})[:method] || :update)
+                  yield payload_for(sl, relationship_payload)
+                end
               end
             end
           end
@@ -37,10 +41,32 @@ module Graphiti
 
       private
 
-      def should_yield?(type)
-        (@only.length == 0 && @except.length == 0) ||
-          (@only.length > 0 && @only.include?(type)) ||
-          (@except.length > 0 && !@except.include?(type))
+      def only_relationship_types
+        @only[:relationship_types] || []
+      end
+
+      def except_relationship_types
+        @except[:relationship_types] || []
+      end
+
+      def only_method_types
+        @only[:method_types] || []
+      end
+
+      def except_method_types
+        @except[:method_types] || []
+      end
+
+      def should_yield_method_type?(type)
+        (only_method_types.length == 0 && except_method_types.length == 0) ||
+          (only_method_types.length > 0 && only_method_types.include?(type)) ||
+          (except_method_types.length > 0 && !except_method_types.include?(type))
+      end
+
+      def should_yield_relationship_type?(type)
+        (only_relationship_types.length == 0 && except_relationship_types.length == 0) ||
+          (only_relationship_types.length > 0 && only_relationship_types.include?(type)) ||
+          (except_relationship_types.length > 0 && !except_relationship_types.include?(type))
       end
 
       def payload_for(sideload, relationship_payload)
