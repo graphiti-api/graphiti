@@ -2,6 +2,21 @@ module Graphiti
   module Errors
     class Base < StandardError; end
 
+    class NullRelation
+      extend ActiveModel::Naming
+      attr_accessor :id, :errors, :pointer
+
+      def initialize(id, pointer)
+        @id = id
+        @pointer = pointer
+        @errors = ActiveModel::Errors.new(self)
+      end
+
+      def self.human_attribute_name(attr, options = {})
+        attr
+      end
+    end
+
     class AdapterNotImplemented < Base
       def initialize(adapter, attribute, method)
         @adapter = adapter

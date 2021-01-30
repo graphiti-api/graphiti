@@ -853,6 +853,81 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
       end
 
+      context "when associating to a nonexistant record" do
+        context "and raise_on_missing_sidepost is false" do
+          before do
+            Graphiti.config.raise_on_missing_sidepost = false
+          end
+
+          after do
+            Graphiti.config.raise_on_missing_sidepost = true
+          end
+
+          let(:payload) do
+            {
+              data: {
+                type: "employees",
+                attributes: {first_name: "Joe"},
+                relationships: {
+                  classification: {
+                    data: {
+                      type: "classifications", id: "99999"
+                    }
+                  }
+                }
+              }
+            }
+          end
+
+          it "returns validation error" do
+            make_request
+            if ::Rails::VERSION::MAJOR == 4
+              expect(json.deep_symbolize_keys).to eq({
+                errors: [{
+                  code: "unprocessable_entity",
+                  status: "422",
+                  title: "Validation Error",
+                  detail: "translation missing: en.could not be found",
+                  source: {pointer: nil},
+                  meta: {
+                    relationship: {
+                      attribute: "base",
+                      message: "translation missing: en.could not be found",
+                      name: "classification",
+                      type: "classifications",
+                      id: "99999"
+                    }
+                  }
+                }]
+              })
+            else
+              expect(json.deep_symbolize_keys).to eq({
+                errors: [{
+                  code: "unprocessable_entity",
+                  status: "422",
+                  title: "Validation Error",
+                  detail: "could not be found",
+                  source: {pointer: nil},
+                  meta: {
+                    relationship: {
+                      attribute: "base",
+                      message: "could not be found",
+                      code: "not_found",
+                      name: "classification",
+                      type: "classifications",
+                      id: "99999"
+                    }
+                  }
+                }]
+              })
+            end
+          end
+        end
+
+        context "and raise_on_missing_sidepost is true" do
+        end
+      end
+
       context "when no method specified" do
         let!(:position) { Position.create!(title: "specialist") }
         let!(:department) { Department.create!(name: "safety") }
