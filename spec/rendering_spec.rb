@@ -239,6 +239,86 @@ RSpec.describe "serialization" do
         })
       end
     end
+
+    context "when the resource is polymorphic" do
+      let!(:visa) { PORO::Visa.create(number: '1') }
+      let!(:gold_visa) { PORO::GoldVisa.create(number: '2') }
+      let!(:mastercard) { PORO::Mastercard.create(number: '3') }
+
+      context "with sparse fieldsets" do
+        let(:json) do
+          JSON.parse(PORO::CreditCardResource.all(cc_params).to_json)
+        end
+
+        context "when only child specified" do
+          let(:cc_params) { { fields: { mastercards: 'description' } } }
+
+          it "works" do
+            expect(json["data"]).to eq([
+              {
+                "id" => "1",
+                "number" => 1,
+                "description" => "visa description",
+                "visa_only_attr" => "visa only"
+              },
+              {
+                "id" => "1",
+                "number" => 2,
+                "description" => "visa description",
+                "visa_only_attr" => "visa only"
+              },
+              {
+                "id" => "1",
+                "description" => "mastercard description"
+              }
+            ])
+          end
+        end
+
+        context "when only parent specified" do
+          let(:cc_params) { { fields: { credit_cards: 'number' } } }
+
+          it "works" do
+            expect(json["data"]).to eq([
+              {
+                "id" => "1",
+                "number" => 1,
+              },
+              {
+                "id" => "1",
+                "number" => 2,
+              },
+              {
+                "id" => "1",
+                "number" => 3,
+              }
+            ])
+          end
+        end
+
+        context "when both parent and child are specified" do
+          let(:cc_params) { { fields: { credit_cards: 'number', mastercards: 'description' } } }
+
+          it "combines the types" do
+            expect(json["data"]).to eq([
+              {
+                "id" => "1",
+                "number" => 1,
+              },
+              {
+                "id" => "1",
+                "number" => 2,
+              },
+              {
+                "id" => "1",
+                "number" => 3,
+                "description" => "mastercard description",
+              }
+            ])
+          end
+        end
+      end
+    end
   end
 
   context "when rendering xml" do

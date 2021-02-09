@@ -13,6 +13,7 @@ module PORO
             teams: [],
             paypals: [],
             visas: [],
+            gold_visas: [],
             mastercards: [],
             visa_rewards: [],
             books: [],
@@ -405,7 +406,7 @@ module PORO
     self.polymorphic = %w[PORO::VisaResource PORO::GoldVisaResource PORO::MastercardResource]
 
     def base_scope
-      {type: [:visas, :mastercards]}
+      {type: [:visas, :gold_visas, :mastercards]}
     end
 
     attribute :number, :integer

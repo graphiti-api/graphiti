@@ -6,6 +6,15 @@ module Graphiti
         if fields_list.nil?
           fields_list = fields[name_chain.join('.').to_sym]
         end
+
+        # polymorphic resources
+        if @resource.respond_to?(:type) && @resource.type != jsonapi_type
+          if fields[@resource.type]
+            fields_list ||= []
+            fields_list |= fields[@resource.type]
+          end
+        end
+
         attrs = requested_attributes(fields_list).each_with_object({}) { |(k, v), h|
           h[k] = instance_eval(&v)
         }
