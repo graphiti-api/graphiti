@@ -212,7 +212,7 @@ module PORO
   end
 
   class Department < Base
-    attr_accessor :name
+    attr_accessor :name, :description
   end
 
   class Bio < Base
@@ -395,6 +395,7 @@ module PORO
 
   class DepartmentResource < ApplicationResource
     attribute :name, :string
+    attribute :description, :string
   end
 
   class BioResource < ApplicationResource

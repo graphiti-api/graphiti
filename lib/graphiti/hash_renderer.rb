@@ -1,22 +1,30 @@
 module Graphiti
   module SerializableHash
-    def to_hash(fields: nil, include: {})
+    def to_hash(fields: nil, include: {}, name_chain: [])
       {}.tap do |hash|
         fields_list = fields[jsonapi_type] if fields
+        if fields_list.nil?
+          fields_list = fields[name_chain.join('.').to_sym]
+        end
         attrs = requested_attributes(fields_list).each_with_object({}) { |(k, v), h|
           h[k] = instance_eval(&v)
         }
         rels = @_relationships.select { |k, v| !!include[k] }
         rels.each_with_object({}) do |(k, v), h|
           serializers = v.send(:resources)
+          name_chain << k unless name_chain.last == k
           attrs[k] = if serializers.is_a?(Array)
             serializers.map do |rr| # use private method to avoid array casting
-              rr.to_hash(fields: fields, include: include[k])
+              rr.to_hash(fields: fields, include: include[k], name_chain: name_chain)
             end
           elsif serializers.nil?
-            nil
+            if @resource.class.sideload(k).type.to_s.include?('_many')
+              []
+            else
+              nil
+            end
           else
-            serializers.to_hash(fields: fields, include: include[k])
+            serializers.to_hash(fields: fields, include: include[k], name_chain: name_chain)
           end
         end
 

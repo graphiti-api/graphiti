@@ -34,10 +34,10 @@ RSpec.describe "serialization" do
                           department_id: 2
   end
   let!(:department1) do
-    PORO::Department.create(name: "dep1")
+    PORO::Department.create(name: "dep1", description: 'dep1desc')
   end
   let!(:department2) do
-    PORO::Department.create(name: "dep2")
+    PORO::Department.create(name: "dep2", description: 'dep2desc')
   end
 
   before do
@@ -131,14 +131,36 @@ RSpec.describe "serialization" do
           "id" => "1",
           "title" => "title1",
           "rank" => 1,
-          "department" => {"id" => "1", "name" => "dep1"}
+          "department" => {"id" => "1", "name" => "dep1", "description" => "dep1desc" }
         ])
         expect(json[1]["positions"]).to eq([
           "id" => "2",
           "title" => "title2",
           "rank" => 2,
-          "department" => {"id" => "2", "name" => "dep2"}
+          "department" => {"id" => "2", "name" => "dep2", "description" => "dep2desc" }
         ])
+      end
+
+      context "and the relationship is empty" do
+        context "for a to_many" do
+          before do
+            PORO::DB.data[:positions] = []
+          end
+
+          it "renders empty array" do
+            expect(json[0]["positions"]).to eq([])
+          end
+        end
+
+        context "for a to_one" do
+          before do
+            PORO::DB.data[:departments] = []
+          end
+
+          it "renders nil" do
+            expect(json[0]["positions"][0]['department']).to be_nil
+          end
+        end
       end
     end
 
@@ -150,6 +172,32 @@ RSpec.describe "serialization" do
       it "works" do
         expect(json[0].keys).to eq(%w[id first_name positions])
         expect(json[0]["positions"][0].keys).to eq(%w[id rank department])
+      end
+
+      context "on a relationship" do
+        context "via type" do
+          before do
+            params[:include] = 'positions,positions.department'
+            params[:fields] = { departments: 'description' }
+          end
+
+          it "works" do
+            expect(json[0]['positions'][0]['department'])
+              .to eq({ 'description' => 'dep1desc', 'id' => '1' })
+          end
+        end
+
+        context "via dot syntax" do
+          before do
+            params[:include] = 'positions,positions.department'
+            params[:fields] = { :'positions.department' => 'description' }
+          end
+
+          it "works" do
+            expect(json[0]['positions'][0]['department'])
+              .to eq({ 'description' => 'dep1desc', 'id' => '1' })
+          end
+        end
       end
     end
 
@@ -223,13 +271,13 @@ RSpec.describe "serialization" do
           "id" => "1",
           "title" => "title1",
           "rank" => 1,
-          "department" => {"id" => "1", "name" => "dep1"}
+          "department" => {"id" => "1", "name" => "dep1", "description" => "dep1desc" }
         ])
         expect(xml[1]["positions"]).to eq([
           "id" => "2",
           "title" => "title2",
           "rank" => 2,
-          "department" => {"id" => "2", "name" => "dep2"}
+          "department" => {"id" => "2", "name" => "dep2", "description" => "dep2desc" }
         ])
       end
     end
