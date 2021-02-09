@@ -2,13 +2,14 @@
 module Graphiti
   module Util
     class RemoteParams
-      def self.generate(resource, query)
-        new(resource, query).generate
+      def self.generate(resource, query, foreign_key)
+        new(resource, query, foreign_key).generate
       end
 
-      def initialize(resource, query)
+      def initialize(resource, query, foreign_key)
         @resource = resource
         @query = query
+        @foreign_key = foreign_key
         @sorts = []
         @filters = {}
         @fields = {}
@@ -97,7 +98,11 @@ module Graphiti
         return unless fields
 
         fields.each_pair do |type, attrs|
-          @fields[type] = attrs.join(",")
+          all_attrs = attrs
+          if @foreign_key
+            all_attrs |= [@foreign_key]
+          end
+          @fields[type] = all_attrs.join(",")
         end
       end
 

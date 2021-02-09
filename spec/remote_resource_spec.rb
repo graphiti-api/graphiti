@@ -663,10 +663,25 @@ RSpec.describe "remote resources" do
       end
 
       it "honors the param manipulation" do
-        url = "http://foo.com/api/v1/positions?fields[positions]=title,active&filter[employee_id]=99999&page[size]=2&sort=-foo"
+        url = "http://foo.com/api/v1/positions?fields[positions]=title,active,employee_id&filter[employee_id]=99999&page[size]=2&sort=-foo"
         expect(Faraday).to receive(:get)
           .with(url, anything, anything)
         klass.all(include: "positions").data
+      end
+    end
+
+    context "and specifying fields" do
+      context "for a has_many relationship" do
+        before do
+          klass.has_many :positions, remote: "http://foo.com/api/v1/positions"
+        end
+
+        it "adds the foreign key to the fields, otherwise it wouldn't work" do
+          url = "http://foo.com/api/v1/positions?fields[positions]=title,active,employee_id&filter[employee_id]=1&page[size]=999"
+          expect(Faraday).to receive(:get)
+            .with(url, anything, anything)
+          klass.all(include: "positions", fields: { positions: "title,active" }).data
+        end
       end
     end
   end

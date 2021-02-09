@@ -31,7 +31,7 @@ module Graphiti
       end
 
       def before_resolve(scope, query)
-        scope[:params] = Util::RemoteParams.generate(self, query)
+        scope[:params] = Util::RemoteParams.generate(self, query, scope[:foreign_key])
         scope
       end
 

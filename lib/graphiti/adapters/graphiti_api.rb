@@ -34,7 +34,7 @@ module Graphiti
 
       def build_url(scope)
         url = resource.remote_url
-        params = scope[:params].merge(scope.except(:params))
+        params = scope[:params].merge(scope.except(:params, :foreign_key))
         params[:page] ||= {}
         params[:page][:size] ||= 999
         params = CGI.unescape(params.to_query)
