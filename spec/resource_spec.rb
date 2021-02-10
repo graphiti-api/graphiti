@@ -28,10 +28,11 @@ RSpec.describe Graphiti::Resource do
         expect(klass.filters_deny_empty_by_default).to eq(false)
       end
 
-      it "does not have serializer, type, or model" do
+      it "does not have serializer, type, model, or graphql_entrypoint" do
         expect(klass.serializer).to be_nil
         expect(klass.type).to be_nil
         expect(klass.model).to be_nil
+        expect(klass.graphql_entrypoint).to be_nil
       end
 
       it "adds to global list of resources" do
@@ -50,11 +51,12 @@ RSpec.describe Graphiti::Resource do
         Class.new(app_resource)
       end
 
-      it "infers serializer and type" do
+      it "infers serializer, type, and graphql_entrypoint" do
         expect(klass.serializer.ancestors[3])
           .to eq(Graphiti::Serializer)
         # This class has no name
         expect(klass.type).to eq(:undefined_jsonapi_type)
+        expect(klass.graphql_entrypoint).to eq(:undefined_jsonapi_types)
       end
 
       it "inherits defaults" do

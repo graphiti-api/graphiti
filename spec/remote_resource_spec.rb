@@ -680,7 +680,7 @@ RSpec.describe "remote resources" do
           url = "http://foo.com/api/v1/positions?fields[positions]=title,active,employee_id&filter[employee_id]=1&page[size]=999"
           expect(Faraday).to receive(:get)
             .with(url, anything, anything)
-          klass.all(include: "positions", fields: { positions: "title,active" }).data
+          klass.all(include: "positions", fields: {positions: "title,active"}).data
         end
       end
     end

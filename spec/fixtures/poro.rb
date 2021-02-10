@@ -179,6 +179,7 @@ module PORO
       :age,
       :active,
       :positions,
+      :important_positions,
       :current_position,
       :bio,
       :teams,
@@ -205,7 +206,8 @@ module PORO
       :e_id,
       :employee,
       :department_id,
-      :department
+      :department,
+      :important_department
   end
 
   class Classification < Base

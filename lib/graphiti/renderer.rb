@@ -17,6 +17,14 @@ module Graphiti
       render(self.class.jsonapi_renderer).to_json
     end
 
+    def as_graphql
+      render(self.class.graphql_renderer(@proxy))
+    end
+
+    def to_graphql
+      as_graphql.to_json
+    end
+
     def to_json
       render(self.class.hash_renderer(@proxy)).to_json
     end
@@ -32,6 +40,11 @@ module Graphiti
 
     def self.hash_renderer(proxy)
       implementation = Graphiti::HashRenderer.new(proxy.resource)
+      JSONAPI::Serializable::Renderer.new(implementation)
+    end
+
+    def self.graphql_renderer(proxy)
+      implementation = Graphiti::HashRenderer.new(proxy.resource, graphql: true)
       JSONAPI::Serializable::Renderer.new(implementation)
     end
 
