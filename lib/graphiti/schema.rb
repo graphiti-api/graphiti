@@ -90,6 +90,7 @@ module Graphiti
         config = {
           name: r.name,
           type: r.type.to_s,
+          graphql_entrypoint: r.graphql_entrypoint.to_s,
           description: r.description,
           attributes: attributes(r),
           extra_attributes: extra_attributes(r),

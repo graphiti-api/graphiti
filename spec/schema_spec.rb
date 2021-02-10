@@ -11,6 +11,7 @@ RSpec.describe Graphiti::Schema do
           {
             name: "Schema::EmployeeResource",
             type: "employees",
+            graphql_entrypoint: "employees",
             description: "An employee of the organization",
             attributes: {
               id: {
@@ -183,6 +184,7 @@ RSpec.describe Graphiti::Schema do
           "Schema::EmployeeResource"
         end
         self.type = :employees
+        self.graphql_entrypoint = :employees
         self.description = "An employee of the organization"
 
         attribute :first_name, :string, description: "The employee's first name"

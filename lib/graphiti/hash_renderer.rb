@@ -70,7 +70,7 @@ module Graphiti
         top_level_key = :data
         if @graphql
           top_level_key = @resource.graphql_entrypoint
-          if !serializers.is_a?(Array)
+          unless serializers.is_a?(Array)
             top_level_key = top_level_key.to_s.singularize.to_sym
           end
         end
