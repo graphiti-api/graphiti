@@ -2412,7 +2412,7 @@ RSpec.describe "persistence" do
                 classification: {
                   data: {
                     type: "classifications",
-                    'id': "123"
+                    id: "123"
                   }
                 }
               }
@@ -2420,13 +2420,36 @@ RSpec.describe "persistence" do
           }
         end
 
-        it "responds correctly" do
-          employee = klass.build(payload)
-          expect { employee.save }.to raise_error(
-            Graphiti::Errors::RecordNotFound,
-            "The referenced resource 'classification' with id '123' could not be found. " \
-            "Referenced at 'relationships/classifications'"
-          )
+        context "when raise_on_missing_sidepost is true" do
+          it "responds correctly" do
+            employee = klass.build(payload)
+            expect { employee.save }.to raise_error(
+              Graphiti::Errors::RecordNotFound,
+              "The referenced resource 'classification' with id '123' could not be found. " \
+              "Referenced at 'relationships/classifications'"
+            )
+          end
+        end
+
+        context "when raise_on_missing_sidepost is false" do
+          before do
+            Graphiti.config.raise_on_missing_sidepost = false
+          end
+
+          after do
+            Graphiti.config.raise_on_missing_sidepost = true
+          end
+
+          it "responds correctly" do
+            employee = klass.build(payload)
+            employee.save
+            errors = employee.data.classification.errors
+            expect(errors.details).to eq(base: [{error: :not_found}])
+            expect(errors.messages).to eq(base: ["could not be found"])
+            model = errors.instance_variable_get(:@base)
+            expect(model.id).to eq("123")
+            expect(model.pointer).to eq("data/relationships/classifications")
+          end
         end
       end
     end
