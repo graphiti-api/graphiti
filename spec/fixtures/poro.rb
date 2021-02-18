@@ -215,7 +215,7 @@ module PORO
   end
 
   class Department < Base
-    attr_accessor :name, :description
+    attr_accessor :name, :description, :positions
   end
 
   class Bio < Base
@@ -385,6 +385,7 @@ module PORO
 
   class PositionResource < ApplicationResource
     attribute :employee_id, :integer, only: [:filterable]
+    attribute :department_id, :integer, only: [:filterable]
     attribute :title, :string
     attribute :rank, :integer
     extra_attribute :score, :integer do
@@ -399,6 +400,8 @@ module PORO
   class DepartmentResource < ApplicationResource
     attribute :name, :string
     attribute :description, :string
+
+    has_many :positions
   end
 
   class BioResource < ApplicationResource

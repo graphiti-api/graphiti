@@ -2,9 +2,18 @@ module Graphiti
   module SerializableHash
     def to_hash(fields: nil, include: {}, name_chain: [], graphql: false)
       {}.tap do |hash|
-        fields_list = fields[jsonapi_type] if fields
-        if fields_list.nil?
-          fields_list = fields[name_chain.join(".").to_sym]
+
+        if fields
+          fields_list = nil
+
+          # Dot syntax wins over jsonapi type
+          if name_chain.length > 0
+            fields_list = fields[name_chain.join(".").to_sym]
+          end
+
+          if fields_list.nil?
+            fields_list = fields[jsonapi_type]
+          end
         end
 
         # polymorphic resources
@@ -23,6 +32,7 @@ module Graphiti
         rels.each_with_object({}) do |(k, v), h|
           serializers = v.send(:resources)
           name = graphql ? k.to_s.camelize(:lower) : k
+          name_chain = name_chain.dup
           name_chain << k unless name_chain.last == k
           attrs[name.to_sym] = if serializers.is_a?(Array)
             serializers.map do |rr| # use private method to avoid array casting

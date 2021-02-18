@@ -189,13 +189,54 @@ RSpec.describe "serialization" do
 
         context "via dot syntax" do
           before do
-            params[:include] = "positions,positions.department"
-            params[:fields] = {'positions.department': "description"}
+            params[:include] = "positions.department.positions.department"
+            params[:fields] = {'positions.department.positions.department': "description"}
           end
 
           it "works" do
-            expect(json[0]["positions"][0]["department"])
-              .to eq({"description" => "dep1desc", "id" => "1"})
+            level1 = json[0]["positions"][0]["department"]
+            level2 = level1["positions"][0]["department"]
+            expect(level1.keys).to match_array(%w[id name description positions])
+            expect(level2.keys).to match_array(%w[id description])
+          end
+
+          context "when deeply nested, with multiple objects per type" do
+            before do
+              params[:include] = "positions.department.positions.department"
+              params[:fields] = {:"positions.department.positions.department" => "description"}
+              dept = PORO::Department.create(name: "anotherdept")
+              PORO::Position.create \
+                employee_id: employee1.id,
+                department_id: dept.id
+            end
+
+            it "works" do
+              level1a = json[0]["positions"][0]["department"]
+              level1b = json[0]["positions"][1]["department"]
+              level2a = level1a["positions"][0]["department"]
+              level2b = level1b["positions"][0]["department"]
+              expect(level1a.keys).to match_array(%w[id name description positions])
+              expect(level1b.keys).to match_array(%w[id name description positions])
+              expect(level2a.keys).to match_array(%w[id description])
+              expect(level2b.keys).to match_array(%w[id description])
+            end
+
+            context "and there is also a type-based fieldset" do
+              before do
+                params[:fields][:departments] = "name"
+              end
+
+              it "applies, but the more specific dot-syntax wins" do
+                level1a = json[0]["positions"][0]["department"]
+                level1b = json[0]["positions"][1]["department"]
+                level2a = level1a["positions"][0]["department"]
+                level2b = level1b["positions"][0]["department"]
+                expect(level1a.keys).to match_array(%w[id name positions])
+                expect(level1b.keys).to match_array(%w[id name positions])
+                expect(level2a.keys).to match_array(%w[id description])
+                expect(level2b.keys).to match_array(%w[id description])
+              end
+            end
           end
         end
       end
@@ -320,10 +361,6 @@ RSpec.describe "serialization" do
       end
     end
 
-    # TODO not correct
-    # What about exemplaryEmployees, employees type?
-    # Need a self.graphql_entrypoint config that defaults
-    # And raise on conflicts
     describe "in graphql context" do
       let(:json) { proxy.as_graphql }
 
