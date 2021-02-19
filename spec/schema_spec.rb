@@ -574,6 +574,20 @@ RSpec.describe Graphiti::Schema do
       end
     end
 
+    context "with multiple remote resources" do
+      let(:resources) { [position_resource, employee_resource] }
+
+      before do
+        employee_resource.remote = "http://foo.com"
+        position_resource.remote = "http://bar.com"
+      end
+
+      it "is added to the schema sorted by name" do
+        expect(schema[:resources].map { |resource| resource[:name] })
+          .to eq(["Schema::EmployeeResource", "Schema::PositionResource"])
+      end
+    end
+
     context "when sideload is single: true" do
       before do
         employee_resource.has_many :positions,

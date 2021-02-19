@@ -25,7 +25,7 @@ module Graphiti
 
     def initialize(resources)
       @resources = resources.sort_by(&:name)
-      @remote_resources = resources.select(&:remote?)
+      @remote_resources = @resources.select(&:remote?)
       @local_resources = @resources - @remote_resources
     end
 
