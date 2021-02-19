@@ -10,6 +10,7 @@ Features:
 
 Fixes:
 - [282] Support model names including "Resource"
+- [313](https://github.com/graphiti-api/graphiti/pull/313) Sort remote resources in schema generation
 
 ## 1.1.0
 
