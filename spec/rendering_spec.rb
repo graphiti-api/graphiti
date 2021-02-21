@@ -203,7 +203,7 @@ RSpec.describe "serialization" do
           context "when deeply nested, with multiple objects per type" do
             before do
               params[:include] = "positions.department.positions.department"
-              params[:fields] = {:"positions.department.positions.department" => "description"}
+              params[:fields] = {"positions.department.positions.department": "description"}
               dept = PORO::Department.create(name: "anotherdept")
               PORO::Position.create \
                 employee_id: employee1.id,
