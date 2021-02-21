@@ -34,10 +34,10 @@ RSpec.describe "serialization" do
                           department_id: 2
   end
   let!(:department1) do
-    PORO::Department.create(name: "dep1")
+    PORO::Department.create(name: "dep1", description: "dep1desc")
   end
   let!(:department2) do
-    PORO::Department.create(name: "dep2")
+    PORO::Department.create(name: "dep2", description: "dep2desc")
   end
 
   before do
@@ -131,14 +131,36 @@ RSpec.describe "serialization" do
           "id" => "1",
           "title" => "title1",
           "rank" => 1,
-          "department" => {"id" => "1", "name" => "dep1"}
+          "department" => {"id" => "1", "name" => "dep1", "description" => "dep1desc"}
         ])
         expect(json[1]["positions"]).to eq([
           "id" => "2",
           "title" => "title2",
           "rank" => 2,
-          "department" => {"id" => "2", "name" => "dep2"}
+          "department" => {"id" => "2", "name" => "dep2", "description" => "dep2desc"}
         ])
+      end
+
+      context "and the relationship is empty" do
+        context "for a to_many" do
+          before do
+            PORO::DB.data[:positions] = []
+          end
+
+          it "renders empty array" do
+            expect(json[0]["positions"]).to eq([])
+          end
+        end
+
+        context "for a to_one" do
+          before do
+            PORO::DB.data[:departments] = []
+          end
+
+          it "renders nil" do
+            expect(json[0]["positions"][0]["department"]).to be_nil
+          end
+        end
       end
     end
 
@@ -150,6 +172,73 @@ RSpec.describe "serialization" do
       it "works" do
         expect(json[0].keys).to eq(%w[id first_name positions])
         expect(json[0]["positions"][0].keys).to eq(%w[id rank department])
+      end
+
+      context "on a relationship" do
+        context "via type" do
+          before do
+            params[:include] = "positions,positions.department"
+            params[:fields] = {departments: "description"}
+          end
+
+          it "works" do
+            expect(json[0]["positions"][0]["department"])
+              .to eq({"description" => "dep1desc", "id" => "1"})
+          end
+        end
+
+        context "via dot syntax" do
+          before do
+            params[:include] = "positions.department.positions.department"
+            params[:fields] = {'positions.department.positions.department': "description"}
+          end
+
+          it "works" do
+            level1 = json[0]["positions"][0]["department"]
+            level2 = level1["positions"][0]["department"]
+            expect(level1.keys).to match_array(%w[id name description positions])
+            expect(level2.keys).to match_array(%w[id description])
+          end
+
+          context "when deeply nested, with multiple objects per type" do
+            before do
+              params[:include] = "positions.department.positions.department"
+              params[:fields] = {:"positions.department.positions.department" => "description"}
+              dept = PORO::Department.create(name: "anotherdept")
+              PORO::Position.create \
+                employee_id: employee1.id,
+                department_id: dept.id
+            end
+
+            it "works" do
+              level1a = json[0]["positions"][0]["department"]
+              level1b = json[0]["positions"][1]["department"]
+              level2a = level1a["positions"][0]["department"]
+              level2b = level1b["positions"][0]["department"]
+              expect(level1a.keys).to match_array(%w[id name description positions])
+              expect(level1b.keys).to match_array(%w[id name description positions])
+              expect(level2a.keys).to match_array(%w[id description])
+              expect(level2b.keys).to match_array(%w[id description])
+            end
+
+            context "and there is also a type-based fieldset" do
+              before do
+                params[:fields][:departments] = "name"
+              end
+
+              it "applies, but the more specific dot-syntax wins" do
+                level1a = json[0]["positions"][0]["department"]
+                level1b = json[0]["positions"][1]["department"]
+                level2a = level1a["positions"][0]["department"]
+                level2b = level1b["positions"][0]["department"]
+                expect(level1a.keys).to match_array(%w[id name positions])
+                expect(level1b.keys).to match_array(%w[id name positions])
+                expect(level2a.keys).to match_array(%w[id description])
+                expect(level2b.keys).to match_array(%w[id description])
+              end
+            end
+          end
+        end
       end
     end
 
@@ -191,6 +280,231 @@ RSpec.describe "serialization" do
         })
       end
     end
+
+    context "when the resource is polymorphic" do
+      let!(:visa) { PORO::Visa.create(number: "1") }
+      let!(:gold_visa) { PORO::GoldVisa.create(number: "2") }
+      let!(:mastercard) { PORO::Mastercard.create(number: "3") }
+
+      context "with sparse fieldsets" do
+        let(:json) do
+          JSON.parse(PORO::CreditCardResource.all(cc_params).to_json)
+        end
+
+        context "when only child specified" do
+          let(:cc_params) { {fields: {mastercards: "description"}} }
+
+          it "works" do
+            expect(json["data"]).to eq([
+              {
+                "id" => "1",
+                "number" => 1,
+                "description" => "visa description",
+                "visa_only_attr" => "visa only"
+              },
+              {
+                "id" => "1",
+                "number" => 2,
+                "description" => "visa description",
+                "visa_only_attr" => "visa only"
+              },
+              {
+                "id" => "1",
+                "description" => "mastercard description"
+              }
+            ])
+          end
+        end
+
+        context "when only parent specified" do
+          let(:cc_params) { {fields: {credit_cards: "number"}} }
+
+          it "works" do
+            expect(json["data"]).to eq([
+              {
+                "id" => "1",
+                "number" => 1
+              },
+              {
+                "id" => "1",
+                "number" => 2
+              },
+              {
+                "id" => "1",
+                "number" => 3
+              }
+            ])
+          end
+        end
+
+        context "when both parent and child are specified" do
+          let(:cc_params) { {fields: {credit_cards: "number", mastercards: "description"}} }
+
+          it "combines the types" do
+            expect(json["data"]).to eq([
+              {
+                "id" => "1",
+                "number" => 1
+              },
+              {
+                "id" => "1",
+                "number" => 2
+              },
+              {
+                "id" => "1",
+                "number" => 3,
+                "description" => "mastercard description"
+              }
+            ])
+          end
+        end
+      end
+    end
+
+    describe "in graphql context" do
+      let(:json) { proxy.as_graphql }
+
+      context "and the data is an array" do
+        it "sets the top level key as the jsonapi type" do
+          expect(json.keys).to eq([:employees])
+        end
+
+        context "when manual graphql_entrypoint" do
+          before do
+            resource.graphql_entrypoint = :exemplaryEmployees
+          end
+
+          it "matches the entrypoint" do
+            expect(json.keys).to eq([:exemplaryEmployees])
+          end
+        end
+      end
+
+      context "and the data is a single object" do
+        it "sets the top level key as the jsonapi type" do
+          json = resource.find(id: employee1.id).as_graphql
+          expect(json.keys).to eq([:employee])
+        end
+
+        context "when manual graphql_entrypoint" do
+          before do
+            resource.graphql_entrypoint = :exemplaryEmployees
+          end
+
+          it "matches the singularized entrypoint" do
+            json = resource.find(id: employee1.id).as_graphql
+            expect(json.keys).to eq([:exemplaryEmployee])
+          end
+        end
+      end
+
+      context "when the id is not requested" do
+        before do
+          params[:include] = "positions"
+          params[:fields] = {employees: "first_name", positions: "title"}
+        end
+
+        it "is not returned" do
+          expect(json[:employees][0]).to eq({
+            firstName: "John",
+            positions: [{title: "title1"}]
+          })
+        end
+      end
+
+      context "when the id is requested" do
+        before do
+          params[:include] = "positions"
+          params[:fields] = {employees: "id,first_name", positions: "id,title"}
+        end
+
+        it "is returned" do
+          expect(json[:employees][0]).to eq({
+            id: employee1.id.to_s,
+            firstName: "John",
+            positions: [{id: position1.id.to_s, title: "title1"}]
+          })
+        end
+      end
+
+      context "when _type is not requested" do
+        before do
+          params[:include] = "positions"
+          params[:fields] = {employees: "first_name", positions: "title"}
+        end
+
+        it "is not returned" do
+          expect(json[:employees][0]).to eq({
+            firstName: "John",
+            positions: [{title: "title1"}]
+          })
+        end
+      end
+
+      context "when the _type is requested" do
+        before do
+          params[:include] = "positions"
+          params[:fields] = {employees: "_type,first_name", positions: "_type,title"}
+        end
+
+        it "is returned" do
+          expect(json[:employees][0]).to eq({
+            _type: "employees",
+            firstName: "John",
+            positions: [{_type: "positions", title: "title1"}]
+          })
+        end
+      end
+
+      context "when a multi-word attribute" do
+        before do
+          position_resource = Class.new(PORO::PositionResource) do
+            def self.name
+              "PORO::PositionResource"
+            end
+            attribute :multi_word, :string do
+              "foo"
+            end
+          end
+          resource.has_many :positions, resource: position_resource
+          params[:include] = "positions"
+          params[:fields] = {employees: "first_name", positions: "multi_word"}
+        end
+
+        it "is camelized" do
+          expect(json[:employees][0]).to eq({
+            firstName: "John",
+            positions: [{multiWord: "foo"}]
+          })
+        end
+      end
+
+      context "when a multi-word relationship" do
+        before do
+          position_resource = Class.new(PORO::PositionResource) do
+            def self.name
+              "PORO::PositionResource"
+            end
+          end
+          position_resource.belongs_to :important_department,
+            resource: PORO::DepartmentResource
+          resource.has_many :important_positions,
+            resource: position_resource
+          params[:include] = "important_positions.important_department"
+        end
+
+        it "is camelized" do
+          expect(json[:employees][0][:importantPositions]).to eq([{
+            rank: 1,
+            title: "title1",
+            importantDepartment: {
+              description: "dep1desc",
+              name: "dep1"
+            }
+          }])
+        end
+      end
+    end
   end
 
   context "when rendering xml" do
@@ -223,13 +537,13 @@ RSpec.describe "serialization" do
           "id" => "1",
           "title" => "title1",
           "rank" => 1,
-          "department" => {"id" => "1", "name" => "dep1"}
+          "department" => {"id" => "1", "name" => "dep1", "description" => "dep1desc"}
         ])
         expect(xml[1]["positions"]).to eq([
           "id" => "2",
           "title" => "title2",
           "rank" => 2,
-          "department" => {"id" => "2", "name" => "dep2"}
+          "department" => {"id" => "2", "name" => "dep2", "description" => "dep2desc"}
         ])
       end
     end

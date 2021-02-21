@@ -83,7 +83,8 @@ module Graphiti
           :relationships_readable_by_default,
           :relationships_writable_by_default,
           :filters_accept_nil_by_default,
-          :filters_deny_empty_by_default
+          :filters_deny_empty_by_default,
+          :graphql_entrypoint
 
         class << self
           prepend Overrides
@@ -97,6 +98,7 @@ module Graphiti
           # re-assigning causes a new Class.new
           klass.serializer = (klass.serializer || klass.infer_serializer_superclass)
           klass.type ||= klass.infer_type
+          klass.graphql_entrypoint = klass.type.to_s.pluralize.to_sym
           default(klass, :attributes_readable_by_default, true)
           default(klass, :attributes_writable_by_default, true)
           default(klass, :attributes_sortable_by_default, true)
@@ -144,6 +146,7 @@ module Graphiti
           if (@abstract_class = val)
             self.serializer = nil
             self.type = nil
+            self.graphql_entrypoint = nil
           end
         end
 

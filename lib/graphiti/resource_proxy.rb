@@ -51,6 +51,14 @@ module Graphiti
       Renderer.new(self, options).to_xml
     end
 
+    def to_graphql(options = {})
+      Renderer.new(self, options).to_graphql
+    end
+
+    def as_graphql(options = {})
+      Renderer.new(self, options).as_graphql
+    end
+
     def data
       @data ||= begin
         records = @scope.resolve

@@ -13,6 +13,7 @@ module PORO
             teams: [],
             paypals: [],
             visas: [],
+            gold_visas: [],
             mastercards: [],
             visa_rewards: [],
             books: [],
@@ -178,6 +179,7 @@ module PORO
       :age,
       :active,
       :positions,
+      :important_positions,
       :current_position,
       :bio,
       :teams,
@@ -204,7 +206,8 @@ module PORO
       :e_id,
       :employee,
       :department_id,
-      :department
+      :department,
+      :important_department
   end
 
   class Classification < Base
@@ -212,7 +215,7 @@ module PORO
   end
 
   class Department < Base
-    attr_accessor :name
+    attr_accessor :name, :description, :positions
   end
 
   class Bio < Base
@@ -382,6 +385,7 @@ module PORO
 
   class PositionResource < ApplicationResource
     attribute :employee_id, :integer, only: [:filterable]
+    attribute :department_id, :integer, only: [:filterable]
     attribute :title, :string
     attribute :rank, :integer
     extra_attribute :score, :integer do
@@ -395,6 +399,9 @@ module PORO
 
   class DepartmentResource < ApplicationResource
     attribute :name, :string
+    attribute :description, :string
+
+    has_many :positions
   end
 
   class BioResource < ApplicationResource
@@ -404,7 +411,7 @@ module PORO
     self.polymorphic = %w[PORO::VisaResource PORO::GoldVisaResource PORO::MastercardResource]
 
     def base_scope
-      {type: [:visas, :mastercards]}
+      {type: [:visas, :gold_visas, :mastercards]}
     end
 
     attribute :number, :integer

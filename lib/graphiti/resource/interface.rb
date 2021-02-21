@@ -46,7 +46,7 @@ module Graphiti
         private
 
         def validate!(params)
-          return unless validate_endpoints?
+          return if Graphiti.context[:graphql] || !validate_endpoints?
 
           if context&.respond_to?(:request)
             path = context.request.env["PATH_INFO"]

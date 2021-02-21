@@ -7,6 +7,7 @@ module Graphiti
       ::Rails.application.eager_load! if defined?(::Rails)
       resources ||= Graphiti.resources.reject(&:abstract_class?)
       resources.reject! { |r| r.name.nil? }
+
       new(resources).generate
     end
 
@@ -89,6 +90,7 @@ module Graphiti
         config = {
           name: r.name,
           type: r.type.to_s,
+          graphql_entrypoint: r.graphql_entrypoint.to_s,
           description: r.description,
           attributes: attributes(r),
           extra_attributes: extra_attributes(r),
@@ -202,6 +204,9 @@ module Graphiti
               config[:guard] = true
             end
           end
+          if filter[:required] # one-off filter, not attribute
+            config[:required] = true
+          end
           f[name] = config
         end
       end
@@ -214,6 +219,7 @@ module Graphiti
           if config.type == :polymorphic_belongs_to
             schema[:resources] = config.children.values
               .map(&:resource).map(&:class).map(&:name)
+            schema[:parent_resource] = config.parent_resource.class.name
           else
             schema[:resource] = config.resource.class.name
           end

@@ -11,6 +11,7 @@ RSpec.describe Graphiti::Schema do
           {
             name: "Schema::EmployeeResource",
             type: "employees",
+            graphql_entrypoint: "employees",
             description: "An employee of the organization",
             attributes: {
               id: {
@@ -183,6 +184,7 @@ RSpec.describe Graphiti::Schema do
           "Schema::EmployeeResource"
         end
         self.type = :employees
+        self.graphql_entrypoint = :employees
         self.description = "An employee of the organization"
 
         attribute :first_name, :string, description: "The employee's first name"
@@ -375,21 +377,42 @@ RSpec.describe Graphiti::Schema do
     end
 
     context "when filter is required" do
-      before do
-        employee_resource.config[:filters] = {}
-        employee_resource.class_eval do
-          attribute :first_name, :string, filterable: :required
+      context "via attribute syntax" do
+        before do
+          employee_resource.config[:filters] = {}
+          employee_resource.class_eval do
+            attribute :first_name, :string, filterable: :required
+          end
+        end
+
+        it "flags it as required" do
+          expect(schema[:resources][0][:filters][:first_name][:required])
+            .to eq(true)
+        end
+
+        it "does NOT flag as guarded" do
+          expect(schema[:resources][0][:filters][:first_name])
+            .to_not have_key(:guard)
         end
       end
 
-      it "flags it as required" do
-        expect(schema[:resources][0][:filters][:first_name][:required])
-          .to eq(true)
-      end
+      context "via filter syntax" do
+        before do
+          employee_resource.config[:filters] = {}
+          employee_resource.class_eval do
+            filter :first_name, :string, required: true
+          end
+        end
 
-      it "does NOT flag as guarded" do
-        expect(schema[:resources][0][:filters][:first_name])
-          .to_not have_key(:guard)
+        it "flags it as required" do
+          expect(schema[:resources][0][:filters][:first_name][:required])
+            .to eq(true)
+        end
+
+        it "does NOT flag as guarded" do
+          expect(schema[:resources][0][:filters][:first_name])
+            .to_not have_key(:guard)
+        end
       end
     end
 
@@ -755,6 +778,7 @@ RSpec.describe Graphiti::Schema do
       it "associates the relationship with multiple resources" do
         expect(schema[:resources][0][:relationships][:dwelling]).to eq({
           description: nil,
+          parent_resource: "Schema::EmployeeResource",
           type: "polymorphic_belongs_to",
           resources: ["Schema::HouseResource", "Schema::CondoResource"]
         })

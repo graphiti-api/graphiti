@@ -209,7 +209,9 @@ module Graphiti
       end
 
       with_error_handling(Errors::SideloadQueryBuildingError) do
-        proxy = resource.class._all(params, opts, base_scope)
+        scope = base_scope
+        scope[:foreign_key] = foreign_key if remote?
+        proxy = resource.class._all(params, opts, scope)
         pre_load_proc&.call(proxy, parents)
       end
 
