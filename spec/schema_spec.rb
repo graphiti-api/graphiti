@@ -722,12 +722,15 @@ RSpec.describe Graphiti::Schema do
     end
 
     context "when polymorphic resources" do
-      let(:resources) { [PORO::CreditCardResource] }
+      let(:resources) { [PORO::CreditCardResource, PORO::VisaResource] }
 
-      it "generates a polymorphic schema for the resource" do
+      it "generates a polymorphic schema for the parent but not the children" do
         expect(schema[:resources][0][:polymorphic]).to eq(true)
         expect(schema[:resources][0][:children])
           .to eq(["PORO::VisaResource", "PORO::GoldVisaResource", "PORO::MastercardResource"])
+        visa = schema[:resources].find { |r| r[:name] == "PORO::VisaResource" }
+        expect(visa).to_not have_key(:polymorphic)
+        expect(visa).to_not have_key(:children)
       end
     end
 

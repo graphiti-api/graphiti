@@ -123,7 +123,137 @@ RSpec.describe "polymorphic resource behavior" do
 
     it "does not render the relationship when it does not pertain" do
       render
-      expect(json["data"][1]).to_not have_key("relationships")
+      commercials = json["data"][1]["relationships"]["commercials"]
+      expect(commercials["meta"]["included"]).to eq(false)
+    end
+  end
+
+  describe "on__<type>--<name> syntax" do
+    let!(:commercial1) do
+      PORO::MastercardCommercial.create \
+        mastercard_id: mastercard.id,
+        runtime: 30,
+        name: "foo"
+    end
+    let!(:commercial2) do
+      PORO::MastercardCommercial.create \
+        mastercard_id: mastercard.id,
+        runtime: 60,
+        name: "bar"
+    end
+
+    before do
+      params[:include] = "on__mastercards--commercials"
+    end
+
+    # Only renderer supported for now
+    context "when rendering flat json" do
+      it "respects type-specific sideloads" do
+        expect_any_instance_of(PORO::MastercardCommercialResource)
+          .to receive(:resolve).and_call_original
+        json = JSON.parse(proxy.to_json)
+        expect(json["data"][0]).to_not have_key("commercials")
+        expect(json["data"][1]["commercials"]).to eq([
+          {"id" => commercial1.id.to_s, "runtime" => 30, "name" => "foo"},
+          {"id" => commercial2.id.to_s, "runtime" => 60, "name" => "bar"}
+        ])
+      end
+
+      # NB currently doesn't support on__ syntax, so 2 types
+      # Can load same relationship independently but have to have same fields
+      # This is something we can improve
+      it "can limit fields on type-specific sideloads" do
+        params[:fields] = {"commercials" => "runtime"}
+        json = JSON.parse(proxy.to_json)
+        expect(json["data"][0]).to_not have_key("commercials")
+        expect(json["data"][1]["commercials"]).to eq([
+          {"id" => commercial1.id.to_s, "runtime" => 30},
+          {"id" => commercial2.id.to_s, "runtime" => 60}
+        ])
+      end
+
+      context "when nesting additional sideloads off of type-specific ones" do
+        let!(:actor1) do
+          PORO::Actor.create \
+            commercial_id: commercial1.id,
+            first_name: "Jane",
+            last_name: "Doe"
+        end
+
+        let!(:actor2) do
+          PORO::Actor.create \
+            commercial_id: commercial1.id,
+            first_name: "John",
+            last_name: "DoReMe"
+        end
+
+        before do
+          params[:include] = "on__mastercards--commercials.actors"
+        end
+
+        it "can nest additional sideloads and limit their fields" do
+          params[:fields] = {"commercials.actors" => "last_name"}
+          json = JSON.parse(proxy.to_json)
+          expect(json["data"][0]).to_not have_key("commercials")
+          commercials = (json["data"][1]["commercials"])
+          expect(commercials[0]["actors"]).to eq([
+            {"id" => actor1.id.to_s, "last_name" => "Doe"},
+            {"id" => actor2.id.to_s, "last_name" => "DoReMe"}
+          ])
+        end
+
+        it "can filter sideloads off of type-specific ones" do
+          params[:filter] = {
+            "on__mastercards--commercials.actors.last_name": {
+              eq: "DoReMe"
+            }
+          }
+          json = JSON.parse(proxy.to_json)
+          commercials = (json["data"][1]["commercials"])
+          expect(commercials[0]["actors"]).to eq([{
+            "id" => actor2.id.to_s,
+            "first_name" => "John",
+            "last_name" => "DoReMe"
+          }])
+        end
+
+        it "can sort sideloads off of type-specific ones" do
+          params[:sort] = "-on__mastercards--commercials.actors.first_name"
+          json = JSON.parse(proxy.to_json)
+          commercials = (json["data"][1]["commercials"])
+          expect(commercials[0]["actors"]).to eq([
+            {
+              "id" => actor2.id.to_s,
+              "first_name" => "John",
+              "last_name" => "DoReMe"
+            },
+            {
+              "id" => actor1.id.to_s,
+              "first_name" => "Jane",
+              "last_name" => "Doe"
+            }
+          ])
+        end
+
+        it "can paginate sideloads off of type-specific ones" do
+          params[:page] = {
+            size: 1,
+            number: 2,
+            "on__mastercards--commercials.size": 1,
+            "on__mastercards--commercials.actors.size": 1,
+            "on__mastercards--commercials.actors.number": 2
+          }
+          json = JSON.parse(proxy.to_json)
+          commercials = (json["data"][0]["commercials"])
+          expect(commercials[0]["actors"]).to eq([
+            {
+              "id" => actor2.id.to_s,
+              "first_name" => "John",
+              "last_name" => "DoReMe"
+            }
+          ])
+        end
+      end
     end
   end
 end
