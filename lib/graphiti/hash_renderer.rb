@@ -2,7 +2,6 @@ module Graphiti
   module SerializableHash
     def to_hash(fields: nil, include: {}, name_chain: [], graphql: false)
       {}.tap do |hash|
-
         if fields
           fields_list = nil
 
