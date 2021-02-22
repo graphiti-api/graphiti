@@ -42,9 +42,14 @@ module Graphiti
         end
 
         def sideload(name)
-          sl = super
+          if (split_on = name.to_s.split(/^on__/)).length > 1
+            on_type, name = split_on[1].split("--").map(&:to_sym)
+          end
+
+          sl = super(name)
           if !polymorphic_child? && sl.nil?
             children.each do |c|
+              next if on_type && c.type != on_type
               break if (sl = c.sideloads[name])
             end
           end

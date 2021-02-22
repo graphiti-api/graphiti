@@ -16,8 +16,10 @@ module PORO
             gold_visas: [],
             mastercards: [],
             visa_rewards: [],
+            mastercard_commercials: [],
             books: [],
-            states: []
+            states: [],
+            actors: []
           }
       end
 
@@ -39,9 +41,11 @@ module PORO
           visas: PORO::Visa,
           gold_visas: PORO::GoldVisa,
           mastercards: PORO::Mastercard,
+          mastercard_commercials: PORO::MastercardCommercial,
           visa_rewards: PORO::VisaReward,
           books: PORO::Book,
-          states: PORO::State
+          states: PORO::State,
+          actors: PORO::Actor
         }
       end
 
@@ -190,7 +194,8 @@ module PORO
       :cc_id,
       :credit_card_type,
       :payment_processor,
-      :salary
+      :salary,
+      :credit_cards
 
     def initialize(*)
       super
@@ -231,7 +236,7 @@ module PORO
   end
 
   class CreditCard < Base
-    attr_accessor :number, :description
+    attr_accessor :number, :description, :employee_id
   end
 
   class Visa < CreditCard
@@ -249,6 +254,15 @@ module PORO
   end
 
   class Mastercard < CreditCard
+    attr_accessor :commercials
+  end
+
+  class MastercardCommercial < Base
+    attr_accessor :mastercard_id, :runtime, :name, :actors
+  end
+
+  class Actor < Base
+    attr_accessor :commercial_id, :first_name, :last_name
   end
 
   class VisaReward < Base
@@ -377,6 +391,9 @@ module PORO
     end
     has_many :positions
     many_to_many :teams, foreign_key: {employee_teams: :employee_id}
+    has_many :credit_cards # can also belong_to
+    has_many :visas
+    has_many :gold_visas
 
     def admin?
       context && context.current_user == "admin"
@@ -416,6 +433,7 @@ module PORO
 
     attribute :number, :integer
     attribute :description, :string
+    filter :employee_id, :integer
   end
 
   class VisaResource < CreditCardResource
@@ -436,6 +454,28 @@ module PORO
   class GoldVisaResource < VisaResource
   end
 
+  class ActorResource < ApplicationResource
+    filter :commercial_id, :integer
+    attribute :first_name, :string
+    attribute :last_name, :string
+
+    def base_scope
+      {type: :actors}
+    end
+  end
+
+  class MastercardCommercialResource < ApplicationResource
+    filter :mastercard_id, :integer
+    attribute :runtime, :integer
+    attribute :name, :string
+
+    def base_scope
+      {type: :mastercard_commercials}
+    end
+
+    has_many :actors, foreign_key: :commercial_id
+  end
+
   class MastercardResource < CreditCardResource
     attribute :description, :string do
       "mastercard description"
@@ -444,6 +484,8 @@ module PORO
     def base_scope
       {type: :mastercards}
     end
+
+    has_many :commercials, resource: PORO::MastercardCommercialResource
   end
 
   class VisaRewardResource < ApplicationResource

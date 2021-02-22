@@ -96,7 +96,18 @@ module Graphiti
               sl_resource = resource_for_sideload(sideload)
               query_parents = parents + [self]
               sub_hash = sub_hash[:include] if sub_hash.key?(:include)
-              hash[key] = Query.new(sl_resource, @params, key, sub_hash, query_parents, :all)
+
+              # NB: To handle on__<type>--<name>
+              # A) relationship_name == :positions
+              # B) key == on__employees.positions
+              # This way A) ensures sideloads are resolved
+              # And B) ensures nested filters, sorts etc still work
+              relationship_name = sideload ? sideload.name : key
+              hash[relationship_name] = Query.new sl_resource,
+                @params,
+                key,
+                sub_hash,
+                query_parents, :all
             else
               handle_missing_sideload(key)
             end

@@ -15,11 +15,16 @@ module Graphiti
           end
         end
 
-        # polymorphic resources
-        if @resource.respond_to?(:type) && @resource.type != jsonapi_type
+        # polymorphic resources - merge the PARENT type
+        if @resource.polymorphic? && @resource.type != jsonapi_type
           if fields[@resource.type]
             fields_list ||= []
             fields_list |= fields[@resource.type]
+          end
+
+          if fields[jsonapi_type]
+            fields_list ||= []
+            fields_list |= fields[jsonapi_type]
           end
         end
 
@@ -27,22 +32,56 @@ module Graphiti
           name = graphql ? k.to_s.camelize(:lower).to_sym : k
           h[name] = instance_eval(&v)
         }
-        rels = @_relationships.select { |k, v| !!include[k] }
+
+        # The main logic here is just !!include[k]
+        # But we also have special on__<type>--<name> includes
+        # Where we only include when matching the polymorphic type
+        rels = @_relationships.select { |k, v|
+          if include[k]
+            true
+          else
+            included = false
+            include.keys.each do |key|
+              split = key.to_s.split(/^on__/)
+              if split.length > 1
+                requested_type, key = split[1].split("--")
+                if requested_type.to_sym == jsonapi_type
+                  included = k == key.to_sym
+                  break
+                end
+              end
+            end
+            included
+          end
+        }
+
         rels.each_with_object({}) do |(k, v), h|
+          nested_include = include[k]
+
+          # This logic only fires if it's a special on__<type>--<name> include
+          unless include.has_key?(k)
+            include.keys.each do |include_key|
+              if k == include_key.to_s.split("--")[1].to_sym
+                nested_include = include[include_key]
+                break
+              end
+            end
+          end
+
           serializers = v.send(:resources)
           name = graphql ? k.to_s.camelize(:lower) : k
           name_chain = name_chain.dup
           name_chain << k unless name_chain.last == k
           attrs[name.to_sym] = if serializers.is_a?(Array)
-            serializers.map do |rr| # use private method to avoid array casting
-              rr.to_hash(fields: fields, include: include[k], graphql: graphql, name_chain: name_chain)
+            serializers.map do |rr|
+              rr.to_hash(fields: fields, include: nested_include, graphql: graphql, name_chain: name_chain)
             end
           elsif serializers.nil?
             if @resource.class.sideload(k).type.to_s.include?("_many")
               []
             end
           else
-            serializers.to_hash(fields: fields, include: include[k], graphql: graphql, name_chain: name_chain)
+            serializers.to_hash(fields: fields, include: nested_include, graphql: graphql, name_chain: name_chain)
           end
         end
 

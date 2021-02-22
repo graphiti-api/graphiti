@@ -110,7 +110,7 @@ module Graphiti
           config[:default_page_size] = r.default_page_size
         end
 
-        if r.polymorphic?
+        if r.polymorphic? && !r.polymorphic_child?
           config[:polymorphic] = true
           config[:children] = r.children.map(&:name)
         end

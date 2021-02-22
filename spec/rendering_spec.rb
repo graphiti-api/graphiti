@@ -162,6 +162,55 @@ RSpec.describe "serialization" do
           end
         end
       end
+
+      context "when the relationship is to a polymorphic resource" do
+        before do
+          PORO::Visa.create employee_id: employee2.id, number: 1
+          gold = PORO::GoldVisa.create employee_id: employee2.id, number: 2
+          PORO::VisaReward.create visa_id: gold.id
+          PORO::Mastercard.create employee_id: employee2.id, number: 3
+          params[:include] = "credit_cards.on__gold_visas--visa_rewards"
+        end
+
+        # NB - both visa and gold visa support the relationship
+        # But we only see it on gold visas
+        it "respects type-specific includes" do
+          cards = json[1]["credit_cards"]
+          expect(cards[0].keys).to eq(%w[id number description visa_only_attr])
+          expect(cards[1].keys)
+            .to eq(%w[id number description visa_only_attr visa_rewards])
+          expect(cards[2].keys).to eq(%w[id number description])
+          expect(cards[1]["visa_rewards"]).to eq([{
+            "id" => "1",
+            "points" => nil
+          }])
+        end
+      end
+
+      context "and the top-level resource is polymorphic" do
+        before do
+          PORO::Visa.create employee_id: employee2.id, number: 1
+          gold = PORO::GoldVisa.create employee_id: employee2.id, number: 2
+          PORO::VisaReward.create visa_id: gold.id
+          PORO::Mastercard.create employee_id: employee2.id, number: 3
+        end
+
+        it "respects type-specific includes" do
+          proxy = PORO::CreditCardResource.all({
+            include: "on__gold_visas--visa_rewards"
+          })
+          json = JSON.parse(proxy.to_json)
+          cards = json["data"]
+          expect(cards[0].keys).to eq(%w[id number description visa_only_attr])
+          expect(cards[1].keys)
+            .to eq(%w[id number description visa_only_attr visa_rewards])
+          expect(cards[2].keys).to eq(%w[id number description])
+          expect(cards[1]["visa_rewards"]).to eq([{
+            "id" => "1",
+            "points" => nil
+          }])
+        end
+      end
     end
 
     context "when sparse fields" do
