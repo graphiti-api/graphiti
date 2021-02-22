@@ -56,16 +56,21 @@ module Graphiti
         method_name = @attr[:readable]
         instance = @resource.new
         attribute = @name.to_s
+        resource_class = @resource
 
         -> {
           method = instance.method(method_name)
-          if method.arity.zero?
+          result = if method.arity.zero?
             instance.instance_eval(&method_name)
           elsif method.arity == 1
             instance.instance_exec(@object, &method)
           else
             instance.instance_exec(@object, attribute, &method)
           end
+          if Graphiti.context[:graphql] && !result
+            raise ::Graphiti::Errors::UnreadableAttribute.new(resource_class, attribute)
+          end
+          result
         }
       end
 
