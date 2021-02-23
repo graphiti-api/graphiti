@@ -36,6 +36,18 @@ RSpec.describe "fields" do
           expect(attributes.keys).to_not include("salary")
         end
       end
+
+      context "and running in GraphQL context" do
+        it "raises error" do
+          expect {
+            Graphiti.with_context ctx, {} do
+              Graphiti.context[:graphql] = true
+              render
+              expect(attributes.keys).to_not include("salary")
+            end
+          }.to raise_error(::Graphiti::Errors::UnreadableAttribute, /salary/)
+        end
+      end
     end
 
     context "and the guard passes" do

@@ -2,6 +2,17 @@ module Graphiti
   module Errors
     class Base < StandardError; end
 
+    class UnreadableAttribute < Base
+      def initialize(resource_class, name)
+        @resource_class = resource_class
+        @name = name
+      end
+
+      def message
+        "#{@resource_class}: Requested field #{@name}, but not authorized to read it"
+      end
+    end
+
     class NullRelation
       extend ActiveModel::Naming
       attr_accessor :id, :errors, :pointer
