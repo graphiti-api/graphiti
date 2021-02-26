@@ -101,6 +101,38 @@ RSpec.describe "serialization" do
       expect(position["department"]).to be_nil
     end
 
+    it "can render _type as jsonapi type when requested" do
+      params[:fields] = {employees: "first_name,_type", positions: "_type"}
+      json = JSON.parse(proxy.to_json)
+      expect(json["data"][0]["_type"]).to eq("employees")
+      expect(json["data"][0]["positions"][0]["_type"]).to eq("positions")
+    end
+
+    context "when requesting __typename" do
+      it "works" do
+        params[:fields] = {
+          employees: "first_name,__typename",
+          positions: "__typename"
+        }
+        json = JSON.parse(proxy.to_json)
+        expect(json["data"][0]["__typename"]).to eq("POROEmployee")
+        expect(json["data"][0]["positions"][0]["__typename"])
+          .to eq("POROPosition")
+      end
+
+      context "and the resource is a polymorphic subclass" do
+        before do
+          PORO::Mastercard.create
+        end
+
+        it "picks the subclass name" do
+          params = {fields: {mastercards: "__typename"}}
+          json = PORO::MastercardResource.all(params).as_json[:data]
+          expect(json[0][:__typename]).to eq("POROMastercard")
+        end
+      end
+    end
+
     class RenderResults < SimpleDelegator
       attr_accessor :meta
 
