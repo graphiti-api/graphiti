@@ -47,6 +47,10 @@ module Graphiti
       Renderer.new(self, options).to_json
     end
 
+    def as_json(options = {})
+      Renderer.new(self, options).as_json
+    end
+
     def to_xml(options = {})
       Renderer.new(self, options).to_xml
     end

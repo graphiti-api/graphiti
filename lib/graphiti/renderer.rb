@@ -26,7 +26,11 @@ module Graphiti
     end
 
     def to_json
-      render(self.class.hash_renderer(@proxy)).to_json
+      as_json.to_json
+    end
+
+    def as_json
+      render(self.class.hash_renderer(@proxy))
     end
 
     def to_xml
