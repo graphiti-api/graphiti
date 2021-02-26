@@ -12,6 +12,8 @@ module Graphiti
       def apply
         return unless readable?
 
+        remove_guard if previously_guarded?
+
         if @name == :id
           @serializer.id(&proc)
         elsif @attr[:proc]
@@ -19,7 +21,9 @@ module Graphiti
         elsif @serializer.attribute_blocks[@name].nil?
           @serializer.send(_method, @name, serializer_options, &proc)
         else
-          unless @serializer.send(applied_method).include?(@name)
+          if @serializer.send(applied_method).include?(@name)
+            @serializer.field_condition_blocks[@name] = guard if guard?
+          else
             inner = @serializer.attribute_blocks.delete(@name)
             wrapped = wrap_proc(inner)
             @serializer.send(_method, @name, serializer_options, &wrapped)
@@ -31,6 +35,14 @@ module Graphiti
       end
 
       private
+
+      def previously_guarded?
+        @serializer.field_condition_blocks[@name]
+      end
+
+      def remove_guard
+        @serializer.field_condition_blocks.delete(@name)
+      end
 
       def applied_method
         if extra?

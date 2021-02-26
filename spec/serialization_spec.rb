@@ -859,6 +859,115 @@ RSpec.describe "serialization" do
           expect(json["data"][0]["attributes"]["foo"]).to eq("bar")
         end
       end
+
+      context "and then overridden" do
+        let(:ctx) { OpenStruct.new(admin: false) }
+
+        around do |e|
+          Graphiti.with_context(ctx) do
+            e.run
+          end
+        end
+
+        context "without a guard" do
+          before do
+            resource.attribute :foo, :string
+          end
+
+          it "is no longer guarded" do
+            render
+            expect(json["data"][0]["attributes"]["foo"]).to eq("bar")
+          end
+        end
+
+        context "without a guard and with a block" do
+          before do
+            resource.attribute :foo, :string do
+              "baz"
+            end
+          end
+
+          it "is no longer guarded" do
+            render
+            expect(json["data"][0]["attributes"]["foo"]).to eq("baz")
+          end
+        end
+
+        context "with a guard" do
+          before do
+            resource.class_eval do
+              attribute :foo, :string, readable: :overriden?
+
+              def admin?
+                true
+              end
+
+              def overriden?
+                !!context.overridden
+              end
+            end
+          end
+
+          context "and the guard fails" do
+            it "overrides the prior guard" do
+              render
+              expect(json["data"][0]["attributes"]).to_not have_key("foo")
+            end
+          end
+
+          context "and the guard passes" do
+            before do
+              ctx.overridden = true
+            end
+
+            it "overrides the prior guard" do
+              render
+              expect(json["data"][0]["attributes"]["foo"]).to eq("bar")
+            end
+          end
+        end
+
+        context "with a guard and with a block" do
+          before do
+            resource.class_eval do
+              attribute :foo, :string, readable: :overriden? do
+                "baz"
+              end
+
+              def admin?
+                true
+              end
+
+              def overriden?
+                !!context.overridden
+              end
+            end
+          end
+
+          context "and the guard passes" do
+            before do
+              ctx.overridden = true
+            end
+
+            it "overrides the prior guard" do
+              render
+              expect(json["data"][0]["attributes"]["foo"]).to eq("baz")
+            end
+          end
+
+
+          context "and the guard fails" do
+            before do
+              ctx.overridden = false
+            end
+
+            it "overrides the prior guard" do
+              render
+              expect(json["data"][0]["attributes"]).to_not have_key("foo")
+            end
+          end
+        end
+      end
     end
   end
 
@@ -895,7 +1004,9 @@ RSpec.describe "serialization" do
         attribute :foo, :string do
           "bar"
         end
-        extra_attribute :first_name, :string
+        extra_attribute :extra_first_name, :string do
+          @object.first_name
+        end
         extra_attribute :credit_card_id, :string, readable: false do
           "123"
         end
@@ -944,7 +1055,7 @@ RSpec.describe "serialization" do
         end
       end
 
-      context "if  guard fails" do
+      context "if the guard fails" do
         around do |e|
           Graphiti.with_context(OpenStruct.new(admin: false)) do
             e.run
@@ -958,33 +1069,33 @@ RSpec.describe "serialization" do
     end
 
     it "adds extra attributes to the serializer" do
-      params[:extra_fields] = {employees: "first_name"}
+      params[:extra_fields] = {employees: "extra_first_name"}
       expect(resource.serializer.attribute_blocks.keys)
-        .to match_array([:first_name, :foo, :age, :credit_card_type])
+        .to match_array([:extra_first_name, :foo, :age, :credit_card_type])
       render
       expect(json["data"][0]["attributes"]).to eq({
         "foo" => "bar",
-        "first_name" => "John"
+        "extra_first_name" => "John"
       })
     end
 
     it "does not render extra attributes if not requested" do
       render
-      expect(json["data"][0]["attributes"]).to_not have_key("first_name")
+      expect(json["data"][0]["attributes"]).to_not have_key("extra_first_name")
     end
 
     context "when passing a block" do
       before do
-        resource.serializer.attribute_blocks.delete(:first_name)
-        resource.extra_attribute :first_name, :string do
+        resource.serializer.attribute_blocks.delete(:extra_first_name)
+        resource.extra_attribute :extra_first_name, :string do
           "im extra, serialized"
         end
       end
 
       it "is used during serialization" do
-        params[:extra_fields] = {employees: "first_name"}
+        params[:extra_fields] = {employees: "extra_first_name"}
         render
-        expect(json["data"][0]["attributes"]["first_name"])
+        expect(json["data"][0]["attributes"]["extra_first_name"])
           .to eq("im extra, serialized")
       end
     end
