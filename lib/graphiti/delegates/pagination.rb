@@ -11,6 +11,7 @@ module Graphiti
 
       def links
         @links ||= {}.tap do |links|
+          links[:self] = pagination_link(current_page)
           links[:first] = pagination_link(1)
           links[:last] = pagination_link(last_page)
           links[:prev] = pagination_link(current_page - 1) unless current_page == 1

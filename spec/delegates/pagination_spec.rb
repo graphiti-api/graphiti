@@ -20,7 +20,7 @@ RSpec.describe Graphiti::Delegates::Pagination do
       allow(instance).to receive(:item_count).and_return(current_per_page * total_pages)
     end
     it "generates pagination links" do
-      expect(subject).to include(:first, :next, :last, :prev)
+      expect(subject.keys).to match_array(%i[first next last prev self])
     end
     it "generates a link for the first page" do
       expect(subject[:first]).to eq pagination_link(1)
@@ -33,6 +33,9 @@ RSpec.describe Graphiti::Delegates::Pagination do
     end
     it "generates a link for the prev page" do
       expect(subject[:prev]).to eq pagination_link(prev_page)
+    end
+    it "generates a link for the current page" do
+      expect(subject[:self]).to eq pagination_link(current_page)
     end
     context "if on the first page" do
       let(:current_page) { 1 }
