@@ -955,7 +955,6 @@ RSpec.describe "serialization" do
             end
           end
 
-
           context "and the guard fails" do
             before do
               ctx.overridden = false

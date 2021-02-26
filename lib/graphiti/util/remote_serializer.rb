@@ -44,6 +44,7 @@ module Graphiti
           model.delete_field(:_relationships)
           # If this isn't set, Array(resources) will return []
           # This is important, because jsonapi-serializable makes this call
+          # To see the test failure, remote resource position > department
           model.instance_variable_set(:@__graphiti_resource, 1)
           model.instance_variable_set(:@__graphiti_serializer, serializer)
         end
