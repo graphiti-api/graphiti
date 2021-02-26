@@ -1681,4 +1681,128 @@ RSpec.describe "serialization" do
       end
     end
   end
+
+  context "when attribute and relationship share the same name" do
+    let!(:employee) { PORO::Employee.create }
+    let!(:position) do
+      PORO::Position.create(title: "foo", employee_id: employee.id)
+    end
+
+    before do
+      resource.attribute :positions, :string do
+        "attrpositions"
+      end
+      resource.has_many :positions
+    end
+
+    context "when relationship is included" do
+      before do
+        params[:include] = :positions
+      end
+
+      it "renders both the attribute and the relationship" do
+        render
+        expect(json["data"][0]["attributes"]["positions"])
+          .to eq("attrpositions")
+        resource_id = {"id" => position.id.to_s, "type" => "positions"}
+        expect(json["data"][0]["relationships"]["positions"]).to eq({
+          "data" => [resource_id]
+        })
+        expect(json["included"][0].slice("type", "id")).to eq(resource_id)
+      end
+
+      context "and rendering json" do
+        it "renders the relationship" do
+          json = proxy.as_json[:data][0]
+          expect(json[:positions]).to eq([{
+            id: position.id.to_s,
+            title: "foo",
+            rank: nil
+          }])
+        end
+      end
+    end
+
+    context "when the relationship is not included" do
+      it "renders both the attribute and the relationship" do
+        render
+        expect(json["data"][0]["attributes"]["positions"])
+          .to eq("attrpositions")
+        expect(json["data"][0]["relationships"]["positions"]).to eq({
+          "meta" => {"included" => false}
+        })
+      end
+
+      context "and rendering json" do
+        it "renders the attribute" do
+          json = proxy.as_json[:data][0]
+          expect(json[:positions]).to eq("attrpositions")
+        end
+      end
+    end
+
+    context "when the attribute is guarded, and the guard fails" do
+      before do
+        resource.class_eval do
+          attribute :first_name, :string
+          attribute :positions, :string, readable: :admin?
+          def admin?
+            false
+          end
+        end
+      end
+
+      context "and the relationship is not included" do
+        before do
+          params[:include] = "positions"
+        end
+
+        it "does not render the attribute, does render the relationship" do
+          render
+          expect(json["data"][0]["attributes"]).to_not have_key("positions")
+          resource_id = {"id" => position.id.to_s, "type" => "positions"}
+          expect(json["data"][0]["relationships"]["positions"]["data"])
+            .to eq([resource_id])
+          expect(json["included"][0].slice("id", "type")).to eq(resource_id)
+        end
+
+        context "and rendering JSON" do
+          it "still renders the relationship" do
+            json = proxy.as_json[:data][0]
+            expect(json[:positions]).to eq([{
+              id: position.id.to_s,
+              title: "foo",
+              rank: nil
+            }])
+          end
+        end
+      end
+
+      context "and the relationship is included" do
+        before do
+          params[:include] = "positions"
+        end
+
+        it "is still rendered" do
+          render
+          expect(json["data"][0]["attributes"]).to_not have_key("positions")
+          resource_id = {"id" => position.id.to_s, "type" => "positions"}
+          expect(json["data"][0]["relationships"]["positions"]["data"])
+            .to eq([resource_id])
+          expect(json["included"][0].slice("id", "type")).to eq(resource_id)
+        end
+
+        context "and rendering JSON" do
+          it "still renders the relationship" do
+            json = proxy.as_json[:data][0]
+            expect(json[:positions]).to eq([{
+              id: position.id.to_s,
+              title: "foo",
+              rank: nil
+            }])
+          end
+        end
+      end
+    end
+  end
 end
