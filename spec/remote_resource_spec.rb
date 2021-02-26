@@ -72,7 +72,7 @@ RSpec.describe "remote resources" do
       expect(model.to_h).to_not have_key(:_relationships)
     end
 
-    it "can serialize correctly" do
+    it "can serialize jsonapi correctly" do
       json = JSON.parse(query.to_jsonapi)
       data = json["data"][0]
       expect(data["id"]).to eq("123")
@@ -83,6 +83,18 @@ RSpec.describe "remote resources" do
         "full_name" => "Jane Doe"
       })
       expect(json["meta"]).to eq({})
+    end
+
+    it "can serialize flat json correctly" do
+      json = query.as_json
+      expect(json).to eq({
+        data: [{
+          id: "123",
+          last_name: "DOE",
+          full_name: "Jane Doe",
+          first_name: "Jane"
+        }]
+      })
     end
 
     context "when remote_base_url is set" do

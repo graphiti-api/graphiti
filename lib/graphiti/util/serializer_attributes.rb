@@ -20,14 +20,12 @@ module Graphiti
           @serializer.send(_method, @name, serializer_options, &proc)
         elsif @serializer.attribute_blocks[@name].nil?
           @serializer.send(_method, @name, serializer_options, &proc)
+        elsif @serializer.send(applied_method).include?(@name)
+          @serializer.field_condition_blocks[@name] = guard if guard?
         else
-          if @serializer.send(applied_method).include?(@name)
-            @serializer.field_condition_blocks[@name] = guard if guard?
-          else
-            inner = @serializer.attribute_blocks.delete(@name)
-            wrapped = wrap_proc(inner)
-            @serializer.send(_method, @name, serializer_options, &wrapped)
-          end
+          inner = @serializer.attribute_blocks.delete(@name)
+          wrapped = wrap_proc(inner)
+          @serializer.send(_method, @name, serializer_options, &wrapped)
         end
 
         existing = @serializer.send(applied_method)

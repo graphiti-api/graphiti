@@ -72,16 +72,21 @@ module Graphiti
           name = graphql ? k.to_s.camelize(:lower) : k
           name_chain = name_chain.dup
           name_chain << k unless name_chain.last == k
-          attrs[name.to_sym] = if serializers.is_a?(Array)
-            serializers.map do |rr|
-              rr.to_hash(fields: fields, include: nested_include, graphql: graphql, name_chain: name_chain)
+
+          unless remote_resource? && serializers.nil?
+            attrs[name.to_sym] = if serializers.is_a?(Array)
+              serializers.map do |rr|
+                rr.to_hash(fields: fields, include: nested_include, graphql: graphql, name_chain: name_chain)
+              end
+            elsif serializers.nil?
+              if @resource.class.respond_to?(:sideload)
+                if @resource.class.sideload(k).type.to_s.include?("_many")
+                  []
+                end
+              end
+            else
+              serializers.to_hash(fields: fields, include: nested_include, graphql: graphql, name_chain: name_chain)
             end
-          elsif serializers.nil?
-            if @resource.class.sideload(k).type.to_s.include?("_many")
-              []
-            end
-          else
-            serializers.to_hash(fields: fields, include: nested_include, graphql: graphql, name_chain: name_chain)
           end
         end
 
@@ -107,9 +112,14 @@ module Graphiti
     end
 
     def polymorphic_subclass?
-      @resource.respond_to?(:polymorphic?) &&
+      !remote_resource? &&
         @resource.polymorphic? &&
         @resource.type != jsonapi_type
+    end
+
+    # See hack in util/remote_serializer.rb
+    def remote_resource?
+      @resource == 1
     end
   end
 
