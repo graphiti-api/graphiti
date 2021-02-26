@@ -20,6 +20,12 @@ module Graphiti
         split = namespace.split("::")
         split[0, split.length - 1].join("::")
       end
+
+      def self.graphql_type_name(name)
+        name.gsub("Resource", "")
+          .gsub("::", "") # remove modules
+          .gsub(".", "__") # remove remote resource .
+      end
     end
   end
 end

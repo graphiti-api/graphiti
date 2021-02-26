@@ -16,7 +16,7 @@ module Graphiti
         end
 
         # polymorphic resources - merge the PARENT type
-        if @resource.polymorphic? && @resource.type != jsonapi_type
+        if polymorphic_subclass?
           if fields[@resource.type]
             fields_list ||= []
             fields_list |= fields[@resource.type]
@@ -88,11 +88,28 @@ module Graphiti
         if !graphql || (fields_list || []).include?(:id)
           hash[:id] = jsonapi_id
         end
-        if graphql && (fields_list || []).include?(:_type)
+
+        if (fields_list || []).include?(:_type)
           hash[:_type] = jsonapi_type.to_s
         end
+
+        if (fields_list || []).include?(:__typename)
+          resource_class = @resource.class
+          if polymorphic_subclass?
+            resource_class = @resource.class.resource_for_type(jsonapi_type)
+          end
+          hash[:__typename] = ::Graphiti::Util::Class
+            .graphql_type_name(resource_class.name)
+        end
+
         hash.merge!(attrs) if attrs.any?
       end
+    end
+
+    def polymorphic_subclass?
+      @resource.respond_to?(:polymorphic?) &&
+        @resource.polymorphic? &&
+        @resource.type != jsonapi_type
     end
   end
 
