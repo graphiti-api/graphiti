@@ -6,6 +6,7 @@ require "active_support/core_ext/class/attribute"
 require "active_support/core_ext/hash/conversions" # to_xml
 require "active_support/concern"
 require "active_support/time"
+require "active_support/deprecation"
 
 require "dry-types"
 require "graphiti_errors"
