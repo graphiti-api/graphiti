@@ -56,7 +56,7 @@ RSpec.describe Graphiti::Resource do
           .to eq(Graphiti::Serializer)
         # This class has no name
         expect(klass.type).to eq(:undefined_jsonapi_type)
-        expect(klass.graphql_entrypoint).to eq(:undefined_jsonapi_types)
+        expect(klass.graphql_entrypoint).to eq(:undefinedJsonapiTypes)
       end
 
       it "inherits defaults" do
@@ -468,6 +468,13 @@ RSpec.describe Graphiti::Resource do
   describe "#adapter" do
     it "defaults" do
       expect(instance.adapter.class).to eq(Graphiti::Adapters::Abstract)
+    end
+  end
+
+  describe ".graphql_entrypoint" do
+    it "automatically converts to gql camelCase" do
+      klass.graphql_entrypoint = :exemplary_employees
+      expect(klass.graphql_entrypoint).to eq(:exemplaryEmployees)
     end
   end
 
