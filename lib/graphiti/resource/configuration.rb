@@ -28,6 +28,14 @@ module Graphiti
           end
         end
 
+        def graphql_entrypoint=(val)
+          if val
+            super(val.to_s.camelize(:lower).to_sym)
+          else
+            super
+          end
+        end
+
         # The .stat call stores a proc based on adapter
         # So if we assign a new adapter, reconfigure
         def adapter=(val)
