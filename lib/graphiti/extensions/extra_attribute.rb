@@ -46,9 +46,12 @@ module Graphiti
               next false unless instance_exec(&options[:if])
             end
 
-            @extra_fields &&
+            (@extra_fields &&
               @extra_fields[@_type] &&
-              @extra_fields[@_type].include?(name)
+              @extra_fields[@_type].include?(name)) ||
+            (@extra_fields &&
+              @extra_fields[@resource] &&
+              @extra_fields[@resource].include?(name))
           }
 
           attribute name, if: allow_field, &blk
