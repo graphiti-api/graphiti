@@ -434,6 +434,10 @@ module PORO
     attribute :number, :integer
     attribute :description, :string
     filter :employee_id, :integer
+
+    extra_attribute :credit_score, :integer do
+      999
+    end
   end
 
   class VisaResource < CreditCardResource

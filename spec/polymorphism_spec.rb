@@ -8,6 +8,7 @@ RSpec.describe "polymorphic resource behavior" do
   let(:resource) do
     Class.new(PORO::CreditCardResource) do
       self.polymorphic_child = false
+      self.type = "credit_cards"
     end
   end
 
@@ -253,6 +254,34 @@ RSpec.describe "polymorphic resource behavior" do
             }
           ])
         end
+      end
+    end
+  end
+
+  describe "accessing extra_fields" do
+    before do
+      params[:include] = "visa_rewards"
+    end
+
+    context "using the parent as key" do
+      before do
+        params[:extra_fields] = {credit_cards: "credit_score"}
+      end
+
+      it "displays the extra_field" do
+        render
+        expect(json["data"][0]["attributes"]).to include({"credit_score" => 999})
+      end
+    end
+
+    context "using the polymorphic child as key" do
+      before do
+        params[:extra_fields] = {visas: "credit_score"}
+      end
+
+      it "displays the extra_field" do
+        render
+        expect(json["data"][0]["attributes"]).to include({"credit_score" => 999})
       end
     end
   end
