@@ -14,7 +14,8 @@ module Graphiti
     end
 
     class NullRelation
-      extend ActiveModel::Naming
+      extend ActiveModel::Naming if defined? ActiveModel::Naming
+
       attr_accessor :id, :errors, :pointer
 
       def initialize(id, pointer)
