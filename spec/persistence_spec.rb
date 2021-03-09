@@ -2446,7 +2446,7 @@ RSpec.describe "persistence" do
             errors = employee.data.classification.errors
             expect(errors.details).to eq(base: [{error: :not_found}])
             expect(errors.messages).to eq(base: ["could not be found"])
-            model = errors.instance_variable_get(:@base)
+            model = errors.instance_variable_get(:@target)
             expect(model.id).to eq("123")
             expect(model.pointer).to eq("data/relationships/classifications")
           end
