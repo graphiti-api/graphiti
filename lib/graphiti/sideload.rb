@@ -136,6 +136,14 @@ module Graphiti
       base_filter(parents)
     end
 
+    def link_extra_fields
+      extra_fields_name = [association_name, resource.type].find { |param|
+        context.params.dig(:extra_fields, param)
+      }
+
+      {resource.type => context.params.dig(:extra_fields, extra_fields_name)} if extra_fields_name
+    end
+
     # The parent resource is a remote,
     # AND the sideload is a remote to the same endpoint
     def shared_remote?
