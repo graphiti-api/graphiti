@@ -1322,6 +1322,66 @@ RSpec.describe "serialization" do
           end
         end
 
+        context "with nested extra attribute" do
+          context "when referencing the type" do
+            let!(:employee) { PORO::Employee.create(classification_id: 789) }
+
+            before do
+              resource.belongs_to :classification
+              params[:extra_fields] = {classifications: "description"}
+            end
+
+            def classification
+              json["data"][0]["relationships"]["classification"]
+            end
+
+            it "links correctly" do
+              render
+              expect(classification["links"]["related"])
+                .to eq("/poro/classifications/789?extra_fields[classifications]=description")
+            end
+          end
+
+          context "when referencing the association name" do
+            before do
+              resource.has_many :positions, as: :senior_positions
+              params[:extra_fields] = {senior_positions: "score"}
+            end
+
+            it "links correctly" do
+              render
+              expect(positions["links"]["related"])
+                .to eq("/poro/positions?extra_fields[positions]=score&filter[employee_id]=1")
+            end
+          end
+
+          context "when referencing a polymorphic_belongs_to" do
+            let!(:employee) { PORO::Employee.create(credit_card_id: 1123, credit_card_type: "Visa") }
+
+            before do
+              resource.polymorphic_belongs_to :credit_card do
+                group_by(:credit_card_type) do
+                  on(:Visa)
+                  on(:GoldVisa)
+                  on(:Mastercard)
+                end
+              end
+
+              params[:extra_fields] = {credit_card: "foo"}
+            end
+
+            def credit_card
+              json["data"][0]["relationships"]["credit_card"]
+            end
+
+            it "links correctly" do
+              render
+              expect(credit_card["links"]["related"])
+                .to eq("/poro/visas/1123?extra_fields[visas]=foo")
+            end
+          end
+        end
+
         context "with runtime params" do
           xit "links correctly" do
           end
