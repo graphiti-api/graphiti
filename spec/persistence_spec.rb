@@ -1935,11 +1935,11 @@ RSpec.describe "persistence" do
       end
 
       it "coerces integers" do
-        expect(save(1)).to eq(BigDecimal(1))
+        expect(save(1)).to eq(BigDecimal("1"))
       end
 
       it "coerces strings" do
-        expect(save("1")).to eq(BigDecimal(1))
+        expect(save("1")).to eq(BigDecimal("1"))
       end
 
       it "allows nils" do

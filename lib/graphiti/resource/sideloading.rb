@@ -71,7 +71,7 @@ module Graphiti
               hash[:filter][:"#{as}_type"] = model_ref.name
             end
 
-            instance_eval(&blk) if block_given?
+            instance_eval(&blk) if blk
           end
         end
 
@@ -85,7 +85,7 @@ module Graphiti
               hash[:filter][:"#{as}_type"] = model_ref.name
             end
 
-            instance_eval(&blk) if block_given?
+            instance_eval(&blk) if blk
           end
         end
 

@@ -13,7 +13,7 @@ module Graphiti
     class ValidatorFactory
       def self.create(root_resource, raw_params, action)
         case action
-        when :update then
+        when :update
           RequestValidators::UpdateValidator
         else
           RequestValidators::Validator
