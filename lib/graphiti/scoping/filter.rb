@@ -12,6 +12,12 @@ module Graphiti
           resource, missing_dependent_filters
       end
 
+      if any_required_filters.any?
+        unless present_any_required_filters.any?
+          raise Errors::MissingAnyRequiredFilter.new resource, any_required_filters
+        end
+      end
+
       each_filter do |filter, operator, value|
         @scope = filter_scope(filter, operator, value)
       end

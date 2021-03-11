@@ -1783,4 +1783,56 @@ RSpec.describe "filtering" do
       expect(records.map(&:id)).to eq([employee2.id])
     end
   end
+
+  context "when filter is any_required on .attribute" do
+    before do
+      resource.attribute :first_name, :string, filterable: :any_required
+      resource.attribute :last_name, :string, filterable: :any_required
+    end
+
+    context "when one is given in the request" do
+      before do
+        params[:filter] = {first_name: "Agatha"}
+      end
+
+      it "works" do
+        expect(records.map(&:id)).to eq([employee2.id])
+      end
+    end
+
+    context "when none are given in request" do
+      it "raises error" do
+        expect {
+          records
+        }.to raise_error(/One of the following filters must be passed in: first_name, last_name/)
+      end
+    end
+  end
+
+  context "when filter is any_required on .filter", focus: true do
+    before do
+      resource.config[:filters] = {}
+      resource.config[:attributes] = {}
+      resource.filter :first_name, :string, any_required: true
+      resource.filter :last_name, :string, any_required: true
+    end
+
+    context "when one is given in the request" do
+      before do
+        params[:filter] = {first_name: "Agatha"}
+      end
+
+      it "works" do
+        expect(records.map(&:id)).to eq([employee2.id])
+      end
+    end
+
+    context "when none are given in the request" do
+      it "raises error" do
+        expect {
+          records
+        }.to raise_error(/One of the following filters must be passed in: first_name, last_name/)
+      end
+    end
+  end
 end

@@ -23,6 +23,8 @@ module Graphiti
             end
 
             required = att[:filterable] == :required || !!opts[:required]
+            any_required = att[:filterable] == :any_required || !!opts[:any_required]
+
             config[:filters][name.to_sym] = {
               aliases: aliases,
               name: name.to_sym,
@@ -31,6 +33,7 @@ module Graphiti
               deny: opts[:deny],
               single: !!opts[:single],
               dependencies: opts[:dependent],
+              any_required: any_required,
               required: required,
               operators: operators.to_hash,
               allow_nil: opts.fetch(:allow_nil, filters_accept_nil_by_default),

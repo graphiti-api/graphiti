@@ -683,6 +683,17 @@ module Graphiti
       end
     end
 
+    class MissingAnyRequiredFilter < Base
+      def initialize(resource, filters)
+        @resource = resource
+        @filters = filters
+      end
+
+      def message
+        "#{@resource.class.name}: One of the following filters must be passed in: #{@filters.keys.join(', ')}"
+      end
+    end
+
     class ResourceNotFound < Base
       def initialize(resource_class, sideload_name, tried)
         @resource_class = resource_class

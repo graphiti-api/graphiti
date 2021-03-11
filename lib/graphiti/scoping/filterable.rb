@@ -47,5 +47,15 @@ module Graphiti
         v[:dependencies].present?
       end
     end
+
+    def present_any_required_filters
+      any_required_filters.keys.intersection(filter_param.keys)
+    end
+
+    def any_required_filters
+      resource.filters.select do |k, v|
+        v[:any_required].present?
+      end
+    end
   end
 end
