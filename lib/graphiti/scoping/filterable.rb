@@ -49,7 +49,7 @@ module Graphiti
     end
 
     def present_any_required_filters
-      any_required_filters.keys.intersection(filter_param.keys)
+      any_required_filters.keys.select { |name| filter_param.keys.include?(name) }
     end
 
     def any_required_filters
