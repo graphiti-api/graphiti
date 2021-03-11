@@ -63,7 +63,7 @@ module Graphiti
         end
 
         def sort_all(&blk)
-          if block_given?
+          if blk
             config[:_sort_all] = blk
           else
             config[:_sort_all]

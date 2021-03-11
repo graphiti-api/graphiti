@@ -19,24 +19,24 @@ module Graphiti
       def filter_eq(scope, attribute, value)
         scope.where(attribute => value)
       end
-      alias filter_integer_eq filter_eq
-      alias filter_float_eq filter_eq
-      alias filter_big_decimal_eq filter_eq
-      alias filter_date_eq filter_eq
-      alias filter_boolean_eq filter_eq
-      alias filter_uuid_eq filter_eq
-      alias filter_enum_eq filter_eq
+      alias_method :filter_integer_eq, :filter_eq
+      alias_method :filter_float_eq, :filter_eq
+      alias_method :filter_big_decimal_eq, :filter_eq
+      alias_method :filter_date_eq, :filter_eq
+      alias_method :filter_boolean_eq, :filter_eq
+      alias_method :filter_uuid_eq, :filter_eq
+      alias_method :filter_enum_eq, :filter_eq
 
       def filter_not_eq(scope, attribute, value)
         scope.where.not(attribute => value)
       end
-      alias filter_integer_not_eq filter_not_eq
-      alias filter_float_not_eq filter_not_eq
-      alias filter_big_decimal_not_eq filter_not_eq
-      alias filter_date_not_eq filter_not_eq
-      alias filter_boolean_not_eq filter_not_eq
-      alias filter_uuid_not_eq filter_not_eq
-      alias filter_enum_not_eq filter_not_eq
+      alias_method :filter_integer_not_eq, :filter_not_eq
+      alias_method :filter_float_not_eq, :filter_not_eq
+      alias_method :filter_big_decimal_not_eq, :filter_not_eq
+      alias_method :filter_date_not_eq, :filter_not_eq
+      alias_method :filter_boolean_not_eq, :filter_not_eq
+      alias_method :filter_uuid_not_eq, :filter_not_eq
+      alias_method :filter_enum_not_eq, :filter_not_eq
 
       def filter_string_eq(scope, attribute, value, is_not: false)
         column = column_for(scope, attribute)
@@ -122,40 +122,40 @@ module Graphiti
         column = column_for(scope, attribute)
         scope.where(column.gt_any(value))
       end
-      alias filter_integer_gt filter_gt
-      alias filter_float_gt filter_gt
-      alias filter_big_decimal_gt filter_gt
-      alias filter_datetime_gt filter_gt
-      alias filter_date_gt filter_gt
+      alias_method :filter_integer_gt, :filter_gt
+      alias_method :filter_float_gt, :filter_gt
+      alias_method :filter_big_decimal_gt, :filter_gt
+      alias_method :filter_datetime_gt, :filter_gt
+      alias_method :filter_date_gt, :filter_gt
 
       def filter_gte(scope, attribute, value)
         column = column_for(scope, attribute)
         scope.where(column.gteq_any(value))
       end
-      alias filter_integer_gte filter_gte
-      alias filter_float_gte filter_gte
-      alias filter_big_decimal_gte filter_gte
-      alias filter_datetime_gte filter_gte
-      alias filter_date_gte filter_gte
+      alias_method :filter_integer_gte, :filter_gte
+      alias_method :filter_float_gte, :filter_gte
+      alias_method :filter_big_decimal_gte, :filter_gte
+      alias_method :filter_datetime_gte, :filter_gte
+      alias_method :filter_date_gte, :filter_gte
 
       def filter_lt(scope, attribute, value)
         column = column_for(scope, attribute)
         scope.where(column.lt_any(value))
       end
-      alias filter_integer_lt filter_lt
-      alias filter_float_lt filter_lt
-      alias filter_big_decimal_lt filter_lt
-      alias filter_datetime_lt filter_lt
-      alias filter_date_lt filter_lt
+      alias_method :filter_integer_lt, :filter_lt
+      alias_method :filter_float_lt, :filter_lt
+      alias_method :filter_big_decimal_lt, :filter_lt
+      alias_method :filter_datetime_lt, :filter_lt
+      alias_method :filter_date_lt, :filter_lt
 
       def filter_lte(scope, attribute, value)
         column = column_for(scope, attribute)
         scope.where(column.lteq_any(value))
       end
-      alias filter_integer_lte filter_lte
-      alias filter_float_lte filter_lte
-      alias filter_big_decimal_lte filter_lte
-      alias filter_date_lte filter_lte
+      alias_method :filter_integer_lte, :filter_lte
+      alias_method :filter_float_lte, :filter_lte
+      alias_method :filter_big_decimal_lte, :filter_lte
+      alias_method :filter_date_lte, :filter_lte
 
       # Ensure fractional seconds don't matter
       def filter_datetime_eq(scope, attribute, value, is_not: false)

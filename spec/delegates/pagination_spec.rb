@@ -148,7 +148,7 @@ RSpec.describe Graphiti::Delegates::Pagination do
 
       it "returns 0 if resource.stat(:total, :count) is nil" do
         expect(proxy.scope).to receive(:unpaginated_object)
-        expect(proxy.resource).to receive(:stat).with(:total, :count).and_return(lambda { |obj, meth| nil })
+        expect(proxy.resource).to receive(:stat).with(:total, :count).and_return(lambda { |obj, meth| })
         expect(subject).to eq 0
       end
 

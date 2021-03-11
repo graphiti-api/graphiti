@@ -97,10 +97,8 @@ module Graphiti
       end
 
       def offset
-        @offset ||= begin
-          if (value = page_param[:offset])
-            value.to_i
-          end
+        @offset ||= if (value = page_param[:offset])
+          value.to_i
         end
       end
 
