@@ -1809,7 +1809,7 @@ RSpec.describe "filtering" do
     end
   end
 
-  context "when filter is any_required on .filter", focus: true do
+  context "when filter is any_required on .filter" do
     before do
       resource.config[:filters] = {}
       resource.config[:attributes] = {}

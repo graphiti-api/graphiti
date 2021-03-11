@@ -690,7 +690,7 @@ module Graphiti
       end
 
       def message
-        "#{@resource.class.name}: One of the following filters must be passed in: #{@filters.keys.join(', ')}"
+        "#{@resource.class.name}: One of the following filters must be passed in: #{@filters.keys.join(", ")}"
       end
     end
 
