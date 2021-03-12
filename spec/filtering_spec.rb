@@ -1784,7 +1784,7 @@ RSpec.describe "filtering" do
     end
   end
 
-  context "with filter group", focus: true do
+  context "with filter group" do
     context "when required invalid" do
       before do
         resource.filter_group [:first_name, :last_name], required: :foo
