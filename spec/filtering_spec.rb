@@ -1818,7 +1818,7 @@ RSpec.describe "filtering" do
         before do
           params[:filter] = {
             first_name: "Agatha",
-            last_name: "Christie",
+            last_name: "Christie"
           }
         end
 
@@ -1843,9 +1843,7 @@ RSpec.describe "filtering" do
 
       context "when one is given in the request" do
         before do
-          params[:filter] = {
-            last_name: "Christie",
-          }
+          params[:filter] = {last_name: "Christie"}
         end
 
         it "works" do
