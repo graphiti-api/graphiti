@@ -21,6 +21,8 @@ module Graphiti
           VALID_FILTER_GROUP_REQUIRED_VALUES
         )
       end
+
+      true
     end
 
     private

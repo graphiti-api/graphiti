@@ -1850,6 +1850,19 @@ RSpec.describe "filtering" do
           expect(records.map(&:id)).to eq([employee2.id])
         end
       end
+
+      context "when all are given in the request" do
+        before do
+          params[:filter] = {
+            first_name: "Agatha",
+            last_name: "Christie"
+          }
+        end
+
+        it "works" do
+          expect(records.map(&:id)).to eq([employee2.id])
+        end
+      end
     end
   end
 end
