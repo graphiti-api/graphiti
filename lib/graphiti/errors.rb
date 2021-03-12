@@ -824,7 +824,7 @@ module Graphiti
       end
 
       def message
-        <<-MSG.strip
+        <<-MSG.gsub(/\s+/, ' ').strip
           The filter group required: value on resource #{@resource.class} must be one of the following:
           #{@valid_required_values.join(", ")}
         MSG
@@ -839,7 +839,7 @@ module Graphiti
       end
 
       def message
-        <<-MSG.strip
+        <<-MSG.gsub(/\s+/, ' ').strip
           #{@required_label} of the following filters must be provided on resource #{@resource.class}:
           #{@filter_names.join(", ")}
         MSG

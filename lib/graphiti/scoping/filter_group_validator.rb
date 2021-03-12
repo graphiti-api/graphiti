@@ -28,8 +28,6 @@ module Graphiti
     attr_reader :resource, :query_hash
 
     def raise_unless_all_requirements_met?
-      return if grouped_filters.empty?
-
       met = filter_group_names.all? do |filter_name|
         filter_group_filter_param.include?(filter_name)
       end
@@ -44,8 +42,6 @@ module Graphiti
     end
 
     def raise_unless_any_requirements_met?
-      return if grouped_filters.empty?
-
       met = filter_group_names.any? do |filter_name|
         filter_group_filter_param.keys.include?(filter_name)
       end
