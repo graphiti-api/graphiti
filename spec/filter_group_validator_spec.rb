@@ -48,7 +48,7 @@ RSpec.describe Graphiti::Scoping::FilterGroupValidator do
         let(:query_hash) do
           {
             filter: {
-              first_name: {},
+              first_name: {}
             }
           }
         end
@@ -71,7 +71,7 @@ RSpec.describe Graphiti::Scoping::FilterGroupValidator do
         end
 
         it "works" do
-          expect(subject).to be false
+          expect(subject).to be true
         end
       end
     end
