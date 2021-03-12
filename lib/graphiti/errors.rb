@@ -816,5 +816,34 @@ module Graphiti
 
     class ConflictRequest < InvalidRequest
     end
+
+    class FilterGroupInvalidRequirement < Base
+      def initialize(resource, valid_required_values)
+        @resource = resource
+        @valid_required_values = valid_required_values
+      end
+
+      def message
+        <<-MSG.strip
+          The filter group required: value on resource #{@resource.class} must be one of the following:
+          #{@valid_required_values.join(", ")}
+        MSG
+      end
+    end
+
+    class FilterGroupMissingRequiredFilters < Base
+      def initialize(resource, filter_names, required)
+        @resource = resource
+        @filter_names = filter_names
+        @required_label = required == :all ? 'All' : 'One'
+      end
+
+      def message
+        <<-MSG.strip
+          #{@required_label} of the following filters must be provided on resource #{@resource.class}:
+          #{@filter_names.join(", ")}
+        MSG
+      end
+    end
   end
 end

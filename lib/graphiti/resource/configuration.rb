@@ -199,6 +199,7 @@ module Graphiti
           @config ||=
             {
               filters: {},
+              grouped_filters: {},
               default_filters: {},
               stats: {},
               sort_all: nil,
@@ -233,6 +234,10 @@ module Graphiti
 
         def filters
           config[:filters]
+        end
+
+        def grouped_filters
+          config[:grouped_filters]
         end
 
         def sorts
@@ -271,6 +276,10 @@ module Graphiti
 
       def filters
         self.class.filters
+      end
+
+      def grouped_filters
+        self.class.grouped_filters
       end
 
       def sort_all
