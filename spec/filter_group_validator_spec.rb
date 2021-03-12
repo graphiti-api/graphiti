@@ -7,7 +7,7 @@ RSpec.describe Graphiti::Scoping::FilterGroupValidator do
 
   subject { validator.raise_unless_filter_group_requirements_met! }
 
-  describe '#raise_unless_filter_group_requirements_met!' do
+  describe "#raise_unless_filter_group_requirements_met!" do
     before do
       allow(resource).to receive(:grouped_filters).and_return(grouped_filters)
     end
