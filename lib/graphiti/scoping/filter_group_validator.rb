@@ -7,14 +7,14 @@ module Graphiti
       @query_hash = query_hash
     end
 
-    def raise_unless_filter_group_requirements_met?
+    def raise_unless_filter_group_requirements_met!
       return if grouped_filters.empty?
 
       case filter_group_requirement
       when :all
-        raise_unless_all_requirements_met?
+        raise_unless_all_requirements_met!
       when :any
-        raise_unless_any_requirements_met?
+        raise_unless_any_requirements_met!
       else
         raise Errors::FilterGroupInvalidRequirement.new(
           resource,
@@ -27,7 +27,7 @@ module Graphiti
 
     attr_reader :resource, :query_hash
 
-    def raise_unless_all_requirements_met?
+    def raise_unless_all_requirements_met!
       met = filter_group_names.all? { |filter_name| filter_group_filter_param.include?(filter_name) }
 
       unless met
@@ -39,7 +39,7 @@ module Graphiti
       end
     end
 
-    def raise_unless_any_requirements_met?
+    def raise_unless_any_requirements_met!
       met = filter_group_names.any? { |filter_name| filter_group_filter_param.keys.include?(filter_name) }
 
       unless met
