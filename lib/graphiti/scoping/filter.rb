@@ -1,10 +1,12 @@
 module Graphiti
   class Scoping::Filter < Scoping::Base
     include Scoping::Filterable
-    include Scoping::FilterGroup
 
     def apply
-      raise_unless_filter_group_requirements_met?
+      Graphiti::Scoping::FilterGroupValidator.new(
+        resource,
+        query_hash
+      ).raise_unless_filter_group_requirements_met?
 
       if missing_required_filters.any? && !@opts[:bypass_required_filters]
         raise Errors::RequiredFilter.new(resource, missing_required_filters)

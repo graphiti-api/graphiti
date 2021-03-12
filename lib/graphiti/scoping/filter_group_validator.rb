@@ -1,16 +1,20 @@
 module Graphiti
-  # @api private
-  module Scoping::FilterGroup
+  class Scoping::FilterGroupValidator
     VALID_FILTER_GROUP_REQUIRED_VALUES = %i[all any]
+
+    def initialize(resource, query_hash)
+      @resource = resource
+      @query_hash = query_hash
+    end
 
     def raise_unless_filter_group_requirements_met?
       return if grouped_filters.empty?
 
       case filter_group_requirement
       when :all
-        raise_unless_all_filter_group_requirements_met?
+        raise_unless_all_requirements_met?
       when :any
-        raise_unless_any_filter_group_requirements_met?
+        raise_unless_any_requirements_met?
       else
         raise Errors::FilterGroupInvalidRequirement.new(
           resource,
@@ -19,8 +23,11 @@ module Graphiti
       end
     end
 
-    # @api private
-    def raise_unless_all_filter_group_requirements_met?
+    private
+
+    attr_reader :resource, :query_hash
+
+    def raise_unless_all_requirements_met?
       return if grouped_filters.empty?
 
       met = filter_group_names.all? do |filter_name|
@@ -36,8 +43,7 @@ module Graphiti
       end
     end
 
-    # @api private
-    def raise_unless_any_filter_group_requirements_met?
+    def raise_unless_any_requirements_met?
       return if grouped_filters.empty?
 
       met = filter_group_names.any? do |filter_name|
@@ -53,27 +59,22 @@ module Graphiti
       end
     end
 
-    # @api private
     def filter_group_requirement_valid?
       VALID_FILTER_GROUP_REQUIRED_VALUES.include?(filter_group_requirement)
     end
 
-    # @api private
     def filter_group_names
       grouped_filters.fetch(:names, [])
     end
 
-    # @api private
     def filter_group_requirement
       grouped_filters.fetch(:required, :invalid)
     end
 
-    # @api private
     def grouped_filters
       resource.grouped_filters
     end
 
-    # @api private
     def filter_group_filter_param
       query_hash.fetch(:filter, {})
     end
