@@ -74,19 +74,22 @@ module Graphiti
           name_chain << k unless name_chain.last == k
 
           unless remote_resource? && serializers.nil?
-            attrs[name.to_sym] = if serializers.is_a?(Array)
-              serializers.map do |rr|
+            payload = if serializers.is_a?(Array)
+              data = serializers.map { |rr|
                 rr.to_hash(fields: fields, include: nested_include, graphql: graphql, name_chain: name_chain)
-              end
+              }
+              graphql ? {nodes: data} : data
             elsif serializers.nil?
               if @resource.class.respond_to?(:sideload)
                 if @resource.class.sideload(k).type.to_s.include?("_many")
-                  []
+                  graphql ? {nodes: []} : []
                 end
               end
             else
               serializers.to_hash(fields: fields, include: nested_include, graphql: graphql, name_chain: name_chain)
             end
+
+            attrs[name.to_sym] = payload
           end
         end
 
@@ -133,29 +136,58 @@ module Graphiti
       serializers = options[:data]
       opts = options.slice(:fields, :include)
       opts[:graphql] = @graphql
-      to_hash(serializers, opts).tap do |hash|
-        hash.merge!(options.slice(:meta)) unless options[:meta].empty?
-      end
+      top_level_key = get_top_level_key(@resource, serializers.is_a?(Array))
+
+      hash = {top_level_key => {}}
+      nodes = get_nodes(serializers, opts)
+      add_nodes(hash, top_level_key, options, nodes, @graphql)
+      add_stats(hash, top_level_key, options, @graphql)
+      hash
     end
 
     private
 
-    def to_hash(serializers, opts)
-      {}.tap do |hash|
-        top_level_key = :data
-        if @graphql
-          top_level_key = @resource.graphql_entrypoint
-          unless serializers.is_a?(Array)
-            top_level_key = top_level_key.to_s.singularize.to_sym
-          end
-        end
+    def get_top_level_key(resource, is_many)
+      key = :data
 
-        hash[top_level_key] = if serializers.is_a?(Array)
-          serializers.map do |s|
-            s.to_hash(**opts)
+      if @graphql
+        key = @resource.graphql_entrypoint
+        key = key.to_s.singularize.to_sym unless is_many
+      end
+
+      key
+    end
+
+    def get_nodes(serializers, opts)
+      if serializers.is_a?(Array)
+        serializers.map do |s|
+          s.to_hash(**opts)
+        end
+      else
+        serializers.to_hash(**opts)
+      end
+    end
+
+    def add_nodes(hash, top_level_key, opts, nodes, graphql)
+      payload = nodes
+      if graphql && nodes.is_a?(Array)
+        payload = {nodes: nodes}
+      end
+
+      # Don't render nodes if we only requested stats
+      unless graphql && opts[:fields].values == [[:stats]]
+        hash[top_level_key] = payload
+      end
+    end
+
+    def add_stats(hash, top_level_key, options, graphql)
+      if options[:meta] && !options[:meta].empty?
+        if @graphql
+          if (stats = options[:meta][:stats])
+            hash[top_level_key][:stats] = stats
           end
         else
-          serializers.to_hash(**opts)
+          hash.merge!(options.slice(:meta))
         end
       end
     end

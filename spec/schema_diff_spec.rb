@@ -891,6 +891,49 @@ RSpec.describe Graphiti::SchemaDiff do
       end
     end
 
+    context "when a stat is added" do
+      before do
+        resource_a.stat age: [:sum]
+      end
+
+      it { is_expected.to eq([]) }
+    end
+
+    context "when a stat is removed" do
+      before do
+        resource_a.stat age: [:sum]
+        resource_b.config[:stats].delete(:age)
+      end
+
+      it "returns error" do
+        expect(diff).to eq([
+          "SchemaDiff::EmployeeResource: stat :age was removed."
+        ])
+      end
+    end
+
+    context "when a calculation is added" do
+      before do
+        resource_a.stat age: [:sum]
+        resource_b.stat age: [:sum, :average]
+      end
+
+      it { is_expected.to eq([]) }
+    end
+
+    context "when a calculation is removed" do
+      before do
+        resource_a.stat age: [:sum, :average]
+        resource_b.stat age: [:sum]
+      end
+
+      it "returns error" do
+        expect(diff).to eq([
+          "SchemaDiff::EmployeeResource: calculation :average was removed from stat :age."
+        ])
+      end
+    end
+
     context "when relationship is added" do
       before do
         resource_b.has_many :positions, resource: position_resource
