@@ -96,7 +96,8 @@ module Graphiti
           extra_attributes: extra_attributes(r),
           sorts: sorts(r),
           filters: filters(r),
-          relationships: relationships(r)
+          relationships: relationships(r),
+          stats: stats(r)
         }
 
         if r.grouped_filters.any?
@@ -166,6 +167,14 @@ module Graphiti
         "guarded"
       else
         !!value
+      end
+    end
+
+    def stats(resource)
+      {}.tap do |stats|
+        resource.stats.each_pair do |name, config|
+          stats[name] = config.calculations.keys
+        end
       end
     end
 

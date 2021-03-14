@@ -31,6 +31,9 @@ RSpec.describe Graphiti::Schema do
               id: {},
               first_name: {}
             },
+            stats: {
+              total: [:count]
+            },
             filters: {
               id: {
                 type: "integer_id",
@@ -549,6 +552,19 @@ RSpec.describe Graphiti::Schema do
       it "returns :guarded, not the runtime method" do
         expect(schema[:resources][0][:extra_attributes][:net_sales][:readable])
           .to eq("guarded")
+      end
+    end
+
+    context "when an additional statistic/calculations" do
+      before do
+        employee_resource.stat age: [:average, :sum]
+      end
+
+      it "is added to the schema" do
+        expect(schema[:resources][0][:stats]).to eq({
+          total: [:count],
+          age: [:average, :sum]
+        })
       end
     end
 

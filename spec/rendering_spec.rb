@@ -486,9 +486,9 @@ RSpec.describe "serialization" do
         end
 
         it "is not returned" do
-          expect(json[:employees][0]).to eq({
+          expect(json[:employees][:nodes][0]).to eq({
             firstName: "John",
-            positions: [{title: "title1"}]
+            positions: {nodes: [{title: "title1"}]}
           })
         end
       end
@@ -500,10 +500,10 @@ RSpec.describe "serialization" do
         end
 
         it "is returned" do
-          expect(json[:employees][0]).to eq({
+          expect(json[:employees][:nodes][0]).to eq({
             id: employee1.id.to_s,
             firstName: "John",
-            positions: [{id: position1.id.to_s, title: "title1"}]
+            positions: {nodes: [{id: position1.id.to_s, title: "title1"}]}
           })
         end
       end
@@ -515,9 +515,9 @@ RSpec.describe "serialization" do
         end
 
         it "is not returned" do
-          expect(json[:employees][0]).to eq({
+          expect(json[:employees][:nodes][0]).to eq({
             firstName: "John",
-            positions: [{title: "title1"}]
+            positions: {nodes: [{title: "title1"}]}
           })
         end
       end
@@ -529,10 +529,10 @@ RSpec.describe "serialization" do
         end
 
         it "is returned" do
-          expect(json[:employees][0]).to eq({
+          expect(json[:employees][:nodes][0]).to eq({
             _type: "employees",
             firstName: "John",
-            positions: [{_type: "positions", title: "title1"}]
+            positions: {nodes: [{_type: "positions", title: "title1"}]}
           })
         end
       end
@@ -553,9 +553,9 @@ RSpec.describe "serialization" do
         end
 
         it "is camelized" do
-          expect(json[:employees][0]).to eq({
+          expect(json[:employees][:nodes][0]).to eq({
             firstName: "John",
-            positions: [{multiWord: "foo"}]
+            positions: {nodes: [{multiWord: "foo"}]}
           })
         end
       end
@@ -575,7 +575,8 @@ RSpec.describe "serialization" do
         end
 
         it "is camelized" do
-          expect(json[:employees][0][:importantPositions]).to eq([{
+          employee = json[:employees][:nodes][0]
+          expect(employee[:importantPositions][:nodes]).to eq([{
             rank: 1,
             title: "title1",
             importantDepartment: {
