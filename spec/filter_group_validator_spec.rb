@@ -1,7 +1,7 @@
 require "spec_helper"
 
 RSpec.describe Graphiti::Scoping::FilterGroupValidator do
-  let(:resource) { double(:resource) }
+  let(:resource) { double(:resource, type: :employees) }
   let(:query_hash) { {} }
   let(:validator) { described_class.new(resource, query_hash) }
 

@@ -59,7 +59,6 @@ module Graphiti
       end
     end
 
-
     def filter_group_names
       grouped_filters.fetch(:names, [])
     end
