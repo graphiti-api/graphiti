@@ -840,7 +840,7 @@ module Graphiti
 
       def message
         <<-MSG.gsub(/\s+/, " ").strip
-          #{@required_label} of the following filters must be provided on resource #{@resource.class}:
+          #{@required_label} of the following filters must be provided on resource #{@resource.type}:
           #{@filter_names.join(", ")}
         MSG
       end

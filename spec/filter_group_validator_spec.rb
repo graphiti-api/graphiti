@@ -5,35 +5,33 @@ RSpec.describe Graphiti::Scoping::FilterGroupValidator do
   let(:query_hash) { {} }
   let(:validator) { described_class.new(resource, query_hash) }
 
-  subject { validator.raise_unless_filter_group_requirements_met! }
-
-  describe "#raise_unless_filter_group_requirements_met!" do
-    before do
-      allow(resource).to receive(:grouped_filters).and_return(grouped_filters)
-    end
+  describe ".raise_unless_filter_group_requirement_valid!" do
+    subject { described_class.raise_unless_filter_group_requirement_valid!(resource, required) }
 
     context "when required invalid" do
-      let(:query_hash) do
-        {
-          filter: {
-            first_name: {},
-            last_name: {}
-          }
-        }
-      end
-
-      let(:grouped_filters) do
-        {
-          names: [:first_name, :last_name],
-          required: :foo
-        }
-      end
+      let(:required) { :invalid }
 
       it "raises an error" do
         expect {
           subject
         }.to raise_error(/The filter group required: value on resource .+ must be one of the following:/)
       end
+    end
+
+    context "when required valid" do
+      let(:required) { :all }
+
+      it "works" do
+        expect(subject).to be true
+      end
+    end
+  end
+
+  describe "#raise_unless_filter_group_requirements_met!" do
+    subject { validator.raise_unless_filter_group_requirements_met! }
+
+    before do
+      allow(resource).to receive(:grouped_filters).and_return(grouped_filters)
     end
 
     context "when all are required" do

@@ -46,6 +46,9 @@ module Graphiti
 
         def filter_group(filter_names, *args)
           opts = args.extract_options!
+
+          Scoping::FilterGroupValidator.raise_unless_filter_group_requirement_valid!(self, opts[:required])
+
           config[:grouped_filters] = {
             names: filter_names,
             required: opts[:required]

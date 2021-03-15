@@ -1786,13 +1786,9 @@ RSpec.describe "filtering" do
 
   context "with filter group" do
     context "when required invalid" do
-      before do
-        resource.filter_group [:first_name, :last_name], required: :foo
-      end
-
       it "raises an error" do
         expect {
-          records
+          resource.filter_group [:first_name, :last_name], required: :foo
         }.to raise_error(/The filter group required: value on resource .+ must be one of the following:/)
       end
     end

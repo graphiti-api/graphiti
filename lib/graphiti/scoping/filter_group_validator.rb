@@ -1,6 +1,17 @@
 module Graphiti
   class Scoping::FilterGroupValidator
-    VALID_FILTER_GROUP_REQUIRED_VALUES = %i[all any]
+    VALID_REQUIRED_VALUES = %i[all any]
+
+    def self.raise_unless_filter_group_requirement_valid!(resource, requirement)
+      unless VALID_REQUIRED_VALUES.include?(requirement)
+        raise Errors::FilterGroupInvalidRequirement.new(
+          resource,
+          VALID_REQUIRED_VALUES
+        )
+      end
+
+      true
+    end
 
     def initialize(resource, query_hash)
       @resource = resource
@@ -15,11 +26,6 @@ module Graphiti
         raise_unless_all_requirements_met!
       when :any
         raise_unless_any_requirements_met!
-      else
-        raise Errors::FilterGroupInvalidRequirement.new(
-          resource,
-          VALID_FILTER_GROUP_REQUIRED_VALUES
-        )
       end
 
       true
@@ -53,9 +59,6 @@ module Graphiti
       end
     end
 
-    def filter_group_requirement_valid?
-      VALID_FILTER_GROUP_REQUIRED_VALUES.include?(filter_group_requirement)
-    end
 
     def filter_group_names
       grouped_filters.fetch(:names, [])
