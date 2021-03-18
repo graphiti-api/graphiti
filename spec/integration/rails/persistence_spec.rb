@@ -887,12 +887,12 @@ if ENV["APPRAISAL_INITIALIZED"]
                   code: "unprocessable_entity",
                   status: "422",
                   title: "Validation Error",
-                  detail: "translation missing: en.could not be found",
+                  detail: "could not be found",
                   source: {pointer: nil},
                   meta: {
                     relationship: {
                       attribute: "base",
-                      message: "translation missing: en.could not be found",
+                      message: "could not be found",
                       name: "classification",
                       type: "classifications",
                       id: "99999"

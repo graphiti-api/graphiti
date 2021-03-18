@@ -1783,4 +1783,82 @@ RSpec.describe "filtering" do
       expect(records.map(&:id)).to eq([employee2.id])
     end
   end
+
+  context "with filter group" do
+    context "when required invalid" do
+      it "raises an error" do
+        expect {
+          resource.filter_group [:first_name, :last_name], required: :foo
+        }.to raise_error(/The filter group required: value on resource .+ must be one of the following:/)
+      end
+    end
+
+    context "when all are required" do
+      before do
+        resource.filter_group [:first_name, :last_name], required: :all
+      end
+
+      context "when all are not given in the request" do
+        before do
+          params[:filter] = {first_name: "Agatha"}
+        end
+
+        it "raises an error" do
+          expect {
+            records
+          }.to raise_error(/All of the following filters must be provided on resource/)
+        end
+      end
+
+      context "when all are given in the request" do
+        before do
+          params[:filter] = {
+            first_name: "Agatha",
+            last_name: "Christie"
+          }
+        end
+
+        it "works" do
+          expect(records.map(&:id)).to eq([employee2.id])
+        end
+      end
+    end
+
+    context "when any are required" do
+      before do
+        resource.filter_group [:first_name, :last_name], required: :any
+      end
+
+      context "when none are given in the request" do
+        it "raises an error" do
+          expect {
+            records
+          }.to raise_error(/One of the following filters must be provided on resource/)
+        end
+      end
+
+      context "when one is given in the request" do
+        before do
+          params[:filter] = {last_name: "Christie"}
+        end
+
+        it "works" do
+          expect(records.map(&:id)).to eq([employee2.id])
+        end
+      end
+
+      context "when all are given in the request" do
+        before do
+          params[:filter] = {
+            first_name: "Agatha",
+            last_name: "Christie"
+          }
+        end
+
+        it "works" do
+          expect(records.map(&:id)).to eq([employee2.id])
+        end
+      end
+    end
+  end
 end

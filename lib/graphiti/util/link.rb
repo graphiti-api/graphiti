@@ -63,6 +63,10 @@ module Graphiti
             params[:filter] = @sideload.link_filter([@model])
           end
 
+          if (extra_fields = @sideload.link_extra_fields)
+            params[:extra_fields] ||= extra_fields
+          end
+
           @sideload.params_proc&.call(params, [@model], context)
         end
       end
