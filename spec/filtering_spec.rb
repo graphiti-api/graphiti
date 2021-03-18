@@ -1861,7 +1861,7 @@ RSpec.describe "filtering" do
       end
     end
 
-    context 'when bypass required filters true' do
+    context "when bypass required filters true" do
       before do
         resource.filter_group [:first_name, :last_name], required: :all
         resource.filter :id, :integer
