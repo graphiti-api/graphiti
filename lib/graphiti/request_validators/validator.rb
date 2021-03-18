@@ -5,21 +5,31 @@ module Graphiti
 
       def initialize(root_resource, raw_params, action)
         @root_resource = root_resource
-        @raw_params = raw_params
+        @params = normalized_params(raw_params)
         @errors = Graphiti::Util::SimpleErrors.new(raw_params)
         @action = action
       end
 
       def validate
-        resource = @root_resource
-        if (meta_type = deserialized_payload.meta[:type].try(:to_sym))
-          if @root_resource.type != meta_type && @root_resource.polymorphic?
-            resource = @root_resource.class.resource_for_type(meta_type).new
-          end
-        end
+        # Right now, all requests - even reads - go through the validator
+        # In the future these should have their own validation logic, but
+        # for now we can just bypass
+        return true unless @params.has_key?(:data)
 
-        typecast_attributes(resource, deserialized_payload.attributes, deserialized_payload.meta[:payload_path])
-        process_relationships(resource, deserialized_payload.relationships, deserialized_payload.meta[:payload_path])
+        resource = @root_resource
+
+        if @params[:data].has_key?(:type)
+          if (meta_type = deserialized_payload.meta[:type].try(:to_sym))
+            if @root_resource.type != meta_type && @root_resource.polymorphic?
+              resource = @root_resource.class.resource_for_type(meta_type).new
+            end
+          end
+
+          typecast_attributes(resource, deserialized_payload.attributes, deserialized_payload.meta[:payload_path])
+          process_relationships(resource, deserialized_payload.relationships, deserialized_payload.meta[:payload_path])
+        else
+          errors.add(:"data.type", :missing)
+        end
 
         errors.blank?
       end
@@ -33,14 +43,7 @@ module Graphiti
       end
 
       def deserialized_payload
-        @deserialized_payload ||= begin
-                                    payload = normalized_params
-                                    if payload[:data] && payload[:data][:type]
-                                      Graphiti::Deserializer.new(payload)
-                                    else
-                                      Graphiti::Deserializer.new({})
-                                    end
-                                  end
+        @deserialized_payload ||= Graphiti::Deserializer.new(@params)
       end
 
       private
@@ -86,8 +89,8 @@ module Graphiti
         end
       end
 
-      def normalized_params
-        normalized = @raw_params
+      def normalized_params(raw_params)
+        normalized = raw_params
         if normalized.respond_to?(:to_unsafe_h)
           normalized = normalized.to_unsafe_h.deep_symbolize_keys
         end

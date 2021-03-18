@@ -54,6 +54,23 @@ RSpec.describe Graphiti::RequestValidator do
       end
     end
 
+    context "when missing type" do
+      let(:payload) do
+        {
+          data: {
+            attributes: {
+              first_name: "Jane"
+            }
+          }
+        }
+      end
+
+      it "adds corresponding error" do
+        expect(validate).to eq(false)
+        expect(instance.errors).to be_added(:'data.type', :missing)
+      end
+    end
+
     context "when a single level resource payload" do
       let(:payload) do
         {
