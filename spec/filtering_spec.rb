@@ -1860,5 +1860,19 @@ RSpec.describe "filtering" do
         end
       end
     end
+
+    context 'when bypass required filters true' do
+      before do
+        resource.filter_group [:first_name, :last_name], required: :all
+        resource.filter :id, :integer
+      end
+
+      it "does not require the filter" do
+        expect {
+          proxy = resource.find(filter: {id: employee2.id})
+          expect(proxy.data.id).to eq(employee2.id)
+        }.to_not raise_error
+      end
+    end
   end
 end
