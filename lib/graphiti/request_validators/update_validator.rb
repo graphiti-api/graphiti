@@ -26,17 +26,17 @@ module Graphiti
           [:data, :type],
           [:data, :id]
         ].each do |required_attr|
-          attribute_mismatch(required_attr) unless @raw_params.dig(*required_attr)
+          attribute_mismatch(required_attr) unless @params.dig(*required_attr)
         end
         errors.blank?
       end
 
       def payload_matches_endpoint?
-        unless @raw_params.dig(:data, :id) == @raw_params.dig(:filter, :id)
+        unless @params.dig(:data, :id) == @params.dig(:filter, :id)
           attribute_mismatch([:data, :id])
         end
 
-        meta_type = @raw_params.dig(:data, :type)
+        meta_type = @params.dig(:data, :type)
 
         # NOTE: calling #to_s and comparing 2 strings is slower than
         # calling #to_sym and comparing 2 symbols. But pre ruby-2.2
