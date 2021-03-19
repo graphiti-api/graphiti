@@ -728,6 +728,112 @@ RSpec.describe Graphiti::SchemaDiff do
       end
     end
 
+    context "when a filter group is added" do
+      before do
+        resource_b.filter_group [:first_name, :last_name], required: :any
+      end
+
+      it "returns error" do
+        expect(diff).to eq([
+          "SchemaDiff::EmployeeResource: filter group [:first_name, :last_name] was added."
+        ])
+      end
+    end
+
+    context "when a filter group is removed" do
+      before do
+        resource_b
+        resource_a.filter_group [:first_name, :last_name], required: :any
+      end
+
+      it "has no errors" do
+        expect(diff).to eq([])
+      end
+    end
+
+    context "when a filter group removes a name" do
+      before do
+        resource_b.filter_group [:last_name], required: :any
+        resource_a.filter_group [:first_name, :last_name], required: :any
+      end
+
+      it "has no errors" do
+        expect(diff).to eq([])
+      end
+    end
+
+    context "when a filter group adds a name" do
+      before do
+        resource_b.filter_group [:first_name, :last_name], required: required
+        resource_a.filter_group [:first_name], required: required
+      end
+
+      context "and any are required" do
+        let(:required) { :any }
+
+        it "has no errors" do
+          expect(diff).to eq([])
+        end
+      end
+
+      context "and all are required" do
+        let(:required) { :all }
+
+        it "returns error" do
+          expect(diff).to eq([
+            "SchemaDiff::EmployeeResource: all required filter group [:first_name] added member [:last_name]."
+          ])
+        end
+      end
+    end
+
+    context "when a filter group removes a name" do
+      before do
+        resource_b.filter_group [:first_name], required: required
+        resource_a.filter_group [:first_name, :last_name], required: required
+      end
+
+      context "and any are required" do
+        let(:required) { :any }
+
+        it "has no errors" do
+          expect(diff).to eq([])
+        end
+      end
+
+      context "and all are required" do
+        let(:required) { :all }
+
+        it "has no errors" do
+          expect(diff).to eq([])
+        end
+      end
+    end
+
+    context "when a filter group goes from :all to :any" do
+      before do
+        resource_b.filter_group [:first_name, :last_name], required: :any
+        resource_a.filter_group [:first_name, :last_name], required: :all
+      end
+
+      it "has no errors" do
+        expect(diff).to eq([])
+      end
+    end
+
+    context "when a filter group goes from :any to :all" do
+      before do
+        resource_b.filter_group [:first_name, :last_name], required: :all
+        resource_a.filter_group [:first_name, :last_name], required: :any
+      end
+
+      it "returns error" do
+        expect(diff).to eq([
+          "SchemaDiff::EmployeeResource: filter group [:first_name, :last_name] moved from required: :any to required: :all"
+        ])
+      end
+    end
+
     context "when filter goes unguarded to guarded" do
       before do
         resource_b.attribute :foo, :string, filterable: :admin?
