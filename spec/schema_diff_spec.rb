@@ -891,6 +891,18 @@ RSpec.describe Graphiti::SchemaDiff do
       end
     end
 
+    context "when the original schema does not have stats" do
+      before do
+        a[:resources].each { |r| r.delete(:stats) }
+      end
+
+      it "does not blow up" do
+        expect {
+          expect(diff).to eq([])
+        }.to_not raise_error
+      end
+    end
+
     context "when a stat is added" do
       before do
         resource_a.stat age: [:sum]
@@ -1193,7 +1205,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
         it "returns error" do
           expect(diff).to eq([
-            'Endpoint "/schema_diff/employees" had incompatible sideload allowlist. Was [{:positions=>:department}, :same], now [:positions, :same].'
+            'Endpoint "/schema_diff/employees" had incompatible sideload allowlist. Was [{:positions=>"department"}, "same"], now ["positions", "same"].'
           ])
         end
       end

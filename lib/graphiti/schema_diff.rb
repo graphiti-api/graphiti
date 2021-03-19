@@ -1,8 +1,8 @@
 module Graphiti
   class SchemaDiff
     def initialize(old, new)
-      @old = old.deep_symbolize_keys
-      @new = new.deep_symbolize_keys
+      @old = JSON.parse(old.to_json).deep_symbolize_keys
+      @new = JSON.parse(new.to_json).deep_symbolize_keys
       @errors = []
     end
 
@@ -135,12 +135,12 @@ module Graphiti
         end
 
         if new_sort[:only] && !old_sort[:only]
-          @errors << "#{old_resource[:name]}: sort #{name.inspect} now limited to only #{new_sort[:only].inspect}."
+          @errors << "#{old_resource[:name]}: sort #{name.inspect} now limited to only #{new_sort[:only].to_sym.inspect}."
         end
 
         if new_sort[:only] && old_sort[:only]
           if new_sort[:only] != old_sort[:only]
-            @errors << "#{old_resource[:name]}: sort #{name.inspect} was limited to only #{old_sort[:only].inspect}, now limited to only #{new_sort[:only].inspect}."
+            @errors << "#{old_resource[:name]}: sort #{name.inspect} was limited to only #{old_sort[:only].to_sym.inspect}, now limited to only #{new_sort[:only].to_sym.inspect}."
           end
         end
       end
@@ -212,28 +212,30 @@ module Graphiti
           new_names = new_resource[:filter_group][:names]
           old_names = old_resource[:filter_group][:names]
           diff = new_names - old_names
-          if !diff.empty? && new_resource[:filter_group][:required] == :all
-            @errors << "#{old_resource[:name]}: all required filter group #{old_names.inspect} added #{"member".pluralize(diff.length)} #{diff.inspect}."
+          if !diff.empty? && new_resource[:filter_group][:required] == "all"
+            @errors << "#{old_resource[:name]}: all required filter group #{old_names.map(&:to_sym).inspect} added #{"member".pluralize(diff.length)} #{diff.map(&:to_sym).inspect}."
           end
 
           old_required = old_resource[:filter_group][:required]
           new_required = new_resource[:filter_group][:required]
-          if old_required == :any && new_required == :all
-            @errors << "#{old_resource[:name]}: filter group #{old_names.inspect} moved from required: :any to required: :all"
+          if old_required == "any" && new_required == "all"
+            @errors << "#{old_resource[:name]}: filter group #{old_names.map(&:to_sym).inspect} moved from required: :any to required: :all"
           end
         else
-          @errors << "#{old_resource[:name]}: filter group #{new_resource[:filter_group][:names].inspect} was added."
+          @errors << "#{old_resource[:name]}: filter group #{new_resource[:filter_group][:names].map(&:to_sym).inspect} was added."
         end
       end
     end
 
     def compare_stats(old_resource, new_resource)
+      return unless old_resource.key?(:stats)
+
       old_resource[:stats].each_pair do |name, old_calculations|
         new_calculations = new_resource[:stats][name]
         if new_calculations
           old_calculations.each do |calc|
             unless new_calculations.include?(calc)
-              @errors << "#{old_resource[:name]}: calculation #{calc.inspect} was removed from stat #{name.inspect}."
+              @errors << "#{old_resource[:name]}: calculation #{calc.to_sym.inspect} was removed from stat #{name.inspect}."
             end
           end
         else
