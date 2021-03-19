@@ -30,6 +30,7 @@ module Graphiti
           compare_extra_attributes(r, new_resource)
           compare_sorts(r, new_resource)
           compare_filters(r, new_resource)
+          compare_filter_group(r, new_resource)
           compare_relationships(r, new_resource)
         end
       end
@@ -200,6 +201,27 @@ module Graphiti
 
         if new_filter[:guard] && !old_filter[:guard]
           @errors << "#{old_resource[:name]}: filter #{name.inspect} went from unguarded to guarded."
+        end
+      end
+    end
+
+    def compare_filter_group(old_resource, new_resource)
+      if new_resource[:filter_group]
+        if old_resource[:filter_group]
+          new_names = new_resource[:filter_group][:names]
+          old_names = old_resource[:filter_group][:names]
+          diff = new_names - old_names
+          if !diff.empty? && new_resource[:filter_group][:required] == :all
+            @errors << "#{old_resource[:name]}: all required filter group #{old_names.inspect} added #{"member".pluralize(diff.length)} #{diff.inspect}."
+          end
+
+          old_required = old_resource[:filter_group][:required]
+          new_required = new_resource[:filter_group][:required]
+          if old_required == :any && new_required == :all
+            @errors << "#{old_resource[:name]}: filter group #{old_names.inspect} moved from required: :any to required: :all"
+          end
+        else
+          @errors << "#{old_resource[:name]}: filter group #{new_resource[:filter_group][:names].inspect} was added."
         end
       end
     end

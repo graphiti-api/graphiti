@@ -99,6 +99,10 @@ module Graphiti
           relationships: relationships(r)
         }
 
+        if r.grouped_filters.any?
+          config[:filter_group] = r.grouped_filters
+        end
+
         if r.default_sort
           default_sort = r.default_sort.map { |s|
             {s.keys.first.to_s => s.values.first.to_s}
@@ -210,6 +214,10 @@ module Graphiti
           f[name] = config
         end
       end
+    end
+
+    def filter_group(resource)
+      resource.config[:grouped_filters]
     end
 
     def relationships(resource)

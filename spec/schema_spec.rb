@@ -475,6 +475,20 @@ RSpec.describe Graphiti::Schema do
       end
     end
 
+    context "when a filter group" do
+      before do
+        employee_resource.filter_group [:first_name, :last_name],
+          required: :any
+      end
+
+      it "is present in the schema" do
+        expect(schema[:resources][0][:filter_group]).to eq({
+          names: [:first_name, :last_name],
+          required: :any
+        })
+      end
+    end
+
     context "when the attribute is a string enum" do
       before do
         employee_resource.class_eval do
