@@ -16,13 +16,11 @@ module Graphiti
 
         if @name == :id
           @serializer.id(&proc)
-        elsif @attr[:proc]
+        elsif @attr[:proc] ||
+            !previously_applied? ||
+            previously_applied_via_resource?
           @serializer.send(_method, @name, serializer_options, &proc)
-        elsif @serializer.attribute_blocks[@name].nil?
-          @serializer.send(_method, @name, serializer_options, &proc)
-        elsif @serializer.send(applied_method).include?(@name)
-          @serializer.field_condition_blocks[@name] = guard if guard?
-        else
+        else # Previously applied via explicit serializer, so wrap it
           inner = @serializer.attribute_blocks.delete(@name)
           wrapped = wrap_proc(inner)
           @serializer.send(_method, @name, serializer_options, &wrapped)
@@ -33,6 +31,14 @@ module Graphiti
       end
 
       private
+
+      def previously_applied?
+        @serializer.attribute_blocks[@name].present?
+      end
+
+      def previously_applied_via_resource?
+        @serializer.send(applied_method).include?(@name)
+      end
 
       def previously_guarded?
         @serializer.field_condition_blocks[@name]

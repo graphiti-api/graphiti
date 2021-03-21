@@ -871,6 +871,7 @@ RSpec.describe "serialization" do
 
         context "without a guard" do
           before do
+            allow_any_instance_of(PORO::Employee).to receive(:foo) { "bar" }
             resource.attribute :foo, :string
           end
 
@@ -895,6 +896,7 @@ RSpec.describe "serialization" do
 
         context "with a guard" do
           before do
+            allow_any_instance_of(PORO::Employee).to receive(:foo) { "bar" }
             resource.class_eval do
               attribute :foo, :string, readable: :overriden?
 

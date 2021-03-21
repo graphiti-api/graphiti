@@ -29,6 +29,64 @@ RSpec.describe "extra_fields" do
       .to match_array(%w[first_name last_name age stack_ranking])
   end
 
+  context "when multiple extra attributes" do
+    context "added with blocks" do
+      before do
+        resource.extra_attribute :a, :string do
+          "a"
+        end
+        resource.extra_attribute :b, :string do
+          "b"
+        end
+      end
+
+      context "when not requested" do
+        it "does not render them" do
+          render
+          expect(attributes.keys).to match_array(%w[first_name last_name age])
+        end
+      end
+
+      context "when one is requested" do
+        before do
+          params[:extra_fields] = {employees: "b"}
+        end
+
+        it "is rendered" do
+          render
+          expect(attributes.keys).to match_array(%w[first_name last_name age b])
+        end
+      end
+    end
+
+    context "added without blocks" do
+      before do
+        allow_any_instance_of(PORO::Employee).to receive(:a) { "a" }
+        allow_any_instance_of(PORO::Employee).to receive(:b) { "b" }
+        resource.extra_attribute :a, :string
+        resource.extra_attribute :b, :string
+      end
+
+      context "when not requested" do
+        it "does not render them" do
+          render
+          expect(attributes.keys).to match_array(%w[first_name last_name age])
+        end
+      end
+
+      context "when one is requested" do
+        before do
+          params[:extra_fields] = {employees: "b"}
+        end
+
+        it "is rendered" do
+          render
+          expect(attributes.keys).to match_array(%w[first_name last_name age b])
+        end
+      end
+    end
+  end
+
   context "when altering scope based on extra attrs" do
     context "when the extra attr exists" do
       before do
