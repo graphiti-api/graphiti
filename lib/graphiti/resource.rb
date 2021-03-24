@@ -73,7 +73,7 @@ module Graphiti
         type_name = filters[name][:type]
       end
       type = Graphiti::Types[type_name]
-      return if value.nil? && type[:kind] != "array"
+      return if value.blank? && type[:kind] != "array"
       begin
         flag = :read if flag == :readable
         flag = :write if flag == :writable

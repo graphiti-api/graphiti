@@ -155,7 +155,41 @@ RSpec.describe Graphiti::RequestValidator do
           end
         end
 
-        context "and the typecast succeeds" do
+        context "and the typecast succeeds by empty string" do
+          before do
+            payload[:data][:attributes][:age] = ""
+          end
+
+          it "validates correctly" do
+            expect(validate).to eq true
+            expect(instance.errors).to be_blank
+          end
+
+          it "correctly typecasts the fields" do
+            validate
+
+            expect(instance.deserialized_payload.attributes[:age]).to be_blank
+          end
+        end
+
+        context "and the typecast succeeds by nil" do
+          before do
+            payload[:data][:attributes][:age] = nil
+          end
+
+          it "validates correctly" do
+            expect(validate).to eq true
+            expect(instance.errors).to be_blank
+          end
+
+          it "correctly typecasts the fields" do
+            validate
+
+            expect(instance.deserialized_payload.attributes[:age]).to be_blank
+          end
+        end
+
+        context "and the typecast succeeds by value" do
           before do
             payload[:data][:attributes][:age] = "34"
           end
