@@ -145,7 +145,7 @@ module Graphiti
               writable: flag(config[:writable]),
               description: resource.attribute_description(name)
             }
-            attrs[name].merge!({ typecast_on_blank: flag(config[:typecast_on_blank]) }) unless config[:typecast_on_blank]
+            attrs[name].merge!({typecast_on_blank: flag(config[:typecast_on_blank])}) unless config[:typecast_on_blank]
           end
         end
       end
@@ -159,7 +159,7 @@ module Graphiti
             readable: flag(config[:readable]),
             description: resource.attribute_description(name)
           }
-          attrs[name].merge!({ typecast_on_blank: flag(config[:typecast_on_blank]) }) unless config[:typecast_on_blank]
+          attrs[name].merge!({typecast_on_blank: flag(config[:typecast_on_blank])}) unless config[:typecast_on_blank]
         end
       end
     end
