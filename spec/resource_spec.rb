@@ -69,6 +69,7 @@ RSpec.describe Graphiti::Resource do
         expect(klass.attributes_sortable_by_default).to eq(true)
         expect(klass.attributes_filterable_by_default).to eq(true)
         expect(klass.attributes_schema_by_default).to eq(true)
+        expect(klass.attributes_typecast_on_blank_by_default).to eq(true)
         expect(klass.relationships_readable_by_default).to eq(true)
         expect(klass.relationships_writable_by_default).to eq(true)
         expect(klass.filters_accept_nil_by_default).to eq(false)
@@ -156,6 +157,7 @@ RSpec.describe Graphiti::Resource do
             self.attributes_sortable_by_default = false
             self.attributes_filterable_by_default = false
             self.attributes_schema_by_default = false
+            self.attributes_typecast_on_blank_by_default = false
             self.relationships_readable_by_default = false
             self.relationships_writable_by_default = false
             self.filters_accept_nil_by_default = true
@@ -172,6 +174,7 @@ RSpec.describe Graphiti::Resource do
           expect(klass.attributes_sortable_by_default).to eq(false)
           expect(klass.attributes_filterable_by_default).to eq(false)
           expect(klass.attributes_schema_by_default).to eq(false)
+          expect(klass.attributes_typecast_on_blank_by_default).to eq(false)
           expect(klass.relationships_readable_by_default).to eq(false)
           expect(klass.relationships_writable_by_default).to eq(false)
           expect(klass.filters_accept_nil_by_default).to eq(true)

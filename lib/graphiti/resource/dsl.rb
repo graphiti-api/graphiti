@@ -123,6 +123,7 @@ module Graphiti
           attribute_option(options, :sortable)
           attribute_option(options, :filterable)
           attribute_option(options, :schema, true)
+          attribute_option(options, :typecast_on_blank, true)
           options[:type] = type
           options[:proc] = blk
           config[:attributes][name] = options
@@ -144,7 +145,8 @@ module Graphiti
             readable: true,
             writable: false,
             sortable: false,
-            filterable: false
+            filterable: false,
+            typecast_on_blank: true
           }
           options = defaults.merge(options)
           attribute_option(options, :readable)

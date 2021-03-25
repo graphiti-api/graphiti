@@ -16,6 +16,7 @@ RSpec.describe Graphiti::RequestValidator do
       self.model = PORO::Employee
       attribute :first_name, :string
       attribute :age, :integer
+      attribute :birthdate, :datetime, typecast_on_blank: false
       attribute :created_at, :datetime, writable: false
       attribute :salary, :integer, writable: :admin?, readable: false
 
@@ -155,6 +156,19 @@ RSpec.describe Graphiti::RequestValidator do
           end
         end
 
+        context "and the typecast fails on blank" do
+          before do
+            payload[:data][:attributes][:age] = ""
+          end
+
+          it "has a attribute access error" do
+            expect(validate).to eq false
+
+            expect(instance.errors).to be_added(:'data.attributes.age', :type_error)
+            expect(instance.errors.full_messages).to eq(["data.attributes.age should be type integer"])
+          end
+        end
+
         context "and the typecast succeeds" do
           before do
             payload[:data][:attributes][:age] = "34"
@@ -169,6 +183,55 @@ RSpec.describe Graphiti::RequestValidator do
             validate
 
             expect(instance.deserialized_payload.attributes[:age]).to eq 34
+          end
+        end
+      end
+
+      context "when the payload contains fields needing typecasting not on blank" do
+        context "and the typecast fails" do
+          before do
+            payload[:data][:attributes][:birthdate] = "foobar"
+          end
+
+          it "has a attribute access error" do
+            expect(validate).to eq false
+
+            expect(instance.errors).to be_added(:'data.attributes.birthdate', :type_error)
+            expect(instance.errors.full_messages).to eq(["data.attributes.birthdate should be type datetime"])
+          end
+        end
+
+        context "and the typecast succeeds on blank" do
+          before do
+            payload[:data][:attributes][:birthdate] = ""
+          end
+
+          it "validates correctly" do
+            expect(validate).to eq true
+            expect(instance.errors).to be_blank
+          end
+
+          it "correctly typecasts the fields" do
+            validate
+
+            expect(instance.deserialized_payload.attributes[:birthdate]).to be_blank
+          end
+        end
+
+        context "and the typecast succeeds" do
+          before do
+            payload[:data][:attributes][:birthdate] = "2021-03-25"
+          end
+
+          it "validates correctly" do
+            expect(validate).to eq true
+            expect(instance.errors).to be_blank
+          end
+
+          it "correctly typecasts the fields" do
+            validate
+
+            expect(instance.deserialized_payload.attributes[:birthdate]).to eq "2021-03-25"
           end
         end
       end

@@ -2248,6 +2248,42 @@ RSpec.describe "persistence" do
         expect(save("foo")).to eq("custom!")
       end
     end
+
+    # test for typecast_on_blank
+    context "when typecast_on_blank is false" do
+      before do
+        klass.attribute :age, :datetime, typecast_on_blank: false
+      end
+
+      it "works" do
+        expect(save("2021-03-25")).to eq("2021-03-25")
+      end
+
+      it "applies basic coercion" do
+        expect(save("2021-03-25")).to eq("2021-03-25")
+      end
+
+      it "raises error on single values" do
+        expect {
+          save("No datetieme")
+        }.to(raise_error { |e|
+          expect(e).to be_a Graphiti::Errors::InvalidRequest
+          expect(e.errors.full_messages).to eq ["data.attributes.age should be type datetime"]
+        })
+      end
+
+      it "raises no error on nils" do
+        expect {
+          save(nil)
+        }.to_not(raise_error(Graphiti::Errors::InvalidRequest))
+      end
+
+      it "raises no error on {}" do
+        expect {
+          save({})
+        }.to_not(raise_error(Graphiti::Errors::InvalidRequest))
+      end
+    end
   end
 
   describe "nested writes" do

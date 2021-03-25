@@ -77,6 +77,10 @@ module Graphiti
             key == :id &&
             resource.class.config[:attributes][:id][:writable] == false
 
+          if resource.class.config[:attributes].has_key?(key)
+            next unless resource.class.config[:attributes][key][:typecast_on_blank] || value.present?
+          end
+
           begin
             attributes[key] = resource.typecast(key, value, :writable)
           rescue Graphiti::Errors::UnknownAttribute

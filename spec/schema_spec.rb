@@ -25,11 +25,19 @@ RSpec.describe Graphiti::Schema do
                 readable: true,
                 writable: true,
                 description: "The employee's first name"
+              },
+              birthdate: {
+                type: "datetime",
+                readable: true,
+                writable: true,
+                typecast_on_blank: false,
+                description: "The employee's birth date"
               }
             },
             sorts: {
               id: {},
-              first_name: {}
+              first_name: {},
+              birthdate: {}
             },
             stats: {
               total: [:count]
@@ -43,6 +51,10 @@ RSpec.describe Graphiti::Schema do
                 type: "string",
                 operators: Graphiti::Adapters::Abstract.default_operators[:string].map(&:to_s)
               },
+              birthdate: {
+                type: "datetime",
+                operators: Graphiti::Adapters::Abstract.default_operators[:datetime].map(&:to_s)
+              },
               title: {
                 type: "string",
                 operators: Graphiti::Adapters::Abstract.default_operators[:string].map(&:to_s)
@@ -53,6 +65,12 @@ RSpec.describe Graphiti::Schema do
                 type: "float",
                 readable: true,
                 description: "The total value of the employee's sales"
+              },
+              anniversary: {
+                type: "datetime",
+                readable: true,
+                typecast_on_blank: false,
+                description: nil
               }
             },
             relationships: {
@@ -192,7 +210,10 @@ RSpec.describe Graphiti::Schema do
 
         attribute :first_name, :string, description: "The employee's first name"
         attribute :hidden_attribute, :string, schema: false
+        attribute :birthdate, :datetime, typecast_on_blank: false, description: "The employee's birth date"
+
         extra_attribute :net_sales, :float, description: "The total value of the employee's sales"
+        extra_attribute :anniversary, :datetime, typecast_on_blank: false
 
         filter :title, :string do
           eq do |scope, value|
@@ -539,6 +560,19 @@ RSpec.describe Graphiti::Schema do
       it "is readable" do
         expect(schema[:resources][0][:attributes][:hidden_attribute][:readable])
           .to eq(true)
+      end
+    end
+
+    context "when attribute changes to typecast_on_blank false" do
+      before do
+        employee_resource.class_eval do
+          attribute :frist_name, :string, typecast_on_blank: false
+        end
+      end
+
+      it "is readable" do
+        expect(schema[:resources][0][:attributes][:frist_name][:typecast_on_blank])
+          .to eq(false)
       end
     end
 
