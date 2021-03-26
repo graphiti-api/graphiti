@@ -25,7 +25,7 @@ module Graphiti
             end
           end
 
-          typecast_attributes(resource, deserialized_payload.attributes, deserialized_payload.meta[:payload_path])
+          typecast_attributes(resource, deserialized_payload.attributes, @action, deserialized_payload.meta[:payload_path])
           process_relationships(resource, deserialized_payload.relationships, deserialized_payload.meta[:payload_path])
         else
           errors.add(:"data.type", :missing)
@@ -65,15 +65,20 @@ module Graphiti
             next
           end
 
-          typecast_attributes(x[:resource], x[:attributes], x[:meta][:payload_path])
-          process_relationships(x[:resource], x[:relationships], x[:meta][:payload_path])
+          resource = x[:resource]
+          attributes = x[:attributes]
+          relationships = x[:relationships]
+          payload_path = x[:meta][:payload_path]
+          action = x[:meta][:method]
+          typecast_attributes(resource, attributes, action, payload_path)
+          process_relationships(resource, relationships, payload_path)
         end
       end
 
-      def typecast_attributes(resource, attributes, payload_path)
+      def typecast_attributes(resource, attributes, action, payload_path)
         attributes.each_pair do |key, value|
           # Only validate id if create action, otherwise it's only used for lookup
-          next if @action != :create &&
+          next if action != :create &&
             key == :id &&
             resource.class.config[:attributes][:id][:writable] == false
 

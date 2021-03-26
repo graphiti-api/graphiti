@@ -404,8 +404,6 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     describe "non-writable foreign keys" do
-      subject(:make_request) { do_update(payload) }
-
       context "when belongs_to" do
         let(:klass) do
           Class.new(EmployeeResource) do
@@ -414,14 +412,16 @@ if ENV["APPRAISAL_INITIALIZED"]
           end
         end
 
-        let(:employee) { Employee.create!(first_name: "Jane") }
-        let(:classification) { Classification.create!(description: "foo") }
+        let!(:employee) { Employee.create!(first_name: "Jane") }
+        let!(:classification) { Classification.create!(description: "foo") }
 
         let(:payload) do
           {
             data: {
               type: "employees",
-              id: employee.id.to_s,
+              attributes: {
+                first_name: "foo"
+              },
               relationships: {
                 classification: {
                   data: {
@@ -436,12 +436,39 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         before do
           allow(controller).to receive(:resource) { klass }
+
+          classification_resource = Class.new(ClassificationResource) do
+            def self.name
+              "ClassificationResource"
+            end
+            attribute :id, :integer_id, writable: false
+          end
+          klass.belongs_to :classification, resource: classification_resource
         end
 
-        it "does not require the FK to be a writable attribute" do
-          make_request
-          employee = Employee.last
-          expect(employee.classification_id).to eq(classification.id)
+        context "and overall action is create" do
+          subject(:make_request) { do_create(payload) }
+
+          it "does not require the FK to be a writable attribute" do
+            expect {
+              make_request
+            }.to change { Employee.count }.by(1)
+            employee = Employee.last
+            expect(employee.classification_id).to eq(classification.id)
+          end
+        end
+
+        context "and overall action is update" do
+          subject(:make_request) { do_update(payload) }
+
+          before do
+            payload[:data][:id] = employee.id.to_s
+          end
+
+          it "does not require the FK to be a writable attribute" do
+            make_request
+            expect(employee.reload.classification_id).to eq(classification.id)
+          end
         end
       end
 
@@ -465,7 +492,9 @@ if ENV["APPRAISAL_INITIALIZED"]
           {
             data: {
               type: "employees",
-              id: employee.id.to_s,
+              attributes: {
+                first_name: "foo"
+              },
               relationships: {
                 positions: {
                   data: [{
@@ -491,10 +520,29 @@ if ENV["APPRAISAL_INITIALIZED"]
           allow(controller).to receive(:resource) { klass }
         end
 
-        it "does not require the FK to be a writable attribute" do
-          make_request
-          employee = Employee.last
-          expect(employee.positions.map(&:title)).to eq(["foo"])
+        context "and the overall request is create" do
+          subject(:make_request) { do_create(payload) }
+
+          it "does not require the FK to be a writable attribute" do
+            expect {
+              make_request
+            }.to change { Employee.count }.by(1)
+            employee = Employee.last
+            expect(employee.positions.map(&:title)).to eq(["foo"])
+          end
+        end
+
+        context "and the overall request is update" do
+          subject(:make_request) { do_update(payload) }
+
+          before do
+            payload[:data][:id] = employee.id.to_s
+          end
+
+          it "does not require the FK to be a writable attribute" do
+            make_request
+            expect(employee.reload.positions.map(&:title)).to eq(["foo"])
+          end
         end
       end
     end
