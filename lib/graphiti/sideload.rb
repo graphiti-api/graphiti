@@ -137,11 +137,16 @@ module Graphiti
     end
 
     def link_extra_fields
+      return unless context&.respond_to?(:params)
+
       extra_fields_name = [association_name, resource.type].find { |param|
         context.params.dig(:extra_fields, param)
       }
 
-      {resource.type => context.params.dig(:extra_fields, extra_fields_name)} if extra_fields_name
+      if extra_fields_name
+        extra_fields = context.params.dig(:extra_fields, extra_fields_name)
+        {resource.type => extra_fields}
+      end
     end
 
     # The parent resource is a remote,
