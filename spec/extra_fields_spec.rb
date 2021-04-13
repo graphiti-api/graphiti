@@ -29,6 +29,45 @@ RSpec.describe "extra_fields" do
       .to match_array(%w[first_name last_name age stack_ranking])
   end
 
+  context "when sideloading/linking" do
+    before do
+      allow_any_instance_of(PORO::Employee)
+        .to receive(:linked_positions) { [] }
+      resource.has_many :linked_positions,
+        resource: PORO::PositionResource,
+        link: true
+      params[:include] = "linked_positions"
+    end
+
+    context "and the context is missing" do
+      around do |e|
+        Graphiti.with_context nil do
+          e.run
+        end
+      end
+
+      it "does not blow up" do
+        params[:extra_fields] = {positions: "foo"}
+        expect { render }.to_not raise_error
+      end
+    end
+
+    context "and the context does not respond to params" do
+      around do |e|
+        # current_user referenced in resource fixtures
+        ctx = Struct.new(:current_user).new
+        Graphiti.with_context ctx do
+          e.run
+        end
+      end
+
+      it "does not blow up" do
+        params[:extra_fields] = {positions: "foo"}
+        expect { render }.to_not raise_error
+      end
+    end
+  end
+
   context "when multiple extra attributes" do
     context "added with blocks" do
       before do
