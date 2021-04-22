@@ -240,7 +240,8 @@ module Graphiti
           children.each do |child|
             if association_type == :many_to_many &&
                 [:create, :update].include?(Graphiti.context[:namespace]) &&
-                !parent.send(association_name).exists?(child.id)
+                !parent.send(association_name).exists?(child.id) &&
+                child.errors.blank?
               parent.send(association_name) << child
             else
               target = association.instance_variable_get(:@target)
