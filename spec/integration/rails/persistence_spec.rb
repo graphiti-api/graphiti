@@ -750,6 +750,11 @@ if ENV["APPRAISAL_INITIALIZED"]
                   {type: "positions", 'temp-id': "pos1", method: "create"},
                   {type: "positions", 'temp-id': "pos2", method: "create"}
                 ]
+              },
+              teams: {
+                data: [
+                  {type: "teams", 'temp-id': "team1", method: "create"}
+                ]
               }
             }
           },
@@ -773,6 +778,11 @@ if ENV["APPRAISAL_INITIALIZED"]
               type: "positions",
               'temp-id': "pos2",
               attributes: {title: "manager"}
+            },
+            {
+              type: "teams",
+              'temp-id': 'team1',
+              attributes: {name: "Team 1"}
             }
           ]
         }
@@ -785,12 +795,14 @@ if ENV["APPRAISAL_INITIALIZED"]
         employee = Employee.first
         positions = employee.positions
         department = employee.positions[0].department
+        team = employee.teams[0]
 
         expect(employee.first_name).to eq("Joe")
         expect(positions.length).to eq(2)
         expect(positions[0].title).to eq("specialist")
         expect(positions[1].title).to eq("manager")
         expect(department.name).to eq("safety")
+        expect(team.name).to eq("Team 1")
       end
 
       context "when a has_many relationship has validation error" do
@@ -810,7 +822,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         it "rolls back the entire transaction" do
           expect {
             make_request
-          }.to_not(change { Employee.count + Position.count + Department.count })
+          }.to_not(change { Employee.count + Position.count + Department.count + Team.count })
           error = json["errors"].find do |err|
             err.fetch("meta", {}).fetch("relationship", {}).fetch("type", nil) == "positions"
           end
@@ -851,7 +863,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         it "rolls back the entire transaction" do
           expect {
             make_request
-          }.to_not(change { Employee.count + Position.count + Department.count })
+          }.to_not(change { Employee.count + Position.count + Department.count + Team.count })
           error = json["errors"].find do |err|
             err.fetch("meta", {}).fetch("relationship", {}).fetch("type", nil) == "departments"
           end
@@ -866,6 +878,47 @@ if ENV["APPRAISAL_INITIALIZED"]
                 "name" => "department",
                 "temp-id" => "dep1",
                 "type" => "departments"
+              )
+            },
+            "source" => {"pointer" => "/data/attributes/name"},
+            "status" => "422",
+            "title" => "Validation Error"
+          )
+        end
+      end
+
+      context "when a many_to_many relationship has a validation error" do
+        around do |e|
+          begin
+            Team.validates :name, presence: true
+            e.run
+          ensure
+            Team.clear_validators!
+          end
+        end
+
+        before do
+          payload[:included][3][:attributes].delete(:name)
+        end
+
+        it "rolls back the entire transaction" do
+          expect {
+            make_request
+          }.to_not(change { Employee.count + Position.count + Department.count + Team.count })
+          error = json["errors"].find do |err|
+            err.fetch("meta", {}).fetch("relationship", {}).fetch("type", nil) == "teams"
+          end
+
+          expect(error).to match(
+            "code" => "unprocessable_entity",
+            "detail" => "Name can't be blank",
+            "meta" => {
+              "relationship" => hash_including(
+                "attribute" => "name",
+                "message" => "can't be blank",
+                "name" => "teams",
+                "temp-id" => "team1",
+                "type" => "teams"
               )
             },
             "source" => {"pointer" => "/data/attributes/name"},
