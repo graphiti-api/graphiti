@@ -781,7 +781,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             },
             {
               type: "teams",
-              'temp-id': 'team1',
+              'temp-id': "team1",
               attributes: {name: "Team 1"}
             }
           ]
