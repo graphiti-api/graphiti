@@ -327,4 +327,86 @@ RSpec.describe "sorting" do
       end
     end
   end
+
+  context "when cursor pagination is on" do
+    before do
+      resource.cursor_paginatable = true
+    end
+
+    context "and given an uncursorable sort" do
+      before do
+        params[:sort] = "-age"
+      end
+
+      it "applies multisort with default cursor" do
+        expect_any_instance_of(resource.adapter).to receive(:order)
+          .with(anything, :age, :desc).and_call_original
+        expect_any_instance_of(resource.adapter).to receive(:order)
+          .with(anything, :id, :asc).and_call_original
+        ids
+      end
+
+      context "with custom default cursor" do
+        before do
+          resource.sort :created_at, :datetime, cursorable: true
+          resource.default_cursor = :created_at
+        end
+
+        it "is applied correctly as multisort" do
+          expect_any_instance_of(resource.adapter).to receive(:order)
+            .with(anything, :age, :desc).and_call_original
+          expect_any_instance_of(resource.adapter).to receive(:order)
+            .with(anything, :created_at, :asc).and_call_original
+          ids
+        end
+      end
+    end
+
+    context "and given a cursorable sort" do
+      before do
+        resource.sort :created_at, :datetime, cursorable: true
+        params[:sort] = "-created_at"
+      end
+
+      it "does not add the default cursor to sorts" do
+        expect_any_instance_of(resource.adapter).to receive(:order)
+          .with(anything, :created_at, :desc).and_call_original
+        ids
+      end
+
+      context "that has custom sorting logic" do
+        before do
+          resource.sort :identifier, :integer, cursorable: true do |scope, dir|
+            scope[:sort] ||= []
+            scope[:sort] << {id: dir}
+            scope
+          end
+          params[:sort] = "-identifier"
+        end
+
+        it "honors the custom sort logic" do
+          expect(ids).to eq([2, 1])
+        end
+
+        it "does not add the default cursor to sorts" do
+          expect(PORO::DB).to receive(:all)
+            .with(hash_including(sort: [{id: :desc}]))
+            .and_call_original
+          ids
+        end
+      end
+    end
+
+    context "and given the default cursor as sort" do
+      before do
+        params[:sort] = "-id"
+      end
+
+      it "does not add the default cursor to sorts" do
+        expect_any_instance_of(resource.adapter).to receive(:order)
+          .with(anything, :id, :desc).once.and_call_original
+        ids
+      end
+    end
+  end
 end

@@ -69,7 +69,7 @@ module Graphiti
           if get_attr(name, :sortable, raise_error: :only_unsupported)
             config[:sorts][name] = {
               proc: blk
-            }.merge(opts.slice(:only))
+            }.merge(opts.slice(:only, :cursorable))
           elsif (type = args[0])
             attribute name, type, only: [:sortable]
             sort(name, opts, &blk)
@@ -80,6 +80,10 @@ module Graphiti
 
         def paginate(&blk)
           config[:pagination] = blk
+        end
+
+        def cursor_paginate(&blk)
+          config[:cursor_pagination] = blk
         end
 
         def stat(symbol_or_hash, &blk)

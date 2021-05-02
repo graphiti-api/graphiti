@@ -188,6 +188,32 @@ module Graphiti
         scope.page(current_page).per(per_page)
       end
 
+      def cursor_paginate(scope, after, size)
+        clause = nil
+        after.each_with_index do |part, index|
+          method = part[:direction] == "asc" ? :filter_gt : :filter_lt
+
+          if index.zero?
+            clause = public_send \
+              method,
+              scope,
+              part[:attribute],
+              [part[:value]]
+          else
+            sub_scope = filter_eq \
+              scope,
+              after[index - 1][:attribute],
+              [after[index - 1][:value]]
+            sub_scope = filter_gt \
+              sub_scope,
+              part[:attribute],
+              [part[:value]]
+            clause = clause.or(sub_scope)
+          end
+        end
+        paginate(clause, 1, size)
+      end
+
       # (see Adapters::Abstract#count)
       def count(scope, attr)
         if attr.to_sym == :total

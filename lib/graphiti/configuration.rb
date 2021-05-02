@@ -13,6 +13,7 @@ module Graphiti
     attr_accessor :links_on_demand
     attr_accessor :pagination_links_on_demand
     attr_accessor :pagination_links
+    attr_accessor :cursor_on_demand
     attr_accessor :typecast_reads
     attr_accessor :raise_on_missing_sidepost
 
@@ -29,6 +30,7 @@ module Graphiti
       @links_on_demand = false
       @pagination_links_on_demand = false
       @pagination_links = false
+      @cursor_on_demand = false
       @typecast_reads = true
       @raise_on_missing_sidepost = true
       self.debug = ENV.fetch("GRAPHITI_DEBUG", true)

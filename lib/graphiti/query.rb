@@ -39,6 +39,16 @@ module Graphiti
       end
     end
 
+    def cursor?
+      return false if [:json, :xml, "json", "xml"].include?(params[:format])
+
+      if Graphiti.config.cursor_on_demand
+        [true, "true"].include?(@params[:cursor])
+      else
+        @resource.cursor_paginatable?
+      end
+    end
+
     def debug_requested?
       !!@params[:debug]
     end
@@ -185,6 +195,8 @@ module Graphiti
 
     def pagination
       @pagination ||= begin
+        valid_params = Scoping::Paginate::VALID_QUERY_PARAMS
+
         {}.tap do |hash|
           (@params[:page] || {}).each_pair do |name, value|
             if legacy_nested?(name)
@@ -193,8 +205,9 @@ module Graphiti
               end
             elsif nested?(name)
               hash[name.to_s.split(".").last.to_sym] = value
-            elsif top_level? && [:number, :size].include?(name.to_sym)
-              hash[name.to_sym] = value.to_i
+            elsif top_level? && valid_params.include?(name.to_sym)
+              value = value.to_i if [:size, :number].include?(name.to_sym)
+              hash[name.to_sym] = value
             end
           end
         end
