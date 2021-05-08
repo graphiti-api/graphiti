@@ -995,41 +995,58 @@ RSpec.describe Graphiti::Query do
     end
   end
 
-  describe '#pagination_links?' do
+  describe "#pagination_links?" do
     subject { instance.pagination_links? }
+    let(:pagination_links) { Graphiti.config.pagination_links }
+    let(:pagination_links_on_demand) { Graphiti.config.pagination_links_on_demand }
 
-    context 'when pagination_links_on_demand' do
-      before { Graphiti.config.pagination_links_on_demand = true }
+    around do |e|
+      original_pagination_links = Graphiti.config.pagination_links
+      original_pagination_links_on_demand = Graphiti.config.pagination_links_on_demand
+      Graphiti.config.pagination_links = pagination_links
+      Graphiti.config.pagination_links_on_demand = pagination_links_on_demand
+      begin
+        e.run
+      ensure
+        Graphiti.config.pagination_links = original_pagination_links
+        Graphiti.config.pagination_links_on_demand = original_pagination_links_on_demand
+      end
+    end
 
-      context 'when params ask for pagination' do
-        let(:params) { { pagination_links: true } }
+    context "when pagination_links_on_demand" do
+      let(:pagination_links_on_demand) { true }
+
+      context "when params ask for pagination" do
+        let(:params) { {pagination_links: true} }
 
         it { is_expected.to eq(true) }
       end
 
-      context 'when params dont ask pagination' do
+      context "when params dont ask pagination" do
         it { is_expected.to eq(false) }
       end
     end
 
-    context 'when action is equal to find' do
-      let(:params) { { action: 'show' } }
-      before { Graphiti.config.pagination_links_on_demand = false }
+    context "when action is equal to find" do
+      let(:params) { {action: "show"} }
+      let(:pagination_links_on_demand) { false }
 
       it { is_expected.to eq(false) }
     end
 
-    context 'when action is equal to all' do
-      let(:params) { { action: 'index' } }
-      before { Graphiti.config.pagination_links_on_demand = false }
+    context "when action is equal to all" do
+      let(:params) { {action: "index"} }
+      let(:pagination_links_on_demand) { false }
 
-      context 'when is equal config.pagination_links is true' do
-        before { Graphiti.config.pagination_links = true }
+      context "when is equal config.pagination_links is true" do
+        let(:pagination_links) { true }
+
         it { is_expected.to eq(true) }
       end
 
-      context 'when is equal config.pagination_links is false' do
-        before { Graphiti.config.pagination_links = false }
+      context "when is equal config.pagination_links is false" do
+        let(:pagination_links) { false }
+
         it { is_expected.to eq(false) }
       end
     end
