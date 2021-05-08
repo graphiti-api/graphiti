@@ -994,4 +994,44 @@ RSpec.describe Graphiti::Query do
       end
     end
   end
+
+  describe '#pagination_links?' do
+    subject { instance.pagination_links? }
+
+    context 'when pagination_links_on_demand' do
+      before { Graphiti.config.pagination_links_on_demand = true }
+
+      context 'when params ask for pagination' do
+        let(:params) { { pagination_links: true } }
+
+        it { is_expected.to eq(true) }
+      end
+
+      context 'when params dont ask pagination' do
+        it { is_expected.to eq(false) }
+      end
+    end
+
+    context 'when action is equal to find' do
+      let(:params) { { action: 'show' } }
+      before { Graphiti.config.pagination_links_on_demand = false }
+
+      it { is_expected.to eq(false) }
+    end
+
+    context 'when action is equal to all' do
+      let(:params) { { action: 'index' } }
+      before { Graphiti.config.pagination_links_on_demand = false }
+
+      context 'when is equal config.pagination_links is true' do
+        before { Graphiti.config.pagination_links = true }
+        it { is_expected.to eq(true) }
+      end
+
+      context 'when is equal config.pagination_links is false' do
+        before { Graphiti.config.pagination_links = false }
+        it { is_expected.to eq(false) }
+      end
+    end
+  end
 end
