@@ -54,6 +54,30 @@ module Graphiti
           }
         end
 
+        def cursor_paginatable=(val)
+          super
+
+          unless default_cursor?
+            if sorts.key?(:id)
+              type = attributes[:id][:type]
+              canonical = Graphiti::Types[type][:canonical_name]
+              if canonical == :integer
+                self.default_cursor = :id
+              end
+            end
+          end
+        end
+
+        def default_cursor=(val)
+          super
+
+          if attributes.key?(val)
+            sort val, cursorable: true
+          else
+            raise "friendly error about not an attribute"
+          end
+        end
+
         def model
           klass = super
           unless klass || abstract_class?
@@ -82,6 +106,9 @@ module Graphiti
           :serializer,
           :default_page_size,
           :default_sort,
+          :default_cursor,
+          :cursor_paginatable,
+          :cursorable_attributes,
           :max_page_size,
           :attributes_readable_by_default,
           :attributes_writable_by_default,
@@ -120,6 +147,7 @@ module Graphiti
           unless klass.config[:attributes][:id]
             klass.attribute :id, :integer_id
           end
+
           klass.stat total: [:count]
 
           if defined?(::Rails) && ::Rails.env.development?
@@ -205,6 +233,7 @@ module Graphiti
               sort_all: nil,
               sorts: {},
               pagination: nil,
+              cursor_pagination: nil,
               after_graph_persist: {},
               before_commit: {},
               after_commit: {},
@@ -252,6 +281,10 @@ module Graphiti
           config[:pagination]
         end
 
+        def cursor_pagination
+          config[:cursor_pagination]
+        end
+
         def default_filters
           config[:default_filters]
         end
@@ -296,6 +329,10 @@ module Graphiti
 
       def pagination
         self.class.pagination
+      end
+
+      def cursor_pagination
+        self.class.cursor_pagination
       end
 
       def attributes

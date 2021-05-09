@@ -51,7 +51,10 @@ module Graphiti
     private
 
     def each_sort
-      sort_param.each do |sort_hash|
+      sorts = sort_param
+      add_cursor_pagination_fallback(sorts)
+
+      sorts.each do |sort_hash|
         attribute = sort_hash.keys.first
         direction = sort_hash.values.first
         yield attribute, direction
@@ -81,6 +84,14 @@ module Graphiti
       key = attr.sub("-", "").to_sym
 
       {key => value}
+    end
+
+    def add_cursor_pagination_fallback(sorts)
+      if sorts.present? && @resource.cursor_paginatable?
+        sort_key = sorts.last.keys[0]
+        cursorable = !!@resource.sorts[sort_key][:cursorable]
+        sorts << {@resource.default_cursor => :asc} unless cursorable
+      end
     end
   end
 end

@@ -28,6 +28,45 @@ module Graphiti
 
         existing = @serializer.send(applied_method)
         @serializer.send(:"#{applied_method}=", [@name] | existing)
+
+        # NB could use some refacotring
+        @serializer.meta do
+          # Not a remote resource and requested/enabled
+          if @resource.respond_to?(:cursor_paginatable?) &&
+              @resource.cursor_paginatable? &&
+              @proxy.query.cursor?
+
+            parts = []
+            has_cursorable_part = false
+            if @proxy.query.sorts.any?
+              @proxy.query.sorts.each do |sort|
+                attribute, direction = Array(sort)[0]
+                cursorable = !!@resource.sorts[attribute][:cursorable]
+                parts << {attribute: attribute, direction: direction}
+                if cursorable
+                  has_cursorable_part = true
+                  break
+                end
+              end
+            end
+
+            unless has_cursorable_part
+              parts << {attribute: @resource.default_cursor, direction: :asc}
+            end
+
+            parts.each do |part|
+              config = @resource.get_attr!(part[:attribute], :sortable, request: true)
+
+              part[:value] = if config[:proc]
+                instance_eval(&config[:proc])
+              else
+                @object.public_send(part[:attribute])
+              end
+            end
+
+            {cursor: Util::Cursor.encode(parts)}
+          end
+        end
       end
 
       private

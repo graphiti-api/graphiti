@@ -723,6 +723,18 @@ module Graphiti
       end
     end
 
+    class UnsupportedCursorPagination < Base
+      def initialize(resource)
+        @resource = resource
+      end
+
+      def message
+        <<~MSG
+          It looks like you are passing cursor pagination params, but #{@resource.class.name} does not support cursor pagination.
+        MSG
+      end
+    end
+
     class UnsupportedPageSize < Base
       def initialize(size, max)
         @size, @max = size, max

@@ -97,11 +97,28 @@ module PORO
       end
 
       def apply_pagination(records, params)
-        return records unless params[:per]
+        if params.key?(:after)
+          start_at = 0
 
-        start_at = (params[:page] - 1) * (params[:per])
-        end_at = (params[:page] * params[:per]) - 1
-        return [] if end_at < 0
+          if (after = params[:after])
+            after = after[0] # no multisort for PORO
+            start_at = records.index do |r|
+              r.send(after[:attribute]) == after[:value]
+            end + 1
+          end
+
+          end_at = if (per = params[:per])
+            start_at + (per - 1)
+          else
+            999
+          end
+        else
+          return records unless params[:per]
+          start_at = (params[:page] - 1) * (params[:per])
+          end_at = (params[:page] * params[:per]) - 1
+          return [] if end_at < 0
+        end
+
         records[start_at..end_at]
       end
     end
@@ -109,7 +126,7 @@ module PORO
 
   class Base
     include ActiveModel::Validations
-    attr_accessor :id
+    attr_accessor :id, :created_at
 
     def self.create(attrs = {})
       record = new(attrs)
@@ -117,7 +134,9 @@ module PORO
       if record.valid?
         id = attrs[:id] || DB.data[type].length + 1
         attrs[:id] = id
+        attrs[:created_at] = attrs[:created_at] || Time.now
         record.id = id
+        record.created_at = attrs[:created_at]
         DB.data[type] << attrs
       end
 
@@ -294,6 +313,10 @@ module PORO
 
     def paginate(scope, current_page, per_page)
       scope.merge!(page: current_page, per: per_page)
+    end
+
+    def cursor_paginate(scope, after, size)
+      scope.merge!(after: after, per: size)
     end
 
     def filter(scope, name, value)

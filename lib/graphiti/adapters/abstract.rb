@@ -255,6 +255,10 @@ module Graphiti
         raise "you must override #paginate in an adapter subclass"
       end
 
+      def cursor_paginate(scope, after, size)
+        raise "you must override #cursor_paginate in an adapter subclass"
+      end
+
       # @param scope the scope object we are chaining
       # @param [Symbol] attr corresponding stat attribute name
       # @return [Numeric] the count of the scope

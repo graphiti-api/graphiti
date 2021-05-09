@@ -1866,4 +1866,334 @@ RSpec.describe "serialization" do
       end
     end
   end
+
+  context "when cursor pagination turned on" do
+    let!(:employee1) { PORO::Employee.create(age: 10) }
+    let!(:employee2) { PORO::Employee.create(age: 20) }
+
+    before do
+      resource.cursor_paginatable = true
+      resource.attribute :created_at, :datetime
+    end
+
+    def encode(attribute, value)
+      Graphiti::Util::Cursor.encode([{
+        attribute: attribute,
+        value: value,
+        direction: "asc"
+      }])
+    end
+
+    def decode(cursor)
+      Graphiti::Util::Cursor.decode(resource.new, cursor)
+    end
+
+    it "renders the cursor in resource meta" do
+      render
+      expect(decode(json["data"][0]["meta"]["cursor"]))
+        .to eq([{attribute: :id, direction: "asc", value: employee1.id}])
+      expect(decode(json["data"][1]["meta"]["cursor"]))
+        .to eq([{attribute: :id, direction: "asc", value: employee2.id}])
+    end
+
+    context "when default_cursor is specified" do
+      before do
+        resource.default_cursor = :created_at
+      end
+
+      it "is respected" do
+        render
+        expect(decode(json["data"][0]["meta"]["cursor"]))
+          .to eq([{
+            attribute: :created_at,
+            direction: "asc",
+            value: employee1.created_at.iso8601(6)
+          }])
+        expect(decode(json["data"][1]["meta"]["cursor"]))
+          .to eq([{
+            attribute: :created_at,
+            direction: "asc",
+            value: employee2.created_at.iso8601(6)
+          }])
+      end
+    end
+
+    context "when a sort is passed in the request" do
+      before do
+        resource.attribute :age, :integer
+        params[:sort] = "-age"
+      end
+
+      context "and the sort is not cursorable" do
+        # We will multisort in this case, see sorting spec
+        it "renders the default cursor" do
+          render
+
+          expect(decode(json["data"][0]["meta"]["cursor"]))
+            .to eq([
+              {attribute: :age, direction: "desc", value: employee2.age},
+              {attribute: :id, direction: "asc", value: employee2.id}
+            ])
+          expect(decode(json["data"][1]["meta"]["cursor"]))
+            .to eq([
+              {attribute: :age, direction: "desc", value: employee1.age},
+              {attribute: :id, direction: "asc", value: employee1.id}
+            ])
+        end
+      end
+
+      context "and it is cursorable" do
+        before do
+          resource.sort :created_at, cursorable: true
+          params[:sort] = "-created_at"
+        end
+
+        it "renders a cursor with the given sort" do
+          render
+
+          expect(decode(json["data"][0]["meta"]["cursor"]))
+            .to eq([{
+              attribute: :created_at,
+              direction: "desc",
+              value: employee2.created_at.iso8601(6)
+            }])
+          expect(decode(json["data"][1]["meta"]["cursor"]))
+            .to eq([{
+              attribute: :created_at,
+              direction: "desc",
+              value: employee1.created_at.iso8601(6)
+            }])
+        end
+      end
+
+      context "when multiple sorts passed in the request" do
+        before do
+          resource.attribute :age, :integer
+          params[:sort] = "-age,created_at"
+        end
+
+        context "and the last sort is cursorable" do
+          before do
+            resource.sort :created_at, cursorable: true
+          end
+
+          it "adds multiple attributes - but not the default - to the cursor" do
+            render
+
+            expect(decode(json["data"][0]["meta"]["cursor"]))
+              .to eq([
+                {
+                  attribute: :age,
+                  direction: "desc",
+                  value: employee2.age
+                },
+                {
+                  attribute: :created_at,
+                  direction: "asc",
+                  value: employee2.created_at.iso8601(6)
+                }
+              ])
+
+            expect(decode(json["data"][1]["meta"]["cursor"]))
+              .to eq([
+                {
+                  attribute: :age,
+                  direction: "desc",
+                  value: employee1.age
+                },
+                {
+                  attribute: :created_at,
+                  direction: "asc",
+                  value: employee1.created_at.iso8601(6)
+                }
+              ])
+          end
+        end
+
+        context "and the last sort is not cursorable" do
+          it "adds the default cursor to the payload" do
+            render
+
+            expect(decode(json["data"][0]["meta"]["cursor"]))
+              .to eq([
+                {
+                  attribute: :age,
+                  direction: "desc",
+                  value: employee2.age
+                },
+                {
+                  attribute: :created_at,
+                  direction: "asc",
+                  value: employee2.created_at.iso8601(6)
+                },
+                {
+                  attribute: :id,
+                  direction: "asc",
+                  value: employee2.id
+                }
+              ])
+
+            expect(decode(json["data"][1]["meta"]["cursor"]))
+              .to eq([
+                {
+                  attribute: :age,
+                  direction: "desc",
+                  value: employee1.age
+                },
+                {
+                  attribute: :created_at,
+                  direction: "asc",
+                  value: employee1.created_at.iso8601(6)
+                },
+                {
+                  attribute: :id,
+                  direction: "asc",
+                  value: employee1.id
+                }
+              ])
+          end
+        end
+      end
+    end
+
+    context "when .cursor_paginatable == false" do
+      before do
+        resource.cursor_paginatable = false
+      end
+
+      it "does not render meta/cursor" do
+        render
+        expect(json["data"][0]).to_not have_key("meta")
+        expect(json["data"][1]).to_not have_key("meta")
+      end
+
+      context "but cursor_on_demand is true and cursor requested" do
+        around do |e|
+          original = Graphiti.config.cursor_on_demand
+          Graphiti.config.cursor_on_demand = true
+          begin
+            e.run
+          ensure
+            Graphiti.config.cursor_on_demand = original
+          end
+        end
+
+        before do
+          params[:cursor] = true
+        end
+
+        it "still does not render meta/cursor" do
+          render
+          expect(json["data"][0]).to_not have_key("meta")
+          expect(json["data"][1]).to_not have_key("meta")
+        end
+      end
+    end
+
+    context "when cursor_on_demand" do
+      around do |e|
+        original = Graphiti.config.cursor_on_demand
+        Graphiti.config.cursor_on_demand = true
+        begin
+          e.run
+        ensure
+          Graphiti.config.cursor_on_demand = original
+        end
+      end
+
+      context "and cursor param is passed" do
+        before do
+          params[:cursor] = true
+        end
+
+        it "renders cursor in meta" do
+          render
+          expect(json["data"][0]["meta"]["cursor"]).to be_present
+          expect(json["data"][1]["meta"]["cursor"]).to be_present
+        end
+
+        context "but resource is not cursor paginatable" do
+          before do
+            resource.cursor_paginatable = false
+          end
+
+          it "does not render meta/cursor" do
+            render
+            expect(json["data"][0]).to_not have_key("meta")
+            expect(json["data"][1]).to_not have_key("meta")
+          end
+        end
+      end
+
+      context "and cursor param is not passed" do
+        it "does not render meta/cursor" do
+          render
+          expect(json["data"][0]).to_not have_key("meta")
+          expect(json["data"][1]).to_not have_key("meta")
+        end
+      end
+    end
+
+    context "when the cursor has special rendering logic" do
+      before do
+        resource.attribute :timestamp, :datetime do
+          @object.created_at
+        end
+
+        resource.sort :timestamp, cursorable: true
+        resource.default_cursor = :timestamp
+      end
+
+      it "is honored" do
+        render
+
+        expect(decode(json["data"][0]["meta"]["cursor"]))
+          .to eq([
+            {
+              attribute: :timestamp,
+              direction: "asc",
+              value: employee1.created_at.iso8601(6)
+            }
+          ])
+        expect(decode(json["data"][1]["meta"]["cursor"]))
+          .to eq([
+            {
+              attribute: :timestamp,
+              direction: "asc",
+              value: employee2.created_at.iso8601(6)
+            }
+          ])
+      end
+
+      context "but the attribute is unreadable" do
+        before do
+          resource.attribute :timestamp, :datetime, readable: false do
+            @object.created_at
+          end
+        end
+
+        it "still honors the serialization block" do
+          render
+
+          expect(decode(json["data"][0]["meta"]["cursor"]))
+            .to eq([
+              {
+                attribute: :timestamp,
+                direction: "asc",
+                value: employee1.created_at.iso8601(6)
+              }
+            ])
+
+          expect(decode(json["data"][1]["meta"]["cursor"]))
+            .to eq([
+              {
+                attribute: :timestamp,
+                direction: "asc",
+                value: employee2.created_at.iso8601(6)
+              }
+            ])
+        end
+      end
+    end
+  end
 end
