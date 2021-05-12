@@ -1032,6 +1032,13 @@ RSpec.describe Graphiti::Query do
       let(:pagination_links_on_demand) { false }
 
       it { is_expected.to eq(false) }
+
+      context 'when pagination_links_on_demand and param is present' do
+        let(:params) { {action: "show", pagination_links: true} }
+        let(:pagination_links_on_demand) { true }
+
+        it { is_expected.to eq(false) }
+      end
     end
 
     context "when action is equal to all" do
