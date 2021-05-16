@@ -98,6 +98,7 @@ module PORO
 
       def apply_pagination(records, params)
         return records unless params[:per]
+        records = records[params[:offset]..records.length] if params[:offset]
 
         start_at = (params[:page] - 1) * (params[:per])
         end_at = (params[:page] * params[:per]) - 1
@@ -292,8 +293,11 @@ module PORO
       {}
     end
 
-    def paginate(scope, current_page, per_page)
-      scope.merge!(page: current_page, per: per_page)
+    def paginate(scope, current_page, per_page, offset)
+      scope[:page] = current_page if current_page
+      scope[:per] = per_page if per_page
+      scope[:offset] = offset if offset
+      scope
     end
 
     def filter(scope, name, value)

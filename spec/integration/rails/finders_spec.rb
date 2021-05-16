@@ -74,11 +74,6 @@ if ENV["APPRAISAL_INITIALIZED"]
       expect(d.map(&:id)).to eq([author2.id, author1.id])
     end
 
-    it "allows basic pagination" do
-      do_index({page: {number: 2, size: 1}})
-      expect(d.map(&:id)).to eq([author2.id])
-    end
-
     it "allows allowlisted filters (and other configs)" do
       do_index({filter: {first_name: "George"}})
       expect(d.map(&:id)).to eq([author2.id])
@@ -93,6 +88,116 @@ if ENV["APPRAISAL_INITIALIZED"]
       do_index({include: "books.genre"})
       expect(included.map(&:jsonapi_type).uniq)
         .to match_array(%w[books genres])
+    end
+
+    describe "paginating" do
+      let!(:author3) { Legacy::Author.create! first_name: "3" }
+      let!(:author4) { Legacy::Author.create! first_name: "4" }
+
+      subject do
+        do_index(page: params)
+        d.map(&:id)
+      end
+
+      context "by number and size" do
+        let(:params) { {number: 2, size: 1} }
+
+        it { is_expected.to eq([author2.id]) }
+      end
+
+      context "by only offset" do
+        let(:params) { {offset: 2} }
+
+        it { is_expected.to eq([author3.id, author4.id]) }
+      end
+
+      context "by offset and size" do
+        let(:params) { {offset: 2, size: 1} }
+
+        it { is_expected.to eq([author3.id]) }
+      end
+
+      context "by offset, number and size" do
+        let(:params) { {offset: 2, size: 1, number: 2} }
+
+        it { is_expected.to eq([author4.id]) }
+      end
+
+      context "when rendering pagination links" do
+        let(:params) { {size: 1, number: 2} }
+
+        around do |e|
+          original = Graphiti.config.pagination_links
+          begin
+            Graphiti.config.pagination_links = true
+            e.run
+          ensure
+            Graphiti.config.pagination_links = original
+          end
+        end
+
+        let(:links) do
+          {}.tap do |links|
+            json["links"].each_pair do |key, value|
+              links[key] = CGI.unescape(value).split("?")[1]
+            end
+          end
+        end
+
+        context "with page and size" do
+          it "works" do
+            do_index(page: params)
+            expect(links["self"]).to eq("page[number]=2&page[size]=1")
+            expect(links["first"]).to eq("page[number]=1&page[size]=1")
+            expect(links["last"]).to eq("page[number]=4&page[size]=1")
+            expect(links["prev"]).to eq("page[number]=1&page[size]=1")
+            expect(links["next"]).to eq("page[number]=3&page[size]=1")
+          end
+
+          context "when on the last page" do
+            let(:params) { {size: 1, number: 4} }
+
+            it "does not render 'next'" do
+              do_index(page: params)
+              expect(links).to_not have_key("next")
+            end
+          end
+
+          context "and offset" do
+            before do
+              params[:offset] = 1
+            end
+
+            it "works" do
+              do_index(page: params)
+
+              expect(d[0].id).to eq(author3.id)
+              expect(links["self"])
+                .to eq("page[number]=2&page[offset]=1&page[size]=1")
+              expect(links["first"])
+                .to eq("page[number]=1&page[offset]=1&page[size]=1")
+              expect(links["last"])
+                .to eq("page[number]=3&page[offset]=1&page[size]=1")
+              expect(links["prev"])
+                .to eq("page[number]=1&page[offset]=1&page[size]=1")
+              expect(links["next"])
+                .to eq("page[number]=3&page[offset]=1&page[size]=1")
+            end
+
+            context "when on the last page" do
+              before do
+                params[:number] = 3 # 1 per page + 1 offset = 4th/last result
+              end
+
+              it "does not render 'next'" do
+                do_index(page: params)
+                expect(d[0].id).to eq(author4.id)
+                expect(links).to_not have_key("next")
+              end
+            end
+          end
+        end
+      end
     end
 
     describe "filtering" do

@@ -33,12 +33,24 @@ module Graphiti
 
     # Apply default pagination proc via the Resource adapter
     def apply_standard_scope
-      resource.adapter.paginate(@scope, number, size)
+      arity = resource.adapter.method(:paginate)
+
+      if arity == 4 # backwards-compat
+        resource.adapter.paginate(@scope, number, size)
+      else
+        resource.adapter.paginate(@scope, number, size, offset)
+      end
     end
 
     # Apply the custom pagination proc
     def apply_custom_scope
-      resource.instance_exec(@scope, number, size, resource.context, &custom_scope)
+      resource.instance_exec \
+        @scope,
+        number,
+        size,
+        resource.context,
+        offset,
+        &custom_scope
     end
 
     private
@@ -49,6 +61,12 @@ module Graphiti
 
     def page_param
       @page_param ||= (query_hash[:page] || {})
+    end
+
+    def offset
+      if (value = page_param[:offset])
+        value.to_i
+      end
     end
 
     def number
