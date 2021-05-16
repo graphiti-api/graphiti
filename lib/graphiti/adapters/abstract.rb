@@ -244,14 +244,15 @@ module Graphiti
       # @param scope The scope object we are chaining
       # @param [Integer] current_page The current page number
       # @param [Integer] per_page The number of results per page
+      # @param [Integer] offset The offset to start from
       # @return the scope
       #
       # @example ActiveRecord default
       #   # via kaminari gem
-      #   def paginate(scope, current_page, per_page)
+      #   def paginate(scope, current_page, per_page, offset)
       #     scope.page(current_page).per(per_page)
       #   end
-      def paginate(scope, current_page, per_page)
+      def paginate(scope, current_page, per_page, offset)
         raise "you must override #paginate in an adapter subclass"
       end
 

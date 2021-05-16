@@ -66,6 +66,52 @@ RSpec.describe "pagination" do
     expect(ids).to eq([3, 4])
   end
 
+  context "when offset is given" do
+    before do
+      params[:page] = {offset: 2}
+    end
+
+    it "works" do
+      expect(ids).to eq([3, 4])
+    end
+
+    context "alongside page size" do
+      before do
+        params[:page][:size] = 1
+      end
+
+      it "works" do
+        expect(ids).to eq([3])
+      end
+    end
+
+    context "alongside page number" do
+      before do
+        params[:page][:number] = 2
+        params[:page][:size] = 1
+      end
+
+      it "works" do
+        expect(ids).to eq([4])
+      end
+    end
+
+    context "when a custom pagination override" do
+      before do
+        @spy = spy = {}
+        resource.paginate do |scope, current_page, per_page, ctx, offset|
+          spy[:value] = offset
+          scope
+        end
+      end
+
+      it "is yielded" do
+        ids
+        expect(@spy[:value]).to eq(2)
+      end
+    end
+  end
+
   # for metadata
   context "with page size 0" do
     it "should return empty array" do

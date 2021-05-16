@@ -30,13 +30,14 @@ module Graphiti
 
         uri = URI(@proxy.resource.endpoint[:url].to_s)
 
+        page_params = {
+          number: page,
+          size: page_size
+        }
+        page_params[:offset] = offset if offset
+
         # Overwrite the pagination query params with the desired page
-        uri.query = pagination_params.merge({
-          page: {
-            number: page,
-            size: page_size
-          }
-        }).to_query
+        uri.query = pagination_params.merge(page: page_params).to_query
         uri.to_s
       end
 
@@ -46,8 +47,11 @@ module Graphiti
         elsif page_size == 0 || item_count == 0
           return nil
         end
-        @last_page = (item_count / page_size)
-        @last_page += 1 if item_count % page_size > 0
+
+        count = item_count
+        count = item_count - offset if offset
+        @last_page = (count / page_size)
+        @last_page += 1 if count % page_size > 0
         @last_page
       end
 
@@ -80,6 +84,14 @@ module Graphiti
 
       def current_page
         @current_page ||= (page_param[:number] || 1).to_i
+      end
+
+      def offset
+        @offset ||= begin
+          if (value = page_param[:offset])
+            value.to_i
+          end
+        end
       end
 
       def page_size

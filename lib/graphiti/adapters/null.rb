@@ -178,7 +178,7 @@ module Graphiti
       end
 
       # (see Adapters::Abstract#paginate)
-      def paginate(scope, current_page, per_page)
+      def paginate(scope, current_page, per_page, offset)
         scope
       end
 

@@ -195,7 +195,7 @@ module Graphiti
               end
             elsif nested?(name)
               hash[name.to_s.split(".").last.to_sym] = value
-            elsif top_level? && [:number, :size].include?(name.to_sym)
+            elsif top_level? && [:number, :size, :offset].include?(name.to_sym)
               hash[name.to_sym] = value.to_i
             end
           end

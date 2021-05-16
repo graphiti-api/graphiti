@@ -360,7 +360,7 @@ module Legacy
       model.all
     end
 
-    def paginate(scope, a, b)
+    def paginate(scope, a, b, c)
       scope
     end
 

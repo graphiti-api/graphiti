@@ -184,8 +184,11 @@ module Graphiti
       end
 
       # (see Adapters::Abstract#paginate)
-      def paginate(scope, current_page, per_page)
-        scope.page(current_page).per(per_page)
+      def paginate(scope, current_page, per_page, offset)
+        scope = scope.page(current_page) if current_page
+        scope = scope.per(per_page) if per_page
+        scope = scope.padding(offset) if offset
+        scope
       end
 
       # (see Adapters::Abstract#count)
