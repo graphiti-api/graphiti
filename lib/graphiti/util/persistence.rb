@@ -24,6 +24,14 @@ class Graphiti::Util::Persistence
     end
   end
 
+  def assign
+    attributes = @adapter.persistence_attributes(self, @attributes)
+    @assigned = call_resource_method(:assign, attributes, @caller_model)
+    @resource.decorate_record(@assigned)
+
+    @assigned
+  end
+
   # Perform the actual save logic.
   #
   # belongs_to must be processed before/separately from has_many -
@@ -49,8 +57,10 @@ class Graphiti::Util::Persistence
     parents = @adapter.process_belongs_to(self, attributes)
     persisted = persist_object(@meta[:method], attributes)
     @resource.decorate_record(persisted)
-    assign_temp_id(persisted, @meta[:temp_id])
 
+    return persisted if @meta[:method] == :assign
+
+    assign_temp_id(persisted, @meta[:temp_id])
     associate_parents(persisted, parents)
 
     children = @adapter.process_has_many(self, persisted)
@@ -129,6 +139,8 @@ class Graphiti::Util::Persistence
 
   def persist_object(method, attributes)
     case method
+      when :assign
+        call_resource_method(:assign, attributes, @caller_model)
       when :destroy
         call_resource_method(:destroy, attributes[:id], @caller_model)
       when :update, nil, :disassociate

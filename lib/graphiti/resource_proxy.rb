@@ -117,6 +117,16 @@ module Graphiti
       @pagination ||= Delegates::Pagination.new(self)
     end
 
+    def assign_attributes(params = nil)
+      # deserialize params again?
+
+      @data = @resource.assign_with_relationships(
+        @payload.meta,
+        @payload.attributes,
+        @payload.relationships,
+      )
+    end
+
     def save(action: :create)
       # TODO: remove this. Only used for persisting many-to-many with AR
       # (see activerecord adapter)
@@ -167,6 +177,7 @@ module Graphiti
 
     def update
       resolve_data
+      assign_attributes
       save(action: :update)
     end
 

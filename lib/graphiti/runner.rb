@@ -8,7 +8,6 @@ module Graphiti
       @params = params
       @query = query
       @action = action
-
       validator = RequestValidator.new(jsonapi_resource, params, action)
       validator.validate!
 

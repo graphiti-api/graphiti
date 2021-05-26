@@ -8,6 +8,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       routes.draw do
         post "create" => "anonymous#create"
+        put "update" => "anonymous#update"
         delete "destroy" => "anonymous#destroy"
       end
 
@@ -34,6 +35,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       class EmployeeResource < ApplicationResource
         self.model = Employee
+        self.type= "employees"
 
         before_attributes :one
         before_attributes :two
@@ -168,6 +170,18 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
       end
 
+      def update
+        employee = IntegrationCallbacks::EmployeeResource._find(params)
+        Thread.current[:proxy] = employee
+        employee.assign_attributes
+
+        if employee.update_attributes
+          render jsonapi: employee
+        else
+          raise "whoops"
+        end
+      end
+
       def destroy
         employee = IntegrationCallbacks::EmployeeResource._find(params)
         Thread.current[:proxy] = employee
@@ -194,7 +208,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       {
         data: {
           type: "employees",
-          attributes: {first_name: "Jane"}
+          attributes: { first_name: "Jane"}
         }
       }
     end
@@ -222,6 +236,41 @@ if ENV["APPRAISAL_INITIALIZED"]
           it "rolls back the transaction" do
             expect {
               expect { post :create, params: payload }.to raise_error("test")
+            }.to_not(change { Employee.count })
+          end
+        end
+      end
+
+      describe "update callbacks" do
+        let!(:employee) { Employee.create!(first_name: "asdf") }
+        let(:payload) {
+          { id: employee.id, 
+              data: {
+                id: employee.id,
+                type: 'employees',
+                attributes: { first_name: "Jane" }
+              }
+            }
+        }
+
+
+        it "fires hooks in order" do
+          expect {
+            put :update, params: payload
+          }.to change { Employee.find(employee.id).first_name }
+          employee = proxy.data
+          expect(employee.first_name)
+            .to eq("Jane5a6a7a12347b6b5b_12a_13a_14a89_10_11_14b_13b_12b")
+        end
+
+        context "when an error is raised" do
+          before do
+            $raise = true
+          end
+
+          it "rolls back the transaction" do
+            expect {
+              expect { put :update, params: payload }.to raise_error("test")
             }.to_not(change { Employee.count })
           end
         end

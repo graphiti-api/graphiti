@@ -69,6 +69,24 @@ module Graphiti
         end
       end
 
+      def assign(assign_params, meta = nil)
+        id = assign_params[:id]
+        assign_params = assign_params.except(:id)
+        model_instance = nil
+
+        run_callbacks :attributes, :assign, assign_params, meta do |params|
+          model_instance = if meta[:method] == :update && id
+                             self.class._find(id: id).data
+                           else
+                             call_with_meta(:build, model, meta)
+                           end
+          call_with_meta(:assign_attributes, model_instance, params, meta)
+          model_instance
+        end
+
+        model_instance
+      end
+
       def create(create_params, meta = nil)
         model_instance = nil
 
