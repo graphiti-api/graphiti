@@ -4,11 +4,11 @@ module Graphiti
       extend ActiveSupport::Concern
 
       class_methods do
-        def before_attributes(method = nil, only: [:create, :update], &blk)
+        def before_attributes(method = nil, only: [:create, :update, :assign], &blk)
           add_callback(:attributes, :before, method, only, &blk)
         end
 
-        def after_attributes(method = nil, only: [:create, :update], &blk)
+        def after_attributes(method = nil, only: [:create, :update, :assign], &blk)
           add_callback(:attributes, :after, method, only, &blk)
         end
 
@@ -69,13 +69,13 @@ module Graphiti
         end
       end
 
-      def assign(assign_params, meta = nil)
+      def assign(assign_params, meta = nil, action_name = nil)
         id = assign_params[:id]
         assign_params = assign_params.except(:id)
         model_instance = nil
 
-        run_callbacks :attributes, :assign, assign_params, meta do |params|
-          model_instance = if meta[:method] == :update && id
+        run_callbacks :attributes, action_name, assign_params, meta do |params|
+          model_instance = if action_name != :create && id
                              self.class._find(id: id).data
                            else
                              call_with_meta(:build, model, meta)
@@ -91,11 +91,7 @@ module Graphiti
         model_instance = nil
 
         run_callbacks :persistence, :create, create_params, meta do
-          run_callbacks :attributes, :create, create_params, meta do |params|
-            model_instance = call_with_meta(:build, model, meta)
-            call_with_meta(:assign_attributes, model_instance, params, meta)
-            model_instance
-          end
+          model_instance = assign(create_params, meta, :create)
 
           run_callbacks :save, :create, model_instance, meta do
             model_instance = call_with_meta(:save, model_instance, meta)
@@ -107,15 +103,9 @@ module Graphiti
 
       def update(update_params, meta = nil)
         model_instance = nil
-        id = update_params[:id]
-        update_params = update_params.except(:id)
 
         run_callbacks :persistence, :update, update_params, meta do
-          run_callbacks :attributes, :update, update_params, meta do |params|
-            model_instance = self.class._find(id: id).data
-            call_with_meta(:assign_attributes, model_instance, params, meta)
-            model_instance
-          end
+          model_instance = assign(update_params, meta, :update)
 
           run_callbacks :save, :update, model_instance, meta do
             model_instance = call_with_meta(:save, model_instance, meta)

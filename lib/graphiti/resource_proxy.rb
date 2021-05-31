@@ -9,7 +9,8 @@ module Graphiti
       single: false,
       raise_on_missing: false,
       cache: nil,
-      cache_expires_in: nil)
+      cache_expires_in: nil,
+      data: nil)
 
       @resource = resource
       @scope = scope
@@ -74,6 +75,11 @@ module Graphiti
       Renderer.new(self, options).as_graphql
     end
 
+    def data=(models)
+      @data = data
+      [@data].flatten.compact.each { |r| @resource.decorate_record(r) }
+    end
+
     def data
       @data ||= begin
         records = @scope.resolve
@@ -123,7 +129,7 @@ module Graphiti
       @data = @resource.assign_with_relationships(
         @payload.meta,
         @payload.attributes,
-        @payload.relationships,
+        @payload.relationships
       )
     end
 
@@ -177,7 +183,6 @@ module Graphiti
 
     def update
       resolve_data
-      assign_attributes
       save(action: :update)
     end
 
