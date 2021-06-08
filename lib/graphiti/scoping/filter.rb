@@ -171,14 +171,18 @@ module Graphiti
       type = Graphiti::Types[filter[:type]]
       array_or_string = [:string, :array].include?(type[:canonical_name])
       if (arr = value.scan(/\[.*?\]/)).present? && array_or_string
-        value = arr.map { |json|
-          begin
-            JSON.parse(json)
-          rescue
-            raise Errors::InvalidJSONArray.new(resource, value)
-          end
-        }
-        value = value[0] if value.length == 1
+        begin
+          value = arr.map { |json|
+            begin
+              JSON.parse(json)
+            rescue
+              raise Errors::InvalidJSONArray.new(resource, value)
+            end
+          }
+          value = value[0] if value.length == 1
+        rescue Errors::InvalidJSONArray => e
+          raise(e) if type[:canonical_name] == :array
+        end
       else
         value = parse_string_arrays(value, !!filter[:single])
       end
