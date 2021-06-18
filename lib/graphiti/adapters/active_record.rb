@@ -255,6 +255,8 @@ module Graphiti
         else
           super
         end
+
+        parent
       end
 
       def associate(parent, child, association_name, association_type)
@@ -265,6 +267,8 @@ module Graphiti
         else
           super
         end
+
+        parent
       end
 
       # When a has_and_belongs_to_many relationship, we don't have a foreign
@@ -275,6 +279,7 @@ module Graphiti
           parent.send(association_name).delete(child)
         end
         # Nothing to do in the else case, happened when we merged foreign key
+        parent
       end
 
       # (see Adapters::Abstract#create)
