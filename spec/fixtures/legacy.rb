@@ -333,7 +333,7 @@ module Legacy
     attribute :float_age, :float
     attribute :decimal_age, :big_decimal
     attribute :active, :boolean
-    attribute :last_login, :datetime, only: [:filterable]
+    attribute :last_login, :datetime, only: [:filterable, :sortable]
     attribute :created_at, :datetime, only: [:filterable]
     attribute :created_at_date, :date, only: [:filterable]
     attribute :identifier, :uuid

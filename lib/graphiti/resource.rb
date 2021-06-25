@@ -28,11 +28,12 @@ module Graphiti
       serializer
     end
 
-    def decorate_record(record)
+    def decorate_record(record, index = nil)
       unless record.instance_variable_get(:@__graphiti_serializer)
         serializer = serializer_for(record)
         record.instance_variable_set(:@__graphiti_serializer, serializer)
         record.instance_variable_set(:@__graphiti_resource, self)
+        record.instance_variable_set(:@__graphiti_index, index) if index
       end
     end
 
