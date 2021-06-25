@@ -45,6 +45,23 @@ module Graphiti
       end
     end
 
+    def cursor
+      starting_offset = 0
+      page_param = @proxy.query.pagination
+      if (page_number = page_param[:number])
+        page_size = page_param[:size] || @resource.default_page_size
+        starting_offset = (page_number - 1) * page_size
+      end
+
+      if (cursor = page_param[:after])
+        starting_offset = cursor[:offset]
+      end
+
+      current_offset = @object.instance_variable_get(:@__graphiti_index)
+      offset = starting_offset + current_offset + 1 # (+ 1 b/c o-base index)
+      Base64.encode64({offset: offset}.to_json).chomp
+    end
+
     def as_jsonapi(kwargs = {})
       super(**kwargs).tap do |hash|
         strip_relationships!(hash) if strip_relationships?

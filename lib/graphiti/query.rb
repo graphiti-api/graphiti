@@ -191,12 +191,13 @@ module Graphiti
           (@params[:page] || {}).each_pair do |name, value|
             if legacy_nested?(name)
               value.each_pair do |k, v|
-                hash[k.to_sym] = v.to_i
+                hash[k.to_sym] = cast_page_param(k.to_sym, v)
               end
             elsif nested?(name)
-              hash[name.to_s.split(".").last.to_sym] = value
-            elsif top_level? && [:number, :size, :offset].include?(name.to_sym)
-              hash[name.to_sym] = value.to_i
+              param_name = name.to_s.split(".").last.to_sym
+              hash[param_name] = cast_page_param(param_name, value)
+            elsif top_level? && Scoping::Paginate::PARAMS.include?(name.to_sym)
+              hash[name.to_sym] = cast_page_param(name.to_sym, value)
             end
           end
         end
@@ -239,6 +240,18 @@ module Graphiti
     end
 
     private
+
+    def cast_page_param(name, value)
+      if [:before, :after].include?(name)
+        decode_cursor(value)
+      else
+        value.to_i
+      end
+    end
+
+    def decode_cursor(cursor)
+      JSON.parse(Base64.decode64(cursor)).symbolize_keys
+    end
 
     # Try to find on this resource
     # If not there, follow the legacy logic of scalling all other
