@@ -14,9 +14,17 @@ module Graphiti
           links[:self] = pagination_link(current_page)
           links[:first] = pagination_link(1)
           links[:last] = pagination_link(last_page)
-          links[:prev] = pagination_link(current_page - 1) unless current_page == 1
-          links[:next] = pagination_link(current_page + 1) unless current_page == last_page
+          links[:prev] = pagination_link(current_page - 1) if has_previous_page?
+          links[:next] = pagination_link(current_page + 1) if has_next_page?
         end.select { |k, v| !v.nil? }
+      end
+
+      def has_next_page?
+        current_page != last_page && last_page.present?
+      end
+
+      def has_previous_page?
+        current_page != 1
       end
 
       private

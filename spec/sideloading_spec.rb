@@ -677,15 +677,36 @@ RSpec.describe "sideloading" do
         allow_sideload :positions, class: Sideloading::PositionSideload
       end
       params[:include] = "positions"
-      params[:page] = {
-        size: 1,
-        positions: {size: 1}
-      }
+      params[:page] = {size: 1}
     end
 
     it "works" do
+      params[:page][:positions] = {size: 1}
       render
       expect(included("positions").map(&:id)).to match_array([2])
+    end
+
+    context "with offset" do
+      before do
+        params[:page][:positions] = {offset: 1}
+      end
+
+      it "works" do
+        render
+        expect(included("positions").map(&:id)).to match_array([1])
+      end
+    end
+
+    context "with cursor" do
+      before do
+        cursor = Base64.encode64({offset: 1}.to_json)
+        params[:page][:positions] = {after: cursor}
+      end
+
+      it "works" do
+        render
+        expect(included("positions").map(&:id)).to match_array([1])
+      end
     end
   end
 

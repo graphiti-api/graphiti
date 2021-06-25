@@ -733,6 +733,12 @@ module Graphiti
       end
     end
 
+    class UnsupportedBeforeCursor < Base
+      def message
+        "Passing in page[before] and page[number] is not supported. Please create an issue if you need it!"
+      end
+    end
+
     class InvalidInclude < Base
       def initialize(resource, relationship)
         @resource = resource

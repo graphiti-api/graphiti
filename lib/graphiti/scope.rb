@@ -85,8 +85,8 @@ module Graphiti
     # Used to ensure the resource's serializer is used
     # Not one derived through the usual jsonapi-rb logic
     def assign_serializer(records)
-      records.each do |r|
-        @resource.decorate_record(r)
+      records.each_with_index do |r, index|
+        @resource.decorate_record(r, index)
       end
     end
 
