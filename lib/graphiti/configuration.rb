@@ -15,6 +15,7 @@ module Graphiti
     attr_accessor :pagination_links
     attr_accessor :typecast_reads
     attr_accessor :raise_on_missing_sidepost
+    attr_accessor :before_sideload
 
     attr_reader :debug, :debug_models
 

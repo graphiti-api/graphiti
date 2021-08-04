@@ -43,6 +43,7 @@ module Graphiti
         parent_resource = @resource
         graphiti_context = Graphiti.context
         resolve_sideload = -> {
+          Graphiti.config.before_sideload&.call(graphiti_context)
           Graphiti.context = graphiti_context
           sideload.resolve(results, q, parent_resource)
           @resource.adapter.close if concurrent
