@@ -868,10 +868,18 @@ RSpec.describe "filtering" do
             params[:filter] = {foo: "[foo]"}
           end
 
-          it "works" do
-            expect {
-              records
-            }.to raise_error(Graphiti::Errors::InvalidJSONArray)
+          it "does not coerce" do
+            assert_filter_value(["[foo]"])
+          end
+
+          context "when single" do
+            before do
+              resource.filter :foo, single: true
+            end
+
+            it "does not cast to array" do
+              assert_filter_value("[foo]")
+            end
           end
         end
       end

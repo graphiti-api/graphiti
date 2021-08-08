@@ -34,9 +34,9 @@ module Graphiti
 
     # Apply default pagination proc via the Resource adapter
     def apply_standard_scope
-      arity = resource.adapter.method(:paginate).arity
+      meth = resource.adapter.method(:paginate)
 
-      if arity == 4 # backwards-compat
+      if meth.arity == 4 # backwards-compat
         resource.adapter.paginate(@scope, number, size, offset)
       else
         resource.adapter.paginate(@scope, number, size)
