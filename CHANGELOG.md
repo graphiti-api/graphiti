@@ -12,6 +12,7 @@ Features:
 Fixes:
 - [282] Support model names including "Resource"
 - [313](https://github.com/graphiti-api/graphiti/pull/313) Sort remote resources in schema generation
+- [374](https://github.com/graphiti-api/graphiti/pull/374) Trim leading spaces from error messages
 
 ## 1.1.0
 
