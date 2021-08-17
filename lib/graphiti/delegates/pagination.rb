@@ -24,7 +24,9 @@ module Graphiti
       end
 
       def has_previous_page?
-        current_page != 1
+        current_page != 1 ||
+          !!pagination_params.try(:[], :page).try(:[], :after) ||
+          !!pagination_params.try(:[], :page).try(:[], :offset)
       end
 
       private

@@ -215,11 +215,11 @@ module Graphiti
         end
 
         if fields.include?(:start_cursor)
-          info[:startCursor] = serializers.first.cursor
+          info[:startCursor] = serializers.first.try(:cursor)
         end
 
         if fields.include?(:end_cursor)
-          info[:endCursor] = serializers.last.cursor
+          info[:endCursor] = serializers.last.try(:cursor)
         end
 
         hash[top_level_key][:pageInfo] = info
