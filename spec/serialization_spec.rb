@@ -2058,13 +2058,37 @@ RSpec.describe "serialization" do
           end
 
           context "and there is a previous page" do
-            before do
-              params[:page] = {size: 1, number: 2}
+            context "via page number" do
+              before do
+                params[:page] = {size: 1, number: 2}
+              end
+
+              it "is true" do
+                render
+                expect(json.values[0]["pageInfo"]["hasPreviousPage"]).to eq(true)
+              end
             end
 
-            it "is true" do
-              render
-              expect(json.values[0]["pageInfo"]["hasPreviousPage"]).to eq(true)
+            context "via offset param" do
+              before do
+                params[:page] = {offset: 1}
+              end
+
+              it "is true" do
+                render
+                expect(json.values[0]["pageInfo"]["hasPreviousPage"]).to eq(true)
+              end
+            end
+
+            context "via after param" do
+              before do
+                params[:page] = {after: Base64.encode64({offset: 1}.to_json)}
+              end
+
+              it "is true" do
+                render
+                expect(json.values[0]["pageInfo"]["hasPreviousPage"]).to eq(true)
+              end
             end
           end
 
@@ -2087,9 +2111,23 @@ RSpec.describe "serialization" do
             cursor = JSON.parse(Base64.decode64(cursor))
             expect(cursor).to eq("offset" => 1)
           end
+
+          context "but no results" do
+            before do
+              PORO::DB.data[:employees] = []
+            end
+
+            it "is nil" do
+              render
+              page_info = json.values[0]["pageInfo"]
+              expect(page_info.key?("startCursor")).to eq(true)
+              cursor = json.values[0]["pageInfo"]["startCursor"]
+              expect(cursor).to be_nil
+            end
+          end
         end
 
-        context "when start_cursor requested" do
+        context "when end_cursor requested" do
           before do
             params[:fields] = {page_info: "end_cursor"}
           end
@@ -2099,6 +2137,20 @@ RSpec.describe "serialization" do
             cursor = json.values[0]["pageInfo"]["endCursor"]
             cursor = JSON.parse(Base64.decode64(cursor))
             expect(cursor).to eq("offset" => 4)
+          end
+
+          context "but no results" do
+            before do
+              PORO::DB.data[:employees] = []
+            end
+
+            it "is nil" do
+              render
+              page_info = json.values[0]["pageInfo"]
+              expect(page_info.key?("endCursor")).to eq(true)
+              cursor = json.values[0]["pageInfo"]["endCursor"]
+              expect(cursor).to be_nil
+            end
           end
         end
 
