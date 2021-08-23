@@ -577,6 +577,44 @@ RSpec.describe Graphiti::Schema do
       end
     end
 
+    context "when extra attribute has schema false" do
+      before do
+        employee_resource.class_eval do
+          extra_attribute :net_sales, :float, schema: false
+        end
+      end
+
+      it "is not in the list of extra_attributes" do
+        expect(schema[:resources][0][:extra_attributes]).not_to have_key(:net_sales)
+      end
+    end
+
+    context "when extra attribute is also a filter" do
+      before do
+        employee_resource.class_eval do
+          extra_attribute :net_sales, :float, filterable: true
+          filter :net_sales, only: [:eq]
+        end
+      end
+
+      it "is in the list of filters" do
+        expect(schema[:resources][0][:filters]).to have_key(:net_sales)
+      end
+    end
+
+    context "when extra attribute is also a sort" do
+      before do
+        employee_resource.class_eval do
+          extra_attribute :net_sales, :float, sortable: true
+          sort :net_sales
+        end
+      end
+
+      it "is in the list of sorts" do
+        expect(schema[:resources][0][:sorts]).to have_key(:net_sales)
+      end
+    end
+
     context "when an additional statistic/calculations" do
       before do
         employee_resource.stat age: [:average, :sum]

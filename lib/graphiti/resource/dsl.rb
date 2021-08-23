@@ -151,7 +151,8 @@ module Graphiti
             readable: true,
             writable: false,
             sortable: false,
-            filterable: false
+            filterable: false,
+            schema: true
           }
           options = defaults.merge(options)
           attribute_option(options, :readable)
