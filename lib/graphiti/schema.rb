@@ -197,7 +197,7 @@ module Graphiti
     def filters(resource)
       {}.tap do |f|
         resource.filters.each_pair do |name, filter|
-          next unless resource.attributes[name][:schema]
+          next unless resource.filters[name][:schema]
 
           config = {
             type: filter[:type].to_s,

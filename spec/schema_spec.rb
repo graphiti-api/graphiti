@@ -529,6 +529,28 @@ RSpec.describe Graphiti::Schema do
       end
     end
 
+    context "when the attribute is schema: false then .filter called" do
+      before do
+        employee_resource.filter :hidden_attribute
+      end
+
+      it "appears in the schema" do
+        expect(schema[:resources][0][:filters].key?(:hidden_attribute))
+          .to eq(true)
+      end
+
+      context "when passed schema: false at filter level" do
+        before do
+          employee_resource.filter :hidden_attribute, schema: false
+        end
+
+        it "does not appear in the schema" do
+          expect(schema[:resources][0][:filters].key?(:hidden_attribute))
+            .to eq(false)
+        end
+      end
+    end
+
     context "when attribute changes to schema true" do
       before do
         employee_resource.class_eval do

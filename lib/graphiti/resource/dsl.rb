@@ -23,6 +23,8 @@ module Graphiti
             end
 
             required = att[:filterable] == :required || !!opts[:required]
+            schema = !!opts[:via_attribute_dsl] ? att[:schema] : opts[:schema] != false
+
             config[:filters][name.to_sym] = {
               aliases: aliases,
               name: name.to_sym,
@@ -32,6 +34,7 @@ module Graphiti
               single: !!opts[:single],
               dependencies: opts[:dependent],
               required: required,
+              schema: schema,
               operators: operators.to_hash,
               allow_nil: opts.fetch(:allow_nil, filters_accept_nil_by_default),
               deny_empty: opts.fetch(:deny_empty, filters_deny_empty_by_default)
@@ -130,7 +133,7 @@ module Graphiti
           options[:sortable] ? sort(name) : config[:sorts].delete(name)
 
           if options[:filterable]
-            filter(name, allow: options[:allow])
+            filter(name, allow: options[:allow], via_attribute_dsl: true)
           else
             config[:filters].delete(name)
           end
