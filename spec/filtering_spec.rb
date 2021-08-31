@@ -1338,11 +1338,12 @@ RSpec.describe "filtering" do
           resource.attributes[:foo][:filterable] = false
         end
 
-        it "raises helpful error" do
+        it "makes it filterable" do
           expect {
             resource.filter :foo do
             end
-          }.to raise_error(Graphiti::Errors::AttributeError, "PORO::EmployeeResource: Tried to add filter attribute :foo, but the attribute was marked :filterable => false.")
+          }.to change { resource.attributes[:foo][:filterable] }
+            .from(false).to(true)
         end
       end
     end

@@ -9,7 +9,11 @@ module Graphiti
           opts = args.extract_options!
           type_override = args[0]
 
-          if (att = get_attr(name, :filterable, raise_error: :only_unsupported))
+          if (att = (attributes[name] || extra_attributes[name]))
+            # We're opting in to filtering, so force this
+            # UNLESS the filter is guarded at the attribute level
+            att[:filterable] = true if att[:filterable] == false
+
             aliases = [name, opts[:aliases]].flatten.compact
             operators = FilterOperators.build(self, att[:type], opts, &blk)
 
