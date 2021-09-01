@@ -25,8 +25,9 @@ module Graphiti
 
         # See #requested_relationships
         def self.relationship(name, options = {}, &block)
+          prev = Util::Hash.deep_dup(field_condition_blocks)
           super
-          field_condition_blocks.delete(name)
+          self.field_condition_blocks = prev
           _register_condition(relationship_condition_blocks, name, options)
         end
 
