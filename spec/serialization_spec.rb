@@ -1804,51 +1804,49 @@ RSpec.describe "serialization" do
 
     context "when the attribute is guarded, and the guard fails" do
       before do
+        # NB - add 'things' here rather than relying on existing relationships
+        # This is because order matters - the relationship has to be applied
+        # *only after* the attribute to truly tests things. This is what happens
+        # in production when eager loading code, so we should mimic here.
         resource.class_eval do
           attribute :first_name, :string
-          attribute :positions, :string, readable: :admin?
+          attribute :things, :string, readable: :admin? do
+            'things!'
+          end
           def admin?
             false
           end
+          has_many :things, resource: PORO::PositionResource,
+            foreign_key: :employee_id
         end
       end
 
       context "and the relationship is not included" do
-        before do
-          params[:include] = "positions"
-        end
-
         it "does not render the attribute, does render the relationship" do
           render
-          expect(json["data"][0]["attributes"]).to_not have_key("positions")
-          resource_id = {"id" => position.id.to_s, "type" => "positions"}
-          expect(json["data"][0]["relationships"]["positions"]["data"])
-            .to eq([resource_id])
-          expect(json["included"][0].slice("id", "type")).to eq(resource_id)
+          expect(json["data"][0]["attributes"]).to_not have_key("things")
+          expect(json["data"][0]["relationships"].key?("things"))
+            .to eq(true)
         end
 
         context "and rendering JSON" do
-          it "still renders the relationship" do
+          it "is not present" do
             json = proxy.as_json[:data][0]
-            expect(json[:positions]).to eq([{
-              id: position.id.to_s,
-              title: "foo",
-              rank: nil
-            }])
+            expect(json.key?(:things)).to eq(false)
           end
         end
       end
 
       context "and the relationship is included" do
         before do
-          params[:include] = "positions"
+          params[:include] = "things"
         end
 
         it "is still rendered" do
           render
-          expect(json["data"][0]["attributes"]).to_not have_key("positions")
+          expect(json["data"][0]["attributes"]).to_not have_key("things")
           resource_id = {"id" => position.id.to_s, "type" => "positions"}
-          expect(json["data"][0]["relationships"]["positions"]["data"])
+          expect(json["data"][0]["relationships"]["things"]["data"])
             .to eq([resource_id])
           expect(json["included"][0].slice("id", "type")).to eq(resource_id)
         end
@@ -1856,7 +1854,7 @@ RSpec.describe "serialization" do
         context "and rendering JSON" do
           it "still renders the relationship" do
             json = proxy.as_json[:data][0]
-            expect(json[:positions]).to eq([{
+            expect(json[:things]).to eq([{
               id: position.id.to_s,
               title: "foo",
               rank: nil

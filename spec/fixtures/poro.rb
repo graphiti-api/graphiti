@@ -196,7 +196,8 @@ module PORO
       :credit_card_type,
       :payment_processor,
       :salary,
-      :credit_cards
+      :credit_cards,
+      :things
 
     def initialize(*)
       super
