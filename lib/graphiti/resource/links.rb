@@ -72,14 +72,18 @@ module Graphiti
         request_path = request_path.split(".")[0]
 
         endpoints.any? do |e|
-          has_id = params[:id] || params[:data].try(:[], :id)
-          path = request_path
-          if [:update, :show, :destroy].include?(context_namespace) && has_id
-            path = request_path.split("/")
-            path.pop
-            path = path.join("/")
+          begin
+            has_id = params[:id] || params[:data].try(:[], :id)
+            path = request_path
+            if [:update, :show, :destroy].include?(context_namespace) && has_id
+              path = request_path.split("/")
+              path.pop
+              path = path.join("/")
+            end
+            e[:full_path].to_s == path && e[:actions].include?(context_namespace)
+          rescue
+            false
           end
-          e[:full_path].to_s == path && e[:actions].include?(context_namespace)
         end
       end
 
