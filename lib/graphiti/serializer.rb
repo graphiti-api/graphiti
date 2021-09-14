@@ -40,7 +40,7 @@ module Graphiti
         # conditional without affecting the relationship.
         def requested_relationships(fields)
           @_relationships.select do |k, _|
-            _conditionally_included?(self.class.relationship_condition_blocks, k)
+            _conditionally_included?(self.class.relationship_condition_blocks, k) && (fields.nil? || fields.include?(k))
           end
         end
       end

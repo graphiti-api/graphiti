@@ -2,7 +2,13 @@ require "spec_helper"
 
 RSpec.describe "fields" do
   include_context "resource testing"
-  let(:resource) { Class.new(PORO::EmployeeResource) }
+  let(:resource) do
+    Class.new(PORO::EmployeeResource) do
+      def self.name
+        "PORO::EmployeeResource"
+      end
+    end
+  end
   let(:base_scope) { {type: :employees} }
 
   let!(:employee) do
@@ -58,6 +64,57 @@ RSpec.describe "fields" do
           render
           expect(attributes.keys).to include("salary")
         end
+      end
+    end
+  end
+
+  context "with sideload" do
+    let!(:department) { PORO::Department.create }
+    let!(:position) { PORO::Position.create employee_id: employee.id, department_id: department.id }
+    let!(:bio) { PORO::Bio.create(employee_id: employee.id) }
+
+    before do
+      resource.class_eval do
+        allow_sideload :positions, type: :has_many do
+          scope do |employee_ids|
+            {
+              type: :positions,
+              conditions: {employee_id: employee_ids}
+            }
+          end
+
+          assign_each do |employee, positions|
+            positions.select { |p| p.employee_id == employee.id }
+          end
+        end
+
+        has_one :bio do
+          scope do |employee_ids|
+            {
+              type: :bios,
+              conditions: {employee_id: employee_ids}
+            }
+          end
+        end
+      end
+      params[:include] = "positions,bio"
+    end
+
+    context "with only attribute in fields param" do
+      before { params[:fields] = { employees: "first_name" } }
+
+      it 'limits relationships with fields param' do
+        render
+        expect(d[0].relationships).to be_nil
+      end
+    end
+
+    context "with only relationship in fields param" do
+      before { params[:fields] = { employees: "positions" } }
+
+      it 'only allows the relationship referenced in fields param' do
+        render
+        expect(d[0].relationships.keys).to contain_exactly("positions")
       end
     end
   end
