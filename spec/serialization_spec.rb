@@ -1811,13 +1811,13 @@ RSpec.describe "serialization" do
         resource.class_eval do
           attribute :first_name, :string
           attribute :things, :string, readable: :admin? do
-            'things!'
+            "things!"
           end
           def admin?
             false
           end
           has_many :things, resource: PORO::PositionResource,
-            foreign_key: :employee_id
+                            foreign_key: :employee_id
         end
       end
 
@@ -1993,7 +1993,7 @@ RSpec.describe "serialization" do
               cursor = Base64.encode64({offset: 2}.to_json)
               params[:page] = {after: cursor}
             end
-  
+
             xit "TODO" do
               render
               expect(get_cursor(0)).to eq(offset: 2)
