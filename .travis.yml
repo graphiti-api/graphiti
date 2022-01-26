@@ -3,6 +3,7 @@ language: ruby
 rvm:
 - 2.6
 - 2.7
+- 3.0
 gemfile:
   - Gemfile
   - gemfiles/rails_5_2.gemfile
@@ -63,6 +64,11 @@ jobs:
       gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
     - env: COMMAND=rspec
       gemfile: gemfiles/rails_6_graphiti_rails.gemfile
+    # Rails 5.2 seems to not like Ruby 3
+    - gemfile: gemfiles/rails_5_2.gemfile
+      rvm: 3.0
+    - gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
+      rvm: 3.0
 
 script:
   - bundle exec $COMMAND
