@@ -13,25 +13,25 @@ RSpec.describe "serialization" do
 
   let!(:employee1) do
     PORO::Employee.create first_name: "John",
-                          last_name: "Doe",
-                          age: 33
+      last_name: "Doe",
+      age: 33
   end
   let!(:employee2) do
     PORO::Employee.create first_name: "Jane",
-                          last_name: "Dougherty",
-                          age: 44
+      last_name: "Dougherty",
+      age: 44
   end
   let!(:position1) do
     PORO::Position.create title: "title1",
-                          rank: 1,
-                          employee_id: 1,
-                          department_id: 1
+      rank: 1,
+      employee_id: 1,
+      department_id: 1
   end
   let!(:position2) do
     PORO::Position.create title: "title2",
-                          rank: 2,
-                          employee_id: 2,
-                          department_id: 2
+      rank: 2,
+      employee_id: 2,
+      department_id: 2
   end
   let!(:department1) do
     PORO::Department.create(name: "dep1", description: "dep1desc")
