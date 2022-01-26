@@ -1,18 +1,12 @@
 sudo: false
 language: ruby
 rvm:
-- 2.5
 - 2.6
 - 2.7
 gemfile:
   - Gemfile
-  - gemfiles/rails_4.gemfile
-  - gemfiles/rails_5_0.gemfile
-  - gemfiles/rails_5_1.gemfile
   - gemfiles/rails_5_2.gemfile
   - gemfiles/rails_6.gemfile
-  - gemfiles/rails_5_0_graphiti_rails.gemfile
-  - gemfiles/rails_5_1_graphiti_rails.gemfile
   - gemfiles/rails_5_2_graphiti_rails.gemfile
   - gemfiles/rails_6_graphiti_rails.gemfile
 env:
@@ -69,14 +63,6 @@ jobs:
       gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
     - env: COMMAND=rspec
       gemfile: gemfiles/rails_6_graphiti_rails.gemfile
-
-    # Don't run rails 4 egmfile against any rubies (for some reason?)
-    - gemfile: gemfiles/rails_4.gemfile
-      rvm: 2.5
-    - gemfile: gemfiles/rails_4.gemfile
-      rvm: 2.6
-    - gemfile: gemfiles/rails_4.gemfile
-      rvm: 2.7
 
 script:
   - bundle _1.17.3_ exec $COMMAND
