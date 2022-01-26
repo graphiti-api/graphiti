@@ -317,7 +317,7 @@ module Graphiti
       end
 
       def sanitized_like_for(scope, attribute, value, &block)
-        escape_char = '\\'
+        escape_char = "\\"
         column = column_for(scope, attribute)
         map = value.map { |v|
           v = v.downcase

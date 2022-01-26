@@ -24,29 +24,29 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     let!(:author1) do
       Legacy::Author.create! first_name: "Stephen",
-                             age: 70,
-                             active: true,
-                             float_age: 70.03,
-                             decimal_age: 70.033,
-                             state: state,
-                             organization: org1,
-                             dwelling: house,
-                             created_at: one_day_ago,
-                             last_login: one_day_ago,
-                             created_at_date: one_day_ago.to_date,
-                             identifier: SecureRandom.uuid
+        age: 70,
+        active: true,
+        float_age: 70.03,
+        decimal_age: 70.033,
+        state: state,
+        organization: org1,
+        dwelling: house,
+        created_at: one_day_ago,
+        last_login: one_day_ago,
+        created_at_date: one_day_ago.to_date,
+        identifier: SecureRandom.uuid
     end
     let!(:author2) do
       Legacy::Author.create! first_name: "George",
-                             age: 65,
-                             active: false,
-                             float_age: 70.01,
-                             decimal_age: 70.011,
-                             dwelling: condo,
-                             created_at: two_days_ago,
-                             last_login: one_day_ago,
-                             created_at_date: two_days_ago.to_date,
-                             identifier: SecureRandom.uuid
+        age: 65,
+        active: false,
+        float_age: 70.01,
+        decimal_age: 70.011,
+        dwelling: condo,
+        created_at: two_days_ago,
+        last_login: one_day_ago,
+        created_at_date: two_days_ago.to_date,
+        identifier: SecureRandom.uuid
     end
     let!(:book1) { Legacy::Book.create!(author: author1, genre: genre, title: "The Shining") }
     let!(:book2) { Legacy::Book.create!(author: author1, genre: genre, title: "The Stand") }
@@ -208,14 +208,14 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       let!(:author3) do
         Legacy::Author.create! first_name: "GeOrge",
-                               age: 72,
-                               identifier: "AbC123",
-                               active: true,
-                               float_age: 70.05,
-                               decimal_age: 70.055,
-                               last_login: nil,
-                               created_at: 1.day.from_now,
-                               created_at_date: 1.day.from_now.to_date
+          age: 72,
+          identifier: "AbC123",
+          active: true,
+          float_age: 70.05,
+          decimal_age: 70.055,
+          last_login: nil,
+          created_at: 1.day.from_now,
+          created_at_date: 1.day.from_now.to_date
       end
 
       context "when multiple operators" do
