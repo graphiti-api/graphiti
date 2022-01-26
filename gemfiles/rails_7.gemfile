@@ -2,12 +2,10 @@
 
 source "https://rubygems.org"
 
-gem "rails", "~> 6.0"
+gem "rails", "~> 7.0"
 gem "rspec-rails"
 gem "sqlite3", "~> 1.4.0"
 gem "database_cleaner"
-gem "rescue_registry"
-gem "graphiti-rails", git: "https://github.com/graphiti-api/graphiti-rails.git", branch: "master"
 
 group :test do
   gem "pry"

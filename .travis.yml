@@ -8,8 +8,10 @@ gemfile:
   - Gemfile
   - gemfiles/rails_5_2.gemfile
   - gemfiles/rails_6.gemfile
+  - gemfiles/rails_7.gemfile
   - gemfiles/rails_5_2_graphiti_rails.gemfile
   - gemfiles/rails_6_graphiti_rails.gemfile
+  - gemfiles/rails_7_graphiti_rails.gemfile
 env:
   - COMMAND="standardrb --no-fix --format progress"
   - COMMAND=rspec
@@ -38,6 +40,8 @@ jobs:
     - env: COMMAND="standardrb --no-fix --format progress"
       gemfile: gemfiles/rails_6.gemfile
     - env: COMMAND="standardrb --no-fix --format progress"
+      gemfile: gemfiles/rails_7.gemfile
+    - env: COMMAND="standardrb --no-fix --format progress"
       gemfile: gemfiles/rails_5_0_graphiti_rails.gemfile
     - env: COMMAND="standardrb --no-fix --format progress"
       gemfile: gemfiles/rails_5_1_graphiti_rails.gemfile
@@ -45,6 +49,8 @@ jobs:
       gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
     - env: COMMAND="standardrb --no-fix --format progress"
       gemfile: gemfiles/rails_6_graphiti_rails.gemfile
+    - env: COMMAND="standardrb --no-fix --format progress"
+      gemfile: gemfiles/rails_7_graphiti_rails.gemfile
     # Don't run the basic versions of the specs for any of the specific gemfiles
     - env: COMMAND=rspec
       gemfile: gemfiles/rails_4.gemfile
@@ -56,6 +62,8 @@ jobs:
       gemfile: gemfiles/rails_5_2.gemfile
     - env: COMMAND=rspec
       gemfile: gemfiles/rails_6.gemfile
+    - env: COMMAND=rspec
+      gemfile: gemfiles/rails_7.gemfile
     - env: COMMAND=rspec
       gemfile: gemfiles/rails_5_0_graphiti_rails.gemfile
     - env: COMMAND=rspec
@@ -69,6 +77,14 @@ jobs:
       rvm: 3.0
     - gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
       rvm: 3.0
+    - env: COMMAND=rspec
+      gemfile: gemfiles/rails_7_graphiti_rails.gemfile
+    # Rails 7 can't run on 2.6
+    - gemfile: gemfiles/rails_7.gemfile
+      rvm: 2.6
+    - gemfile: gemfiles/rails_7_graphiti_rails.gemfile
+      rvm: 2.6
+
 
 script:
   - bundle exec $COMMAND
