@@ -116,7 +116,7 @@ if ENV["APPRAISAL_INITIALIZED"]
               do_index(sort: "last_login", page: {before: cursor, size: 2})
               expect(ids).to eq([author3.id, author2.id])
             end
-  
+
             it "works desc" do
               do_index(sort: "-last_login")
               expect(ids).to eq([author4.id, author2.id, author3.id, author1.id])
