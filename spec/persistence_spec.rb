@@ -27,12 +27,7 @@ RSpec.describe "persistence" do
 
   def expect_errors(object, expected)
     errors = object.errors.full_messages
-    if RUBY_VERSION.to_i < 3
-      expect(errors).to eq(expected)
-    else
-      # This appears to be a Rails issue
-      expect(errors[0]).to include("translation missing")
-    end
+    expect(errors).to eq(expected)
   end
 
   it "can persist single entities" do
