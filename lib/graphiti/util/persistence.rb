@@ -45,6 +45,7 @@ class Graphiti::Util::Persistence
   # @return a model instance
   def run
     attributes = @adapter.persistence_attributes(self, @attributes)
+    @adapter.process_nullified_belongs_to_associations(self, attributes)
 
     parents = @adapter.process_belongs_to(self, attributes)
     persisted = persist_object(@meta[:method], attributes)
@@ -53,6 +54,7 @@ class Graphiti::Util::Persistence
 
     associate_parents(persisted, parents)
 
+    @adapter.process_nullified_has_many_associations(self, persisted)
     children = @adapter.process_has_many(self, persisted)
 
     associate_children(persisted, children) unless @meta[:method] == :destroy
@@ -68,7 +70,7 @@ class Graphiti::Util::Persistence
     persisted
   end
 
-  def iterate(only: [], except: [])
+  def iterate(only: {}, except: {})
     opts = {
       resource: @resource,
       relationships: @relationships
