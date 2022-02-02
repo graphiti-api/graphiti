@@ -40,6 +40,8 @@ module Graphiti
           ],
           uuid: [:eq, :not_eq],
           enum: [:eq, :not_eq],
+          string_enum: [:eq, :not_eq],
+          integer_enum: [:eq, :not_eq],
           integer_id: numerical_operators,
           integer: numerical_operators,
           big_decimal: numerical_operators,
