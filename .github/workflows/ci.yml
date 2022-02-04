@@ -31,6 +31,7 @@ jobs:
           - "2.6"
           - "2.7"
           - "3.0"
+          - "3.1"
         gemfile:
           - Gemfile
           - gemfiles/rails_5_2.gemfile
@@ -70,6 +71,10 @@ jobs:
             ruby: 3.0
           - gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
             ruby: 3.0
+          - gemfile: gemfiles/rails_5_2.gemfile
+            ruby: 3.1
+          - gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
+            ruby: 3.1
           # Raise 7 can't run on 2.6
           - gemfile: gemfiles/rails_7.gemfile
             ruby: 2.6

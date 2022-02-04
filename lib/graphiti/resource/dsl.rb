@@ -189,9 +189,9 @@ module Graphiti
         def attribute_option(options, name, exclusive = false)
           if options[name] != false
             default = if (only = options[:only]) && !exclusive
-              Array(only).include?(name) ? true : false
+              Array(only).include?(name)
             elsif (except = options[:except]) && !exclusive
-              Array(except).include?(name) ? false : true
+              !Array(except).include?(name)
             else
               send(:"attributes_#{name}_by_default")
             end

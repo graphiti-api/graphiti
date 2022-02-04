@@ -433,11 +433,11 @@ RSpec.describe "filtering" do
     context "one level" do
       let!(:pos1) do
         PORO::Position.create title: "foo",
-                              employee_id: employee1.id
+          employee_id: employee1.id
       end
       let!(:pos2) do
         PORO::Position.create title: "bar",
-                              employee_id: employee1.id
+          employee_id: employee1.id
       end
 
       before do
@@ -460,11 +460,11 @@ RSpec.describe "filtering" do
       let!(:department2) { PORO::Department.create(name: "bar") }
       let!(:pos1) do
         PORO::Position.create department_id: department1.id,
-                              employee_id: employee1.id
+          employee_id: employee1.id
       end
       let!(:pos2) do
         PORO::Position.create department_id: department2.id,
-                              employee_id: employee1.id
+          employee_id: employee1.id
       end
 
       before do

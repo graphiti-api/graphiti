@@ -5,22 +5,20 @@ module Graphiti
         def process_belongs_to(persistence, attributes)
           parents = [].tap do |processed|
             persistence.iterate(only: [:polymorphic_belongs_to, :belongs_to]) do |x|
-              begin
-                id = x.dig(:attributes, :id)
-                x[:object] = x[:resource]
-                  .persist_with_relationships(x[:meta], x[:attributes], x[:relationships])
+              id = x.dig(:attributes, :id)
+              x[:object] = x[:resource]
+                .persist_with_relationships(x[:meta], x[:attributes], x[:relationships])
+              processed << x
+            rescue Graphiti::Errors::RecordNotFound
+              if Graphiti.config.raise_on_missing_sidepost
+                path = "relationships/#{x.dig(:meta, :jsonapi_type)}"
+                raise Graphiti::Errors::RecordNotFound.new(x[:sideload].name, id, path)
+              else
+                pointer = "data/relationships/#{x.dig(:meta, :jsonapi_type)}"
+                object = Graphiti::Errors::NullRelation.new(id.to_s, pointer)
+                object.errors.add(:base, :not_found, message: "could not be found")
+                x[:object] = object
                 processed << x
-              rescue Graphiti::Errors::RecordNotFound
-                if Graphiti.config.raise_on_missing_sidepost
-                  path = "relationships/#{x.dig(:meta, :jsonapi_type)}"
-                  raise Graphiti::Errors::RecordNotFound.new(x[:sideload].name, id, path)
-                else
-                  pointer = "data/relationships/#{x.dig(:meta, :jsonapi_type)}"
-                  object = Graphiti::Errors::NullRelation.new(id.to_s, pointer)
-                  object.errors.add(:base, :not_found, message: "could not be found")
-                  x[:object] = object
-                  processed << x
-                end
               end
             end
           end
