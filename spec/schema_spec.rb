@@ -244,6 +244,10 @@ RSpec.describe Graphiti::Schema do
       expect(schema[:types]).to eq(expected[:types])
     end
 
+    it "has sorted types" do
+      expect(schema[:types].to_a).to eq(expected[:types].sort)
+    end
+
     # Dynamically-created resources, e.g. remote resources
     context "when resource has missing name" do
       let(:no_name) do

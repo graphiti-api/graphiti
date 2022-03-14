@@ -42,7 +42,7 @@ module Graphiti
 
     def generate_types
       {}.tap do |types|
-        Graphiti::Types.map.each_pair do |name, config|
+        Graphiti::Types.map.sort.each_entry do |name, config|
           types[name] = config.slice(:kind, :description)
         end
       end
