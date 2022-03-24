@@ -7,11 +7,11 @@ RSpec.describe "stats" do
 
   let!(:employee1) do
     PORO::Employee.create first_name: "Stephen",
-                          last_name: "King"
+      last_name: "King"
   end
   let!(:employee1) do
     PORO::Employee.create first_name: "Stephen",
-                          last_name: "King"
+      last_name: "King"
   end
 
   context "when total count requested" do

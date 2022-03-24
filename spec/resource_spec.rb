@@ -1770,8 +1770,7 @@ RSpec.describe Graphiti::Resource do
           scope = scope.merge(before: true)
           yield scope
           context.after = scope.dup
-          scope = scope.merge(after: true)
-          scope
+          scope.merge(after: true)
         end
 
         def resolve(scope)

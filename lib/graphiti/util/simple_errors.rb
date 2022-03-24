@@ -33,7 +33,7 @@ module Graphiti
       def size
         values.flatten.size
       end
-      alias count size
+      alias_method :count, :size
 
       def values
         messages.values.reject(&:empty?)
@@ -48,7 +48,7 @@ module Graphiti
       def empty?
         size.zero?
       end
-      alias blank? empty?
+      alias_method :blank?, :empty?
 
       def add(attribute, code, message: nil)
         message ||= "is #{code.to_s.humanize.downcase}"
@@ -64,7 +64,7 @@ module Graphiti
       def full_messages
         map { |attribute, message| full_message(attribute, message) }
       end
-      alias to_a full_messages
+      alias_method :to_a, :full_messages
 
       def full_messages_for(attribute)
         attribute = attribute.to_sym

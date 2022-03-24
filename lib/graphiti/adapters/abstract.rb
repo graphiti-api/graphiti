@@ -1,7 +1,7 @@
 module Graphiti
   module Adapters
     class Abstract
-      require "graphiti/adapters/persistence/associations.rb"
+      require "graphiti/adapters/persistence/associations"
       include Graphiti::Adapters::Persistence::Associations
 
       attr_reader :resource

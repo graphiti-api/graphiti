@@ -1720,7 +1720,9 @@ RSpec.describe "serialization" do
 
     context "when specified" do
       before do
-        resource.link :test_link do |model| "#{endpoint[:url]}/#{model.id}" end
+        resource.link :test_link do |model|
+          "#{endpoint[:url]}/#{model.id}"
+        end
       end
 
       it "links correctly" do
@@ -1732,7 +1734,9 @@ RSpec.describe "serialization" do
 
     context "nil links" do
       before do
-        resource.link :test_link do |model| nil end
+        resource.link :test_link do |model|
+          nil
+        end
       end
 
       specify "are still included" do
@@ -1811,13 +1815,13 @@ RSpec.describe "serialization" do
         resource.class_eval do
           attribute :first_name, :string
           attribute :things, :string, readable: :admin? do
-            'things!'
+            "things!"
           end
           def admin?
             false
           end
           has_many :things, resource: PORO::PositionResource,
-            foreign_key: :employee_id
+                            foreign_key: :employee_id
         end
       end
 
@@ -1993,7 +1997,7 @@ RSpec.describe "serialization" do
               cursor = Base64.encode64({offset: 2}.to_json)
               params[:page] = {after: cursor}
             end
-  
+
             xit "TODO" do
               render
               expect(get_cursor(0)).to eq(offset: 2)

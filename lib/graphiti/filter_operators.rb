@@ -17,7 +17,6 @@ module Graphiti
         end
       end
 
-      # rubocop: disable Style/MethodMissingSuper
       def method_missing(name, *args, &blk)
         @procs[name] = blk
       end

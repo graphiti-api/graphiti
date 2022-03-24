@@ -7,7 +7,6 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
       @calls = []
     end
 
-    # rubocop: disable Style/MethodMissingSuper
     def method_missing(name, *args, &blk)
       @calls << [name, args, blk]
     end
@@ -56,9 +55,9 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
           args = call[1]
           opts = args.extract_options!
           opts.merge! as: sideload.name,
-                      parent: sideload,
-                      group_name: group.name,
-                      polymorphic_child: true
+            parent: sideload,
+            group_name: group.name,
+            polymorphic_child: true
           unless sideload.resource.class.abstract_class?
             opts[:foreign_key] ||= sideload.foreign_key
             opts[:primary_key] ||= sideload.primary_key

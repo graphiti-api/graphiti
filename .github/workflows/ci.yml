@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request: {}
+
+concurrency:
+  group: ci-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.0"
+          bundler-cache: true
+      - name: Run standardrb
+        run: bundle exec standardrb --no-fix --format progress
+  test:
+    name: "Tests - ${{ matrix.ruby }} | ${{ matrix.gemfile }} | Appraisal: ${{ matrix.appraisal }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby:
+          - "2.6"
+          - "2.7"
+          - "3.0"
+          - "3.1"
+        gemfile:
+          - Gemfile
+          - gemfiles/rails_5_2.gemfile
+          - gemfiles/rails_6.gemfile
+          - gemfiles/rails_7.gemfile
+          - gemfiles/rails_5_2_graphiti_rails.gemfile
+          - gemfiles/rails_6_graphiti_rails.gemfile
+          - gemfiles/rails_7_graphiti_rails.gemfile
+        appraisal:
+          - true
+          - false
+        include:
+          - ruby: ruby-head
+            gemfile: Gemfile
+            appraisal: true
+          - ruby: ruby-head
+            gemfile: Gemfile
+            appraisal: false
+        exclude:
+          # Skip some extra variants
+          - gemfile: Gemfile
+            appraisal: true
+          - gemfile: gemfiles/rails_5_2.gemfile
+            appraisal: false
+          - gemfile: gemfiles/rails_6.gemfile
+            appraisal: false
+          - gemfile: gemfiles/rails_7.gemfile
+            appraisal: false
+          - gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
+            appraisal: false
+          - gemfile: gemfiles/rails_6_graphiti_rails.gemfile
+            appraisal: false
+          - gemfile: gemfiles/rails_7_graphiti_rails.gemfile
+            appraisal: false
+          # Rails 5 can't run on Ruby 3
+          - gemfile: gemfiles/rails_5_2.gemfile
+            ruby: 3.0
+          - gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
+            ruby: 3.0
+          - gemfile: gemfiles/rails_5_2.gemfile
+            ruby: 3.1
+          - gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
+            ruby: 3.1
+          # Raise 7 can't run on 2.6
+          - gemfile: gemfiles/rails_7.gemfile
+            ruby: 2.6
+          - gemfile: gemfiles/rails_7_graphiti_rails.gemfile
+            ruby: 2.6
+    continue-on-error: ${{ matrix.ruby == 'ruby-head' }}
+    env: # $BUNDLE_GEMFILE must be set at the job level, so it is set for all steps
+      BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gemfile }}
+    steps:
+      - name: Set up Appraisal
+        if: matrix.appraisal
+        run: echo "APPRAISAL_INITIALIZED=true" >> $GITHUB_ENV
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - name: Run tests
+        run: bundle exec rspec
