@@ -40,7 +40,7 @@ module Graphiti
 
       def filter_string_eq(scope, attribute, value, is_not: false)
         column = column_for(scope, attribute)
-        clause = column.lower.eq_any(value.map(&:downcase))
+        clause = column.lower.eq_any(value.map { |val| val&.downcase })
         is_not ? scope.where.not(clause) : scope.where(clause)
       end
 
