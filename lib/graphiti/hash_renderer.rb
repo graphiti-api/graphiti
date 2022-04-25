@@ -192,7 +192,11 @@ module Graphiti
       if options[:meta] && !options[:meta].empty?
         if @graphql
           if (stats = options[:meta][:stats])
-            hash[top_level_key][:stats] = stats
+            camelized = {}
+            stats.each_pair do |key, value|
+              camelized[key.to_s.camelize(:lower).to_sym] = value
+            end
+            hash[top_level_key][:stats] = camelized
           end
         else
           hash.merge!(options.slice(:meta))
