@@ -305,6 +305,14 @@ module Graphiti
         ::ActiveRecord::Base.clear_active_connections!
       end
 
+      def can_group?
+        true
+      end
+
+      def group(scope, attribute)
+        scope.group(attribute)
+      end
+
       private
 
       def column_for(scope, name)

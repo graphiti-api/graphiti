@@ -415,6 +415,10 @@ module Graphiti
         [:eq, :not_eq, :gt, :gte, :lt, :lte].freeze
       end
 
+      def can_group?
+        false
+      end
+
       private
 
       def activerecord_adapter

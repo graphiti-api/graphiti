@@ -86,8 +86,10 @@ module Graphiti
     def stats
       @stats ||= if @query.hash[:stats]
         scope = @scope.unpaginated_object
-        if (group = @query.hash[:stats].delete(:group_by))
-          scope = scope.group(group[0])
+        if resource.adapter.can_group?
+          if (group = @query.hash[:stats].delete(:group_by))
+            scope = resource.adapter.group(scope, group[0])
+          end
         end
         payload = Stats::Payload.new @resource,
           @query,
