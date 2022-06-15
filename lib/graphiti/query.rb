@@ -84,7 +84,11 @@ module Graphiti
     end
 
     def resource_for_sideload(sideload)
-      sideload&.resource || RemoteSideloadResource.new
+      if @resource.remote?
+        RemoteSideloadResource.new
+      else
+        sideload.resource
+      end
     end
 
     def sideloads
