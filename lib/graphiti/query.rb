@@ -78,14 +78,13 @@ module Graphiti
       end
     end
 
+    class RemoteSideloadResource < ::Graphiti::Resource
+      self.remote = "_remote_sideload_".freeze
+      self.abstract_class = true # exclude from schema
+    end
+
     def resource_for_sideload(sideload)
-      if @resource.remote?
-        Class.new(Graphiti::Resource) {
-          self.remote = "_remote_sideload_"
-        }.new
-      else
-        sideload.resource
-      end
+      sideload&.resource || RemoteSideloadResource.new
     end
 
     def sideloads
