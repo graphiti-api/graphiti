@@ -13,7 +13,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     context "basic" do
       it "works" do
-        proxy = PositionResource.all(stats: { total: "count" })
+        proxy = PositionResource.all(stats: {total: "count"})
         expect(proxy.stats).to eq({
           total: {
             count: 6
@@ -24,7 +24,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     context "when grouping" do
       it "works" do
-        proxy = PositionResource.all(stats: { total: "count", group_by: :employee_id })
+        proxy = PositionResource.all(stats: {total: "count", group_by: :employee_id})
         expect(proxy.stats).to eq({
           total: {
             count: {
