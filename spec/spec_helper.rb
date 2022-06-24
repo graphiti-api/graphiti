@@ -13,6 +13,7 @@ Graphiti.setup!
 
 # Optional dep for cross-api requests
 require "faraday"
+require "base64"
 
 RSpec.configure do |config|
   config.include GraphitiSpecHelpers::RSpec
