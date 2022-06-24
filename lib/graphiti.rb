@@ -176,17 +176,17 @@ if defined?(ActiveRecord)
   require "graphiti/adapters/active_record"
 end
 
-if defined?(Rails)
-  require "graphiti/rails"
-  require "graphiti/responders"
+# if defined?(Rails)
+#   require "graphiti/rails"
+#   require "graphiti/responders"
 
-  # graphiti-rails has own Railtie
-  begin
-    require "graphiti-rails"
-  rescue LoadError
-    require "graphiti/railtie"
-  end
-end
+#   # graphiti-rails has own Railtie
+#   begin
+#     require "graphiti-rails"
+#   rescue LoadError
+#     require "graphiti/railtie"
+#   end
+# end
 
 require "graphiti/runner"
 
