@@ -587,7 +587,7 @@ RSpec.describe "serialization" do
         end
       end
 
-      context 'when a multi-word stat' do
+      context "when a multi-word stat" do
         before do
           resource.stat multi_word: [:average] do
             average do
