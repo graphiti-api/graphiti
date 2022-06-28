@@ -4,6 +4,11 @@ module Graphiti
       extend ActiveSupport::Concern
 
       class_methods do
+        def cache_resource(expires_in: false)
+          @cache_resource = true
+          @cache_expires_in = expires_in
+        end
+
         def all(params = {}, base_scope = nil)
           validate_request!(params)
           _all(params, {}, base_scope)
@@ -13,7 +18,7 @@ module Graphiti
         def _all(params, opts, base_scope)
           runner = Runner.new(self, params, opts.delete(:query), :all)
           opts[:params] = params
-          runner.proxy(base_scope, opts)
+          runner.proxy(base_scope, opts.merge(caching_options))
         end
 
         def find(params = {}, base_scope = nil)
@@ -31,10 +36,14 @@ module Graphiti
           params[:filter][:id] = id if id
 
           runner = Runner.new(self, params, nil, :find)
-          runner.proxy base_scope,
+
+          find_options = {
             single: true,
             raise_on_missing: true,
             bypass_required_filters: true
+          }.merge(caching_options)
+
+          runner.proxy base_scope, find_options
         end
 
         def build(params, base_scope = nil)
@@ -44,6 +53,10 @@ module Graphiti
         end
 
         private
+
+        def caching_options
+          {cache: @cache_resource, cache_expires_in: @cache_expires_in}
+        end
 
         def validate_request!(params)
           return if Graphiti.context[:graphql] || !validate_endpoints?
