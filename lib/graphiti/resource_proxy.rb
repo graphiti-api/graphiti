@@ -153,10 +153,12 @@ module Graphiti
       success
     end
 
-    def update_attributes
+    def update
       data
       save(action: :update)
     end
+
+    alias update_attributes update
 
     def include_hash
       @include_hash ||= begin
