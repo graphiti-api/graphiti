@@ -21,7 +21,7 @@ module Graphiti
         def boolean_attribute(name, options = {}, &blk)
           blk ||= proc { @object.public_send(name) }
           field_name = :"is_#{name.to_s.delete("?")}"
-          attribute field_name, options, &blk
+          attribute field_name, :boolean, options, &blk
         end
       end
     end
