@@ -327,6 +327,7 @@ module Legacy
 
   class AuthorResource < ApplicationResource
     attribute :first_name, :string
+    attribute :last_name, :string
     attribute :fname, :string # alias
     attribute :age, :integer
     attribute :birthdays, :integer # alias

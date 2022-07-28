@@ -1019,6 +1019,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(json["data"]["attributes"].except("identifier")).to eq({
           "first_name" => "Stephen",
           "fname" => "Stephen", # alias
+          "last_name" => "King",
           "age" => 70,
           "birthdays" => 70, # alias
           "float_age" => 70.03,
