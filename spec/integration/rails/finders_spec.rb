@@ -24,6 +24,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     let!(:author1) do
       Legacy::Author.create! first_name: "Stephen",
+        last_name: "King",
         age: 70,
         active: true,
         float_age: 70.03,
@@ -38,6 +39,7 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
     let!(:author2) do
       Legacy::Author.create! first_name: "George",
+        last_name: "Martin",
         age: 65,
         active: false,
         float_age: 70.01,
@@ -281,6 +283,15 @@ if ENV["APPRAISAL_INITIALIZED"]
           it "executes case-insensitive search" do
             expect(ids).to eq([author2.id, author3.id])
           end
+
+          context "when value is nil" do
+            let(:filter) { {last_name: value} }
+            let(:value) { {eq: "null"} }
+
+            it "works" do
+              expect(ids).to eq([author3.id])
+            end
+          end
         end
 
         context "nothing" do
@@ -305,6 +316,15 @@ if ENV["APPRAISAL_INITIALIZED"]
           it "executes case-insensitive NOT search" do
             expect(ids).to eq([author1.id])
           end
+
+          context "when value is nil" do
+            let(:filter) { {last_name: value} }
+            let(:value) { {'!eq': "null"} }
+
+            it "works" do
+              expect(ids).to eq([author1.id, author2.id])
+            end
+          end
         end
 
         # test not_ alternative to !
@@ -313,6 +333,15 @@ if ENV["APPRAISAL_INITIALIZED"]
 
           it "executes case-insensitive NOT search" do
             expect(ids).to eq([author1.id])
+          end
+
+          context "when value is nil" do
+            let(:filter) { {last_name: value} }
+            let(:value) { {not_eq: "null"} }
+
+            it "works" do
+              expect(ids).to eq([author1.id, author2.id])
+            end
           end
         end
 
