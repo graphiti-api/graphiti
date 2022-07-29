@@ -26,11 +26,11 @@ RSpec.describe "sideloading" do
   let!(:employee) { PORO::Employee.create }
   let!(:position1) do
     PORO::Position.create employee_id: employee.id,
-                          department_id: department1.id
+      department_id: department1.id
   end
   let!(:position2) do
     PORO::Position.create employee_id: employee.id,
-                          department_id: department2.id
+      department_id: department2.id
   end
   let!(:department1) { PORO::Department.create }
   let!(:department2) { PORO::Department.create }
@@ -340,16 +340,16 @@ RSpec.describe "sideloading" do
     let!(:paypal) { PORO::Paypal.create }
     let!(:employee2) do
       PORO::Employee.create credit_card_type: "Mastercard",
-                            credit_card_id: mastercard.id
+        credit_card_id: mastercard.id
     end
     let!(:employee3) do
       PORO::Employee.create credit_card_type: "Paypal",
-                            credit_card_id: paypal.id
+        credit_card_id: paypal.id
     end
 
     before do
       employee.update_attributes credit_card_type: "Visa",
-                                 credit_card_id: visa.id
+        credit_card_id: visa.id
       params[:include] = "credit_card"
     end
 

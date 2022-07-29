@@ -807,12 +807,10 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       context "when a has_many relationship has validation error" do
         around do |e|
-          begin
-            Position.validates :title, presence: true
-            e.run
-          ensure
-            Position.clear_validators!
-          end
+          Position.validates :title, presence: true
+          e.run
+        ensure
+          Position.clear_validators!
         end
 
         before do
@@ -848,12 +846,10 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       context "when a belongs_to relationship has a validation error" do
         around do |e|
-          begin
-            Department.validates :name, presence: true
-            e.run
-          ensure
-            Department.clear_validators!
-          end
+          Department.validates :name, presence: true
+          e.run
+        ensure
+          Department.clear_validators!
         end
 
         before do
@@ -889,12 +885,10 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       context "when a many_to_many relationship has a validation error" do
         around do |e|
-          begin
-            Team.validates :name, presence: true
-            e.run
-          ensure
-            Team.clear_validators!
-          end
+          Team.validates :name, presence: true
+          e.run
+        ensure
+          Team.clear_validators!
         end
 
         before do
@@ -1496,7 +1490,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       context "when destroying" do
         let!(:location) do
           Location.create locatable_id: employee.id,
-                          locatable_type: "Employee"
+            locatable_type: "Employee"
         end
         let(:location_id) { location.id.to_s }
         let(:location_id_key) { :id }
@@ -1511,7 +1505,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       context "when disassociating" do
         let!(:location) do
           Location.create locatable_id: employee.id,
-                          locatable_type: "Employee"
+            locatable_type: "Employee"
         end
         let(:location_id) { location.id.to_s }
         let(:location_id_key) { :id }
@@ -1582,7 +1576,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       context "when destroying" do
         let!(:note) do
           Note.create notable_id: employee.id,
-                      notable_type: "Employee"
+            notable_type: "Employee"
         end
         let(:note_id) { note.id.to_s }
         let(:note_id_key) { :id }
@@ -1599,7 +1593,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       context "when disassociating" do
         let!(:note) do
           Note.create notable_id: employee.id,
-                      notable_type: "Employee"
+            notable_type: "Employee"
         end
         let(:note_id) { note.id.to_s }
         let(:note_id_key) { :id }

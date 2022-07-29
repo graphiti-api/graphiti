@@ -85,9 +85,15 @@ module Graphiti
 
     def stats
       @stats ||= if @query.hash[:stats]
+        scope = @scope.unpaginated_object
+        if resource.adapter.can_group?
+          if (group = @query.hash[:stats].delete(:group_by))
+            scope = resource.adapter.group(scope, group[0])
+          end
+        end
         payload = Stats::Payload.new @resource,
           @query,
-          @scope.unpaginated_object,
+          scope,
           data
         payload.generate
       else
@@ -147,10 +153,12 @@ module Graphiti
       success
     end
 
-    def update_attributes
+    def update
       data
       save(action: :update)
     end
+
+    alias update_attributes update
 
     def include_hash
       @include_hash ||= begin
