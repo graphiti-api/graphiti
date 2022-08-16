@@ -71,9 +71,9 @@ module Graphiti
     end
 
     # Allow access to resource methods
-    def method_missing(id, *args, &blk)
+    def method_missing(id, ...)
       if @resource.respond_to?(id, true)
-        @resource.send(id, *args, &blk)
+        @resource.send(id, ...)
       else
         super
       end
