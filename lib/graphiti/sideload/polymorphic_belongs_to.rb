@@ -41,7 +41,7 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
     end
 
     def on(name, &blk)
-      group = Group.new(name)
+      group = Group.new(name.to_sym)
       @groups << group
       group
     end
