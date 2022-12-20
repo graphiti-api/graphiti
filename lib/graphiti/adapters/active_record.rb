@@ -248,7 +248,7 @@ module Graphiti
               parent.send(association_name) << child
             else
               target = association.instance_variable_get(:@target)
-              target |= [child]
+              target = [child] | target
               association.instance_variable_set(:@target, target)
             end
           end
