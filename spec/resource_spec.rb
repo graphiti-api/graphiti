@@ -1224,6 +1224,12 @@ RSpec.describe Graphiti::Resource do
                 expect { klass.find }.to_not raise_error
               end
             end
+
+            it "works" do
+              Graphiti.with_context ctx, :show do
+                expect { klass.find(id: 123) }.to_not raise_error
+              end
+            end
           end
         end
 
