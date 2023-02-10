@@ -1224,6 +1224,13 @@ RSpec.describe Graphiti::Resource do
                 expect { klass.find }.to_not raise_error
               end
             end
+          end
+
+          # singular resource with singular route
+          context "that is a singular show route without an id but finding the resource by id" do
+            before do
+              request.env["PATH_INFO"] += ""
+            end
 
             it "works" do
               Graphiti.with_context ctx, :show do
