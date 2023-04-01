@@ -82,13 +82,13 @@ RSpec.describe Graphiti::Sideload do
         end
       end
 
-      xit "works with symbols" do
+      it "works with symbols" do
         instance = Class.new(described_class).new(name, opts.merge(readable: :user_can_read?, writable: :user_can_write?))
         expect(instance).not_to be_readable
         expect(instance).to be_writable
       end
 
-      xit "works with strings" do
+      it "works with strings" do
         instance = Class.new(described_class).new(name, opts.merge(readable: "user_can_read?", writable: "user_can_write?"))
         expect(instance).not_to be_readable
         expect(instance).to be_writable
@@ -113,7 +113,7 @@ RSpec.describe Graphiti::Sideload do
         end
       end
 
-      xit "works" do
+      it "works" do
         options = opts.merge(readable: lambda { user_can_read? }, writable: lambda { true })
         instance = Class.new(described_class).new(name, options)
         expect(instance).not_to be_readable

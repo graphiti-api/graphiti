@@ -19,8 +19,7 @@ module Graphiti
       private
 
       def apply?(sideload)
-        @serializer.relationship_blocks[sideload.name].nil? &&
-          sideload.readable?
+        @serializer.relationship_blocks[sideload.name].nil?
       end
     end
 
@@ -32,7 +31,8 @@ module Graphiti
       end
 
       def apply
-        @serializer.relationship(@sideload.name, &block)
+        sideload = @sideload
+        @serializer.relationship(@sideload.name, if: -> { sideload.readable? }, &block)
       end
 
       # If we can't eagerly validate links on app boot, we do it at runtime

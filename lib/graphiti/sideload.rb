@@ -99,11 +99,11 @@ module Graphiti
     end
 
     def readable?
-      !!@readable
+      evaluate_flag @readable
     end
 
     def writable?
-      !!@writable
+      evaluate_flag @writable
     end
 
     def single?
