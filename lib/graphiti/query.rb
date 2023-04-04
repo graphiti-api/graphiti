@@ -209,7 +209,9 @@ module Graphiti
         allowlist ? Util::IncludeParams.scrub(requested, allowlist) : requested
       end
 
-      @include_hash
+      @include_hash.filter do |key, value|
+        @resource.class.sideload(key).readable?
+      end
     end
 
     def stats
