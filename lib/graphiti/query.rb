@@ -206,11 +206,12 @@ module Graphiti
           allowlist = allowlist[@resource.context_namespace] if allowlist
         end
 
-        allowlist ? Util::IncludeParams.scrub(requested, allowlist) : requested
-      end
+        scrubbed = allowlist ? Util::IncludeParams.scrub(requested, allowlist) : requested
 
-      @include_hash.filter do |key, value|
-        @resource.class.sideload(key).readable?
+        scrubbed.filter do |key, value|
+          sideload = @resource.class.sideload(key)
+          sideload.nil? ? true : sideload.readable?
+        end
       end
     end
 
