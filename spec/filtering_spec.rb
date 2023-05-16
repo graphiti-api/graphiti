@@ -221,8 +221,7 @@ RSpec.describe "filtering" do
     end
 
     it "does not convert to array" do
-      expect(
-        records.map(&:id)).to eq([employee2.id])
+      expect(records.map(&:id)).to eq([employee2.id])
     end
 
     context "when an array of escaped/non-escaped strings" do
@@ -231,8 +230,7 @@ RSpec.describe "filtering" do
       end
 
       it "works correctly" do
-        expect(
-          records.map(&:id)).to eq([
+        expect(records.map(&:id)).to eq([
           employee1.id,
           employee2.id,
           employee4.id
