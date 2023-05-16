@@ -30,12 +30,12 @@ RSpec.describe "filtering" do
   end
 
   context 'retains filtering value' do
-    it 'works when value includes curly brackets' do
+    it 'when value includes curly brackets' do
       params[:filter] = { first_name: '{{John}}'.freeze }
       expect { records }.to_not raise_error(FrozenError)
     end
 
-    it 'works when value does not include curly brackets' do
+    it 'when value does not include curly brackets' do
       params[:filter] = { first_name: 'John'.freeze }
       expect { records }.to_not raise_error(FrozenError)
     end
