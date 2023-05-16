@@ -29,6 +29,18 @@ RSpec.describe "filtering" do
     expect(records.map(&:id)).to eq([employee1.id])
   end
 
+  context 'retains filtering value' do
+    it 'works when value includes curly brackets' do
+      params[:filter] = { first_name: '{{John}}'.freeze }
+      expect { records }.to_not raise_error(FrozenError)
+    end
+
+    it 'works when value does not include curly brackets' do
+      params[:filter] = { first_name: 'John'.freeze }
+      expect { records }.to_not raise_error(FrozenError)
+    end
+  end
+
   context "when filter is type hash" do
     before do
       resource.filter :by_json, :hash do
@@ -209,7 +221,8 @@ RSpec.describe "filtering" do
     end
 
     it "does not convert to array" do
-      expect(records.map(&:id)).to eq([employee2.id])
+      expect(
+        records.map(&:id)).to eq([employee2.id])
     end
 
     context "when an array of escaped/non-escaped strings" do
@@ -218,7 +231,8 @@ RSpec.describe "filtering" do
       end
 
       it "works correctly" do
-        expect(records.map(&:id)).to eq([
+        expect(
+          records.map(&:id)).to eq([
           employee1.id,
           employee2.id,
           employee4.id
