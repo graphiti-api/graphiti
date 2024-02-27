@@ -193,14 +193,14 @@ module Graphiti
       # Find the quoted strings
       quotes = value.scan(/{{.*?}}/)
       # remove them from the rest
-      quotes.each { |q| value.gsub!(q, "") }
+      non_quotes = quotes.inject(value) { |v, q| v.gsub(q, "") }
       # remove the quote characters from the quoted strings
       quotes.each { |q| q.gsub!("{{", "").gsub!("}}", "") }
       # merge everything back together into an array
       value = if singular_filter
-        Array(value) + quotes
+        Array(non_quotes) + quotes
       else
-        Array(value.split(",")) + quotes
+        Array(non_quotes.split(",")) + quotes
       end
       # remove any blanks that are left
       value.reject! { |v| v.length.zero? }
