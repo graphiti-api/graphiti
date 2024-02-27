@@ -29,17 +29,17 @@ RSpec.describe "filtering" do
     expect(records.map(&:id)).to eq([employee1.id])
   end
 
-  context 'retains filtering value' do
-    it 'when value includes curly brackets' do
-      params[:filter] = { first_name: '{{John}}' }
+  context "retains filtering value" do
+    it "when value includes curly brackets" do
+      params[:filter] = {first_name: "{{John}}"}
       records
-      expect(params[:filter]).to eq(first_name: '{{John}}')
+      expect(params[:filter]).to eq(first_name: "{{John}}")
     end
 
-    it 'when value does not include curly brackets' do
-      params[:filter] = { first_name: 'John' }
+    it "when value does not include curly brackets" do
+      params[:filter] = {first_name: "John"}
       records
-      expect(params[:filter]).to eq(first_name: 'John')
+      expect(params[:filter]).to eq(first_name: "John")
     end
   end
 
