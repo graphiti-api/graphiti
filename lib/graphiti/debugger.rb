@@ -140,7 +140,6 @@ module Graphiti
         params ||= {}
         params = params.to_unsafe_h if params.respond_to?(:to_unsafe_h)
         params.reject! { |k, v| [:controller, :action, :format, :debug].include?(k.to_sym) }
-        params.reject! { |k, v| k.to_sym == :include }
         params.deep_symbolize_keys
       end
 
