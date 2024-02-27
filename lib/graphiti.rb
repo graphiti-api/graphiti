@@ -83,7 +83,12 @@ module Graphiti
   end
 
   def self.log(msg, color = :white, bold = false)
-    colored = ActiveSupport::LogSubscriber.new.send(:color, msg, color, bold)
+    if ::ActiveSupport.version >= Gem::Version.new("7.1")
+      colored = ActiveSupport::LogSubscriber.new.send(:color, msg, color, bold: bold)
+    else
+      colored = ActiveSupport::LogSubscriber.new.send(:color, msg, color, bold)
+    end
+
     logger.debug(colored)
   end
 
