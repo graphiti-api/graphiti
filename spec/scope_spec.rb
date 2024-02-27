@@ -94,7 +94,7 @@ RSpec.describe Graphiti::Scope do
       end
 
       context "with concurrency" do
-        let(:before_sideload) { double('BeforeSideload', call: nil) }
+        let(:before_sideload) { double("BeforeSideload", call: nil) }
 
         before { allow(Graphiti.config).to receive(:concurrency).and_return(true) }
         before { allow(Graphiti.config).to receive(:before_sideload).and_return(before_sideload) }
