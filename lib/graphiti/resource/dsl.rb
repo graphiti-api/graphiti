@@ -205,7 +205,7 @@ module Graphiti
             options[name] ||= send(:"relationships_#{name}_by_default")
           end
         end
-        private :attribute_option
+        private :relationship_option
       end
     end
   end

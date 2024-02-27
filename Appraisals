@@ -42,3 +42,18 @@ appraise "rails-7-graphiti-rails" do
   gem "database_cleaner"
   gem "graphiti-rails", "~> 0.4.0"
 end
+
+appraise "rails-7-1" do
+  gem "rails", "~> 7.1"
+  gem "rspec-rails"
+  gem "sqlite3", "~> 1.4.0"
+  gem "database_cleaner"
+end
+
+appraise "rails-7-1-graphiti-rails" do
+  gem "rails", "~> 7.1"
+  gem "rspec-rails"
+  gem "sqlite3", "~> 1.4.0"
+  gem "database_cleaner"
+  gem "graphiti-rails", "~> 0.4.0"
+end
