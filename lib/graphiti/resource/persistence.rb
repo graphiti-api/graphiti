@@ -4,11 +4,11 @@ module Graphiti
       extend ActiveSupport::Concern
 
       class_methods do
-        def before_attributes(method = nil, only: [:create, :update, :assign], &blk)
+        def before_attributes(method = nil, only: [:create, :update], &blk)
           add_callback(:attributes, :before, method, only, &blk)
         end
 
-        def after_attributes(method = nil, only: [:create, :update, :assign], &blk)
+        def after_attributes(method = nil, only: [:create, :update], &blk)
           add_callback(:attributes, :after, method, only, &blk)
         end
 
