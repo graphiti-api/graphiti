@@ -47,7 +47,7 @@ jobs:
           - false
         include:
           - ruby: ruby-head
-            gemfile: Gemfile
+            gemfile: gemfiles/rails_7_1.gemfile
             appraisal: true
           - ruby: ruby-head
             gemfile: Gemfile
