@@ -153,6 +153,8 @@ module Graphiti
     def extra_attributes(resource)
       {}.tap do |attrs|
         resource.extra_attributes.each_pair do |name, config|
+          next unless config[:schema]
+
           attrs[name] = {
             type: config[:type].to_s,
             readable: flag(config[:readable]),
@@ -181,11 +183,11 @@ module Graphiti
     def sorts(resource)
       {}.tap do |s|
         resource.sorts.each_pair do |name, sort|
-          next unless resource.attributes[name][:schema]
+          attr = resource.all_attributes[name]
+          next unless attr[:schema]
 
           config = {}
           config[:only] = sort[:only] if sort[:only]
-          attr = resource.attributes[name]
           if attr[:sortable].is_a?(Symbol)
             config[:guard] = true
           end
@@ -197,7 +199,7 @@ module Graphiti
     def filters(resource)
       {}.tap do |f|
         resource.filters.each_pair do |name, filter|
-          next unless resource.attributes[name][:schema]
+          next unless resource.filters[name][:schema]
 
           config = {
             type: filter[:type].to_s,
@@ -209,7 +211,7 @@ module Graphiti
           config[:deny] = filter[:deny].map(&:to_s) if filter[:deny]
           config[:dependencies] = filter[:dependencies].map(&:to_s) if filter[:dependencies]
 
-          attr = resource.attributes[name]
+          attr = resource.all_attributes[name]
           if attr[:filterable].is_a?(Symbol)
             if attr[:filterable] == :required
               config[:required] = true

@@ -69,11 +69,9 @@ module Graphiti
     end
 
     def sideload_hash
-      @sideload_hash = begin
-        {}.tap do |hash|
-          sideloads.each_pair do |key, value|
-            hash[key] = sideloads[key].hash
-          end
+      @sideload_hash = {}.tap do |hash|
+        sideloads.each_pair do |key, value|
+          hash[key] = sideloads[key].hash
         end
       end
     end
@@ -92,30 +90,28 @@ module Graphiti
     end
 
     def sideloads
-      @sideloads ||= begin
-        {}.tap do |hash|
-          include_hash.each_pair do |key, sub_hash|
-            sideload = @resource.class.sideload(key)
+      @sideloads ||= {}.tap do |hash|
+        include_hash.each_pair do |key, sub_hash|
+          sideload = @resource.class.sideload(key)
 
-            if sideload || @resource.remote?
-              sl_resource = resource_for_sideload(sideload)
-              query_parents = parents + [self]
-              sub_hash = sub_hash[:include] if sub_hash.key?(:include)
+          if sideload || @resource.remote?
+            sl_resource = resource_for_sideload(sideload)
+            query_parents = parents + [self]
+            sub_hash = sub_hash[:include] if sub_hash.key?(:include)
 
-              # NB: To handle on__<type>--<name>
-              # A) relationship_name == :positions
-              # B) key == on__employees.positions
-              # This way A) ensures sideloads are resolved
-              # And B) ensures nested filters, sorts etc still work
-              relationship_name = sideload ? sideload.name : key
-              hash[relationship_name] = Query.new sl_resource,
-                @params,
-                key,
-                sub_hash,
-                query_parents, :all
-            else
-              handle_missing_sideload(key)
-            end
+            # NB: To handle on__<type>--<name>
+            # A) relationship_name == :positions
+            # B) key == on__employees.positions
+            # This way A) ensures sideloads are resolved
+            # And B) ensures nested filters, sorts etc still work
+            relationship_name = sideload ? sideload.name : key
+            hash[relationship_name] = Query.new sl_resource,
+              @params,
+              key,
+              sub_hash,
+              query_parents, :all
+          else
+            handle_missing_sideload(key)
           end
         end
       end
@@ -140,27 +136,25 @@ module Graphiti
     end
 
     def filters
-      @filters ||= begin
-        {}.tap do |hash|
-          (@params[:filter] || {}).each_pair do |name, value|
-            name = name.to_sym
+      @filters ||= {}.tap do |hash|
+        (@params[:filter] || {}).each_pair do |name, value|
+          name = name.to_sym
 
-            if legacy_nested?(name)
-              value.keys.each do |key|
-                filter_name = key.to_sym
-                filter_value = value[key]
+          if legacy_nested?(name)
+            value.keys.each do |key|
+              filter_name = key.to_sym
+              filter_value = value[key]
 
-                if @resource.get_attr!(filter_name, :filterable, request: true)
-                  hash[filter_name] = filter_value
-                end
+              if @resource.get_attr!(filter_name, :filterable, request: true)
+                hash[filter_name] = filter_value
               end
-            elsif nested?(name)
-              name = name.to_s.split(".").last.to_sym
-              validate!(name, :filterable)
-              hash[name] = value
-            elsif top_level? && validate!(name, :filterable)
-              hash[name] = value
             end
+          elsif nested?(name)
+            name = name.to_s.split(".").last.to_sym
+            validate!(name, :filterable)
+            hash[name] = value
+          elsif top_level? && validate!(name, :filterable)
+            hash[name] = value
           end
         end
       end
@@ -189,19 +183,17 @@ module Graphiti
     end
 
     def pagination
-      @pagination ||= begin
-        {}.tap do |hash|
-          (@params[:page] || {}).each_pair do |name, value|
-            if legacy_nested?(name)
-              value.each_pair do |k, v|
-                hash[k.to_sym] = cast_page_param(k.to_sym, v)
-              end
-            elsif nested?(name)
-              param_name = name.to_s.split(".").last.to_sym
-              hash[param_name] = cast_page_param(param_name, value)
-            elsif top_level? && Scoping::Paginate::PARAMS.include?(name.to_sym)
-              hash[name.to_sym] = cast_page_param(name.to_sym, value)
+      @pagination ||= {}.tap do |hash|
+        (@params[:page] || {}).each_pair do |name, value|
+          if legacy_nested?(name)
+            value.each_pair do |k, v|
+              hash[k.to_sym] = cast_page_param(k.to_sym, v)
             end
+          elsif nested?(name)
+            param_name = name.to_s.split(".").last.to_sym
+            hash[param_name] = cast_page_param(param_name, value)
+          elsif top_level? && Scoping::Paginate::PARAMS.include?(name.to_sym)
+            hash[name.to_sym] = cast_page_param(name.to_sym, value)
           end
         end
       end
@@ -224,15 +216,13 @@ module Graphiti
     end
 
     def stats
-      @stats ||= begin
-        {}.tap do |hash|
-          (@params[:stats] || {}).each_pair do |k, v|
-            if legacy_nested?(k)
-              raise NotImplementedError.new("Association statistics are not currently supported")
-            elsif top_level?
-              v = v.split(",") if v.is_a?(String)
-              hash[k.to_sym] = Array(v).flatten.map(&:to_sym)
-            end
+      @stats ||= {}.tap do |hash|
+        (@params[:stats] || {}).each_pair do |k, v|
+          if legacy_nested?(k)
+            raise NotImplementedError.new("Association statistics are not currently supported")
+          elsif top_level?
+            v = v.split(",") if v.is_a?(String)
+            hash[k.to_sym] = Array(v).flatten.map(&:to_sym)
           end
         end
       end

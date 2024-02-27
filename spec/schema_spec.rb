@@ -529,6 +529,28 @@ RSpec.describe Graphiti::Schema do
       end
     end
 
+    context "when the attribute is schema: false then .filter called" do
+      before do
+        employee_resource.filter :hidden_attribute
+      end
+
+      it "appears in the schema" do
+        expect(schema[:resources][0][:filters].key?(:hidden_attribute))
+          .to eq(true)
+      end
+
+      context "when passed schema: false at filter level" do
+        before do
+          employee_resource.filter :hidden_attribute, schema: false
+        end
+
+        it "does not appear in the schema" do
+          expect(schema[:resources][0][:filters].key?(:hidden_attribute))
+            .to eq(false)
+        end
+      end
+    end
+
     context "when attribute changes to schema true" do
       before do
         employee_resource.class_eval do
@@ -552,6 +574,44 @@ RSpec.describe Graphiti::Schema do
       it "returns :guarded, not the runtime method" do
         expect(schema[:resources][0][:extra_attributes][:net_sales][:readable])
           .to eq("guarded")
+      end
+    end
+
+    context "when extra attribute has schema false" do
+      before do
+        employee_resource.class_eval do
+          extra_attribute :net_sales, :float, schema: false
+        end
+      end
+
+      it "is not in the list of extra_attributes" do
+        expect(schema[:resources][0][:extra_attributes]).not_to have_key(:net_sales)
+      end
+    end
+
+    context "when extra attribute is also a filter" do
+      before do
+        employee_resource.class_eval do
+          extra_attribute :net_sales, :float, filterable: true
+          filter :net_sales, only: [:eq]
+        end
+      end
+
+      it "is in the list of filters" do
+        expect(schema[:resources][0][:filters]).to have_key(:net_sales)
+      end
+    end
+
+    context "when extra attribute is also a sort" do
+      before do
+        employee_resource.class_eval do
+          extra_attribute :net_sales, :float, sortable: true
+          sort :net_sales
+        end
+      end
+
+      it "is in the list of sorts" do
+        expect(schema[:resources][0][:sorts]).to have_key(:net_sales)
       end
     end
 
@@ -937,12 +997,10 @@ RSpec.describe Graphiti::Schema do
 
         context "but FORCE_SCHEMA set" do
           around do |e|
-            begin
-              ENV["FORCE_SCHEMA"] = "true"
-              e.run
-            ensure
-              ENV["FORCE_SCHEMA"] = nil
-            end
+            ENV["FORCE_SCHEMA"] = "true"
+            e.run
+          ensure
+            ENV["FORCE_SCHEMA"] = nil
           end
 
           it "writes the file" do

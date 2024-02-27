@@ -46,7 +46,6 @@ module Graphiti
       #
       # ...will hit +method_missing+ and store the proc for future reference.
       # @api private
-      # rubocop: disable Style/MethodMissingSuper
       def method_missing(meth, *args, &blk)
         @calculations[meth] = blk
       end

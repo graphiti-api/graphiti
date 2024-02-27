@@ -1,7 +1,7 @@
 module Graphiti
   module Adapters
     class Abstract
-      require "graphiti/adapters/persistence/associations.rb"
+      require "graphiti/adapters/persistence/associations"
       include Graphiti::Adapters::Persistence::Associations
 
       attr_reader :resource
@@ -413,6 +413,10 @@ module Graphiti
 
       def self.numerical_operators
         [:eq, :not_eq, :gt, :gte, :lt, :lte].freeze
+      end
+
+      def can_group?
+        false
       end
 
       private

@@ -58,8 +58,7 @@ module PORO
         }.flatten
         records = apply_filtering(records, params)
         records = apply_sorting(records, params)
-        records = apply_pagination(records, params)
-        records
+        apply_pagination(records, params)
       end
 
       private
@@ -196,7 +195,8 @@ module PORO
       :credit_card_type,
       :payment_processor,
       :salary,
-      :credit_cards
+      :credit_cards,
+      :things
 
     def initialize(*)
       super
@@ -305,15 +305,15 @@ module PORO
       scope[:conditions][name] = value
       scope
     end
-    alias filter_integer_eq filter
-    alias filter_string_eq filter
-    alias filter_big_decimal_eq filter
-    alias filter_float_eq filter
-    alias filter_date_eq filter
-    alias filter_datetime_eq filter
-    alias filter_boolean_eq filter
-    alias filter_hash_eq filter
-    alias filter_array_eq filter
+    alias_method :filter_integer_eq, :filter
+    alias_method :filter_string_eq, :filter
+    alias_method :filter_big_decimal_eq, :filter
+    alias_method :filter_float_eq, :filter
+    alias_method :filter_date_eq, :filter
+    alias_method :filter_datetime_eq, :filter
+    alias_method :filter_boolean_eq, :filter
+    alias_method :filter_hash_eq, :filter
+    alias_method :filter_array_eq, :filter
 
     # No need for actual logic to fire
     def count(scope, attr)

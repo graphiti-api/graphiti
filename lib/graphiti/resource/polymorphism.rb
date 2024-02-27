@@ -72,7 +72,7 @@ module Graphiti
         end
 
         def resource_for_model(model)
-          resource = children.find { |c| model.class == c.model } ||
+          resource = children.find { |c| model.instance_of?(c.model) } ||
             children.find { |c| model.is_a?(c.model) }
           if resource.nil?
             raise Errors::PolymorphicResourceChildNotFound.new(self, model: model)

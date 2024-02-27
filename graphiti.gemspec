@@ -16,20 +16,20 @@ Gem::Specification.new do |spec|
   spec.bindir = "exe"
   spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
-  spec.required_ruby_version = [">= 2.3", "< 3.1"]
+  spec.required_ruby_version = ">= 2.6"
 
   spec.add_dependency "jsonapi-serializable", "~> 0.3.0"
   spec.add_dependency "jsonapi-renderer", "~> 0.2", ">= 0.2.2"
   spec.add_dependency "dry-types", ">= 0.15.0", "< 2.0"
   spec.add_dependency "graphiti_errors", "~> 1.1.0"
   spec.add_dependency "concurrent-ruby", "~> 1.0"
-  spec.add_dependency "activesupport", ">= 4.1"
+  spec.add_dependency "activesupport", ">= 5.2"
 
   spec.add_development_dependency "faraday", "~> 0.15"
   spec.add_development_dependency "kaminari", "~> 0.17"
   spec.add_development_dependency "bundler"
-  spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "standard", "0.4.7"
-  spec.add_development_dependency "activemodel", ">= 4.1"
+  spec.add_development_dependency "rake", ">= 10.0"
+  spec.add_development_dependency "standard", "~> 1.4.0"
+  spec.add_development_dependency "activemodel", ">= 5.2"
   spec.add_development_dependency "graphiti_spec_helpers", "1.0.beta.4"
 end

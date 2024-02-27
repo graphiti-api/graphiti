@@ -10,11 +10,11 @@ RSpec.describe "relationship identifiers" do
   let!(:employee2) { PORO::Employee.create }
   let!(:position1) do
     PORO::Position.create employee_id: employee.id,
-                          department_id: department1.id
+      department_id: department1.id
   end
   let!(:position2) do
     PORO::Position.create employee_id: employee.id,
-                          department_id: department2.id
+      department_id: department2.id
   end
   let!(:department1) { PORO::Department.create }
   let!(:department2) { PORO::Department.create }
