@@ -66,6 +66,7 @@ module Graphiti
         options[:meta] ||= proxy.meta
         options[:meta][:stats] = proxy.stats unless proxy.stats.empty?
         options[:meta][:debug] = Debugger.to_a if debug_json?
+        options[:proxy] = proxy
 
         renderer.render(records, options)
       end

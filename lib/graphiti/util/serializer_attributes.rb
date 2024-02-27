@@ -28,6 +28,12 @@ module Graphiti
 
         existing = @serializer.send(applied_method)
         @serializer.send(:"#{applied_method}=", [@name] | existing)
+
+        @serializer.meta do
+          if !!@resource.try(:cursor_paginatable?) && !Graphiti.context[:graphql]
+            {cursor: cursor}
+          end
+        end
       end
 
       private

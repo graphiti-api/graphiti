@@ -35,7 +35,7 @@ module Graphiti
       end
 
       def message
-        <<-MSG
+        <<~MSG
           The adapter #{@adapter.class} does not implement method '#{@method}', which was requested for attribute '#{@attribute}'. Add this method to your adapter to support this filter operator.
         MSG
       end
@@ -49,7 +49,7 @@ module Graphiti
       end
 
       def message
-        <<-MSG
+        <<~MSG
           #{@parent_resource_class} sideload :#{@name} - #{@message}
         MSG
       end
@@ -78,7 +78,7 @@ module Graphiti
       end
 
       def message
-        <<-MSG
+        <<~MSG
           #{@resource_class}: Tried to pass block to .#{@method_name}, which only accepts a method name.
         MSG
       end
@@ -90,7 +90,7 @@ module Graphiti
       end
 
       def message
-        <<-MSG
+        <<~MSG
           #{@resource_class}: Tried to perform write operation. Writes are not supported for remote resources - hit the endpoint directly.
         MSG
       end
@@ -105,7 +105,7 @@ module Graphiti
       end
 
       def message
-        <<-MSG
+        <<~MSG
           #{@resource.class}: Tried to filter #{@filter_name.inspect} on operator #{@operator.inspect}, but not supported! Supported operators are #{@supported}.
         MSG
       end
@@ -118,7 +118,7 @@ module Graphiti
       end
 
       def message
-        <<-MSG
+        <<~MSG
           #{@sideload.parent_resource.class.name}: tried to sideload #{@sideload.name.inspect}, but more than one #{@sideload.parent_resource.model.name} was passed!
 
           This is because you marked the sideload #{@sideload.name.inspect} with single: true
@@ -139,7 +139,7 @@ module Graphiti
       end
 
       def message
-        <<-MSG
+        <<~MSG
           #{@resource.class.name}: tried to sort on attribute #{@attribute.inspect}, but passed #{@direction.inspect} when only #{@allowlist.inspect} is supported.
         MSG
       end
@@ -152,7 +152,7 @@ module Graphiti
       end
 
       def message
-        <<-MSG
+        <<~MSG
           #{@resource_class.name}: called .on_extra_attribute #{@name.inspect}, but extra attribute #{@name.inspect} does not exist!
         MSG
       end
@@ -173,7 +173,7 @@ module Graphiti
         else
           "value #{@value.inspect}"
         end
-        msg = <<-MSG
+        msg = <<~MSG
           #{@resource.class.name}: tried to filter on #{@filter.keys[0].inspect}, but passed invalid #{value_string}.
         MSG
         msg << "\nAllowlist: #{allow.inspect}" if allow
@@ -190,7 +190,7 @@ module Graphiti
       end
 
       def message
-        <<-MSG
+        <<~MSG
           #{@resource_class.name} You declared an attribute or filter of type "#{@enum_type}" without providing a list of permitted values, which is required.
 
           When declaring an attribute:
@@ -214,7 +214,7 @@ module Graphiti
       end
 
       def message
-        <<-MSG
+        <<~MSG
           #{@resource_class.name}: Cannot link to sideload #{@sideload.name.inspect}!
 
           Make sure the endpoint "#{@sideload.resource.endpoint[:full_path]}" exists with action #{@action.inspect}, or customize the endpoint for #{@sideload.resource.class.name}.
@@ -730,6 +730,12 @@ module Graphiti
 
       def message
         "Requested page size #{@size} is greater than max supported size #{@max}"
+      end
+    end
+
+    class UnsupportedBeforeCursor < Base
+      def message
+        "Passing in page[before] and page[number] is not supported. Please create an issue if you need it!"
       end
     end
 

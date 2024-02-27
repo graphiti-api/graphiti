@@ -68,10 +68,10 @@ module Graphiti
           model_ref = model
           has_many name, opts do
             params do |hash|
-              hash[:filter][:"#{as}_type"] = model_ref.name
+              hash[:filter][:"#{as}_type"] = {eql: model_ref.name}
             end
 
-            instance_eval(&blk) if block_given?
+            instance_eval(&blk) if blk
           end
         end
 
@@ -82,10 +82,10 @@ module Graphiti
           model_ref = model
           has_one name, opts do
             params do |hash|
-              hash[:filter][:"#{as}_type"] = model_ref.name
+              hash[:filter][:"#{as}_type"] = {eql: model_ref.name}
             end
 
-            instance_eval(&blk) if block_given?
+            instance_eval(&blk) if blk
           end
         end
 

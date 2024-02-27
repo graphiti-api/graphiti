@@ -101,6 +101,10 @@ module Graphiti
           hash[:_type] = jsonapi_type.to_s
         end
 
+        if (fields_list || []).include?(:_cursor)
+          hash[:_cursor] = cursor
+        end
+
         if (fields_list || []).include?(:__typename)
           resource_class = @resource.class
           if polymorphic_subclass?
@@ -142,6 +146,10 @@ module Graphiti
       nodes = get_nodes(serializers, opts)
       add_nodes(hash, top_level_key, options, nodes, @graphql)
       add_stats(hash, top_level_key, options, @graphql)
+      if @graphql
+        add_page_info(hash, serializers, top_level_key, options)
+      end
+
       hash
     end
 
@@ -160,7 +168,7 @@ module Graphiti
 
     def get_nodes(serializers, opts)
       if serializers.is_a?(Array)
-        serializers.map do |s|
+        serializers.each_with_index.map do |s, index|
           s.to_hash(**opts)
         end
       else
@@ -184,11 +192,41 @@ module Graphiti
       if options[:meta] && !options[:meta].empty?
         if @graphql
           if (stats = options[:meta][:stats])
-            hash[top_level_key][:stats] = stats
+            camelized = {}
+            stats.each_pair do |key, value|
+              camelized[key.to_s.camelize(:lower).to_sym] = value
+            end
+            hash[top_level_key][:stats] = camelized
           end
         else
           hash.merge!(options.slice(:meta))
         end
+      end
+    end
+
+    # NB - this is only for top-level right now
+    # The casing here is GQL-specific, we can update later if needed.
+    def add_page_info(hash, serializers, top_level_key, options)
+      if (fields = options[:fields].try(:[], :page_info))
+        info = {}
+
+        if fields.include?(:has_next_page)
+          info[:hasNextPage] = options[:proxy].pagination.has_next_page?
+        end
+
+        if fields.include?(:has_previous_page)
+          info[:hasPreviousPage] = options[:proxy].pagination.has_previous_page?
+        end
+
+        if fields.include?(:start_cursor)
+          info[:startCursor] = serializers.first.try(:cursor)
+        end
+
+        if fields.include?(:end_cursor)
+          info[:endCursor] = serializers.last.try(:cursor)
+        end
+
+        hash[top_level_key][:pageInfo] = info
       end
     end
   end

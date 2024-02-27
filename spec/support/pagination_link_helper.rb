@@ -30,9 +30,9 @@ RSpec.shared_context "pagination_context", shared_context: :metadata do
   let(:pagination_delegate) { Graphiti::Delegates::Pagination.new(proxy) }
   let(:collection) do
     double(total_pages: total_pages,
-           prev_page: prev_page,
-           next_page: next_page,
-           current_per_page: current_per_page)
+      prev_page: prev_page,
+      next_page: next_page,
+      current_per_page: current_per_page)
   end
   let(:total_pages) { 3 }
   let(:prev_page) { 1 }

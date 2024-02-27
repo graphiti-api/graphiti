@@ -92,7 +92,8 @@ module Graphiti
           :relationships_writable_by_default,
           :filters_accept_nil_by_default,
           :filters_deny_empty_by_default,
-          :graphql_entrypoint
+          :graphql_entrypoint,
+          :cursor_paginatable
 
         class << self
           prepend Overrides

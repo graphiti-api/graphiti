@@ -1720,7 +1720,9 @@ RSpec.describe "serialization" do
 
     context "when specified" do
       before do
-        resource.link :test_link do |model| "#{endpoint[:url]}/#{model.id}" end
+        resource.link :test_link do |model|
+          "#{endpoint[:url]}/#{model.id}"
+        end
       end
 
       it "links correctly" do
@@ -1732,7 +1734,9 @@ RSpec.describe "serialization" do
 
     context "nil links" do
       before do
-        resource.link :test_link do |model| nil end
+        resource.link :test_link do |model|
+          nil
+        end
       end
 
       specify "are still included" do
@@ -1804,51 +1808,49 @@ RSpec.describe "serialization" do
 
     context "when the attribute is guarded, and the guard fails" do
       before do
+        # NB - add 'things' here rather than relying on existing relationships
+        # This is because order matters - the relationship has to be applied
+        # *only after* the attribute to truly tests things. This is what happens
+        # in production when eager loading code, so we should mimic here.
         resource.class_eval do
           attribute :first_name, :string
-          attribute :positions, :string, readable: :admin?
+          attribute :things, :string, readable: :admin? do
+            "things!"
+          end
           def admin?
             false
           end
+          has_many :things, resource: PORO::PositionResource,
+                            foreign_key: :employee_id
         end
       end
 
       context "and the relationship is not included" do
-        before do
-          params[:include] = "positions"
-        end
-
         it "does not render the attribute, does render the relationship" do
           render
-          expect(json["data"][0]["attributes"]).to_not have_key("positions")
-          resource_id = {"id" => position.id.to_s, "type" => "positions"}
-          expect(json["data"][0]["relationships"]["positions"]["data"])
-            .to eq([resource_id])
-          expect(json["included"][0].slice("id", "type")).to eq(resource_id)
+          expect(json["data"][0]["attributes"]).to_not have_key("things")
+          expect(json["data"][0]["relationships"].key?("things"))
+            .to eq(true)
         end
 
         context "and rendering JSON" do
-          it "still renders the relationship" do
+          it "is not present" do
             json = proxy.as_json[:data][0]
-            expect(json[:positions]).to eq([{
-              id: position.id.to_s,
-              title: "foo",
-              rank: nil
-            }])
+            expect(json.key?(:things)).to eq(false)
           end
         end
       end
 
       context "and the relationship is included" do
         before do
-          params[:include] = "positions"
+          params[:include] = "things"
         end
 
         it "is still rendered" do
           render
-          expect(json["data"][0]["attributes"]).to_not have_key("positions")
+          expect(json["data"][0]["attributes"]).to_not have_key("things")
           resource_id = {"id" => position.id.to_s, "type" => "positions"}
-          expect(json["data"][0]["relationships"]["positions"]["data"])
+          expect(json["data"][0]["relationships"]["things"]["data"])
             .to eq([resource_id])
           expect(json["included"][0].slice("id", "type")).to eq(resource_id)
         end
@@ -1856,12 +1858,316 @@ RSpec.describe "serialization" do
         context "and rendering JSON" do
           it "still renders the relationship" do
             json = proxy.as_json[:data][0]
-            expect(json[:positions]).to eq([{
+            expect(json[:things]).to eq([{
               id: position.id.to_s,
               title: "foo",
               rank: nil
             }])
           end
+        end
+      end
+    end
+  end
+
+  describe "cursors" do
+    let!(:employee1) { PORO::Employee.create }
+    let!(:employee2) { PORO::Employee.create }
+    let!(:employee3) { PORO::Employee.create }
+    let!(:employee4) { PORO::Employee.create }
+
+    context "when cursors are disabled" do
+      it "does not render a cursor" do
+        render
+        expect(json["data"][0]).to_not have_key("meta")
+      end
+
+      context "but gql" do
+        around do |e|
+          original = Graphiti.context[:graphql]
+          Graphiti.context[:graphql] = true
+          begin
+            e.run
+          ensure
+            Graphiti.context[:graphql] = original
+          end
+        end
+
+        def render(runtime_options = {})
+          json = proxy.to_graphql(runtime_options)
+          response.body = json
+          json
+        end
+
+        context "and cursor is requested" do
+          before do
+            params[:fields] = {employees: "_cursor"}
+          end
+
+          it "is rendered as an attribute" do
+            render
+            nodes = json.values[0][:nodes]
+            expect(nodes.map { |d| d["_cursor"] }).to all(be_present)
+          end
+
+          context "for a relationship" do
+            before do
+              params[:fields][:positions] = "_cursor"
+            end
+
+            it "is rendered as an attribute" do
+              render
+              nodes = json.values[0][:nodes]
+              expect(nodes.map { |d| d["_cursor"] }).to all(be_present)
+            end
+          end
+        end
+
+        context "and cursor is not requested" do
+          it "is not rendered" do
+            render
+            nodes = json.values[0][:nodes]
+            expect(nodes.map { |d| d.key?("_cursor") }).to all(be(false))
+          end
+        end
+      end
+    end
+
+    context "when cursors are enabled" do
+      def get_cursor(index)
+        cursor = json["data"][index]["meta"]["cursor"]
+        JSON.parse(Base64.decode64(cursor)).symbolize_keys
+      end
+
+      context "on the resource" do
+        before do
+          resource.cursor_paginatable = true
+        end
+
+        it "renders cursors" do
+          render
+          expect(json["data"][0]["meta"]["cursor"]).to be_present
+          expect(json["data"][1]["meta"]["cursor"]).to be_present
+          expect(json["data"][2]["meta"]["cursor"]).to be_present
+          expect(json["data"][3]["meta"]["cursor"]).to be_present
+        end
+
+        context "when using page number" do
+          before do
+            params[:page] = {number: 2}
+          end
+
+          context "and implicit page size" do
+            before do
+              resource.default_page_size = 1
+            end
+
+            it "is respected in the offset" do
+              render
+              expect(get_cursor(0)).to eq(offset: 2)
+            end
+          end
+
+          context "and explicit page size" do
+            before do
+              params[:page][:size] = 2
+            end
+
+            it "is respected in the offset" do
+              render
+              expect(get_cursor(0)).to eq(offset: 3)
+              expect(get_cursor(1)).to eq(offset: 4)
+            end
+          end
+        end
+
+        context "when using after cursor" do
+          before do
+            cursor = Base64.encode64({offset: 2}.to_json)
+            params[:page] = {after: cursor}
+          end
+
+          it "is respected in the offset" do
+            render
+            expect(get_cursor(0)).to eq(offset: 3)
+            expect(get_cursor(1)).to eq(offset: 4)
+          end
+
+          context "when using after cursor" do
+            before do
+              cursor = Base64.encode64({offset: 2}.to_json)
+              params[:page] = {after: cursor}
+            end
+
+            xit "TODO" do
+              render
+              expect(get_cursor(0)).to eq(offset: 2)
+              expect(get_cursor(1)).to eq(offset: 3)
+            end
+          end
+        end
+      end
+    end
+
+    describe "page info" do
+      def render(runtime_options = {})
+        json = proxy.to_graphql(runtime_options)
+        response.body = json
+        json
+      end
+
+      context "when graphql" do
+        before do
+          allow_any_instance_of(PORO::Adapter).to receive(:count) { 4 }
+        end
+
+        around do |e|
+          original = Graphiti.context[:graphql]
+          Graphiti.context[:graphql] = true
+          begin
+            e.run
+          ensure
+            Graphiti.context[:graphql] = original
+          end
+        end
+
+        context "when has_next_page requested" do
+          before do
+            params[:fields] = {page_info: "has_next_page"}
+          end
+
+          context "and there is a next page" do
+            before do
+              params[:page] = {size: 1}
+            end
+
+            it "is true" do
+              render
+              expect(json.values[0]["pageInfo"]["hasNextPage"]).to eq(true)
+            end
+          end
+
+          context "and there is not a next page" do
+            it "is false" do
+              render
+              expect(json.values[0]["pageInfo"]["hasNextPage"]).to eq(false)
+            end
+          end
+        end
+
+        context "when has_previous_page requested" do
+          before do
+            params[:fields] = {page_info: "has_previous_page"}
+          end
+
+          context "and there is a previous page" do
+            context "via page number" do
+              before do
+                params[:page] = {size: 1, number: 2}
+              end
+
+              it "is true" do
+                render
+                expect(json.values[0]["pageInfo"]["hasPreviousPage"]).to eq(true)
+              end
+            end
+
+            context "via offset param" do
+              before do
+                params[:page] = {offset: 1}
+              end
+
+              it "is true" do
+                render
+                expect(json.values[0]["pageInfo"]["hasPreviousPage"]).to eq(true)
+              end
+            end
+
+            context "via after param" do
+              before do
+                params[:page] = {after: Base64.encode64({offset: 1}.to_json)}
+              end
+
+              it "is true" do
+                render
+                expect(json.values[0]["pageInfo"]["hasPreviousPage"]).to eq(true)
+              end
+            end
+          end
+
+          context "and there is NOT a previous page" do
+            it "is false" do
+              render
+              expect(json.values[0]["pageInfo"]["hasPreviousPage"]).to eq(false)
+            end
+          end
+        end
+
+        context "when start_cursor requested" do
+          before do
+            params[:fields] = {page_info: "start_cursor"}
+          end
+
+          it "is correct" do
+            render
+            cursor = json.values[0]["pageInfo"]["startCursor"]
+            cursor = JSON.parse(Base64.decode64(cursor))
+            expect(cursor).to eq("offset" => 1)
+          end
+
+          context "but no results" do
+            before do
+              PORO::DB.data[:employees] = []
+            end
+
+            it "is nil" do
+              render
+              page_info = json.values[0]["pageInfo"]
+              expect(page_info.key?("startCursor")).to eq(true)
+              cursor = json.values[0]["pageInfo"]["startCursor"]
+              expect(cursor).to be_nil
+            end
+          end
+        end
+
+        context "when end_cursor requested" do
+          before do
+            params[:fields] = {page_info: "end_cursor"}
+          end
+
+          it "is correct" do
+            render
+            cursor = json.values[0]["pageInfo"]["endCursor"]
+            cursor = JSON.parse(Base64.decode64(cursor))
+            expect(cursor).to eq("offset" => 4)
+          end
+
+          context "but no results" do
+            before do
+              PORO::DB.data[:employees] = []
+            end
+
+            it "is nil" do
+              render
+              page_info = json.values[0]["pageInfo"]
+              expect(page_info.key?("endCursor")).to eq(true)
+              cursor = json.values[0]["pageInfo"]["endCursor"]
+              expect(cursor).to be_nil
+            end
+          end
+        end
+
+        context "but not requested" do
+          it "is not rendered" do
+            render
+            expect(json.values[0].key?("pageInfo")).to eq(false)
+          end
+        end
+      end
+
+      context "when not graphql" do
+        it "is not rendered" do
+          render
+          expect(json.values[0].key?("pageInfo")).to eq(false)
         end
       end
     end

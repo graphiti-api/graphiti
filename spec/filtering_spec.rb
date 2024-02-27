@@ -29,6 +29,20 @@ RSpec.describe "filtering" do
     expect(records.map(&:id)).to eq([employee1.id])
   end
 
+  context "retains filtering value" do
+    it "when value includes curly brackets" do
+      params[:filter] = {first_name: "{{John}}"}
+      records
+      expect(params[:filter]).to eq(first_name: "{{John}}")
+    end
+
+    it "when value does not include curly brackets" do
+      params[:filter] = {first_name: "John"}
+      records
+      expect(params[:filter]).to eq(first_name: "John")
+    end
+  end
+
   context "when filter is type hash" do
     before do
       resource.filter :by_json, :hash do
@@ -433,11 +447,11 @@ RSpec.describe "filtering" do
     context "one level" do
       let!(:pos1) do
         PORO::Position.create title: "foo",
-                              employee_id: employee1.id
+          employee_id: employee1.id
       end
       let!(:pos2) do
         PORO::Position.create title: "bar",
-                              employee_id: employee1.id
+          employee_id: employee1.id
       end
 
       before do
@@ -460,11 +474,11 @@ RSpec.describe "filtering" do
       let!(:department2) { PORO::Department.create(name: "bar") }
       let!(:pos1) do
         PORO::Position.create department_id: department1.id,
-                              employee_id: employee1.id
+          employee_id: employee1.id
       end
       let!(:pos2) do
         PORO::Position.create department_id: department2.id,
-                              employee_id: employee1.id
+          employee_id: employee1.id
       end
 
       before do
@@ -920,7 +934,7 @@ RSpec.describe "filtering" do
 
       it "coerces integers" do
         params[:filter] = {foo: 40}
-        assert_filter_value([BigDecimal(40)])
+        assert_filter_value([BigDecimal("40")])
       end
 
       it "coerces strings" do
@@ -1338,11 +1352,12 @@ RSpec.describe "filtering" do
           resource.attributes[:foo][:filterable] = false
         end
 
-        it "raises helpful error" do
+        it "makes it filterable" do
           expect {
             resource.filter :foo do
             end
-          }.to raise_error(Graphiti::Errors::AttributeError, "PORO::EmployeeResource: Tried to add filter attribute :foo, but the attribute was marked :filterable => false.")
+          }.to change { resource.attributes[:foo][:filterable] }
+            .from(false).to(true)
         end
       end
     end
