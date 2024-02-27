@@ -118,7 +118,7 @@ module Graphiti
         cache_key = :"#{@sideload.object_id}-#{action}"
         return if self.class.validated_link_cache.include?(cache_key)
         prc = Graphiti.config.context_for_endpoint
-        unless prc.call(sideload.resource.endpoint[:full_path], action)
+        unless prc.call(sideload.resource.endpoint[:full_path].to_s, action)
           raise Errors::InvalidLink.new(@resource_class, sideload, action)
         end
         self.class.validated_link_cache << cache_key
