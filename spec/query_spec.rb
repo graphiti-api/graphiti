@@ -11,6 +11,7 @@ RSpec.describe Graphiti::Query do
   before do
     employee_resource.has_many :positions,
       resource: position_resource
+    employee_resource.belongs_to :remote, remote: true
     position_resource.belongs_to :department,
       resource: department_resource
     employee_resource.attribute :name, :string
@@ -986,11 +987,29 @@ RSpec.describe Graphiti::Query do
     end
 
     describe "sideloads" do
-      before { params[:include] = "positions" }
       subject(:sideloads) { instance.sideloads }
 
-      it "does not cascate the action" do
-        expect(sideloads.values.map(&:action)).to eq([:all])
+      context "when including an has_many resource" do
+        before { params[:include] = "positions" }
+
+        it "does not cascate the action" do
+          expect(sideloads.values.map(&:action)).to eq([:all])
+        end
+      end
+
+      context "when including a resource from a remote resource" do
+        before { params[:include] = "remote.resource" }
+
+        let(:sideloads_of_another_query) { described_class.new(resource, params).sideloads }
+
+        def resource_class_of_remote_sideload(sideloads)
+          sideloads.fetch(:remote).sideloads.fetch(:resource).resource.class
+        end
+
+        it "re-uses resource class across multiple queries (avoid memory leak)" do
+          expect(resource_class_of_remote_sideload(sideloads))
+            .to eq(resource_class_of_remote_sideload(sideloads_of_another_query))
+        end
       end
     end
   end
