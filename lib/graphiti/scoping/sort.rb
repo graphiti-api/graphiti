@@ -59,12 +59,10 @@ module Graphiti
     end
 
     def sort_param
-      @sort_param ||= begin
-        if query_hash[:sort].blank?
-          resource.default_sort || []
-        else
-          normalize(query_hash[:sort])
-        end
+      @sort_param ||= if query_hash[:sort].blank?
+        resource.default_sort || []
+      else
+        normalize(query_hash[:sort])
       end
     end
 

@@ -110,10 +110,10 @@ module Graphiti
         end
 
         route = begin
-                  ::Rails.application.routes.recognize_path(path, method: method)
-                rescue
-                  nil
-                end
+          ::Rails.application.routes.recognize_path(path, method: method)
+        rescue
+          nil
+        end
         "#{route[:controller]}_controller".classify.safe_constantize if route
       }
     end

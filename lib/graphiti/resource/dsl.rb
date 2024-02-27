@@ -9,7 +9,11 @@ module Graphiti
           opts = args.extract_options!
           type_override = args[0]
 
-          if (att = get_attr(name, :filterable, raise_error: :only_unsupported))
+          if (att = (attributes[name] || extra_attributes[name]))
+            # We're opting in to filtering, so force this
+            # UNLESS the filter is guarded at the attribute level
+            att[:filterable] = true if att[:filterable] == false
+
             aliases = [name, opts[:aliases]].flatten.compact
             operators = FilterOperators.build(self, att[:type], opts, &blk)
 
@@ -23,6 +27,8 @@ module Graphiti
             end
 
             required = att[:filterable] == :required || !!opts[:required]
+            schema = !!opts[:via_attribute_dsl] ? att[:schema] : opts[:schema] != false
+
             config[:filters][name.to_sym] = {
               aliases: aliases,
               name: name.to_sym,
@@ -32,6 +38,7 @@ module Graphiti
               single: !!opts[:single],
               dependencies: opts[:dependent],
               required: required,
+              schema: schema,
               operators: operators.to_hash,
               allow_nil: opts.fetch(:allow_nil, filters_accept_nil_by_default),
               deny_empty: opts.fetch(:deny_empty, filters_deny_empty_by_default)
@@ -56,7 +63,7 @@ module Graphiti
         end
 
         def sort_all(&blk)
-          if block_given?
+          if blk
             config[:_sort_all] = blk
           else
             config[:_sort_all]
@@ -130,7 +137,7 @@ module Graphiti
           options[:sortable] ? sort(name) : config[:sorts].delete(name)
 
           if options[:filterable]
-            filter(name, allow: options[:allow])
+            filter(name, allow: options[:allow], via_attribute_dsl: true)
           else
             config[:filters].delete(name)
           end
@@ -144,7 +151,8 @@ module Graphiti
             readable: true,
             writable: false,
             sortable: false,
-            filterable: false
+            filterable: false,
+            schema: true
           }
           options = defaults.merge(options)
           attribute_option(options, :readable)
@@ -181,9 +189,9 @@ module Graphiti
         def attribute_option(options, name, exclusive = false)
           if options[name] != false
             default = if (only = options[:only]) && !exclusive
-              Array(only).include?(name) ? true : false
+              Array(only).include?(name)
             elsif (except = options[:except]) && !exclusive
-              Array(except).include?(name) ? false : true
+              !Array(except).include?(name)
             else
               send(:"attributes_#{name}_by_default")
             end
@@ -197,7 +205,7 @@ module Graphiti
             options[name] ||= send(:"relationships_#{name}_by_default")
           end
         end
-        private :attribute_option
+        private :relationship_option
       end
     end
   end

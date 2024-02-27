@@ -1,5 +1,6 @@
 require "json"
 require "forwardable"
+require "uri"
 require "active_support/core_ext/string"
 require "active_support/core_ext/enumerable"
 require "active_support/core_ext/class/attribute"
@@ -83,7 +84,12 @@ module Graphiti
   end
 
   def self.log(msg, color = :white, bold = false)
-    colored = ActiveSupport::LogSubscriber.new.send(:color, msg, color, bold)
+    colored = if ::ActiveSupport.version >= Gem::Version.new("7.1")
+      ActiveSupport::LogSubscriber.new.send(:color, msg, color, bold: bold)
+    else
+      ActiveSupport::LogSubscriber.new.send(:color, msg, color, bold)
+    end
+
     logger.debug(colored)
   end
 
@@ -131,7 +137,6 @@ require "graphiti/resource_proxy"
 require "graphiti/request_validator"
 require "graphiti/request_validators/validator"
 require "graphiti/request_validators/update_validator"
-require "graphiti/query"
 require "graphiti/scope"
 require "graphiti/deserializer"
 require "graphiti/renderer"
@@ -170,6 +175,7 @@ require "graphiti/extensions/extra_attribute"
 require "graphiti/extensions/boolean_attribute"
 require "graphiti/extensions/temp_id"
 require "graphiti/serializer"
+require "graphiti/query"
 require "graphiti/debugger"
 
 if defined?(ActiveRecord)
@@ -208,6 +214,7 @@ module InstanceVariableOverride
     values
   end
 end
+
 class Object
   prepend InstanceVariableOverride
 end
