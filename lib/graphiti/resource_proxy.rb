@@ -158,7 +158,7 @@ module Graphiti
       save(action: :update)
     end
 
-    alias update_attributes update
+    alias_method update_attributes update
 
     def include_hash
       @include_hash ||= begin
