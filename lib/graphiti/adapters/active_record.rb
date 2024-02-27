@@ -305,6 +305,14 @@ module Graphiti
         ::ActiveRecord::Base.clear_active_connections!
       end
 
+      def can_group?
+        true
+      end
+
+      def group(scope, attribute)
+        scope.group(attribute)
+      end
+
       private
 
       def column_for(scope, name)
@@ -317,7 +325,7 @@ module Graphiti
       end
 
       def sanitized_like_for(scope, attribute, value, &block)
-        escape_char = '\\'
+        escape_char = "\\"
         column = column_for(scope, attribute)
         map = value.map { |v|
           v = v.downcase

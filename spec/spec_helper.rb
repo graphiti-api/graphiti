@@ -13,6 +13,7 @@ Graphiti.setup!
 
 # Optional dep for cross-api requests
 require "faraday"
+require "base64"
 
 RSpec.configure do |config|
   config.include GraphitiSpecHelpers::RSpec
@@ -60,6 +61,6 @@ if ENV["APPRAISAL_INITIALIZED"]
   require "rails_spec_helper"
   ActiveRecord::Migration.verbose = false
   ActiveRecord::Base.establish_connection adapter: "sqlite3",
-                                          database: ":memory:"
+    database: ":memory:"
   Dir[File.dirname(__FILE__) + "/fixtures/**/*.rb"].sort.each { |f| require f }
 end

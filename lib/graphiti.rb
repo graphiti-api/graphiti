@@ -1,5 +1,6 @@
 require "json"
 require "forwardable"
+require "uri"
 require "active_support/core_ext/string"
 require "active_support/core_ext/enumerable"
 require "active_support/core_ext/class/attribute"
@@ -83,7 +84,12 @@ module Graphiti
   end
 
   def self.log(msg, color = :white, bold = false)
-    colored = ActiveSupport::LogSubscriber.new.send(:color, msg, color, bold)
+    colored = if ::ActiveSupport.version >= Gem::Version.new("7.1")
+      ActiveSupport::LogSubscriber.new.send(:color, msg, color, bold: bold)
+    else
+      ActiveSupport::LogSubscriber.new.send(:color, msg, color, bold)
+    end
+
     logger.debug(colored)
   end
 
