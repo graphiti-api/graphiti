@@ -586,6 +586,21 @@ RSpec.describe "serialization" do
           }])
         end
       end
+
+      context "when a multi-word stat" do
+        before do
+          resource.stat multi_word: [:average] do
+            average do
+              10
+            end
+          end
+          params[:stats] = {multi_word: "average"}
+        end
+
+        it "is camelized" do
+          expect(json[:employees][:stats].keys.first).to eq(:multiWord)
+        end
+      end
     end
   end
 
