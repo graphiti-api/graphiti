@@ -1,3 +1,12 @@
+graphiti changelog
+
+# [1.5.0](https://github.com/graphiti-api/graphiti/compare/v1.4.0...v1.5.0) (2024-03-18)
+
+
+### Features
+
+* add before_sideload hook ([#371](https://github.com/graphiti-api/graphiti/issues/371)) ([f68b61f](https://github.com/graphiti-api/graphiti/commit/f68b61ff09ec61ecf23acc5bc37d0accba14aeed))
+
 ## 1.4.0, Sun March 17th 2024
 Features: 
 - [461](https://github.com/graphiti-api/graphiti/pull/461), [463](https://github.com/graphiti-api/graphiti/pull/463) Add support for Rails 7.1 + Ruby 3.2 + Ruby 3.3
