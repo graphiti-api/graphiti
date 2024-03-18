@@ -94,12 +94,22 @@ RSpec.describe Graphiti::Scope do
       end
 
       context "with concurrency" do
+        let(:before_sideload) { double("BeforeSideload", call: nil) }
+
         before { allow(Graphiti.config).to receive(:concurrency).and_return(true) }
+        before { allow(Graphiti.config).to receive(:before_sideload).and_return(before_sideload) }
 
         it "closes db connections" do
           allow(sideload).to receive(:resolve).and_return(sideload)
 
           expect(resource.adapter).to receive(:close)
+          instance.resolve_sideloads(results)
+        end
+
+        it "calls configiration.before_sideload with context" do
+          Graphiti.context[:tenant_id] = 1
+          allow(sideload).to receive(:resolve).and_return(sideload)
+          expect(before_sideload).to receive(:call).with(hash_including(tenant_id: 1))
           instance.resolve_sideloads(results)
         end
       end
