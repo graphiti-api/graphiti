@@ -76,7 +76,7 @@ module Graphiti
           path = request_path
           if [:update, :show, :destroy].include?(context_namespace) && has_id
             path = request_path.split("/")
-            path.pop
+            path.pop if path.last == has_id.to_s
             path = path.join("/")
           end
           e[:full_path].to_s == path && e[:actions].include?(context_namespace)
