@@ -1,5 +1,13 @@
 graphiti changelog
 
+## [1.5.3](https://github.com/graphiti-api/graphiti/compare/v1.5.2...v1.5.3) (2024-03-18)
+
+
+### Bug Fixes
+
+* leverage ruby-2.7 parameter forwarding ([#431](https://github.com/graphiti-api/graphiti/issues/431)) ([ae09a46](https://github.com/graphiti-api/graphiti/commit/ae09a464b2156742bb093537deac0578a1a3e40e))
+* prevent :id stripping when :id not in path ([#447](https://github.com/graphiti-api/graphiti/issues/447)) ([e1dd811](https://github.com/graphiti-api/graphiti/commit/e1dd811283f6e6fe7a36b925934df0ecbb4d3411))
+
 ## [1.5.2](https://github.com/graphiti-api/graphiti/compare/v1.5.1...v1.5.2) (2024-03-18)
 
 
