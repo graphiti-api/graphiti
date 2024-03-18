@@ -1,5 +1,12 @@
 graphiti changelog
 
+## [1.5.1](https://github.com/graphiti-api/graphiti/compare/v1.5.0...v1.5.1) (2024-03-18)
+
+
+### Bug Fixes
+
+* polymorphic `on` expects a symbol ([#433](https://github.com/graphiti-api/graphiti/issues/433)) ([4e58702](https://github.com/graphiti-api/graphiti/commit/4e587021265323bd0b170b57e9c7aecaa7f826d7))
+
 # [1.5.0](https://github.com/graphiti-api/graphiti/compare/v1.4.0...v1.5.0) (2024-03-18)
 
 
