@@ -1,4 +1,18 @@
-## Unreleased
+## 1.4.0, Sun March 17th 2024
+Features: 
+- [461](https://github.com/graphiti-api/graphiti/pull/461), [463](https://github.com/graphiti-api/graphiti/pull/463) Add support for Rails 7.1 + Ruby 3.2 + Ruby 3.3
+
+Fixes: 
+- [464](https://github.com/graphiti-api/graphiti/pull/464) Check for url presence before trying to append
+- [407](https://github.com/graphiti-api/graphiti/pull/407) Sort types in generated schema
+- [421](https://github.com/graphiti-api/graphiti/pull/421) Re-use resource class for remote sideloads to avoid memory leak
+- [452](https://github.com/graphiti-api/graphiti/pull/452) Resolve inconsistency for filters containing curly brackets
+- [446](https://github.com/graphiti-api/graphiti/pull/446) Fix private call
+
+## 1.3.9, May 25th 2022
+Use an options hash for log subscriber instead of positional arguments
+
+## 1.x ?? 
 
 Features:
 - [329](https://github.com/graphiti-api/graphiti/pull/329) Propagate `extra_fields` to related resource links.
