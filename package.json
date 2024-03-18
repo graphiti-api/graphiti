@@ -93,6 +93,7 @@
           "changelogFile": "CHANGELOG.md"
         }
       ],
+      "semantic-release-rubygem",
       "@semantic-release/github",
       [
         "@semantic-release/git",
