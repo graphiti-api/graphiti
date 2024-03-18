@@ -67,6 +67,7 @@ module Graphiti
       super(**kwargs).tap do |hash|
         strip_relationships!(hash) if strip_relationships?
         add_links!(hash)
+        add_meta!(hash)
       end
     end
 
@@ -95,6 +96,15 @@ module Graphiti
       hash[:relationships]&.select! do |name, payload|
         payload.key?(:data)
       end
+    end
+
+    def add_meta!(hash)
+      return if @resource.try(:type).nil?
+
+      resource_stats = @_exposures[:proxy].nested_stats.fetch(@resource.type, {})
+      nested_stats = resource_stats[@object.id]
+
+      hash[:meta] = {stats: nested_stats} if nested_stats.present?
     end
 
     def strip_relationships?
