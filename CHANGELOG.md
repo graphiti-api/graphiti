@@ -1,5 +1,12 @@
 graphiti changelog
 
+## [1.5.2](https://github.com/graphiti-api/graphiti/compare/v1.5.1...v1.5.2) (2024-03-18)
+
+
+### Bug Fixes
+
+* Enum should allow the conventionally case-sensitive operators ([#434](https://github.com/graphiti-api/graphiti/issues/434)) ([56d34fd](https://github.com/graphiti-api/graphiti/commit/56d34fd4801bc32c13d64aca880b82b717b2ab81))
+
 ## [1.5.1](https://github.com/graphiti-api/graphiti/compare/v1.5.0...v1.5.1) (2024-03-18)
 
 
