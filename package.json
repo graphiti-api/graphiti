@@ -3,7 +3,7 @@
   "version": "1.4.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jkeen/graphiti.git"
+    "url": "git+https://github.com/graphiti-api/graphiti.git"
   },
   "license": "MIT",
   "bugs": {
@@ -22,7 +22,6 @@
   "release": {
     "branches": [
       "master",
-      "main",
       {
         "name": "beta",
         "prerelease": true
