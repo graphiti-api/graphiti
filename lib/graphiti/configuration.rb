@@ -7,6 +7,8 @@ module Graphiti
     # @return [Boolean] Concurrently fetch sideloads?
     #   Defaults to false OR if classes are cached (Rails-only)
     attr_accessor :concurrency
+    # @return [Integer] Maximum number of threads to use when fetching sideloads concurrently
+    attr_accessor :concurrency_pool_max_size
 
     attr_accessor :respond_to
     attr_accessor :context_for_endpoint
@@ -26,6 +28,7 @@ module Graphiti
     def initialize
       @raise_on_missing_sideload = true
       @concurrency = false
+      @concurrency_pool_max_size = 4
       @respond_to = [:json, :jsonapi, :xml]
       @links_on_demand = false
       @pagination_links_on_demand = false
