@@ -3,14 +3,20 @@ module Graphiti
     attr_accessor :object, :unpaginated_object
     attr_reader :pagination
 
+    @thread_pool_executor_mutex = Mutex.new
+
     def self.thread_pool_executor
+      return @thread_pool_executor if @thread_pool_executor
+
       concurrency = Graphiti.config.concurrency_max_threads || 4
-      @thread_pool_executor ||= Concurrent::ThreadPoolExecutor.new(
-        min_threads: 0,
-        max_threads: concurrency,
-        max_queue: concurrency * 4,
-        fallback_policy: :caller_runs
-      )
+      @thread_pool_executor_mutex.synchronize do
+        @thread_pool_executor ||= Concurrent::ThreadPoolExecutor.new(
+          min_threads: 0,
+          max_threads: concurrency,
+          max_queue: concurrency * 4,
+          fallback_policy: :caller_runs
+        )
+      end
     end
 
     def initialize(object, resource, query, opts = {})
@@ -19,20 +25,20 @@ module Graphiti
       @query = query
       @opts = opts
 
-      @object = @resource.around_scoping(@object, @query.hash) { |scope|
+      @object = @resource.around_scoping(@object, @query.hash) do |scope|
         apply_scoping(scope, opts)
-      }
+      end
     end
 
     def resolve
       if @query.zero_results?
         []
       else
-        resolved = broadcast_data { |payload|
+        resolved = broadcast_data do |payload|
           @object = @resource.before_resolve(@object, @query)
           payload[:results] = @resource.resolve(@object)
           payload[:results]
-        }
+        end
         resolved.compact!
         assign_serializer(resolved)
         yield resolved if block_given?
