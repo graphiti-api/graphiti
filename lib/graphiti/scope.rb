@@ -25,20 +25,20 @@ module Graphiti
       @query = query
       @opts = opts
 
-      @object = @resource.around_scoping(@object, @query.hash) do |scope|
+      @object = @resource.around_scoping(@object, @query.hash) { |scope|
         apply_scoping(scope, opts)
-      end
+      }
     end
 
     def resolve
       if @query.zero_results?
         []
       else
-        resolved = broadcast_data do |payload|
+        resolved = broadcast_data { |payload|
           @object = @resource.before_resolve(@object, @query)
           payload[:results] = @resource.resolve(@object)
           payload[:results]
-        end
+        }
         resolved.compact!
         assign_serializer(resolved)
         yield resolved if block_given?
