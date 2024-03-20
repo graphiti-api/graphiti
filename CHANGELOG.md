@@ -1,5 +1,12 @@
 graphiti changelog
 
+# [1.6.0](https://github.com/graphiti-api/graphiti/compare/v1.5.3...v1.6.0) (2024-03-20)
+
+
+### Features
+
+* add thread pool and concurrency_max_threads configuration option ([#470](https://github.com/graphiti-api/graphiti/issues/470)) ([697d761](https://github.com/graphiti-api/graphiti/commit/697d76172adec24cd7e7522300c8335233fdcc36))
+
 ## [1.5.3](https://github.com/graphiti-api/graphiti/compare/v1.5.2...v1.5.3) (2024-03-18)
 
 
