@@ -150,18 +150,18 @@ RSpec.describe Graphiti::Configuration do
     end
   end
 
-  describe "#concurrency_pool_max_size" do
-    include_context "with config", :concurrency_pool_max_size
+  describe '#concurrency_max_threads' do
+    include_context "with config", :concurrency_max_threads
 
     it "defaults" do
-      expect(Graphiti.config.concurrency_pool_max_size).to eq(4)
+      expect(Graphiti.config.concurrency_max_threads).to eq(4)
     end
 
     it "is overridable" do
       Graphiti.configure do |c|
-        c.concurrency_pool_max_size = 1
+        c.concurrency_max_threads = 1
       end
-      expect(Graphiti.config.concurrency_pool_max_size).to eq(1)
+      expect(Graphiti.config.concurrency_max_threads).to eq(1)
     end
   end
 

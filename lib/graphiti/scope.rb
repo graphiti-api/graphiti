@@ -4,7 +4,7 @@ module Graphiti
     attr_reader :pagination
 
     def self.thread_pool_executor
-      concurrency = Graphiti.config.concurrency_pool_max_size || 4
+      concurrency = Graphiti.config.concurrency_max_threads || 4
       @thread_pool_executor ||= Concurrent::ThreadPoolExecutor.new(
         min_threads: 0,
         max_threads: concurrency,
