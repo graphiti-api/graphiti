@@ -150,7 +150,7 @@ RSpec.describe Graphiti::Configuration do
     end
   end
 
-  describe '#concurrency_max_threads' do
+  describe "#concurrency_max_threads" do
     include_context "with config", :concurrency_max_threads
 
     it "defaults" do

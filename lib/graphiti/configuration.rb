@@ -7,7 +7,7 @@ module Graphiti
     # @return [Boolean] Concurrently fetch sideloads?
     #   Defaults to false OR if classes are cached (Rails-only)
     attr_accessor :concurrency
-    
+
     # This number must be considered in accordance with the database
     # connection pool size configured in `database.yml`. The connection
     # pool should be large enough to accommodate both the foreground
