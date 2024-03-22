@@ -1,5 +1,12 @@
 graphiti changelog
 
+## [1.6.1](https://github.com/graphiti-api/graphiti/compare/v1.6.0...v1.6.1) (2024-03-22)
+
+
+### Bug Fixes
+
+* correct thread-pool mutex logic which was causing a deadlock ([0400ab0](https://github.com/graphiti-api/graphiti/commit/0400ab0d97a1382b66b5295fdc7aa7db680e77cc))
+
 # [1.6.0](https://github.com/graphiti-api/graphiti/compare/v1.5.3...v1.6.0) (2024-03-20)
 
 
