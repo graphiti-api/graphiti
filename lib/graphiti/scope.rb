@@ -9,8 +9,8 @@ module Graphiti
       return @thread_pool_executor if @thread_pool_executor
 
       concurrency = Graphiti.config.concurrency_max_threads || 4
-      @thread_pool_executor_mutex.synchronize do
-        @thread_pool_executor ||= Concurrent::ThreadPoolExecutor.new(
+      @thread_pool_executor ||= @thread_pool_executor_mutex.synchronize do
+        Concurrent::ThreadPoolExecutor.new(
           min_threads: 0,
           max_threads: concurrency,
           max_queue: concurrency * 4,
