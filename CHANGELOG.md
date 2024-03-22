@@ -1,5 +1,12 @@
 graphiti changelog
 
+## [1.6.2](https://github.com/graphiti-api/graphiti/compare/v1.6.1...v1.6.2) (2024-03-22)
+
+
+### Bug Fixes
+
+* thread pool scope and mutex need to be global across all instances of Scope for it to be a global thread pool ([#471](https://github.com/graphiti-api/graphiti/issues/471)) ([51fb51c](https://github.com/graphiti-api/graphiti/commit/51fb51c31f0043d98aa07f689a8cf8c758fa823b))
+
 ## [1.6.1](https://github.com/graphiti-api/graphiti/compare/v1.6.0...v1.6.1) (2024-03-22)
 
 
