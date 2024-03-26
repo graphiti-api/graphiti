@@ -1,5 +1,12 @@
 graphiti changelog
 
+## [1.6.3](https://github.com/graphiti-api/graphiti/compare/v1.6.2...v1.6.3) (2024-03-26)
+
+
+### Bug Fixes
+
+* Remove thread pool executor logic until we get a better handle on what's causing thread pool hangs. refs [#469](https://github.com/graphiti-api/graphiti/issues/469) ([7941b6f](https://github.com/graphiti-api/graphiti/commit/7941b6f75ce1001b034ed6e83c148b893e9f3d99)), closes [#471](https://github.com/graphiti-api/graphiti/issues/471) [#470](https://github.com/graphiti-api/graphiti/issues/470)
+
 ## [1.6.2](https://github.com/graphiti-api/graphiti/compare/v1.6.1...v1.6.2) (2024-03-22)
 
 
