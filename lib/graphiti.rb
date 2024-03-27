@@ -185,6 +185,7 @@ require "graphiti/extensions/temp_id"
 require "graphiti/serializer"
 require "graphiti/query"
 require "graphiti/debugger"
+require "graphiti/util/cache_debug"
 
 if defined?(ActiveRecord)
   require "graphiti/adapters/active_record"

@@ -98,10 +98,29 @@ module Graphiti
           took = ((stop - start) * 1000.0).round(2)
           logs << [""]
           logs << ["=== Graphiti Debug", :green, true]
-          logs << if payload[:proxy]&.cached? && Graphiti.config.cache_rendering?
-            ["Rendering (cached):", :green, true]
+          if payload[:proxy]&.cached? && Graphiti.config.cache_rendering?
+            logs << ["Rendering (cached):", :green, true]
+
+            Graphiti::Util::CacheDebug.new(payload[:proxy]).analyze do |cache_debug|
+              logs << ["Cache key for #{cache_debug.name}", :blue, true]
+              if cache_debug.volatile?
+                logs << [" \\_ volatile | Request count: #{cache_debug.request_count} | Hit count: #{cache_debug.hit_count}", :red, true]
+              else
+                logs << [" \\_   stable | Request count: #{cache_debug.request_count} | Hit count: #{cache_debug.hit_count}", :blue, true]
+              end
+
+              if cache_debug.changed_key?
+                logs << [" [x] cache key changed #{cache_debug.last_version[:etag]} -> #{cache_debug.current_version[:etag]}", :red]
+                logs << ["      removed: #{cache_debug.removed_segments}", :red]
+                logs << ["        added: #{cache_debug.added_segments}", :red]
+              elsif cache_debug.new_key?
+                logs << [" [+] cache key added #{cache_debug.current_version[:etag]}", :red, true]
+              else
+                logs << [" [✓] #{cache_debug.current_version[:etag]}", :green, true]
+              end
+            end
           else
-            ["Rendering:", :green, true]
+            logs << ["Rendering:", :green, true]
           end
           logs << ["Took: #{took}ms", :magenta, true]
         end
