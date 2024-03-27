@@ -2,19 +2,30 @@ module Graphiti
   class ResourceProxy
     include Enumerable
 
-    attr_reader :resource, :query, :scope, :payload
+    attr_reader :resource, :query, :scope, :payload, :cache_expires_in, :cache
 
     def initialize(resource, scope, query,
       payload: nil,
       single: false,
-      raise_on_missing: false)
+      raise_on_missing: false,
+      cache: nil,
+      cache_expires_in: nil)
+
       @resource = resource
       @scope = scope
       @query = query
       @payload = payload
       @single = single
       @raise_on_missing = raise_on_missing
+      @cache = cache
+      @cache_expires_in = cache_expires_in
     end
+
+    def cache?
+      !!@cache
+    end
+
+    alias_method :cached?, :cache?
 
     def single?
       !!@single
@@ -178,6 +189,22 @@ module Graphiti
 
     def debug_requested?
       query.debug_requested?
+    end
+
+    def updated_at
+      @scope.updated_at
+    end
+
+    def etag
+      "W/#{ActiveSupport::Digest.hexdigest(cache_key_with_version.to_s)}"
+    end
+
+    def cache_key
+      ActiveSupport::Cache.expand_cache_key([@scope.cache_key, @query.cache_key])
+    end
+
+    def cache_key_with_version
+      ActiveSupport::Cache.expand_cache_key([@scope.cache_key_with_version, @query.cache_key])
     end
 
     private
