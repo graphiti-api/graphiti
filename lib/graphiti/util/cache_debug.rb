@@ -20,7 +20,7 @@ module Graphiti
       end
 
       def current_version
-        @current_version ||= { 
+        @current_version ||= {
           cache_key: proxy.cache_key_with_version,
           version: proxy.updated_at,
           expires_in: proxy.cache_expires_in,
@@ -50,10 +50,7 @@ module Graphiti
 
       def change_percentage
         return 0 if request_count == 0
-
         (miss_count.to_i / request_count.to_f * 100).round(1)
-      rescue Exception => e
-        puts e.inspect
       end
 
       def volatile?

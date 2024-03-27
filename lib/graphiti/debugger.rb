@@ -103,10 +103,10 @@ module Graphiti
 
             Graphiti::Util::CacheDebug.new(payload[:proxy]).analyze do |cache_debug|
               logs << ["Cache key for #{cache_debug.name}", :blue, true]
-              if cache_debug.volatile?
-                logs << [" \\_ volatile | Request count: #{cache_debug.request_count} | Hit count: #{cache_debug.hit_count}", :red, true]
+              logs << if cache_debug.volatile?
+                [" \\_ volatile | Request count: #{cache_debug.request_count} | Hit count: #{cache_debug.hit_count}", :red, true]
               else
-                logs << [" \\_   stable | Request count: #{cache_debug.request_count} | Hit count: #{cache_debug.hit_count}", :blue, true]
+                [" \\_   stable | Request count: #{cache_debug.request_count} | Hit count: #{cache_debug.hit_count}", :blue, true]
               end
 
               if cache_debug.changed_key?

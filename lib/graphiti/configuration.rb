@@ -20,6 +20,7 @@ module Graphiti
     attr_reader :debug, :debug_models
 
     attr_writer :schema_path
+    attr_writer :cache_rendering
 
     # Set defaults
     # @api private
@@ -61,10 +62,6 @@ module Graphiti
           raise "You must configure a cache store in order to use cache_rendering. Set Graphiti.cache = Rails.cache, for example."
         end
       end
-    end
-
-    def cache_rendering=(val)
-      @cache_rendering = val
     end
 
     def schema_path
