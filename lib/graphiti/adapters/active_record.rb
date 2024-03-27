@@ -40,6 +40,20 @@ module Graphiti
       alias_method :filter_enum_not_eq, :filter_not_eq
       alias_method :filter_enum_not_eql, :filter_not_eq
 
+      def filter_array_eq(scope, attribute, value)
+        if value.is_a?(Array)
+          value = value.map(&:to_s).join(',')
+        end
+        scope.where("#{attribute} @> ?", "{ #{value} }")
+      end
+
+      def filter_array_not_eq(scope, attribute, value)
+        if value.is_a?(Array)
+          value = value.map(&:to_s).join(',')
+        end
+        scope.where.not("#{attribute} @> ?", "{ #{value} }")
+      end
+
       def filter_string_eq(scope, attribute, value, is_not: false)
         column = column_for(scope, attribute)
         clause = column.lower.eq_any(value.map(&:downcase))
