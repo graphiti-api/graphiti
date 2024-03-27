@@ -107,10 +107,12 @@ module Graphiti
     end
   end
 
-  def self.cache(name, kwargs = {}, &block)
-    ::Rails.cache.fetch(name, **kwargs) do
-      block.call
-    end
+  def self.cache=(val)
+    @cache = val
+  end
+
+  def self.cache
+    @cache
   end
 end
 

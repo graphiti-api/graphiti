@@ -68,8 +68,8 @@ module Graphiti
         options[:meta][:debug] = Debugger.to_a if debug_json?
         options[:proxy] = proxy
 
-        if proxy.cache?
-          Graphiti.cache("#{proxy.cache_key}/render", version: proxy.updated_at, expires_in: proxy.cache_expires_in) do
+        if proxy.cache? && Graphiti.config.cache_rendering?
+          Graphiti.cache.fetch("graphiti:render/#{proxy.cache_key}", version: proxy.updated_at, expires_in: proxy.cache_expires_in) do
             options.delete(:cache) # ensure that we don't use JSONAPI-Resources's built-in caching logic
             renderer.render(records, options)
           end

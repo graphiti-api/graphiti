@@ -98,7 +98,7 @@ module Graphiti
           took = ((stop - start) * 1000.0).round(2)
           logs << [""]
           logs << ["=== Graphiti Debug", :green, true]
-          logs << if payload[:proxy]&.cached?
+          logs << if payload[:proxy]&.cached? && Graphiti.config.cache_rendering?
             ["Rendering (cached):", :green, true]
           else
             ["Rendering:", :green, true]

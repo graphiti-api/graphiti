@@ -164,4 +164,27 @@ RSpec.describe Graphiti::Configuration do
       expect(Graphiti.config.raise_on_missing_sideload).to eq(false)
     end
   end
+
+  describe "#cache_rendering" do
+    it "defaults" do
+      expect(Graphiti.config.cache_rendering?).to eq(false)
+    end
+
+    it "is settable" do
+      Graphiti.configure do |c|
+        c.cache_rendering = true
+      end
+      Graphiti.cache = double(fetch: nil) # looks like a cache store
+      expect(Graphiti.config.cache_rendering?).to eq(true)
+    end
+
+    it "warns about not being configured correctly if cache_rendering is true without Graphiti.cache set up" do
+      Graphiti.cache = nil
+      Graphiti.configure do |c|
+        c.cache_rendering = true
+      end
+
+      expect { Graphiti.config.cache_rendering? }.to raise_error(/You must configure a cache store in order to use cache_rendering/)
+    end
+  end
 end
