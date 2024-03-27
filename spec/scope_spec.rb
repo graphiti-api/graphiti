@@ -112,6 +112,12 @@ RSpec.describe Graphiti::Scope do
           expect(before_sideload).to receive(:call).with(hash_including(tenant_id: 1))
           instance.resolve_sideloads(results)
         end
+
+        it 'resolves sideloads concurrently with the threadpool' do
+          allow(sideload).to receive(:resolve).and_return(sideload)
+          expect(Concurrent::Promise).to receive(:execute).with(executor: an_instance_of(Concurrent::ThreadPoolExecutor)).and_call_original
+          instance.resolve_sideloads(results)
+        end
       end
 
       context "without concurrency" do
@@ -133,6 +139,14 @@ RSpec.describe Graphiti::Scope do
           instance.resolve_sideloads(results)
         end
       end
+    end
+  end
+
+  describe '.global_thread_pool_executor' do
+    it 'memoizes the thread pool executor' do
+      one = described_class.global_thread_pool_executor
+      two = described_class.global_thread_pool_executor
+      expect(one).to eq(two)
     end
   end
 end

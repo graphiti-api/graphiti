@@ -3,20 +3,19 @@ module Graphiti
     attr_accessor :object, :unpaginated_object
     attr_reader :pagination
 
-    @@thread_pool_executor_mutex = Mutex.new
-
-    def self.thread_pool_executor
-      return @thread_pool_executor if @thread_pool_executor
-
+    GLOBAL_THREAD_POOL_EXECUTOR = Concurrent::Delay.new do
       concurrency = Graphiti.config.concurrency_max_threads || 4
-      @@thread_pool_executor_mutex.synchronize do
-        @@thread_pool_executor ||= Concurrent::ThreadPoolExecutor.new(
-          min_threads: 0,
-          max_threads: concurrency,
-          max_queue: concurrency * 4,
-          fallback_policy: :caller_runs
-        )
-      end
+      Concurrent::ThreadPoolExecutor.new(
+        min_threads: 0,
+        max_threads: concurrency,
+        max_queue: concurrency * 4,
+        fallback_policy: :caller_runs
+      )
+    end
+    private_constant :GLOBAL_THREAD_POOL_EXECUTOR
+
+    def self.global_thread_pool_executor
+      GLOBAL_THREAD_POOL_EXECUTOR.value!
     end
 
     def initialize(object, resource, query, opts = {})
@@ -66,7 +65,7 @@ module Graphiti
           @resource.adapter.close if concurrent
         }
         if concurrent
-          promises << Concurrent::Promise.execute(executor: self.class.thread_pool_executor, &resolve_sideload)
+          promises << Concurrent::Promise.execute(executor: self.class.global_thread_pool_executor, &resolve_sideload)
         else
           resolve_sideload.call
         end
