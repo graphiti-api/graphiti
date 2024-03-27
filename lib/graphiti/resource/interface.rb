@@ -5,7 +5,7 @@ module Graphiti
 
       class_methods do
         def all(params = {}, base_scope = nil)
-          validate!(params)
+          validate_request!(params)
           _all(params, {}, base_scope)
         end
 
@@ -17,7 +17,7 @@ module Graphiti
         end
 
         def find(params = {}, base_scope = nil)
-          validate!(params)
+          validate_request!(params)
           _find(params, base_scope)
         end
 
@@ -38,14 +38,14 @@ module Graphiti
         end
 
         def build(params, base_scope = nil)
-          validate!(params)
+          validate_request!(params)
           runner = Runner.new(self, params)
           runner.proxy(base_scope, single: true, raise_on_missing: true)
         end
 
         private
 
-        def validate!(params)
+        def validate_request!(params)
           return if Graphiti.context[:graphql] || !validate_endpoints?
 
           if context&.respond_to?(:request)

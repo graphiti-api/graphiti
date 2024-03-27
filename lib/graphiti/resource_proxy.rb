@@ -74,6 +74,7 @@ module Graphiti
       end
     end
     alias_method :to_a, :data
+    alias_method :resolve_data, :data
 
     def meta
       @meta ||= data.respond_to?(:meta) ? data.meta : {}
@@ -136,7 +137,7 @@ module Graphiti
     end
 
     def destroy
-      data
+      resolve_data
       transaction_response = @resource.transaction do
         metadata = {method: :destroy}
         model = @resource.destroy(@query.filters[:id], metadata)
@@ -154,7 +155,7 @@ module Graphiti
     end
 
     def update
-      data
+      resolve_data
       save(action: :update)
     end
 
