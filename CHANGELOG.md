@@ -1,5 +1,7 @@
 graphiti changelog
 
+## [1.6.4](https://github.com/graphiti-api/graphiti/compare/v1.6.3...v1.6.4) (2024-03-27)
+
 ## [1.6.3](https://github.com/graphiti-api/graphiti/compare/v1.6.2...v1.6.3) (2024-03-26)
 
 
