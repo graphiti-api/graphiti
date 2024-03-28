@@ -1,5 +1,14 @@
 graphiti changelog
 
+# [1.7.0](https://github.com/graphiti-api/graphiti/compare/v1.6.4...v1.7.0) (2024-03-27)
+
+
+### Features
+
+* Add support for caching renders in Graphiti, and better support using etags and stale? in the controller ([#424](https://github.com/graphiti-api/graphiti/issues/424)) ([8bae50a](https://github.com/graphiti-api/graphiti/commit/8bae50ab82559e2644d506e16a4f715effd89317))
+
+## [1.6.4](https://github.com/graphiti-api/graphiti/compare/v1.6.3...v1.6.4) (2024-03-27)
+
 ## [1.6.3](https://github.com/graphiti-api/graphiti/compare/v1.6.2...v1.6.3) (2024-03-26)
 
 

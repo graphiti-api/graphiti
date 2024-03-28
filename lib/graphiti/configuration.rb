@@ -34,6 +34,7 @@ module Graphiti
     attr_reader :debug, :debug_models
 
     attr_writer :schema_path
+    attr_writer :cache_rendering
 
     # Set defaults
     # @api private
@@ -47,6 +48,7 @@ module Graphiti
       @pagination_links = false
       @typecast_reads = true
       @raise_on_missing_sidepost = true
+      @cache_rendering = false
       self.debug = ENV.fetch("GRAPHITI_DEBUG", true)
       self.debug_models = ENV.fetch("GRAPHITI_DEBUG_MODELS", false)
 
@@ -63,6 +65,16 @@ module Graphiti
         if (logger = ::Rails.logger)
           self.debug = logger.debug? && debug
           Graphiti.logger = logger
+        end
+      end
+    end
+
+    def cache_rendering?
+      use_caching = @cache_rendering && Graphiti.cache.respond_to?(:fetch)
+
+      use_caching.tap do |use|
+        if @cache_rendering && !Graphiti.cache&.respond_to?(:fetch)
+          raise "You must configure a cache store in order to use cache_rendering. Set Graphiti.cache = Rails.cache, for example."
         end
       end
     end

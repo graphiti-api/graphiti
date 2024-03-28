@@ -106,6 +106,14 @@ module Graphiti
       r.apply_sideloads_to_serializer
     end
   end
+
+  def self.cache=(val)
+    @cache = val
+  end
+
+  def self.cache
+    @cache
+  end
 end
 
 require "graphiti/version"
@@ -177,6 +185,7 @@ require "graphiti/extensions/temp_id"
 require "graphiti/serializer"
 require "graphiti/query"
 require "graphiti/debugger"
+require "graphiti/util/cache_debug"
 
 if defined?(ActiveRecord)
   require "graphiti/adapters/active_record"
