@@ -2,6 +2,22 @@ module Graphiti
   class Scope
     attr_accessor :object, :unpaginated_object
     attr_reader :pagination
+
+    GLOBAL_THREAD_POOL_EXECUTOR = Concurrent::Delay.new do
+      concurrency = Graphiti.config.concurrency_max_threads || 4
+      Concurrent::ThreadPoolExecutor.new(
+        min_threads: 0,
+        max_threads: concurrency,
+        max_queue: concurrency * 4,
+        fallback_policy: :caller_runs
+      )
+    end
+    private_constant :GLOBAL_THREAD_POOL_EXECUTOR
+
+    def self.global_thread_pool_executor
+      GLOBAL_THREAD_POOL_EXECUTOR.value!
+    end
+
     def initialize(object, resource, query, opts = {})
       @object = object
       @resource = resource
@@ -49,7 +65,7 @@ module Graphiti
           @resource.adapter.close if concurrent
         }
         if concurrent
-          promises << Concurrent::Promise.execute(&resolve_sideload)
+          promises << Concurrent::Promise.execute(executor: self.class.global_thread_pool_executor, &resolve_sideload)
         else
           resolve_sideload.call
         end

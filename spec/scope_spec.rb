@@ -112,6 +112,12 @@ RSpec.describe Graphiti::Scope do
           expect(before_sideload).to receive(:call).with(hash_including(tenant_id: 1))
           instance.resolve_sideloads(results)
         end
+
+        it 'resolves sideloads concurrently with the threadpool' do
+          allow(sideload).to receive(:resolve).and_return(sideload)
+          expect(Concurrent::Promise).to receive(:execute).with(executor: an_instance_of(Concurrent::ThreadPoolExecutor)).and_call_original
+          instance.resolve_sideloads(results)
+        end
       end
 
       context "without concurrency" do
@@ -135,7 +141,7 @@ RSpec.describe Graphiti::Scope do
       end
     end
   end
-
+  
   describe "cache_key" do
     let(:employee1) {
       time = Time.parse("2022-06-24 16:36:00.000000000 -0500")
@@ -178,6 +184,14 @@ RSpec.describe Graphiti::Scope do
       expect(instance1.cache_key_with_version).to be_present
       expect(instance2.cache_key_with_version).to be_present
       expect(instance1.cache_key_with_version).not_to eq(instance2.cache_key)
+    end
+  end
+  
+  describe '.global_thread_pool_executor' do
+    it 'memoizes the thread pool executor' do
+      one = described_class.global_thread_pool_executor
+      two = described_class.global_thread_pool_executor
+      expect(one).to eq(two)
     end
   end
 end
