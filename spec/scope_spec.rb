@@ -116,7 +116,17 @@ RSpec.describe Graphiti::Scope do
         it 'resolves sideloads concurrently with the threadpool' do
           allow(sideload).to receive(:resolve).and_return(sideload)
           expect(Concurrent::Promise).to receive(:execute).with(executor: an_instance_of(Concurrent::ThreadPoolExecutor)).and_call_original
-          instance.resolve_sideloads(results)
+          expect { instance.resolve_sideloads(results) }.not_to raise_error
+        end
+
+        context 'with more sideloads than the thread pool size' do
+          before { allow(Graphiti.config).to receive(:concurrency_max_threads).and_return(0) }
+
+          it 'deadlocks' do
+            expect { instance.resolve_sideloads(results) }.to raise_error do |e|
+              expect(e.message).to start_with('No live threads left. Deadlock?')
+            end
+          end
         end
       end
 
@@ -141,7 +151,7 @@ RSpec.describe Graphiti::Scope do
       end
     end
   end
-  
+
   describe "cache_key" do
     let(:employee1) {
       time = Time.parse("2022-06-24 16:36:00.000000000 -0500")
@@ -186,7 +196,7 @@ RSpec.describe Graphiti::Scope do
       expect(instance1.cache_key_with_version).not_to eq(instance2.cache_key)
     end
   end
-  
+
   describe '.global_thread_pool_executor' do
     it 'memoizes the thread pool executor' do
       one = described_class.global_thread_pool_executor
