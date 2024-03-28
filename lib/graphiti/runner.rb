@@ -8,7 +8,6 @@ module Graphiti
       @params = params
       @query = query
       @action = action
-
       validator = RequestValidator.new(jsonapi_resource, params, action)
       validator.validate!
 
@@ -73,7 +72,8 @@ module Graphiti
         single: opts[:single],
         raise_on_missing: opts[:raise_on_missing],
         cache: opts[:cache],
-        cache_expires_in: opts[:cache_expires_in]
+        cache_expires_in: opts[:cache_expires_in],
+        data: opts[:data]
     end
   end
 end

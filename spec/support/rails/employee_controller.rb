@@ -15,7 +15,7 @@ EMPLOYEE_CONTROLLER_BLOCK = lambda do |*args|
 
   def update
     employee = resource.find(params)
-
+    
     if employee.update_attributes
       render jsonapi: employee
     else
