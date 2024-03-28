@@ -72,14 +72,7 @@ module Graphiti
       end
 
       if concurrent
-        # Wait for all promises to finish
-        sleep 0.01 until promises.all? { |p| p.fulfilled? || p.rejected? }
-        # Re-raise the error with correct stacktrace
-        # OPTION** to avoid failing here?? if so need serializable patch
-        # to avoid loading data when association not loaded
-        if (rejected = promises.find(&:rejected?))
-          raise rejected.reason
-        end
+        Concurrent::Promise.zip(*promises, executor: self.class.global_thread_pool_executor).value!
       end
     end
 
