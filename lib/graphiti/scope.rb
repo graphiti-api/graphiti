@@ -59,12 +59,14 @@ module Graphiti
         parent_resource = @resource
         graphiti_context = Graphiti.context
         resolve_sideload = -> {
+          puts "thread #{Thread.current.object_id}: running #{name}"
           Graphiti.config.before_sideload&.call(graphiti_context)
           Graphiti.context = graphiti_context
           sideload.resolve(results, q, parent_resource)
           @resource.adapter.close if concurrent
         }
         if concurrent
+          puts "thread #{Thread.current.object_id}: #{@resource.class.type} queuing #{name}"
           promises << Concurrent::Promise.execute(executor: self.class.global_thread_pool_executor, &resolve_sideload)
         else
           resolve_sideload.call
@@ -72,7 +74,9 @@ module Graphiti
       end
 
       if concurrent
-        Concurrent::Promise.zip(*promises, executor: self.class.global_thread_pool_executor).value!
+        puts "thread #{Thread.current.object_id}: #{@resource.class.type} waiting on #{@query.sideloads.map(&:first)}"
+        Concurrent::Promise.zip(*promises).value!
+        puts "thread #{Thread.current.object_id}: #{@resource.class.type} finished waiting on #{@query.sideloads.map(&:first)}"
       end
     end
 

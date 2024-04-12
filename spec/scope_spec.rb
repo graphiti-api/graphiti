@@ -75,9 +75,9 @@ RSpec.describe Graphiti::Scope do
   describe "#resolve_sideloads" do
     let(:sideload) { double(shared_remote?: false, name: :positions) }
     let(:results) { [double.as_null_object] }
+    let(:params) { {include: {positions: {}}} }
 
     before do
-      params[:include] = {positions: {}}
       objekt = instance.instance_variable_get(:@object)
       allow(resource).to receive(:resolve).with(objekt) { results }
     end
@@ -119,13 +119,30 @@ RSpec.describe Graphiti::Scope do
           expect { instance.resolve_sideloads(results) }.not_to raise_error
         end
 
-        context 'with more sideloads than the thread pool size' do
-          before { allow(Graphiti.config).to receive(:concurrency_max_threads).and_return(0) }
+        context 'with nested sideloads greater than Graphiti.config.concurrency_max_threads' do
+          let(:params) { { include: { positions: { department: {} } } } }
+          let(:position_resource) { PORO::PositionResource.new }
+          let(:departments_sideload) { double(shared_remote?: false, name: :departments) }
 
-          it 'deadlocks' do
-            expect { instance.resolve_sideloads(results) }.to raise_error do |e|
-              expect(e.message).to start_with('No live threads left. Deadlock?')
+          before do
+            stub_const(
+              'Graphiti::Scope::GLOBAL_THREAD_POOL_EXECUTOR',
+              Concurrent::Delay.new {
+                Concurrent::ThreadPoolExecutor.new(max_threads: 1, fallback_policy: :caller_runs)
+              }
+            )
+
+            allow(position_resource.class).to receive(:sideload).with(:department) { departments_sideload }
+            allow(departments_sideload).to receive(:resolve).and_return(departments_sideload)
+
+            # make resolve just load the sideloads
+            allow(sideload).to receive(:resolve) do |results, q, _parent_resource|
+              described_class.new(sideload.as_null_object, position_resource, q).resolve_sideloads(results)
             end
+          end
+
+          it 'does not deadlock' do
+            expect { instance.resolve_sideloads(results) }.not_to raise_error
           end
         end
       end
