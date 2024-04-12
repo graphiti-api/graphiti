@@ -113,20 +113,20 @@ RSpec.describe Graphiti::Scope do
           instance.resolve_sideloads(results)
         end
 
-        it 'resolves sideloads concurrently with the threadpool' do
+        it "resolves sideloads concurrently with the threadpool" do
           allow(sideload).to receive(:resolve).and_return(sideload)
           expect(Concurrent::Promise).to receive(:execute).with(executor: an_instance_of(Concurrent::ThreadPoolExecutor)).and_call_original
           expect { instance.resolve_sideloads(results) }.not_to raise_error
         end
 
-        context 'with nested sideloads greater than Graphiti.config.concurrency_max_threads' do
-          let(:params) { { include: { positions: { department: {} } } } }
+        context "with nested sideloads greater than Graphiti.config.concurrency_max_threads" do
+          let(:params) { {include: {positions: {department: {}}}} }
           let(:position_resource) { PORO::PositionResource.new }
           let(:departments_sideload) { double(shared_remote?: false, name: :departments) }
 
           before do
             stub_const(
-              'Graphiti::Scope::GLOBAL_THREAD_POOL_EXECUTOR',
+              "Graphiti::Scope::GLOBAL_THREAD_POOL_EXECUTOR",
               Concurrent::Delay.new {
                 Concurrent::ThreadPoolExecutor.new(max_threads: 1, fallback_policy: :caller_runs)
               }
@@ -141,7 +141,7 @@ RSpec.describe Graphiti::Scope do
             end
           end
 
-          it 'does not deadlock' do
+          it "does not deadlock" do
             expect { instance.resolve_sideloads(results) }.not_to raise_error
           end
         end
@@ -214,8 +214,8 @@ RSpec.describe Graphiti::Scope do
     end
   end
 
-  describe '.global_thread_pool_executor' do
-    it 'memoizes the thread pool executor' do
+  describe ".global_thread_pool_executor" do
+    it "memoizes the thread pool executor" do
       one = described_class.global_thread_pool_executor
       two = described_class.global_thread_pool_executor
       expect(one).to eq(two)
