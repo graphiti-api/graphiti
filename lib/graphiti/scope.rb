@@ -92,16 +92,17 @@ module Graphiti
     end
 
     def updated_at
-      updated_ats = sideload_resource_proxies.map(&:updated_at)
-
+      updated_time = nil
       begin
+        updated_ats = sideload_resource_proxies.map(&:updated_at)
         updated_ats << @object.maximum(:updated_at)
+        updated_time = updated_ats.compact.max
       rescue => e
-        Graphiti.log("error calculating last_modified_at for #{@resource.class}")
+        Graphiti.log(["error calculating last_modified_at for #{@resource.class}", :red])
         Graphiti.log(e)
       end
 
-      updated_ats.compact.max
+      return updated_time || Time.now
     end
     alias_method :last_modified_at, :updated_at
 
