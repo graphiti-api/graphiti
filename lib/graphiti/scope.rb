@@ -129,9 +129,10 @@ module Graphiti
     def broadcast_data
       opts = {
         resource: @resource,
-        params: @opts[:params],
+        params: @opts[:params] || @query.params,
         sideload: @opts[:sideload],
-        parent: @opts[:parent]
+        parent: @opts[:parent],
+        action: @query.action
         # Set once data is resolved within block
         #   results: ...
       }
