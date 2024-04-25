@@ -209,13 +209,16 @@ module Graphiti
       end
     end
 
-    def load(parents, query, graph_parent)
-      params, opts, proxy = nil, nil, nil
+    def build_resource_proxy(parents, query, graph_parent)
+      params = nil
+      opts = nil
+      proxy = nil
 
       with_error_handling Errors::SideloadParamsError do
         params = load_params(parents, query)
         params_proc&.call(params, parents, context)
         return [] if blank_query?(params)
+
         opts = load_options(parents, query)
         opts[:sideload] = self
         opts[:parent] = graph_parent
@@ -228,7 +231,11 @@ module Graphiti
         pre_load_proc&.call(proxy, parents)
       end
 
-      proxy.to_a
+      proxy
+    end
+
+    def load(parents, query, graph_parent)
+      build_resource_proxy(parents, query, graph_parent).to_a
     end
 
     # Override in subclass

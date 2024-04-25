@@ -43,6 +43,7 @@ module Graphiti
         parent_resource = @resource
         graphiti_context = Graphiti.context
         resolve_sideload = -> {
+          Graphiti.config.before_sideload&.call(graphiti_context)
           Graphiti.context = graphiti_context
           sideload.resolve(results, q, parent_resource)
           @resource.adapter.close if concurrent
@@ -66,14 +67,72 @@ module Graphiti
       end
     end
 
+    def parent_resource
+      @resource
+    end
+
+    def cache_key
+      # This is the combined cache key for the base query and the query for all sideloads
+      # Changing the query will yield a different cache key
+
+      cache_keys = sideload_resource_proxies.map { |proxy| proxy.try(:cache_key) }
+
+      cache_keys << @object.try(:cache_key) # this is what calls into the ORM (ActiveRecord, most likely)
+      ActiveSupport::Cache.expand_cache_key(cache_keys.flatten.compact)
+    end
+
+    def cache_key_with_version
+      # This is the combined and versioned cache key for the base query and the query for all sideloads
+      # If any returned model's updated_at changes, this key will change
+
+      cache_keys = sideload_resource_proxies.map { |proxy| proxy.try(:cache_key_with_version) }
+
+      cache_keys << @object.try(:cache_key_with_version) # this is what calls into ORM (ActiveRecord, most likely)
+      ActiveSupport::Cache.expand_cache_key(cache_keys.flatten.compact)
+    end
+
+    def updated_at
+      updated_time = nil
+      begin
+        updated_ats = sideload_resource_proxies.map(&:updated_at)
+        updated_ats << @object.maximum(:updated_at)
+        updated_time = updated_ats.compact.max
+      rescue => e
+        Graphiti.log(["error calculating last_modified_at for #{@resource.class}", :red])
+        Graphiti.log(e)
+      end
+
+      return updated_time || Time.now
+    end
+    alias_method :last_modified_at, :updated_at
+
     private
+
+    def sideload_resource_proxies
+      @sideload_resource_proxies ||= begin
+        @object = @resource.before_resolve(@object, @query)
+        results = @resource.resolve(@object)
+
+        [].tap do |proxies|
+          unless @query.sideloads.empty?
+            @query.sideloads.each_pair do |name, q|
+              sideload = @resource.class.sideload(name)
+              next if sideload.nil? || sideload.shared_remote?
+
+              proxies << sideload.build_resource_proxy(results, q, parent_resource)
+            end
+          end
+        end.flatten
+      end
+    end
 
     def broadcast_data
       opts = {
         resource: @resource,
-        params: @opts[:params],
+        params: @opts[:params] || @query.params,
         sideload: @opts[:sideload],
-        parent: @opts[:parent]
+        parent: @opts[:parent],
+        action: @query.action
         # Set once data is resolved within block
         #   results: ...
       }
