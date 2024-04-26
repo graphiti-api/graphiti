@@ -629,6 +629,13 @@ RSpec.describe 'sideloading' do
 
   context 'when nesting sideloads' do
     before do
+      stub_const(
+        'Graphiti::Scope::GLOBAL_THREAD_POOL_EXECUTOR',
+        Concurrent::Delay.new do
+          Concurrent::ThreadPoolExecutor.new(max_threads: 0, synchronous: true, fallback_policy: :caller_runs)
+        end
+      )
+
       PORO::EmployeeResource.class_eval do
         allow_sideload :positions, class: Sideloading::PositionSideload
       end
