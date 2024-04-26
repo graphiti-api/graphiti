@@ -24,59 +24,72 @@ module Graphiti
       @query = query
       @opts = opts
 
-      @object = @resource.around_scoping(@object, @query.hash) { |scope|
+      @object = @resource.around_scoping(@object, @query.hash) do |scope|
         apply_scoping(scope, opts)
-      }
+      end
     end
 
     def resolve
       if @query.zero_results?
         []
       else
-        resolved = broadcast_data { |payload|
+        resolved = broadcast_data do |payload|
           @object = @resource.before_resolve(@object, @query)
           payload[:results] = @resource.resolve(@object)
           payload[:results]
-        }
+        end
         resolved.compact!
+        puts resolved
         assign_serializer(resolved)
         yield resolved if block_given?
         @opts[:after_resolve]&.call(resolved)
-        resolve_sideloads(resolved) unless @query.sideloads.empty?
-        resolved
+        p = resolve_sideloads(resolved) unless @query.sideloads.empty?
+        if p.is_a?(Concurrent::Promises::Future)
+          p.then do
+            resolved
+          end
+        else
+          resolved
+        end
       end
     end
 
     def resolve_sideloads(results)
       return if results == []
 
-      concurrent = Graphiti.config.concurrency
-      promises = []
-
-      @query.sideloads.each_pair do |name, q|
+      promises = @query.sideloads.filter_map do |name, q|
         sideload = @resource.class.sideload(name)
         next if sideload.nil? || sideload.shared_remote?
+
         parent_resource = @resource
         graphiti_context = Graphiti.context
-        resolve_sideload = -> {
-          puts "thread #{Thread.current.object_id}: running #{name}"
+
+        p = Concurrent::Promises.future_on(self.class.global_thread_pool_executor) do
           Graphiti.config.before_sideload&.call(graphiti_context)
           Graphiti.context = graphiti_context
-          sideload.resolve(results, q, parent_resource)
-          @resource.adapter.close if concurrent
-        }
-        if concurrent
-          puts "thread #{Thread.current.object_id}: #{@resource.class.type} queuing #{name}"
-          promises << Concurrent::Promise.execute(executor: self.class.global_thread_pool_executor, &resolve_sideload)
+          results = sideload.resolve(results, q, parent_resource)
+          if results.is_a?(Concurrent::Promises::Future)
+            results.then do |r|
+              @resource.adapter.close
+              r
+            end
+          else
+            Concurrent::Promises.fulfilled_future(results)
+          end
+        end
+        if q.sideloads.any?
+          p.flat
         else
-          resolve_sideload.call
+          p
         end
       end
 
-      if concurrent
-        puts "thread #{Thread.current.object_id}: #{@resource.class.type} waiting on #{@query.sideloads.map(&:first)}"
-        Concurrent::Promise.zip(*promises).value!
-        puts "thread #{Thread.current.object_id}: #{@resource.class.type} finished waiting on #{@query.sideloads.map(&:first)}"
+      p = Concurrent::Promises.zip(*promises)
+      if @query.parents.empty?
+        puts p.value!
+        p.value!
+      else
+        p
       end
     end
 
@@ -109,14 +122,14 @@ module Graphiti
 
       begin
         updated_ats << @object.maximum(:updated_at)
-      rescue => e
+      rescue StandardError => e
         Graphiti.log("error calculating last_modified_at for #{@resource.class}")
         Graphiti.log(e)
       end
 
       updated_ats.compact.max
     end
-    alias_method :last_modified_at, :updated_at
+    alias last_modified_at updated_at
 
     private
 
@@ -138,7 +151,7 @@ module Graphiti
       end
     end
 
-    def broadcast_data
+    def broadcast_data(&block)
       opts = {
         resource: @resource,
         params: @opts[:params],
@@ -147,9 +160,7 @@ module Graphiti
         # Set once data is resolved within block
         #   results: ...
       }
-      Graphiti.broadcast(:resolve, opts) do |payload|
-        yield payload
-      end
+      Graphiti.broadcast(:resolve, opts, &block)
     end
 
     # Used to ensure the resource's serializer is used
@@ -174,7 +185,7 @@ module Graphiti
       @object
     end
 
-    def add_scoping(key, scoping_class, opts, default = {})
+    def add_scoping(key, scoping_class, opts, _default = {})
       @object = scoping_class.new(@resource, @query.hash, @object, opts).apply
       @unpaginated_object = @object unless key == :paginate
     end

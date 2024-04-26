@@ -5,11 +5,11 @@ module Graphiti
     attr_reader :resource, :query, :scope, :payload, :cache_expires_in, :cache
 
     def initialize(resource, scope, query,
-      payload: nil,
-      single: false,
-      raise_on_missing: false,
-      cache: nil,
-      cache_expires_in: nil)
+                   payload: nil,
+                   single: false,
+                   raise_on_missing: false,
+                   cache: nil,
+                   cache_expires_in: nil)
 
       @resource = resource
       @scope = scope
@@ -25,7 +25,7 @@ module Graphiti
       !!@cache
     end
 
-    alias_method :cached?, :cache?
+    alias cached? cache?
 
     def single?
       !!@single
@@ -76,16 +76,19 @@ module Graphiti
 
     def data
       @data ||= begin
-        records = @scope.resolve
-        if records.empty? && raise_on_missing?
-          raise Graphiti::Errors::RecordNotFound
-        end
-        records = records[0] if single?
-        records
+        p = @scope.resolve
+        p
       end
+
+      # .then do |records|
+      #   raise Graphiti::Errors::RecordNotFound if records.empty? && raise_on_missing?
+
+      #   records = records[0] if single?
+      #   records
+      # end
     end
-    alias_method :to_a, :data
-    alias_method :resolve_data, :data
+    alias to_a data
+    alias resolve_data data
 
     def meta
       @meta ||= data.respond_to?(:meta) ? data.meta : {}
@@ -97,20 +100,18 @@ module Graphiti
 
     def stats
       @stats ||= if @query.hash[:stats]
-        scope = @scope.unpaginated_object
-        if resource.adapter.can_group?
-          if (group = @query.hash[:stats].delete(:group_by))
-            scope = resource.adapter.group(scope, group[0])
-          end
-        end
-        payload = Stats::Payload.new @resource,
-          @query,
-          scope,
-          data
-        payload.generate
-      else
-        {}
-      end
+                   scope = @scope.unpaginated_object
+                   if resource.adapter.can_group? && (group = @query.hash[:stats].delete(:group_by))
+                     scope = resource.adapter.group(scope, group[0])
+                   end
+                   payload = Stats::Payload.new @resource,
+                                                @query,
+                                                scope,
+                                                data
+                   payload.generate
+                 else
+                   {}
+                 end
     end
 
     def pagination
@@ -124,12 +125,12 @@ module Graphiti
       begin
         Graphiti.context[:namespace] = action
         ::Graphiti::RequestValidator.new(@resource, @payload.params, action).validate!
-        validator = persist {
+        validator = persist do
           @resource.persist_with_relationships \
             @payload.meta(action: action),
             @payload.attributes,
             @payload.relationships
-        }
+        end
       ensure
         Graphiti.context[:namespace] = original
       end
@@ -150,7 +151,7 @@ module Graphiti
     def destroy
       resolve_data
       transaction_response = @resource.transaction do
-        metadata = {method: :destroy}
+        metadata = { method: :destroy }
         model = @resource.destroy(@query.filters[:id], metadata)
         model.instance_variable_set(:@__serializer_klass, @resource.serializer)
         @resource.after_graph_persist(model, metadata)
@@ -159,7 +160,7 @@ module Graphiti
         validator.validate!
         @resource.before_commit(model, metadata)
 
-        {result: validator}
+        { result: validator }
       end
       @data, success = transaction_response[:result].to_a
       success
