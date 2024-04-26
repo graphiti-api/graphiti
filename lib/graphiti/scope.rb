@@ -84,11 +84,11 @@ module Graphiti
       end
 
       p = Concurrent::Promises.zip_futures_on(self.class.global_thread_pool_executor, *promises)
-      # if @query.parents.empty?
-      p.value!
-      # else
-      # p
-      # end
+      if @query.parents.empty?
+        p.value!
+      else
+        p
+      end
     end
 
     def parent_resource
