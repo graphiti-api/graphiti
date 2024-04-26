@@ -73,7 +73,7 @@ RSpec.describe Graphiti::Scope do
   end
 
   describe '#resolve_sideloads' do
-    let(:sideload) { double(shared_remote?: false, name: :positions) }
+    let(:sideload) { double('positions', shared_remote?: false, name: :positions) }
     let(:results) { [double.as_null_object] }
     let(:params) { { include: { positions: {} } } }
 
@@ -115,31 +115,34 @@ RSpec.describe Graphiti::Scope do
 
         it 'resolves sideloads concurrently with the threadpool' do
           allow(sideload).to receive(:resolve).and_return(sideload)
-          expect(Concurrent::Promise).to receive(:execute).with(executor: an_instance_of(Concurrent::ThreadPoolExecutor)).and_call_original
+          expect(Concurrent::Promises).to receive(:future_on).with(an_instance_of(Concurrent::ThreadPoolExecutor)).and_call_original
           expect { instance.resolve_sideloads(results) }.not_to raise_error
         end
 
         context 'with nested sideloads greater than Graphiti.config.concurrency_max_threads' do
           let(:params) { { include: { positions: { department: {} } } } }
-          let(:position_resource) { PORO::PositionResource.new }
-          let(:departments_sideload) { double(shared_remote?: false, name: :departments) }
+          let(:position_resource) do
+            Class.new(PORO::PositionResource) do
+              self.default_page_size = 1
+            end.new
+          end
+          let(:departments_sideload) { double('departments', shared_remote?: false, name: :departments) }
 
           before do
-            require 'byebug'
             stub_const(
               'Graphiti::Scope::GLOBAL_THREAD_POOL_EXECUTOR',
               Concurrent::Delay.new do
-                # Concurrent::ThreadPoolExecutor.new(max_threads: 0, synchronous: true, fallback_policy: :caller_runs)
-                Concurrent::ThreadPoolExecutor.new(max_threads: 10, fallback_policy: :caller_runs)
+                Concurrent::ThreadPoolExecutor.new(max_threads: 1, fallback_policy: :caller_runs)
               end
             )
 
+            allow(position_resource).to receive(:resolve) { results }
             allow(position_resource.class).to receive(:sideload).with(:department) { departments_sideload }
             allow(departments_sideload).to receive(:resolve).and_return(departments_sideload)
 
             # make resolve just load the sideloads
             allow(sideload).to receive(:resolve) do |_results, q, _parent_resource|
-              described_class.new(sideload.as_null_object, position_resource, q).resolve
+              described_class.new(double.as_null_object, position_resource, q).resolve
             end
           end
 
