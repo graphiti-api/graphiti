@@ -36,7 +36,7 @@ module Graphiti
               json[:sideload] = sideload.name
             end
             if params
-              query = "#{payload[:resource].class.name}.all(#{JSON.pretty_generate(params)}).data"
+              query = "#{payload[:resource].class.name}.#{payload[:action]}(#{JSON.pretty_generate(params)}).data"
               logs << [query, :cyan, true]
               logs << ["The error occurred when running the above query. Copy/paste it into a rake task or Rails console session to reproduce. Keep in mind you may have to set context.", :yellow, true]
             else
@@ -64,7 +64,7 @@ module Graphiti
           query = if sideload.class.scope_proc
             "#{payload[:resource].class.name}: Manual sideload via .scope"
           else
-            "#{payload[:resource].class.name}.all(#{params.inspect})"
+            "#{payload[:resource].class.name}.#{payload[:action]}(#{params.inspect})"
           end
           logs << ["    #{query}", :cyan, true]
           json[:query] = query
@@ -82,7 +82,7 @@ module Graphiti
           title = "Top Level Data Retrieval (+ sideloads):"
           logs << [title, :green, true]
           json[:title] = title
-          query = "#{payload[:resource].class.name}.all(#{params.inspect})"
+          query = "#{payload[:resource].class.name}.#{payload[:action]}(#{params.inspect})"
           logs << [query, :cyan, true]
           json[:query] = query
           logs << ["Returned Models: #{results}"] if debug_models

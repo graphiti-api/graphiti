@@ -12,7 +12,7 @@ module Graphiti
       end
 
       def name
-        "#{Graphiti.context[:object].request.method} #{Graphiti.context[:object].request.url}"
+        "#{Graphiti.context[:object]&.request&.method} #{Graphiti.context[:object]&.request&.url}"
       end
 
       def key
