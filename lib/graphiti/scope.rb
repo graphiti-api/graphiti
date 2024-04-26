@@ -3,6 +3,7 @@ module Graphiti
     attr_accessor :object, :unpaginated_object
     attr_reader :pagination
 
+    # TODO: this could be a Concurrent::Promises.delay
     GLOBAL_THREAD_POOL_EXECUTOR = Concurrent::Delay.new do
       concurrency = Graphiti.config.concurrency_max_threads || 4
       Concurrent::ThreadPoolExecutor.new(
@@ -39,15 +40,12 @@ module Graphiti
           payload[:results]
         end
         resolved.compact!
-        puts resolved
         assign_serializer(resolved)
         yield resolved if block_given?
         @opts[:after_resolve]&.call(resolved)
         p = resolve_sideloads(resolved) unless @query.sideloads.empty?
         if p.is_a?(Concurrent::Promises::Future)
-          p.then do
-            resolved
-          end
+          p
         else
           resolved
         end
@@ -69,14 +67,15 @@ module Graphiti
           Graphiti.context = graphiti_context
           results = sideload.resolve(results, q, parent_resource)
           if results.is_a?(Concurrent::Promises::Future)
-            results.then do |r|
+            results.then_on(self.class.global_thread_pool_executor) do
+              # TODO: will this always run?
               @resource.adapter.close
-              r
             end
           else
-            Concurrent::Promises.fulfilled_future(results)
+            Concurrent::Promises.fulfilled_future(results, self.class.global_thread_pool_executor)
           end
         end
+
         if q.sideloads.any?
           p.flat
         else
@@ -123,12 +122,12 @@ module Graphiti
         updated_ats = sideload_resource_proxies.map(&:updated_at)
         updated_ats << @object.maximum(:updated_at)
         updated_time = updated_ats.compact.max
-      rescue => e
+      rescue StandardError => e
         Graphiti.log(["error calculating last_modified_at for #{@resource.class}", :red])
         Graphiti.log(e)
       end
 
-      return updated_time || Time.now
+      updated_time || Time.now
     end
     alias last_modified_at updated_at
 
