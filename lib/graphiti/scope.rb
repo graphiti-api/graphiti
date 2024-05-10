@@ -55,6 +55,8 @@ module Graphiti
     def resolve_sideloads(results)
       return if results == []
 
+      concurrent = Graphiti.config.concurrency
+
       promises = @query.sideloads.filter_map do |name, q|
         sideload = @resource.class.sideload(name)
         next if sideload.nil? || sideload.shared_remote?
@@ -66,11 +68,9 @@ module Graphiti
           Graphiti.config.before_sideload&.call(graphiti_context)
           Graphiti.context = graphiti_context
           results = sideload.resolve(results, q, parent_resource)
+          @resource.adapter.close if concurrent
           if results.is_a?(Concurrent::Promises::Future)
-            results.then_on(self.class.global_thread_pool_executor) do
-              # TODO: will this always run?
-              @resource.adapter.close
-            end
+            results
           else
             Concurrent::Promises.fulfilled_future(results, self.class.global_thread_pool_executor)
           end
