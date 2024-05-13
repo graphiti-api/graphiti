@@ -41,8 +41,24 @@ module Graphiti
         sideload = @resource.class.sideload(name)
         next if sideload.nil? || sideload.shared_remote?
         parent_resource = @resource
+
+        thread = {}.tap do |hash|
+          Thread.current.keys.each do |key|
+            hash[key] = Thread.current[key]
+          end
+        end
+
+        thread_variables = {}.tap do |hash|
+          Thread.current.thread_variables.each do |var|
+            hash[var] = Thread.current.thread_variable_get(var)
+          end
+        end
+        
         graphiti_context = Graphiti.context
         resolve_sideload = -> {
+          thread.each_pair { |key, value| Thread.current[key] = value }
+          thread_variables.each_pair { |key, value| Thread.current.thread_variable_set(key, value) }
+          
           Graphiti.config.before_sideload&.call(graphiti_context)
           Graphiti.context = graphiti_context
           sideload.resolve(results, q, parent_resource)
