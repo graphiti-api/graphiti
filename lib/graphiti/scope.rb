@@ -34,15 +34,25 @@ module Graphiti
           payload[:results] = @resource.resolve(@object)
           payload[:results]
         end
-        resolved.compact!
-        assign_serializer(resolved)
-        yield resolved if block_given?
-        @opts[:after_resolve]&.call(resolved)
-        p = resolve_sideloads(resolved) unless @query.sideloads.empty?
-        if p.is_a?(Concurrent::Promises::Future)
-          p
+        resolved = Concurrent::Promises.fulfilled_future(resolved) unless resolved.is_a?(Concurrent::Promises::Future)
+
+        p = resolved.then_on(self.class.global_thread_pool_executor) do |resolved|
+          resolved.compact!
+          assign_serializer(resolved)
+          yield resolved if block_given?
+          @opts[:after_resolve]&.call(resolved)
+          p = resolve_sideloads(resolved) unless @query.sideloads.empty?
+          if p.is_a?(Concurrent::Promises::Future)
+            p
+          else
+            resolved
+          end
+        end
+
+        if @query.parents.empty?
+          p.value!
         else
-          resolved
+          p.flat
         end
       end
     end
