@@ -56,18 +56,18 @@ module Graphiti
         sideload = @resource.class.sideload(name)
         next if sideload.nil? || sideload.shared_remote?
 
-        parent_resource = @resource
-        graphiti_context = Graphiti.context
-
-        p = Concurrent::Promises.future_on(self.class.global_thread_pool_executor) do
+        p = Concurrent::Promises.future_on(
+          self.class.global_thread_pool_executor, @resource, Graphiti.context, results
+        ) do |parent_resource, graphiti_context, parent_results|
           Graphiti.config.before_sideload&.call(graphiti_context)
           Graphiti.context = graphiti_context
-          results = sideload.resolve(results, q, parent_resource)
-          @resource.adapter.close if concurrent
-          if results.is_a?(Concurrent::Promises::Future)
-            results
+          sideload_results = sideload.resolve(parent_results, q, parent_resource)
+          # TODO: figure out when to close the adapter
+          # @resource.adapter.close if concurrent
+          if sideload_results.is_a?(Concurrent::Promises::Future)
+            sideload_results
           else
-            Concurrent::Promises.fulfilled_future(results, self.class.global_thread_pool_executor)
+            Concurrent::Promises.fulfilled_future(sideload_results, self.class.global_thread_pool_executor)
           end
         end
 
