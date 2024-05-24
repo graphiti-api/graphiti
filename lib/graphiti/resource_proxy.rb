@@ -76,16 +76,17 @@ module Graphiti
 
     def data
       @data ||= begin
-        p = @scope.resolve
-        p
+        records_or_promise = @scope.resolve
+        if records_or_promise.is_a?(Concurrent::Promises::Future)
+          records_or_promise
+        else
+          records = records_or_promise
+          raise Graphiti::Errors::RecordNotFound if records.empty? && raise_on_missing?
+
+          records = records[0] if single?
+          records
+        end
       end
-
-      # .then do |records|
-      #   raise Graphiti::Errors::RecordNotFound if records.empty? && raise_on_missing?
-
-      #   records = records[0] if single?
-      #   records
-      # end
     end
     alias to_a data
     alias resolve_data data
