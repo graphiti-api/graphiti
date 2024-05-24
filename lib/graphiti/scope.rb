@@ -50,7 +50,7 @@ module Graphiti
     def resolve_sideloads(results)
       return if results == []
 
-      concurrent = Graphiti.config.concurrency
+      # concurrent = Graphiti.config.concurrency
 
       promises = @query.sideloads.filter_map do |name, q|
         sideload = @resource.class.sideload(name)
