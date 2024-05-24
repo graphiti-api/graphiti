@@ -1,21 +1,21 @@
 module Graphiti
   class Sideload
-    HOOK_ACTIONS = %i[save create update destroy disassociate]
-    TYPES = %i[has_many belongs_to has_one many_to_many]
+    HOOK_ACTIONS = [:save, :create, :update, :destroy, :disassociate]
+    TYPES = [:has_many, :belongs_to, :has_one, :many_to_many]
 
     attr_reader :name,
-                :parent_resource_class,
-                :parent,
-                :group_name,
-                :link,
-                :polymorphic_as
+      :parent_resource_class,
+      :parent,
+      :group_name,
+      :link,
+      :polymorphic_as
 
     class_attribute :scope_proc,
-                    :assign_proc,
-                    :assign_each_proc,
-                    :params_proc,
-                    :pre_load_proc,
-                    :link_proc
+      :assign_proc,
+      :assign_each_proc,
+      :params_proc,
+      :pre_load_proc,
+      :link_proc
 
     def initialize(name, opts)
       @name = name
@@ -44,9 +44,13 @@ module Graphiti
       @parent = opts[:parent]
       @always_include_resource_ids = opts[:always_include_resource_ids]
 
-      parent.resource.polymorphic << resource_class if polymorphic_child?
+      if polymorphic_child?
+        parent.resource.polymorphic << resource_class
+      end
 
-      @resource_class = create_remote_resource if remote?
+      if remote?
+        @resource_class = create_remote_resource
+      end
     end
 
     def self.scope(&blk)
@@ -75,12 +79,12 @@ module Graphiti
 
     def create_remote_resource
       remote_url = @remote
-      klass = Class.new(Graphiti::Resource) do
+      klass = Class.new(Graphiti::Resource) {
         self.adapter = Graphiti::Adapters::GraphitiAPI
         self.model = OpenStruct
         self.remote = remote_url
         self.validate_endpoints = false
-      end
+      }
       name = "#{parent_resource_class.name}.#{@name}.remote"
       klass.class_eval("def self.name;'#{name}';end", __FILE__, __LINE__)
       klass
@@ -135,13 +139,13 @@ module Graphiti
     def link_extra_fields
       return unless context&.respond_to?(:params)
 
-      extra_fields_name = [association_name, resource.type].find do |param|
+      extra_fields_name = [association_name, resource.type].find { |param|
         context.params.dig(:extra_fields, param)
-      end
+      }
 
       if extra_fields_name
         extra_fields = context.params.dig(:extra_fields, extra_fields_name)
-        { resource.type => extra_fields }
+        {resource.type => extra_fields}
       end
     end
 
@@ -176,25 +180,24 @@ module Graphiti
       @resource_class ||= infer_resource_class
     end
 
-    def scope(_parents)
+    def scope(parents)
       raise "No #scope defined for sideload with name '#{name}'. Make sure to define this in your adapter, or pass a block that defines the scope."
     end
 
-    def assign_each(_parent, _children)
-      raise 'Override #assign_each in subclass'
+    def assign_each(parent, children)
+      raise "Override #assign_each in subclass"
     end
 
     def type
       @type || raise("Override #type in subclass. Should be one of #{TYPES.inspect}")
     end
 
-    def load_params(_parents, _query)
-      raise 'Override #load_params in subclass'
+    def load_params(parents, query)
+      raise "Override #load_params in subclass"
     end
 
     def description
       return @description if @description.present?
-
       parent_resource_class.resolve_i18n_field_description(name, field_type: :relationships)
     end
 
@@ -239,7 +242,7 @@ module Graphiti
     def infer_foreign_key
       model = parent_resource_class.model
       namespace = namespace_for(model)
-      model_name = model.name.gsub("#{namespace}::", '')
+      model_name = model.name.gsub("#{namespace}::", "")
       :"#{model_name.underscore}_id"
     end
 
@@ -260,14 +263,16 @@ module Graphiti
     def assign(parents, children)
       track_associated = type == :has_one
       associated = [] if track_associated
-      map = child_map(children) if performant_assign?
+      if performant_assign?
+        map = child_map(children)
+      end
 
       parents.each do |parent|
         relevant_children = if performant_assign?
-                              children_for(parent, map) || []
-                            else
-                              fire_assign_each(parent, children)
-                            end
+          children_for(parent, map) || []
+        else
+          fire_assign_each(parent, children)
+        end
 
         if relevant_children.is_a?(Array)
           associated |= relevant_children if track_associated
@@ -281,17 +286,19 @@ module Graphiti
     end
 
     def resolve(parents, query, graph_parent)
-      raise Errors::SingularSideload.new(self, parents.length) if single? && parents.length > 1
+      if single? && parents.length > 1
+        raise Errors::SingularSideload.new(self, parents.length)
+      end
 
       if self.class.scope_proc
         sideload_scope = fire_scope(parents)
         sideload_scope = Scope.new sideload_scope,
-                                   resource,
-                                   query,
-                                   parent: graph_parent,
-                                   sideload: self,
-                                   sideload_parent_length: parents.length,
-                                   default_paginate: false
+          resource,
+          query,
+          parent: graph_parent,
+          sideload: self,
+          sideload_parent_length: parents.length,
+          default_paginate: false
         sideload_scope.resolve do |sideload_results|
           fire_assign(parents, sideload_results)
         end
@@ -361,23 +368,22 @@ module Graphiti
     private
 
     def blank_query?(params)
-      if (filter = params[:filter]) && (filter.values == [''])
-        return true
+      if (filter = params[:filter])
+        if filter.values == [""]
+          return true
+        end
       end
-
       false
     end
 
     def validate_options!(opts)
       if opts[:remote]
         if opts[:resource]
-          raise Errors::SideloadConfig.new(@name, opts[:parent_resource],
-                                           'cannot pass :remote and :resource options together')
+          raise Errors::SideloadConfig.new(@name, opts[:parent_resource], "cannot pass :remote and :resource options together")
         end
 
         if opts[:link]
-          raise Errors::SideloadConfig.new(@name, opts[:parent_resource],
-                                           'remote sideloads do not currently support :link')
+          raise Errors::SideloadConfig.new(@name, opts[:parent_resource], "remote sideloads do not currently support :link")
         end
       end
     end
@@ -387,7 +393,7 @@ module Graphiti
         opts[:default_paginate] = false
         opts[:sideload_parent_length] = parents.length
         opts[:query] = query
-        opts[:after_resolve] = lambda { |results|
+        opts[:after_resolve] = ->(results) {
           fire_assign(parents, results)
         }
       end
@@ -414,7 +420,7 @@ module Graphiti
     def with_error_handling(error_class)
       begin
         result = yield
-      rescue StandardError
+      rescue
         raise error_class.new(parent_resource_class, name)
       end
       result
@@ -447,9 +453,9 @@ module Graphiti
       return false if flag.blank?
 
       case flag.class.name
-      when 'Symbol', 'String'
+      when "Symbol", "String"
         resource.send(flag)
-      when 'Proc'
+      when "Proc"
         resource.instance_exec(&flag)
       else
         !!flag

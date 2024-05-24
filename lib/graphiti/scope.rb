@@ -20,20 +20,20 @@ module Graphiti
       @query = query
       @opts = opts
 
-      @object = @resource.around_scoping(@object, @query.hash) do |scope|
+      @object = @resource.around_scoping(@object, @query.hash) { |scope|
         apply_scoping(scope, opts)
-      end
+      }
     end
 
     def resolve
       if @query.zero_results?
         []
       else
-        resolved = broadcast_data do |payload|
+        resolved = broadcast_data { |payload|
           @object = @resource.before_resolve(@object, @query)
           payload[:results] = @resource.resolve(@object)
           payload[:results]
-        end
+        }
         resolved.compact!
         assign_serializer(resolved)
         yield resolved if block_given?
@@ -116,14 +116,14 @@ module Graphiti
         updated_ats = sideload_resource_proxies.map(&:updated_at)
         updated_ats << @object.maximum(:updated_at)
         updated_time = updated_ats.compact.max
-      rescue StandardError => e
+      rescue => e
         Graphiti.log(["error calculating last_modified_at for #{@resource.class}", :red])
         Graphiti.log(e)
       end
 
       updated_time || Time.now
     end
-    alias last_modified_at updated_at
+    alias_method :last_modified_at, :updated_at
 
     private
 
@@ -145,7 +145,7 @@ module Graphiti
       end
     end
 
-    def broadcast_data(&block)
+    def broadcast_data
       opts = {
         resource: @resource,
         params: @opts[:params] || @query.params,
@@ -155,7 +155,9 @@ module Graphiti
         # Set once data is resolved within block
         #   results: ...
       }
-      Graphiti.broadcast(:resolve, opts, &block)
+      Graphiti.broadcast(:resolve, opts) do |payload|
+        yield payload
+      end
     end
 
     # Used to ensure the resource's serializer is used
@@ -180,7 +182,7 @@ module Graphiti
       @object
     end
 
-    def add_scoping(key, scoping_class, opts, _default = {})
+    def add_scoping(key, scoping_class, opts, default = {})
       @object = scoping_class.new(@resource, @query.hash, @object, opts).apply
       @unpaginated_object = @object unless key == :paginate
     end

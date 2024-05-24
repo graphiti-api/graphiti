@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.describe Graphiti::Scope do
   let(:object) { double.as_null_object }
@@ -7,9 +7,9 @@ RSpec.describe Graphiti::Scope do
   let(:instance) { described_class.new(object, resource, query) }
 
   let(:resource) do
-    Class.new(PORO::EmployeeResource) do
+    Class.new(PORO::EmployeeResource) {
       self.default_page_size = 1
-    end.new
+    }.new
   end
   let(:results) { [] }
 
@@ -17,43 +17,43 @@ RSpec.describe Graphiti::Scope do
     allow(resource).to receive(:resolve) { results }
   end
 
-  describe '#resolve' do
-    it 'resolves via resource' do
+  describe "#resolve" do
+    it "resolves via resource" do
       # object gets modified in the Scope's constructor
       objekt = instance.instance_variable_get(:@object)
       expect(resource).to receive(:resolve).with(objekt).and_return(objekt)
       instance.resolve
     end
 
-    it 'returns results' do
+    it "returns results" do
       expect(instance.resolve).to eq([])
     end
 
-    context 'when sideloading' do
+    context "when sideloading" do
       let(:sideload) { double(shared_remote?: false, name: :positions) }
       let(:results) { [double.as_null_object] }
 
       before do
-        params[:include] = { positions: {} }
+        params[:include] = {positions: {}}
         objekt = instance.instance_variable_get(:@object)
         allow(resource).to receive(:resolve).with(objekt) { results }
       end
 
-      context 'when the requested sideload exists on the resource' do
+      context "when the requested sideload exists on the resource" do
         before do
           allow(resource.class).to receive(:sideload).with(:positions) { sideload }
         end
 
-        it 'resolves the sideload' do
+        it "resolves the sideload" do
           expect(sideload).to receive(:resolve)
             .with(results, query.sideloads[:positions], resource)
           instance.resolve
         end
 
-        context 'but no parents were found' do
+        context "but no parents were found" do
           let(:results) { [] }
 
-          it 'does not resolve the sideload' do
+          it "does not resolve the sideload" do
             expect(sideload).to_not receive(:resolve)
             instance.resolve
           end
@@ -61,76 +61,76 @@ RSpec.describe Graphiti::Scope do
       end
     end
 
-    context 'when 0 results requested' do
+    context "when 0 results requested" do
       before do
         allow(query).to receive(:zero_results?) { true }
       end
 
-      it 'returns empty array' do
+      it "returns empty array" do
         expect(instance.resolve).to eq([])
       end
     end
   end
 
-  describe '#resolve_sideloads' do
-    let(:sideload) { double('positions', shared_remote?: false, name: :positions) }
+  describe "#resolve_sideloads" do
+    let(:sideload) { double("positions", shared_remote?: false, name: :positions) }
     let(:results) { [double.as_null_object] }
-    let(:params) { { include: { positions: {} } } }
+    let(:params) { {include: {positions: {}}} }
 
     before do
       objekt = instance.instance_variable_get(:@object)
       allow(resource).to receive(:resolve).with(objekt) { results }
     end
 
-    context 'when the requested sideload exists on the resource' do
+    context "when the requested sideload exists on the resource" do
       before do
         allow(resource.class).to receive(:sideload).with(:positions) { sideload }
       end
 
-      it 'resolves the sideload' do
+      it "resolves the sideload" do
         expect(sideload).to receive(:resolve)
           .with(results, query.sideloads[:positions], resource)
         instance.resolve_sideloads(results)
       end
 
-      context 'with concurrency' do
-        let(:before_sideload) { double('BeforeSideload', call: nil) }
+      context "with concurrency" do
+        let(:before_sideload) { double("BeforeSideload", call: nil) }
 
         before { allow(Graphiti.config).to receive(:concurrency).and_return(true) }
         before { allow(Graphiti.config).to receive(:before_sideload).and_return(before_sideload) }
 
-        it 'closes db connections' do
+        it "closes db connections" do
           allow(sideload).to receive(:resolve).and_return(sideload)
 
           expect(resource.adapter).to receive(:close)
           instance.resolve_sideloads(results)
         end
 
-        it 'calls configiration.before_sideload with context' do
+        it "calls configiration.before_sideload with context" do
           Graphiti.context[:tenant_id] = 1
           allow(sideload).to receive(:resolve).and_return(sideload)
           expect(before_sideload).to receive(:call).with(hash_including(tenant_id: 1))
           instance.resolve_sideloads(results)
         end
 
-        it 'resolves sideloads concurrently with the threadpool' do
+        it "resolves sideloads concurrently with the threadpool" do
           allow(sideload).to receive(:resolve).and_return(sideload)
-          expect(Concurrent::Promises).to receive(:future_on).with(an_instance_of(Concurrent::ThreadPoolExecutor)).and_call_original
+          expect(Concurrent::Promises).to receive(:future_on).with(an_instance_of(Concurrent::ThreadPoolExecutor), any_args).and_call_original
           expect { instance.resolve_sideloads(results) }.not_to raise_error
         end
 
-        context 'with nested sideloads greater than Graphiti.config.concurrency_max_threads' do
-          let(:params) { { include: { positions: { department: {} } } } }
+        context "with nested sideloads greater than Graphiti.config.concurrency_max_threads" do
+          let(:params) { {include: {positions: {department: {}}}} }
           let(:position_resource) do
             Class.new(PORO::PositionResource) do
               self.default_page_size = 1
             end.new
           end
-          let(:departments_sideload) { double('departments', shared_remote?: false, name: :departments) }
+          let(:departments_sideload) { double("departments", shared_remote?: false, name: :departments) }
 
           before do
             stub_const(
-              'Graphiti::Scope::GLOBAL_THREAD_POOL_EXECUTOR',
+              "Graphiti::Scope::GLOBAL_THREAD_POOL_EXECUTOR",
               Concurrent::Delay.new do
                 Concurrent::ThreadPoolExecutor.new(max_threads: 1, fallback_policy: :caller_runs)
               end
@@ -146,16 +146,16 @@ RSpec.describe Graphiti::Scope do
             end
           end
 
-          it 'does not deadlock' do
+          it "does not deadlock" do
             expect { instance.resolve_sideloads(results) }.not_to raise_error
           end
         end
       end
 
-      context 'without concurrency' do
+      context "without concurrency" do
         before { allow(Graphiti.config).to receive(:concurrency).and_return(false) }
 
-        it 'does not close db connection' do
+        it "does not close db connection" do
           allow(sideload).to receive(:resolve).and_return(sideload)
 
           expect(resource.adapter).not_to receive(:close)
@@ -163,10 +163,10 @@ RSpec.describe Graphiti::Scope do
         end
       end
 
-      context 'but no parents were found' do
+      context "but no parents were found" do
         let(:results) { [] }
 
-        it 'does not resolve the sideload' do
+        it "does not resolve the sideload" do
           expect(sideload).to_not receive(:resolve)
           instance.resolve_sideloads(results)
         end
@@ -174,20 +174,18 @@ RSpec.describe Graphiti::Scope do
     end
   end
 
-  describe 'cache_key' do
-    let(:employee1) do
-      time = Time.parse('2022-06-24 16:36:00.000000000 -0500')
-      double(cache_key: 'employee/1', cache_key_with_version: "employee/1-#{time.to_i}",
-             updated_at: time).as_null_object
-    end
+  describe "cache_key" do
+    let(:employee1) {
+      time = Time.parse("2022-06-24 16:36:00.000000000 -0500")
+      double(cache_key: "employee/1", cache_key_with_version: "employee/1-#{time.to_i}", updated_at: time).as_null_object
+    }
 
-    let(:employee2) do
-      time = Time.parse('2022-06-24 16:37:00.000000000 -0500')
-      double(cache_key: 'employee/2', cache_key_with_version: "employee/2-#{time.to_i}",
-             updated_at: time).as_null_object
-    end
+    let(:employee2) {
+      time = Time.parse("2022-06-24 16:37:00.000000000 -0500")
+      double(cache_key: "employee/2", cache_key_with_version: "employee/2-#{time.to_i}", updated_at: time).as_null_object
+    }
 
-    it 'generates a stable key' do
+    it "generates a stable key" do
       instance1 = described_class.new(employee1, resource, query)
       instance2 = described_class.new(employee1, resource, query)
 
@@ -195,10 +193,9 @@ RSpec.describe Graphiti::Scope do
       expect(instance1.cache_key).to eq(instance2.cache_key)
     end
 
-    it 'only caches off of the scoped object ' do
+    it "only caches off of the scoped object " do
       instance1 = described_class.new(employee1, resource, query)
-      instance2 = described_class.new(employee1, resource,
-                                      Graphiti::Query.new(resource, { extra_fields: { positions: ['foo'] } }))
+      instance2 = described_class.new(employee1, resource, Graphiti::Query.new(resource, {extra_fields: {positions: ["foo"]}}))
 
       expect(instance1.cache_key).to be_present
       expect(instance2.cache_key).to be_present
@@ -209,7 +206,7 @@ RSpec.describe Graphiti::Scope do
       expect(instance1.cache_key_with_version).to eq(instance2.cache_key_with_version)
     end
 
-    it 'generates a different key with a different scope query' do
+    it "generates a different key with a different scope query" do
       instance1 = described_class.new(employee1, resource, query)
       instance2 = described_class.new(employee2, resource, query)
       expect(instance1.cache_key).to be_present
@@ -222,8 +219,8 @@ RSpec.describe Graphiti::Scope do
     end
   end
 
-  describe '.global_thread_pool_executor' do
-    it 'memoizes the thread pool executor' do
+  describe ".global_thread_pool_executor" do
+    it "memoizes the thread pool executor" do
       one = described_class.global_thread_pool_executor
       two = described_class.global_thread_pool_executor
       expect(one).to eq(two)
