@@ -5,8 +5,17 @@ module Graphiti
 
     # TODO: this could be a Concurrent::Promises.delay
     GLOBAL_THREAD_POOL_EXECUTOR = Concurrent::Delay.new do
-      # concurrency = Graphiti.config.concurrency_max_threads || 4
-      Concurrent::ThreadPoolExecutor.new(max_threads: 0, synchronous: true, fallback_policy: :caller_runs)
+      if Graphiti.config.concurrency
+        concurrency = Graphiti.config.concurrency_max_threads || 4
+        Concurrent::ThreadPoolExecutor.new(
+          min_threads: 0,
+          max_threads: concurrency,
+          max_queue: concurrency * 4,
+          fallback_policy: :caller_runs
+        )
+      else
+        Concurrent::ThreadPoolExecutor.new(max_threads: 0, synchronous: true, fallback_policy: :caller_runs)
+      end
     end
     private_constant :GLOBAL_THREAD_POOL_EXECUTOR
 
