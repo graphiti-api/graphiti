@@ -102,7 +102,7 @@ module Graphiti
         Graphiti.log(e)
       end
 
-      return updated_time || Time.now
+      updated_time || Time.now
     end
     alias_method :last_modified_at, :updated_at
 
