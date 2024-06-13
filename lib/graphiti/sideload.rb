@@ -234,9 +234,8 @@ module Graphiti
       proxy
     end
 
-    def future_load(parents, query, graph_parent)
-      proxy = build_resource_proxy(parents, query, graph_parent)
-      proxy.respond_to?(:future_resolve_data) ? proxy.future_resolve_data : Concurrent::Promises.fulfilled_future(proxy)
+    def load(parents, query, graph_parent)
+      future_load(parents, query, graph_parent).value!
     end
 
     # Override in subclass
@@ -367,6 +366,11 @@ module Graphiti
     end
 
     private
+
+    def future_load(parents, query, graph_parent)
+      proxy = build_resource_proxy(parents, query, graph_parent)
+      proxy.respond_to?(:future_resolve_data) ? proxy.future_resolve_data : Concurrent::Promises.fulfilled_future(proxy)
+    end
 
     def blank_query?(params)
       if (filter = params[:filter])
