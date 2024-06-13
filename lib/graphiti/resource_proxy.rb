@@ -76,7 +76,7 @@ module Graphiti
 
     def data
       @data ||= begin
-        records  = @scope.resolve
+        records = @scope.resolve
         raise Graphiti::Errors::RecordNotFound if records.empty? && raise_on_missing?
 
         records = records[0] if single?
