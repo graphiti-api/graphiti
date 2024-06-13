@@ -45,8 +45,8 @@ RSpec.describe Graphiti::Scope do
         end
 
         it "resolves the sideload" do
-          expect(sideload).to receive(:resolve)
-            .with(results, query.sideloads[:positions], resource)
+          expect(sideload).to receive(:future_resolve)
+            .with(results, query.sideloads[:positions], resource) { Concurrent::Promises.future {} }
           instance.resolve
         end
 
@@ -88,8 +88,8 @@ RSpec.describe Graphiti::Scope do
       end
 
       it "resolves the sideload" do
-        expect(sideload).to receive(:resolve)
-          .with(results, query.sideloads[:positions], resource)
+        expect(sideload).to receive(:future_resolve)
+          .with(results, query.sideloads[:positions], resource) { Concurrent::Promises.future {} }
         instance.resolve_sideloads(results)
       end
 
@@ -100,7 +100,7 @@ RSpec.describe Graphiti::Scope do
         before { allow(Graphiti.config).to receive(:before_sideload).and_return(before_sideload) }
 
         it "closes db connections" do
-          allow(sideload).to receive(:resolve).and_return(sideload)
+          allow(sideload).to receive(:future_resolve) { Concurrent::Promises.future {} }
 
           expect(resource.adapter).to receive(:close)
           instance.resolve_sideloads(results)
@@ -108,15 +108,16 @@ RSpec.describe Graphiti::Scope do
 
         it "calls configiration.before_sideload with context" do
           Graphiti.context[:tenant_id] = 1
-          allow(sideload).to receive(:resolve).and_return(sideload)
+          allow(sideload).to receive(:future_resolve) { Concurrent::Promises.future {} }
           expect(before_sideload).to receive(:call).with(hash_including(tenant_id: 1))
           instance.resolve_sideloads(results)
         end
 
         it "resolves sideloads concurrently with the threadpool" do
-          allow(sideload).to receive(:resolve).and_return(sideload)
-          expect(Concurrent::Promises).to receive(:future_on).with(an_instance_of(Concurrent::ThreadPoolExecutor), any_args).and_call_original
-          expect { instance.resolve_sideloads(results) }.not_to raise_error
+          allow(sideload).to receive(:future_resolve) { Concurrent::Promises.future {} }
+          expect(Concurrent::Promises).to receive(:future_on).with(:io).and_call_original
+          expect(Concurrent::Promises).to receive(:future_on).with(an_instance_of(Concurrent::ThreadPoolExecutor), any_args).and_call_original.once
+          instance.resolve_sideloads(results)
         end
 
         context "with nested sideloads greater than Graphiti.config.concurrency_max_threads" do
@@ -138,11 +139,11 @@ RSpec.describe Graphiti::Scope do
 
             allow(position_resource).to receive(:resolve) { results }
             allow(position_resource.class).to receive(:sideload).with(:department) { departments_sideload }
-            allow(departments_sideload).to receive(:resolve).and_return(departments_sideload)
+            allow(departments_sideload).to receive(:future_resolve) { Concurrent::Promises.future {} }
 
             # make resolve just load the sideloads
-            allow(sideload).to receive(:resolve) do |_results, q, _parent_resource|
-              described_class.new(double.as_null_object, position_resource, q).resolve
+            allow(sideload).to receive(:future_resolve) do |_results, q, _parent_resource|
+              described_class.new(double.as_null_object, position_resource, q).future_resolve
             end
           end
 
@@ -156,7 +157,7 @@ RSpec.describe Graphiti::Scope do
         before { allow(Graphiti.config).to receive(:concurrency).and_return(false) }
 
         it "does not close db connection" do
-          allow(sideload).to receive(:resolve).and_return(sideload)
+          allow(sideload).to receive(:future_resolve) { Concurrent::Promises.future {} }
 
           expect(resource.adapter).not_to receive(:close)
           instance.resolve_sideloads(results)

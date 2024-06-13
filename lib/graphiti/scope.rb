@@ -35,8 +35,16 @@ module Graphiti
     end
 
     def resolve
+      future_resolve.value!
+    end
+
+    def resolve_sideloads(results)
+      future_resolve_sideloads(results).value!
+    end
+
+    def future_resolve
       if @query.zero_results?
-        []
+        Concurrent::Promises.fulfilled_future([], self.class.global_thread_pool_executor)
       else
         resolved = broadcast_data { |payload|
           @object = @resource.before_resolve(@object, @query)
@@ -47,51 +55,9 @@ module Graphiti
         assign_serializer(resolved)
         yield resolved if block_given?
         @opts[:after_resolve]&.call(resolved)
-        sideloads_result = @query.sideloads.empty? ? nil : resolve_sideloads(resolved)
-        if sideloads_result.is_a?(Concurrent::Promises::Future)
-          sideloads_result
-        else
+        future_resolve_sideloads(resolved).then_on(self.class.global_thread_pool_executor, resolved) do
           resolved
         end
-      end
-    end
-
-    def resolve_sideloads(results)
-      return if results == []
-
-      # concurrent = Graphiti.config.concurrency
-
-      promises = @query.sideloads.filter_map do |name, q|
-        sideload = @resource.class.sideload(name)
-        next if sideload.nil? || sideload.shared_remote?
-
-        p = Concurrent::Promises.future_on(
-          self.class.global_thread_pool_executor, @resource, Graphiti.context, results
-        ) do |parent_resource, graphiti_context, parent_results|
-          Graphiti.config.before_sideload&.call(graphiti_context)
-          Graphiti.context = graphiti_context
-          sideload_results = sideload.resolve(parent_results, q, parent_resource)
-          # TODO: figure out when to close the adapter
-          # @resource.adapter.close if concurrent
-          if sideload_results.is_a?(Concurrent::Promises::Future)
-            sideload_results
-          else
-            Concurrent::Promises.fulfilled_future(sideload_results, self.class.global_thread_pool_executor)
-          end
-        end
-
-        if q.sideloads.any?
-          p.flat
-        else
-          p
-        end
-      end
-
-      p = Concurrent::Promises.zip_futures_on(self.class.global_thread_pool_executor, *promises)
-      if @query.parents.empty?
-        p.value!
-      else
-        p
       end
     end
 
@@ -135,6 +101,32 @@ module Graphiti
     alias_method :last_modified_at, :updated_at
 
     private
+
+    def future_resolve_sideloads(results)
+      return Concurrent::Promises.fulfilled_future(nil, self.class.global_thread_pool_executor) if results == []
+
+      # concurrent = Graphiti.config.concurrency
+
+      sideload_promises = @query.sideloads.filter_map do |name, q|
+        sideload = @resource.class.sideload(name)
+        next if sideload.nil? || sideload.shared_remote?
+
+        sideload_promise = Concurrent::Promises.future_on(
+          self.class.global_thread_pool_executor, @resource, Graphiti.context, results
+        ) do |parent_resource, graphiti_context, parent_results|
+          Graphiti.config.before_sideload&.call(graphiti_context)
+          Graphiti.context = graphiti_context
+          # TODO: Check self.class.scope_proc path of sideload.resolve
+          sideload.future_resolve(parent_results, q, parent_resource)
+          # TODO: figure out when to close the adapter
+          # @resource.adapter.close if concurrent
+        end
+
+        sideload_promise.flat
+      end
+
+      Concurrent::Promises.zip_futures_on(self.class.global_thread_pool_executor, *sideload_promises)
+    end
 
     def sideload_resource_proxies
       @sideload_resource_proxies ||= begin

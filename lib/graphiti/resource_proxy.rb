@@ -76,20 +76,24 @@ module Graphiti
 
     def data
       @data ||= begin
-        records_or_promise = @scope.resolve
-        if records_or_promise.is_a?(Concurrent::Promises::Future)
-          records_or_promise
-        else
-          records = records_or_promise
-          raise Graphiti::Errors::RecordNotFound if records.empty? && raise_on_missing?
+        records  = @scope.resolve
+        raise Graphiti::Errors::RecordNotFound if records.empty? && raise_on_missing?
 
-          records = records[0] if single?
-          records
-        end
+        records = records[0] if single?
+        records
       end
     end
     alias_method :to_a, :data
     alias_method :resolve_data, :data
+
+    def future_resolve_data
+      @scope.future_resolve.then do |records|
+        raise Graphiti::Errors::RecordNotFound if records.empty? && raise_on_missing?
+
+        records = records[0] if single?
+        @data = records
+      end
+    end
 
     def meta
       @meta ||= data.respond_to?(:meta) ? data.meta : {}
