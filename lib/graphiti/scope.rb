@@ -55,14 +55,15 @@ module Graphiti
         assign_serializer(resolved)
         yield resolved if block_given?
         @opts[:after_resolve]&.call(resolved)
-        close_adapter = Graphiti.config.concurrency && @query.parents.any?
-        future_resolve_sideloads(resolved)
-          .on_resolution!(@resource.adapter, close_adapter) do |_, _, _, adapter, close_adapter|
-            adapter.close if close_adapter
-          end
-          .then_on(self.class.global_thread_pool_executor, resolved) do
-            resolved
-          end
+        sideloaded = @query.parents.any?
+        close_adapter = Graphiti.config.concurrency && sideloaded
+        if close_adapter
+          @resource.adapter.close
+        end
+
+        future_resolve_sideloads(resolved).then_on(self.class.global_thread_pool_executor, resolved) do
+          resolved
+        end
       end
     end
 
