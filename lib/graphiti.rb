@@ -1,6 +1,7 @@
 require "json"
 require "forwardable"
 require "uri"
+require "ostruct" unless defined?(::OpenStruct)
 
 require "active_support/version"
 require "active_support/deprecation"
