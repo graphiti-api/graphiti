@@ -9,7 +9,8 @@ module Graphiti
       single: false,
       raise_on_missing: false,
       cache: nil,
-      cache_expires_in: nil)
+      cache_expires_in: nil,
+      data: nil)
 
       @resource = resource
       @scope = scope
@@ -74,6 +75,11 @@ module Graphiti
       Renderer.new(self, options).as_graphql
     end
 
+    def data=(models)
+      @data = data
+      [@data].flatten.compact.each { |r| @resource.decorate_record(r) }
+    end
+
     def data
       @data ||= begin
         records = @scope.resolve
@@ -115,6 +121,16 @@ module Graphiti
 
     def pagination
       @pagination ||= Delegates::Pagination.new(self)
+    end
+
+    def assign_attributes(params = nil)
+      # deserialize params again?
+
+      @data = @resource.assign_with_relationships(
+        @payload.meta,
+        @payload.attributes,
+        @payload.relationships
+      )
     end
 
     def save(action: :create)
