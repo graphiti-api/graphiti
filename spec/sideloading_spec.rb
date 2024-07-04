@@ -1070,6 +1070,40 @@ RSpec.describe "sideloading" do
       }.to_not raise_error
     end
 
+    context "works with multiple copies and resource-provided associations" do
+      before do
+        PORO::Position.class_eval do
+          attr_accessor :custom_department
+        end
+
+        # Just a simple resource-provided association
+        position_resource.belongs_to :custom_department, resource: department_resource, foreign_key: :department_id do
+          assign_each do |position, _|
+            position.department
+          end
+        end
+
+        params[:include] = "current_position.custom_department,positions"
+      end
+
+      it "construct full objects in the (squashed) included list" do
+        render
+
+        included = json["included"]
+        pos1_array = included.select { |i|
+          i["type"] == "positions" && i["id"] == position1.id.to_s
+        }
+
+        expect(pos1_array.length).to eq(1)
+
+        pos1 = pos1_array.first
+
+        expect(pos1["relationships"]).to be_present
+        expect(pos1["relationships"]["custom_department"]).to be_present
+        expect(pos1["relationships"]["custom_department"]["data"]).to be_present
+      end
+    end
+
     describe "across requests" do
       it "uses a different sideloaded resource" do
         ctx = double(current_user: :admin)
