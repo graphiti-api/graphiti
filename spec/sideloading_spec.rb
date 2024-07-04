@@ -1106,6 +1106,49 @@ RSpec.describe "sideloading" do
       }.to_not raise_error
     end
 
+    context "when a resource-provided association populates only one copy" do
+      around do |example|
+        example.run
+      ensure
+        PORO::Position.class_eval do
+          remove_method :custom_department
+          remove_method :custom_department=
+        end
+      end
+
+      before do
+        PORO::Position.class_eval do
+          attr_accessor :custom_department
+        end
+
+        position_resource.belongs_to :custom_department, resource: department_resource, foreign_key: :department_id do
+          assign_each do |position, _|
+            position.department
+          end
+        end
+
+        params[:include] = "current_position.custom_department,positions"
+      end
+
+      def squashed_position1
+        matches = json["included"].select { |i|
+          i["type"] == "positions" && i["id"] == position1.id.to_s
+        }
+        expect(matches.length).to eq(1)
+        matches.first
+      end
+
+      it "renders complete relationship data on the squashed node" do
+        render
+
+        relationships = squashed_position1["relationships"]
+        expect(relationships).to be_present
+        expect(relationships["custom_department"]).to be_present
+        expect(relationships["custom_department"]["data"]).to be_present
+      end
+
+    end
+
     describe "across requests" do
       it "uses a different sideloaded resource" do
         ctx = double(current_user: :admin)
