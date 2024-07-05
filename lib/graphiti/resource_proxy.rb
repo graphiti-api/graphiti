@@ -80,6 +80,7 @@ module Graphiti
         if records.empty? && raise_on_missing?
           raise Graphiti::Errors::RecordNotFound
         end
+
         records = records[0] if single?
         records
       end

@@ -16,6 +16,7 @@ module Graphiti
     attr_accessor :typecast_reads
     attr_accessor :raise_on_missing_sidepost
     attr_accessor :before_sideload
+    attr_accessor :deduplicate_entities
 
     attr_reader :debug, :debug_models
 

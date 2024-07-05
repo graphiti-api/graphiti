@@ -1084,9 +1084,29 @@ RSpec.describe "sideloading" do
         end
 
         params[:include] = "current_position.custom_department,positions"
+
+        Graphiti.config.deduplicate_entities = nil
       end
 
-      it "construct full objects in the (squashed) included list" do
+      it "constructs partial objects in the (squashed) included list with no deduplication" do
+        render
+
+        included = json["included"]
+        pos1_array = included.select { |i|
+          i["type"] == "positions" && i["id"] == position1.id.to_s
+        }
+
+        expect(pos1_array.length).to eq(1)
+
+        pos1 = pos1_array.first
+
+        expect(pos1["relationships"]).to be_present
+        expect(pos1["relationships"]["custom_department"]).to be_present
+        expect(pos1["relationships"]["custom_department"]["data"]).to be_nil
+      end
+
+      it "constructs full objects in the (squashed) included list with deduplication" do
+        Graphiti.config.deduplicate_entities = true
         render
 
         included = json["included"]
@@ -1101,6 +1121,10 @@ RSpec.describe "sideloading" do
         expect(pos1["relationships"]).to be_present
         expect(pos1["relationships"]["custom_department"]).to be_present
         expect(pos1["relationships"]["custom_department"]["data"]).to be_present
+      end
+
+      after do
+        Graphiti.config.deduplicate_entities = nil
       end
     end
 

@@ -13,6 +13,11 @@ module Graphiti
       validator.validate!
 
       @deserialized_payload = validator.deserialized_payload
+      @deduplicate_entities = Graphiti.config.deduplicate_entities
+
+      if @deduplicate_entities
+        @populated_entities ||= {}
+      end
     end
 
     def jsonapi_resource
@@ -30,7 +35,7 @@ module Graphiti
     end
 
     def query
-      @query ||= Query.new(jsonapi_resource, params, nil, nil, [], @action)
+      @query ||= Query.new(jsonapi_resource, params, nil, nil, [], @action, populated_entities: @populated_entities)
     end
 
     def query_hash
@@ -64,9 +69,11 @@ module Graphiti
         :sideload,
         :parent,
         :params,
-        :bypass_required_filters
+        :bypass_required_filters,
+        :deduplicate_entities
       scope = jsonapi_scope(base, scope_opts)
-      ResourceProxy.new jsonapi_resource,
+      ResourceProxy.new(
+        jsonapi_resource,
         scope,
         query,
         payload: deserialized_payload,
@@ -74,6 +81,7 @@ module Graphiti
         raise_on_missing: opts[:raise_on_missing],
         cache: opts[:cache],
         cache_expires_in: opts[:cache_expires_in]
+      )
     end
   end
 end

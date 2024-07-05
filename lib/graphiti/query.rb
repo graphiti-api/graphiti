@@ -2,9 +2,10 @@ require "digest"
 
 module Graphiti
   class Query
-    attr_reader :resource, :association_name, :params, :action
+    attr_reader :resource, :association_name, :params, :action, :populated_entities
 
-    def initialize(resource, params, association_name = nil, nested_include = nil, parents = [], action = nil)
+    def initialize(resource, params, association_name = nil, nested_include = nil, parents = [], action = nil,
+                   populated_entities: nil)
       @resource = resource
       @association_name = association_name
       @params = params
@@ -14,6 +15,7 @@ module Graphiti
       @include_param = nested_include || @params[:include]
       @parents = parents
       @action = parse_action(action)
+      @populated_entities = populated_entities
     end
 
     def association?
@@ -107,11 +109,16 @@ module Graphiti
             # This way A) ensures sideloads are resolved
             # And B) ensures nested filters, sorts etc still work
             relationship_name = sideload ? sideload.name : key
-            hash[relationship_name] = Query.new sl_resource,
+
+            hash[relationship_name] = Query.new(
+              sl_resource,
               @params,
               key,
               sub_hash,
-              query_parents, :all
+              query_parents,
+              :all,
+              populated_entities: @populated_entities
+            )
           else
             handle_missing_sideload(key)
           end
