@@ -28,6 +28,12 @@ module Graphiti
       !!@association_name
     end
 
+    def entity_map
+      return parents.first.entity_map if parents.any?
+
+      @entity_map ||= {}
+    end
+
     def top_level?
       !association?
     end

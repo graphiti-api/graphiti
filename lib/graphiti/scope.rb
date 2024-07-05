@@ -154,10 +154,21 @@ module Graphiti
         payload[:results]
       }
       resolved.compact!
+      deduplicate_entities!(resolved)
       assign_serializer(resolved)
       yield resolved if block_given?
       @opts[:after_resolve]&.call(resolved)
       resolved
+    end
+
+    # Must run before sideloads assign, so every include path populates the
+    # canonical instance.
+    def deduplicate_entities!(resolved)
+      resolved.map! do |record|
+        next record unless record.respond_to?(:id) && !record.id.nil?
+
+        @query.entity_map[[record.class, record.id]] ||= record
+      end
     end
 
     def each_applicable_sideload
