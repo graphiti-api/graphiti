@@ -641,8 +641,10 @@ RSpec.describe Graphiti::Sideload do
         parent: "parent",
         sideload: instance,
         query: anything,
-        after_resolve: anything
+        after_resolve: anything,
+        deduplicate_entities: nil
       }
+
       expect(resource_class).to receive(:_all)
         .with(anything, expected, {type: :positions})
       instance.load(parents, query, "parent")
