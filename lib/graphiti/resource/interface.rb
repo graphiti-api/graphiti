@@ -11,7 +11,7 @@ module Graphiti
 
         def all(params = {}, base_scope = nil)
           validate_request!(params)
-          _all(params, { deduplicate_entities: Graphiti.config.deduplicate_entities }, base_scope)
+          _all(params, {deduplicate_entities: Graphiti.config.deduplicate_entities}, base_scope)
         end
 
         # @api private

@@ -4,8 +4,15 @@ module Graphiti
   class Query
     attr_reader :resource, :association_name, :params, :action, :populated_entities
 
-    def initialize(resource, params, association_name = nil, nested_include = nil, parents = [], action = nil,
-                   populated_entities: nil)
+    def initialize(
+      resource,
+      params,
+      association_name = nil,
+      nested_include = nil,
+      parents = [],
+      action = nil,
+      populated_entities: nil
+    )
       @resource = resource
       @association_name = association_name
       @params = params
