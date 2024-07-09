@@ -12,7 +12,7 @@ module Graphiti
         apply_scoping(scope, opts)
       }
 
-      @deduplicate_entities = @opts[:deduplicate_entities]
+      @deduplicate_entities = @query.deduplicate_entities
 
       if @deduplicate_entities
         @populated_entities = @query.populated_entities || {}

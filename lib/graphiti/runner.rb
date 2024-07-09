@@ -35,7 +35,16 @@ module Graphiti
     end
 
     def query
-      @query ||= Query.new(jsonapi_resource, params, nil, nil, [], @action, populated_entities: @populated_entities)
+      @query ||= Query.new(
+        jsonapi_resource,
+        params,
+        nil,
+        nil,
+        [],
+        @action,
+        deduplicate_entities: @deduplicate_entities,
+        populated_entities: @populated_entities
+      )
     end
 
     def query_hash

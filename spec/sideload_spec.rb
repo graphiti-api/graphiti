@@ -641,8 +641,7 @@ RSpec.describe Graphiti::Sideload do
         parent: "parent",
         sideload: instance,
         query: anything,
-        after_resolve: anything,
-        deduplicate_entities: nil
+        after_resolve: anything
       }
 
       expect(resource_class).to receive(:_all)

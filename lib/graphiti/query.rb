@@ -2,7 +2,7 @@ require "digest"
 
 module Graphiti
   class Query
-    attr_reader :resource, :association_name, :params, :action, :populated_entities
+    attr_reader :resource, :association_name, :params, :action, :deduplicate_entities, :populated_entities
 
     def initialize(
       resource,
@@ -11,6 +11,7 @@ module Graphiti
       nested_include = nil,
       parents = [],
       action = nil,
+      deduplicate_entities: nil,
       populated_entities: nil
     )
       @resource = resource
@@ -22,6 +23,7 @@ module Graphiti
       @include_param = nested_include || @params[:include]
       @parents = parents
       @action = parse_action(action)
+      @deduplicate_entities = deduplicate_entities
       @populated_entities = populated_entities
     end
 
@@ -124,6 +126,7 @@ module Graphiti
               sub_hash,
               query_parents,
               :all,
+              deduplicate_entities: @deduplicate_entities,
               populated_entities: @populated_entities
             )
           else
