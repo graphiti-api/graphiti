@@ -65,6 +65,16 @@ module Graphiti
       end
     end
 
+    def deduplicated_rendering?
+      if @deduplicate_entities
+        raise "Deduplicated rendering is not compatible with concurrent fetching" if @concurrency
+
+        return true
+      end
+
+      false
+    end
+
     def schema_path
       @schema_path ||= raise("No schema_path defined! Set Graphiti.config.schema_path to save your schema.")
     end

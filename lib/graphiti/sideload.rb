@@ -396,7 +396,7 @@ module Graphiti
         opts[:after_resolve] = ->(results) {
           fire_assign(parents, results)
         }
-        opts[:deduplicate_entities] = Graphiti.config.deduplicate_entities
+        opts[:deduplicate_entities] = Graphiti.config.deduplicated_rendering?
       end
     end
 

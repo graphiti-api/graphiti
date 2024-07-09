@@ -13,7 +13,7 @@ module Graphiti
       validator.validate!
 
       @deserialized_payload = validator.deserialized_payload
-      @deduplicate_entities = Graphiti.config.deduplicate_entities
+      @deduplicate_entities = Graphiti.config.deduplicated_rendering?
 
       if @deduplicate_entities
         @populated_entities ||= {}
