@@ -1,5 +1,19 @@
 graphiti changelog
 
+## [1.7.3](https://github.com/graphiti-api/graphiti/compare/v1.7.2...v1.7.3) (2024-06-26)
+
+
+### Bug Fixes
+
+* require OpenStruct explicitly ([#475](https://github.com/graphiti-api/graphiti/issues/475)) ([e0fa18a](https://github.com/graphiti-api/graphiti/commit/e0fa18a8d7f051e385e6e081f79f2ecae92a9260))
+
+## [1.7.2](https://github.com/graphiti-api/graphiti/compare/v1.7.1...v1.7.2) (2024-06-11)
+
+
+### Bug Fixes
+
+* require necessary ActiveSupport parts in proper order ([bb2a488](https://github.com/graphiti-api/graphiti/commit/bb2a48874a6533522df6eb027d0df8ec14c80a20))
+
 ## [1.7.1](https://github.com/graphiti-api/graphiti/compare/v1.7.0...v1.7.1) (2024-04-18)
 
 
