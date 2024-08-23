@@ -179,19 +179,21 @@ module Graphiti
 
     def deduplicate_entities(resolved)
       resolved.map! do |entity|
-        next entity unless entity.respond_to?(:id) # Leave no-id (although unusual) entities as is
+        next entity unless entity.respond_to?(:id) && !entity.id.nil? # Leave no-id (although unusual) entities as is
 
         if @populated_entities.key?(entity.class)
-          populated_entity = @populated_entities[entity.class].find { |populated_entity| populated_entity&.id == entity.id }
+          populated_entity = @populated_entities[entity.class][entity.id]
           if populated_entity.nil?
-            @populated_entities[entity.class].push(entity)
+            @populated_entities[entity.class][entity.id] = entity
 
             entity
           else
             populated_entity
           end
         else
-          @populated_entities[entity.class] = [entity]
+          @populated_entities[entity.class] = {}
+          @populated_entities[entity.class][entity.id] = entity
+
           entity
         end
       end
