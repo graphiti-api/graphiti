@@ -3,8 +3,7 @@ module Graphiti
     attr_accessor :object, :unpaginated_object
     attr_reader :pagination
 
-    # TODO: this could be a Concurrent::Promises.delay
-    GLOBAL_THREAD_POOL_EXECUTOR = Concurrent::Delay.new do
+    GLOBAL_THREAD_POOL_EXECUTOR = Concurrent::Promises.delay do
       if Graphiti.config.concurrency
         concurrency = Graphiti.config.concurrency_max_threads || 4
         Concurrent::ThreadPoolExecutor.new(
