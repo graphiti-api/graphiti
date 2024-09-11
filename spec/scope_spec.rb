@@ -168,6 +168,14 @@ RSpec.describe Graphiti::Scope do
 
           before { allow(Graphiti.config).to receive(:concurrency).and_return(true) }
           before { allow(Graphiti.config).to receive(:before_sideload).and_return(before_sideload) }
+          before do
+            stub_const(
+              "Graphiti::Scope::GLOBAL_THREAD_POOL_EXECUTOR",
+              Concurrent::Promises.delay do
+                Concurrent::ThreadPoolExecutor.new(min_threads: 1, max_threads: 1, fallback_policy: :caller_runs)
+              end
+            )
+          end
 
           it "calls configiration.before_sideload with context" do
             Graphiti.context[:tenant_id] = 1
@@ -193,13 +201,6 @@ RSpec.describe Graphiti::Scope do
             let(:departments_sideload) { double("departments", shared_remote?: false, name: :departments) }
 
             before do
-              stub_const(
-                "Graphiti::Scope::GLOBAL_THREAD_POOL_EXECUTOR",
-                Concurrent::Delay.new do
-                  Concurrent::ThreadPoolExecutor.new(min_threads: 1, max_threads: 1, fallback_policy: :caller_runs)
-                end
-              )
-
               allow(position_resource).to receive(:resolve) { results }
               allow(position_resource.class).to receive(:sideload).with(:department) { departments_sideload }
               allow(departments_sideload).to receive(:future_resolve) { Concurrent::Promises.future {} }
@@ -212,6 +213,20 @@ RSpec.describe Graphiti::Scope do
 
             it "does not deadlock" do
               expect { instance.resolve_sideloads(results) }.not_to raise_error
+            end
+          end
+
+          context "parent thread locals" do
+            it "are accessible to the sideloading thread from the threadpool" do
+              Thread.current[:foo] = "bar"
+
+              allow(sideload).to receive(:future_resolve) do
+                expect(Thread.current[:foo]).to eq("bar")
+                Concurrent::Promises.fulfilled_future({})
+              end
+              instance.resolve_sideloads(results)
+            ensure
+              Thread.current[:foo] = nil
             end
           end
         end
