@@ -114,25 +114,30 @@ module Graphiti
         sideload = @resource.class.sideload(name)
         next if sideload.nil? || sideload.shared_remote?
 
-        thread_storage = Thread.current.keys.each_with_object({}) do |key, memo|
-          memo[key] = Thread.current[key]
+        sideload_promise_with_context(results, q) do |parent_results, sideload_query, parent_resource|
+          sideload.future_resolve(parent_results, sideload_query, parent_resource)
         end
-
-        sideload_promise = Concurrent::Promises.future_on(
-          self.class.global_thread_pool_executor, @resource, results, Graphiti.context, thread_storage
-        ) do |parent_resource, parent_results, graphiti_context, thread_storage|
-          thread_storage.keys.each_with_object(Thread.current) do |key, thread_current|
-            thread_current[key] = thread_storage[key]
-          end
-          Graphiti.config.before_sideload&.call(graphiti_context)
-          Graphiti.context = graphiti_context
-          sideload.future_resolve(parent_results, q, parent_resource)
-        end
-
-        sideload_promise.flat
       end
 
       Concurrent::Promises.zip_futures_on(self.class.global_thread_pool_executor, *sideload_promises)
+    end
+
+    def sideload_promise_with_context(parent_results, sideload_query)
+      thread_storage = Thread.current.keys.each_with_object({}) do |key, memo|
+        memo[key] = Thread.current[key]
+      end
+
+      p = Concurrent::Promises.future_on(
+        self.class.global_thread_pool_executor, @resource, sideload_query, parent_results, Graphiti.context, thread_storage
+      ) do |parent_resource, sideload_query, parent_results, graphiti_context, thread_storage|
+        thread_storage.keys.each_with_object(Thread.current) do |key, thread_current|
+          thread_current[key] = thread_storage[key]
+        end
+        Graphiti.config.before_sideload&.call(graphiti_context)
+        Graphiti.context = graphiti_context
+        yield parent_results, sideload_query, parent_resource
+      end
+      p.flat
     end
 
     def sideload_resource_proxies
