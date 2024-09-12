@@ -128,12 +128,12 @@ module Graphiti
       thread_storage = Thread.current.keys.each_with_object({}) do |key, memo|
         memo[key] = Thread.current[key]
       end
-      fiber_storage = nil
-      if Fiber.current.respond_to?(:storage)
-        fiber_storage = Fiber.current.storage.keys.each_with_object({}) do |key, memo|
-          memo[key] = Fiber[key]
+      fiber_storage =
+        if Fiber.current.respond_to?(:storage)
+          Fiber.current&.storage&.keys&.each_with_object({}) do |key, memo|
+            memo[key] = Fiber[key]
+          end
         end
-      end
 
       Concurrent::Promises.future_on(
         self.class.global_thread_pool_executor, Thread.current.object_id, thread_storage, fiber_storage, *args
