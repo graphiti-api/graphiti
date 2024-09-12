@@ -114,30 +114,39 @@ module Graphiti
         sideload = @resource.class.sideload(name)
         next if sideload.nil? || sideload.shared_remote?
 
-        sideload_promise_with_context(results, q) do |parent_results, sideload_query, parent_resource|
+        p = future_with_fiber_locals(results, q, @resource) do |parent_results, sideload_query, parent_resource|
+          Graphiti.config.before_sideload&.call(Graphiti.context)
           sideload.future_resolve(parent_results, sideload_query, parent_resource)
         end
+        p.flat
       end
 
       Concurrent::Promises.zip_futures_on(self.class.global_thread_pool_executor, *sideload_promises)
     end
 
-    def sideload_promise_with_context(parent_results, sideload_query)
+    def future_with_fiber_locals(*args)
       thread_storage = Thread.current.keys.each_with_object({}) do |key, memo|
         memo[key] = Thread.current[key]
       end
+      fiber_storage = nil
+      if Fiber.current.respond_to?(:storage)
+        fiber_storage = Fiber.current.storage.keys.each_with_object({}) do |key, memo|
+          memo[key] = Fiber[key]
+        end
+      end
 
-      p = Concurrent::Promises.future_on(
-        self.class.global_thread_pool_executor, @resource, sideload_query, parent_results, Graphiti.context, thread_storage
-      ) do |parent_resource, sideload_query, parent_results, graphiti_context, thread_storage|
+      Concurrent::Promises.future_on(
+        self.class.global_thread_pool_executor, thread_storage, fiber_storage, *args
+      ) do |thread_storage, fiber_storage, *args|
         thread_storage.keys.each_with_object(Thread.current) do |key, thread_current|
           thread_current[key] = thread_storage[key]
         end
-        Graphiti.config.before_sideload&.call(graphiti_context)
-        Graphiti.context = graphiti_context
-        yield parent_results, sideload_query, parent_resource
+        fiber_storage&.keys&.each_with_object(Fiber) do |key, fiber_current|
+          fiber_current[key] = fiber_storage[key]
+        end
+
+        yield(*args)
       end
-      p.flat
     end
 
     def sideload_resource_proxies

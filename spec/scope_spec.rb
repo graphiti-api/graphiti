@@ -229,6 +229,28 @@ RSpec.describe Graphiti::Scope do
               Thread.current[:foo] = nil
             end
           end
+
+          context "parent fiber locals" do
+            it "are accessible to the sideloading thread from the threadpool" do
+              # Start the thread pool first
+              #
+              # Fiber storage is inherited from the parent thread so we
+              # need to start the thread pool first so the thread does
+              # not inherit the Fiber[:foo] from the main thread.
+              allow(sideload).to receive(:future_resolve) { Concurrent::Promises.fulfilled_future({}) }
+              instance.resolve_sideloads(results)
+
+              Fiber[:foo] = "bar"
+
+              allow(sideload).to receive(:future_resolve) do
+                expect(Fiber[:foo]).to eq("bar")
+                Concurrent::Promises.fulfilled_future({})
+              end
+              instance.resolve_sideloads(results)
+            ensure
+              Thread.current[:foo] = nil
+            end
+          end
         end
 
         context "without concurrency" do
