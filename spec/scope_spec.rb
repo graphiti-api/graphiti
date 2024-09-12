@@ -225,6 +225,8 @@ RSpec.describe Graphiti::Scope do
                 Concurrent::Promises.fulfilled_future({})
               end
               instance.resolve_sideloads(results)
+
+              expect(Thread.current[:foo]).to eq("bar")
             ensure
               Thread.current[:foo] = nil
             end
@@ -247,8 +249,10 @@ RSpec.describe Graphiti::Scope do
                 Concurrent::Promises.fulfilled_future({})
               end
               instance.resolve_sideloads(results)
+
+              expect(Fiber[:foo]).to eq("bar")
             ensure
-              Thread.current[:foo] = nil
+              Fiber[:foo] = nil
             end
           end
         end
@@ -261,6 +265,24 @@ RSpec.describe Graphiti::Scope do
 
             expect(resource.adapter).not_to receive(:close)
             instance.resolve_sideloads(results)
+          end
+
+          it "does not clear thread locals" do
+            Thread.current[:foo] = "bar"
+
+            allow(sideload).to receive(:future_resolve) { Concurrent::Promises.fulfilled_future({}) }
+            instance.resolve_sideloads(results)
+
+            expect(Thread.current[:foo]).to eq("bar")
+          end
+
+          it "does not clear fiber locals" do
+            Fiber[:foo] = "bar"
+
+            allow(sideload).to receive(:future_resolve) { Concurrent::Promises.fulfilled_future({}) }
+            instance.resolve_sideloads(results)
+
+            expect(Fiber[:foo]).to eq("bar")
           end
         end
 

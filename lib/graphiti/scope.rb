@@ -136,16 +136,21 @@ module Graphiti
       end
 
       Concurrent::Promises.future_on(
-        self.class.global_thread_pool_executor, thread_storage, fiber_storage, *args
-      ) do |thread_storage, fiber_storage, *args|
-        thread_storage.keys.each_with_object(Thread.current) do |key, thread_current|
-          thread_current[key] = thread_storage[key]
-        end
-        fiber_storage&.keys&.each_with_object(Fiber) do |key, fiber_current|
-          fiber_current[key] = fiber_storage[key]
+        self.class.global_thread_pool_executor, Thread.current.object_id, thread_storage, fiber_storage, *args
+      ) do |thread_id, thread_storage, fiber_storage, *args|
+        execution_context_changed = thread_id != Thread.current.object_id
+        if execution_context_changed
+          thread_storage&.keys&.each_with_object(Thread.current) do |key, thread_current|
+            thread_current[key] = thread_storage[key]
+          end
+          fiber_storage&.keys&.each_with_object(Fiber) do |key, fiber_current|
+            fiber_current[key] = fiber_storage[key]
+          end
         end
 
-        yield(*args)
+        result = yield(*args)
+
+        result
       end
     end
 
