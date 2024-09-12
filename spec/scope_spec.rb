@@ -232,27 +232,29 @@ RSpec.describe Graphiti::Scope do
             end
           end
 
-          context "parent fiber locals" do
-            it "are accessible to the sideloading thread from the threadpool" do
-              # Start the thread pool first
-              #
-              # Fiber storage is inherited from the parent thread so we
-              # need to start the thread pool first so the thread does
-              # not inherit the Fiber[:foo] from the main thread.
-              allow(sideload).to receive(:future_resolve) { Concurrent::Promises.fulfilled_future({}) }
-              instance.resolve_sideloads(results)
+          if Fiber.respond_to?(:[])
+            context "parent fiber locals" do
+              it "are accessible to the sideloading thread from the threadpool" do
+                # Start the thread pool first
+                #
+                # Fiber storage is inherited from the parent thread so we
+                # need to start the thread pool first so the thread does
+                # not inherit the Fiber[:foo] from the main thread.
+                allow(sideload).to receive(:future_resolve) { Concurrent::Promises.fulfilled_future({}) }
+                instance.resolve_sideloads(results)
 
-              Fiber[:foo] = "bar"
+                Fiber[:foo] = "bar"
 
-              allow(sideload).to receive(:future_resolve) do
+                allow(sideload).to receive(:future_resolve) do
+                  expect(Fiber[:foo]).to eq("bar")
+                  Concurrent::Promises.fulfilled_future({})
+                end
+                instance.resolve_sideloads(results)
+
                 expect(Fiber[:foo]).to eq("bar")
-                Concurrent::Promises.fulfilled_future({})
+              ensure
+                Fiber[:foo] = nil
               end
-              instance.resolve_sideloads(results)
-
-              expect(Fiber[:foo]).to eq("bar")
-            ensure
-              Fiber[:foo] = nil
             end
           end
         end
@@ -276,13 +278,15 @@ RSpec.describe Graphiti::Scope do
             expect(Thread.current[:foo]).to eq("bar")
           end
 
-          it "does not clear fiber locals" do
-            Fiber[:foo] = "bar"
+          if Fiber.respond_to?(:[])
+            it "does not clear fiber locals" do
+              Fiber[:foo] = "bar"
 
-            allow(sideload).to receive(:future_resolve) { Concurrent::Promises.fulfilled_future({}) }
-            instance.resolve_sideloads(results)
+              allow(sideload).to receive(:future_resolve) { Concurrent::Promises.fulfilled_future({}) }
+              instance.resolve_sideloads(results)
 
-            expect(Fiber[:foo]).to eq("bar")
+              expect(Fiber[:foo]).to eq("bar")
+            end
           end
         end
 
