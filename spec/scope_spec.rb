@@ -86,7 +86,7 @@ RSpec.describe Graphiti::Scope do
             before do
               stub_const(
                 "Graphiti::Scope::GLOBAL_THREAD_POOL_EXECUTOR",
-                Concurrent::Delay.new do
+                Concurrent::Promises.delay do
                   Concurrent::ThreadPoolExecutor.new(min_threads: 2, max_threads: 2, fallback_policy: :caller_runs)
                 end
               )
