@@ -1,5 +1,4 @@
 require "spec_helper"
-require "byebug"
 
 RSpec.describe Graphiti::Scope do
   let(:object) { double.as_null_object }
