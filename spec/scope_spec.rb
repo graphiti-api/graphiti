@@ -1,4 +1,5 @@
 require "spec_helper"
+require "byebug"
 
 RSpec.describe Graphiti::Scope do
   let(:object) { double.as_null_object }
@@ -198,21 +199,36 @@ RSpec.describe Graphiti::Scope do
                 self.default_page_size = 1
               end.new
             end
-            let(:departments_sideload) { double("departments", shared_remote?: false, name: :departments) }
+            let(:department_resource) do
+              Class.new(PORO::DepartmentResource) do
+                self.default_page_size = 1
+              end.new
+            end
+            let(:department_sideload) { double("department", shared_remote?: false, name: :department) }
+            let(:position_results) { double("positions").as_null_object }
 
             before do
-              allow(position_resource).to receive(:resolve) { results }
-              allow(position_resource.class).to receive(:sideload).with(:department) { departments_sideload }
-              allow(departments_sideload).to receive(:future_resolve) { Concurrent::Promises.future {} }
+              allow(position_resource).to receive(:resolve) { position_results }
+              allow(position_resource.class).to receive(:sideload).with(:department) { department_sideload }
+              allow(department_resource).to receive(:resolve) { double("department").as_null_object }
+              allow(department_resource.class).to receive(:sideload).with(:positions) { department_positions_sideload }
 
               # make resolve just load the sideloads
               allow(sideload).to receive(:future_resolve) do |_results, q, _parent_resource|
                 described_class.new(double.as_null_object, position_resource, q).future_resolve
               end
+
+              allow(department_sideload).to receive(:future_resolve) do |_results, q, _parent_resource|
+                described_class.new(double.as_null_object, department_resource, q).future_resolve
+              end
             end
 
             it "does not deadlock" do
               expect { instance.resolve_sideloads(results) }.not_to raise_error
+            end
+
+            it "flattens the nested sideload promises" do
+              expect(instance.resolve_sideloads(results)).to contain_exactly(position_results)
             end
           end
 
