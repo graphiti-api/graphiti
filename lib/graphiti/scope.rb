@@ -3,6 +3,9 @@ module Graphiti
     attr_accessor :object, :unpaginated_object
     attr_reader :pagination
 
+    GLOBAL_THREAD_POOL_EXECUTOR_BROADCAST_STATS = %w[
+      length max_length queue_length max_queue completed_task_count largest_length scheduled_task_count synchronous
+    ]
     GLOBAL_THREAD_POOL_EXECUTOR = Concurrent::Promises.delay do
       if Graphiti.config.concurrency
         concurrency = Graphiti.config.concurrency_max_threads || 4
@@ -16,10 +19,16 @@ module Graphiti
         Concurrent::ThreadPoolExecutor.new(max_threads: 0, synchronous: true, fallback_policy: :caller_runs)
       end
     end
-    private_constant :GLOBAL_THREAD_POOL_EXECUTOR
+    private_constant :GLOBAL_THREAD_POOL_EXECUTOR, :GLOBAL_THREAD_POOL_EXECUTOR_BROADCAST_STATS
 
     def self.global_thread_pool_executor
       GLOBAL_THREAD_POOL_EXECUTOR.value!
+    end
+
+    def self.global_thread_pool_stats
+      GLOBAL_THREAD_POOL_EXECUTOR_BROADCAST_STATS.each_with_object({}) do |key, memo|
+        memo[key] = global_thread_pool_executor.send(key)
+      end
     end
 
     def initialize(object, resource, query, opts = {})
@@ -148,7 +157,9 @@ module Graphiti
           end
         end
 
-        result = yield(*args)
+        result = Graphiti.broadcast(:global_thread_pool_task_run, self.class.global_thread_pool_stats) do
+          yield(*args)
+        end
 
         if execution_context_changed
           thread_storage&.keys&.each { |key| Thread.current[key] = nil }
