@@ -187,4 +187,26 @@ RSpec.describe Graphiti::Configuration do
       expect { Graphiti.config.cache_rendering? }.to raise_error(/You must configure a cache store in order to use cache_rendering/)
     end
   end
+
+  describe "#deduplicate_entities" do
+    it "defaults" do
+      expect(Graphiti.config.deduplicated_rendering?).to eq(false)
+    end
+
+    it "is settable" do
+      Graphiti.configure do |c|
+        c.deduplicate_entities = true
+      end
+      expect(Graphiti.config.deduplicated_rendering?).to eq(true)
+    end
+
+    it "warns about incompatibility between concurrency and deduplicated_rendering" do
+      Graphiti.configure do |c|
+        c.deduplicate_entities = true
+        c.concurrency = true
+      end
+
+      expect { Graphiti.config.deduplicated_rendering? }.to raise_error(/Deduplicated rendering is not compatible with concurrent fetching/)
+    end
+  end
 end
