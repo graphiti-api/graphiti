@@ -28,6 +28,9 @@ module Graphiti
       def generate
         {}.tap do |stats|
           @query.stats.each_pair do |name, calculation|
+            nested_on = @resource.stats[name]&.nested_on
+            next if nested_on.present?
+
             stats[name] = {}
 
             each_calculation(name, calculation) do |calc, function|
