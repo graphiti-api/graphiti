@@ -313,6 +313,31 @@ RSpec.describe Graphiti::Scope do
             instance.resolve_sideloads(results)
           end
         end
+
+        context "when a sideload errors" do
+          before do
+            allow(sideload).to receive(:future_resolve) { Concurrent::Promises.future { raise "danger will robinson!" } }
+          end
+
+          it "raises the error" do
+            expect { instance.resolve_sideloads(results) }.to raise_error("danger will robinson!")
+          end
+        end
+
+        context "when multiple sideloads error" do
+          let(:sideload_2) { double("visas", shared_remote?: false, name: :visas) }
+          let(:params) { {include: {positions: {}, visas: {}}} }
+
+          before do
+            allow(resource.class).to receive(:sideload).with(:visas) { sideload }
+            allow(sideload).to receive(:future_resolve) { Concurrent::Promises.future { raise "danger will robinson!" } }
+            allow(sideload_2).to receive(:future_resolve) { Concurrent::Promises.future { raise "danger will robinson!" } }
+          end
+
+          it "raises the first error" do
+            expect { instance.resolve_sideloads(results) }.to raise_error("danger will robinson!")
+          end
+        end
       end
     end
 
