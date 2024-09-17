@@ -1,5 +1,12 @@
 graphiti changelog
 
+## [1.7.5](https://github.com/graphiti-api/graphiti/compare/v1.7.4...v1.7.5) (2024-09-16)
+
+
+### Bug Fixes
+
+* Fixes error in version check for ActiveRecord adapter introduced in [#478](https://github.com/graphiti-api/graphiti/issues/478) ([#479](https://github.com/graphiti-api/graphiti/issues/479)) ([42c82c3](https://github.com/graphiti-api/graphiti/commit/42c82c397f20eb91c02835e518ff4c351c028ea7))
+
 ## [1.7.4](https://github.com/graphiti-api/graphiti/compare/v1.7.3...v1.7.4) (2024-09-11)
 
 
