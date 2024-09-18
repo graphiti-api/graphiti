@@ -3,7 +3,7 @@ module Graphiti
     attr_accessor :object, :unpaginated_object
     attr_reader :pagination
 
-    GLOBAL_THREAD_POOL_EXECUTOR_BROADCAST_STATS = %w[
+    GLOBAL_THREAD_POOL_EXECUTOR_BROADCAST_STATS = %i[
       length max_length queue_length max_queue completed_task_count largest_length scheduled_task_count synchronous
     ]
     GLOBAL_THREAD_POOL_EXECUTOR = Concurrent::Promises.delay do
