@@ -131,7 +131,13 @@ module Graphiti
       end
 
       Concurrent::Promises.zip_futures_on(self.class.global_thread_pool_executor, *sideload_promises)
-        .rescue { |err| raise err }
+        .rescue_on(self.class.global_thread_pool_executor) do |err|
+          if err.is_a?(Exception)
+            raise err
+          else
+            raise "Error resolving sideloads: #{err}"
+          end
+        end
     end
 
     def future_with_fiber_locals(*args)
