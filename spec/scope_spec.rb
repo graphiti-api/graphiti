@@ -314,13 +314,30 @@ RSpec.describe Graphiti::Scope do
           end
         end
 
-        context "when a sideload errors" do
+        context "when the first sideload errors" do
           before do
-            allow(sideload).to receive(:future_resolve) { Concurrent::Promises.future { raise "danger will robinson!" } }
+            allow(sideload).to receive(:future_resolve) do
+              Concurrent::Promises.future { raise "danger will robinson!" }
+            end
           end
 
           it "raises the error" do
             expect { instance.resolve_sideloads(results) }.to raise_error("danger will robinson!")
+          end
+        end
+
+        context "when another sideload errors" do
+          let(:sideload_2) { double("visas", shared_remote?: false, name: :visas) }
+          let(:params) { {include: {positions: {}, visas: {}}} }
+
+          before do
+            allow(resource.class).to receive(:sideload).with(:visas) { sideload_2 }
+            allow(sideload).to receive(:future_resolve) { Concurrent::Promises.future {} }
+            allow(sideload_2).to receive(:future_resolve) { Concurrent::Promises.future { raise "sideload_2" } }
+          end
+
+          it "raises the error" do
+            expect { instance.resolve_sideloads(results) }.to raise_error("sideload_2")
           end
         end
 
@@ -329,13 +346,13 @@ RSpec.describe Graphiti::Scope do
           let(:params) { {include: {positions: {}, visas: {}}} }
 
           before do
-            allow(resource.class).to receive(:sideload).with(:visas) { sideload }
-            allow(sideload).to receive(:future_resolve) { Concurrent::Promises.future { raise "danger will robinson!" } }
-            allow(sideload_2).to receive(:future_resolve) { Concurrent::Promises.future { raise "danger will robinson!" } }
+            allow(resource.class).to receive(:sideload).with(:visas) { sideload_2 }
+            allow(sideload).to receive(:future_resolve) { Concurrent::Promises.future { raise "sideload" } }
+            allow(sideload_2).to receive(:future_resolve) { Concurrent::Promises.future { raise "sideload_2" } }
           end
 
           it "raises the first error" do
-            expect { instance.resolve_sideloads(results) }.to raise_error("danger will robinson!")
+            expect { instance.resolve_sideloads(results) }.to raise_error("sideload")
           end
         end
       end

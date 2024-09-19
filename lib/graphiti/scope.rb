@@ -69,9 +69,8 @@ module Graphiti
           @resource.adapter.close
         end
 
-        future_resolve_sideloads(resolved).then_on(self.class.global_thread_pool_executor, resolved) do
-          resolved
-        end
+        future_resolve_sideloads(resolved)
+          .then_on(self.class.global_thread_pool_executor, resolved) { resolved }
       end
     end
 
@@ -123,7 +122,7 @@ module Graphiti
         sideload = @resource.class.sideload(name)
         next if sideload.nil? || sideload.shared_remote?
 
-        p = future_with_fiber_locals(results, q, @resource) do |parent_results, sideload_query, parent_resource|
+        p = future_with_context(results, q, @resource) do |parent_results, sideload_query, parent_resource|
           Graphiti.config.before_sideload&.call(Graphiti.context)
           sideload.future_resolve(parent_results, sideload_query, parent_resource)
         end
@@ -131,16 +130,13 @@ module Graphiti
       end
 
       Concurrent::Promises.zip_futures_on(self.class.global_thread_pool_executor, *sideload_promises)
-        .rescue_on(self.class.global_thread_pool_executor) do |err|
-          if err.is_a?(Exception)
-            raise err
-          else
-            raise "Error resolving sideloads: #{err}"
-          end
+        .rescue_on(self.class.global_thread_pool_executor) do |*reasons|
+          first_error = reasons.find { |r| r.is_a?(Exception) }
+          raise first_error
         end
     end
 
-    def future_with_fiber_locals(*args)
+    def future_with_context(*args)
       thread_storage = Thread.current.keys.each_with_object({}) do |key, memo|
         memo[key] = Thread.current[key]
       end
