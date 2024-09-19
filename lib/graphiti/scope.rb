@@ -51,27 +51,25 @@ module Graphiti
     end
 
     def future_resolve
-      if @query.zero_results?
-        Concurrent::Promises.fulfilled_future([], self.class.global_thread_pool_executor)
-      else
-        resolved = broadcast_data { |payload|
-          @object = @resource.before_resolve(@object, @query)
-          payload[:results] = @resource.resolve(@object)
-          payload[:results]
-        }
-        resolved.compact!
-        assign_serializer(resolved)
-        yield resolved if block_given?
-        @opts[:after_resolve]&.call(resolved)
-        sideloaded = @query.parents.any?
-        close_adapter = Graphiti.config.concurrency && sideloaded
-        if close_adapter
-          @resource.adapter.close
-        end
+      return Concurrent::Promises.fulfilled_future([], self.class.global_thread_pool_executor) if @query.zero_results?
 
-        future_resolve_sideloads(resolved)
-          .then_on(self.class.global_thread_pool_executor, resolved) { resolved }
+      resolved = broadcast_data { |payload|
+        @object = @resource.before_resolve(@object, @query)
+        payload[:results] = @resource.resolve(@object)
+        payload[:results]
+      }
+      resolved.compact!
+      assign_serializer(resolved)
+      yield resolved if block_given?
+      @opts[:after_resolve]&.call(resolved)
+      sideloaded = @query.parents.any?
+      close_adapter = Graphiti.config.concurrency && sideloaded
+      if close_adapter
+        @resource.adapter.close
       end
+
+      future_resolve_sideloads(resolved)
+        .then_on(self.class.global_thread_pool_executor, resolved) { resolved }
     end
 
     def parent_resource
