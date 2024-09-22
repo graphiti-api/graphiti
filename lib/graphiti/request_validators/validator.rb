@@ -17,7 +17,6 @@ module Graphiti
         return true unless @params.has_key?(:data)
 
         resource = @root_resource
-
         if @params[:data].has_key?(:type)
           if (meta_type = deserialized_payload.meta[:type].try(:to_sym))
             if @root_resource.type != meta_type && @root_resource.polymorphic?
