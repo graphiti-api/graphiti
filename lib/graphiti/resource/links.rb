@@ -74,12 +74,12 @@ module Graphiti
         endpoints.any? do |e|
           has_id = params[:id] || params[:data].try(:[], :id)
           path = request_path
-          if [:update, :show, :destroy].include?(context_namespace) && has_id
+          if [:update, :show, :destroy].include?(action) && has_id
             path = request_path.split("/")
-            path.pop if path.last == has_id.to_s
+            path.pop if URI.decode_uri_component(path.last) == has_id.to_s
             path = path.join("/")
           end
-          e[:full_path].to_s == path && e[:actions].include?(context_namespace)
+          e[:full_path].to_s == path && e[:actions].include?(action)
         end
       end
 
