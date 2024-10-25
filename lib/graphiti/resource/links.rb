@@ -76,7 +76,7 @@ module Graphiti
           path = request_path
           if [:update, :show, :destroy].include?(action) && has_id
             path = request_path.split("/")
-            path.pop if URI.decode_uri_component(path.last) == has_id.to_s
+            path.pop if Graphiti::Util::UriDecoder.decode_uri(path.last) == has_id.to_s
             path = path.join("/")
           end
           e[:full_path].to_s == path && e[:actions].include?(action)
