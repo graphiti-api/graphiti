@@ -39,7 +39,7 @@ module Graphiti
             :not_match
           ],
           uuid: [:eq, :not_eq],
-          enum: [:eq, :not_eq],
+          enum: [:eq, :not_eq, :eql, :not_eql],
           integer_id: numerical_operators,
           integer: numerical_operators,
           big_decimal: numerical_operators,

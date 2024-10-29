@@ -26,6 +26,7 @@ module Graphiti
       alias_method :filter_boolean_eq, :filter_eq
       alias_method :filter_uuid_eq, :filter_eq
       alias_method :filter_enum_eq, :filter_eq
+      alias_method :filter_enum_eql, :filter_eq
 
       def filter_not_eq(scope, attribute, value)
         scope.where.not(attribute => value)
@@ -37,6 +38,7 @@ module Graphiti
       alias_method :filter_boolean_not_eq, :filter_not_eq
       alias_method :filter_uuid_not_eq, :filter_not_eq
       alias_method :filter_enum_not_eq, :filter_not_eq
+      alias_method :filter_enum_not_eql, :filter_not_eq
 
       def filter_string_eq(scope, attribute, value, is_not: false)
         column = column_for(scope, attribute)
@@ -302,7 +304,11 @@ module Graphiti
       end
 
       def close
-        ::ActiveRecord::Base.clear_active_connections!
+        if ::ActiveRecord.version > "7.2"
+          ::ActiveRecord::Base.connection_handler.clear_active_connections!
+        else
+          ::ActiveRecord::Base.clear_active_connections!
+        end
       end
 
       def can_group?

@@ -1,13 +1,17 @@
 require "json"
 require "forwardable"
 require "uri"
+require "ostruct" unless defined?(::OpenStruct)
+
+require "active_support/version"
+require "active_support/deprecation"
+require "active_support/deprecator" if ::ActiveSupport.version >= Gem::Version.new("7.1")
 require "active_support/core_ext/string"
 require "active_support/core_ext/enumerable"
 require "active_support/core_ext/class/attribute"
 require "active_support/core_ext/hash/conversions" # to_xml
 require "active_support/concern"
 require "active_support/time"
-require "active_support/deprecation"
 
 require "dry-types"
 require "graphiti_errors"
@@ -106,6 +110,14 @@ module Graphiti
       r.apply_sideloads_to_serializer
     end
   end
+
+  def self.cache=(val)
+    @cache = val
+  end
+
+  def self.cache
+    @cache
+  end
 end
 
 require "graphiti/version"
@@ -137,7 +149,6 @@ require "graphiti/resource_proxy"
 require "graphiti/request_validator"
 require "graphiti/request_validators/validator"
 require "graphiti/request_validators/update_validator"
-require "graphiti/query"
 require "graphiti/scope"
 require "graphiti/deserializer"
 require "graphiti/renderer"
@@ -176,7 +187,9 @@ require "graphiti/extensions/extra_attribute"
 require "graphiti/extensions/boolean_attribute"
 require "graphiti/extensions/temp_id"
 require "graphiti/serializer"
+require "graphiti/query"
 require "graphiti/debugger"
+require "graphiti/util/cache_debug"
 
 if defined?(ActiveRecord)
   require "graphiti/adapters/active_record"

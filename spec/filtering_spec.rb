@@ -29,6 +29,20 @@ RSpec.describe "filtering" do
     expect(records.map(&:id)).to eq([employee1.id])
   end
 
+  context "retains filtering value" do
+    it "when value includes curly brackets" do
+      params[:filter] = {first_name: "{{John}}"}
+      records
+      expect(params[:filter]).to eq(first_name: "{{John}}")
+    end
+
+    it "when value does not include curly brackets" do
+      params[:filter] = {first_name: "John"}
+      records
+      expect(params[:filter]).to eq(first_name: "John")
+    end
+  end
+
   context "when filter is type hash" do
     before do
       resource.filter :by_json, :hash do
@@ -563,6 +577,33 @@ RSpec.describe "filtering" do
           }.to raise_error(Graphiti::Errors::MissingEnumAllowList, /integer_enum/)
         end
       end
+    end
+  end
+
+  context "when filtering on an string_enum field" do
+    before do
+      resource.config[:filters] = {}
+      resource.filter :first_name, :string_enum, single: true, allow: ["William", "Harold"] do
+        eq do |scope, value|
+          scope[:conditions][:first_name] = value
+          scope
+        end
+      end
+    end
+
+    it "accepts values in the allowlist with eq operator" do
+      params[:filter] = {first_name: {eq: "William"}}
+      expect(records.map(&:id)).to eq([employee3.id])
+    end
+
+    it "accepts values in the allowlist with eql operator" do
+      params[:filter] = {first_name: {eql: "Harold"}}
+      expect(records.map(&:id)).to eq([employee4.id])
+    end
+
+    it "accepts values in the allowlist with not_eql operator" do
+      params[:filter] = {first_name: {not_eql: "Harold"}}
+      expect(records.map(&:id)).to eq([employee1.id, employee2.id, employee3.id])
     end
   end
 

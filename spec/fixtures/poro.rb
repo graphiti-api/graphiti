@@ -74,6 +74,8 @@ module PORO
             end
             if value.is_a?(Array)
               value.include?(db_value)
+            elsif value.is_a?(Hash) && value[:not]
+              db_value != value[:not]
             else
               db_value == value
             end
@@ -305,6 +307,13 @@ module PORO
       scope[:conditions][name] = value
       scope
     end
+
+    def filter_not_eq(scope, name, value)
+      scope[:conditions] ||= {}
+      scope[:conditions][name] = {not: value}
+      scope
+    end
+
     alias_method :filter_integer_eq, :filter
     alias_method :filter_string_eq, :filter
     alias_method :filter_big_decimal_eq, :filter
@@ -314,6 +323,10 @@ module PORO
     alias_method :filter_boolean_eq, :filter
     alias_method :filter_hash_eq, :filter
     alias_method :filter_array_eq, :filter
+    alias_method :filter_enum_eq, :filter
+    alias_method :filter_enum_not_eq, :filter_not_eq
+    alias_method :filter_enum_eql, :filter
+    alias_method :filter_enum_not_eql, :filter_not_eq
 
     # No need for actual logic to fire
     def count(scope, attr)
