@@ -70,8 +70,8 @@ module Graphiti
 
           serializers = v.send(:resources)
           name = graphql ? k.to_s.camelize(:lower) : k
-          name_chain = name_chain.dup
-          name_chain << k unless name_chain.last == k
+          subchain = name_chain.dup
+          subchain << k unless subchain.last == k
 
           unless remote_resource? && serializers.nil?
             payload = if serializers.is_a?(Array)
@@ -86,7 +86,7 @@ module Graphiti
                 end
               end
             else
-              serializers.to_hash(fields: fields, include: nested_include, graphql: graphql, name_chain: name_chain)
+              serializers.to_hash(fields: fields, include: nested_include, graphql: graphql, name_chain: subchain)
             end
 
             attrs[name.to_sym] = payload
