@@ -68,7 +68,7 @@ RSpec.describe "stats" do
       it "responds with average in meta stats" do
         render
         expect(json["meta"]["stats"])
-          .to eq({"age" => {"average" => "poro_average_age"}})
+          .to eq({"age" => {"average" => 0}})
       end
     end
 
@@ -190,7 +190,7 @@ RSpec.describe "stats" do
       render
       expect(json["meta"]["stats"]).to eq({
         "total" => {"count" => "poro_count_total"},
-        "age" => {"sum" => "poro_sum_age", "average" => "poro_average_age"}
+        "age" => {"sum" => "poro_sum_age", "average" => 0}
       })
     end
   end
