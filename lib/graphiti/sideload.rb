@@ -248,11 +248,7 @@ module Graphiti
     end
 
     def resource
-      @resource ||= begin
-                      kl = resource_class
-                      binding.pry if kl.is_a?(String)
-                      kl.new
-                    end
+      @resource ||= resource_class.new
     end
 
     def parent_resource
