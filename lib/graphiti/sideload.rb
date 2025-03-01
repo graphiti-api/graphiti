@@ -177,7 +177,8 @@ module Graphiti
     end
 
     def resource_class
-      @resource_class ||= infer_resource_class
+      @cons_resource_class ||= (@resource_class.is_a?(String) ? @resource_class.constantize : @resource_class) ||
+        infer_resource_class
     end
 
     def scope(parents)
@@ -247,7 +248,11 @@ module Graphiti
     end
 
     def resource
-      @resource ||= resource_class.new
+      @resource ||= begin
+                      kl = resource_class
+                      binding.pry if kl.is_a?(String)
+                      kl.new
+                    end
     end
 
     def parent_resource
