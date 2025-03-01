@@ -270,8 +270,6 @@ module Legacy
     belongs_to :genre
     many_to_many :tags
     many_to_many :readers, resource: Legacy::UserResource
-    # has_many :sales_stocks, resource: Legacy::Sales::Stock
-    # many_to_many :sales_shops, resource: Legacy::Sales::ShopResource, foreign_key: { sales_stocks: :book_id }
   end
 
   module Sales
