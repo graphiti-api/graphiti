@@ -148,26 +148,36 @@ module Graphiti
       Concurrent::Promises.future_on(
         self.class.global_thread_pool_executor, Thread.current.object_id, thread_storage, fiber_storage, *args
       ) do |thread_id, thread_storage, fiber_storage, *args|
-        execution_context_changed = thread_id != Thread.current.object_id
-        if execution_context_changed
-          thread_storage&.keys&.each_with_object(Thread.current) do |key, thread_current|
-            thread_current[key] = thread_storage[key]
+        wrap_in_rails_executor do
+          execution_context_changed = thread_id != Thread.current.object_id
+          if execution_context_changed
+            thread_storage&.keys&.each_with_object(Thread.current) do |key, thread_current|
+              thread_current[key] = thread_storage[key]
+            end
+            fiber_storage&.keys&.each_with_object(Fiber) do |key, fiber_current|
+              fiber_current[key] = fiber_storage[key]
+            end
           end
-          fiber_storage&.keys&.each_with_object(Fiber) do |key, fiber_current|
-            fiber_current[key] = fiber_storage[key]
+
+          result = Graphiti.broadcast(:global_thread_pool_task_run, self.class.global_thread_pool_stats) do
+            yield(*args)
           end
-        end
 
-        result = Graphiti.broadcast(:global_thread_pool_task_run, self.class.global_thread_pool_stats) do
-          yield(*args)
-        end
+          if execution_context_changed
+            thread_storage&.keys&.each { |key| Thread.current[key] = nil }
+            fiber_storage&.keys&.each { |key| Fiber[key] = nil }
+          end
 
-        if execution_context_changed
-          thread_storage&.keys&.each { |key| Thread.current[key] = nil }
-          fiber_storage&.keys&.each { |key| Fiber[key] = nil }
+          result
         end
+      end
+    end
 
-        result
+    def wrap_in_rails_executor(&block)
+      if defined?(::Rails.application.executor)
+        ::Rails.application.executor.wrap(&block)
+      else
+        yield
       end
     end
 
