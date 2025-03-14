@@ -2,6 +2,35 @@ module Graphiti
   class Scope
     attr_accessor :object, :unpaginated_object
     attr_reader :pagination
+
+    GLOBAL_THREAD_POOL_EXECUTOR_BROADCAST_STATS = %i[
+      length max_length queue_length max_queue completed_task_count largest_length scheduled_task_count synchronous
+    ]
+    GLOBAL_THREAD_POOL_EXECUTOR = Concurrent::Promises.delay do
+      if Graphiti.config.concurrency
+        concurrency = Graphiti.config.concurrency_max_threads || 4
+        Concurrent::ThreadPoolExecutor.new(
+          min_threads: 0,
+          max_threads: concurrency,
+          max_queue: concurrency * 4,
+          fallback_policy: :caller_runs
+        )
+      else
+        Concurrent::ThreadPoolExecutor.new(max_threads: 0, synchronous: true, fallback_policy: :caller_runs)
+      end
+    end
+    private_constant :GLOBAL_THREAD_POOL_EXECUTOR, :GLOBAL_THREAD_POOL_EXECUTOR_BROADCAST_STATS
+
+    def self.global_thread_pool_executor
+      GLOBAL_THREAD_POOL_EXECUTOR.value!
+    end
+
+    def self.global_thread_pool_stats
+      GLOBAL_THREAD_POOL_EXECUTOR_BROADCAST_STATS.each_with_object({}) do |key, memo|
+        memo[key] = global_thread_pool_executor.send(key)
+      end
+    end
+
     def initialize(object, resource, query, opts = {})
       @object = object
       @resource = resource
@@ -14,57 +43,33 @@ module Graphiti
     end
 
     def resolve
-      if @query.zero_results?
-        []
-      else
-        resolved = broadcast_data { |payload|
-          @object = @resource.before_resolve(@object, @query)
-          payload[:results] = @resource.resolve(@object)
-          payload[:results]
-        }
-        resolved.compact!
-        assign_serializer(resolved)
-        yield resolved if block_given?
-        @opts[:after_resolve]&.call(resolved)
-        resolve_sideloads(resolved) unless @query.sideloads.empty?
-        resolved
-      end
+      future_resolve.value!
     end
 
     def resolve_sideloads(results)
-      return if results == []
+      future_resolve_sideloads(results).value!
+    end
 
-      concurrent = Graphiti.config.concurrency
-      promises = []
+    def future_resolve
+      return Concurrent::Promises.fulfilled_future([], self.class.global_thread_pool_executor) if @query.zero_results?
 
-      @query.sideloads.each_pair do |name, q|
-        sideload = @resource.class.sideload(name)
-        next if sideload.nil? || sideload.shared_remote?
-        parent_resource = @resource
-        graphiti_context = Graphiti.context
-        resolve_sideload = -> {
-          Graphiti.config.before_sideload&.call(graphiti_context)
-          Graphiti.context = graphiti_context
-          sideload.resolve(results, q, parent_resource)
-          @resource.adapter.close if concurrent
-        }
-        if concurrent
-          promises << Concurrent::Promise.execute(&resolve_sideload)
-        else
-          resolve_sideload.call
-        end
+      resolved = broadcast_data { |payload|
+        @object = @resource.before_resolve(@object, @query)
+        payload[:results] = @resource.resolve(@object)
+        payload[:results]
+      }
+      resolved.compact!
+      assign_serializer(resolved)
+      yield resolved if block_given?
+      @opts[:after_resolve]&.call(resolved)
+      sideloaded = @query.parents.any?
+      close_adapter = Graphiti.config.concurrency && sideloaded
+      if close_adapter
+        @resource.adapter.close
       end
 
-      if concurrent
-        # Wait for all promises to finish
-        sleep 0.01 until promises.all? { |p| p.fulfilled? || p.rejected? }
-        # Re-raise the error with correct stacktrace
-        # OPTION** to avoid failing here?? if so need serializable patch
-        # to avoid loading data when association not loaded
-        if (rejected = promises.find(&:rejected?))
-          raise rejected.reason
-        end
-      end
+      future_resolve_sideloads(resolved)
+        .then_on(self.class.global_thread_pool_executor, resolved) { resolved }
     end
 
     def parent_resource
@@ -107,6 +112,74 @@ module Graphiti
     alias_method :last_modified_at, :updated_at
 
     private
+
+    def future_resolve_sideloads(results)
+      return Concurrent::Promises.fulfilled_future(nil, self.class.global_thread_pool_executor) if results == []
+
+      sideload_promises = @query.sideloads.filter_map do |name, q|
+        sideload = @resource.class.sideload(name)
+        next if sideload.nil? || sideload.shared_remote?
+
+        p = future_with_context(results, q, @resource) do |parent_results, sideload_query, parent_resource|
+          Graphiti.config.before_sideload&.call(Graphiti.context)
+          sideload.future_resolve(parent_results, sideload_query, parent_resource)
+        end
+        p.flat
+      end
+
+      Concurrent::Promises.zip_futures_on(self.class.global_thread_pool_executor, *sideload_promises)
+        .rescue_on(self.class.global_thread_pool_executor) do |*reasons|
+          first_error = reasons.find { |r| r.is_a?(Exception) }
+          raise first_error
+        end
+    end
+
+    def future_with_context(*args)
+      thread_storage = Thread.current.keys.each_with_object({}) do |key, memo|
+        memo[key] = Thread.current[key]
+      end
+      fiber_storage =
+        if Fiber.current.respond_to?(:storage)
+          Fiber.current&.storage&.keys&.each_with_object({}) do |key, memo|
+            memo[key] = Fiber[key]
+          end
+        end
+
+      Concurrent::Promises.future_on(
+        self.class.global_thread_pool_executor, Thread.current.object_id, thread_storage, fiber_storage, *args
+      ) do |thread_id, thread_storage, fiber_storage, *args|
+        wrap_in_rails_executor do
+          execution_context_changed = thread_id != Thread.current.object_id
+          if execution_context_changed
+            thread_storage&.keys&.each_with_object(Thread.current) do |key, thread_current|
+              thread_current[key] = thread_storage[key]
+            end
+            fiber_storage&.keys&.each_with_object(Fiber) do |key, fiber_current|
+              fiber_current[key] = fiber_storage[key]
+            end
+          end
+
+          result = Graphiti.broadcast(:global_thread_pool_task_run, self.class.global_thread_pool_stats) do
+            yield(*args)
+          end
+
+          if execution_context_changed
+            thread_storage&.keys&.each { |key| Thread.current[key] = nil }
+            fiber_storage&.keys&.each { |key| Fiber[key] = nil }
+          end
+
+          result
+        end
+      end
+    end
+
+    def wrap_in_rails_executor(&block)
+      if defined?(::Rails.application.executor)
+        ::Rails.application.executor.wrap(&block)
+      else
+        yield
+      end
+    end
 
     def sideload_resource_proxies
       @sideload_resource_proxies ||= begin
