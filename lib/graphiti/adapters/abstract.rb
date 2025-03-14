@@ -364,6 +364,8 @@ module Graphiti
             associate(parent, c, association_name, association_type)
           end
         end
+
+        parent
       end
 
       def associate(parent, child, association_name, association_type)
@@ -379,6 +381,8 @@ module Graphiti
         else
           parent.send(:"#{association_name}=", child)
         end
+
+        parent
       end
 
       def disassociate(parent, child, association_name, association_type)
