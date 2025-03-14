@@ -225,6 +225,7 @@ module Legacy
   end
 
   class UserResource < ApplicationResource
+    has_many :my_books, resource: 'Legacy::BookResource'
   end
 
   class BookResource < ApplicationResource
