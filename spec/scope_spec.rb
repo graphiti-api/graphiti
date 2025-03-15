@@ -135,4 +135,49 @@ RSpec.describe Graphiti::Scope do
       end
     end
   end
+
+  describe "cache_key" do
+    let(:employee1) {
+      time = Time.parse("2022-06-24 16:36:00.000000000 -0500")
+      double(cache_key: "employee/1", cache_key_with_version: "employee/1-#{time.to_i}", updated_at: time).as_null_object
+    }
+
+    let(:employee2) {
+      time = Time.parse("2022-06-24 16:37:00.000000000 -0500")
+      double(cache_key: "employee/2", cache_key_with_version: "employee/2-#{time.to_i}", updated_at: time).as_null_object
+    }
+
+    it "generates a stable key" do
+      instance1 = described_class.new(employee1, resource, query)
+      instance2 = described_class.new(employee1, resource, query)
+
+      expect(instance1.cache_key).to be_present
+      expect(instance1.cache_key).to eq(instance2.cache_key)
+    end
+
+    it "only caches off of the scoped object " do
+      instance1 = described_class.new(employee1, resource, query)
+      instance2 = described_class.new(employee1, resource, Graphiti::Query.new(resource, {extra_fields: {positions: ["foo"]}}))
+
+      expect(instance1.cache_key).to be_present
+      expect(instance2.cache_key).to be_present
+      expect(instance1.cache_key).to eq(instance2.cache_key)
+
+      expect(instance1.cache_key_with_version).to be_present
+      expect(instance2.cache_key_with_version).to be_present
+      expect(instance1.cache_key_with_version).to eq(instance2.cache_key_with_version)
+    end
+
+    it "generates a different key with a different scope query" do
+      instance1 = described_class.new(employee1, resource, query)
+      instance2 = described_class.new(employee2, resource, query)
+      expect(instance1.cache_key).to be_present
+      expect(instance2.cache_key).to be_present
+      expect(instance1.cache_key).not_to eq(instance2.cache_key)
+
+      expect(instance1.cache_key_with_version).to be_present
+      expect(instance2.cache_key_with_version).to be_present
+      expect(instance1.cache_key_with_version).not_to eq(instance2.cache_key)
+    end
+  end
 end

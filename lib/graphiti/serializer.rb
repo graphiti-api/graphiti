@@ -71,9 +71,9 @@ module Graphiti
     end
 
     # Allow access to resource methods
-    def method_missing(id, *args, &blk)
+    def method_missing(id, ...)
       if @resource.respond_to?(id, true)
-        @resource.send(id, *args, &blk)
+        @resource.send(id, ...)
       else
         super
       end
@@ -99,7 +99,7 @@ module Graphiti
 
     def strip_relationships?
       return false unless Graphiti.config.links_on_demand
-      params = Graphiti.context[:object].params || {}
+      params = Graphiti.context[:object]&.params || {}
       [false, nil, "false"].include?(params[:links])
     end
   end

@@ -1077,4 +1077,23 @@ RSpec.describe Graphiti::Query do
       end
     end
   end
+
+  describe "cache_key" do
+    it "generates a stable key" do
+      instance1 = described_class.new(resource, params)
+      instance2 = described_class.new(resource, params)
+
+      expect(instance1.cache_key).to be_present
+      expect(instance1.cache_key).to eq(instance2.cache_key)
+    end
+
+    it "generates a different key with different params" do
+      instance1 = described_class.new(resource, params)
+      instance2 = described_class.new(resource, {extra_fields: {positions: ["foo"]}})
+
+      expect(instance1.cache_key).to be_present
+      expect(instance2.cache_key).to be_present
+      expect(instance1.cache_key).not_to eq(instance2.cache_key)
+    end
+  end
 end

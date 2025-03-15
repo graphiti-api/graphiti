@@ -36,7 +36,7 @@ module Graphiti
               json[:sideload] = sideload.name
             end
             if params
-              query = "#{payload[:resource].class.name}.all(#{JSON.pretty_generate(params)}).data"
+              query = "#{payload[:resource].class.name}.#{payload[:action]}(#{JSON.pretty_generate(params)}).data"
               logs << [query, :cyan, true]
               logs << ["The error occurred when running the above query. Copy/paste it into a rake task or Rails console session to reproduce. Keep in mind you may have to set context.", :yellow, true]
             else
@@ -64,7 +64,7 @@ module Graphiti
           query = if sideload.class.scope_proc
             "#{payload[:resource].class.name}: Manual sideload via .scope"
           else
-            "#{payload[:resource].class.name}.all(#{params.inspect})"
+            "#{payload[:resource].class.name}.#{payload[:action]}(#{params.inspect})"
           end
           logs << ["    #{query}", :cyan, true]
           json[:query] = query
@@ -82,7 +82,7 @@ module Graphiti
           title = "Top Level Data Retrieval (+ sideloads):"
           logs << [title, :green, true]
           json[:title] = title
-          query = "#{payload[:resource].class.name}.all(#{params.inspect})"
+          query = "#{payload[:resource].class.name}.#{payload[:action]}(#{params.inspect})"
           logs << [query, :cyan, true]
           json[:query] = query
           logs << ["Returned Models: #{results}"] if debug_models
@@ -98,7 +98,30 @@ module Graphiti
           took = ((stop - start) * 1000.0).round(2)
           logs << [""]
           logs << ["=== Graphiti Debug", :green, true]
-          logs << ["Rendering:", :green, true]
+          if payload[:proxy]&.cached? && Graphiti.config.cache_rendering?
+            logs << ["Rendering (cached):", :green, true]
+
+            Graphiti::Util::CacheDebug.new(payload[:proxy]).analyze do |cache_debug|
+              logs << ["Cache key for #{cache_debug.name}", :blue, true]
+              logs << if cache_debug.volatile?
+                [" \\_ volatile | Request count: #{cache_debug.request_count} | Hit count: #{cache_debug.hit_count}", :red, true]
+              else
+                [" \\_   stable | Request count: #{cache_debug.request_count} | Hit count: #{cache_debug.hit_count}", :blue, true]
+              end
+
+              if cache_debug.changed_key?
+                logs << [" [x] cache key changed #{cache_debug.last_version[:etag]} -> #{cache_debug.current_version[:etag]}", :red]
+                logs << ["      removed: #{cache_debug.removed_segments}", :red]
+                logs << ["        added: #{cache_debug.added_segments}", :red]
+              elsif cache_debug.new_key?
+                logs << [" [+] cache key added #{cache_debug.current_version[:etag]}", :red, true]
+              else
+                logs << [" [✓] #{cache_debug.current_version[:etag]}", :green, true]
+              end
+            end
+          else
+            logs << ["Rendering:", :green, true]
+          end
           logs << ["Took: #{took}ms", :magenta, true]
         end
       end

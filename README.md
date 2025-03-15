@@ -1,6 +1,7 @@
-![Build Status](https://travis-ci.org/graphiti-api/graphiti.svg?branch=master)
+[![CI](https://github.com/graphiti-api/graphiti/actions/workflows/ci.yml/badge.svg)](https://github.com/graphiti-api/graphiti/actions/workflows/ci.yml)
 [![Gem Version](https://badge.fury.io/rb/graphiti.svg)](https://badge.fury.io/rb/graphiti)
 [![Ruby Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://github.com/testdouble/standard)
+[![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 
 <p align="center">
   <a href="https://www.graphiti.dev/guides">

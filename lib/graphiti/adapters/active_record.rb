@@ -304,7 +304,11 @@ module Graphiti
       end
 
       def close
-        ::ActiveRecord::Base.clear_active_connections!
+        if ::ActiveRecord.version > Gem::Version.new("7.2")
+          ::ActiveRecord::Base.connection_handler.clear_active_connections!
+        else
+          ::ActiveRecord::Base.clear_active_connections!
+        end
       end
 
       def can_group?
