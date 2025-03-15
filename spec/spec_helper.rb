@@ -68,7 +68,7 @@ end
 
 if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("3.2.0")
   unless defined?(::ActionDispatch::Journey)
-    require 'uri'
+    require "uri"
     # NOTE: `decode_www_form_component` isn't an ideal default for production,
     # because it varies slightly compared to typical uri parameterization,
     # but it will allow tests to pass in non-rails contexts.
