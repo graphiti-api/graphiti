@@ -1,3 +1,5 @@
+require "digest"
+
 module Graphiti
   class Query
     attr_reader :resource, :association_name, :params, :action
@@ -76,11 +78,14 @@ module Graphiti
       end
     end
 
+    class RemoteSideloadResource < ::Graphiti::Resource
+      self.remote = "_remote_sideload_".freeze
+      self.abstract_class = true # exclude from schema
+    end
+
     def resource_for_sideload(sideload)
       if @resource.remote?
-        Class.new(Graphiti::Resource) {
-          self.remote = "_remote_sideload_"
-        }.new
+        RemoteSideloadResource.new
       else
         sideload.resource
       end
@@ -229,7 +234,21 @@ module Graphiti
       ![false, "false"].include?(@params[:paginate])
     end
 
+    def cache_key
+      "args-#{query_cache_key}"
+    end
+
     private
+
+    def query_cache_key
+      attrs = {extra_fields: extra_fields,
+               fields: fields,
+               links: links?,
+               pagination_links: pagination_links?,
+               format: params[:format]}
+
+      Digest::SHA1.hexdigest(attrs.to_s)
+    end
 
     def cast_page_param(name, value)
       if [:before, :after].include?(name)

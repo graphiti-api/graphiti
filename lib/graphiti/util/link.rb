@@ -48,6 +48,7 @@ module Graphiti
 
       def on_demand_links(url)
         return url unless Graphiti.config.links_on_demand
+        return unless url
 
         url << if url.include?("?")
           "&links=true"
