@@ -8,9 +8,16 @@ module Graphiti
       def endpoint
         if (endpoint = super)
           endpoint
-        else
+        elsif !@__skip_inference
           self.endpoint = infer_endpoint
         end
+      end
+
+      def endpoint=(value)
+        # changes introduced in Ruby 3.2 and above require some extra hoops
+        # to allow .endpoint = nil to work properly
+        @__skip_inference = value.blank?
+        super
       end
     end
 
