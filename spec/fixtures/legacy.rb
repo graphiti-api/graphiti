@@ -196,8 +196,8 @@ module Legacy
     has_many :tags, through: :taggings
     has_many :readerships
     has_many :readers, through: :readerships, source: :user
-    has_many :sales_stocks, class_name: 'Legacy::Sales::Stock'
-    has_many :sales_shops, class_name: 'Legacy::Sales::Shop', through: :sales_stocks, source: :shop
+    has_many :sales_stocks, class_name: "Legacy::Sales::Stock"
+    has_many :sales_shops, class_name: "Legacy::Sales::Shop", through: :sales_stocks, source: :shop
   end
 
   class User < ApplicationRecord
