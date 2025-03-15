@@ -42,6 +42,8 @@ jobs:
           - gemfiles/rails_6_graphiti_rails.gemfile
           - gemfiles/rails_7_graphiti_rails.gemfile
           - gemfiles/rails_7_1_graphiti_rails.gemfile
+          - gemfiles/rails_7_2_graphiti_rails.gemfile
+          - gemfiles/rails_8_0_graphiti_rails.gemfile
         appraisal:
           - true
           - false
