@@ -1,5 +1,19 @@
 graphiti changelog
 
+## [1.7.7](https://github.com/graphiti-api/graphiti/compare/v1.7.6...v1.7.7) (2025-03-15)
+
+
+### Bug Fixes
+
+* change class attribute behavior on endpoint method to work in ruby 3.2+ ([#493](https://github.com/graphiti-api/graphiti/issues/493)) ([04f1f3c](https://github.com/graphiti-api/graphiti/commit/04f1f3c783bfe18e6568cc21924d417a82234135))
+
+## [1.7.6](https://github.com/graphiti-api/graphiti/compare/v1.7.5...v1.7.6) (2024-11-06)
+
+
+### Bug Fixes
+
+* Gem version check ([#483](https://github.com/graphiti-api/graphiti/issues/483)) ([68e2492](https://github.com/graphiti-api/graphiti/commit/68e2492032692d8bb928a733f8b0f8710be31c49))
+
 ## [1.7.5](https://github.com/graphiti-api/graphiti/compare/v1.7.4...v1.7.5) (2024-09-16)
 
 
