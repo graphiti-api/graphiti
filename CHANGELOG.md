@@ -1,5 +1,40 @@
 graphiti changelog
 
+## [1.7.6](https://github.com/graphiti-api/graphiti/compare/v1.7.5...v1.7.6) (2024-11-06)
+
+
+### Bug Fixes
+
+* Gem version check ([#483](https://github.com/graphiti-api/graphiti/issues/483)) ([68e2492](https://github.com/graphiti-api/graphiti/commit/68e2492032692d8bb928a733f8b0f8710be31c49))
+
+## [1.7.5](https://github.com/graphiti-api/graphiti/compare/v1.7.4...v1.7.5) (2024-09-16)
+
+
+### Bug Fixes
+
+* Fixes error in version check for ActiveRecord adapter introduced in [#478](https://github.com/graphiti-api/graphiti/issues/478) ([#479](https://github.com/graphiti-api/graphiti/issues/479)) ([42c82c3](https://github.com/graphiti-api/graphiti/commit/42c82c397f20eb91c02835e518ff4c351c028ea7))
+
+## [1.7.4](https://github.com/graphiti-api/graphiti/compare/v1.7.3...v1.7.4) (2024-09-11)
+
+
+### Bug Fixes
+
+* update ActiveRecord adapter w/ support for Rails 7.2+ ([#478](https://github.com/graphiti-api/graphiti/issues/478)) ([8313e33](https://github.com/graphiti-api/graphiti/commit/8313e3359f0dde28d9940867c7ded964db4c854d))
+
+## [1.7.3](https://github.com/graphiti-api/graphiti/compare/v1.7.2...v1.7.3) (2024-06-26)
+
+
+### Bug Fixes
+
+* require OpenStruct explicitly ([#475](https://github.com/graphiti-api/graphiti/issues/475)) ([e0fa18a](https://github.com/graphiti-api/graphiti/commit/e0fa18a8d7f051e385e6e081f79f2ecae92a9260))
+
+## [1.7.2](https://github.com/graphiti-api/graphiti/compare/v1.7.1...v1.7.2) (2024-06-11)
+
+
+### Bug Fixes
+
+* require necessary ActiveSupport parts in proper order ([bb2a488](https://github.com/graphiti-api/graphiti/commit/bb2a48874a6533522df6eb027d0df8ec14c80a20))
+
 ## [1.7.1](https://github.com/graphiti-api/graphiti/compare/v1.7.0...v1.7.1) (2024-04-18)
 
 

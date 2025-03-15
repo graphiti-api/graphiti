@@ -490,9 +490,15 @@ RSpec.describe Graphiti::SchemaDiff do
       end
 
       it "returns error" do
-        expect(diff).to eq([
-          'SchemaDiff::EmployeeResource: default sort changed from [{:foo=>"asc"}] to [{:foo=>"desc"}].'
-        ])
+        if RUBY_VERSION >= "3.4"
+          expect(diff).to eq([
+            'SchemaDiff::EmployeeResource: default sort changed from [{foo: "asc"}] to [{foo: "desc"}].'
+          ])
+        else
+          expect(diff).to eq([
+            'SchemaDiff::EmployeeResource: default sort changed from [{:foo=>"asc"}] to [{:foo=>"desc"}].'
+          ])
+        end
       end
     end
 
@@ -1204,9 +1210,15 @@ RSpec.describe Graphiti::SchemaDiff do
         end
 
         it "returns error" do
-          expect(diff).to eq([
-            'Endpoint "/schema_diff/employees" had incompatible sideload allowlist. Was [{:positions=>"department"}, "same"], now ["positions", "same"].'
-          ])
+          if RUBY_VERSION >= "3.4"
+            expect(diff).to eq([
+              'Endpoint "/schema_diff/employees" had incompatible sideload allowlist. Was [{positions: "department"}, "same"], now ["positions", "same"].'
+            ])
+          else
+            expect(diff).to eq([
+              'Endpoint "/schema_diff/employees" had incompatible sideload allowlist. Was [{:positions=>"department"}, "same"], now ["positions", "same"].'
+            ])
+          end
         end
       end
     end
