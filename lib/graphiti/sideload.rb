@@ -21,7 +21,7 @@ module Graphiti
       @name = name
       validate_options!(opts)
       @parent_resource_class = opts[:parent_resource]
-      @resource_class = opts[:resource]
+      @resource_class_name = opts[:resource]
       @primary_key = opts[:primary_key]
       @foreign_key = opts[:foreign_key]
       @type = opts[:type]
@@ -177,7 +177,7 @@ module Graphiti
     end
 
     def resource_class
-      @cons_resource_class ||= (@resource_class.is_a?(String) ? @resource_class.constantize : @resource_class) ||
+      @resource_class ||= (@resource_class_name.is_a?(String) ? @resource_class_name.constantize : @resource_class_name) ||
         infer_resource_class
     end
 
