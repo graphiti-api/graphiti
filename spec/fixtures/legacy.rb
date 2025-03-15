@@ -282,7 +282,7 @@ module Legacy
     class ShopResource < ApplicationResource
       attribute :name, :string
       has_many :stocks
-      many_to_many :books, resource: Legacy::BookResource, foreign_key: { sales_stocks: :shop_id }
+      many_to_many :books, resource: Legacy::BookResource, foreign_key: {sales_stocks: :shop_id}
     end
   end
 
