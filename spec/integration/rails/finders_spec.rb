@@ -1286,6 +1286,21 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(author2_hobbies.size).to eq(1)
       end
 
+      context "when sideloads non-namespace model via a namespace model" do
+        let(:shop) { Legacy::Sales::Shop.create(name: "shop") }
+
+        before do
+          allow(Legacy::Sales::ShopResource).to receive(:validate_endpoints?) { false }
+          allow(controller).to receive(:resource).and_return(Legacy::Sales::ShopResource)
+          Legacy::Sales::Stock.create(shop_id: shop.id, book_id: book1.id, amount: 2)
+        end
+
+        it "works" do
+          do_index({include: "books"})
+          expect(included("books").map(&:id)).to eq([book1.id])
+        end
+      end
+
       context "when configured as a has_many association" do
         before do
           @orig_sideload = Legacy::AuthorResource.sideloads.delete(:hobbies)

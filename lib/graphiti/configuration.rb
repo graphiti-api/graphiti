@@ -18,6 +18,7 @@ module Graphiti
     attr_accessor :before_sideload
 
     attr_reader :debug, :debug_models
+    attr_reader :uri_decoder
 
     attr_writer :schema_path
     attr_writer :cache_rendering
@@ -36,6 +37,8 @@ module Graphiti
       @cache_rendering = false
       self.debug = ENV.fetch("GRAPHITI_DEBUG", true)
       self.debug_models = ENV.fetch("GRAPHITI_DEBUG_MODELS", false)
+
+      @uri_decoder = infer_uri_decoder
 
       # FIXME: Don't duplicate graphiti-rails efforts
       if defined?(::Rails.root) && (root = ::Rails.root)
@@ -84,6 +87,33 @@ module Graphiti
       yield
     ensure
       send(:"#{key}=", original)
+    end
+
+    def uri_decoder=(decoder)
+      unless decoder.respond_to?(:call)
+        raise "uri_decoder must respond to `call`."
+      end
+
+      @uri_decoder = decoder
+    end
+
+    private
+
+    def infer_uri_decoder
+      if defined?(::ActionDispatch::Journey::Router::Utils)
+        # available in all supported versions of Rails.
+        # This method should be preferred for comparing URI path segments
+        # to params, as it is the exact decoder used in the Rails router.
+        @uri_decoder = ::ActionDispatch::Journey::Router::Utils.method(:unescape_uri)
+      elsif URI.respond_to?(:decode_uri_component)
+        # available in Ruby >= 3.2
+        @uri_decoder = URI.method(:decode_uri_component)
+      end
+    rescue => e
+      Kernel.warn("Error inferring Graphiti uri_decoder: #{e}")
+    ensure
+      # fallback
+      @uri_decoder ||= :itself.to_proc
     end
   end
 

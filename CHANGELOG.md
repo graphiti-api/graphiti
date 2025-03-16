@@ -1,5 +1,21 @@
 graphiti changelog
 
+## [1.7.9](https://github.com/graphiti-api/graphiti/compare/v1.7.8...v1.7.9) (2025-03-16)
+
+
+### Bug Fixes
+
+* update version check for clear active connections active record deprecation ([#491](https://github.com/graphiti-api/graphiti/issues/491)) ([4e764f6](https://github.com/graphiti-api/graphiti/commit/4e764f66c3a06b4a83c37afa83ddd64a78ef3b19))
+
+## [1.7.8](https://github.com/graphiti-api/graphiti/compare/v1.7.7...v1.7.8) (2025-03-16)
+
+
+### Bug Fixes
+
+* compare URI-decoded path params ([#482](https://github.com/graphiti-api/graphiti/issues/482)) ([20b80dd](https://github.com/graphiti-api/graphiti/commit/20b80dd35bfa4e2f677af3fb9472def6da668149))
+* correct issue with many_to_many when one of the models has a prefix to the intersection model association ([#449](https://github.com/graphiti-api/graphiti/issues/449)) ([dc28a4f](https://github.com/graphiti-api/graphiti/commit/dc28a4f72fe4c577e23ced102a0b5e7063ba8026))
+* lazy constantize relation resources ([#492](https://github.com/graphiti-api/graphiti/issues/492)) ([3cc2983](https://github.com/graphiti-api/graphiti/commit/3cc298399b4dc8970a2beed49b333396c76bd218))
+
 ## [1.7.7](https://github.com/graphiti-api/graphiti/compare/v1.7.6...v1.7.7) (2025-03-15)
 
 

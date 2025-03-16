@@ -168,6 +168,14 @@ module Graphiti
         scope
       end
 
+      def filter_uuid_eq(scope, attribute, value)
+        scope
+      end
+
+      def filter_uuid_not_eq(scope, attribute, value)
+        scope
+      end
+
       def base_scope(model)
         {}
       end

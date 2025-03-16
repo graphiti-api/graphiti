@@ -1238,6 +1238,23 @@ RSpec.describe Graphiti::Resource do
               end
             end
           end
+
+          context "with a url-encoded path param" do
+            before do
+              request.env["PATH_INFO"] += "/123%3B456"
+
+              klass.instance_exec do
+                attribute :id, :uuid
+              end
+            end
+
+            it "works" do
+              klass
+              Graphiti.with_context ctx, :show do
+                expect { klass.find(id: "123;456") }.to_not raise_error
+              end
+            end
+          end
         end
 
         context "and the request matches a secondary endpoint" do
