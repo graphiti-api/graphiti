@@ -16,6 +16,7 @@ module Graphiti
     attr_accessor :typecast_reads
     attr_accessor :raise_on_missing_sidepost
     attr_accessor :before_sideload
+    attr_accessor :deduplicate_entities
 
     attr_reader :debug, :debug_models
     attr_reader :uri_decoder
@@ -65,6 +66,16 @@ module Graphiti
           raise "You must configure a cache store in order to use cache_rendering. Set Graphiti.cache = Rails.cache, for example."
         end
       end
+    end
+
+    def deduplicated_rendering?
+      if @deduplicate_entities
+        raise "Deduplicated rendering is not compatible with concurrent fetching" if @concurrency
+
+        return true
+      end
+
+      false
     end
 
     def schema_path

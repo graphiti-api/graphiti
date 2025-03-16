@@ -11,6 +11,12 @@ module Graphiti
       @object = @resource.around_scoping(@object, @query.hash) { |scope|
         apply_scoping(scope, opts)
       }
+
+      @deduplicate_entities = @query.deduplicate_entities
+
+      if @deduplicate_entities
+        @populated_entities = @query.populated_entities || {}
+      end
     end
 
     def resolve
@@ -23,6 +29,9 @@ module Graphiti
           payload[:results]
         }
         resolved.compact!
+
+        deduplicate_entities(resolved) if @deduplicate_entities
+
         assign_serializer(resolved)
         yield resolved if block_given?
         @opts[:after_resolve]&.call(resolved)
@@ -166,6 +175,28 @@ module Graphiti
     def add_scoping(key, scoping_class, opts, default = {})
       @object = scoping_class.new(@resource, @query.hash, @object, opts).apply
       @unpaginated_object = @object unless key == :paginate
+    end
+
+    def deduplicate_entities(resolved)
+      resolved.map! do |entity|
+        next entity unless entity.respond_to?(:id) && !entity.id.nil? # Leave no-id (although unusual) entities as is
+
+        if @populated_entities.key?(entity.class)
+          populated_entity = @populated_entities[entity.class][entity.id]
+          if populated_entity.nil?
+            @populated_entities[entity.class][entity.id] = entity
+
+            entity
+          else
+            populated_entity
+          end
+        else
+          @populated_entities[entity.class] = {}
+          @populated_entities[entity.class][entity.id] = entity
+
+          entity
+        end
+      end
     end
   end
 end
