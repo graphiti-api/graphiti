@@ -304,7 +304,7 @@ module Graphiti
       end
 
       def close
-        if ::ActiveRecord.version > Gem::Version.new("7.2")
+        if ::ActiveRecord.version > Gem::Version.new("7.1")
           ::ActiveRecord::Base.connection_handler.clear_active_connections!
         else
           ::ActiveRecord::Base.clear_active_connections!
