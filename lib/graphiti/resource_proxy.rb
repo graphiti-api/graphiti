@@ -83,9 +83,8 @@ module Graphiti
     def data
       @data ||= begin
         records = @scope.resolve
-        if records.empty? && raise_on_missing?
-          raise Graphiti::Errors::RecordNotFound
-        end
+        raise Graphiti::Errors::RecordNotFound if records.empty? && raise_on_missing?
+
         records = records[0] if single?
         records
       end
@@ -93,6 +92,15 @@ module Graphiti
 
     alias_method :to_a, :data
     alias_method :resolve_data, :data
+
+    def future_resolve_data
+      @scope.future_resolve.then do |records|
+        raise Graphiti::Errors::RecordNotFound if records.empty? && raise_on_missing?
+
+        records = records[0] if single?
+        @data = records
+      end
+    end
 
     def meta
       @meta ||= data.respond_to?(:meta) ? data.meta : {}
