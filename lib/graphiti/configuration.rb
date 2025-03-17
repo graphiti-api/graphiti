@@ -8,6 +8,20 @@ module Graphiti
     #   Defaults to false OR if classes are cached (Rails-only)
     attr_accessor :concurrency
 
+    # This number must be considered in accordance with the database
+    # connection pool size configured in `database.yml`. The connection
+    # pool should be large enough to accommodate both the foreground
+    # threads (ie. web server or job worker threads) and background
+    # threads. For each process, Graphiti will create one global
+    # executor that uses this many threads to sideload resources
+    # asynchronously. Thus, the pool size should be at least
+    # `thread_count + concurrency_max_threads + 1`. For example, if your
+    # web server has a maximum of 3 threads, and
+    # `concurrency_max_threads` is set to 4, then your pool size should
+    # be at least 8.
+    # @return [Integer] Maximum number of threads to use when fetching sideloads concurrently
+    attr_accessor :concurrency_max_threads
+
     attr_accessor :respond_to
     attr_accessor :context_for_endpoint
     attr_accessor :links_on_demand
@@ -28,6 +42,7 @@ module Graphiti
     def initialize
       @raise_on_missing_sideload = true
       @concurrency = false
+      @concurrency_max_threads = 4
       @respond_to = [:json, :jsonapi, :xml]
       @links_on_demand = false
       @pagination_links_on_demand = false
