@@ -53,6 +53,12 @@ jobs:
             gemfile: gemfiles/rails_7_1.gemfile
             appraisal: true
           - ruby: ruby-head
+            gemfile: gemfiles/rails_7_2_graphiti_rails.gemfile
+            appraisal: true
+          - ruby: ruby-head
+            gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
+            appraisal: true
+          - ruby: ruby-head
             gemfile: Gemfile
             appraisal: false
         exclude:
@@ -86,12 +92,30 @@ jobs:
           - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
             ruby: 3.1
 
+          # Rails 7.2 needs ruby 3.1 +
+          - gemfile: gemfiles/rails_7_2_graphiti_rails.gemfile
+            ruby: 2.7
+          - gemfile: gemfiles/rails_7_2_graphiti_rails.gemfile
+            ruby: 3.0
+
+          # Rails 7.1 needs ruby 3.0 +
+          - gemfile: gemfiles/rails_7_1_graphiti_rails.gemfile
+            ruby: 2.7
+          - gemfile: gemfiles/rails_7_1_graphiti_rails.gemfile
+            ruby: 3.0
+
           # Rails 7.0 needs ruby 3.1 +
           - gemfile: gemfiles/rails_7_0_graphiti_rails.gemfile
             ruby: 3.2
           - gemfile: gemfiles/rails_7_0_graphiti_rails.gemfile
             ruby: 3.3
           - gemfile: gemfiles/rails_7_0_graphiti_rails.gemfile
+            ruby: 3.4
+
+          # Rails 6 needs < ruby 3.4
+          - gemfile: gemfiles/rails_6.gemfile
+            ruby: 3.4
+          - gemfile: gemfiles/rails_6_graphiti_rails.gemfile
             ruby: 3.4
 
           # Rails 5 can't run on Ruby 3
