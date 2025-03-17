@@ -1,5 +1,35 @@
 graphiti changelog
 
+# [1.8.0](https://github.com/graphiti-api/graphiti/compare/v1.7.9...v1.8.0) (2025-03-17)
+
+
+### Features
+
+* add thread pool with promises to limit concurrent sideloading ([#472](https://github.com/graphiti-api/graphiti/issues/472)) ([2998852](https://github.com/graphiti-api/graphiti/commit/2998852cea3e5f366e3748d808e26e83e484e989))
+
+## [1.7.9](https://github.com/graphiti-api/graphiti/compare/v1.7.8...v1.7.9) (2025-03-16)
+
+
+### Bug Fixes
+
+* update version check for clear active connections active record deprecation ([#491](https://github.com/graphiti-api/graphiti/issues/491)) ([4e764f6](https://github.com/graphiti-api/graphiti/commit/4e764f66c3a06b4a83c37afa83ddd64a78ef3b19))
+
+## [1.7.8](https://github.com/graphiti-api/graphiti/compare/v1.7.7...v1.7.8) (2025-03-16)
+
+
+### Bug Fixes
+
+* compare URI-decoded path params ([#482](https://github.com/graphiti-api/graphiti/issues/482)) ([20b80dd](https://github.com/graphiti-api/graphiti/commit/20b80dd35bfa4e2f677af3fb9472def6da668149))
+* correct issue with many_to_many when one of the models has a prefix to the intersection model association ([#449](https://github.com/graphiti-api/graphiti/issues/449)) ([dc28a4f](https://github.com/graphiti-api/graphiti/commit/dc28a4f72fe4c577e23ced102a0b5e7063ba8026))
+* lazy constantize relation resources ([#492](https://github.com/graphiti-api/graphiti/issues/492)) ([3cc2983](https://github.com/graphiti-api/graphiti/commit/3cc298399b4dc8970a2beed49b333396c76bd218))
+
+## [1.7.7](https://github.com/graphiti-api/graphiti/compare/v1.7.6...v1.7.7) (2025-03-15)
+
+
+### Bug Fixes
+
+* change class attribute behavior on endpoint method to work in ruby 3.2+ ([#493](https://github.com/graphiti-api/graphiti/issues/493)) ([04f1f3c](https://github.com/graphiti-api/graphiti/commit/04f1f3c783bfe18e6568cc21924d417a82234135))
+
 ## [1.7.6](https://github.com/graphiti-api/graphiti/compare/v1.7.5...v1.7.6) (2024-11-06)
 
 

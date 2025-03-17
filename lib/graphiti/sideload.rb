@@ -21,7 +21,7 @@ module Graphiti
       @name = name
       validate_options!(opts)
       @parent_resource_class = opts[:parent_resource]
-      @resource_class = opts[:resource]
+      @resource_class_name = opts[:resource]
       @primary_key = opts[:primary_key]
       @foreign_key = opts[:foreign_key]
       @type = opts[:type]
@@ -177,7 +177,8 @@ module Graphiti
     end
 
     def resource_class
-      @resource_class ||= infer_resource_class
+      @resource_class ||= (@resource_class_name.is_a?(String) ? @resource_class_name.constantize : @resource_class_name) ||
+        infer_resource_class
     end
 
     def scope(parents)
@@ -235,7 +236,7 @@ module Graphiti
     end
 
     def load(parents, query, graph_parent)
-      build_resource_proxy(parents, query, graph_parent).to_a
+      future_load(parents, query, graph_parent).value!
     end
 
     # Override in subclass
@@ -285,7 +286,7 @@ module Graphiti
       children.replace(associated) if track_associated
     end
 
-    def resolve(parents, query, graph_parent)
+    def future_resolve(parents, query, graph_parent)
       if single? && parents.length > 1
         raise Errors::SingularSideload.new(self, parents.length)
       end
@@ -299,11 +300,11 @@ module Graphiti
           sideload: self,
           sideload_parent_length: parents.length,
           default_paginate: false
-        sideload_scope.resolve do |sideload_results|
+        sideload_scope.future_resolve do |sideload_results|
           fire_assign(parents, sideload_results)
         end
       else
-        load(parents, query, graph_parent)
+        future_load(parents, query, graph_parent)
       end
     end
 
@@ -366,6 +367,11 @@ module Graphiti
     end
 
     private
+
+    def future_load(parents, query, graph_parent)
+      proxy = build_resource_proxy(parents, query, graph_parent)
+      proxy.respond_to?(:future_resolve_data) ? proxy.future_resolve_data : Concurrent::Promises.fulfilled_future(proxy)
+    end
 
     def blank_query?(params)
       if (filter = params[:filter])

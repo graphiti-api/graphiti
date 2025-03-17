@@ -1,7 +1,6 @@
 class Graphiti::Adapters::ActiveRecord::ManyToManySideload < Graphiti::Sideload::ManyToMany
   def through_table_name
-    @through_table_name ||= parent_resource_class.model
-      .reflections[through.to_s].klass.table_name
+    @through_table_name ||= resource_class.model.reflections[through.to_s].klass.table_name
   end
 
   def through_relationship_name
