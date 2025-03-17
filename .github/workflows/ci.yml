@@ -77,17 +77,24 @@ jobs:
             appraisal: false
           - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
             appraisal: false
+
+          # Rails 8 needs ruby 3.2 +
           - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
             ruby: 2.7
           - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
             ruby: 3.0
           - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
             ruby: 3.1
-          - gemfile: gemfiles/rails_7_2_graphiti_rails.gemfile
-            ruby: 2.7
-          - gemfile: gemfiles/rails_7_2_graphiti_rails.gemfile
-            ruby: 3.0
-            # Rails 5 can't run on Ruby 3
+
+          # Rails 7.0 needs ruby 3.1 +
+          - gemfile: gemfiles/rails_7_0_graphiti_rails.gemfile
+            ruby: 3.2
+          - gemfile: gemfiles/rails_7_0_graphiti_rails.gemfile
+            ruby: 3.3
+          - gemfile: gemfiles/rails_7_0_graphiti_rails.gemfile
+            ruby: 3.4
+
+          # Rails 5 can't run on Ruby 3
           - gemfile: gemfiles/rails_5_2.gemfile
             ruby: 3.0
           - gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
