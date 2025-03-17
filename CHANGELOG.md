@@ -1,5 +1,7 @@
 graphiti changelog
 
+## [1.8.1](https://github.com/graphiti-api/graphiti/compare/v1.8.0...v1.8.1) (2025-03-17)
+
 # [1.8.0](https://github.com/graphiti-api/graphiti/compare/v1.7.9...v1.8.0) (2025-03-17)
 
 
