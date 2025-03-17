@@ -1,5 +1,12 @@
 graphiti changelog
 
+# [1.8.0](https://github.com/graphiti-api/graphiti/compare/v1.7.9...v1.8.0) (2025-03-17)
+
+
+### Features
+
+* add thread pool with promises to limit concurrent sideloading ([#472](https://github.com/graphiti-api/graphiti/issues/472)) ([2998852](https://github.com/graphiti-api/graphiti/commit/2998852cea3e5f366e3748d808e26e83e484e989))
+
 ## [1.7.9](https://github.com/graphiti-api/graphiti/compare/v1.7.8...v1.7.9) (2025-03-16)
 
 
