@@ -72,6 +72,20 @@ jobs:
             appraisal: false
           - gemfile: gemfiles/rails_7_1_graphiti_rails.gemfile
             appraisal: false
+          - gemfile: gemfiles/rails_7_2_graphiti_rails.gemfile
+            appraisal: false
+          - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
+            appraisal: false
+          - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
+            ruby: 2.7
+          - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
+            ruby: 3.0
+          - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
+            ruby: 3.1
+          - gemfile: gemfiles/rails_7_2_graphiti_rails.gemfile
+            ruby: 2.7
+          - gemfile: gemfiles/rails_7_2_graphiti_rails.gemfile
+            ruby: 3.0
             # Rails 5 can't run on Ruby 3
           - gemfile: gemfiles/rails_5_2.gemfile
             ruby: 3.0
