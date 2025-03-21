@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [master, main]
+    branches: [main]
   pull_request: {}
 
 concurrency:
@@ -156,7 +156,7 @@ jobs:
   publish:
     name: Release
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
     needs: [test]
     steps:
       - name: Dispatch Release
