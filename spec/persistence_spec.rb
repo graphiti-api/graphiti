@@ -37,6 +37,22 @@ RSpec.describe "persistence" do
     expect(employee.data.first_name).to eq("Jane")
   end
 
+  it "can access the unsaved model after build" do
+    employee = klass.build(payload)
+    expect(employee.data).to_not be_nil
+    expect(employee.data.first_name).to eq("Jane")
+    expect(employee.data.id).to be_nil
+  end
+
+  xit "can modify attributes directly on the unsaved model before save" do
+    employee = klass.build(payload)
+    expect(employee.data).to_not be_nil
+    employee.data.first_name = "June"
+
+    expect(employee.save).to eq(true)
+    expect(employee.data.first_name).to eq("June")
+  end
+
   describe "updating" do
     let!(:employee) { PORO::Employee.create(first_name: "asdf") }
 
@@ -51,6 +67,16 @@ RSpec.describe "persistence" do
           employee.update_attributes
         }.to raise_error(Graphiti::Errors::RecordNotFound)
       end
+    end
+
+    it "can apply attributes and access model" do
+      employee = klass.find(payload)
+      expect(employee.data.first_name).to eq("asdf")
+      employee.assign_attributes
+      expect(employee.data.first_name).to eq("Jane")
+
+      employee = klass.find(payload)
+      expect(employee.data.first_name).to eq("asdf")
     end
   end
 
@@ -1825,8 +1851,8 @@ RSpec.describe "persistence" do
 
     context "and it is a create operation" do
       it "works" do
-        instance = klass.build(payload)
         expect {
+          instance = klass.build(payload)
           instance.save
         }.to raise_error(Graphiti::Errors::InvalidRequest, /data.attributes.id/)
       end
