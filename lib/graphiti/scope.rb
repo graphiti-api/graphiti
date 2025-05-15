@@ -163,10 +163,10 @@ module Graphiti
             yield(*args)
           end
 
-          if execution_context_changed
-            thread_storage&.keys&.each { |key| Thread.current[key] = nil }
-            fiber_storage&.keys&.each { |key| Fiber[key] = nil }
-          end
+          # if execution_context_changed
+          #   thread_storage&.keys&.each { |key| Thread.current[key] = nil }
+          #   fiber_storage&.keys&.each { |key| Fiber[key] = nil }
+          # end
 
           result
         end
