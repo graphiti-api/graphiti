@@ -187,7 +187,7 @@ module Graphiti
       end
       yield
     ensure
-      new_fiber_locals.each do |key|
+      new_fiber_locals&.each do |key|
         Fiber[key] = nil
       end
     end
