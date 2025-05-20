@@ -97,6 +97,12 @@ module Graphiti
       adapter.disassociate(parent, child, association_name, type)
     end
 
+    def assign_with_relationships(meta, attributes, relationships, caller_model = nil, foreign_key = nil)
+      persistence = Graphiti::Util::Persistence \
+        .new(self, meta, attributes, relationships, caller_model, foreign_key)
+      persistence.assign
+    end
+
     def persist_with_relationships(meta, attributes, relationships, caller_model = nil, foreign_key = nil)
       persistence = Graphiti::Util::Persistence \
         .new(self, meta, attributes, relationships, caller_model, foreign_key)
