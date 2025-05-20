@@ -176,6 +176,8 @@ module Graphiti
     end
 
     def with_fiber_locals(fiber_locals)
+      return yield unless fiber_locals
+
       new_fiber_locals = []
       fiber_locals.each do |key, value|
         if !Fiber[key]
