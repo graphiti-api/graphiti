@@ -1,5 +1,12 @@
 graphiti changelog
 
+## [1.8.2](https://github.com/graphiti-api/graphiti/compare/v1.8.1...v1.8.2) (2025-05-20)
+
+
+### Bug Fixes
+
+* prevent context loss by always setting thread and fiber locals ([#497](https://github.com/graphiti-api/graphiti/issues/497)) ([5f45f76](https://github.com/graphiti-api/graphiti/commit/5f45f76f590a8a15e9ae3d47d0673c483da11e66))
+
 ## [1.8.1](https://github.com/graphiti-api/graphiti/compare/v1.8.0...v1.8.1) (2025-03-17)
 
 # [1.8.0](https://github.com/graphiti-api/graphiti/compare/v1.7.9...v1.8.0) (2025-03-17)
