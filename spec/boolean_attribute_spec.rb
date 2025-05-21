@@ -10,7 +10,8 @@ RSpec.describe ".boolean_attribute" do
   end
 
   let(:author) { double(id: 1) }
-  let(:resource) { klass.new(object: author) }
+  let(:proxy) { double(nested_stats: {}) }
+  let(:resource) { klass.new(resource: double(type: "klass"), object: author, proxy: proxy) }
 
   subject { resource.as_jsonapi[:attributes] }
 
