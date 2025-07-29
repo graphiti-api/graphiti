@@ -2,14 +2,19 @@ module Graphiti
   class ResourceProxy
     include Enumerable
 
-    attr_reader :resource, :query, :scope, :payload, :cache_expires_in, :cache
+    attr_reader :resource, :query, :scope, :payload, :cache_expires_in, :cache, :cache_tag
 
-    def initialize(resource, scope, query,
+    def initialize(
+      resource,
+      scope,
+      query,
       payload: nil,
       single: false,
       raise_on_missing: false,
       cache: nil,
-      cache_expires_in: nil)
+      cache_expires_in: nil,
+      cache_tag: nil
+    )
 
       @resource = resource
       @scope = scope
@@ -19,6 +24,7 @@ module Graphiti
       @raise_on_missing = raise_on_missing
       @cache = cache
       @cache_expires_in = cache_expires_in
+      @cache_tag = cache_tag
     end
 
     def cache?
@@ -207,12 +213,30 @@ module Graphiti
       "W/#{ActiveSupport::Digest.hexdigest(cache_key_with_version.to_s)}"
     end
 
+    def resource_cache_tag
+      return unless @cache_tag.present? && @resource.respond_to?(@cache_tag)
+
+      @resource.try(@cache_tag)
+    end
+
     def cache_key
-      ActiveSupport::Cache.expand_cache_key([@scope.cache_key, @query.cache_key])
+      ActiveSupport::Cache.expand_cache_key(
+        [
+          @scope.cache_key,
+          @query.cache_key,
+          resource_cache_tag,
+        ].compact_blank
+      )
     end
 
     def cache_key_with_version
-      ActiveSupport::Cache.expand_cache_key([@scope.cache_key_with_version, @query.cache_key])
+      ActiveSupport::Cache.expand_cache_key(
+        [
+          @scope.cache_key_with_version,
+          @query.cache_key,
+          resource_cache_tag,
+        ].compact_blank
+      )
     end
 
     private
