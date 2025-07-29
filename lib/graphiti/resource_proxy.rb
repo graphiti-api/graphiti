@@ -224,7 +224,7 @@ module Graphiti
         [
           @scope.cache_key,
           @query.cache_key,
-          resource_cache_tag,
+          resource_cache_tag
         ].compact_blank
       )
     end
@@ -234,7 +234,7 @@ module Graphiti
         [
           @scope.cache_key_with_version,
           @query.cache_key,
-          resource_cache_tag,
+          resource_cache_tag
         ].compact_blank
       )
     end

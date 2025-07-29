@@ -14,7 +14,7 @@ RSpec.describe Graphiti::ResourceProxy do
     let(:query) { double(cache_key: "query-hash") }
     let(:scope) { double(cache_key: "scope-hash", cache_key_with_version: "scope-hash-123456") }
 
-    subject { described_class.new(resource, scope, query, **{ cache_tag: :cache_tag }) }
+    subject { described_class.new(resource, scope, query, **{cache_tag: :cache_tag}) }
 
     it "cache_key combines query and scope cache keys if no tags are set" do
       cache_key = subject.cache_key

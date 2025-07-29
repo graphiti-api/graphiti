@@ -56,7 +56,7 @@ module Graphiti
         private
 
         def caching_options
-          { cache: @cache_resource, cache_expires_in: @cache_expires_in, cache_tag: @cache_tag }
+          {cache: @cache_resource, cache_expires_in: @cache_expires_in, cache_tag: @cache_tag}
         end
 
         def validate_request!(params)
