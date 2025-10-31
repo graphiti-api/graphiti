@@ -83,7 +83,7 @@ module Graphiti
   end
 
   def self.log(msg, color = :white, bold = false)
-    colored = ActiveSupport::LogSubscriber.new.send(:color, msg, color, bold)
+    colored = ActiveSupport::LogSubscriber.new.send(:color, msg, color, bold: bold)
     logger.debug(colored)
   end
 
