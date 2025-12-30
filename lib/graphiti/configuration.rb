@@ -115,7 +115,7 @@ module Graphiti
     private
 
     def infer_uri_decoder
-      if defined?(::ActionDispatch::Journey::Router::Utils)
+      if defined?(::ActionDispatch::Journey::Router::Utils) && ::ActionDispatch::Journey::Router::Utils.respond_to?(:uri_decoder)
         # available in all supported versions of Rails.
         # This method should be preferred for comparing URI path segments
         # to params, as it is the exact decoder used in the Rails router.
