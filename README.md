@@ -218,7 +218,6 @@ Request:
 </details>
 
 
-
 [Graphiti Guides](https://www.graphiti.dev/guides/)
 
 [Join the Discord](https://discord.gg/wgqkMBsSRV)
