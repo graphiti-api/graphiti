@@ -302,7 +302,7 @@ module Graphiti
       {}.tap do |hash|
         fieldset.each_pair do |type, fields|
           type = type.to_sym
-          fields = fields.split(",") unless fields.is_a?(Array)
+          fields = fields.to_s.split(",") unless fields.is_a?(Array)
           hash[type] = fields.map(&:to_sym)
         end
       end
