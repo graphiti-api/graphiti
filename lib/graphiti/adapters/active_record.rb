@@ -41,22 +41,24 @@ module Graphiti
       alias_method :filter_enum_not_eql, :filter_not_eq
 
       def filter_string_eq(scope, attribute, value, is_not: false)
+        return filter_string_eql(scope, attribute, nil, is_not: is_not) if Array(value).compact.blank?
+
         column = column_for(scope, attribute)
-        clause = column.lower.eq_any(value.map(&:downcase))
+        clause = column.lower.eq_any(value.map { |val| val.downcase })
         is_not ? scope.where.not(clause) : scope.where(clause)
       end
 
       def filter_string_eql(scope, attribute, value, is_not: false)
-        clause = {attribute => value}
+        clause = {attribute => value.presence}
         is_not ? scope.where.not(clause) : scope.where(clause)
       end
 
       def filter_string_not_eq(scope, attribute, value)
-        filter_string_eq(scope, attribute, value, is_not: true)
+        filter_string_eq(scope, attribute, value.presence, is_not: true)
       end
 
       def filter_string_not_eql(scope, attribute, value)
-        filter_string_eql(scope, attribute, value, is_not: true)
+        filter_string_eql(scope, attribute, value.presence, is_not: true)
       end
 
       # Arel has different match escaping behavior before rails 5.
