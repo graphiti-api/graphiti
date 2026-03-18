@@ -317,6 +317,76 @@ RSpec.describe Graphiti::RequestValidator do
           end
         end
       end
+
+      context "when the payload contains unknown relationships" do
+        let(:payload) do
+          {
+            data: {
+              type: "employees",
+              attributes: {first_name: "Jane"},
+              relationships: {
+                pets: {
+                  data: {type: "pets", id: "1", method: "update"}
+                }
+              }
+            },
+            included: [
+              {
+                type: "pets",
+                id: "1",
+                attributes: {name: "mel"}
+              }
+            ]
+          }
+        end
+
+        it "has an unknown relationship error" do
+          expect(validate).to eq false
+          expect(instance.errors).to be_added(:'data.relationships.pets', :invalid_relationship)
+        end
+
+        it "raises InvalidRequest when using validate!" do
+          expect {
+            instance.validate!
+          }.to raise_error(Graphiti::Errors::InvalidRequest)
+        end
+      end
+
+      context "when the payload contains a valid relationship" do
+        before do
+          root_resource_class.has_many :positions, resource: nested_resource_class
+        end
+
+        let(:payload) do
+          {
+            data: {
+              type: "employees",
+              attributes: {first_name: "Jane"},
+              relationships: {
+                positions: {
+                  data: [{
+                    'temp-id': "abc123",
+                    type: "positions",
+                    method: "create"
+                  }]
+                }
+              }
+            },
+            included: [
+              {
+                'temp-id': "abc123",
+                type: "positions",
+                attributes: {title: "foo"}
+              }
+            ]
+          }
+        end
+
+        it "validates correctly" do
+          expect(validate).to eq true
+          expect(instance.errors).to be_blank
+        end
+      end
     end
   end
 
