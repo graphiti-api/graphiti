@@ -1,5 +1,12 @@
 graphiti changelog
 
+## [1.10.2](https://github.com/graphiti-api/graphiti/compare/v1.10.1...v1.10.2) (2026-03-18)
+
+
+### Bug Fixes
+
+* Ensure RequestValidator validates resource relationships ([ddb5ad2](https://github.com/graphiti-api/graphiti/commit/ddb5ad2b69330774bd1a47935ed89a9fe4396a54))
+
 ## [1.10.1](https://github.com/graphiti-api/graphiti/compare/v1.10.0...v1.10.1) (2026-01-09)
 
 
