@@ -98,7 +98,7 @@ module Graphiti
 
     class UnsupportedOperator < Base
       attr_reader :resource, :filter_name, :supported, :operator
-      
+
       def initialize(resource, filter_name, supported, operator)
         @resource = resource
         @filter_name = filter_name
