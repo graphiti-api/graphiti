@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request: {}
 
 concurrency:
@@ -33,6 +33,7 @@ jobs:
           - "3.1"
           - "3.2"
           - "3.3"
+          - "3.4"
         gemfile:
           - Gemfile
           - gemfiles/rails_5_2.gemfile
@@ -42,12 +43,24 @@ jobs:
           - gemfiles/rails_6_graphiti_rails.gemfile
           - gemfiles/rails_7_graphiti_rails.gemfile
           - gemfiles/rails_7_1_graphiti_rails.gemfile
+          - gemfiles/rails_7_2_graphiti_rails.gemfile
+          - gemfiles/rails_8_0_graphiti_rails.gemfile
+          - gemfiles/rails_8_1_graphiti_rails.gemfile
         appraisal:
           - true
           - false
         include:
           - ruby: ruby-head
             gemfile: gemfiles/rails_7_1.gemfile
+            appraisal: true
+          - ruby: ruby-head
+            gemfile: gemfiles/rails_7_2_graphiti_rails.gemfile
+            appraisal: true
+          - ruby: ruby-head
+            gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
+            appraisal: true
+          - ruby: ruby-head
+            gemfile: gemfiles/rails_8_1_graphiti_rails.gemfile
             appraisal: true
           - ruby: ruby-head
             gemfile: Gemfile
@@ -70,7 +83,56 @@ jobs:
             appraisal: false
           - gemfile: gemfiles/rails_7_1_graphiti_rails.gemfile
             appraisal: false
-            # Rails 5 can't run on Ruby 3
+          - gemfile: gemfiles/rails_7_2_graphiti_rails.gemfile
+            appraisal: false
+          - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
+            appraisal: false
+          - gemfile: gemfiles/rails_8_1_graphiti_rails.gemfile
+            appraisal: false
+
+          # Rails 8.1 needs ruby 3.2 +
+          - gemfile: gemfiles/rails_8_1_graphiti_rails.gemfile
+            ruby: 2.7
+          - gemfile: gemfiles/rails_8_1_graphiti_rails.gemfile
+            ruby: 3.0
+          - gemfile: gemfiles/rails_8_1_graphiti_rails.gemfile
+            ruby: 3.1
+
+          # Rails 8 needs ruby 3.2 +
+          - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
+            ruby: 2.7
+          - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
+            ruby: 3.0
+          - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
+            ruby: 3.1
+
+          # Rails 7.2 needs ruby 3.1 +
+          - gemfile: gemfiles/rails_7_2_graphiti_rails.gemfile
+            ruby: 2.7
+          - gemfile: gemfiles/rails_7_2_graphiti_rails.gemfile
+            ruby: 3.0
+
+          # Rails 7.1 needs ruby 3.0 +
+          - gemfile: gemfiles/rails_7_1_graphiti_rails.gemfile
+            ruby: 2.7
+          - gemfile: gemfiles/rails_7_1_graphiti_rails.gemfile
+            ruby: 3.0
+
+          # Rails 7.0 needs ruby 3.1 +
+          - gemfile: gemfiles/rails_7_0_graphiti_rails.gemfile
+            ruby: 3.2
+          - gemfile: gemfiles/rails_7_0_graphiti_rails.gemfile
+            ruby: 3.3
+          - gemfile: gemfiles/rails_7_0_graphiti_rails.gemfile
+            ruby: 3.4
+
+          # Rails 6 needs < ruby 3.4
+          - gemfile: gemfiles/rails_6.gemfile
+            ruby: 3.4
+          - gemfile: gemfiles/rails_6_graphiti_rails.gemfile
+            ruby: 3.4
+
+          # Rails 5 can't run on Ruby 3
           - gemfile: gemfiles/rails_5_2.gemfile
             ruby: 3.0
           - gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
@@ -87,6 +149,10 @@ jobs:
             ruby: 3.3
           - gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
             ruby: 3.3
+          - gemfile: gemfiles/rails_5_2.gemfile
+            ruby: 3.4
+          - gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
+            ruby: 3.4
     continue-on-error: ${{ matrix.ruby == 'ruby-head' }}
     env: # $BUNDLE_GEMFILE must be set at the job level, so it is set for all steps
       BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gemfile }}
@@ -104,7 +170,7 @@ jobs:
   publish:
     name: Release
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
     needs: [test]
     steps:
       - name: Dispatch Release

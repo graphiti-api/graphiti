@@ -190,6 +190,7 @@ require "graphiti/serializer"
 require "graphiti/query"
 require "graphiti/debugger"
 require "graphiti/util/cache_debug"
+require "graphiti/util/uri_decoder"
 
 if defined?(ActiveRecord)
   require "graphiti/adapters/active_record"

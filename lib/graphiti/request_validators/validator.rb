@@ -49,6 +49,13 @@ module Graphiti
       private
 
       def process_relationships(resource, relationships, payload_path)
+        relationships.each_key do |name|
+          unless resource.class.sideload(name.to_sym)
+            full_key = fully_qualified_key(name, payload_path, :relationships)
+            @errors.add(full_key, :invalid_relationship, message: "is not a valid relationship")
+          end
+        end
+
         opts = {
           resource: resource,
           relationships: relationships

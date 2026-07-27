@@ -1,5 +1,65 @@
 graphiti changelog
 
+## [1.10.2](https://github.com/graphiti-api/graphiti/compare/v1.10.1...v1.10.2) (2026-03-18)
+
+
+### Bug Fixes
+
+* Ensure RequestValidator validates resource relationships ([ddb5ad2](https://github.com/graphiti-api/graphiti/commit/ddb5ad2b69330774bd1a47935ed89a9fe4396a54))
+
+## [1.10.1](https://github.com/graphiti-api/graphiti/compare/v1.10.0...v1.10.1) (2026-01-09)
+
+
+### Bug Fixes
+
+* make parse_fieldset more resilient ([#502](https://github.com/graphiti-api/graphiti/issues/502)) ([216213b](https://github.com/graphiti-api/graphiti/commit/216213bb643566e644c53727557a8e8c163ae6a1))
+
+# [1.10.0](https://github.com/graphiti-api/graphiti/compare/v1.9.0...v1.10.0) (2026-01-06)
+
+
+### Features
+
+* add cache tag support to allow context-aware caching ([#498](https://github.com/graphiti-api/graphiti/issues/498)) ([e8c2bad](https://github.com/graphiti-api/graphiti/commit/e8c2bad478cb3dd8dbd1a5e993b10f84046a0fa8))
+
+# [1.9.0](https://github.com/graphiti-api/graphiti/compare/v1.8.2...v1.9.0) (2026-01-03)
+
+
+### Features
+
+* Support rails 8.1 ([#500](https://github.com/graphiti-api/graphiti/issues/500)) ([34d0cf0](https://github.com/graphiti-api/graphiti/commit/34d0cf03b6b4d887d10d660f0ae08bfa6833345f))
+
+## [1.8.2](https://github.com/graphiti-api/graphiti/compare/v1.8.1...v1.8.2) (2025-05-20)
+
+
+### Bug Fixes
+
+* prevent context loss by always setting thread and fiber locals ([#497](https://github.com/graphiti-api/graphiti/issues/497)) ([5f45f76](https://github.com/graphiti-api/graphiti/commit/5f45f76f590a8a15e9ae3d47d0673c483da11e66))
+
+## [1.8.1](https://github.com/graphiti-api/graphiti/compare/v1.8.0...v1.8.1) (2025-03-17)
+
+# [1.8.0](https://github.com/graphiti-api/graphiti/compare/v1.7.9...v1.8.0) (2025-03-17)
+
+
+### Features
+
+* add thread pool with promises to limit concurrent sideloading ([#472](https://github.com/graphiti-api/graphiti/issues/472)) ([2998852](https://github.com/graphiti-api/graphiti/commit/2998852cea3e5f366e3748d808e26e83e484e989))
+
+## [1.7.9](https://github.com/graphiti-api/graphiti/compare/v1.7.8...v1.7.9) (2025-03-16)
+
+
+### Bug Fixes
+
+* update version check for clear active connections active record deprecation ([#491](https://github.com/graphiti-api/graphiti/issues/491)) ([4e764f6](https://github.com/graphiti-api/graphiti/commit/4e764f66c3a06b4a83c37afa83ddd64a78ef3b19))
+
+## [1.7.8](https://github.com/graphiti-api/graphiti/compare/v1.7.7...v1.7.8) (2025-03-16)
+
+
+### Bug Fixes
+
+* compare URI-decoded path params ([#482](https://github.com/graphiti-api/graphiti/issues/482)) ([20b80dd](https://github.com/graphiti-api/graphiti/commit/20b80dd35bfa4e2f677af3fb9472def6da668149))
+* correct issue with many_to_many when one of the models has a prefix to the intersection model association ([#449](https://github.com/graphiti-api/graphiti/issues/449)) ([dc28a4f](https://github.com/graphiti-api/graphiti/commit/dc28a4f72fe4c577e23ced102a0b5e7063ba8026))
+* lazy constantize relation resources ([#492](https://github.com/graphiti-api/graphiti/issues/492)) ([3cc2983](https://github.com/graphiti-api/graphiti/commit/3cc298399b4dc8970a2beed49b333396c76bd218))
+
 ## [1.7.7](https://github.com/graphiti-api/graphiti/compare/v1.7.6...v1.7.7) (2025-03-15)
 
 

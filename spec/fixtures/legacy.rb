@@ -95,6 +95,16 @@ ActiveRecord::Schema.define(version: 1) do
     t.integer :mentor_id
     t.integer :mentee_id
   end
+
+  create_table :sales_shops do |t|
+    t.string :name
+  end
+
+  create_table :sales_stocks do |t|
+    t.integer :book_id
+    t.integer :shop_id
+    t.integer :amount
+  end
 end
 
 module Legacy
@@ -186,6 +196,8 @@ module Legacy
     has_many :tags, through: :taggings
     has_many :readerships
     has_many :readers, through: :readerships, source: :user
+    has_many :sales_stocks, class_name: "Legacy::Sales::Stock"
+    has_many :sales_shops, class_name: "Legacy::Sales::Shop", through: :sales_stocks, source: :shop
   end
 
   class User < ApplicationRecord
@@ -208,6 +220,22 @@ module Legacy
     belongs_to :tag
   end
 
+  module Sales
+    def self.table_name_prefix
+      "sales_"
+    end
+
+    class Stock < ApplicationRecord
+      belongs_to :book
+      belongs_to :shop
+    end
+
+    class Shop < ApplicationRecord
+      has_many :stocks
+      has_many :books, through: :stocks, inverse_of: :sales_shops
+    end
+  end
+
   class LegacyApplicationSerializer < Graphiti::Serializer
   end
 
@@ -225,6 +253,7 @@ module Legacy
   end
 
   class UserResource < ApplicationResource
+    has_many :my_books, resource: "Legacy::BookResource"
   end
 
   class BookResource < ApplicationResource
@@ -242,6 +271,20 @@ module Legacy
     belongs_to :genre
     many_to_many :tags
     many_to_many :readers, resource: Legacy::UserResource
+  end
+
+  module Sales
+    class StockResource < ApplicationResource
+      attribute :amount, :integer
+      belongs_to :book
+      belongs_to :shop
+    end
+
+    class ShopResource < ApplicationResource
+      attribute :name, :string
+      has_many :stocks
+      many_to_many :books, resource: Legacy::BookResource, foreign_key: {sales_stocks: :shop_id}
+    end
   end
 
   class StateResource < ApplicationResource

@@ -150,6 +150,21 @@ RSpec.describe Graphiti::Configuration do
     end
   end
 
+  describe "#concurrency_max_threads" do
+    include_context "with config", :concurrency_max_threads
+
+    it "defaults" do
+      expect(Graphiti.config.concurrency_max_threads).to eq(4)
+    end
+
+    it "is overridable" do
+      Graphiti.configure do |c|
+        c.concurrency_max_threads = 1
+      end
+      expect(Graphiti.config.concurrency_max_threads).to eq(1)
+    end
+  end
+
   describe "#raise_on_missing_sideload" do
     include_context "with config", :raise_on_missing_sideload
 

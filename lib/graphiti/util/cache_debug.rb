@@ -12,7 +12,9 @@ module Graphiti
       end
 
       def name
-        "#{Graphiti.context[:object]&.request&.method} #{Graphiti.context[:object]&.request&.url}"
+        tag = proxy.resource_cache_tag
+
+        "#{::Graphiti.context[:object]&.request&.method} #{::Graphiti.context[:object]&.request&.url} #{tag}"
       end
 
       def key

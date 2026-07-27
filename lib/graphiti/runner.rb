@@ -58,22 +58,29 @@ module Graphiti
 
     def proxy(base = nil, opts = {})
       base ||= jsonapi_resource.base_scope
-      scope_opts = opts.slice :sideload_parent_length,
+      scope_opts = opts.slice(
+        :sideload_parent_length,
         :default_paginate,
         :after_resolve,
         :sideload,
         :parent,
         :params,
         :bypass_required_filters
+      )
+
       scope = jsonapi_scope(base, scope_opts)
-      ResourceProxy.new jsonapi_resource,
+
+      ::Graphiti::ResourceProxy.new(
+        jsonapi_resource,
         scope,
         query,
         payload: deserialized_payload,
         single: opts[:single],
         raise_on_missing: opts[:raise_on_missing],
         cache: opts[:cache],
-        cache_expires_in: opts[:cache_expires_in]
+        cache_expires_in: opts[:cache_expires_in],
+        cache_tag: opts[:cache_tag]
+      )
     end
   end
 end

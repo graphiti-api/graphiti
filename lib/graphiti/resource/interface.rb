@@ -4,9 +4,10 @@ module Graphiti
       extend ActiveSupport::Concern
 
       class_methods do
-        def cache_resource(expires_in: false)
+        def cache_resource(expires_in: false, tag: nil)
           @cache_resource = true
           @cache_expires_in = expires_in
+          @cache_tag = tag
         end
 
         def all(params = {}, base_scope = nil)
@@ -55,7 +56,7 @@ module Graphiti
         private
 
         def caching_options
-          {cache: @cache_resource, cache_expires_in: @cache_expires_in}
+          {cache: @cache_resource, cache_expires_in: @cache_expires_in, cache_tag: @cache_tag}
         end
 
         def validate_request!(params)

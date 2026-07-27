@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "jsonapi-renderer", "~> 0.2", ">= 0.2.2"
   spec.add_dependency "dry-types", ">= 0.15.0", "< 2.0"
   spec.add_dependency "graphiti_errors", "~> 1.1.0"
-  spec.add_dependency "concurrent-ruby", "~> 1.0"
+  spec.add_dependency "concurrent-ruby", ">= 1.2", "< 2.0"
   spec.add_dependency "activesupport", ">= 5.2"
 
   spec.add_development_dependency "faraday", "~> 0.15"
