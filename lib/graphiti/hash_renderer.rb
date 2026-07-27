@@ -76,7 +76,7 @@ module Graphiti
           unless remote_resource? && serializers.nil?
             payload = if serializers.is_a?(Array)
               data = serializers.map { |rr|
-                rr.to_hash(fields: fields, include: nested_include, graphql: graphql, name_chain: name_chain)
+                rr.to_hash(fields: fields, include: nested_include, graphql: graphql, name_chain: subchain)
               }
               graphql ? {nodes: data} : data
             elsif serializers.nil?
