@@ -135,7 +135,8 @@
         "@semantic-release/git",
         {
           "assets": [
-            "CHANGELOG.md"
+            "CHANGELOG.md",
+            "lib/graphiti/version.rb"
           ],
           "message": "${nextRelease.version} CHANGELOG [skip ci]\n\n${nextRelease.notes}"
         }
