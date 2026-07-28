@@ -67,6 +67,32 @@ module Graphiti
       adapter.base_scope(model)
     end
 
+    # Exposes write context to attribute guards for the duration of the block.
+    # @api private
+    def with_guarded_write(action, id)
+      @guarded_write = {action: action, id: id}
+      yield
+    ensure
+      remove_instance_variable(:@guarded_write) if defined?(@guarded_write)
+      remove_instance_variable(:@guard_model) if defined?(@guard_model)
+    end
+
+    # The model a writable guard is being asked about. Resolved lazily and
+    # memoized, so it costs nothing unless a guard asks for it, and is only
+    # resolved once per payload. On create, this is a new unsaved instance.
+    # @api private
+    def guard_model
+      return @guard_model if defined?(@guard_model)
+
+      @guard_model = if !defined?(@guarded_write)
+        nil
+      elsif @guarded_write[:action] == :create || @guarded_write[:id].nil?
+        build(model)
+      else
+        self.class._find(id: @guarded_write[:id]).data
+      end
+    end
+
     def typecast(name, value, flag)
       att = get_attr!(name, flag, request: true)
       type_name = att[:type]
