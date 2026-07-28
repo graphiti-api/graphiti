@@ -628,6 +628,23 @@ RSpec.describe "sideloading" do
   end
 
   context "when nesting sideloads" do
+    # This context adds sideloads to the shared PORO resources rather than to
+    # an anonymous subclass, so snapshot and restore them - otherwise every
+    # later example in the suite inherits the extra relationships.
+    around do |example|
+      shared = [PORO::EmployeeResource, PORO::PositionResource]
+      snapshot = shared.map { |klass|
+        [klass, klass.config[:sideloads].dup,
+          klass.serializer.relationship_blocks.dup]
+      }
+      example.run
+    ensure
+      snapshot.each do |klass, sideloads, blocks|
+        klass.config[:sideloads] = sideloads
+        klass.serializer.relationship_blocks.replace(blocks)
+      end
+    end
+
     before do
       stub_const(
         "Graphiti::Scope::GLOBAL_THREAD_POOL_EXECUTOR",
@@ -1035,6 +1052,18 @@ RSpec.describe "sideloading" do
         def self.name
           "PORO::PositionResource"
         end
+      end
+    end
+
+    # PORO::Position is shared across the whole suite and defines #department
+    # as an attr_accessor. Overriding it here without restoring leaks into
+    # every later example, where it blows up as soon as no departments exist.
+    around do |example|
+      example.run
+    ensure
+      PORO::Position.class_eval do
+        remove_method :department
+        attr_reader :department
       end
     end
 

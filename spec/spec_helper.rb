@@ -35,6 +35,18 @@ RSpec.configure do |config|
     end
   end
 
+  # Every anonymous Class.new(SomeResource) registers itself in the global
+  # Graphiti.resources via the inherited hook, and nothing ever removes it.
+  # Graphiti.setup! walks that list and re-applies sideloads, so without this
+  # an example calling setup! reaches back into every throwaway resource
+  # earlier examples defined - which makes results depend on spec order.
+  config.around do |example|
+    registered = Graphiti.resources.dup
+    example.run
+  ensure
+    Graphiti.resources.replace(registered)
+  end
+
   config.filter_run_when_matching :focus
 
   config.example_status_persistence_file_path = File.expand_path(".rspec-examples", __dir__)
