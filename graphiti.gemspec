@@ -24,6 +24,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency "graphiti_errors", "~> 1.1.0"
   spec.add_dependency "concurrent-ruby", ">= 1.2", "< 2.0"
   spec.add_dependency "activesupport", ">= 5.2"
+  # Bundled (no longer default) as of Ruby 3.5; graphiti uses OpenStruct in lib/
+  spec.add_dependency "ostruct", ">= 0.5"
 
   spec.add_development_dependency "faraday", "~> 0.15"
   spec.add_development_dependency "kaminari", "~> 0.17"
