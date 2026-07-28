@@ -18,9 +18,12 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
-    let(:one_day_ago) { 1.day.ago }
-    let(:two_days_ago) { 2.days.ago }
-    let(:one_day_from_now) { 1.day.from_now }
+    # Datetime filters are compared against an iso8601 string, which drops
+    # sub-second precision. Pinning these to whole seconds keeps the fixture
+    # and the filter value from disagreeing about which second they are in.
+    let(:one_day_ago) { 1.day.ago.change(usec: 0) }
+    let(:two_days_ago) { 2.days.ago.change(usec: 0) }
+    let(:one_day_from_now) { 1.day.from_now.change(usec: 0) }
 
     let!(:author1) do
       Legacy::Author.create! first_name: "Stephen",
