@@ -1,5 +1,12 @@
 graphiti changelog
 
+## [1.10.3](https://github.com/graphiti-api/graphiti/compare/v1.10.2...v1.10.3) (2026-07-28)
+
+
+### Bug Fixes
+
+* declare ostruct runtime dependency for Ruby 3.5+ ([#508](https://github.com/graphiti-api/graphiti/issues/508)) ([38ef5c5](https://github.com/graphiti-api/graphiti/commit/38ef5c55b437b2cd42049405f8e98e991939b0fb))
+
 ## [1.10.2](https://github.com/graphiti-api/graphiti/compare/v1.10.1...v1.10.2) (2026-03-18)
 
 
