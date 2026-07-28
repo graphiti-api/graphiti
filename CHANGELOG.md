@@ -1,5 +1,7 @@
 graphiti changelog
 
+## [1.11.1](https://github.com/graphiti-api/graphiti/compare/v1.11.0...v1.11.1) (2026-07-28)
+
 # [1.11.0](https://github.com/graphiti-api/graphiti/compare/v1.10.3...v1.11.0) (2026-07-28)
 
 
