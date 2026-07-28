@@ -1,5 +1,17 @@
 graphiti changelog
 
+# [1.11.0](https://github.com/graphiti-api/graphiti/compare/v1.10.3...v1.11.0) (2026-07-28)
+
+
+### Bug Fixes
+
+* filter instead of failing for nil string values ([#503](https://github.com/graphiti-api/graphiti/issues/503)) ([44bf76c](https://github.com/graphiti-api/graphiti/commit/44bf76c1d519f3d7bfa31f08e88dfcc61cc56455))
+
+
+### Features
+
+* adds attr_reader to Graphiti::Errors::UnsupportedOperator ([#506](https://github.com/graphiti-api/graphiti/issues/506)) ([315cc30](https://github.com/graphiti-api/graphiti/commit/315cc30bad69485d7c5c5f02a0d515b67382281f))
+
 ## [1.10.3](https://github.com/graphiti-api/graphiti/compare/v1.10.2...v1.10.3) (2026-07-28)
 
 
