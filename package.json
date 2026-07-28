@@ -37,6 +37,10 @@
         {
           "releaseRules": [
             {
+              "breakingMarker": "!",
+              "release": "major"
+            },
+            {
               "breaking": true,
               "release": "major"
             },
@@ -86,6 +90,13 @@
             }
           ],
           "parserOpts": {
+            "headerPattern": "^(\\w*)(?:\\((.*)\\))?(!)?: (.*)$",
+            "headerCorrespondence": [
+              "type",
+              "scope",
+              "breakingMarker",
+              "subject"
+            ],
             "noteKeywords": [
               "BREAKING CHANGE",
               "BREAKING CHANGES",
@@ -97,7 +108,20 @@
           }
         }
       ],
-      "@semantic-release/release-notes-generator",
+      [
+        "@semantic-release/release-notes-generator",
+        {
+          "parserOpts": {
+            "headerPattern": "^(\\w*)(?:\\((.*)\\))?(!)?: (.*)$",
+            "headerCorrespondence": [
+              "type",
+              "scope",
+              "breakingMarker",
+              "subject"
+            ]
+          }
+        }
+      ],
       [
         "@semantic-release/changelog",
         {
