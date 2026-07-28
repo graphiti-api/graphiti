@@ -1126,4 +1126,61 @@ RSpec.describe "sideloading" do
     xit "should maybe raise, not sure yet. that is why this spec is spending" do
     end
   end
+
+  # Guards are applied per level - each sideload builds a child Query against
+  # its own resource - so an unreadable relationship nested under a readable
+  # one is never resolved, not merely hidden at render time.
+  context "when a nested relationship is not readable" do
+    let(:position_resource) do
+      Class.new(PORO::PositionResource) do
+        def self.name
+          "PORO::PositionResource"
+        end
+
+        def admin?
+          context&.admin
+        end
+
+        belongs_to :department,
+          resource: PORO::DepartmentResource,
+          readable: :admin?
+      end
+    end
+
+    let(:resource) do
+      nested = position_resource
+      Class.new(PORO::EmployeeResource) do
+        def self.name
+          "PORO::EmployeeResource"
+        end
+        has_many :positions, resource: nested
+      end
+    end
+
+    let!(:department) { PORO::Department.create(name: "dep") }
+    let!(:employee) { PORO::Employee.create(first_name: "John") }
+    let!(:position) do
+      PORO::Position.create title: "t",
+        employee_id: employee.id,
+        department_id: department.id
+    end
+
+    before { params[:include] = "positions.department" }
+
+    def nested_sideloads(admin)
+      Graphiti.with_context(OpenStruct.new(admin: admin)) do
+        resource.all(params).query.sideloads[:positions].sideloads.keys
+      end
+    end
+
+    it "is not resolved" do
+      expect(nested_sideloads(false)).to be_empty
+    end
+
+    context "and the guard passes" do
+      it "is resolved" do
+        expect(nested_sideloads(true)).to eq([:department])
+      end
+    end
+  end
 end
