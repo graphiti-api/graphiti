@@ -120,6 +120,46 @@ RSpec.describe Graphiti::Sideload do
         expect(instance).to be_writable
       end
     end
+
+    context "when both resources define the guard" do
+      let(:parent_resource_class) do
+        Class.new(PORO::EmployeeResource) do
+          def self.name
+            "PORO::EmployeeResource"
+          end
+
+          def user_can_read?
+            true
+          end
+        end
+      end
+
+      let(:resource_class) do
+        Class.new(PORO::PositionResource) do
+          self.model = PORO::Position
+          def self.name
+            "PORO::PositionResource"
+          end
+
+          def user_can_read?
+            false
+          end
+        end
+      end
+
+      it "prefers the resource declaring the relationship" do
+        instance = Class.new(described_class).new(name, opts.merge(readable: :user_can_read?))
+        expect(instance).to be_readable
+      end
+    end
+
+    context "when the guard is defined on neither resource" do
+      it "raises naming the declaring resource" do
+        instance = Class.new(described_class).new(name, opts.merge(readable: :nope?))
+        expect { instance.readable? }
+          .to raise_error(NoMethodError, /nope\?.*PORO::EmployeeResource/)
+      end
+    end
   end
 
   describe "#primary_key" do

@@ -755,27 +755,70 @@ RSpec.describe "serialization" do
       end
     end
 
-    xcontext "when a sideload is not readable" do
+    # The readable flag is evaluated at render time, not on boot, so the
+    # relationship is always applied to the serializer - what changes is
+    # whether it is rendered.
+    context "when a sideload is not readable" do
       before do
         resource.allow_sideload :hidden, readable: false, type: :has_many
         Graphiti.setup!
+        PORO::Employee.create(first_name: "John")
       end
 
-      it "is not applied to the serializer" do
-        expect(resource.serializer.relationship_blocks.keys)
-          .to_not include(:hidden)
+      it "is not rendered" do
+        render
+        expect(json["data"][0]["relationships"].to_h.keys)
+          .to_not include("hidden")
       end
     end
 
-    xcontext "when a sideload macro not readable" do
+    context "when a sideload macro not readable" do
       before do
         resource.belongs_to :hidden, readable: false
         Graphiti.setup!
+        PORO::Employee.create(first_name: "John")
       end
 
-      it "is not applied to the serializer" do
-        expect(resource.serializer.relationship_blocks.keys)
-          .to_not include(:hidden)
+      it "is not rendered" do
+        render
+        expect(json["data"][0]["relationships"].to_h.keys)
+          .to_not include("hidden")
+      end
+    end
+
+    context "when a sideload is readable via a guard" do
+      before do
+        resource.class_eval do
+          # defined on the resource that DECLARES the relationship
+          def admin?
+            context&.admin
+          end
+        end
+        resource.has_many :positions,
+          resource: PORO::PositionResource,
+          readable: :admin?
+        Graphiti.setup!
+        PORO::Employee.create(first_name: "John")
+      end
+
+      context "and the guard passes" do
+        it "is rendered" do
+          Graphiti.with_context(OpenStruct.new(admin: true)) do
+            render
+            expect(json["data"][0]["relationships"].to_h.keys)
+              .to include("positions")
+          end
+        end
+      end
+
+      context "and the guard does not pass" do
+        it "is not rendered" do
+          Graphiti.with_context(OpenStruct.new(admin: false)) do
+            render
+            expect(json["data"][0]["relationships"].to_h.keys)
+              .to_not include("positions")
+          end
+        end
       end
     end
 

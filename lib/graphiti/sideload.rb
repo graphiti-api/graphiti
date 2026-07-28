@@ -454,18 +454,43 @@ module Graphiti
       Util::Class.namespace_for(klass)
     end
 
-    # TODO: call this at runtime to support procs
+    # A guard may live on either side of the relationship. The resource that
+    # declares it wins, so `has_many :positions, readable: :admin?` on
+    # EmployeeResource reads the same way as `attribute :salary, readable:
+    # :admin?` does. Defining it on the related resource instead lets one
+    # guard cover every relationship pointing at it.
     def evaluate_flag(flag)
       return false if flag.blank?
 
       case flag.class.name
       when "Symbol", "String"
-        resource.send(flag)
+        guard_resource(flag).send(flag)
       when "Proc"
-        resource.instance_exec(&flag)
+        evaluate_guard_proc(flag)
       else
         !!flag
       end
+    end
+
+    # Private methods are eligible - guards are often not part of a
+    # resource's public API.
+    def guard_resource(method_name)
+      if !parent_resource.respond_to?(method_name, true) &&
+          resource.respond_to?(method_name, true)
+        resource
+      else
+        parent_resource
+      end
+    end
+
+    # A proc can't be introspected the way a method name can, so run it
+    # against the declaring resource and only reach for the related one if
+    # that resource turns out not to define what the proc references.
+    def evaluate_guard_proc(flag)
+      parent_resource.instance_exec(&flag)
+    rescue NameError => error
+      raise error unless resource.respond_to?(error.name, true)
+      resource.instance_exec(&flag)
     end
 
     def context
