@@ -44,7 +44,7 @@ module Graphiti
         return filter_string_eql(scope, attribute, nil, is_not: is_not) if Array(value).compact.blank?
 
         column = column_for(scope, attribute)
-        clause = column.lower.eq_any(value.map { |val| val.downcase })
+        clause = column.lower.eq_any(value.map(&:downcase))
         is_not ? scope.where.not(clause) : scope.where(clause)
       end
 
