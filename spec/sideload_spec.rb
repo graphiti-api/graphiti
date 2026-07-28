@@ -653,6 +653,21 @@ RSpec.describe Graphiti::Sideload do
       expect(records).to eq(results)
     end
 
+    it "loads synchronously without a future by default" do
+      expect(instance).not_to receive(:future_load)
+      expect(instance.load(parents, query, nil)).to eq(results)
+    end
+
+    context "when Graphiti.config.concurrency is true" do
+      before { allow(Graphiti.config).to receive(:concurrency).and_return(true) }
+
+      it "loads via a future" do
+        expect(instance).to receive(:future_load)
+          .with(parents, query, nil).and_return(Concurrent::Promises.fulfilled_future(results))
+        expect(instance.load(parents, query, nil)).to eq(results)
+      end
+    end
+
     context "when params customization" do
       before do
         instance.class.params do |hash, parents, context|

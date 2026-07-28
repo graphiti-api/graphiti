@@ -236,6 +236,8 @@ module Graphiti
     end
 
     def load(parents, query, graph_parent)
+      return build_resource_proxy(parents, query, graph_parent).to_a unless Graphiti.config.concurrency
+
       future_load(parents, query, graph_parent).value!
     end
 
@@ -284,6 +286,33 @@ module Graphiti
         end
       end
       children.replace(associated) if track_associated
+    end
+
+    # Synchronous counterpart to #future_resolve, used when concurrency is off.
+    # Mirrors #future_resolve but resolves inline via the synchronous
+    # Scope#resolve / #load paths (no promises). See Scope#sync_resolve_sideloads.
+    def resolve(parents, query, graph_parent)
+      return future_resolve(parents, query, graph_parent).value! if Graphiti.config.concurrency
+
+      if single? && parents.length > 1
+        raise Errors::SingularSideload.new(self, parents.length)
+      end
+
+      if self.class.scope_proc
+        sideload_scope = fire_scope(parents)
+        sideload_scope = Scope.new sideload_scope,
+          resource,
+          query,
+          parent: graph_parent,
+          sideload: self,
+          sideload_parent_length: parents.length,
+          default_paginate: false
+        sideload_scope.resolve do |sideload_results|
+          fire_assign(parents, sideload_results)
+        end
+      else
+        load(parents, query, graph_parent)
+      end
     end
 
     def future_resolve(parents, query, graph_parent)
