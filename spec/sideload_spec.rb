@@ -154,10 +154,15 @@ RSpec.describe Graphiti::Sideload do
     end
 
     context "when the guard is defined on neither resource" do
-      it "raises naming the declaring resource" do
+      # Asserting on #name/#receiver rather than the message: how ruby words
+      # "undefined method" changed in 3.3, and on older versions the anonymous
+      # resource class has no name to match against.
+      it "raises against the declaring resource" do
         instance = Class.new(described_class).new(name, opts.merge(readable: :nope?))
-        expect { instance.readable? }
-          .to raise_error(NoMethodError, /nope\?.*PORO::EmployeeResource/)
+        expect { instance.readable? }.to raise_error(NoMethodError) { |error|
+          expect(error.name).to eq(:nope?)
+          expect(error.receiver).to be_a(parent_resource_class)
+        }
       end
     end
   end
