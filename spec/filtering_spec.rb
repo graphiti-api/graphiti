@@ -1925,4 +1925,29 @@ RSpec.describe "filtering" do
       end
     end
   end
+
+  context "when the requested operator is not supported" do
+    before do
+      resource.filter :first_name, :string, only: :eq
+      params[:filter] = {first_name: {prefix: "Ste"}}
+    end
+
+    it "raises UnsupportedOperator" do
+      expect { records }.to raise_error(
+        Graphiti::Errors::UnsupportedOperator,
+        /Tried to filter :first_name on operator :prefix, but not supported/
+      )
+    end
+
+    # These readers are public API - consumers build their own error messages
+    # from them rather than parsing #message.
+    it "exposes the resource, filter name, operator and supported operators" do
+      expect { records }.to raise_error(Graphiti::Errors::UnsupportedOperator) { |error|
+        expect(error.resource).to be_a(resource)
+        expect(error.filter_name).to eq(:first_name)
+        expect(error.operator).to eq(:prefix)
+        expect(error.supported).to eq([:eq])
+      }
+    end
+  end
 end
