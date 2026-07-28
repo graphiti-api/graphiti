@@ -7,6 +7,8 @@
 /spec/reports/
 /gemfiles/*.lock
 /tmp/
+# railties generates local_secret.txt under the dummy app root, which is spec/
+/spec/tmp/
 node_modules
 .byebug_history
 spec/.rspec-examples

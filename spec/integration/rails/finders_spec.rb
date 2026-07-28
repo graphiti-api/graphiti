@@ -281,6 +281,15 @@ if ENV["APPRAISAL_INITIALIZED"]
           it "executes case-insensitive search" do
             expect(ids).to eq([author2.id, author3.id])
           end
+
+          context "with nil value" do
+            let(:value) { nil }
+            let!(:author3) { Legacy::Author.create! }
+
+            it "works" do
+              expect(ids).to eq([author3.id])
+            end
+          end
         end
 
         context "nothing" do
@@ -297,6 +306,15 @@ if ENV["APPRAISAL_INITIALIZED"]
           it "executes case-sensitive search" do
             expect(ids).to eq([author3.id])
           end
+
+          context "with nil value" do
+            let(:value) { nil }
+            let!(:author3) { Legacy::Author.create! }
+
+            it "works" do
+              expect(ids).to eq([author3.id])
+            end
+          end
         end
 
         context "!eq" do
@@ -304,6 +322,15 @@ if ENV["APPRAISAL_INITIALIZED"]
 
           it "executes case-insensitive NOT search" do
             expect(ids).to eq([author1.id])
+          end
+
+          context "with nil value" do
+            let(:value) { {'!eq': nil} }
+            let!(:author3) { Legacy::Author.create! }
+
+            it "works" do
+              expect(ids).to eq([author1.id, author2.id])
+            end
           end
         end
 
@@ -313,6 +340,15 @@ if ENV["APPRAISAL_INITIALIZED"]
 
           it "executes case-insensitive NOT search" do
             expect(ids).to eq([author1.id])
+          end
+
+          context "with nil value" do
+            let(:value) { {not_eq: nil} }
+            let!(:author3) { Legacy::Author.create! }
+
+            it "works" do
+              expect(ids).to eq([author1.id, author2.id])
+            end
           end
         end
 
