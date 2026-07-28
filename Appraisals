@@ -46,7 +46,8 @@ end
 appraise "rails-7-1" do
   gem "rails", "~> 7.1"
   gem "rspec-rails"
-  gem "sqlite3", "~> 1.4.0"
+  # This appraisal is the ruby-head job; sqlite3 1.4.x cannot build on Ruby 4.x
+  gem "sqlite3", "~> 2.1"
   gem "database_cleaner"
 end
 
