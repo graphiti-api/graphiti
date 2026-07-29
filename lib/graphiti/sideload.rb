@@ -106,6 +106,10 @@ module Graphiti
       evaluate_flag @writable
     end
 
+    def guarded?
+      dynamic_flag?(@readable) || dynamic_flag?(@writable)
+    end
+
     def single?
       !!@single
     end
@@ -454,18 +458,23 @@ module Graphiti
       Util::Class.namespace_for(klass)
     end
 
-    # A guard may live on either side of the relationship. The resource that
-    # declares it wins, so `has_many :positions, readable: :admin?` on
-    # EmployeeResource reads the same way as `attribute :salary, readable:
-    # :admin?` does. Defining it on the related resource instead lets one
-    # guard cover every relationship pointing at it.
+    def dynamic_flag?(flag)
+      flag.is_a?(Symbol) || flag.is_a?(String) || flag.is_a?(Proc)
+    end
+
+    # The guard method may be defined on either resource. The declaring side
+    # wins (`has_many :positions, readable: :admin?` calls EmployeeResource#admin?,
+    # matching how attribute guards resolve). If the related resource is the only place
+    # that defines it, the guard runs there. For instance, PositionResource#admin? can guard
+    # every relationship that points at positions.
+
     def evaluate_flag(flag)
       return false if flag.blank?
 
-      case flag.class.name
-      when "Symbol", "String"
+      case flag
+      when Symbol, String
         guard_resource(flag).send(flag)
-      when "Proc"
+      when Proc
         evaluate_guard_proc(flag)
       else
         !!flag

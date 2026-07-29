@@ -28,6 +28,9 @@ module Graphiti
           prev = Util::Hash.deep_dup(field_condition_blocks)
           super
           self.field_condition_blocks = prev
+          # _register_condition mutates the hash, which ancestors share by
+          # reference until reassigned - copy first so the guard doesn't leak.
+          self.relationship_condition_blocks = Util::Hash.deep_dup(relationship_condition_blocks)
           _register_condition(relationship_condition_blocks, name, options)
         end
 

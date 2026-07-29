@@ -62,6 +62,18 @@ module Graphiti
     @resources ||= []
   end
 
+  # Every guarded relationship, e.g. ["EmployeeResource.positions"]
+  def self.guarded_relationships
+    ::Rails.application.eager_load! if defined?(::Rails) && ::Rails.respond_to?(:application) && ::Rails.application
+
+    resources.flat_map { |resource_class|
+      resource_class.config[:sideloads]
+        .select { |_name, sideload| sideload.guarded? }
+        .keys
+        .map { |relationship_name| "#{resource_class.name || "(anonymous resource)"}.#{relationship_name}" }
+    }.uniq.sort
+  end
+
   def self.broadcast(name, payload)
     # AS::N prefers domain naming format with more specific towards end
     name = "#{name}.graphiti"

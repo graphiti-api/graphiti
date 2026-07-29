@@ -820,6 +820,11 @@ RSpec.describe "serialization" do
           end
         end
       end
+
+      it "does not leak the guard condition to ancestor serializers" do
+        expect(PORO::EmployeeSerializer.relationship_condition_blocks)
+          .to_not have_key(:positions)
+      end
     end
 
     context "when an attribute is not readable" do

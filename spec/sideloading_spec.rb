@@ -1183,4 +1183,34 @@ RSpec.describe "sideloading" do
       end
     end
   end
+
+  describe "Graphiti.guarded_relationships" do
+    let!(:guarded_resource) do
+      Class.new(PORO::EmployeeResource) do
+        def self.name
+          "GuardAudit::EmployeeResource"
+        end
+
+        def admin?
+          true
+        end
+
+        has_many :positions, readable: :admin?
+        has_many :teams, writable: -> { admin? }
+        has_many :bios
+      end
+    end
+
+    it "lists relationships with guarded readable/writable flags" do
+      expect(Graphiti.guarded_relationships).to include(
+        "GuardAudit::EmployeeResource.positions",
+        "GuardAudit::EmployeeResource.teams"
+      )
+    end
+
+    it "omits relationships with boolean flags" do
+      expect(Graphiti.guarded_relationships)
+        .to_not include("GuardAudit::EmployeeResource.bios")
+    end
+  end
 end

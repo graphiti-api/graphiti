@@ -718,6 +718,19 @@ RSpec.describe Graphiti::Schema do
       end
     end
 
+    context "when sideload is guarded" do
+      before do
+        employee_resource.has_many :positions,
+          readable: :admin?,
+          resource: position_resource
+      end
+
+      it "flags it as guarded" do
+        expect(schema[:resources][0][:relationships][:positions][:guard])
+          .to eq(true)
+      end
+    end
+
     context "when sideload allowlist" do
       before do
         test_context.sideload_allowlist = {
