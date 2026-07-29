@@ -44,10 +44,21 @@ RSpec.describe Graphiti::Scope do
           allow(resource.class).to receive(:sideload).with(:positions) { sideload }
         end
 
-        it "resolves the sideload" do
-          expect(sideload).to receive(:future_resolve)
-            .with(results, query.sideloads[:positions], resource) { Concurrent::Promises.future {} }
+        it "resolves the sideload synchronously by default" do
+          expect(sideload).to receive(:resolve)
+            .with(results, query.sideloads[:positions], resource)
+          expect(sideload).not_to receive(:future_resolve)
           instance.resolve
+        end
+
+        context "when Graphiti.config.concurrency is true" do
+          before { allow(Graphiti.config).to receive(:concurrency).and_return(true) }
+
+          it "resolves the sideload via a future" do
+            expect(sideload).to receive(:future_resolve)
+              .with(results, query.sideloads[:positions], resource) { Concurrent::Promises.future {} }
+            instance.resolve
+          end
         end
 
         context "but no parents were found" do
@@ -121,6 +132,9 @@ RSpec.describe Graphiti::Scope do
         context "when Graphiti.config.concurrency is false" do
           before do
             allow(Graphiti.config).to receive(:concurrency).and_return(false)
+            allow(sideload).to receive(:resolve) do |_results, q, _parent_resource|
+              described_class.new(double.as_null_object, position_resource, q).resolve
+            end
           end
 
           it "does not close db connections" do
@@ -158,8 +172,8 @@ RSpec.describe Graphiti::Scope do
         end
 
         it "resolves the sideload" do
-          expect(sideload).to receive(:future_resolve)
-            .with(results, query.sideloads[:positions], resource) { Concurrent::Promises.future {} }
+          expect(sideload).to receive(:resolve)
+            .with(results, query.sideloads[:positions], resource)
           instance.resolve_sideloads(results)
         end
 
@@ -278,7 +292,7 @@ RSpec.describe Graphiti::Scope do
           before { allow(Graphiti.config).to receive(:concurrency).and_return(false) }
 
           it "does not close db connection" do
-            allow(sideload).to receive(:future_resolve) { Concurrent::Promises.future {} }
+            allow(sideload).to receive(:resolve)
 
             expect(resource.adapter).not_to receive(:close)
             instance.resolve_sideloads(results)
@@ -287,7 +301,7 @@ RSpec.describe Graphiti::Scope do
           it "does not clear thread locals" do
             Thread.current[:foo] = "bar"
 
-            allow(sideload).to receive(:future_resolve) { Concurrent::Promises.fulfilled_future({}) }
+            allow(sideload).to receive(:resolve)
             instance.resolve_sideloads(results)
 
             expect(Thread.current[:foo]).to eq("bar")
@@ -297,7 +311,7 @@ RSpec.describe Graphiti::Scope do
             it "does not clear fiber locals" do
               Fiber[:foo] = "bar"
 
-              allow(sideload).to receive(:future_resolve) { Concurrent::Promises.fulfilled_future({}) }
+              allow(sideload).to receive(:resolve)
               instance.resolve_sideloads(results)
 
               expect(Fiber[:foo]).to eq("bar")
@@ -315,29 +329,59 @@ RSpec.describe Graphiti::Scope do
         end
 
         context "when the first sideload errors" do
-          before do
-            allow(sideload).to receive(:future_resolve) do
-              Concurrent::Promises.future { raise "danger will robinson!" }
+          context "without concurrency" do
+            before do
+              allow(sideload).to receive(:resolve) { raise "danger will robinson!" }
+            end
+
+            it "raises the error" do
+              expect { instance.resolve_sideloads(results) }.to raise_error("danger will robinson!")
             end
           end
 
-          it "raises the error" do
-            expect { instance.resolve_sideloads(results) }.to raise_error("danger will robinson!")
+          context "with concurrency" do
+            before do
+              allow(Graphiti.config).to receive(:concurrency).and_return(true)
+              allow(sideload).to receive(:future_resolve) do
+                Concurrent::Promises.future { raise "danger will robinson!" }
+              end
+            end
+
+            it "raises the error" do
+              expect { instance.resolve_sideloads(results) }.to raise_error("danger will robinson!")
+            end
           end
         end
 
-        context "when another sideload errors" do
+        context "when a later sideload errors" do
           let(:sideload_2) { double("visas", shared_remote?: false, name: :visas) }
           let(:params) { {include: {positions: {}, visas: {}}} }
 
           before do
             allow(resource.class).to receive(:sideload).with(:visas) { sideload_2 }
-            allow(sideload).to receive(:future_resolve) { Concurrent::Promises.future {} }
-            allow(sideload_2).to receive(:future_resolve) { Concurrent::Promises.future { raise "sideload_2" } }
           end
 
-          it "raises the error" do
-            expect { instance.resolve_sideloads(results) }.to raise_error("sideload_2")
+          context "without concurrency" do
+            before do
+              allow(sideload).to receive(:resolve)
+              allow(sideload_2).to receive(:resolve) { raise "sideload_2" }
+            end
+
+            it "raises the error" do
+              expect { instance.resolve_sideloads(results) }.to raise_error("sideload_2")
+            end
+          end
+
+          context "with concurrency" do
+            before do
+              allow(Graphiti.config).to receive(:concurrency).and_return(true)
+              allow(sideload).to receive(:future_resolve) { Concurrent::Promises.future {} }
+              allow(sideload_2).to receive(:future_resolve) { Concurrent::Promises.future { raise "sideload_2" } }
+            end
+
+            it "raises the error" do
+              expect { instance.resolve_sideloads(results) }.to raise_error("sideload_2")
+            end
           end
         end
 
@@ -347,12 +391,29 @@ RSpec.describe Graphiti::Scope do
 
           before do
             allow(resource.class).to receive(:sideload).with(:visas) { sideload_2 }
-            allow(sideload).to receive(:future_resolve) { Concurrent::Promises.future { raise "sideload" } }
-            allow(sideload_2).to receive(:future_resolve) { Concurrent::Promises.future { raise "sideload_2" } }
           end
 
-          it "raises the first error" do
-            expect { instance.resolve_sideloads(results) }.to raise_error("sideload")
+          context "without concurrency" do
+            before do
+              allow(sideload).to receive(:resolve) { raise "sideload" }
+              allow(sideload_2).to receive(:resolve) { raise "sideload_2" }
+            end
+
+            it "raises the first error" do
+              expect { instance.resolve_sideloads(results) }.to raise_error("sideload")
+            end
+          end
+
+          context "with concurrency" do
+            before do
+              allow(Graphiti.config).to receive(:concurrency).and_return(true)
+              allow(sideload).to receive(:future_resolve) { Concurrent::Promises.future { raise "sideload" } }
+              allow(sideload_2).to receive(:future_resolve) { Concurrent::Promises.future { raise "sideload_2" } }
+            end
+
+            it "raises the first error" do
+              expect { instance.resolve_sideloads(results) }.to raise_error("sideload")
+            end
           end
         end
       end

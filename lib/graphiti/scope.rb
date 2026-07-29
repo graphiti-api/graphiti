@@ -42,11 +42,20 @@ module Graphiti
       }
     end
 
-    def resolve
+    def resolve(&blk)
+      # When concurrency is disabled, take a synchronous path that mirrors the
+      # pre-1.8 semantics. This avoids allocating Concurrent::Promises futures,
+      # Thread/Fiber storage snapshots, and Rails executor wrappers on every
+      # request purely to drive a thread pool that is intentionally synchronous.
+      # See https://github.com/graphiti-api/graphiti/issues/505
+      return sync_resolve(&blk) unless Graphiti.config.concurrency
+
       future_resolve.value!
     end
 
     def resolve_sideloads(results)
+      return sync_resolve_sideloads(results) unless Graphiti.config.concurrency
+
       future_resolve_sideloads(results).value!
     end
 
@@ -112,6 +121,43 @@ module Graphiti
     alias_method :last_modified_at, :updated_at
 
     private
+
+    # Synchronous counterpart to #future_resolve, used when concurrency is off.
+    # Resolves the resource and its sideloads inline without any promise
+    # machinery. See #resolve.
+    def sync_resolve
+      return [] if @query.zero_results?
+
+      resolved = broadcast_data { |payload|
+        @object = @resource.before_resolve(@object, @query)
+        payload[:results] = @resource.resolve(@object)
+        payload[:results]
+      }
+      resolved.compact!
+      assign_serializer(resolved)
+      yield resolved if block_given?
+      @opts[:after_resolve]&.call(resolved)
+      sync_resolve_sideloads(resolved) unless @query.sideloads.empty?
+      resolved
+    end
+
+    # Synchronous counterpart to #future_resolve_sideloads, used when
+    # concurrency is off. Resolves each sideload inline. See #resolve_sideloads.
+    def sync_resolve_sideloads(results)
+      return if results == []
+
+      @query.sideloads.each_pair do |name, q|
+        sideload = @resource.class.sideload(name)
+        next if sideload.nil? || sideload.shared_remote?
+
+        Graphiti.config.before_sideload&.call(Graphiti.context)
+        sideload.resolve(results, q, @resource)
+      end
+
+      # Match pre-1.8 semantics: the non-concurrent resolve_sideloads returned
+      # nil (not the sideloads Hash). Callers don't rely on the return value.
+      nil
+    end
 
     def future_resolve_sideloads(results)
       return Concurrent::Promises.fulfilled_future(nil, self.class.global_thread_pool_executor) if results == []

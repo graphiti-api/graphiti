@@ -108,7 +108,20 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
   end
 
   def resolve(parents, query, graph_parent)
-    future_resolve(parents, query, graph_parent).value!
+    return future_resolve(parents, query, graph_parent).value! if Graphiti.config.concurrency
+
+    parents.group_by(&grouper.field_name).each_pair do |group_name, group|
+      next if group_name.nil? || grouper.ignore?(group_name)
+
+      match = ->(c) { c.group_name == group_name.to_sym }
+      if (sideload = children.values.find(&match))
+        duped = remove_invalid_sideloads(sideload.resource, query)
+        sideload.resolve(group, duped, graph_parent)
+      else
+        err = ::Graphiti::Errors::PolymorphicSideloadChildNotFound
+        raise err.new(self, group_name)
+      end
+    end
   end
 
   def future_resolve(parents, query, graph_parent)
