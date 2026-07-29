@@ -445,6 +445,12 @@ module Graphiti
 
           secondary_endpoint '/my_url', [:index, :update]
 
+          Or disable endpoint validation for this resource:
+
+          self.validate_endpoints = false
+
+          See https://www.graphiti.dev/guides/concepts/links for more information.
+
           The current endpoints allowed for this resource are: #{@resource_class.endpoints.inspect}
         MSG
       end

@@ -1274,11 +1274,15 @@ RSpec.describe Graphiti::Resource do
             klass.primary_endpoint "/api/v1/employees", [:create]
           end
 
-          it "raises error" do
+          it "raises error with endpoint configuration guidance" do
             Graphiti.with_context ctx, :index do
               expect {
                 klass.all
-              }.to raise_error(Graphiti::Errors::InvalidEndpoint, /QueryAllSpec::EmployeeResource cannot be called directly from endpoint \/api\/v1\/employees/)
+              }.to raise_error(Graphiti::Errors::InvalidEndpoint) { |error|
+                expect(error.message).to include("QueryAllSpec::EmployeeResource cannot be called directly from endpoint /api/v1/employees")
+                expect(error.message).to include("self.validate_endpoints = false")
+                expect(error.message).to include("https://www.graphiti.dev/guides/concepts/links")
+              }
             end
           end
 
