@@ -50,14 +50,41 @@ module Graphiti
         end
       end
 
+      # Guards may optionally accept the model being written and the attribute
+      # name, mirroring readable guards.
       def guard_passes?
-        !!resource.send(attribute[flag])
+        result = case guard_arity
+        when 0 then call_guard
+        when 1 then call_guard(resource.guard_model)
+        else call_guard(resource.guard_model, name.to_s)
+        end
+        !!result
+      end
+
+      def call_guard(*args)
+        if guard.is_a?(Proc)
+          resource.instance_exec(*args, &guard)
+        else
+          resource.send(guard, *args)
+        end
+      end
+
+      def guard_arity
+        method = guard.is_a?(Proc) ? guard : resource.method(guard)
+        # Negative arity means optional or splatted params - hand over
+        # everything and let the guard take what it wants.
+        method.arity.negative? ? 2 : method.arity
+      end
+
+      def guard
+        attribute[flag]
       end
 
       def guarded?
-        request? &&
-          attribute[flag].is_a?(Symbol) &&
-          attribute[flag] != :required
+        return false unless request?
+        return false if guard == :required
+
+        guard.is_a?(Symbol) || guard.is_a?(String) || guard.is_a?(Proc)
       end
 
       def supported?

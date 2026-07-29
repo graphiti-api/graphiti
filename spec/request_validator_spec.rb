@@ -139,6 +139,95 @@ RSpec.describe Graphiti::RequestValidator do
             expect(instance.errors).to be_blank
           end
         end
+
+        # The point of resolving lazily: a guard that doesn't ask for a model
+        # must not cause one to be built or loaded.
+        context "and the guard takes no arguments" do
+          it "is not handed a model" do
+            expect(root_resource).to_not receive(:guard_model)
+            validate
+          end
+        end
+
+        context "and the guard takes the model" do
+          before do
+            root_resource_class.attribute :salary, :integer,
+              writable: :salary_writable?, readable: false
+            root_resource_class.class_eval do
+              def salary_writable?(model)
+                model.first_name != "locked"
+              end
+            end
+          end
+
+          it "is handed the model under write" do
+            expect(validate).to eq true
+            expect(instance.errors).to be_blank
+          end
+
+          context "and the guard rejects it" do
+            before do
+              allow(root_resource).to receive(:guard_model)
+                .and_return(PORO::Employee.new(first_name: "locked"))
+            end
+
+            it "has an unwritable attribute error" do
+              expect(validate).to eq false
+              expect(instance.errors)
+                .to be_added(:'data.attributes.salary', :unwritable_attribute)
+            end
+          end
+        end
+
+        context "and the guard takes the model and attribute name" do
+          before do
+            root_resource_class.attribute :salary, :integer,
+              writable: :salary_writable?, readable: false
+            root_resource_class.class_eval do
+              attr_reader :guarded_with
+
+              def salary_writable?(model, attribute_name)
+                @guarded_with = [model, attribute_name]
+                true
+              end
+            end
+          end
+
+          it "receives both" do
+            expect(validate).to eq true
+            model, attribute_name = root_resource.guarded_with
+            expect(model).to be_a(PORO::Employee)
+            expect(attribute_name).to eq("salary")
+          end
+        end
+
+        context "and the guard is a string" do
+          before do
+            root_resource_class.attribute :salary, :integer,
+              writable: "admin?", readable: false
+            allow(root_resource).to receive(:admin?).and_return(false)
+          end
+
+          it "is still applied" do
+            expect(validate).to eq false
+            expect(instance.errors)
+              .to be_added(:'data.attributes.salary', :unwritable_attribute)
+          end
+        end
+
+        context "and the guard is a proc" do
+          before do
+            root_resource_class.attribute :salary, :integer,
+              writable: -> { admin? }, readable: false
+            allow(root_resource).to receive(:admin?).and_return(false)
+          end
+
+          it "is still applied" do
+            expect(validate).to eq false
+            expect(instance.errors)
+              .to be_added(:'data.attributes.salary', :unwritable_attribute)
+          end
+        end
       end
 
       context "when the payload contains fields needing typecasting" do

@@ -165,6 +165,49 @@ if ENV["APPRAISAL_INITIALIZED"]
           }.to raise_error(Graphiti::Errors::ConflictRequest)
         end
       end
+
+      # A writable guard can accept the model being written, so policy objects
+      # can make per-record decisions. On update that is the persisted record,
+      # loaded before the incoming attributes are applied.
+      context "when a writable guard accepts the model" do
+        let(:guard_arguments) { [] }
+
+        before do
+          captured = guard_arguments
+          guarded = Class.new(EmployeeResource) do
+            def self.name
+              "EmployeeResource"
+            end
+
+            attribute :first_name, :string, writable: :editable?
+
+            define_method(:editable?) do |record, attribute_name|
+              captured << [record, attribute_name]
+              record.first_name != "locked"
+            end
+          end
+          allow(controller).to receive(:resource) { guarded }
+        end
+
+        it "receives the persisted record and the attribute name" do
+          make_request
+          record, attribute_name = guard_arguments.first
+          expect(record).to be_a(Employee)
+          expect(record.id).to eq(employee.id)
+          expect(record.first_name).to eq("Joe")
+          expect(attribute_name).to eq("first_name")
+        end
+
+        context "and the guard rejects the record" do
+          let(:employee) { Employee.create(first_name: "locked") }
+
+          it "refuses the write" do
+            expect { make_request }
+              .to raise_error(Graphiti::Errors::InvalidRequest)
+            expect(employee.reload.first_name).to eq("locked")
+          end
+        end
+      end
     end
 
     describe "basic destroy" do

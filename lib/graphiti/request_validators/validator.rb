@@ -83,20 +83,22 @@ module Graphiti
       end
 
       def typecast_attributes(resource, attributes, action, payload_path)
-        attributes.each_pair do |key, value|
-          # Only validate id if create action, otherwise it's only used for lookup
-          next if action != :create &&
-            key == :id &&
-            resource.class.config[:attributes][:id][:writable] == false
+        resource.with_guarded_write(action, attributes[:id]) do
+          attributes.each_pair do |key, value|
+            # Only validate id if create action, otherwise it's only used for lookup
+            next if action != :create &&
+              key == :id &&
+              resource.class.config[:attributes][:id][:writable] == false
 
-          begin
-            attributes[key] = resource.typecast(key, value, :writable)
-          rescue Graphiti::Errors::UnknownAttribute
-            @errors.add(fully_qualified_key(key, payload_path), :unknown_attribute, message: "is an unknown attribute")
-          rescue Graphiti::Errors::InvalidAttributeAccess
-            @errors.add(fully_qualified_key(key, payload_path), :unwritable_attribute, message: "cannot be written")
-          rescue Graphiti::Errors::TypecastFailed => e
-            @errors.add(fully_qualified_key(key, payload_path), :type_error, message: "should be type #{e.type_name}")
+            begin
+              attributes[key] = resource.typecast(key, value, :writable)
+            rescue Graphiti::Errors::UnknownAttribute
+              @errors.add(fully_qualified_key(key, payload_path), :unknown_attribute, message: "is an unknown attribute")
+            rescue Graphiti::Errors::InvalidAttributeAccess
+              @errors.add(fully_qualified_key(key, payload_path), :unwritable_attribute, message: "cannot be written")
+            rescue Graphiti::Errors::TypecastFailed => e
+              @errors.add(fully_qualified_key(key, payload_path), :type_error, message: "should be type #{e.type_name}")
+            end
           end
         end
       end
