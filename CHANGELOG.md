@@ -1,5 +1,12 @@
 graphiti changelog
 
+## [1.12.2](https://github.com/graphiti-api/graphiti/compare/v1.12.1...v1.12.2) (2026-07-29)
+
+
+### Bug Fixes
+
+* improve InvalidEndpoint guidance ([#512](https://github.com/graphiti-api/graphiti/issues/512)) ([1e6db50](https://github.com/graphiti-api/graphiti/commit/1e6db50b949505ebf4d587bb08c7711a9c771b13))
+
 ## [1.12.1](https://github.com/graphiti-api/graphiti/compare/v1.12.0...v1.12.1) (2026-07-29)
 
 
