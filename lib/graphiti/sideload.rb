@@ -99,11 +99,15 @@ module Graphiti
     end
 
     def readable?
-      !!@readable
+      evaluate_flag @readable
     end
 
     def writable?
-      !!@writable
+      evaluate_flag @writable
+    end
+
+    def guarded?
+      dynamic_flag?(@readable) || dynamic_flag?(@writable)
     end
 
     def single?
@@ -454,18 +458,48 @@ module Graphiti
       Util::Class.namespace_for(klass)
     end
 
-    # TODO: call this at runtime to support procs
+    def dynamic_flag?(flag)
+      flag.is_a?(Symbol) || flag.is_a?(String) || flag.is_a?(Proc)
+    end
+
+    # The guard method may be defined on either resource. The declaring side
+    # wins (`has_many :positions, readable: :admin?` calls EmployeeResource#admin?,
+    # matching how attribute guards resolve). If the related resource is the only place
+    # that defines it, the guard runs there. For instance, PositionResource#admin? can guard
+    # every relationship that points at positions.
+
     def evaluate_flag(flag)
       return false if flag.blank?
 
-      case flag.class.name
-      when "Symbol", "String"
-        resource.send(flag)
-      when "Proc"
-        resource.instance_exec(&flag)
+      case flag
+      when Symbol, String
+        guard_resource(flag).send(flag)
+      when Proc
+        evaluate_guard_proc(flag)
       else
         !!flag
       end
+    end
+
+    # Private methods are eligible - guards are often not part of a
+    # resource's public API.
+    def guard_resource(method_name)
+      if !parent_resource.respond_to?(method_name, true) &&
+          resource.respond_to?(method_name, true)
+        resource
+      else
+        parent_resource
+      end
+    end
+
+    # A proc can't be introspected the way a method name can, so run it
+    # against the declaring resource and only reach for the related one if
+    # that resource turns out not to define what the proc references.
+    def evaluate_guard_proc(flag)
+      parent_resource.instance_exec(&flag)
+    rescue NameError => error
+      raise error unless resource.respond_to?(error.name, true)
+      resource.instance_exec(&flag)
     end
 
     def context

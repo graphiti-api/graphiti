@@ -18,6 +18,24 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.required_ruby_version = ">= 2.7"
 
+  # TODO: remove once the 1.12 upgrade window has passed
+  spec.post_install_message = <<~MSG
+    Graphiti: relationship readable:/writable: guards are now enforced.
+
+    Symbols, strings, and procs passed to a relationship's readable/writable
+    guards were always interpreted as true and never actually called before this
+    conditional relationship change. They are now evaluated per-request, where
+    unreadable relationships are omitted from responses and includes, and unwritable
+    relationships reject writes.
+
+    To list every affected relationship in your app:
+
+      bin/rails runner 'puts Graphiti.guarded_relationships'
+
+    Audit these before deploying. Apps using schema.json will also see affected 
+    relationships flagged as "became guarded" by the schema check.
+  MSG
+
   spec.add_dependency "jsonapi-serializable", "~> 0.3.0"
   spec.add_dependency "jsonapi-renderer", "~> 0.2", ">= 0.2.2"
   spec.add_dependency "dry-types", ">= 0.15.0", "< 2.0"

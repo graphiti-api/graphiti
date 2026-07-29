@@ -102,6 +102,10 @@ module Graphiti
           next
         end
 
+        if new_rel[:guard] && !old_rel[:guard]
+          @errors << "#{old_resource[:name]}: relationship #{name.inspect} became guarded."
+        end
+
         if new_rel[:resource] != old_rel[:resource]
           @errors << "#{old_resource[:name]}: relationship #{name.inspect} changed resource from #{old_rel[:resource]} to #{new_rel[:resource]}."
         end

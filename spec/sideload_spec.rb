@@ -82,13 +82,13 @@ RSpec.describe Graphiti::Sideload do
         end
       end
 
-      xit "works with symbols" do
+      it "works with symbols" do
         instance = Class.new(described_class).new(name, opts.merge(readable: :user_can_read?, writable: :user_can_write?))
         expect(instance).not_to be_readable
         expect(instance).to be_writable
       end
 
-      xit "works with strings" do
+      it "works with strings" do
         instance = Class.new(described_class).new(name, opts.merge(readable: "user_can_read?", writable: "user_can_write?"))
         expect(instance).not_to be_readable
         expect(instance).to be_writable
@@ -113,11 +113,56 @@ RSpec.describe Graphiti::Sideload do
         end
       end
 
-      xit "works" do
+      it "works" do
         options = opts.merge(readable: lambda { user_can_read? }, writable: lambda { true })
         instance = Class.new(described_class).new(name, options)
         expect(instance).not_to be_readable
         expect(instance).to be_writable
+      end
+    end
+
+    context "when both resources define the guard" do
+      let(:parent_resource_class) do
+        Class.new(PORO::EmployeeResource) do
+          def self.name
+            "PORO::EmployeeResource"
+          end
+
+          def user_can_read?
+            true
+          end
+        end
+      end
+
+      let(:resource_class) do
+        Class.new(PORO::PositionResource) do
+          self.model = PORO::Position
+          def self.name
+            "PORO::PositionResource"
+          end
+
+          def user_can_read?
+            false
+          end
+        end
+      end
+
+      it "prefers the resource declaring the relationship" do
+        instance = Class.new(described_class).new(name, opts.merge(readable: :user_can_read?))
+        expect(instance).to be_readable
+      end
+    end
+
+    context "when the guard is defined on neither resource" do
+      # Asserting on #name/#receiver rather than the message: how ruby words
+      # "undefined method" changed in 3.3, and on older versions the anonymous
+      # resource class has no name to match against.
+      it "raises against the declaring resource" do
+        instance = Class.new(described_class).new(name, opts.merge(readable: :nope?))
+        expect { instance.readable? }.to raise_error(NoMethodError) { |error|
+          expect(error.name).to eq(:nope?)
+          expect(error.receiver).to be_a(parent_resource_class)
+        }
       end
     end
   end

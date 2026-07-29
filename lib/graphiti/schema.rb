@@ -247,6 +247,10 @@ module Graphiti
             schema[:single] = true
           end
 
+          if config.guarded?
+            schema[:guard] = true
+          end
+
           r[name] = schema
         end
       end

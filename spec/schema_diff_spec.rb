@@ -1001,6 +1001,34 @@ RSpec.describe Graphiti::SchemaDiff do
       it { is_expected.to eq([]) }
     end
 
+    context "when relationship becomes guarded" do
+      before do
+        resource_a.has_many :positions,
+          resource: position_resource
+        resource_b.has_many :positions,
+          readable: :admin?,
+          resource: position_resource
+      end
+
+      it "returns error" do
+        expect(diff).to eq([
+          "SchemaDiff::EmployeeResource: relationship :positions became guarded."
+        ])
+      end
+    end
+
+    context "when relationship removes a guard" do
+      before do
+        resource_a.has_many :positions,
+          readable: :admin?,
+          resource: position_resource
+        resource_b.has_many :positions,
+          resource: position_resource
+      end
+
+      it { is_expected.to eq([]) }
+    end
+
     context "when relationship changes resource" do
       let(:position_resource2) do
         Class.new(application_resource) do
