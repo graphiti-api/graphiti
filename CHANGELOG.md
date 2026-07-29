@@ -1,5 +1,12 @@
 graphiti changelog
 
+## [1.12.1](https://github.com/graphiti-api/graphiti/compare/v1.12.0...v1.12.1) (2026-07-29)
+
+
+### Performance Improvements
+
+* skip promise machinery when concurrency is disabled ([#510](https://github.com/graphiti-api/graphiti/issues/510)) ([b2e5f37](https://github.com/graphiti-api/graphiti/commit/b2e5f37428f7628b9fadd03823bd68552e125af0)), closes [#472](https://github.com/graphiti-api/graphiti/issues/472) [#497](https://github.com/graphiti-api/graphiti/issues/497) [#505](https://github.com/graphiti-api/graphiti/issues/505)
+
 # [1.12.0](https://github.com/graphiti-api/graphiti/compare/v1.11.1...v1.12.0) (2026-07-29)
 
 
