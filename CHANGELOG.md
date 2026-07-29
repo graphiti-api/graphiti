@@ -1,5 +1,18 @@
 graphiti changelog
 
+# [1.12.0](https://github.com/graphiti-api/graphiti/compare/v1.11.1...v1.12.0) (2026-07-29)
+
+
+### Bug Fixes
+
+* GQL name chaining ([#415](https://github.com/graphiti-api/graphiti/issues/415)) [skip ci] ([930928a](https://github.com/graphiti-api/graphiti/commit/930928a8779037efbcc1989eef5cf579c608e431))
+
+
+### Features
+
+* conditional relationships evaluate readable/writable guards per-request ([#450](https://github.com/graphiti-api/graphiti/issues/450)) ([3ed3187](https://github.com/graphiti-api/graphiti/commit/3ed3187068d268cd85ee1c36dc8135aa92abd05c))
+* pass the model and attribute name to writable guards ([#511](https://github.com/graphiti-api/graphiti/issues/511)) [skip ci] ([24a8a94](https://github.com/graphiti-api/graphiti/commit/24a8a94f801867f57cc7c1ae9c6a9bdbfec05c24))
+
 ## [1.11.1](https://github.com/graphiti-api/graphiti/compare/v1.11.0...v1.11.1) (2026-07-28)
 
 # [1.11.0](https://github.com/graphiti-api/graphiti/compare/v1.10.3...v1.11.0) (2026-07-28)
