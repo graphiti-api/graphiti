@@ -486,6 +486,19 @@ module Graphiti
       end
     end
 
+    class InvalidWrapModel < Base
+      def initialize(resource_class, model)
+        @resource_class = resource_class
+        @model = model
+      end
+
+      def message
+        <<~MSG
+          #{@resource_class.name}.wrap was given a #{@model.class}, but this resource is for #{@resource_class.model} (subclasses are fine).
+        MSG
+      end
+    end
+
     class ResourceEndpointConflict < Base
       def initialize(path, action, resource_a, resource_b)
         @path = path

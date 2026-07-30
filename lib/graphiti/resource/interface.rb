@@ -53,7 +53,27 @@ module Graphiti
           runner.proxy(base_scope, single: true, raise_on_missing: true, assign_action: :create)
         end
 
+        # Wrap models fetched outside graphiti so they render like any other proxy
+        def wrap(models, base_scope = nil)
+          validate_wrap_models!(models)
+          runner = Runner.new(self, {}, nil, :find)
+          runner.proxy(base_scope, bypass_required_filters: true).tap do |proxy|
+            proxy.data = models
+          end
+        end
+
         private
+
+        # Skip polymorphic parents - resource_for_model raises a better error for unknown children
+        def validate_wrap_models!(models)
+          return if abstract_class? || (polymorphic? && !polymorphic_child?)
+
+          [models].flatten.compact.each do |model|
+            unless model.is_a?(self.model)
+              raise Errors::InvalidWrapModel.new(self, model)
+            end
+          end
+        end
 
         def caching_options
           {cache: @cache_resource, cache_expires_in: @cache_expires_in, cache_tag: @cache_tag}

@@ -82,6 +82,12 @@ module Graphiti
       Renderer.new(self, options).as_graphql
     end
 
+    # Records supplied directly, no scope resolution
+    def data=(models)
+      @data = models
+      [@data].flatten.compact.each { |record| @resource.decorate_record(record) }
+    end
+
     def data
       return @data unless @data.nil?
       return assign_attributes(@payload.params) if @assign_action
