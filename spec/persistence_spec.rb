@@ -727,6 +727,60 @@ RSpec.describe "persistence" do
 
         include_examples "around persistence", only_update: true
       end
+
+      describe "deprecation of pre-yield attribute mutation" do
+        context "when a hook modifies the attributes hash before yield" do
+          before do
+            klass.class_eval do
+              around_persistence :do_around_persistence
+
+              def do_around_persistence(attributes)
+                attributes[:first_name] = "b4"
+                yield
+              end
+            end
+          end
+
+          it "warns on create, naming the changed keys" do
+            expect(Graphiti::DEPRECATOR).to receive(:warn)
+              .with(/around_persistence hook modified the attributes hash before yield \(changed keys: :first_name\)/)
+            klass.build(payload).save
+          end
+
+          it "warns on update" do
+            employee = PORO::Employee.create(first_name: "asdf")
+            payload[:data][:id] = employee.id.to_s
+
+            expect(Graphiti::DEPRECATOR).to receive(:warn).with(/before yield/)
+            klass.find(payload).update_attributes
+          end
+        end
+
+        context "when a hook only wraps its yield" do
+          before do
+            klass.class_eval do
+              around_persistence :do_around_persistence
+
+              def do_around_persistence(attributes)
+                model = yield
+                model.update_attributes(first_name: "#{model.first_name}after")
+              end
+            end
+          end
+
+          it "does not warn" do
+            expect(Graphiti::DEPRECATOR).not_to receive(:warn)
+            klass.build(payload).save
+          end
+        end
+
+        context "when no around_persistence hook is registered" do
+          it "does not warn" do
+            expect(Graphiti::DEPRECATOR).not_to receive(:warn)
+            klass.build(payload).save
+          end
+        end
+      end
     end
 
     describe ".around_save" do
