@@ -7,8 +7,12 @@ class Graphiti::Util::Persistence
   # @param [Hash] relationships see (Deserializer#relationships)
   # @param [Model] caller_model The persisted parent object in the request graph
   # @param [Symbol] foreign_key Attribute assigned by parent object in graph
-  def initialize(resource, meta, attributes, relationships, caller_model, foreign_key = nil)
+  # @param [Model] assigned_model a model already built by #assign, to be
+  #   assigned onto rather than rebuilt
+  # TODO: make foreign_key a keyword once the satellite gems are rolled in
+  def initialize(resource, meta, attributes, relationships, caller_model, foreign_key = nil, assigned_model: nil)
     @resource = resource
+    @assigned_model = assigned_model
     @meta = meta
     @attributes = attributes
     @relationships = relationships
@@ -22,6 +26,14 @@ class Graphiti::Util::Persistence
         @resource = @resource.class.resource_for_type(meta_type).new
       end
     end
+  end
+
+  def assign
+    attributes = @adapter.persistence_attributes(self, @attributes)
+    assigned = @resource.assign(attributes, metadata, @meta[:method], model_instance: @assigned_model)
+    @resource.decorate_record(assigned)
+
+    assigned
   end
 
   # Perform the actual save logic.
@@ -46,11 +58,13 @@ class Graphiti::Util::Persistence
   def run
     attributes = @adapter.persistence_attributes(self, @attributes)
 
+    payload_attributes = attributes.dup
     parents = @adapter.process_belongs_to(self, attributes)
+    apply_derived_attributes(attributes, payload_attributes)
     persisted = persist_object(@meta[:method], attributes)
     @resource.decorate_record(persisted)
-    assign_temp_id(persisted, @meta[:temp_id])
 
+    assign_temp_id(persisted, @meta[:temp_id])
     associate_parents(persisted, parents)
 
     children = @adapter.process_has_many(self, persisted)
@@ -80,6 +94,19 @@ class Graphiti::Util::Persistence
   end
 
   private
+
+  # process_belongs_to persists the parents and writes their primary keys into
+  # +attributes+. A model that was already assigned (see ResourceProxy#assign_attributes)
+  # predates those keys, so apply just them - the payload attributes are already on it,
+  # and re-applying them would clobber any changes made since.
+  def apply_derived_attributes(attributes, payload_attributes)
+    return unless @assigned_model
+
+    derived = attributes.reject { |key, value| payload_attributes[key] == value }
+    return if derived.empty?
+
+    @resource.assign_attributes(@assigned_model, derived, metadata)
+  end
 
   def add_hook(prc, lifecycle_event)
     ::Graphiti::Util::TransactionHooksRecorder.add(prc, lifecycle_event)
@@ -163,10 +190,19 @@ class Graphiti::Util::Persistence
     }
   end
 
+  def accepts_assigned_model?(method)
+    method.parameters.any? { |type, name| name == :assigned_model && [:key, :keyreq].include?(type) }
+  end
+
   def call_resource_method(method_name, attributes, caller_model)
     method = @resource.method(method_name)
 
-    if method.arity == 1
+    if @assigned_model && [:create, :update].include?(method_name)
+      unless accepts_assigned_model?(method)
+        raise Graphiti::Errors::AssignedModelNotSupported.new(@resource.class, method_name)
+      end
+      method.call(attributes, metadata, assigned_model: @assigned_model)
+    elsif method.arity == 1
       method.call(attributes)
     else
       method.call(attributes, metadata)

@@ -50,7 +50,7 @@ module Graphiti
         def build(params, base_scope = nil)
           validate_request!(params)
           runner = Runner.new(self, params)
-          runner.proxy(base_scope, single: true, raise_on_missing: true)
+          runner.proxy(base_scope, single: true, raise_on_missing: true, assign_action: :create)
         end
 
         private

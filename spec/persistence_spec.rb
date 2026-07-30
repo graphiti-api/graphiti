@@ -37,6 +37,438 @@ RSpec.describe "persistence" do
     expect(employee.data.first_name).to eq("Jane")
   end
 
+  it "keeps a client-supplied id on create" do
+    captured_attributes = nil
+    klass.before_attributes do |attributes|
+      captured_attributes = attributes.dup
+    end
+    payload[:data][:id] = "789"
+
+    employee = klass.build(payload)
+
+    expect(employee.data.id).to eq(789)
+    expect(captured_attributes[:id]).to eq(789)
+  end
+
+  it "can access the unsaved model after build" do
+    employee = klass.build(payload)
+    expect(employee.data).to_not be_nil
+    expect(employee.data.first_name).to eq("Jane")
+    expect(employee.data.id).to be_nil
+  end
+
+  it "can modify attributes directly on the unsaved model before save" do
+    employee = klass.build(payload)
+    expect(employee.data).to_not be_nil
+    employee.data.first_name = "June"
+
+    expect(employee.save).to eq(true)
+    expect(employee.data.first_name).to eq("June")
+  end
+
+  # Controllers use this to answer "what would happen if I saved this?" - render
+  # the model with the payload applied, or its validation errors, without touching
+  # the database. See also the "dry run" specs in spec/integration/rails.
+  describe "inspecting the model before saving" do
+    let(:callback_passes) { [] }
+    let(:klass) do
+      passes = callback_passes
+      Class.new(PORO::EmployeeResource) do
+        self.model = PORO::Employee
+
+        before_attributes do |attributes|
+          passes << attributes
+          attributes
+        end
+
+        def self.name
+          "PORO::EmployeeResource"
+        end
+      end
+    end
+
+    describe "writable guard evaluation" do
+      let(:klass) do
+        Class.new(PORO::EmployeeResource) do
+          self.model = PORO::Employee
+
+          def self.name
+            "PORO::EmployeeResource"
+          end
+
+          class << self
+            attr_accessor :guard_calls
+          end
+          self.guard_calls = 0
+
+          attribute :first_name, :string, writable: :first_name_writable?
+
+          def first_name_writable?(_model = nil, _attribute = nil)
+            self.class.guard_calls += 1
+            true
+          end
+        end
+      end
+
+      # Guards run once when the proxy is built and once during
+      # #assign_attributes. #save skips re-validating the payload it already
+      # validated, so inspecting the model costs no extra guard evaluations
+      # over the plain-save path.
+      it "does not re-run guards at save time" do
+        employee = klass.build(payload)
+        employee.data
+        calls_after_assign = klass.guard_calls
+
+        expect(employee.save).to eq(true)
+        expect(klass.guard_calls).to eq(calls_after_assign)
+      end
+
+      it "still runs guards at save time on the plain-save path" do
+        employee = klass.build(payload)
+        calls_before_save = klass.guard_calls
+
+        expect(employee.save).to eq(true)
+        expect(klass.guard_calls).to eq(calls_before_save + 1)
+      end
+    end
+
+    describe "on create" do
+      it "exposes an unsaved model without persisting it" do
+        employee = klass.build(payload)
+
+        expect(employee.data.first_name).to eq("Jane")
+        expect(employee.data.id).to be_nil
+        expect(employee.data.valid?).to eq(true)
+        expect(PORO::DB.data[:employees]).to be_empty
+      end
+
+      it "runs the attributes callbacks once, no matter how often data is read" do
+        employee = klass.build(payload)
+
+        3.times { employee.data }
+        employee.assign_attributes(payload)
+        employee.save
+
+        expect(callback_passes.length).to eq(1)
+      end
+
+      it "returns the same model instance every time" do
+        employee = klass.build(payload)
+        expect(employee.data).to equal(employee.data)
+      end
+
+      it "exposes validation errors without persisting" do
+        klass.model = Class.new(PORO::Employee) {
+          validates :first_name, presence: true
+
+          def self.name
+            "PORO::Employee"
+          end
+        }
+        payload[:data][:attributes] = {first_name: nil}
+
+        employee = klass.build(payload)
+
+        expect(employee.data.valid?).to eq(false)
+        expect_errors(employee.data, ["First name can't be blank"])
+        expect(PORO::DB.data[:employees]).to be_empty
+      end
+
+      it "still persists after the model has been inspected" do
+        employee = klass.build(payload)
+        employee.data
+
+        expect(employee.save).to eq(true)
+        expect(employee.data.id).to_not be_nil
+      end
+
+      # The persistence callbacks receive a frozen copy of the attributes
+      # (see Resource::Persistence#create) - the payload itself must stay
+      # mutable for anything reading it after save, e.g. after_commit hooks.
+      it "does not leave the payload attributes frozen after save" do
+        employee = klass.build(payload)
+        employee.data
+        employee.save
+
+        expect(employee.payload.attributes).to_not be_frozen
+      end
+    end
+
+    describe "on update" do
+      let!(:employee) { PORO::Employee.create(first_name: "asdf") }
+
+      before do
+        payload[:data][:id] = employee.id.to_s
+      end
+
+      it "reads the persisted model until the payload is applied" do
+        proxy = klass.find(payload)
+        expect(proxy.data.first_name).to eq("asdf")
+
+        proxy.assign_attributes(payload)
+        expect(proxy.data.first_name).to eq("Jane")
+      end
+
+      it "does not persist the applied payload" do
+        klass.find(payload).assign_attributes(payload)
+
+        expect(PORO::Employee.find(employee.id).first_name).to eq("asdf")
+      end
+
+      it "runs the attributes callbacks once across repeated calls" do
+        proxy = klass.find(payload)
+
+        proxy.data
+        proxy.assign_attributes(payload)
+        proxy.assign_attributes(payload)
+
+        expect(callback_passes.length).to eq(1)
+      end
+
+      it "assigns onto the already-resolved model rather than reloading it" do
+        proxy = klass.find(payload)
+        resolved = proxy.data
+
+        expect(proxy.assign_attributes(payload)).to equal(resolved)
+      end
+
+      it "re-assigns onto the same model when called with different params" do
+        proxy = klass.find(payload)
+        first_assigned = proxy.assign_attributes(payload)
+
+        new_payload = {data: {type: "employees", id: employee.id.to_s, attributes: {first_name: "June"}}}
+        second_assigned = proxy.assign_attributes(new_payload)
+
+        expect(second_assigned).to equal(first_assigned)
+        expect(proxy.data.first_name).to eq("June")
+        expect(proxy.update_attributes).to eq(true)
+        expect(PORO::Employee.find(employee.id).first_name).to eq("June")
+      end
+
+      it "supports Rails-style find-then-assign" do
+        proxy = klass.find(id: employee.id.to_s)
+        proxy.assign_attributes(payload)
+
+        expect(proxy.data.first_name).to eq("Jane")
+        expect(PORO::Employee.find(employee.id).first_name).to eq("asdf")
+      end
+
+      it "does not re-assign when only read-side query params differ" do
+        proxy = klass.find(payload)
+        proxy.assign_attributes(payload)
+        proxy.assign_attributes(payload.merge(sort: "-id"))
+
+        expect(callback_passes.length).to eq(1)
+      end
+
+      it "does not mutate the params passed by the caller" do
+        original = {data: {type: "employees", id: employee.id.to_s, attributes: {first_name: "Jill"}}}
+        snapshot = Marshal.load(Marshal.dump(original))
+
+        proxy = klass.find(id: employee.id.to_s)
+        proxy.assign_attributes(original)
+
+        expect(original).to eq(snapshot)
+      end
+
+      it "persists once the payload has already been applied" do
+        proxy = klass.find(payload)
+        proxy.assign_attributes(payload)
+
+        expect(proxy.update_attributes).to eq(true)
+        expect(PORO::Employee.find(employee.id).first_name).to eq("Jane")
+        expect(callback_passes.length).to eq(1)
+      end
+
+      it "keeps changes made to the model after the payload was applied" do
+        proxy = klass.find(payload)
+        proxy.assign_attributes(payload)
+        proxy.data.first_name = "June"
+
+        expect(proxy.update_attributes).to eq(true)
+        expect(PORO::Employee.find(employee.id).first_name).to eq("June")
+      end
+
+      it "can modify the model for rendering without persisting" do
+        proxy = klass.find(payload)
+        proxy.data.first_name = "June"
+
+        expect(proxy.data.first_name).to eq("June")
+        expect(PORO::Employee.find(employee.id).first_name).to eq("asdf")
+      end
+    end
+
+    # Attributes are assigned before the persistence callbacks fire, so
+    # around_persistence receives the assigned model - its pre-yield position
+    # is the last chance to modify the model before save.
+    describe "with an around_persistence hook" do
+      context "that modifies the model before yielding" do
+        before do
+          klass.class_eval do
+            around_persistence :do_around_persistence
+
+            def do_around_persistence(model)
+              model.first_name = "hooked"
+              yield
+            end
+          end
+        end
+
+        it "persists the pre-yield change on create" do
+          employee = klass.build(payload)
+
+          expect(employee.save).to eq(true)
+          expect(PORO::Employee.find(employee.data.id).first_name).to eq("hooked")
+        end
+
+        it "receives the same instance the caller inspected" do
+          employee = klass.build(payload)
+          inspected = employee.data
+
+          expect(employee.save).to eq(true)
+          expect(employee.data).to equal(inspected)
+          expect(PORO::Employee.find(employee.data.id).first_name).to eq("hooked")
+        end
+
+        it "assigns and saves in one call when update is given params" do
+          existing = PORO::Employee.create(first_name: "asdf")
+          payload[:data][:id] = existing.id.to_s
+
+          proxy = klass.find(payload)
+          expect(proxy.update(payload)).to eq(true)
+          expect(PORO::Employee.find(existing.id).first_name).to eq("hooked")
+        end
+
+        it "persists the pre-yield change on update" do
+          existing = PORO::Employee.create(first_name: "asdf")
+          payload[:data][:id] = existing.id.to_s
+
+          proxy = klass.find(payload)
+          proxy.assign_attributes(payload)
+
+          expect(proxy.update_attributes).to eq(true)
+          expect(PORO::Employee.find(existing.id).first_name).to eq("hooked")
+        end
+      end
+
+      context "that only wraps the save" do
+        before do
+          klass.class_eval do
+            around_persistence :do_around_persistence
+
+            def do_around_persistence(model)
+              saved = yield
+              saved.update_attributes(first_name: "#{saved.first_name}after")
+            end
+          end
+        end
+
+        it "works after the model has been inspected" do
+          employee = klass.build(payload)
+          employee.data
+
+          expect(employee.save).to eq(true)
+          expect(PORO::Employee.find(employee.data.id).first_name).to eq("Janeafter")
+        end
+      end
+
+      context "that raises FrozenError on some other object" do
+        before do
+          klass.class_eval do
+            around_persistence :do_around_persistence
+
+            def do_around_persistence(attributes)
+              "frozen".freeze << "oops"
+              yield
+            end
+          end
+        end
+
+        it "propagates the original error untouched" do
+          employee = klass.build(payload)
+          employee.data
+
+          expect {
+            employee.save
+          }.to raise_error(FrozenError, /can't modify frozen String/)
+        end
+      end
+
+      context "that raises a FrozenError constructed without a receiver" do
+        before do
+          klass.class_eval do
+            around_persistence :do_around_persistence
+
+            def do_around_persistence(attributes)
+              raise FrozenError, "custom frozen boom"
+            end
+          end
+        end
+
+        it "propagates the original error untouched" do
+          employee = klass.build(payload)
+          employee.data
+
+          expect {
+            employee.save
+          }.to raise_error(FrozenError, "custom frozen boom")
+        end
+
+        it "propagates it on the one-shot path too" do
+          expect {
+            klass.build(payload).save
+          }.to raise_error(FrozenError, "custom frozen boom")
+        end
+      end
+    end
+
+    describe "with an overridden create/update" do
+      context "when the override cannot receive the assigned model" do
+        before do
+          klass.class_eval do
+            def create(attributes, meta = nil)
+              super
+            end
+          end
+        end
+
+        it "raises instead of silently dropping changes made to the unsaved model" do
+          employee = klass.build(payload)
+          employee.data.first_name = "June"
+
+          expect {
+            employee.save
+          }.to raise_error(Graphiti::Errors::AssignedModelNotSupported, /create/)
+        end
+
+        it "still works on the one-shot path" do
+          employee = klass.build(payload)
+
+          expect(employee.save).to eq(true)
+          expect(employee.data.first_name).to eq("Jane")
+        end
+      end
+
+      context "when the override accepts the assigned_model keyword" do
+        before do
+          klass.class_eval do
+            def create(attributes, meta = nil, assigned_model: nil)
+              super
+            end
+          end
+        end
+
+        it "passes the assigned model through" do
+          employee = klass.build(payload)
+          employee.data.first_name = "June"
+
+          expect(employee.save).to eq(true)
+          expect(PORO::Employee.find(employee.data.id).first_name).to eq("June")
+        end
+      end
+    end
+  end
+
   describe "updating" do
     let!(:employee) { PORO::Employee.create(first_name: "asdf") }
 
@@ -51,6 +483,16 @@ RSpec.describe "persistence" do
           employee.update_attributes
         }.to raise_error(Graphiti::Errors::RecordNotFound)
       end
+    end
+
+    it "can apply attributes and access model" do
+      employee = klass.find(payload)
+      expect(employee.data.first_name).to eq("asdf")
+      employee.assign_attributes(payload)
+      expect(employee.data.first_name).to eq("Jane")
+
+      employee = klass.find(payload)
+      expect(employee.data.first_name).to eq("asdf")
     end
   end
 
@@ -663,8 +1105,8 @@ RSpec.describe "persistence" do
               attrs[:first_name] = "#{attrs[:first_name]}mid"
             end
 
-            def do_around_persistence(attributes)
-              attributes[:first_name] = "b4"
+            def do_around_persistence(model)
+              model.first_name = "b4"
               model = yield
               model.update_attributes(first_name: "#{model.first_name}after")
               1 # return value shouldnt matter
@@ -687,7 +1129,7 @@ RSpec.describe "persistence" do
 
             it "can modify attributes and the saved model" do
               reloaded = PORO::Employee.find(employee.id)
-              expect(reloaded.first_name).to eq("b4midafter")
+              expect(reloaded.first_name).to eq("b4after")
             end
           end
         end
@@ -697,7 +1139,7 @@ RSpec.describe "persistence" do
 
           it "can modify attributes and the saved model" do
             reloaded = PORO::Employee.find(employee.id)
-            expect(reloaded.first_name).to eq("b4midafter")
+            expect(reloaded.first_name).to eq("b4after")
           end
         end
       end
@@ -1115,21 +1557,21 @@ RSpec.describe "persistence" do
             model.first_name << "_aroundsaveC2"
           end
 
-          def around_persistence_a(attrs)
-            attrs[:first_name] << "_aroundpersA1"
-            model = yield attrs
+          def around_persistence_a(model)
+            model.first_name << "_aroundpersA1"
+            model = yield model
             model.first_name << "_aroundpersA2"
           end
 
-          def around_persistence_b(attrs)
-            attrs[:first_name] << "_aroundpersB1"
-            model = yield attrs
+          def around_persistence_b(model)
+            model.first_name << "_aroundpersB1"
+            model = yield model
             model.first_name << "_aroundpersB2"
           end
 
-          def around_persistence_c(attrs)
-            attrs[:first_name] << "_aroundpersC1"
-            model = yield attrs
+          def around_persistence_c(model)
+            model.first_name << "_aroundpersC1"
+            model = yield model
             model.first_name << "_aroundpersC2"
           end
         end
@@ -1140,8 +1582,6 @@ RSpec.describe "persistence" do
         proxy.save
         expect(proxy.data.first_name.split("_")).to eq([
           "Jane",
-          "aroundpersA1",
-          "aroundpersB1",
           "aroundattrsA1",
           "aroundattrsB1",
           "b4attrsA",
@@ -1150,6 +1590,8 @@ RSpec.describe "persistence" do
           "afterattrsB",
           "aroundattrsB2",
           "aroundattrsA2",
+          "aroundpersA1",
+          "aroundpersB1",
           "aroundsaveA1",
           "aroundsaveB1",
           "b4saveA",
@@ -1170,9 +1612,6 @@ RSpec.describe "persistence" do
         proxy.update_attributes
         expect(proxy.data.first_name.split("_")).to eq([
           "Jane",
-          "aroundpersA1",
-          "aroundpersB1",
-          "aroundpersC1",
           "aroundattrsA1",
           "aroundattrsB1",
           "aroundattrsC1",
@@ -1185,6 +1624,9 @@ RSpec.describe "persistence" do
           "aroundattrsC2",
           "aroundattrsB2",
           "aroundattrsA2",
+          "aroundpersA1",
+          "aroundpersB1",
+          "aroundpersC1",
           "aroundsaveA1",
           "aroundsaveB1",
           "aroundsaveC1",
@@ -1825,8 +2267,8 @@ RSpec.describe "persistence" do
 
     context "and it is a create operation" do
       it "works" do
-        instance = klass.build(payload)
         expect {
+          instance = klass.build(payload)
           instance.save
         }.to raise_error(Graphiti::Errors::InvalidRequest, /data.attributes.id/)
       end
@@ -2384,6 +2826,16 @@ RSpec.describe "persistence" do
         expect(data.classification).to be_a(classification_model)
         expect(data.classification.id).to be_present
         expect(data.classification.description).to eq("classy")
+      end
+
+      it "works when the model is inspected before save" do
+        employee = klass.build(payload)
+        employee.data # force assignment
+        expect(employee.save).to eq(true)
+        data = employee.data
+        expect(data.id).to be_present
+        expect(data.classification).to be_a(classification_model)
+        expect(data.classification_id).to eq(data.classification.id)
       end
 
       context "when a nested validation error" do
