@@ -4,6 +4,7 @@ module Graphiti
   class Query
     attr_reader :resource, :association_name, :params, :action
 
+    # TODO: make the trailing optionals keywords once the satellite gems are rolled in - see Runner#query for the nil-padding this forces
     def initialize(resource, params, association_name = nil, nested_include = nil, parents = [], action = nil)
       @resource = resource
       @association_name = association_name

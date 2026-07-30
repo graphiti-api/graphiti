@@ -3,6 +3,7 @@ module Graphiti
     attr_reader :params
     attr_reader :deserialized_payload
 
+    # TODO: make query and action keywords once the satellite gems are rolled in - they instantiate Runner positionally
     def initialize(resource_class, params, query = nil, action = nil)
       @resource_class = resource_class
       @params = params
