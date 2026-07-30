@@ -1,5 +1,13 @@
 graphiti changelog
 
+# [1.13.0](https://github.com/graphiti-api/graphiti/compare/v1.12.2...v1.13.0) (2026-07-30)
+
+
+### Features
+
+* add Resource.wrap as an easy way to use graphiti serialization on models fetched via other means (and not via graphiti's finders) ([#513](https://github.com/graphiti-api/graphiti/issues/513)) ([fcd19e2](https://github.com/graphiti-api/graphiti/commit/fcd19e2d023091d85947dbdd89259b587e0f582b))
+* deprecate mutating attributes in around_persistence hooks ([#514](https://github.com/graphiti-api/graphiti/issues/514)) [skip ci] ([8410ab0](https://github.com/graphiti-api/graphiti/commit/8410ab0a916077601cf85d8260a05ef9098149eb))
+
 ## [1.12.2](https://github.com/graphiti-api/graphiti/compare/v1.12.1...v1.12.2) (2026-07-29)
 
 
