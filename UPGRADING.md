@@ -21,7 +21,11 @@ resource.save          # persists that same instance
 resource = MyResource.find(params)
 resource.assign_attributes(params)
 resource.data.changed  # dirty tracking works
-resource.update_attributes
+resource.update
+
+# or assign and save in one call, Rails-style
+resource = MyResource.find(params)
+resource.update(params)
 ```
 
 `assign_attributes` is idempotent per payload, validation still runs before assignment, and the instance you inspect is the instance that saves.

@@ -223,7 +223,11 @@ module Graphiti
       success
     end
 
-    def update
+    # Rails-style: pass params to assign and save in one call, or call with
+    # no arguments to save a payload assigned earlier (via find or
+    # #assign_attributes).
+    def update(params = nil)
+      assign_attributes(params) if params
       resolve_data
       save(action: :update)
     end

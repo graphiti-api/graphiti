@@ -330,6 +330,15 @@ RSpec.describe "persistence" do
           expect(PORO::Employee.find(employee.data.id).first_name).to eq("hooked")
         end
 
+        it "assigns and saves in one call when update is given params" do
+          existing = PORO::Employee.create(first_name: "asdf")
+          payload[:data][:id] = existing.id.to_s
+
+          proxy = klass.find(payload)
+          expect(proxy.update(payload)).to eq(true)
+          expect(PORO::Employee.find(existing.id).first_name).to eq("hooked")
+        end
+
         it "persists the pre-yield change on update" do
           existing = PORO::Employee.create(first_name: "asdf")
           payload[:data][:id] = existing.id.to_s
