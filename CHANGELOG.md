@@ -1,5 +1,19 @@
 graphiti changelog
 
+# [2.0.0-beta.1](https://github.com/graphiti-api/graphiti/compare/v1.12.2...v2.0.0-beta.1) (2026-07-30)
+
+
+### Features
+
+* drop Ruby 2.7 and Rails 5.2 support ([e905ddb](https://github.com/graphiti-api/graphiti/commit/e905ddb5c842299ffbfe5ec3c4ff98ec9b603a51))
+* the model you inspect is the model that saves ([#465](https://github.com/graphiti-api/graphiti/issues/465)) ([a905fff](https://github.com/graphiti-api/graphiti/commit/a905fffc3a2aa5e663ff4cadcd632e68f053c81a))
+
+
+### BREAKING CHANGES
+
+* around_persistence hooks receive the assigned model instead of the attributes hash. Move attribute-hash modifications to before_attributes, or set values on the model. Custom create/update overrides that should receive a pre-assigned model must accept an assigned_model: keyword. See UPGRADING.md
+* Ruby >= 3.0 / Rails >= 6 are now required.
+
 ## [1.12.2](https://github.com/graphiti-api/graphiti/compare/v1.12.1...v1.12.2) (2026-07-29)
 
 
