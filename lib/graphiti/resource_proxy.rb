@@ -80,6 +80,12 @@ module Graphiti
       Renderer.new(self, options).as_graphql
     end
 
+    # Records supplied directly, no scope resolution
+    def data=(models)
+      @data = models
+      [@data].flatten.compact.each { |record| @resource.decorate_record(record) }
+    end
+
     def data
       @data ||= begin
         records = @scope.resolve
