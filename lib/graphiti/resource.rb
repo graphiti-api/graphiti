@@ -123,15 +123,18 @@ module Graphiti
       adapter.disassociate(parent, child, association_name, type)
     end
 
-    def assign_with_relationships(meta, attributes, relationships, caller_model = nil, foreign_key = nil)
+    # TODO: make foreign_key a keyword once the satellite gems are rolled in - they call these positionally
+    def assign_with_relationships(meta, attributes, relationships, caller_model = nil, foreign_key = nil, model_instance: nil)
       persistence = Graphiti::Util::Persistence \
-        .new(self, meta, attributes, relationships, caller_model, foreign_key)
+        .new(self, meta, attributes, relationships, caller_model, foreign_key,
+          assigned_model: model_instance)
       persistence.assign
     end
 
-    def persist_with_relationships(meta, attributes, relationships, caller_model = nil, foreign_key = nil)
+    def persist_with_relationships(meta, attributes, relationships, caller_model = nil, foreign_key = nil, assigned_model: nil)
       persistence = Graphiti::Util::Persistence \
-        .new(self, meta, attributes, relationships, caller_model, foreign_key)
+        .new(self, meta, attributes, relationships, caller_model, foreign_key,
+          assigned_model: assigned_model)
       persistence.run
     end
 

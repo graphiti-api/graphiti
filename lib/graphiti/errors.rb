@@ -84,6 +84,25 @@ module Graphiti
       end
     end
 
+    class AssignedModelNotSupported < Base
+      def initialize(resource_class, method_name)
+        @resource_class = resource_class
+        @method_name = method_name
+      end
+
+      def message
+        <<~MSG
+          #{@resource_class}: the model was already assigned via #assign_attributes (or #data before save), but ##{@method_name} is overridden without a parameter to receive it, so changes made to the unsaved model would be silently lost.
+
+          Accept and use the assigned model in your override:
+
+            def #{@method_name}(attributes, meta = nil, assigned_model: nil)
+
+          or persist with #save alone, without inspecting the model first. See UPGRADING.md.
+        MSG
+      end
+    end
+
     class RemoteWrite < Base
       def initialize(resource_class)
         @resource_class = resource_class

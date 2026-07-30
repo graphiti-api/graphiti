@@ -173,7 +173,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       def update
         employee = IntegrationCallbacks::EmployeeResource._find(params)
         Thread.current[:proxy] = employee
-        employee.assign_attributes
+        employee.assign_attributes(params)
 
         if employee.update_attributes
           render jsonapi: employee

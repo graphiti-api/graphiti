@@ -11,7 +11,7 @@ module Graphiti
       payload: nil,
       single: false,
       raise_on_missing: false,
-      data: nil,
+      assign_action: nil,
       cache: nil,
       cache_expires_in: nil,
       cache_tag: nil
@@ -23,6 +23,7 @@ module Graphiti
       @payload = payload
       @single = single
       @raise_on_missing = raise_on_missing
+      @assign_action = assign_action
       @cache = cache
       @cache_expires_in = cache_expires_in
       @cache_tag = cache_tag
@@ -81,13 +82,11 @@ module Graphiti
       Renderer.new(self, options).as_graphql
     end
 
-    def data=(models)
-      @data = data
-      [@data].flatten.compact.each { |r| @resource.decorate_record(r) }
-    end
-
     def data
-      @data ||= begin
+      return @data unless @data.nil?
+      return assign_attributes(@payload.params) if @assign_action
+
+      @data = begin
         records = @scope.resolve
         raise Graphiti::Errors::RecordNotFound if records.empty? && raise_on_missing?
 
@@ -138,13 +137,35 @@ module Graphiti
       @pagination ||= Delegates::Pagination.new(self)
     end
 
-    def assign_attributes(params = nil)
-      # deserialize params again?
+    # Apply request params to the underlying model without saving it,
+    # Rails-style: the params are always passed explicitly, in the same
+    # request-params shape find/build accept. They are validated,
+    # deserialized, and become the payload #save will persist.
+    #
+    # Idempotent per params - calling again with params that normalize to
+    # the same payload is a no-op, so the attributes callbacks fire once.
+    # Different params re-assign onto the same model instance.
+    #
+    # Note the attributes callbacks fire here, outside any transaction
+    # opened during #save - the persistence hooks wrap only the save phase,
+    # receiving this assigned model.
+    def assign_attributes(params)
+      action = @assign_action || :update
+      params = normalized_params_copy(params)
+      add_endpoint_filter(params, action)
+      validator = ::Graphiti::RequestValidator.new(@resource, params, action)
+      validator.validate!
 
-      @data = @resource.assign_with_relationships(
-        @payload.meta,
+      if @assigned_model && same_write_payload?(validator.deserialized_payload)
+        return @assigned_model
+      end
+
+      @payload = validator.deserialized_payload
+      @assigned_model = @data = @resource.assign_with_relationships(
+        @payload.meta(action: action),
         @payload.attributes,
-        @payload.relationships
+        @payload.relationships,
+        model_instance: @assigned_model || (data if action == :update)
       )
     end
 
@@ -154,12 +175,18 @@ module Graphiti
       original = Graphiti.context[:namespace]
       begin
         Graphiti.context[:namespace] = action
-        ::Graphiti::RequestValidator.new(@resource, @payload.params, action).validate!
+        # An assigned model can only come from #assign_attributes, which
+        # validated the payload it stored - re-validating here would run the
+        # writable guards (and their guard_model lookups) a redundant time.
+        unless @assigned_model
+          ::Graphiti::RequestValidator.new(@resource, @payload.params, action).validate!
+        end
         validator = persist {
           @resource.persist_with_relationships \
             @payload.meta(action: action),
             @payload.attributes,
-            @payload.relationships
+            @payload.relationships,
+            assigned_model: @assigned_model
         }
       ensure
         Graphiti.context[:namespace] = original
@@ -257,6 +284,39 @@ module Graphiti
     end
 
     private
+
+    # Validation typecasts values and injects ids into the params it is
+    # given - work on a deep copy so the caller's hash stays untouched.
+    def normalized_params_copy(params)
+      if params.respond_to?(:to_unsafe_h)
+        params.to_unsafe_h.deep_symbolize_keys
+      else
+        ::Graphiti::Util::Hash.deep_dup(params)
+      end
+    end
+
+    # UpdateValidator enforces that data.id matches the endpoint's filter id.
+    # Params that came through find already carry that filter; params passed
+    # directly to #assign_attributes usually don't, so merge in the id this
+    # proxy was found with. A payload whose data.id names a different record
+    # still fails validation with ConflictRequest. Mutates the copy made by
+    # #normalized_params_copy, never caller state.
+    def add_endpoint_filter(params, action)
+      return unless action == :update
+
+      endpoint_id = @query.filters[:id]
+      return if endpoint_id.nil? || params[:filter].try(:[], :id)
+
+      params[:filter] ||= {}
+      params[:filter][:id] = endpoint_id
+    end
+
+    # Compare only the write payload (data + included) - a repeat call whose
+    # params differ in read-side keys like sort or page is still a no-op.
+    def same_write_payload?(deserialized_payload)
+      deserialized_payload.params.values_at(:data, :included) ==
+        @payload.params.values_at(:data, :included)
+    end
 
     def persist
       transaction_response = @resource.transaction do

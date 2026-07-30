@@ -69,13 +69,19 @@ module Graphiti
         end
       end
 
-      def assign(assign_params, meta = nil, action_name = nil)
-        id = assign_params[:id]
-        assign_params = assign_params.except(:id)
-        model_instance = nil
+      # +model_instance+ is the already-built model from a previous #assign
+      # (see ResourceProxy#assign_attributes). When given, attributes are
+      # applied to it rather than to a freshly built/found model.
+      def assign(assign_params, meta = nil, action_name = nil, model_instance: nil)
+        # Only update strips :id (it identifies the record to find) - a create
+        # payload may legitimately carry a client-supplied id to assign.
+        if action_name == :update
+          id = assign_params[:id]
+          assign_params = assign_params.except(:id)
+        end
 
         run_callbacks :attributes, action_name, assign_params, meta do |params|
-          model_instance = if action_name != :create && id
+          model_instance ||= if action_name == :update
             self.class._find(id: id).data
           else
             call_with_meta(:build, model, meta)
@@ -87,29 +93,33 @@ module Graphiti
         model_instance
       end
 
-      def create(create_params, meta = nil)
-        model_instance = nil
+      # Attributes are assigned before the persistence callbacks fire, so
+      # around_persistence receives the assigned model - its pre-yield
+      # position is the last chance to touch the model before save, inside
+      # the transaction. Modify attributes in before_attributes instead.
+      def create(create_params, meta = nil, assigned_model: nil)
+        model_instance = assigned_model || assign(create_params, meta, :create)
 
-        run_callbacks :persistence, :create, create_params, meta do
-          model_instance = assign(create_params, meta, :create)
-
+        run_callbacks :persistence, :create, model_instance, meta do
           run_callbacks :save, :create, model_instance, meta do
             model_instance = call_with_meta(:save, model_instance, meta)
           end
 
           model_instance
         end
+
+        model_instance
       end
 
-      def update(update_params, meta = nil)
-        model_instance = nil
+      def update(update_params, meta = nil, assigned_model: nil)
+        model_instance = assigned_model || assign(update_params, meta, :update)
 
-        run_callbacks :persistence, :update, update_params, meta do
-          model_instance = assign(update_params, meta, :update)
-
+        run_callbacks :persistence, :update, model_instance, meta do
           run_callbacks :save, :update, model_instance, meta do
             model_instance = call_with_meta(:save, model_instance, meta)
           end
+
+          model_instance
         end
 
         model_instance

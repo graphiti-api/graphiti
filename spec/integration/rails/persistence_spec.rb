@@ -1748,4 +1748,78 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
   end
+
+  # Applying the payload without saving lets a controller inspect ActiveRecord's
+  # dirty tracking to decide whether the update is permitted at all.
+  # type: :controller only to opt into the DatabaseCleaner hooks in spec_helper
+  RSpec.describe "applying a payload without saving", type: :controller do
+    let!(:employee) { Employee.create!(first_name: "Joe", last_name: "Smith") }
+
+    let(:payload) do
+      {
+        id: employee.id,
+        data: {
+          id: employee.id.to_s,
+          type: "employees",
+          attributes: {first_name: "Jane"}
+        }
+      }
+    end
+
+    around do |e|
+      Graphiti.with_context({}, :update) { e.run }
+    end
+
+    it "leaves the record clean before the payload is applied" do
+      proxy = EmployeeResource.find(payload)
+
+      expect(proxy.data.changed).to eq([])
+      expect(proxy.data.first_name).to eq("Joe")
+    end
+
+    it "reports the changed attributes once the payload is applied" do
+      proxy = EmployeeResource.find(payload)
+      proxy.assign_attributes(payload)
+
+      expect(proxy.data.changed).to eq(["first_name"])
+      expect(proxy.data.first_name_was).to eq("Joe")
+      expect(proxy.data).to be_changed
+    end
+
+    it "does not touch the database" do
+      proxy = EmployeeResource.find(payload)
+      proxy.assign_attributes(payload)
+
+      expect(employee.reload.first_name).to eq("Joe")
+    end
+
+    it "reports the same changes when applied more than once" do
+      proxy = EmployeeResource.find(payload)
+      proxy.assign_attributes(payload)
+      proxy.assign_attributes(payload)
+
+      expect(proxy.data.changed).to eq(["first_name"])
+    end
+
+    it "commits the pending changes on update_attributes" do
+      proxy = EmployeeResource.find(payload)
+      proxy.assign_attributes(payload)
+
+      expect {
+        expect(proxy.update_attributes).to eq(true)
+      }.to change { employee.reload.first_name }.from("Joe").to("Jane")
+
+      expect(proxy.data.changed).to eq([])
+    end
+
+    it "surfaces validation errors without saving" do
+      payload[:data][:attributes][:first_name] = nil
+      proxy = EmployeeResource.find(payload)
+      proxy.assign_attributes(payload)
+
+      expect(proxy.data.valid?).to eq(false)
+      expect(proxy.data.errors.full_messages).to eq(["First name can't be blank"])
+      expect(employee.reload.first_name).to eq("Joe")
+    end
+  end
 end

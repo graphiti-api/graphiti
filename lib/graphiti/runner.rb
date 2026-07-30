@@ -76,7 +76,7 @@ module Graphiti
         payload: deserialized_payload,
         single: opts[:single],
         raise_on_missing: opts[:raise_on_missing],
-        data: opts[:data],
+        assign_action: opts[:assign_action],
         cache: opts[:cache],
         cache_expires_in: opts[:cache_expires_in],
         cache_tag: opts[:cache_tag]
