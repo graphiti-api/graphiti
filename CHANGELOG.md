@@ -1,5 +1,12 @@
 graphiti changelog
 
+# [2.0.0-beta.3](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.2...v2.0.0-beta.3) (2026-07-31)
+
+
+### Features
+
+* carry the assigned model on the resource, not through override signatures ([8ad848d](https://github.com/graphiti-api/graphiti/commit/8ad848d9bcd24cd63efb67e8ce32d5c8f3cfe147))
+
 # [2.0.0-beta.2](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.1...v2.0.0-beta.2) (2026-07-30)
 
 
