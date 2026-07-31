@@ -190,22 +190,21 @@ class Graphiti::Util::Persistence
     }
   end
 
-  def accepts_assigned_model?(method)
-    method.parameters.any? { |type, name| name == :assigned_model && [:key, :keyreq].include?(type) }
-  end
-
+  # The assigned model rides on the resource instance rather than through
+  # the method signature, so any override of #create/#update - whatever its
+  # arity - passes it through untouched.
   def call_resource_method(method_name, attributes, caller_model)
     method = @resource.method(method_name)
+    call = if method.arity == 1
+      -> { method.call(attributes) }
+    else
+      -> { method.call(attributes, metadata) }
+    end
 
     if @assigned_model && [:create, :update].include?(method_name)
-      unless accepts_assigned_model?(method)
-        raise Graphiti::Errors::AssignedModelNotSupported.new(@resource.class, method_name)
-      end
-      method.call(attributes, metadata, assigned_model: @assigned_model)
-    elsif method.arity == 1
-      method.call(attributes)
+      @resource.with_assigned_model(@assigned_model) { call.call }
     else
-      method.call(attributes, metadata)
+      call.call
     end
   end
 end

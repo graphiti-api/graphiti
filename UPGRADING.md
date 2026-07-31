@@ -54,16 +54,6 @@ To migrate, move attribute-hash modifications to `before_attributes` (which stil
 
 `before/around/after_attributes` and `before/around/after_save` are unchanged.
 
-### Breaking: custom create/update overrides and pre-assigned models
-
-If a resource overrides `create` or `update` and callers inspect the model before saving, the override must accept the already-assigned model:
-
-```ruby
-def create(attributes, meta = nil, assigned_model: nil)
-```
-
-Without the keyword, saving a proxy whose model was inspected raises `Graphiti::Errors::AssignedModelNotSupported` rather than silently discarding changes made to the inspected instance. Overridden resources used only via plain `save` are unaffected.
-
 ### Fine print
 
 - If you inspect the model before saving, the attributes callbacks run at inspection time (in your controller, outside the save transaction). On the plain `save` path they run inside the transaction, at the same point as 1.x.

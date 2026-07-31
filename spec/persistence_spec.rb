@@ -423,48 +423,68 @@ RSpec.describe "persistence" do
     end
 
     describe "with an overridden create/update" do
-      context "when the override cannot receive the assigned model" do
-        before do
-          klass.class_eval do
-            def create(attributes, meta = nil)
-              super
-            end
+      # The assigned model rides on the resource instance, so overrides pass
+      # it through no matter their signature.
+      [
+        ["a one-arg override", "def create(attributes)\n  super(attributes)\nend"],
+        ["a two-arg override", "def create(attributes, meta = nil)\n  super\nend"],
+        ["a forwarding override", "def create(...)\n  super\nend"]
+      ].each do |description, override|
+        context "with #{description}" do
+          before do
+            klass.class_eval(override)
           end
-        end
 
-        it "raises instead of silently dropping changes made to the unsaved model" do
-          employee = klass.build(payload)
-          employee.data.first_name = "June"
+          it "saves the inspected instance" do
+            employee = klass.build(payload)
+            employee.data.first_name = "June"
 
-          expect {
-            employee.save
-          }.to raise_error(Graphiti::Errors::AssignedModelNotSupported, /create/)
-        end
+            expect(employee.save).to eq(true)
+            expect(PORO::Employee.find(employee.data.id).first_name).to eq("June")
+          end
 
-        it "still works on the one-shot path" do
-          employee = klass.build(payload)
+          it "still works on the one-shot path" do
+            employee = klass.build(payload)
 
-          expect(employee.save).to eq(true)
-          expect(employee.data.first_name).to eq("Jane")
+            expect(employee.save).to eq(true)
+            expect(employee.data.first_name).to eq("Jane")
+          end
         end
       end
 
-      context "when the override accepts the assigned_model keyword" do
+      context "when the override reads assigned_model" do
         before do
           klass.class_eval do
-            def create(attributes, meta = nil, assigned_model: nil)
-              super
+            def create(attributes)
+              assigned_model.last_name = "hooked" if assigned_model
+              super(attributes)
             end
           end
         end
 
-        it "passes the assigned model through" do
+        it "exposes the inspected instance" do
           employee = klass.build(payload)
-          employee.data.first_name = "June"
+          employee.data
 
           expect(employee.save).to eq(true)
-          expect(PORO::Employee.find(employee.data.id).first_name).to eq("June")
+          expect(PORO::Employee.find(employee.data.id).last_name).to eq("hooked")
         end
+
+        it "is nil on the plain-save path" do
+          employee = klass.build(payload)
+
+          expect(employee.save).to eq(true)
+          expect(PORO::Employee.find(employee.data.id).last_name).to_not eq("hooked")
+        end
+      end
+
+      it "clears assigned_model after the save" do
+        employee = klass.build(payload)
+        employee.data
+        resource = employee.resource
+
+        expect(employee.save).to eq(true)
+        expect(resource.assigned_model).to be_nil
       end
     end
   end

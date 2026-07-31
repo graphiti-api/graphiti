@@ -93,11 +93,23 @@ module Graphiti
         model_instance
       end
 
+      # The model built by a prior ResourceProxy#assign_attributes, present
+      # for the duration of the save that persists it
+      attr_reader :assigned_model
+
+      # @api private
+      def with_assigned_model(model)
+        @assigned_model = model
+        yield
+      ensure
+        @assigned_model = nil
+      end
+
       # Attributes are assigned before the persistence callbacks fire, so
       # around_persistence receives the assigned model - its pre-yield
       # position is the last chance to touch the model before save, inside
       # the transaction. Modify attributes in before_attributes instead.
-      def create(create_params, meta = nil, assigned_model: nil)
+      def create(create_params, meta = nil)
         model_instance = assigned_model || assign(create_params, meta, :create)
 
         run_callbacks :persistence, :create, model_instance, meta do
@@ -111,7 +123,7 @@ module Graphiti
         model_instance
       end
 
-      def update(update_params, meta = nil, assigned_model: nil)
+      def update(update_params, meta = nil)
         model_instance = assigned_model || assign(update_params, meta, :update)
 
         run_callbacks :persistence, :update, model_instance, meta do
