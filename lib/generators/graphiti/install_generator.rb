@@ -4,7 +4,7 @@ module Graphiti
   class InstallGenerator < ::Rails::Generators::Base
     include GeneratorMixin
 
-    source_root File.expand_path("../templates", __FILE__)
+    source_root File.expand_path("templates", __dir__)
 
     class_option :'omit-comments',
       type: :boolean,
@@ -41,8 +41,20 @@ module Graphiti
         RUBY
       end
 
-      inject_into_file "spec/rails_helper.rb", after: /RSpec.configure.+^end$/m do
-        "\n\nGraphitiSpecHelpers::RSpec.schema!"
+      if defined?(RSpec)
+        inject_into_file "spec/rails_helper.rb", after: /RSpec.configure.+^end$/m do
+          <<~RUBY
+
+            require "graphiti/spec_helpers/rspec"
+
+            RSpec.configure do |config|
+              config.include Graphiti::SpecHelpers::RSpec
+              config.include Graphiti::SpecHelpers::Sugar
+            end
+
+            Graphiti::SpecHelpers::RSpec.schema!
+          RUBY
+        end
       end
 
       insert_into_file "config/routes.rb", after: "Rails.application.routes.draw do\n" do
@@ -70,16 +82,10 @@ module Graphiti
     end
 
     def app_controller_code
-      str = ""
-      str << "  include Graphiti::Rails\n"
-      str << "  include Graphiti::Responders\n"
-      str << "\n"
-      str << "  register_exception Graphiti::Errors::RecordNotFound,\n"
-      str << "    status: 404\n"
-      str << "\n"
-      str << "  rescue_from Exception do |e|\n"
-      str << "    handle_exception(e)\n"
-      str << "  end\n"
+      str = +"  include Graphiti::Rails::Controller\n"
+      if defined?(::Responders)
+        str << "  include Graphiti::Rails::Responders\n"
+      end
       str
     end
   end

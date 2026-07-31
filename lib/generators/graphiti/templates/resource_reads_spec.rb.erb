@@ -7,7 +7,7 @@ RSpec.describe <%= resource_class %>, type: :resource do
     it 'works' do
       render
       data = jsonapi_data[0]
-      expect(data.id).to eq(<%= var %>.id)
+      expect(data.<%= id_or_rawid %>).to eq(<%= var %>.id)
       expect(data.jsonapi_type).to eq('<%= type %>')
       <%- attributes.each do |a| -%>
       <%- if [:created_at, :updated_at].include?(a.name.to_sym) -%>
@@ -31,7 +31,7 @@ RSpec.describe <%= resource_class %>, type: :resource do
 
       it 'works' do
         render
-        expect(d.map(&:id)).to eq([<%= var %>2.id])
+        expect(d.map(&:<%= id_or_rawid %>)).to eq([<%= var %>2.id])
       end
     end
   end
@@ -48,10 +48,10 @@ RSpec.describe <%= resource_class %>, type: :resource do
 
         it 'works' do
           render
-          expect(d.map(&:id)).to eq([
+          expect(d.map(&:<%= id_or_rawid %>)).to eq([
             <%= var %>1.id,
             <%= var %>2.id
-          ])
+          ]<%= sort_raw_ids %>)
         end
       end
 
@@ -62,10 +62,10 @@ RSpec.describe <%= resource_class %>, type: :resource do
 
         it 'works' do
           render
-          expect(d.map(&:id)).to eq([
+          expect(d.map(&:<%= id_or_rawid %>)).to eq([
             <%= var %>2.id,
             <%= var %>1.id
-          ])
+          ]<%= sort_raw_ids_descending %>)
         end
       end
     end

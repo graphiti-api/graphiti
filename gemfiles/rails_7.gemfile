@@ -4,10 +4,11 @@ source "https://rubygems.org"
 
 gem "rails", "~> 7.0"
 gem "rspec-rails"
+gem "responders"
 gem "sqlite3", "~> 1.4.0"
-gem "database_cleaner"
 
 group :test do
+  gem "database_cleaner"
   gem "pry"
   gem "pry-byebug", platform: [:mri]
   gem "appraisal"

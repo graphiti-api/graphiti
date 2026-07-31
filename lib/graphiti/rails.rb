@@ -1,38 +1,26 @@
+require "graphiti"
+require "rails"
+
 module Graphiti
-  # Rails Integration. Mix this in to ApplicationController.
-  #
-  # * Mixes in Base
-  # * Adds a global around_action (see Base#wrap_context)
-  #
-  # @see Base#render_jsonapi
-  # @see Base#wrap_context
+  # Rails integration for Graphiti. See {file:README.md} for more details.
   module Rails
-    def self.included(klass)
-      backtrace = ::Rails::VERSION::MAJOR == 4 ? caller(2) : caller_locations(2)
-      Graphiti::DEPRECATOR.deprecation_warning("Including Graphiti::Rails", "Use graphiti-rails instead. See https://www.graphiti.dev/guides/graphiti-rails-migration for details.", backtrace)
+    autoload :Context, "graphiti/rails/context"
+    autoload :Controller, "graphiti/rails/controller"
+    autoload :Debugging, "graphiti/rails/debugging"
+    autoload :Responders, "graphiti/rails/responders"
 
-      klass.class_eval do
-        include Graphiti::Context
-        include GraphitiErrors
-        around_action :wrap_context
-        around_action :debug
-      end
-    end
+    # @!attribute self.handled_exception_formats
+    # A list of formats as symbols whose exceptions will be handled by Graphiti. See {Railtie}.
+    cattr_accessor :handled_exception_formats, default: []
 
-    def wrap_context
-      Graphiti.with_context(jsonapi_context, action_name.to_sym) do
-        yield
-      end
-    end
-
-    def debug
-      Debugger.debug do
-        yield
-      end
-    end
-
-    def jsonapi_context
-      self
-    end
+    # @!attribute self.respond_to_formats
+    # A list of formats as symbols which will be available for Graphiti::Rails::Responders. See {Railtie}.
+    cattr_accessor :respond_to_formats, default: []
   end
 end
+
+ActiveSupport.on_load(:active_record) do
+  require "graphiti/adapters/active_record"
+end
+
+require "graphiti/rails/railtie"

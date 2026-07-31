@@ -14,6 +14,12 @@ module Graphiti
       aliases: ["--omit-comments", "-c"],
       desc: "Generate without documentation comments"
 
+    class_option :rawid,
+      type: :boolean,
+      default: false,
+      aliases: ["--rawid", "-r"],
+      desc: "Generate tests using rawid"
+
     class_option :actions,
       type: :array,
       default: nil,
@@ -94,7 +100,10 @@ module Graphiti
       end
       if attributes_class.table_exists?
         attributes_class.columns.map do |c|
-          OpenStruct.new({name: c.name.to_sym, type: c.type})
+          OpenStruct.new({
+            name: c.name.to_sym,
+            type: convert_column_type_to_graphiti_resource_type(c.type)
+          })
         end
       else
         raise "#{attributes_class} table must exist. Please run migrations."
@@ -113,7 +122,7 @@ module Graphiti
     end
 
     def responders?
-      defined?(Responders)
+      defined?(::Responders)
     end
 
     def generate_controller
@@ -132,10 +141,7 @@ module Graphiti
     end
 
     def generate_route
-      # Rails 5.2 adds `plural_route_name`, fallback to `plural_table_name`
-      plural_name = try(:plural_route_name) || plural_table_name
-
-      code = "resources :#{plural_name}"
+      code = "resources :#{file_name.pluralize}"
       code << %(, only: [#{actions.map { |a| ":#{a}" }.join(", ")}]) if actions.length < 5
       code << "\n"
       inject_into_file "config/routes.rb", after: /ApplicationResource.*$\n/ do
@@ -146,12 +152,14 @@ module Graphiti
     def generate_resource_specs
       opts = {}
       opts[:actions] = @options[:actions] if @options[:actions]
+      opts[:rawid] = @options[:rawid] if @options[:rawid]
       invoke "graphiti:resource_test", [resource_klass], opts
     end
 
     def generate_api_specs
       opts = {}
       opts[:actions] = @options[:actions] if @options[:actions]
+      opts[:rawid] = @options[:rawid] if @options[:rawid]
       invoke "graphiti:api_test", [resource_klass], opts
     end
 
@@ -175,6 +183,35 @@ module Graphiti
 
     def type
       model_klass.name.underscore.pluralize
+    end
+
+    def convert_column_type_to_graphiti_resource_type(type)
+      # TODO: Support database specific types.
+      case type
+      when :string, :text
+        :string
+      when :float, :decimal
+        :integer
+      when :integer, :bigint
+        :integer
+      when :datetime, :time
+        :datetime
+      when :date
+        :date
+      when :boolean
+        :boolean
+      when :numeric
+        # TODO: Return type.
+        type
+      when :primary_key
+        # TODO: Return type.
+        type
+      when :binary
+        # TODO: Return type.
+        type
+      else
+        type
+      end
     end
   end
 end

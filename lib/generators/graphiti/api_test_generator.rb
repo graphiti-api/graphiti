@@ -4,7 +4,7 @@ module Graphiti
   class ApiTestGenerator < ::Rails::Generators::Base
     include GeneratorMixin
 
-    source_root File.expand_path("templates", __dir__)
+    source_root File.expand_path("../templates", __FILE__)
 
     argument :resource, type: :string
     class_option :actions,
@@ -12,6 +12,12 @@ module Graphiti
       default: nil,
       aliases: ["--actions", "-a"],
       desc: 'Array of controller actions, e.g. "index show destroy"'
+
+    class_option :rawid,
+      type: :boolean,
+      default: false,
+      aliases: ["--rawid", "-r"],
+      desc: "Generate tests using rawid"
 
     desc "Generates rspec request specs at spec/api"
     def generate

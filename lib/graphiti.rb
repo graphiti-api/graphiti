@@ -19,12 +19,14 @@ require "graphiti_errors"
 require "jsonapi/serializable"
 
 # These gems are merged into graphiti as of 2.0, but their 1.x/0.x releases
-# still resolve against graphiti 2.x, and each ships files that collide with
-# ours. Which copy a require picks up would come down to load path order, so
-# fail loudly instead of loading the stale one quietly. Checked here because
-# graphiti is loaded either way, whichever copy wins.
+# still resolve against graphiti 2.x. They ship files that collide with ours
+# (lib/graphiti_spec_helpers.rb, lib/graphiti/rails.rb), so which copy a require
+# picks up would come down to load path order. Fail loudly instead of loading
+# the stale one quietly. Checked here because graphiti is loaded either way,
+# whichever copy wins.
 {
-  "graphiti_spec_helpers" => 'The "graphiti_spec_helpers/rspec" require and the GraphitiSpecHelpers namespace still resolve.'
+  "graphiti_spec_helpers" => 'The "graphiti_spec_helpers/rspec" require and the GraphitiSpecHelpers namespace still resolve.',
+  "graphiti-rails" => 'Graphiti::Rails and its config.graphiti options are unchanged. Drop the "graphiti-rails" require if you have one.'
 }.each do |gem_name, guidance|
   next unless Gem.loaded_specs.key?(gem_name)
 
@@ -228,14 +230,6 @@ end
 
 if defined?(Rails)
   require "graphiti/rails"
-  require "graphiti/responders"
-
-  # graphiti-rails has own Railtie
-  begin
-    require "graphiti-rails"
-  rescue LoadError
-    require "graphiti/railtie"
-  end
 end
 
 require "graphiti/runner"

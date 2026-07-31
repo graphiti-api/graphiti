@@ -38,27 +38,22 @@ jobs:
           - Gemfile
           - gemfiles/rails_6.gemfile
           - gemfiles/rails_7.gemfile
-          - gemfiles/rails_6_graphiti_rails.gemfile
-          - gemfiles/rails_7_graphiti_rails.gemfile
-          - gemfiles/rails_7_1_graphiti_rails.gemfile
-          - gemfiles/rails_7_2_graphiti_rails.gemfile
-          - gemfiles/rails_8_0_graphiti_rails.gemfile
-          - gemfiles/rails_8_1_graphiti_rails.gemfile
+          - gemfiles/rails_7_1.gemfile
+          - gemfiles/rails_7_2.gemfile
+          - gemfiles/rails_8_0.gemfile
+          - gemfiles/rails_8_1.gemfile
         appraisal:
           - true
           - false
         include:
           - ruby: ruby-head
-            gemfile: gemfiles/rails_7_1.gemfile
+            gemfile: gemfiles/rails_7_2.gemfile
             appraisal: true
           - ruby: ruby-head
-            gemfile: gemfiles/rails_7_2_graphiti_rails.gemfile
+            gemfile: gemfiles/rails_8_0.gemfile
             appraisal: true
           - ruby: ruby-head
-            gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
-            appraisal: true
-          - ruby: ruby-head
-            gemfile: gemfiles/rails_8_1_graphiti_rails.gemfile
+            gemfile: gemfiles/rails_8_1.gemfile
             appraisal: true
           - ruby: ruby-head
             gemfile: Gemfile
@@ -71,51 +66,37 @@ jobs:
             appraisal: false
           - gemfile: gemfiles/rails_7.gemfile
             appraisal: false
-          - gemfile: gemfiles/rails_6_graphiti_rails.gemfile
+          - gemfile: gemfiles/rails_7_1.gemfile
             appraisal: false
-          - gemfile: gemfiles/rails_7_graphiti_rails.gemfile
+          - gemfile: gemfiles/rails_7_2.gemfile
             appraisal: false
-          - gemfile: gemfiles/rails_7_1_graphiti_rails.gemfile
+          - gemfile: gemfiles/rails_8_0.gemfile
             appraisal: false
-          - gemfile: gemfiles/rails_7_2_graphiti_rails.gemfile
-            appraisal: false
-          - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
-            appraisal: false
-          - gemfile: gemfiles/rails_8_1_graphiti_rails.gemfile
+          - gemfile: gemfiles/rails_8_1.gemfile
             appraisal: false
 
           # Rails 8.1 needs ruby 3.2 +
-          - gemfile: gemfiles/rails_8_1_graphiti_rails.gemfile
+          - gemfile: gemfiles/rails_8_1.gemfile
             ruby: 3.0
-          - gemfile: gemfiles/rails_8_1_graphiti_rails.gemfile
+          - gemfile: gemfiles/rails_8_1.gemfile
             ruby: 3.1
 
           # Rails 8 needs ruby 3.2 +
-          - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
+          - gemfile: gemfiles/rails_8_0.gemfile
             ruby: 3.0
-          - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
+          - gemfile: gemfiles/rails_8_0.gemfile
             ruby: 3.1
 
           # Rails 7.2 needs ruby 3.1 +
-          - gemfile: gemfiles/rails_7_2_graphiti_rails.gemfile
+          - gemfile: gemfiles/rails_7_2.gemfile
             ruby: 3.0
 
           # Rails 7.1 needs ruby 3.0 +
-          - gemfile: gemfiles/rails_7_1_graphiti_rails.gemfile
+          - gemfile: gemfiles/rails_7_1.gemfile
             ruby: 3.0
-
-          # Rails 7.0 needs ruby 3.1 +
-          - gemfile: gemfiles/rails_7_0_graphiti_rails.gemfile
-            ruby: 3.2
-          - gemfile: gemfiles/rails_7_0_graphiti_rails.gemfile
-            ruby: 3.3
-          - gemfile: gemfiles/rails_7_0_graphiti_rails.gemfile
-            ruby: 3.4
 
           # Rails 6 needs < ruby 3.4
           - gemfile: gemfiles/rails_6.gemfile
-            ruby: 3.4
-          - gemfile: gemfiles/rails_6_graphiti_rails.gemfile
             ruby: 3.4
 
     continue-on-error: ${{ matrix.ruby == 'ruby-head' }}

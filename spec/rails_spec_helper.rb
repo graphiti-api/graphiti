@@ -11,13 +11,6 @@ require "action_controller"
 
 require "graphiti/rails"
 
-# graphiti-rails has own Railtie
-begin
-  require "graphiti-rails"
-rescue LoadError
-  require "graphiti/railtie"
-end
-
 module BasicRailsApp
   module_function
 
@@ -61,8 +54,7 @@ end
 
 class ApplicationController < ActionController::Base
   include Rails.application.routes.url_helpers
-  # FIXME: Don't always include
-  include Graphiti::Rails
+  include Graphiti::Rails::Controller
 end
 
 require "rspec/rails"
