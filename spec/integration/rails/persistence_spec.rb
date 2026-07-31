@@ -1,6 +1,6 @@
 if ENV["APPRAISAL_INITIALIZED"]
   RSpec.describe "persistence", type: :controller do
-    include GraphitiSpecHelpers
+    include Graphiti::SpecHelpers
 
     # defined in spec/supports/rails/employee_controller.rb
     controller(ApplicationController, &EMPLOYEE_CONTROLLER_BLOCK)

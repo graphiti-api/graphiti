@@ -1,6 +1,6 @@
 if ENV["APPRAISAL_INITIALIZED"]
   RSpec.describe "cursor pagination", type: :controller do
-    include GraphitiSpecHelpers
+    include Graphiti::SpecHelpers
 
     controller(ApplicationController) do
       def index

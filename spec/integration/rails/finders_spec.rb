@@ -1,6 +1,6 @@
 if ENV["APPRAISAL_INITIALIZED"]
   RSpec.describe "integrated resources and adapters", type: :controller do
-    include GraphitiSpecHelpers
+    include Graphiti::SpecHelpers
 
     controller(ApplicationController) do
       def index

@@ -18,6 +18,24 @@ require "graphiti_errors"
 
 require "jsonapi/serializable"
 
+# These gems are merged into graphiti as of 2.0, but their 1.x/0.x releases
+# still resolve against graphiti 2.x, and each ships files that collide with
+# ours. Which copy a require picks up would come down to load path order, so
+# fail loudly instead of loading the stale one quietly. Checked here because
+# graphiti is loaded either way, whichever copy wins.
+{
+  "graphiti_spec_helpers" => 'The "graphiti_spec_helpers/rspec" require and the GraphitiSpecHelpers namespace still resolve.'
+}.each do |gem_name, guidance|
+  next unless Gem.loaded_specs.key?(gem_name)
+
+  raise <<~MSG
+    #{gem_name} is merged into graphiti as of 2.0 and is no longer published
+    separately. Remove it from your Gemfile.
+
+    #{guidance}
+  MSG
+end
+
 module Graphiti
   DEPRECATOR = ActiveSupport::Deprecation.new("2.0", "Graphiti")
 

@@ -51,7 +51,7 @@ RSpec.describe "relationship identifiers" do
       it "does not include anything" do
         expect do
           included("employees")
-        end.to raise_error(GraphitiSpecHelpers::Errors::NoSideloads)
+        end.to raise_error(Graphiti::SpecHelpers::Errors::NoSideloads)
       end
 
       it "specifies meta[:included] = false" do
@@ -131,7 +131,7 @@ RSpec.describe "relationship identifiers" do
       it "does not include anything" do
         expect do
           included("employees")
-        end.to raise_error(GraphitiSpecHelpers::Errors::NoSideloads)
+        end.to raise_error(Graphiti::SpecHelpers::Errors::NoSideloads)
       end
 
       it "includes relationship identifiers" do

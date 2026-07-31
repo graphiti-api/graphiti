@@ -5,7 +5,7 @@ require "pry"
 
 require "logger"
 require "active_model"
-require "graphiti_spec_helpers/rspec"
+require "graphiti/spec_helpers/rspec"
 require "graphiti"
 # Avoiding loading classes before we're ready
 Graphiti::Resource.autolink = false
@@ -17,8 +17,8 @@ require "faraday"
 require "base64"
 
 RSpec.configure do |config|
-  config.include GraphitiSpecHelpers::RSpec
-  config.include GraphitiSpecHelpers::Sugar
+  config.include Graphiti::SpecHelpers::RSpec
+  config.include Graphiti::SpecHelpers::Sugar
 
   config.after do
     PORO::DB.clear
