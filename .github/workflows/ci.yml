@@ -23,81 +23,54 @@ jobs:
       - name: Run standardrb
         run: bundle exec standardrb --no-fix --format progress
   test:
-    name: "Tests - ${{ matrix.ruby }} | ${{ matrix.gemfile }} | Appraisal: ${{ matrix.appraisal }}"
+    name: "Tests - ${{ matrix.ruby }} | ${{ matrix.gemfile }}"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      # Every cell is listed explicitly rather than built from a cross product
+      # plus `exclude:`. An exclude row naming a gemfile that does not exist is
+      # silently ignored, which is how this matrix carried four dead rows for a
+      # "rails_7_0_graphiti_rails.gemfile" that was never generated. A bad
+      # gemfile path in an include row fails the job loudly instead.
+      #
+      # Ruby coverage per Rails version tracks that version's own supported
+      # range; see Appraisals for the matching sqlite3 constraints.
       matrix:
-        ruby:
-          - "3.0"
-          - "3.1"
-          - "3.2"
-          - "3.3"
-          - "3.4"
-        gemfile:
-          - Gemfile
-          - gemfiles/rails_6.gemfile
-          - gemfiles/rails_7.gemfile
-          - gemfiles/rails_7_1.gemfile
-          - gemfiles/rails_7_2.gemfile
-          - gemfiles/rails_8_0.gemfile
-          - gemfiles/rails_8_1.gemfile
-        appraisal:
-          - true
-          - false
         include:
-          - ruby: ruby-head
-            gemfile: gemfiles/rails_7_2.gemfile
-            appraisal: true
-          - ruby: ruby-head
-            gemfile: gemfiles/rails_8_0.gemfile
-            appraisal: true
-          - ruby: ruby-head
-            gemfile: gemfiles/rails_8_1.gemfile
-            appraisal: true
-          - ruby: ruby-head
-            gemfile: Gemfile
-            appraisal: false
-        exclude:
-          # Skip some extra variants
-          - gemfile: Gemfile
-            appraisal: true
-          - gemfile: gemfiles/rails_6.gemfile
-            appraisal: false
-          - gemfile: gemfiles/rails_7.gemfile
-            appraisal: false
-          - gemfile: gemfiles/rails_7_1.gemfile
-            appraisal: false
-          - gemfile: gemfiles/rails_7_2.gemfile
-            appraisal: false
-          - gemfile: gemfiles/rails_8_0.gemfile
-            appraisal: false
-          - gemfile: gemfiles/rails_8_1.gemfile
-            appraisal: false
+          # No Rails - the library on its own, across every supported Ruby
+          - { ruby: "3.0", gemfile: Gemfile, appraisal: false }
+          - { ruby: "3.1", gemfile: Gemfile, appraisal: false }
+          - { ruby: "3.2", gemfile: Gemfile, appraisal: false }
+          - { ruby: "3.3", gemfile: Gemfile, appraisal: false }
+          - { ruby: "3.4", gemfile: Gemfile, appraisal: false }
+          - { ruby: ruby-head, gemfile: Gemfile, appraisal: false }
 
-          # Rails 8.1 needs ruby 3.2 +
-          - gemfile: gemfiles/rails_8_1.gemfile
-            ruby: 3.0
-          - gemfile: gemfiles/rails_8_1.gemfile
-            ruby: 3.1
+          # Rails 6.1 - EOL, does not support Ruby 3.4
+          - { ruby: "3.0", gemfile: gemfiles/rails_6_1.gemfile, appraisal: true }
+          - { ruby: "3.3", gemfile: gemfiles/rails_6_1.gemfile, appraisal: true }
 
-          # Rails 8 needs ruby 3.2 +
-          - gemfile: gemfiles/rails_8_0.gemfile
-            ruby: 3.0
-          - gemfile: gemfiles/rails_8_0.gemfile
-            ruby: 3.1
+          # Rails 7.0 - EOL, floor + one modern Ruby
+          - { ruby: "3.0", gemfile: gemfiles/rails_7_0.gemfile, appraisal: true }
+          - { ruby: "3.4", gemfile: gemfiles/rails_7_0.gemfile, appraisal: true }
 
-          # Rails 7.2 needs ruby 3.1 +
-          - gemfile: gemfiles/rails_7_2.gemfile
-            ruby: 3.0
+          # Rails 7.1 - needs Ruby 3.1+
+          - { ruby: "3.1", gemfile: gemfiles/rails_7_1.gemfile, appraisal: true }
+          - { ruby: "3.4", gemfile: gemfiles/rails_7_1.gemfile, appraisal: true }
 
-          # Rails 7.1 needs ruby 3.0 +
-          - gemfile: gemfiles/rails_7_1.gemfile
-            ruby: 3.0
+          # Rails 7.2 - needs Ruby 3.1+
+          - { ruby: "3.1", gemfile: gemfiles/rails_7_2.gemfile, appraisal: true }
+          - { ruby: "3.4", gemfile: gemfiles/rails_7_2.gemfile, appraisal: true }
+          - { ruby: ruby-head, gemfile: gemfiles/rails_7_2.gemfile, appraisal: true }
 
-          # Rails 6 needs < ruby 3.4
-          - gemfile: gemfiles/rails_6.gemfile
-            ruby: 3.4
+          # Rails 8.0 - needs Ruby 3.2+
+          - { ruby: "3.2", gemfile: gemfiles/rails_8_0.gemfile, appraisal: true }
+          - { ruby: "3.4", gemfile: gemfiles/rails_8_0.gemfile, appraisal: true }
+          - { ruby: ruby-head, gemfile: gemfiles/rails_8_0.gemfile, appraisal: true }
+
+          # Rails 8.1 - needs Ruby 3.2+
+          - { ruby: "3.2", gemfile: gemfiles/rails_8_1.gemfile, appraisal: true }
+          - { ruby: "3.4", gemfile: gemfiles/rails_8_1.gemfile, appraisal: true }
+          - { ruby: ruby-head, gemfile: gemfiles/rails_8_1.gemfile, appraisal: true }
 
     continue-on-error: ${{ matrix.ruby == 'ruby-head' }}
     env: # $BUNDLE_GEMFILE must be set at the job level, so it is set for all steps
