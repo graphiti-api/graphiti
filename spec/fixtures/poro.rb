@@ -51,7 +51,7 @@ module PORO
 
       def all(params)
         target_types = params[:type]
-        records = data.select { |k, v| Array(target_types).include?(k) }
+        records = data.slice(*Array(target_types))
         return [] unless records
         records = records.map { |type, records_for_type|
           records_for_type.map { |attrs| klasses[type].new(attrs) }
