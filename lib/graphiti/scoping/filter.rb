@@ -82,7 +82,7 @@ module Graphiti
       if is_array
         @resource.typecast(name, value, :filterable)
       else
-        value = value.nil? || value.is_a?(Hash) ? [value] : Array(value)
+        value = (value.nil? || value.is_a?(Hash)) ? [value] : Array(value)
         value.map { |v| @resource.typecast(name, v, :filterable) }
       end
     end
@@ -100,7 +100,7 @@ module Graphiti
 
       param_value.map do |operator, value|
         if type == :hash
-          value, operator = \
+          value, operator =
             parse_hash_value(filter, param_value, value, operator)
         end
 

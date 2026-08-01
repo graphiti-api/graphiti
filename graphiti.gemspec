@@ -31,7 +31,11 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "kaminari", "~> 1.2"
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake", ">= 10.0"
-  spec.add_development_dependency "standard", "~> 1.4.0"
+  spec.add_development_dependency "standard", "~> 1.56"
   spec.add_development_dependency "activemodel", ">= 7.0"
+  # Only the specs need this, for ActiveSupport's Hash.from_xml when asserting
+  # on to_xml output. It used to arrive transitively via rubocop; rubocop 1.88
+  # dropped it, and it is a bundled (not default) gem since Ruby 3.0.
+  spec.add_development_dependency "rexml"
   spec.add_development_dependency "graphiti_spec_helpers", "~> 1.2"
 end

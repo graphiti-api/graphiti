@@ -139,11 +139,11 @@ module Legacy
       class_name: "Legacy::State"
 
     has_many :mentor_joins, class_name: "AuthorMentorship",
-                            foreign_key: :mentee_id, inverse_of: :mentee
+      foreign_key: :mentee_id, inverse_of: :mentee
     has_many :mentors, through: :mentor_joins, class_name: "Author", source: :mentor
 
     has_many :mentee_joins, class_name: "AuthorMentorship",
-                            foreign_key: :mentor_id, inverse_of: :mentor
+      foreign_key: :mentor_id, inverse_of: :mentor
     has_many :mentees, through: :mentee_joins, class_name: "Author", source: :mentee
   end
 

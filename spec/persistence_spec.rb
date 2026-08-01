@@ -1274,7 +1274,7 @@ RSpec.describe "persistence" do
           relationships: {
             positions: {
               data: [{
-                type: "positions", 'temp-id': "abc123", method: "create"
+                type: "positions", "temp-id": "abc123", method: "create"
               }]
             }
           }
@@ -1282,7 +1282,7 @@ RSpec.describe "persistence" do
         included: [
           {
             type: "positions",
-            'temp-id': "abc123",
+            "temp-id": "abc123",
             attributes: {title: "Engineer"}
           }
         ]
@@ -1989,11 +1989,11 @@ RSpec.describe "persistence" do
       end
 
       it "coerces integers" do
-        expect(save(1)).to eq(BigDecimal("1"))
+        expect(save(1)).to eq(BigDecimal(1))
       end
 
       it "coerces strings" do
-        expect(save("1")).to eq(BigDecimal("1"))
+        expect(save("1")).to eq(BigDecimal(1))
       end
 
       it "allows nils" do
@@ -2310,7 +2310,7 @@ RSpec.describe "persistence" do
               positions: {
                 data: [{
                   type: "positions",
-                  'temp-id': "abc123",
+                  "temp-id": "abc123",
                   method: "create"
                 }]
               }
@@ -2319,7 +2319,7 @@ RSpec.describe "persistence" do
           included: [
             {
               type: "positions",
-              'temp-id': "abc123",
+              "temp-id": "abc123",
               attributes: {title: "mytitle"}
             }
           ]
@@ -2387,7 +2387,7 @@ RSpec.describe "persistence" do
               classification: {
                 data: {
                   type: "classifications",
-                  'temp-id': "abc123",
+                  "temp-id": "abc123",
                   method: "create"
                 }
               }
@@ -2395,7 +2395,7 @@ RSpec.describe "persistence" do
           },
           included: [
             {
-              'temp-id': "abc123",
+              "temp-id": "abc123",
               type: "classifications",
               attributes: {description: "classy"}
             }
@@ -2513,7 +2513,7 @@ RSpec.describe "persistence" do
               bio: {
                 data: {
                   type: "bios",
-                  'temp-id': "abc123",
+                  "temp-id": "abc123",
                   method: "create"
                 }
               }
@@ -2522,7 +2522,7 @@ RSpec.describe "persistence" do
           included: [
             {
               type: "bios",
-              'temp-id': "abc123",
+              "temp-id": "abc123",
               attributes: {text: "mytext"}
             }
           ]
@@ -2589,7 +2589,7 @@ RSpec.describe "persistence" do
               teams: {
                 data: [{
                   type: "teams",
-                  'temp-id': "abc123",
+                  "temp-id": "abc123",
                   method: "create"
                 }]
               }
@@ -2598,7 +2598,7 @@ RSpec.describe "persistence" do
           included: [
             {
               type: "teams",
-              'temp-id': "abc123",
+              "temp-id": "abc123",
               attributes: {name: "ip"}
             }
           ]
@@ -2666,7 +2666,7 @@ RSpec.describe "persistence" do
               credit_card: {
                 data: {
                   type: jsonapi_type,
-                  'temp-id': "abc123",
+                  "temp-id": "abc123",
                   method: "create"
                 }
               }
@@ -2674,7 +2674,7 @@ RSpec.describe "persistence" do
           },
           included: [
             {
-              'temp-id': "abc123",
+              "temp-id": "abc123",
               type: jsonapi_type,
               attributes: {number: 123456}
             }
@@ -2746,7 +2746,7 @@ RSpec.describe "persistence" do
               positions: {
                 data: [{
                   type: "positions",
-                  'temp-id': "abc123",
+                  "temp-id": "abc123",
                   method: "create"
                 }]
               }
@@ -2755,13 +2755,13 @@ RSpec.describe "persistence" do
           included: [
             {
               type: "positions",
-              'temp-id': "abc123",
+              "temp-id": "abc123",
               attributes: {title: "mytitle"},
               relationships: {
                 department: {
                   data: {
                     type: "departments",
-                    'temp-id': "abc456",
+                    "temp-id": "abc456",
                     method: "create"
                   }
                 }
@@ -2769,7 +2769,7 @@ RSpec.describe "persistence" do
             },
             {
               type: "departments",
-              'temp-id': "abc456",
+              "temp-id": "abc456",
               attributes: {name: "mydept"}
             }
           ]

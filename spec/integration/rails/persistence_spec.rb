@@ -283,7 +283,7 @@ if ENV["APPRAISAL_INITIALIZED"]
               relationships: {
                 positions: {
                   data: [{
-                    'temp-id': "abc123",
+                    "temp-id": "abc123",
                     type: "positions",
                     method: "create"
                   }]
@@ -292,7 +292,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             },
             included: [
               {
-                'temp-id': "abc123",
+                "temp-id": "abc123",
                 type: "positions",
                 attributes: {title: "foo"}
               }
@@ -390,20 +390,20 @@ if ENV["APPRAISAL_INITIALIZED"]
             relationships: {
               positions: {
                 data: [
-                  {'temp-id': "pos1", type: "positions", method: "create"},
-                  {'temp-id': "pos2", type: "positions", method: "create"}
+                  {"temp-id": "pos1", type: "positions", method: "create"},
+                  {"temp-id": "pos2", type: "positions", method: "create"}
                 ]
               }
             }
           },
           included: [
             {
-              'temp-id': "pos1",
+              "temp-id": "pos1",
               type: "positions",
               attributes: {title: "foo"}
             },
             {
-              'temp-id': "pos2",
+              "temp-id": "pos2",
               type: "positions",
               attributes: {title: "bar"}
             }
@@ -541,7 +541,7 @@ if ENV["APPRAISAL_INITIALIZED"]
               relationships: {
                 positions: {
                   data: [{
-                    'temp-id': "abc123",
+                    "temp-id": "abc123",
                     type: "positions",
                     method: "create"
                   }]
@@ -550,7 +550,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             },
             included: [
               {
-                'temp-id': "abc123",
+                "temp-id": "abc123",
                 type: "positions",
                 attributes: {title: "foo"}
               }
@@ -604,7 +604,7 @@ if ENV["APPRAISAL_INITIALIZED"]
               relationships: {
                 salary: {
                   data: {
-                    'temp-id': "abc123",
+                    "temp-id": "abc123",
                     type: "salaries",
                     method: "create"
                   }
@@ -613,7 +613,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             },
             included: [
               {
-                'temp-id': "abc123",
+                "temp-id": "abc123",
                 type: "salaries",
                 attributes: {
                   base_rate: 15.00,
@@ -790,13 +790,13 @@ if ENV["APPRAISAL_INITIALIZED"]
             relationships: {
               positions: {
                 data: [
-                  {type: "positions", 'temp-id': "pos1", method: "create"},
-                  {type: "positions", 'temp-id': "pos2", method: "create"}
+                  {type: "positions", "temp-id": "pos1", method: "create"},
+                  {type: "positions", "temp-id": "pos2", method: "create"}
                 ]
               },
               teams: {
                 data: [
-                  {type: "teams", 'temp-id': "team1", method: "create"}
+                  {type: "teams", "temp-id": "team1", method: "create"}
                 ]
               }
             }
@@ -804,27 +804,27 @@ if ENV["APPRAISAL_INITIALIZED"]
           included: [
             {
               type: "positions",
-              'temp-id': "pos1",
+              "temp-id": "pos1",
               attributes: {title: "specialist"},
               relationships: {
                 department: {
-                  data: {type: "departments", 'temp-id': "dep1", method: "create"}
+                  data: {type: "departments", "temp-id": "dep1", method: "create"}
                 }
               }
             },
             {
               type: "departments",
-              'temp-id': "dep1",
+              "temp-id": "dep1",
               attributes: {name: "safety"}
             },
             {
               type: "positions",
-              'temp-id': "pos2",
+              "temp-id": "pos2",
               attributes: {title: "manager"}
             },
             {
               type: "teams",
-              'temp-id': "team1",
+              "temp-id": "team1",
               attributes: {name: "Team 1"}
             }
           ]
@@ -1268,26 +1268,26 @@ if ENV["APPRAISAL_INITIALIZED"]
             relationships: {
               positions: {
                 data: [
-                  {'temp-id': "a", type: "positions", method: "create"}
+                  {"temp-id": "a", type: "positions", method: "create"}
                 ]
               }
             }
           },
           included: [
             {
-              'temp-id': "a",
+              "temp-id": "a",
               type: "positions",
               attributes: {},
               relationships: {
                 department: {
                   data: {
-                    'temp-id': "b", type: "departments", method: "create"
+                    "temp-id": "b", type: "departments", method: "create"
                   }
                 }
               }
             },
             {
-              'temp-id': "b",
+              "temp-id": "b",
               type: "departments",
               attributes: {}
             }
@@ -1385,7 +1385,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             relationships: {
               teams: {
                 data: [
-                  {'temp-id': "abc123", type: "teams", method: "create"},
+                  {"temp-id": "abc123", type: "teams", method: "create"},
                   {id: prior_team.id.to_s, type: "teams", method: "update"},
                   {id: disassociate_team.id.to_s, type: "teams", method: "disassociate"},
                   {id: destroy_team.id.to_s, type: "teams", method: "destroy"},
@@ -1396,7 +1396,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           },
           included: [
             {
-              'temp-id': "abc123",
+              "temp-id": "abc123",
               type: "teams",
               attributes: {name: "Team #1"}
             },
@@ -1447,20 +1447,20 @@ if ENV["APPRAISAL_INITIALIZED"]
             relationships: {
               tasks: {
                 data: [
-                  {'temp-id': "abc123", type: "features", method: "create"},
-                  {'temp-id': "abc456", type: "bugs", method: "create"}
+                  {"temp-id": "abc123", type: "features", method: "create"},
+                  {"temp-id": "abc456", type: "bugs", method: "create"}
                 ]
               }
             }
           },
           included: [
             {
-              'temp-id': "abc123",
+              "temp-id": "abc123",
               type: "features",
               attributes: {name: "test feature"}
             },
             {
-              'temp-id': "abc456",
+              "temp-id": "abc456",
               type: "bugs",
               attributes: {name: "test bug"}
             }
@@ -1507,7 +1507,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       context "when creating" do
         let(:location_id) { "abc123" }
-        let(:location_id_key) { :'temp-id' }
+        let(:location_id_key) { :"temp-id" }
         let(:method) { "create" }
 
         it "works" do
@@ -1595,7 +1595,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       context "when creating" do
         let(:note_id) { "abc123" }
-        let(:note_id_key) { :'temp-id' }
+        let(:note_id_key) { :"temp-id" }
         let(:method) { "create" }
 
         it "works" do
@@ -1668,7 +1668,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             relationships: {
               workspace: {
                 data: {
-                  'temp-id': "work1", type: workspace_type, method: "create"
+                  "temp-id": "work1", type: workspace_type, method: "create"
                 }
               }
             }
@@ -1676,7 +1676,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           included: [
             {
               type: workspace_type,
-              'temp-id': "work1",
+              "temp-id": "work1",
               attributes: {
                 address: "Fake Workspace Address"
               }

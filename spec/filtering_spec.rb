@@ -457,7 +457,7 @@ RSpec.describe "filtering" do
       before do
         params[:filter] = {
           id: employee1.id,
-          'positions.title': "bar"
+          "positions.title": "bar"
         }
         params[:include] = "positions"
       end
@@ -484,7 +484,7 @@ RSpec.describe "filtering" do
       before do
         params[:filter] = {
           id: employee1.id,
-          'positions.department.name': "bar"
+          "positions.department.name": "bar"
         }
         params[:include] = "positions.department"
       end
@@ -961,7 +961,7 @@ RSpec.describe "filtering" do
 
       it "coerces integers" do
         params[:filter] = {foo: 40}
-        assert_filter_value([BigDecimal("40")])
+        assert_filter_value([BigDecimal(40)])
       end
 
       it "coerces strings" do

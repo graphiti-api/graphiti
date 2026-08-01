@@ -1440,7 +1440,7 @@ RSpec.describe "serialization" do
         context "that does not have an index endpoint" do
           before do
             Graphiti.config.context_for_endpoint = ->(path, action) {
-              action == :index ? nil : double
+              (action == :index) ? nil : double
             }
           end
 
@@ -1691,7 +1691,7 @@ RSpec.describe "serialization" do
         context "that does not have a show endpoint" do
           before do
             Graphiti.config.context_for_endpoint = ->(path, action) {
-              action == :show ? nil : double
+              (action == :show) ? nil : double
             }
           end
 
@@ -1869,7 +1869,7 @@ RSpec.describe "serialization" do
             false
           end
           has_many :things, resource: PORO::PositionResource,
-                            foreign_key: :employee_id
+            foreign_key: :employee_id
         end
       end
 

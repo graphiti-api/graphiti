@@ -862,7 +862,7 @@ module Graphiti
       def initialize(resource, filter_names, required)
         @resource = resource
         @filter_names = filter_names
-        @required_label = required == :all ? "All" : "One"
+        @required_label = (required == :all) ? "All" : "One"
       end
 
       def message

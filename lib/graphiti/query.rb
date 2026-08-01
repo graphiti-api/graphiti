@@ -215,7 +215,7 @@ module Graphiti
 
         scrubbed.filter do |key, value|
           sideload = @resource.class.sideload(key)
-          sideload.nil? ? true : sideload.readable?
+          sideload.nil? || sideload.readable?
         end
       end
     end
@@ -291,7 +291,7 @@ module Graphiti
       return false unless association?
 
       split = name.to_s.split(".")
-      query_names = split[0..split.length - 2].map(&:to_sym)
+      query_names = split[0..-2].map(&:to_sym)
       my_names = parents.map(&:association_name).compact + [association_name].compact
       query_names == my_names
     end
@@ -323,7 +323,7 @@ module Graphiti
     end
 
     def sort_hash(attr)
-      value = attr[0] == "-" ? :desc : :asc
+      value = (attr[0] == "-") ? :desc : :asc
       key = attr.sub("-", "").to_sym
 
       {key => value}
