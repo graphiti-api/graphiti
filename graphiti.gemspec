@@ -27,11 +27,11 @@ Gem::Specification.new do |spec|
   # Bundled (no longer default) as of Ruby 3.5; graphiti uses OpenStruct in lib/
   spec.add_dependency "ostruct", ">= 0.5"
 
-  spec.add_development_dependency "faraday", "~> 0.15"
-  spec.add_development_dependency "kaminari", "~> 0.17"
+  spec.add_development_dependency "faraday", ">= 2.0", "< 3"
+  spec.add_development_dependency "kaminari", "~> 1.2"
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake", ">= 10.0"
   spec.add_development_dependency "standard", "~> 1.4.0"
   spec.add_development_dependency "activemodel", ">= 7.0"
-  spec.add_development_dependency "graphiti_spec_helpers", "1.0.beta.4"
+  spec.add_development_dependency "graphiti_spec_helpers", "~> 1.2"
 end
