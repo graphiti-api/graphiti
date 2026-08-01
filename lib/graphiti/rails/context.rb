@@ -6,6 +6,7 @@ module Graphiti
       def self.included(klass)
         klass.class_eval do
           include Graphiti::Context
+
           around_action :wrap_graphiti_context
         end
       end

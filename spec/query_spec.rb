@@ -290,7 +290,7 @@ RSpec.describe Graphiti::Query do
 
       context "via relationship name dot syntax" do
         before do
-          params[:filter] = {'positions.title': {eq: "asdf"}}
+          params[:filter] = {"positions.title": {eq: "asdf"}}
         end
 
         let(:expected) do
@@ -312,7 +312,7 @@ RSpec.describe Graphiti::Query do
 
         context "when multiple levels" do
           before do
-            params[:filter] = {'positions.department.name': {eq: "asdf"}}
+            params[:filter] = {"positions.department.name": {eq: "asdf"}}
           end
 
           let(:expected) do
@@ -608,10 +608,10 @@ RSpec.describe Graphiti::Query do
         before do
           params[:page] = {
             number: 2, size: 1,
-            'positions.size': 2,
-            'positions.number': 3,
-            'positions.department.size': 3,
-            'positions.department.number': 4
+            "positions.size": 2,
+            "positions.number": 3,
+            "positions.department.size": 3,
+            "positions.department.number": 4
           }
         end
 

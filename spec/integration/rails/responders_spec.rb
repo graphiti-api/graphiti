@@ -67,6 +67,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       it "is what stops respond_with raising on the proxy" do
         plain = Class.new(ApplicationController) do
           include ActionController::MimeResponds
+
           respond_to :jsonapi
         end
 

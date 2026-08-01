@@ -109,7 +109,7 @@ module Graphiti
       end
 
       def page_param
-        @page_param ||= (@proxy.query.hash[:page] || {})
+        @page_param ||= @proxy.query.hash[:page] || {}
       end
     end
   end

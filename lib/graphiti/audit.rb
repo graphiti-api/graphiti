@@ -1,7 +1,7 @@
 module Graphiti
   # Resources register themselves as they load, so eager load before auditing.
   class Audit
-    Finding = Struct.new(:severity, :check, :message, :remedy, keyword_init: true) do
+    Finding = Struct.new(:severity, :check, :message, :remedy) do
       def error?
         severity == :error
       end
@@ -18,8 +18,7 @@ module Graphiti
       :resource_ids_blocker,
       :preloaded,
       :options,
-      :findings,
-      keyword_init: true
+      :findings
     ) do
       def would_start_loading?
         return false if resource_ids_default == :never
@@ -75,7 +74,7 @@ module Graphiti
         resource_ids_source_if_always: resource_ids_source_if_always(resource_class, sideload),
         resource_ids_default: resource_class.belongs_to_resource_ids_by_default,
         resource_ids_blocker: sideload.resource_ids_blocker,
-        preloaded: source == :load ? association_preloaded?(resource_class, sideload) : nil,
+        preloaded: (source == :load) ? association_preloaded?(resource_class, sideload) : nil,
         options: declaration_options(sideload),
         findings: [
           missing_association_method(sideload, model),

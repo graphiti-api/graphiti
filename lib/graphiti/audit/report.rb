@@ -60,7 +60,7 @@ module Graphiti
 
         section_heading(label, color, ISSUE_HEADINGS.fetch(check, check.to_s.tr("_", " "))) +
           lines_grouped_by_resource(group.map { |row, finding| [row, finding.message] }) +
-          (fixes.size == 1 ? [fix_line(fixes.first), ""] : [])
+          ((fixes.size == 1) ? [fix_line(fixes.first), ""] : [])
       end
 
       def loading_section
@@ -83,7 +83,7 @@ module Graphiti
         rows = @rows.select(&:would_start_loading?)
         return [] if rows.empty?
 
-        verb = rows.size == 1 ? "renders" : "render"
+        verb = (rows.size == 1) ? "renders" : "render"
 
         section_heading("FYI", :blue, "#{count(rows.size, "belongs_to relationship")} #{verb} no resource ids") +
           lines_grouped_by_resource(rows.map { |row| [row, nil] }) +
@@ -189,7 +189,7 @@ module Graphiti
 
         rows.map do |cells|
           line = cells.each_with_index.map { |cell, index|
-            index == cells.size - 1 ? cell.painted : cell.pad_to(widths[index])
+            (index == cells.size - 1) ? cell.painted : cell.pad_to(widths[index])
           }.join("  ")
           indent + line
         end
@@ -203,7 +203,7 @@ module Graphiti
         counts = [
           count(@rows.group_by(&:resource).size, "resource"),
           count(@rows.size, "relationship"),
-          paint(count(errors, "error"), errors > 0 ? :red : nil)
+          paint(count(errors, "error"), (errors > 0) ? :red : nil)
         ]
         counts << paint("#{loading} loading ids without preloading", :yellow) if loading > 0
         counts << "#{no_ids} without resource ids" if no_ids > 0

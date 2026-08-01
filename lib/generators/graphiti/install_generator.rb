@@ -6,7 +6,7 @@ module Graphiti
 
     source_root File.expand_path("templates", __dir__)
 
-    class_option :'omit-comments',
+    class_option :"omit-comments",
       type: :boolean,
       default: false,
       aliases: ["-c"],

@@ -61,7 +61,7 @@ module Graphiti
     end
 
     def page_param
-      @page_param ||= (query_hash[:page] || {})
+      @page_param ||= query_hash[:page] || {}
     end
 
     def offset

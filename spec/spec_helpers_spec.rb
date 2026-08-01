@@ -2,6 +2,7 @@ require "spec_helper"
 
 describe Graphiti::SpecHelpers do
   include Graphiti::SpecHelpers
+
   attr_accessor :response
 
   let(:instance) { klass.new }

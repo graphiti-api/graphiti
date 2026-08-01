@@ -6,6 +6,7 @@ module Graphiti
 
       included do
         include ActionController::MimeResponds
+
         respond_to(*Graphiti::Rails.respond_to_formats)
       end
 
@@ -14,7 +15,7 @@ module Graphiti
         opts = args.extract_options!
         opts[:location] = nil
         args << opts
-        super(*args, &blk)
+        super
       end
     end
   end

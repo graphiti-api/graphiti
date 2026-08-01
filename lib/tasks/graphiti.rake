@@ -20,7 +20,7 @@ namespace :graphiti do
   task audit: [:environment] do
     helpers.setup_rails!
     rows = Graphiti::Audit.run
-    puts Graphiti::Audit::Report.new(rows).to_s
+    puts Graphiti::Audit::Report.new(rows)
 
     exit 1 if rows.any?(&:error?)
   end

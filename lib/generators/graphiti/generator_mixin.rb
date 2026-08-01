@@ -39,7 +39,7 @@ module Graphiti
 
     def update_config!(attrs)
       config = graphiti_config.merge(attrs)
-      File.open(".graphiticfg.yml", "w") { |f| f.write(config.to_yaml) }
+      File.write(".graphiticfg.yml", config.to_yaml)
     end
 
     def id_or_rawid

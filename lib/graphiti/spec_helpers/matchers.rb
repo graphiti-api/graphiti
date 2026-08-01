@@ -73,7 +73,7 @@ module Graphiti
         attr_reader :target, :opts, :resource
 
         def assert_opt(opt)
-          asserted_opt = opt == :resource ? :resource_class : opt
+          asserted_opt = (opt == :resource) ? :resource_class : opt
           return true if config.send(asserted_opt) == opts[opt]
 
           @opt_failures << opt_failure_message(opt, opts[opt], config.send(asserted_opt))

@@ -973,9 +973,9 @@ RSpec.describe Graphiti::Resource do
 
     it "infers from name" do
       expect(klass.endpoint).to eq({
-        path: :'/employees',
-        full_path: :'/employees',
-        url: :'/employees',
+        path: :"/employees",
+        full_path: :"/employees",
+        url: :"/employees",
         actions: [:index, :show, :create, :update, :destroy]
       })
     end
@@ -986,11 +986,11 @@ RSpec.describe Graphiti::Resource do
       end
 
       it "is applied to url" do
-        expect(klass.endpoint[:url]).to eq(:'http://example.com/employees')
+        expect(klass.endpoint[:url]).to eq(:"http://example.com/employees")
       end
 
       it "is NOT applied to full_path" do
-        expect(klass.endpoint[:full_path]).to eq(:'/employees')
+        expect(klass.endpoint[:full_path]).to eq(:"/employees")
       end
     end
 
@@ -1000,11 +1000,11 @@ RSpec.describe Graphiti::Resource do
       end
 
       it "is applied to full_path" do
-        expect(klass.endpoint[:full_path]).to eq(:'/api/v1/employees')
+        expect(klass.endpoint[:full_path]).to eq(:"/api/v1/employees")
       end
 
       it "is applied to url" do
-        expect(klass.endpoint[:url]).to eq(:'/api/v1/employees')
+        expect(klass.endpoint[:url]).to eq(:"/api/v1/employees")
       end
     end
 
@@ -1019,9 +1019,9 @@ RSpec.describe Graphiti::Resource do
 
       it "adds to path" do
         expect(klass.endpoint).to eq({
-          path: :'/poro/employees',
-          full_path: :'/poro/employees',
-          url: :'/poro/employees',
+          path: :"/poro/employees",
+          full_path: :"/poro/employees",
+          url: :"/poro/employees",
           actions: [:index, :show, :create, :update, :destroy]
         })
       end
@@ -1038,7 +1038,7 @@ RSpec.describe Graphiti::Resource do
     end
 
     it "infers path from name" do
-      expect(instance.endpoint[:path]).to eq(:'/employees')
+      expect(instance.endpoint[:path]).to eq(:"/employees")
     end
 
     it "defaults actions" do
@@ -1057,7 +1057,7 @@ RSpec.describe Graphiti::Resource do
       end
 
       it "infers path from module + name" do
-        expect(instance.endpoint[:path]).to eq(:'/poro/employees')
+        expect(instance.endpoint[:path]).to eq(:"/poro/employees")
       end
     end
   end

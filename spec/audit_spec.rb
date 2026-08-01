@@ -31,7 +31,7 @@ RSpec.describe Graphiti::Audit do
     end
 
     it "accepts a private method, since rendering only needs it to exist" do
-      PORO::Team.class_eval { private def employees() = [] }
+      PORO::Team.class_eval { private def employees = [] }
 
       expect(finding(resource, :missing_association_method)).to be_nil
     ensure

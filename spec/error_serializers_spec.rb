@@ -68,6 +68,7 @@ RSpec.describe Graphiti::ErrorSerializers do
     let(:object) do
       Class.new do
         include ActiveModel::Validations
+
         attr_accessor :name
 
         def self.name

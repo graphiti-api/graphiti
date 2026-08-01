@@ -62,7 +62,7 @@ module Graphiti
 
       def method_missing(id, *args, &blk)
         matches = @errors.select { |e| e.attribute.to_sym == id }
-        matches.length == 1 ? matches[0] : matches
+        (matches.length == 1) ? matches[0] : matches
       end
 
       # Any name is answered: an attribute with no matching error yields an empty

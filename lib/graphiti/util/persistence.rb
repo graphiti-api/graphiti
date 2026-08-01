@@ -156,12 +156,12 @@ class Graphiti::Util::Persistence
 
   def persist_object(method, attributes)
     case method
-      when :destroy
-        call_resource_method(:destroy, attributes[:id], @caller_model)
-      when :update, nil, :disassociate
-        call_resource_method(:update, attributes, @caller_model)
-      else
-        call_resource_method(:create, attributes, @caller_model)
+    when :destroy
+      call_resource_method(:destroy, attributes[:id], @caller_model)
+    when :update, nil, :disassociate
+      call_resource_method(:update, attributes, @caller_model)
+    else
+      call_resource_method(:create, attributes, @caller_model)
     end
   end
 
