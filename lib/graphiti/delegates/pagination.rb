@@ -32,7 +32,7 @@ module Graphiti
       private
 
       def pagination_params
-        @pagination_params ||= @proxy.query.params.reject { |key, _| [:action, :controller, :format].include?(key) }
+        @pagination_params ||= @proxy.query.params.except(:action, :controller, :format)
       end
 
       def pagination_link(page)

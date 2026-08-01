@@ -76,8 +76,8 @@ module Graphiti
       end
 
       def changes
-        sub_keys_old = last_version[:cache_key]&.scan(/\w+\/query-[a-z0-9-]+\/args-[a-z0-9-]+/).to_a || []
-        sub_keys_new = current_version[:cache_key]&.scan(/\w+\/query-[a-z0-9-]+\/args-[a-z0-9-]+/).to_a || []
+        sub_keys_old = last_version[:cache_key]&.scan(/\w+\/query-[a-z0-9-]+\/args-[a-z0-9-]+/).to_a
+        sub_keys_new = current_version[:cache_key]&.scan(/\w+\/query-[a-z0-9-]+\/args-[a-z0-9-]+/).to_a
 
         [sub_keys_old, sub_keys_new]
       end
