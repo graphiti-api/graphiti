@@ -1272,6 +1272,17 @@ RSpec.describe "filtering" do
       end
     end
 
+    context "when array_of_strings" do
+      before do
+        resource.attribute :foo, :array_of_strings
+      end
+
+      it "wraps a single query value" do
+        params[:filter] = {foo: "Beef"}
+        assert_filter_value(["Beef"])
+      end
+    end
+
     # test for all array_of_*
     context "when array_of_integers" do
       before do
