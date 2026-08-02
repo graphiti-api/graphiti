@@ -82,6 +82,10 @@ module Graphiti
       Dry::Types["params.hash"][input]
     }
 
+    ParamArray = Dry::Types["strict.array"].constructor { |input|
+      input.is_a?(String) ? [input] : input
+    }
+
     REQUIRED_KEYS = [:params, :read, :write, :kind, :description]
 
     def self.map
@@ -193,7 +197,7 @@ module Graphiti
 
           arrays[:"array_of_#{name.to_s.pluralize}"] = {
             canonical_name: name,
-            params: Dry::Types["strict.array"].of(map[:params]),
+            params: ParamArray.of(map[:params]),
             read: Dry::Types["strict.array"].of(map[:read]),
             test: Dry::Types["strict.array"].of(map[:test]),
             write: Dry::Types["strict.array"].of(map[:write]),

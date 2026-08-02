@@ -210,7 +210,7 @@ module Graphiti
 
     def parse_string_null(filter, value)
       return value unless filter[:allow_nil]
-      return value.map { |item| item == "null" ? nil : item } if value.is_a?(Array)
+      return value.map { |item| (item == "null") ? nil : item } if value.is_a?(Array)
       return if value == "null"
 
       value
