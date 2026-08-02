@@ -296,6 +296,17 @@ RSpec.describe "filtering" do
       it "works" do
         expect(records.map(&:id)).to eq([employee2.id])
       end
+
+      context "with comma-delimited values" do
+        before do
+          employee3.update_attributes(first_name: "Lucy")
+          params[:filter] = {first_name: "null,Lucy"}
+        end
+
+        it "typecasts null to nil" do
+          expect(records.map(&:id)).to eq([employee2.id, employee3.id])
+        end
+      end
     end
 
     context "with integer type" do
