@@ -1,5 +1,13 @@
 graphiti changelog
 
+## [1.13.1](https://github.com/graphiti-api/graphiti/compare/v1.13.0...v1.13.1) (2026-08-02)
+
+
+### Bug Fixes
+
+* accept a single value for array filters ([#517](https://github.com/graphiti-api/graphiti/issues/517)) ([23f3e80](https://github.com/graphiti-api/graphiti/commit/23f3e80b583b0bf0843d8bb9334970ae56d83299))
+* typecast null values in filter lists ([#515](https://github.com/graphiti-api/graphiti/issues/515)) ([3dcf4c8](https://github.com/graphiti-api/graphiti/commit/3dcf4c868abb12eb6b6d59cd0814b227d4838ece))
+
 # [1.13.0](https://github.com/graphiti-api/graphiti/compare/v1.12.2...v1.13.0) (2026-07-30)
 
 
