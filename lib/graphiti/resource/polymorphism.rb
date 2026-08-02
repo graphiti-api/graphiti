@@ -46,7 +46,7 @@ module Graphiti
             on_type, name = split_on[1].split("--").map(&:to_sym)
           end
 
-          sl = super(name)
+          sl = super
           if !polymorphic_child? && sl.nil?
             children.each do |c|
               next if on_type && c.type != on_type

@@ -8,7 +8,7 @@ module Graphiti
 
     argument :attributes, type: :array, default: [], banner: "field[:type][:index] field[:type][:index]"
 
-    class_option :'omit-comments',
+    class_option :"omit-comments",
       type: :boolean,
       default: false,
       aliases: ["--omit-comments", "-c"],
@@ -20,7 +20,7 @@ module Graphiti
       aliases: ["--actions", "-a"],
       desc: 'Array of controller actions to support, e.g. "index show destroy"'
 
-    class_option :'attributes-from',
+    class_option :"attributes-from",
       banner: "Model",
       type: :string,
       aliases: ["--model", "-m"],

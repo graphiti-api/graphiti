@@ -798,7 +798,7 @@ RSpec.describe Graphiti::Schema do
 
       it "generates correctly" do
         expect(schema[:endpoints]).to eq({
-          '/api/v1/schema/employees': {
+          "/api/v1/schema/employees": {
             actions: {
               index: {resource: "Schema::EmployeeResource"},
               show: {resource: "Schema::EmployeeResource"},
@@ -807,7 +807,7 @@ RSpec.describe Graphiti::Schema do
               destroy: {resource: "Schema::EmployeeResource"}
             }
           },
-          '/api/v1/special_employees': {
+          "/api/v1/special_employees": {
             actions: {
               index: {resource: "Schema::EmployeeResource"}
             }
@@ -837,7 +837,7 @@ RSpec.describe Graphiti::Schema do
       end
 
       it "does not add the action to the schema" do
-        expect(schema[:endpoints][:'/api/v1/schema/employees'][:actions].keys)
+        expect(schema[:endpoints][:"/api/v1/schema/employees"][:actions].keys)
           .to eq([:show, :create])
       end
     end

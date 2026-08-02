@@ -43,7 +43,7 @@ module Graphiti
       # @return [Hash] the merged hash
       # @api private
       def self.deep_merge!(hash, other)
-        merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
+        merger = proc { |key, v1, v2| (Hash === v1 && Hash === v2) ? v1.merge(v2, &merger) : v2 }
         hash.merge!(other, &merger)
       end
 

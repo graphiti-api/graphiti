@@ -99,14 +99,14 @@ module Graphiti
       Graphiti.config.context_for_endpoint = ->(path, action) {
         method = :GET
         case action
-          when :show then path = "#{path}/1"
-          when :create then method = :POST
-          when :update
-            path = "#{path}/1"
-            method = :PUT
-          when :destroy
-            path = "#{path}/1"
-            method = :DELETE
+        when :show then path = "#{path}/1"
+        when :create then method = :POST
+        when :update
+          path = "#{path}/1"
+          method = :PUT
+        when :destroy
+          path = "#{path}/1"
+          method = :DELETE
         end
 
         route = begin

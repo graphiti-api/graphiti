@@ -15,7 +15,6 @@ module Graphiti
       cache_expires_in: nil,
       cache_tag: nil
     )
-
       @resource = resource
       @scope = scope
       @query = query

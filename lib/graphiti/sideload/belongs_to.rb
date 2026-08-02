@@ -1,7 +1,7 @@
 class Graphiti::Sideload::BelongsTo < Graphiti::Sideload
   def initialize(name, opts)
     opts = {always_include_resource_ids: false}.merge(opts)
-    super(name, opts)
+    super
   end
 
   def type

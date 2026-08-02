@@ -321,14 +321,14 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!eq" do
-          let(:value) { {'!eq': "george"} }
+          let(:value) { {"!eq": "george"} }
 
           it "executes case-insensitive NOT search" do
             expect(ids).to eq([author1.id])
           end
 
           context "with nil value" do
-            let(:value) { {'!eq': nil} }
+            let(:value) { {"!eq": nil} }
             let!(:author3) { Legacy::Author.create! }
 
             it "works" do
@@ -365,7 +365,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!eql" do
-          let(:value) { {'!eql': "GeOrge"} }
+          let(:value) { {"!eql": "GeOrge"} }
 
           it "executes case-sensitive search" do
             expect(ids).to eq([author1.id, author2.id])
@@ -399,7 +399,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!prefix" do
-          let(:value) { {'!prefix': "Geo"} }
+          let(:value) { {"!prefix": "Geo"} }
 
           it "executes case-insensitive prefix NOT query" do
             expect(ids).to eq([author1.id])
@@ -433,7 +433,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!suffix" do
-          let(:value) { {'!suffix': "orge"} }
+          let(:value) { {"!suffix": "orge"} }
 
           it "executes case-insensitive suffix NOT query" do
             expect(ids).to eq([author1.id])
@@ -467,7 +467,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!match" do
-          let(:value) { {'!match': "org"} }
+          let(:value) { {"!match": "org"} }
 
           it "executes case-insensitive NOT match query" do
             expect(ids).to eq([author1.id])
@@ -487,7 +487,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!eq" do
-          let(:value) { {'!eq': 65} }
+          let(:value) { {"!eq": 65} }
 
           it "works" do
             expect(ids).to eq([author1.id, author3.id])
@@ -539,14 +539,14 @@ if ENV["APPRAISAL_INITIALIZED"]
         let(:filter) { {decimal_age: value} }
 
         context "eq" do
-          let(:value) { {eq: 70.011.to_d} }
+          let(:value) { {eq: BigDecimal("70.011")} }
 
           it "works" do
             expect(ids).to eq([author2.id])
           end
 
           context "as a string" do
-            let(:value) { {eq: 70.011.to_d.to_s} }
+            let(:value) { {eq: BigDecimal("70.011").to_s} }
 
             it "works" do
               expect(ids).to eq([author2.id])
@@ -555,7 +555,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!eq" do
-          let(:value) { {'!eq': 70.011.to_d} }
+          let(:value) { {"!eq": BigDecimal("70.011")} }
 
           it "works" do
             expect(ids).to eq([author1.id, author3.id])
@@ -563,7 +563,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "nothing" do
-          let(:value) { 70.011.to_d }
+          let(:value) { BigDecimal("70.011") }
 
           it "defaults to eq" do
             expect(ids).to eq([author2.id])
@@ -571,7 +571,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "gt" do
-          let(:value) { {gt: 70.033.to_d} }
+          let(:value) { {gt: BigDecimal("70.033")} }
 
           it "works" do
             expect(ids).to eq([author3.id])
@@ -579,7 +579,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "gte" do
-          let(:value) { {gte: 70.033.to_d} }
+          let(:value) { {gte: BigDecimal("70.033")} }
 
           it "works" do
             expect(ids).to eq([author1.id, author3.id])
@@ -587,7 +587,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "lt" do
-          let(:value) { {lt: 70.033.to_d} }
+          let(:value) { {lt: BigDecimal("70.033")} }
 
           it "works" do
             expect(ids).to eq([author2.id])
@@ -595,7 +595,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "lte" do
-          let(:value) { {lte: 70.033.to_d} }
+          let(:value) { {lte: BigDecimal("70.033")} }
 
           it "works" do
             expect(ids).to eq([author1.id, author2.id])
@@ -615,7 +615,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!eq" do
-          let(:value) { {'!eq': 70.01} }
+          let(:value) { {"!eq": 70.01} }
 
           it "works" do
             expect(ids).to eq([author1.id, author3.id])
@@ -675,7 +675,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!eq" do
-          let(:value) { {'!eq': two_days_ago.to_date.iso8601} }
+          let(:value) { {"!eq": two_days_ago.to_date.iso8601} }
 
           it "works" do
             expect(ids).to eq([author1.id, author3.id])
@@ -744,7 +744,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!eq" do
-          let(:value) { {'!eq': two_days_ago.iso8601} }
+          let(:value) { {"!eq": two_days_ago.iso8601} }
 
           it "works" do
             expect(ids).to eq([author1.id, author3.id])
@@ -752,7 +752,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
           context "when value is nil" do
             let(:filter) { {last_login: value} }
-            let(:value) { {'!eq': "null"} }
+            let(:value) { {"!eq": "null"} }
 
             it "works" do
               expect(ids).to eq([author1.id, author2.id])

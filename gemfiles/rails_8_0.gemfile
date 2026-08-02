@@ -2,12 +2,12 @@
 
 source "https://rubygems.org"
 
-gem "rails", "~> 7.0"
+gem "rails", "~> 8.0"
 gem "rspec-rails"
-gem "sqlite3", "~> 1.4.0"
-gem "database_cleaner"
+gem "sqlite3", "~> 2.1"
 
 group :test do
+  gem "database_cleaner"
   gem "pry"
   gem "pry-byebug", platform: [:mri]
   gem "appraisal"

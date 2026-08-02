@@ -87,13 +87,13 @@ if ENV["APPRAISAL_INITIALIZED"]
           {
             data: {
               type: "employees",
-              'temp-id': "empl1",
+              "temp-id": "empl1",
               attributes: {first_name: "Joe"},
               relationships: {
                 positions: {
                   data: [
-                    {type: "positions", 'temp-id': "pos1", method: "create"},
-                    {type: "positions", 'temp-id': "pos2", method: "create"}
+                    {type: "positions", "temp-id": "pos1", method: "create"},
+                    {type: "positions", "temp-id": "pos2", method: "create"}
                   ]
                 }
               }
@@ -101,22 +101,22 @@ if ENV["APPRAISAL_INITIALIZED"]
             included: [
               {
                 type: "positions",
-                'temp-id': "pos1",
+                "temp-id": "pos1",
                 attributes: {title: "specialist"},
                 relationships: {
                   department: {
-                    data: {type: "departments", 'temp-id': "dep1", method: "create"}
+                    data: {type: "departments", "temp-id": "dep1", method: "create"}
                   }
                 }
               },
               {
                 type: "departments",
-                'temp-id': "dep1",
+                "temp-id": "dep1",
                 attributes: {name: "safety"}
               },
               {
                 type: "positions",
-                'temp-id': "pos2",
+                "temp-id": "pos2",
                 attributes: {title: "manager"}
               }
             ]

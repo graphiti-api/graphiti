@@ -9,7 +9,7 @@ module Graphiti
           opts = args.extract_options!
           type_override = args[0]
 
-          if (att = (attributes[name] || extra_attributes[name]))
+          if (att = attributes[name] || extra_attributes[name])
             # We're opting in to filtering, so force this
             # UNLESS the filter is guarded at the attribute level
             att[:filterable] = true if att[:filterable] == false
@@ -27,7 +27,7 @@ module Graphiti
             end
 
             required = att[:filterable] == :required || !!opts[:required]
-            schema = !!opts[:via_attribute_dsl] ? att[:schema] : opts[:schema] != false
+            schema = (!!opts[:via_attribute_dsl]) ? att[:schema] : opts[:schema] != false
 
             config[:filters][name.to_sym] = {
               aliases: aliases,

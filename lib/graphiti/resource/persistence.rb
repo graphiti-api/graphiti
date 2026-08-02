@@ -65,7 +65,7 @@ module Graphiti
         def add_callback(kind, lifecycle, method, only, &blk)
           config[:callbacks][kind] ||= {}
           config[:callbacks][kind][lifecycle] ||= []
-          config[:callbacks][kind][lifecycle] << {callback: (method || blk), only: Array(only)}
+          config[:callbacks][kind][lifecycle] << {callback: method || blk, only: Array(only)}
         end
       end
 

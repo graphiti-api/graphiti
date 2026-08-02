@@ -196,7 +196,7 @@ RSpec.describe "polymorphic resource behavior" do
           params[:fields] = {"commercials.actors" => "last_name"}
           json = JSON.parse(proxy.to_json)
           expect(json["data"][0]).to_not have_key("commercials")
-          commercials = (json["data"][1]["commercials"])
+          commercials = json["data"][1]["commercials"]
           expect(commercials[0]["actors"]).to eq([
             {"id" => actor1.id.to_s, "last_name" => "Doe"},
             {"id" => actor2.id.to_s, "last_name" => "DoReMe"}
@@ -210,7 +210,7 @@ RSpec.describe "polymorphic resource behavior" do
             }
           }
           json = JSON.parse(proxy.to_json)
-          commercials = (json["data"][1]["commercials"])
+          commercials = json["data"][1]["commercials"]
           expect(commercials[0]["actors"]).to eq([{
             "id" => actor2.id.to_s,
             "first_name" => "John",
@@ -221,7 +221,7 @@ RSpec.describe "polymorphic resource behavior" do
         it "can sort sideloads off of type-specific ones" do
           params[:sort] = "-on__mastercards--commercials.actors.first_name"
           json = JSON.parse(proxy.to_json)
-          commercials = (json["data"][1]["commercials"])
+          commercials = json["data"][1]["commercials"]
           expect(commercials[0]["actors"]).to eq([
             {
               "id" => actor2.id.to_s,
@@ -245,7 +245,7 @@ RSpec.describe "polymorphic resource behavior" do
             "on__mastercards--commercials.actors.number": 2
           }
           json = JSON.parse(proxy.to_json)
-          commercials = (json["data"][0]["commercials"])
+          commercials = json["data"][0]["commercials"]
           expect(commercials[0]["actors"]).to eq([
             {
               "id" => actor2.id.to_s,
