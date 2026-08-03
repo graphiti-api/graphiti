@@ -21,6 +21,13 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         get :index
       end
+
+      it "does not register Graphiti's exception handlers" do
+        registry = controller.class.rescue_registry
+
+        expect(registry.handles_exception?(Graphiti::Errors::RecordNotFound.new)).to eq(false)
+        expect(registry.handles_exception?(RuntimeError.new)).to eq(false)
+      end
     end
 
     describe "a controller with it" do
@@ -36,6 +43,14 @@ if ENV["APPRAISAL_INITIALIZED"]
         get :index
 
         expect(JSON.parse(response.body)["object"]).to eq(controller.class.name)
+      end
+
+      it "registers Graphiti's exception handlers" do
+        registry = controller.class.rescue_registry
+
+        expect(registry.handles_exception?(Graphiti::Errors::RecordNotFound.new)).to eq(true)
+        # the Exception catch-all
+        expect(registry.handles_exception?(RuntimeError.new)).to eq(true)
       end
     end
   end

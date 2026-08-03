@@ -1,4 +1,6 @@
 namespace :graphiti do
+  include Graphiti::Rails::TestHelpers
+
   def session
     @session ||= ActionDispatch::Integration::Session.new(Rails.application)
   end
@@ -19,7 +21,10 @@ namespace :graphiti do
       "?cache=bust"
     end
     path = "#{path}&debug=true" if debug
-    session.get(path.to_s)
+    handle_request_exceptions do
+      headers = {Authorization: ENV["AUTHORIZATION_HEADER"]}.compact
+      session.get(path.to_s, headers: headers)
+    end
     JSON.parse(session.response.body)
   end
 

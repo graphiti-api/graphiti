@@ -17,6 +17,24 @@ module Graphiti
       included do
         include Graphiti::Rails::Context
         include Graphiti::Rails::Debugging
+
+        # Broad, but the handler only renders formats listed in
+        # config.graphiti.handled_exception_formats and hands everything else
+        # back to Rails.
+        register_exception Exception,
+          status: :passthrough,
+          handler: Graphiti::Rails::FallbackHandler
+
+        register_exception Graphiti::Errors::InvalidRequest,
+          status: 400, handler: Graphiti::Rails::InvalidRequestHandler
+        register_exception Graphiti::Errors::ConflictRequest,
+          status: 409, handler: Graphiti::Rails::ConflictRequestHandler
+        register_exception Graphiti::Errors::RecordNotFound,
+          status: 404, handler: Graphiti::Rails::ExceptionHandler
+        register_exception Graphiti::Errors::RemoteWrite,
+          status: 400, handler: Graphiti::Rails::ExceptionHandler
+        register_exception Graphiti::Errors::SingularSideload,
+          status: 400, handler: Graphiti::Rails::ExceptionHandler
       end
     end
   end

@@ -14,19 +14,21 @@ require "active_support/concern"
 require "active_support/time"
 
 require "dry-types"
-require "graphiti_errors"
 
 require "jsonapi/serializable"
 
 # These gems are merged into graphiti as of 2.0, but their 1.x/0.x releases
-# still resolve against graphiti 2.x. They ship files that collide with ours
+# still resolve against graphiti 2.x. Leaving one installed is never harmless:
+# graphiti_spec_helpers and graphiti-rails ship files that collide with ours
 # (lib/graphiti_spec_helpers.rb, lib/graphiti/rails.rb), so which copy a require
-# picks up would come down to load path order. Fail loudly instead of loading
-# the stale one quietly. Checked here because graphiti is loaded either way,
-# whichever copy wins.
+# picks up comes down to load path order, and graphiti_errors installs a second,
+# competing exception handler on any controller that includes it. Fail loudly
+# rather than let either happen quietly. Checked here because graphiti is loaded
+# either way, whichever copy wins.
 {
-  "graphiti_spec_helpers" => 'The "graphiti_spec_helpers/rspec" require and the GraphitiSpecHelpers namespace still resolve.',
-  "graphiti-rails" => 'Graphiti::Rails and its config.graphiti options are unchanged. Drop the "graphiti-rails" require if you have one.'
+  "graphiti_spec_helpers" => 'The "graphiti_spec_helpers/rspec" require and the GraphitiSpecHelpers namespace are unchanged.',
+  "graphiti-rails" => 'Graphiti::Rails and its config.graphiti options are unchanged. Drop the "graphiti-rails" require if you have one.',
+  "graphiti_errors" => "Exception handling now goes through rescue_registry. Remove `include GraphitiErrors` from your controllers — Graphiti registers its own handlers, and you can add yours with `register_exception`."
 }.each do |gem_name, guidance|
   next unless Gem.loaded_specs.key?(gem_name)
 
@@ -223,6 +225,9 @@ require "graphiti/query"
 require "graphiti/debugger"
 require "graphiti/util/cache_debug"
 require "graphiti/util/uri_decoder"
+require "graphiti/error_serializers/validation"
+require "graphiti/error_serializers/invalid_request"
+require "graphiti/error_serializers/conflict_request"
 
 if defined?(ActiveRecord)
   require "graphiti/adapters/active_record"
