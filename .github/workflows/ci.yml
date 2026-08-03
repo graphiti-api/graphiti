@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.0"
+          ruby-version: "3.2"
           bundler-cache: true
       - name: Run standardrb
         run: bundle exec standardrb --no-fix --format progress
@@ -38,36 +38,26 @@ jobs:
       matrix:
         include:
           # No Rails - the library on its own, across every supported Ruby
-          - { ruby: "3.0", gemfile: Gemfile, appraisal: false }
-          - { ruby: "3.1", gemfile: Gemfile, appraisal: false }
           - { ruby: "3.2", gemfile: Gemfile, appraisal: false }
           - { ruby: "3.3", gemfile: Gemfile, appraisal: false }
           - { ruby: "3.4", gemfile: Gemfile, appraisal: false }
           - { ruby: ruby-head, gemfile: Gemfile, appraisal: false }
 
-          # Rails 6.1 - EOL, does not support Ruby 3.4
-          - { ruby: "3.0", gemfile: gemfiles/rails_6_1.gemfile, appraisal: true }
-          - { ruby: "3.3", gemfile: gemfiles/rails_6_1.gemfile, appraisal: true }
-
-          # Rails 7.0 - EOL, floor + one modern Ruby
-          - { ruby: "3.0", gemfile: gemfiles/rails_7_0.gemfile, appraisal: true }
-          - { ruby: "3.4", gemfile: gemfiles/rails_7_0.gemfile, appraisal: true }
-
-          # Rails 7.1 - needs Ruby 3.1+
-          - { ruby: "3.1", gemfile: gemfiles/rails_7_1.gemfile, appraisal: true }
+          # Rails 7.1 - the floor
+          - { ruby: "3.2", gemfile: gemfiles/rails_7_1.gemfile, appraisal: true }
           - { ruby: "3.4", gemfile: gemfiles/rails_7_1.gemfile, appraisal: true }
 
-          # Rails 7.2 - needs Ruby 3.1+
-          - { ruby: "3.1", gemfile: gemfiles/rails_7_2.gemfile, appraisal: true }
+          # Rails 7.2
+          - { ruby: "3.2", gemfile: gemfiles/rails_7_2.gemfile, appraisal: true }
           - { ruby: "3.4", gemfile: gemfiles/rails_7_2.gemfile, appraisal: true }
           - { ruby: ruby-head, gemfile: gemfiles/rails_7_2.gemfile, appraisal: true }
 
-          # Rails 8.0 - needs Ruby 3.2+
+          # Rails 8.0
           - { ruby: "3.2", gemfile: gemfiles/rails_8_0.gemfile, appraisal: true }
           - { ruby: "3.4", gemfile: gemfiles/rails_8_0.gemfile, appraisal: true }
           - { ruby: ruby-head, gemfile: gemfiles/rails_8_0.gemfile, appraisal: true }
 
-          # Rails 8.1 - needs Ruby 3.2+
+          # Rails 8.1
           - { ruby: "3.2", gemfile: gemfiles/rails_8_1.gemfile, appraisal: true }
           - { ruby: "3.4", gemfile: gemfiles/rails_8_1.gemfile, appraisal: true }
           - { ruby: ruby-head, gemfile: gemfiles/rails_8_1.gemfile, appraisal: true }

@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.bindir = "exe"
   spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
-  spec.required_ruby_version = ">= 3.0"
+  spec.required_ruby_version = ">= 3.2"
 
   # TODO: remove once the 1.12 upgrade window has passed
   spec.post_install_message = <<~MSG
@@ -41,7 +41,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "dry-types", ">= 0.15.0", "< 2.0"
   spec.add_dependency "graphiti_errors", "~> 1.1.0"
   spec.add_dependency "concurrent-ruby", ">= 1.2", "< 2.0"
-  spec.add_dependency "activesupport", ">= 5.2"
+  spec.add_dependency "activesupport", ">= 7.1"
   # Bundled (no longer default) as of Ruby 3.5; graphiti uses OpenStruct in lib/
   spec.add_dependency "ostruct", ">= 0.5"
 
@@ -50,7 +50,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake", ">= 10.0"
   spec.add_development_dependency "standard", "~> 1.4.0"
-  spec.add_development_dependency "activemodel", ">= 5.2"
+  spec.add_development_dependency "activemodel", ">= 7.1"
   # Was reaching the suite transitively through graphiti_spec_helpers, which is
   # now part of this gem.
   spec.add_development_dependency "rspec", "~> 3.0"
