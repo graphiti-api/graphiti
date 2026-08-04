@@ -3,6 +3,12 @@ require "forwardable"
 require "uri"
 require "ostruct" unless defined?(::OpenStruct)
 
+# The umbrella require, not just the core_ext files below: Graphiti.broadcast
+# calls ActiveSupport::Notifications.instrument, which reaches for
+# ActiveSupport::IsolatedExecutionState. That constant is autoloaded here and
+# nowhere else, so without this a non-Rails app raises NameError on the first
+# render unless something else happened to load ActiveSupport for us.
+require "active_support"
 require "active_support/version"
 require "active_support/deprecation"
 require "active_support/deprecator" if ::ActiveSupport.version >= Gem::Version.new("7.1")
