@@ -128,7 +128,7 @@ module Graphiti
         # If eager loading, ensure routes are loaded first, then apply
         # This happens in Railtie
         def eagerly_apply_sideload?(sideload)
-          # TODO: Maybe handle this in graphiti-rails
+          # TODO: Maybe handle this in the Rails integration
           if defined?(::Rails) && (app = ::Rails.application)
             app.config.eager_load ? false : true
           else

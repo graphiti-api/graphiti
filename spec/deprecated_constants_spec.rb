@@ -44,6 +44,36 @@ RSpec.describe "deprecated constants" do
     end
   end
 
+  describe "the graphiti_errors serializers" do
+    {
+      "GraphitiErrors::Validation::Serializer" => Graphiti::ErrorSerializers::Validation,
+      "GraphitiErrors::InvalidRequest::Serializer" => Graphiti::ErrorSerializers::InvalidRequest,
+      "GraphitiErrors::ConflictRequest::Serializer" => Graphiti::ErrorSerializers::ConflictRequest,
+      "GraphitiErrors::Serializers::Validation" => Graphiti::ErrorSerializers::Validation
+    }.each do |old_name, target|
+      it "resolves #{old_name}" do
+        resolved = silenced { Object.const_get(old_name) == target }
+
+        expect(resolved).to eq(true)
+      end
+    end
+
+    # These proxies are leaves. Naming one hands back the proxy, and it is
+    # calling through it that reports the deprecation.
+    it "warns when used" do
+      expect(Graphiti::DEPRECATOR).to receive(:warn).at_least(:once).and_return(nil)
+
+      GraphitiErrors::Validation::Serializer.new(Object.new)
+    end
+
+    # The mixin and its exception handlers are replaced by rescue_registry, not
+    # renamed, so there is nothing for them to point at.
+    it "does not resurrect the rest of GraphitiErrors" do
+      expect(GraphitiErrors).to_not respond_to(:disable!)
+      expect(defined?(GraphitiErrors::ExceptionHandler)).to be_nil
+    end
+  end
+
   describe "GraphitiContextProxy" do
     it "resolves to Graphiti::SpecHelpers::ContextProxy" do
       resolved = silenced { GraphitiContextProxy == Graphiti::SpecHelpers::ContextProxy }
@@ -52,10 +82,23 @@ RSpec.describe "deprecated constants" do
     end
   end
 
-  describe "the deprecated require path" do
-    it "still loads" do
-      expect { silenced { require "graphiti_spec_helpers" } }.to_not raise_error
-      expect(Object.const_defined?("Graphiti::SpecHelpers")).to eq(true)
+  describe "include GraphitiErrors" do
+    it "raises with the replacement rather than doing nothing" do
+      expect {
+        Class.new { include GraphitiErrors }
+      }.to raise_error(/include Graphiti::Rails::Controller/)
+    end
+  end
+
+  describe "deprecated require paths" do
+    {
+      "graphiti_spec_helpers" => "Graphiti::SpecHelpers",
+      "graphiti_errors" => "Graphiti::ErrorSerializers::Validation"
+    }.each do |path, still_available|
+      it "#{path.inspect} still loads" do
+        expect { silenced { require path } }.to_not raise_error
+        expect(Object.const_defined?(still_available)).to eq(true)
+      end
     end
   end
 end

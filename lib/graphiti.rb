@@ -41,7 +41,7 @@ require "jsonapi/serializable"
 end
 
 module Graphiti
-  DEPRECATOR = ActiveSupport::Deprecation.new("2.0", "Graphiti")
+  DEPRECATOR = ActiveSupport::Deprecation.new("3.0", "Graphiti")
 
   # @api private
   def self.context
@@ -228,6 +228,7 @@ require "graphiti/util/uri_decoder"
 require "graphiti/error_serializers/validation"
 require "graphiti/error_serializers/invalid_request"
 require "graphiti/error_serializers/conflict_request"
+require "graphiti/error_serializers/deprecated_constants"
 
 if defined?(ActiveRecord)
   require "graphiti/adapters/active_record"
