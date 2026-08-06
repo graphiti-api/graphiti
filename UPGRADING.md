@@ -49,7 +49,7 @@ Every name below still works, warns, and will be removed in the next major. They
 | rspec shared contexts `"resource testing"`, `"remote api"` | `"graphiti resource testing"`, `"graphiti remote api"` |
 | `GraphitiContextProxy` | `Graphiti::SpecHelpers::ContextProxy` |
 | `Graphiti::Rails::DEPRECATOR` | `Graphiti::DEPRECATOR` (the old name still resolves) |
-| `require "graphiti_errors"`, `require "graphiti/responders"` | no longer needed |
+| `require "graphiti_errors"`, `require "graphiti/responders"` | remove / no longer needed |
 
 `RSpec.describe PostResource, type: :resource` still picks up the resource-testing context automatically — that has not changed.
 
@@ -57,7 +57,7 @@ Every name below still works, warns, and will be removed in the next major. They
 
 | 1.x | 2.0 |
 | --- | --- |
-| `include GraphitiErrors` | nothing — `register_exception` is available on every controller (raises if left in) |
+| `include GraphitiErrors` | `register_exception` is available on every controller |
 | `GraphitiErrors::ExceptionHandler` | subclass `Graphiti::Rails::ExceptionHandler` |
 | `GraphitiErrors.enable!` / `.disable!` | `handle_request_exceptions` |
 
@@ -127,33 +127,15 @@ end
 
 This has to be a request spec — exceptions are rendered in Rack middleware, which controller specs bypass.
 
-## The model you inspect is the model that saves
+## Persistence hooks
 
-Proxies returned by `build` and `find` now apply the request payload lazily, and expose the resulting model before anything is written:
+Attributes are now assigned to the model once, up front, before the persistence hooks run — which is what lets `build` and `find` hand you the model before anything is written. See the persistence guide for what that enables.
 
-```ruby
-# Creates
-resource = MyResource.build(params)
-resource.data          # unsaved model, attributes applied
-resource.data.valid?   # inspect before committing to anything
-resource.save          # persists that same instance
+That changes one hook.
 
-# Updates
-resource = MyResource.find(params)
-resource.assign_attributes(params)
-resource.data.changed  # dirty tracking works
-resource.update
+### around_persistence receives the model, not the attributes hash
 
-# or assign and save in one call, Rails-style
-resource = MyResource.find(params)
-resource.update(params)
-```
-
-`assign_attributes` is idempotent per payload, validation still runs before assignment, and the instance you inspect is the instance that saves.
-
-### Breaking: around_persistence receives the model, not the attributes hash
-
-To make the above hold, attributes are assigned to the model once, before the persistence hooks fire. `around_persistence` now wraps the save of an already-assigned model and receives that model:
+It now wraps the save of an already-assigned model, and gets that model:
 
 ```ruby
 # 1.x
