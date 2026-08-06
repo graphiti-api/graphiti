@@ -55,7 +55,18 @@ class EmployeeResource < ApplicationResource
 end
 ```
 
-A pretty boilerplate controller that just interfaces with the resource
+In Rails, controllers serving resources include `Graphiti::Rails::Controller`. Putting it in `ApplicationController` covers the whole app; putting it in an API base class scopes it there and leaves the rest alone.
+
+```ruby
+class ApplicationController < ActionController::Base
+  include Graphiti::Rails::Controller
+end
+```
+
+That gives those controllers the Graphiti context, the debugger, and JSON:API rendering for Graphiti's exceptions plus anything else raised. Registering your own exceptions does not require it — `register_exception` is available on every controller — but only controllers with the include render *unregistered* exceptions as JSON:API rather than falling through to Rails.
+
+A pretty boilerplate controller that just interfaces with the resource. `respond_with` comes from the [`responders`](https://github.com/heartcombo/responders) gem; with it in your Gemfile, add `include Graphiti::Rails::Responders` as well. Otherwise use `render jsonapi:` as the write actions below do.
+
 ```ruby
 class EmployeesController < ApplicationController
   def index
