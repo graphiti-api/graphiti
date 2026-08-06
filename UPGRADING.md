@@ -8,9 +8,9 @@ Graphiti 2.0 requires **Ruby 3.2+** and **Rails 7.1+**. Ruby 3.1 and earlier are
 
 **1. Drop three gems.** `graphiti-rails`, `graphiti_spec_helpers` and `graphiti_errors` are now part of `graphiti` itself.
 
-```ruby
+```diff
 # Gemfile
-  gem "graphiti"
++ gem "graphiti"
 - gem "graphiti-rails"
 - gem "graphiti_spec_helpers"
 - gem "graphiti_errors"
@@ -22,27 +22,26 @@ Graphiti raises at load if one is still installed — they ship files that colli
 
 ```ruby
 class ApplicationController < ActionController::Base
-+ include Graphiti::Rails::Controller
+  include Graphiti::Rails::Controller
 end
 ```
 
-Do this even if you already had `include Graphiti::Rails` there. That old spelling still sets the controller up so nothing breaks mid-upgrade, but it warns and is removed in 3.0.
+Do this even if you already had `include Graphiti::Rails` there. That old spelling still sets the controller up so nothing breaks mid-upgrade, but it warns and will be removed in the next major version.
 
 **3. Update `around_persistence` hooks**, if you have any. See [the model you inspect is the model that saves](#the-model-you-inspect-is-the-model-that-saves).
 
 That is the whole required migration for most apps. Everything below either still works with a warning, or is a behaviour change to be aware of.
 
-## Renamed, with the old name still working
-
-Every name below still works, warns, and will be removed in 3.0. These are a bridge so an upgrade does not break halfway, not an alternative to changing them.
+## Deprecations you should fix
+Every name below still works, warns, and will be removed in the next major. They're easy fixes though, so why not now?
 
 | 1.x | 2.0 |
 | --- | --- |
 | `require "graphiti_spec_helpers/rspec"` | `require "graphiti/spec_helpers/rspec"` |
 | `GraphitiSpecHelpers::RSpec` / `::Sugar` / `::Errors::*` | `Graphiti::SpecHelpers::*` |
-| `require "graphiti-rails"` | no longer needed |
-| `include Graphiti::Rails` | `include Graphiti::Rails::Controller` (the old spelling still sets the controller up) |
-| `Graphiti::Responders` | `Graphiti::Rails::Responders` |
+| `require "graphiti-rails"` | remove / no longer needed |
+| `include Graphiti::Rails` | `include Graphiti::Rails::Controller`|
+| `include Graphiti::Responders` | `include Graphiti::Rails::Responders` |
 | `jsonapi_context` | `graphiti_context` |
 | `GraphitiErrors::Validation::Serializer` | `Graphiti::ErrorSerializers::Validation` |
 | `GraphitiErrors::InvalidRequest::Serializer` | `Graphiti::ErrorSerializers::InvalidRequest` |
