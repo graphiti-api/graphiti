@@ -62,6 +62,25 @@ Every name below still works, warns, and will be removed in 3.0. These are a bri
 | `GraphitiErrors::ExceptionHandler` | subclass `Graphiti::Rails::ExceptionHandler` |
 | `GraphitiErrors.enable!` / `.disable!` | `handle_request_exceptions` |
 
+## Without Rails
+
+The serializers move but keep working: `Graphiti::ErrorSerializers::Validation`, `::InvalidRequest` and `::ConflictRequest` load with core and need no Rails.
+
+`GraphitiErrors::ExceptionHandler`, which turned any exception into a JSON:API errors payload, is replaced by `RescueRegistry::ExceptionHandler` — a runtime dependency now, and usable outside Rails:
+
+```ruby
+require "rack" # or RescueRegistry::ExceptionHandler raises NameError on Rack
+require "rescue_registry"
+
+handler = RescueRegistry::ExceptionHandler.new(exception, status: 404)
+handler.build_payload            # => {errors: [{code: :not_found, status: "404", ...}]}
+handler.formatted_response(:json) # => [404, "{\"errors\":[...]}", :json]
+```
+
+`register_exception` and the rendering are Rails-only, but rescue_registry ships `RescueRegistry::ShowExceptions`, a Rack middleware for exactly this case — see its README.
+
+`GraphitiErrors.logger` has no replacement; `Graphiti.logger` is the nearest thing.
+
 ## Controllers opt in
 
 Until 2.0, Graphiti added itself to **every** controller in the application: an `around_action` wrapping each request in a Graphiti context, another wrapping it in the debugger, and a catch-all exception handler — on Devise controllers, admin controllers, HTML pages, everything.
