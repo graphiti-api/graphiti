@@ -129,7 +129,7 @@ This has to be a request spec — exceptions are rendered in Rack middleware, wh
 
 ## Persistence hooks
 
-Attributes are now assigned to the model once, up front, before the persistence hooks run — which is what lets `build` and `find` hand you the model before anything is written. See the persistence guide for what that enables.
+Attributes are now assigned to the model once, up front, before the persistence hooks run — which is what lets `build` and `find` hand you the model before anything is written. See the [lifecycle hooks guide](https://www.graphiti.dev/guides/concepts/resources#persistence-lifecycle-hooks) for what that enables.
 
 That changes one hook.
 
