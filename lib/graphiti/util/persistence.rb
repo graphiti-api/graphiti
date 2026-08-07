@@ -51,11 +51,11 @@ class Graphiti::Util::Persistence
     @resource.decorate_record(persisted)
     assign_temp_id(persisted, @meta[:temp_id])
 
-    associate_parents(persisted, parents)
+    persisted = associate_parents(persisted, parents)
 
     children = @adapter.process_has_many(self, persisted)
 
-    associate_children(persisted, children) unless @meta[:method] == :destroy
+    persisted = associate_children(persisted, children) unless @meta[:method] == :destroy
 
     post_process(persisted, parents)
     post_process(persisted, children)
@@ -93,38 +93,42 @@ class Graphiti::Util::Persistence
       if x[:object] && object
         if x[:meta][:method] == :disassociate
           if x[:sideload].type == :belongs_to
-            x[:sideload].disassociate(object, x[:object])
+            object = x[:sideload].disassociate(object, x[:object])
           else
-            x[:sideload].disassociate(x[:object], object)
+            object = x[:sideload].disassociate(x[:object], object)
           end
         elsif x[:sideload].type == :belongs_to
-          x[:sideload].associate(object, x[:object])
+          object = x[:sideload].associate(object, x[:object])
         elsif [:has_many, :many_to_many].include?(x[:sideload].type)
-          x[:sideload].associate_all(object, Array(x[:object]))
+          object = x[:sideload].associate_all(object, Array(x[:object]))
         else
-          x[:sideload].associate(x[:object], object)
+          object = x[:sideload].associate(x[:object], object)
         end
       end
     end
+
+    object
   end
 
   def associate_children(object, children)
     children.each do |x|
       if x[:object] && object
         if x[:meta][:method] == :disassociate
-          x[:sideload].disassociate(object, x[:object])
+          object = x[:sideload].disassociate(object, x[:object])
         elsif x[:meta][:method] == :destroy
           if x[:sideload].type == :many_to_many
-            x[:sideload].disassociate(object, x[:object])
+            object = x[:sideload].disassociate(object, x[:object])
           end
           # otherwise, no need to disassociate destroyed objects
         elsif [:has_many, :many_to_many].include?(x[:sideload].type)
-          x[:sideload].associate_all(object, Array(x[:object]))
+          object = x[:sideload].associate_all(object, Array(x[:object]))
         else
-          x[:sideload].associate(object, x[:object])
+          object = x[:sideload].associate(object, x[:object])
         end
       end
     end
+
+    object
   end
 
   def persist_object(method, attributes)
@@ -151,6 +155,7 @@ class Graphiti::Util::Persistence
 
   def assign_temp_id(object, temp_id)
     object.instance_variable_set(:@_jsonapi_temp_id, temp_id)
+    object
   end
 
   def metadata
