@@ -31,18 +31,14 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-Skipping this fails at boot rather than at request time: a controller calling `sideload_allowlist` raises `NoMethodError` while its class body loads, so the app stops starting.
-
-If the controller already has `include Graphiti::Rails`, replace that line rather than adding to it. The old spelling still sets the controller up, so nothing breaks mid-upgrade, but it warns and goes away in the next major version.
+If the controller already has `include Graphiti::Rails`, replace it with `include Graphiti::Rails::Controller`. 
 
 <details>
 <summary>What the include actually brings, and what a controller without it loses</summary>
 
 Until 2.0, Graphiti added itself to **every** controller in the application: an `around_action` wrapping each request in a Graphiti context, another wrapping it in the debugger, and a catch-all exception handler, on Devise controllers, admin controllers, HTML pages, everything.
 
-`Graphiti::Rails::Controller` now bundles all of it, and where you include it decides the blast radius. `ApplicationController` matches 1.x behavior. An API base class scopes it and leaves the rest of the app alone.
-
-A controller without it gets no Graphiti context, no debugger, and none of Graphiti's exception handlers, so if a resource action sees an empty `Graphiti.context`, this include is what is missing.
+`Graphiti::Rails::Controller` now bundles all of it, and including it is required. If you include it in `ApplicationController` that would matches 1.x behavior. Including it in an API base class scopes it and leaves the rest of the app alone. A controller without it gets no Graphiti context, no debugger, and none of Graphiti's exception handlers, so if a resource action sees an empty `Graphiti.context`, this include is what is missing.
 
 The class-level DSL travels with it, which is the one failure you see before a request is ever served:
 
