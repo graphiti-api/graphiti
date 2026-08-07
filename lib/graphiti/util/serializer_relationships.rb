@@ -19,7 +19,14 @@ module Graphiti
       private
 
       def apply?(sideload)
-        @serializer.relationship_blocks[sideload.name].nil?
+        return true if @serializer.relationship_blocks[sideload.name].nil?
+
+        # A subclass inherits its parent's relationship blocks, each closed
+        # over the parent's sideload. Redeclaring the relationship has to
+        # replace that block or the override never reaches the payload.
+        # Anything not generated here was written by hand, so leave it.
+        applied = @serializer.relationship_sideloads[sideload.name]
+        !applied.nil? && !applied.equal?(sideload)
       end
     end
 
@@ -32,6 +39,10 @@ module Graphiti
 
       def apply
         sideload = @sideload
+        # Reassign rather than mutate: ancestors share the hash by reference
+        # until a subclass writes to it.
+        @serializer.relationship_sideloads =
+          @serializer.relationship_sideloads.merge(@sideload.name => @sideload)
         @serializer.relationship(@sideload.name, if: -> { sideload.readable? }, &block)
       end
 

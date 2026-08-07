@@ -13,10 +13,16 @@ module Graphiti
     class_attribute :attributes_applied_via_resource
     class_attribute :extra_attributes_applied_via_resource
     class_attribute :relationship_condition_blocks
+    # Which sideload each generated relationship block was built for. A
+    # subclass inherits its parent's blocks, so this is how a redeclared
+    # relationship is told apart from one already applied, and from one the
+    # application wrote by hand.
+    class_attribute :relationship_sideloads
     self.attributes_applied_via_resource = []
     self.extra_attributes_applied_via_resource = []
     # See #requested_relationships
     self.relationship_condition_blocks ||= {}
+    self.relationship_sideloads ||= {}
 
     def self.inherited(klass)
       super
