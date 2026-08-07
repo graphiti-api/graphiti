@@ -1,5 +1,39 @@
 graphiti changelog
 
+# [2.0.0-beta.4](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.3...v2.0.0-beta.4) (2026-08-07)
+
+
+### Bug Fixes
+
+* a subclass redeclaring a relationship reaches its serializer ([976dbc4](https://github.com/graphiti-api/graphiti/commit/976dbc47e7bbf951da925a13a34f1bc9679470f8))
+* make each appraisal test the Rails version it is named for ([9e00652](https://github.com/graphiti-api/graphiti/commit/9e00652e124a411a2916d0fef52dc4fd2dc59020))
+* require active_support so graphiti boots without Rails ([d431a03](https://github.com/graphiti-api/graphiti/commit/d431a0328fb4071429f39f4c69cda9c6cee308f2))
+
+
+### Code Refactoring
+
+* bridge the remaining 1.x names ([3d80ef9](https://github.com/graphiti-api/graphiti/commit/3d80ef98cf765a152032b7fed89b3cdc10be23dc))
+
+
+### Features
+
+* belongs_to renders resource linkage by default ([024824d](https://github.com/graphiti-api/graphiti/commit/024824d319619811ade886c72ce345cfeb584dbc)), closes [#168](https://github.com/graphiti-api/graphiti/issues/168) [#185](https://github.com/graphiti-api/graphiti/issues/185) [#167](https://github.com/graphiti-api/graphiti/issues/167) [#167](https://github.com/graphiti-api/graphiti/issues/167)
+* fold graphiti_spec_helpers into graphiti ([da955a1](https://github.com/graphiti-api/graphiti/commit/da955a1e090ba44be31bf043ed90baa6661a4772))
+* fold graphiti-rails into graphiti ([7740f8a](https://github.com/graphiti-api/graphiti/commit/7740f8a5803f1fbf02ef4e27d8baa6e0809d2b43)), closes [graphiti-rails#52](https://github.com/graphiti-rails/issues/52)
+* handle exceptions with rescue_registry, fold in graphiti_errors ([e48171c](https://github.com/graphiti-api/graphiti/commit/e48171c117e7b8141fb6f966a972b0c1cd50c5ab))
+* require Ruby 3.2 and Rails 7.1 ([635b249](https://github.com/graphiti-api/graphiti/commit/635b249a99f7d1ef726ae2328707ee6210cc0608))
+
+
+### BREAKING CHANGES
+
+* nothing removed, everything warns and goes away in 3.0. Except `include GraphitiErrors`, which now raises, as rescue_registry replaced it, so there's nothing to point it at.
+* graphiti_errors is no longer a dependency and must be removed from the Gemfile, along with any `include GraphitiErrors`.
+
+GraphitiErrors::Validation::Serializer is now Graphiti::ErrorSerializers::Validation, and GraphitiErrors.enable!/disable! becomes handle_request_exceptions. 409 responses now report code "conflict" and title "Conflict Error".
+* Ruby >= 3.2 and Rails >= 7.1 are now required.
+* remove graphiti-rails from your Gemfile. Controllers serving Graphiti resources must `include Graphiti::Rails::Controller` — previously every controller received it whether it wanted it or not. Graphiti::Responders is now Graphiti::Rails::Responders.
+* remove graphiti_spec_helpers from your Gemfile. Prefer Graphiti::SpecHelpers and "graphiti/spec_helpers/rspec"; the old namespace and require paths still resolve, warn, and are removed in 3.0.
+
 # [2.0.0-beta.3](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.2...v2.0.0-beta.3) (2026-07-31)
 
 
