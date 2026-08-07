@@ -128,6 +128,48 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
+    context "when the target is keyed by something other than :id" do
+      # Examples in this file share a database, so this may already exist.
+      let!(:region) do
+        Region.find_or_create_by!(code: "rg-1") { |r| r.name = "Northeast" }
+      end
+
+      before { position.update_column(:region_name, "Northeast") }
+
+      let(:resource_class) do
+        Class.new(PositionResource) do
+          def self.name
+            "PositionResource"
+          end
+
+          belongs_to :region,
+            resource: RegionResource,
+            foreign_key: :region_name,
+            primary_key: :name,
+            always_include_resource_ids: true
+        end
+      end
+
+      def region_linkage
+        json = JSON.parse(
+          resource_class.all(filter: {id: position.id}).to_jsonapi
+        )
+        json["data"][0]["relationships"]["region"]
+      end
+
+      it "renders the related id, not the foreign key" do
+        expect(region_linkage["data"]).to eq(
+          "type" => "regions", "id" => region.id.to_s
+        )
+      end
+
+      it "loads the association to get it" do
+        queries = queries_while { region_linkage }
+
+        expect(queries.grep(/FROM .regions./)).to_not be_empty
+      end
+    end
+
     context "for relationship types other than belongs_to" do
       it "never derives linkage from a foreign key" do
         expect(EmployeeResource.sideloads[:positions].linkage_from_foreign_key?)
