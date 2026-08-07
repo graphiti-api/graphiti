@@ -56,3 +56,27 @@
   vertical-align: baseline;
   padding: 0.15em 0.3em;
 }
+
+/* The bar is full-bleed on every page, so it takes a tint of the brand pink
+   rather than the pink itself, which at that width reads as a promo banner.
+   Docusaurus hashes the class name, hence the prefix selector. */
+.theme-announcement-bar  {
+  background: #fdeef7;
+  color: #7a1758;
+  font-size: 1.1rem;
+  border-bottom: 1px solid rgba(224, 40, 157, 0.25);
+  font-weight: 500;
+}
+
+[data-theme='dark'] .theme-announcement-bar  {
+  background: #33272f;
+  color: #ffcbf1;
+  border-bottom-color: rgba(255, 102, 217, 0.25);
+}
+
+/* The link and the close button both carry their own colour, so they drift
+   from the bar's text unless told to inherit it. */
+.theme-announcement-bar  a,
+.theme-announcement-bar  button {
+  color: inherit;
+}

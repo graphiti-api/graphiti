@@ -1,10 +1,9 @@
 name: Docs
 
-# Publishes the documentation site from beta so the deploy is exercised well
-# before it matters. Pages serves this repo under /graphiti/, and the root of
-# graphiti.dev comes from graphiti-api.github.io, so nothing here can affect
-# the live 1.x site. When the domain moves to this repo, drop DOCS_BASE_URL so
-# baseUrl returns to "/" and add website/static/CNAME.
+# Publishes the documentation site from beta. graphiti.dev now points at this
+# repo via website/static/CNAME, so this deploy is the live site: the 1.x
+# Jekyll site is frozen under website/static/1.13 and ships with every build,
+# and graphiti-api.github.io no longer serves the domain.
 on:
   push:
     branches: [beta]
@@ -39,8 +38,6 @@ jobs:
 
       - name: Build
         working-directory: website
-        env:
-          DOCS_BASE_URL: /graphiti/
         run: npm run build
 
       - name: Publish to gh-pages

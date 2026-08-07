@@ -1,16 +1,25 @@
 // @ts-check
 const {themes} = require('prism-react-renderer');
 
+// Docusaurus prepends baseUrl to navbar and Link hrefs, but not to raw HTML
+// like announcementBar content, so that markup has to build its own absolute
+// paths. Always has a trailing slash.
+const baseUrl = process.env.DOCS_BASE_URL || '/';
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Graphiti',
   tagline: 'Stylish Graph APIs',
   favicon: 'img/favicon.ico',
 
-  url: 'https://www.graphiti.dev',
-  // Project pages serve this repo under /graphiti/ until the domain moves
-  // here from graphiti-api.github.io, so the deploy sets DOCS_BASE_URL.
-  baseUrl: process.env.DOCS_BASE_URL || '/',
+  // Apex, matching the CNAME. This feeds canonical tags and sitemap.xml, so it
+  // has to agree with the host actually serving the site or the two split
+  // search ranking between them.
+  url: 'https://graphiti.dev',
+  // graphiti.dev resolves to this repo, so the site serves from the root.
+  // DOCS_BASE_URL still overrides it for a build served from the project-pages
+  // path, which is what /graphiti/ was during the beta.
+  baseUrl,
   organizationName: 'graphiti-api',
   projectName: 'graphiti',
 
@@ -75,7 +84,7 @@ const config = {
           {from: ['/cookbooks/customizing-sideloads'], to: '/topics/customizing-sideloads'},
           {from: ['/cookbooks/hopping-relationships'], to: '/topics/hopping-relationships'},
 
-          {from: ['/js/introduction'], to: '/js'},
+          {from: ['/js/introduction'], to: '/js/'},
           {
             from: [
               '/js/reads/index',
@@ -100,11 +109,24 @@ const config = {
             to: '/js/writes',
           },
         ],
+
+        // The 2.0 docs were staged under /graphiti/ for the whole beta, so
+        // those URLs are in the wild. createRedirects sees every generated
+        // route, which the static /1.13/ tree is not: that one is by hand.
+        createRedirects(existingPath) {
+          return [`/graphiti${existingPath}`];
+        },
       },
     ],
   ],
 
   themeConfig: {
+    announcementBar: {
+      // Changing the id un-dismisses the bar for everyone who has closed it.
+      id: 'graphiti-2-0-beta',
+      content: `Graphiti 2.0 is in beta, and the docs have been reorganized to describe it. <a href="${baseUrl}1.13/">Docs for 1.x</a>.`,
+      isCloseable: true,
+    },
     colorMode: {
       // Dark for a first-time visitor. Flip respectPrefersColorScheme to true
       // to follow the OS setting instead, in which case defaultMode only
