@@ -170,11 +170,11 @@ end
 
 ### Pagination Links {#pagination-links}
 
-Requesting big collections can result into slow responses sometimes. In order to avoid this, you could use [pagination](https://jsonapi.org/format/#fetching-pagination). It'll break your response into smaller pieces that will make your server responds faster. Paginations links can be present in your response in the following ways:
+Requesting large collections can make for slow responses. [Pagination](https://jsonapi.org/format/#fetching-pagination) breaks the response into smaller pieces, and pagination links tell the client how to walk them. They can appear in a response two ways.
 
 #### Showing by default {#pagination-links-showing-by-default}
 
-With this configuration, all the responses will return the pagination links
+Every collection response returns pagination links:
 
 ```ruby
 Graphiti.configure do |c|
@@ -184,7 +184,7 @@ end
 
 #### When requested {#pagination-links-when-requested}
 
-You can showing the pagination links when it was requested in the URL with `?pagination_links=true`
+Links are rendered only when the request asks for them with `?pagination_links=true`. Worth doing when the collection is large: the `last` link needs a total count, so rendering links costs a `stat(:total, :count)` on every request that gets them.
 
 ```ruby
 Graphiti.configure do |c|
