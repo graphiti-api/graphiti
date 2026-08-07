@@ -84,8 +84,8 @@ module Graphiti
 
           if context&.respond_to?(:request)
             path = context.request.env["PATH_INFO"]
-            unless allow_request?(path, params, context_namespace)
-              raise Errors::InvalidEndpoint.new(self, path, context_namespace)
+            unless allow_request?(path, params, current_action)
+              raise Errors::InvalidEndpoint.new(self, path, current_action)
             end
           end
         end

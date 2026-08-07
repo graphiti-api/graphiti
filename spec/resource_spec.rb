@@ -416,10 +416,10 @@ RSpec.describe Graphiti::Resource do
       dbl = double
       instance.with_context(dbl, :index) do
         expect(instance.context).to eq(dbl)
-        expect(instance.context_namespace).to eq(:index)
+        expect(instance.current_action).to eq(:index)
       end
       expect(instance.context).to be_nil
-      expect(instance.context_namespace).to be_nil
+      expect(instance.current_action).to be_nil
     end
 
     context "when an error" do
@@ -436,7 +436,17 @@ RSpec.describe Graphiti::Resource do
           end
         }.to raise_error("foo")
         expect(instance.context).to eq("orig")
-        expect(instance.context_namespace).to eq("orig namespace")
+        expect(instance.current_action).to eq("orig namespace")
+      end
+    end
+  end
+
+  describe "#context_namespace" do
+    it "is a deprecated alias of #current_action" do
+      instance.with_context(double, :index) do
+        expect(Graphiti::DEPRECATOR).to receive(:deprecation_warning)
+          .with(:context_namespace, /current_action/)
+        expect(instance.context_namespace).to eq(:index)
       end
     end
   end

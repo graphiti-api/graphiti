@@ -209,7 +209,7 @@ module Graphiti
         allowlist = nil
         if @resource.context&.respond_to?(:sideload_allowlist)
           allowlist = @resource.context.sideload_allowlist
-          allowlist = allowlist[@resource.context_namespace] if allowlist
+          allowlist = allowlist[@resource.current_action] if allowlist
         end
 
         scrubbed = allowlist ? Util::IncludeParams.scrub(requested, allowlist) : requested

@@ -51,8 +51,20 @@ module Graphiti
       self.class.context
     end
 
-    def self.context_namespace
+    # Rails sets this from action_name, so it is whatever the controller action
+    # is called, not a fixed list. Persistence overrides it with :create/:update
+    # while saving, and :show while resolving sideloads afterwards.
+    def self.current_action
       Graphiti.context[:namespace]
+    end
+
+    def current_action
+      self.class.current_action
+    end
+
+    def self.context_namespace
+      Graphiti::DEPRECATOR.deprecation_warning(:context_namespace, "Use #current_action instead")
+      current_action
     end
 
     def context_namespace
