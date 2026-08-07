@@ -1,6 +1,7 @@
 {
   "name": "graphiti",
-  "version": "1.4.0",
+  "private": true,
+  "version": "0.0.0-development",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/graphiti-api/graphiti.git"
@@ -15,9 +16,9 @@
   },
   "devDependencies": {
     "semantic-release-rubygem": "^1.2.0",
-    "semantic-release": "^19.0.3",
-    "@semantic-release/changelog": "^6.0.1",
-    "@semantic-release/git": "^10.0.1" 
+    "semantic-release": "^25.0.8",
+    "@semantic-release/changelog": "^7.0.0",
+    "@semantic-release/git": "^11.0.1"
   },
   "release": {
     "branches": [
