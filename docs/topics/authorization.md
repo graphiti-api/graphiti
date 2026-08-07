@@ -38,16 +38,16 @@ This runs before filtering, sorting, and pagination, so it can't be bypassed by 
 
 ### Knowing which action you're in
 
-`base_scope` runs for every action, and sometimes you want it to behave differently for a collection than for a single record. Use `context_namespace`, which is the current action name as a symbol. Rails sets it from `action_name` when wrapping the request (`lib/graphiti/rails/context.rb#wrap_graphiti_context`):
+`base_scope` runs for every action, and sometimes you want it to behave differently for a collection than for a single record. Use `current_action`, which is the action name as a symbol. Rails sets it from `action_name` when wrapping the request (`lib/graphiti/rails/context.rb#wrap_graphiti_context`):
 
 ```ruby
 def base_scope
-  return Post.all if context_namespace == :show
+  return Post.all if current_action == :show
   Post.where(account_id: context.current_user.account_id)
 end
 ```
 
-Reach for this rather than digging through the query object's internals. `context_namespace` is public and stable. The params inside `Graphiti::Query` are neither.
+Reach for this rather than digging through the query object's internals. `current_action` is public and stable. The params inside `Graphiti::Query` are neither. It is `nil` when nothing set it, which includes a Resource spec that calls `Graphiti.with_context` without a second argument.
 
 ## Integrating with Pundit
 

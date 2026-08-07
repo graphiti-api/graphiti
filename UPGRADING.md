@@ -48,6 +48,7 @@ Every name below still works, warns, and will be removed in the next major. They
 | `GraphitiErrors::ConflictRequest::Serializer` | `Graphiti::ErrorSerializers::ConflictRequest` |
 | rspec shared contexts `"resource testing"`, `"remote api"` | `"graphiti resource testing"`, `"graphiti remote api"` |
 | `GraphitiContextProxy` | `Graphiti::SpecHelpers::ContextProxy` |
+| `context_namespace` | `current_action` |
 | `Graphiti::Rails::DEPRECATOR` | `Graphiti::DEPRECATOR` (the old name still resolves) |
 | `require "graphiti_errors"`, `require "graphiti/responders"` | remove / no longer needed |
 
