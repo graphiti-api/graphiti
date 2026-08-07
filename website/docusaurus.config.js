@@ -8,7 +8,9 @@ const config = {
   favicon: 'img/favicon.ico',
 
   url: 'https://www.graphiti.dev',
-  baseUrl: '/',
+  // Project pages serve this repo under /graphiti/ until the domain moves
+  // here from graphiti-api.github.io, so the deploy sets DOCS_BASE_URL.
+  baseUrl: process.env.DOCS_BASE_URL || '/',
   organizationName: 'graphiti-api',
   projectName: 'graphiti',
 

@@ -1,0 +1,60 @@
+name: Docs
+
+# Publishes the documentation site from beta so the deploy is exercised well
+# before it matters. Pages serves this repo under /graphiti/, and the root of
+# graphiti.dev comes from graphiti-api.github.io, so nothing here can affect
+# the live 1.x site. When the domain moves to this repo, drop DOCS_BASE_URL so
+# baseUrl returns to "/" and add website/static/CNAME.
+on:
+  push:
+    branches: [beta]
+    paths:
+      - 'docs/**'
+      - 'website/**'
+      - '.github/workflows/docs.yml'
+  workflow_dispatch: {}
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    name: Build and publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+
+      - name: Install
+        working-directory: website
+        run: npm ci
+
+      - name: Build
+        working-directory: website
+        env:
+          DOCS_BASE_URL: /graphiti/
+        run: npm run build
+
+      - name: Publish to gh-pages
+        working-directory: website/build
+        run: |
+          set -euo pipefail
+          # Pages skips directories beginning with an underscore unless Jekyll
+          # is switched off, and Docusaurus emits some.
+          touch .nojekyll
+          git init --quiet --initial-branch=gh-pages
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --all
+          git commit --quiet -m "docs: build ${GITHUB_SHA::7} from ${GITHUB_REF_NAME}"
+          git push --force --quiet \
+            "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
+            gh-pages
