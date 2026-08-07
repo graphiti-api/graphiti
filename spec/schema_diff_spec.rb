@@ -1029,6 +1029,34 @@ RSpec.describe Graphiti::SchemaDiff do
       it { is_expected.to eq([]) }
     end
 
+    context "when relationship stops including resource linkage" do
+      before do
+        resource_a.has_many :positions,
+          always_include_resource_ids: true,
+          resource: position_resource
+        resource_b.has_many :positions,
+          resource: position_resource
+      end
+
+      it "returns error" do
+        expect(diff).to eq([
+          "SchemaDiff::EmployeeResource: relationship :positions no longer includes resource linkage."
+        ])
+      end
+    end
+
+    context "when relationship starts including resource linkage" do
+      before do
+        resource_a.has_many :positions,
+          resource: position_resource
+        resource_b.has_many :positions,
+          always_include_resource_ids: true,
+          resource: position_resource
+      end
+
+      it { is_expected.to eq([]) }
+    end
+
     context "when relationship changes resource" do
       let(:position_resource2) do
         Class.new(application_resource) do

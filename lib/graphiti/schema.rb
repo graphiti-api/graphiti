@@ -251,6 +251,10 @@ module Graphiti
             schema[:guard] = true
           end
 
+          if config.always_include_resource_ids?
+            schema[:linkage] = true
+          end
+
           r[name] = schema
         end
       end

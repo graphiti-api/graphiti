@@ -53,9 +53,25 @@ module Graphiti
         proc do
           data { instance_eval(&data_proc_ref) }
 
-          # include relationship links for belongs_to relationships
-          # https://github.com/graphiti-api/graphiti/issues/167
-          linkage always: sideload_ref.always_include_resource_ids?
+          # An included relationship is already loaded, and a customized
+          # sideload can resolve it to something the foreign key alone would
+          # not predict, so the loaded records win. Only the un-included case
+          # is worth short-circuiting.
+          if sideload_ref.linkage_from_foreign_key? &&
+              !self_ref.send(:included_anywhere?, @proxy.query.include_hash, sideload_ref.name)
+            linkage always: sideload_ref.always_include_resource_ids? do
+              foreign_key = @object.public_send(sideload_ref.foreign_key)
+
+              unless foreign_key.nil?
+                {
+                  type: sideload_ref.resource.type,
+                  id: foreign_key.to_s
+                }
+              end
+            end
+          else
+            linkage always: sideload_ref.always_include_resource_ids?
+          end
 
           if link_ref
             if @proxy.query.links?
@@ -66,6 +82,15 @@ module Graphiti
               end
             end
           end
+        end
+      end
+
+      # A relationship nested under another one is still loaded and can still
+      # be narrowed by a deep filter, so the foreign key is not a safe
+      # stand-in for what the request actually returns.
+      def included_anywhere?(include_hash, name)
+        include_hash.any? do |key, nested|
+          key == name || included_anywhere?(nested, name)
         end
       end
 

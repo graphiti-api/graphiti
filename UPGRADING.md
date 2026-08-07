@@ -81,6 +81,23 @@ handler.formatted_response(:json) # => [404, "{\"errors\":[...]}", :json]
 
 `GraphitiErrors.logger` has no replacement; `Graphiti.logger` is the nearest thing.
 
+## belongs_to renders its id
+
+A `belongs_to` now includes resource linkage in the payload by default, where 1.x sent only a link:
+
+```json
+"employee": { "data": { "type": "employees", "id": "1" }, "links": { "related": "..." } }
+```
+
+The id comes from the foreign key already on the parent, so this costs no extra queries, and clients can resolve the relationship against data they already hold instead of following the link. `has_many` is unchanged, since answering there means a query per record.
+
+Relationships are marked `linkage: true` in `schema.json`, and the schema check reports a relationship that stops including it. To go back to the old payload, per relationship or for a whole resource:
+
+```ruby
+belongs_to :employee, always_include_resource_ids: false
+self.always_include_resource_ids_by_default = false
+```
+
 ## Controllers opt in
 
 Until 2.0, Graphiti added itself to **every** controller in the application: an `around_action` wrapping each request in a Graphiti context, another wrapping it in the debugger, and a catch-all exception handler — on Devise controllers, admin controllers, HTML pages, everything.

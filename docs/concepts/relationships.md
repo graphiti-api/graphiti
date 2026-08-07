@@ -70,20 +70,31 @@ has_many :positions,
   writable: true,
   link: self.autolink, # default true
   single: false, # only allow this sideload when one employee
-  always_include_resource_ids: self.always_include_resource_ids_by_default # default false
+  always_include_resource_ids: true # default: true for belongs_to, false otherwise
 ```
 
-*note*: Setting `always_include_resource_ids: true` could result in 1+N queries (see [#167](https://github.com/graphiti-api/graphiti/issues/167#issuecomment-686866646))
+`belongs_to` renders resource linkage by default, so a client can see which record a relationship points at without following the link:
 
-To flip that default for every relationship at once, rather than repeating the option on each one, set it on `ApplicationResource`:
+```json
+"employee": {
+  "data": { "type": "employees", "id": "1" },
+  "links": { "related": "/employees?filter[id]=1" }
+}
+```
+
+That costs nothing, because the id is already on the parent as its foreign key. A `has_many` would have to run a query per record to answer the same question, so it stays off unless you ask for it.
+
+A `belongs_to` falls back to loading the association when the foreign key cannot answer for it: a `params` block or `base_scope` can filter out the record the key points at, a polymorphic target takes its type from the record rather than the relationship, and a remote resource has no local key to read. Turning linkage on for those, or for a `has_many`, brings back the 1+N described in [#167](https://github.com/graphiti-api/graphiti/issues/167#issuecomment-686866646).
+
+Set the default for every relationship on a resource, whatever its type:
 
 ```ruby
 class ApplicationResource < Graphiti::Resource
-  self.always_include_resource_ids_by_default = true
+  self.always_include_resource_ids_by_default = false
 end
 ```
 
-Subclasses inherit the setting, and any relationship that passes `always_include_resource_ids` explicitly still wins over it. Mind the 1+N caveat above before turning this on app-wide.
+Subclasses inherit it, and a relationship passing `always_include_resource_ids` explicitly still wins.
 
 ### Conditional Relationships {#conditional-relationships}
 

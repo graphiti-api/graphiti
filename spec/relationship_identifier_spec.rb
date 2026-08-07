@@ -191,14 +191,45 @@ RSpec.describe "relationship identifiers" do
         render
       end
 
-      # Currently disabled as causes an N+1
-      xit "has relationship ids" do
+      it "has relationship ids" do
         jsonapi_data.each do |record|
           data = record.relationships["employee"]["data"]
 
           expect(data[:type]).to eq("employees")
           expect(data[:id]).to eq("1")
         end
+      end
+    end
+
+    context "with a custom primary_key" do
+      let!(:named_employee) { PORO::Employee.create(first_name: "Steve") }
+      let!(:named_position) { PORO::Position.create(employee_id: "Steve") }
+
+      let(:resource) do
+        Class.new(PORO::PositionResource) do
+          def self.name
+            "PORO::PositionResource"
+          end
+
+          belongs_to :employee, primary_key: :first_name
+        end
+      end
+
+      it "has no relationship identifiers, rather than the foreign key" do
+        render
+
+        record = jsonapi_data.find { |node| node.id == named_position.id }
+        expect(record.relationships["employee"].keys).to_not include("data")
+      end
+
+      it "still renders the related id when the relationship is included" do
+        params[:include] = "employee"
+        render
+
+        record = jsonapi_data.find { |node| node.id == named_position.id }
+        data = record.relationships["employee"]["data"]
+
+        expect(data[:id]).to eq(named_employee.id.to_s)
       end
     end
 
@@ -230,6 +261,75 @@ RSpec.describe "relationship identifiers" do
           data = record.relationships["employee"]
           expect(data.keys).to_not include("data")
         end
+      end
+    end
+
+    context "with always_include_resource_ids_by_default" do
+      let(:resource) do
+        Class.new(PORO::PositionResource) do
+          def self.name
+            "PORO::PositionResource"
+          end
+
+          self.always_include_resource_ids_by_default = true
+
+          belongs_to :employee do
+            scope do |employee_ids|
+              {
+                type: :employees,
+                conditions: {id: employee_ids}
+              }
+            end
+          end
+        end
+      end
+
+      before do
+        allow_any_instance_of(PORO::Position).to receive(:employee) { employee }
+        render
+      end
+
+      it "includes relationship identifiers without the per-relationship option" do
+        jsonapi_data.each do |record|
+          data = record.relationships["employee"]["data"]
+
+          expect(data[:type]).to eq("employees")
+          expect(data[:id]).to eq("1")
+        end
+      end
+
+      context "and the relationship opts out" do
+        let(:resource) do
+          Class.new(PORO::PositionResource) do
+            def self.name
+              "PORO::PositionResource"
+            end
+
+            self.always_include_resource_ids_by_default = true
+
+            belongs_to :employee, always_include_resource_ids: false do
+              scope do |employee_ids|
+                {
+                  type: :employees,
+                  conditions: {id: employee_ids}
+                }
+              end
+            end
+          end
+        end
+
+        it "honors the relationship over the default" do
+          jsonapi_data.each do |record|
+            expect(record.relationships["employee"].keys).to_not include("data")
+          end
+        end
+      end
+    end
+
+    context "when always_include_resource_ids_by_default is unset" do
+      it "is nil, leaving the decision to the relationship type" do
+        expect(PORO::PositionResource.always_include_resource_ids_by_default)
+          .to be_nil
       end
     end
   end

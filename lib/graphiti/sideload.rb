@@ -122,8 +122,25 @@ module Graphiti
       !!@polymorphic_as
     end
 
+    # False everywhere but a plain belongs_to - see
+    # Sideload::BelongsTo#linkage_from_foreign_key?.
+    def linkage_from_foreign_key?
+      false
+    end
+
+    # nil at either of the first two levels means "not specified" rather
+    # than "false".
     def always_include_resource_ids?
-      !!@always_include_resource_ids
+      return !!@always_include_resource_ids unless @always_include_resource_ids.nil?
+
+      configured = parent_resource_class&.always_include_resource_ids_by_default
+      return !!configured unless configured.nil?
+
+      default_include_resource_ids?
+    end
+
+    def default_include_resource_ids?
+      false
     end
 
     def link?

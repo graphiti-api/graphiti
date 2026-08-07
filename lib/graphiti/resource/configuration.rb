@@ -90,6 +90,7 @@ module Graphiti
           :attributes_schema_by_default,
           :relationships_readable_by_default,
           :relationships_writable_by_default,
+          :always_include_resource_ids_by_default,
           :filters_accept_nil_by_default,
           :filters_deny_empty_by_default,
           :graphql_entrypoint,
