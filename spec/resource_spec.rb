@@ -1281,7 +1281,7 @@ RSpec.describe Graphiti::Resource do
               }.to raise_error(Graphiti::Errors::InvalidEndpoint) { |error|
                 expect(error.message).to include("QueryAllSpec::EmployeeResource cannot be called directly from endpoint /api/v1/employees")
                 expect(error.message).to include("self.validate_endpoints = false")
-                expect(error.message).to include("https://www.graphiti.dev/guides/concepts/links")
+                expect(error.message).to include("https://www.graphiti.dev/concepts/links")
               }
             end
           end
