@@ -55,10 +55,8 @@ RSpec.describe "graphiti without Rails" do
         RUBY
 
         output = nil
-        Bundler.with_unbundled_env do
-          IO.popen(["ruby", "-I", File.expand_path("../lib", __dir__), "-e", script], err: [:child, :out]) do |io|
-            output = io.read
-          end
+        IO.popen(["ruby", "-I", File.expand_path("../lib", __dir__), "-e", script], err: [:child, :out]) do |io|
+          output = io.read
         end
 
         expect($?).to be_success, "subprocess failed:\n#{output}"
