@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Boogaloo" rel="stylesheet">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/1.13/assets/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/1.13/assets/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/1.13/assets/favicons/favicon-16x16.png">
+  <link rel="manifest" href="/1.13/assets/favicons/site.webmanifest">
+  <link rel="mask-icon" href="/1.13/assets/favicons/safari-pinned-tab.svg" color="#F86DA7">
+  <link rel="shortcut icon" href="/1.13/assets/favicons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#F86DA7">
+  <meta name="msapplication-config" content="/1.13/assets/favicons/browserconfig.xml">
+  <meta name="theme-color" content="#F86DA7">
+
+  <title>Graphiti</title>
+  <meta name="description" content="Stylish Graph APIs">
+
+  <link rel="stylesheet" href="/1.13/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/1.13/feed.xml">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-127904727-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-127904727-1');
+  </script>
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <a href="/1.13/1.13" class="navbar-brand">
+        <img alt="logo" src="/1.13/assets/img/logo.png">
+      </a>
+    </div>
+    <nav class="" role="navigation">
+      <ul class="nav navbar-nav nav-links">
+        <li>
+          <a class="quickstart nav-link" href="/1.13/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="guides nav-link" href="/1.13/guides">Guides</a>
+        </li>
+        <li>
+          <a class="tutorial nav-link" href="/1.13/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="spraypaint nav-link" href="/1.13/js">Spraypaint</a>
+        </li>
+      </ul>
+      <ul class="nav gh navbar-nav navbar-right visible-lg visible-md">
+        <li>
+          <span class="star">⭐</span>
+          <a href="https://github.com/graphiti-api/graphiti">
+            <img alt="github-star" style="margin-right: 65px;margin-top: -20px" src="/1.13/assets/img/gh.png">
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <h1 id="hopping-relationships">Hopping Relationships</h1>
+
+<blockquote>
+  <p><a href="https://github.com/graphiti-api/employee_directory/commit/b187127d60ea67ef4c2a326721caeaad21ed7ec9">See the code</a></p>
+</blockquote>
+
+<p>Our <a href="https://github.com/graphiti-api/employee_directory">sample application</a>
+has the setup <code class="language-plaintext highlighter-rouge">Employee &gt; Position &gt; Department</code>, where one of the
+positions is the <code class="language-plaintext highlighter-rouge">current_position</code>. What if we wanted to change this to
+<code class="language-plaintext highlighter-rouge">Employee &gt; Department</code>, hiding everything about positions
+under-the-hood?</p>
+
+<p>Let’s start by saying an <code class="language-plaintext highlighter-rouge">Employee</code> has many <code class="language-plaintext highlighter-rouge">Department</code>s. Here’s the
+spec:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">describe</span> <span class="s1">'sideloading'</span> <span class="k">do</span>
+  <span class="n">describe</span> <span class="s1">'departments'</span> <span class="k">do</span>
+    <span class="n">let!</span><span class="p">(</span><span class="ss">:employee</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:employee</span><span class="p">)</span> <span class="p">}</span>
+    <span class="n">let!</span><span class="p">(</span><span class="ss">:position1</span><span class="p">)</span> <span class="k">do</span>
+      <span class="n">create</span> <span class="ss">:position</span><span class="p">,</span>
+        <span class="ss">historical_index: </span><span class="mi">2</span><span class="p">,</span>
+        <span class="ss">employee: </span><span class="n">employee</span><span class="p">,</span>
+        <span class="ss">department: </span><span class="n">department1</span>
+    <span class="k">end</span>
+    <span class="n">let!</span><span class="p">(</span><span class="ss">:position2</span><span class="p">)</span> <span class="k">do</span>
+      <span class="n">create</span> <span class="ss">:position</span><span class="p">,</span>
+        <span class="ss">historical_index: </span><span class="mi">1</span><span class="p">,</span>
+        <span class="ss">employee: </span><span class="n">employee</span><span class="p">,</span>
+        <span class="ss">department: </span><span class="n">department2</span>
+    <span class="k">end</span>
+    <span class="n">let!</span><span class="p">(</span><span class="ss">:department1</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:department</span><span class="p">)</span> <span class="p">}</span>
+    <span class="n">let!</span><span class="p">(</span><span class="ss">:department2</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:department</span><span class="p">)</span> <span class="p">}</span>
+
+    <span class="n">before</span> <span class="k">do</span>
+      <span class="n">params</span><span class="p">[</span><span class="ss">:include</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'departments'</span>
+    <span class="k">end</span>
+
+    <span class="n">it</span> <span class="s1">'finds the departments for all positions'</span> <span class="k">do</span>
+      <span class="n">render</span>
+      <span class="n">sl</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nf">sideload</span><span class="p">(</span><span class="ss">:departments</span><span class="p">)</span>
+      <span class="n">expect</span><span class="p">(</span><span class="n">sl</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:id</span><span class="p">)).</span><span class="nf">to</span> <span class="n">eq</span><span class="p">([</span><span class="n">department1</span><span class="p">.</span><span class="nf">id</span><span class="p">,</span> <span class="n">department2</span><span class="p">.</span><span class="nf">id</span><span class="p">])</span>
+      <span class="n">expect</span><span class="p">(</span><span class="n">sl</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:jsonapi_type</span><span class="p">).</span><span class="nf">uniq</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span><span class="p">([</span><span class="s1">'departments'</span><span class="p">])</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Start by defining the association:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">has_many</span> <span class="ss">:departments</span></code></pre></figure>
+
+<p>And you’ll get this error:</p>
+
+<figure class="highlight"><pre><code class="language-error" data-lang="error">Graphiti::Errors::AttributeError:
+  DepartmentResource: Tried to filter on attribute :employee_id, but could not find an attribute with that name.</code></pre></figure>
+
+<p>Which makes sense - if this is a <code class="language-plaintext highlighter-rouge">has_many</code> association, we’d expect
+DepartmentResource to filter by <code class="language-plaintext highlighter-rouge">employee_id</code>. Though in our case we
+don’t have that as a foreign key, we can still implement the
+<code class="language-plaintext highlighter-rouge">employee_id</code> filter:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">filter</span> <span class="ss">:employee_id</span><span class="p">,</span> <span class="ss">:integer</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:eq</span><span class="p">]</span> <span class="k">do</span>
+  <span class="n">eq</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">joins</span><span class="p">(</span><span class="ss">:positions</span><span class="p">).</span><span class="nf">merge</span><span class="p">(</span><span class="no">Position</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">employee_id: </span><span class="n">value</span><span class="p">))</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>In order to find <code class="language-plaintext highlighter-rouge">Department</code>s by an <code class="language-plaintext highlighter-rouge">employee_id</code>, we need to join the
+<code class="language-plaintext highlighter-rouge">positions</code> table which has the <code class="language-plaintext highlighter-rouge">employee_id</code> column.</p>
+
+<p>We now get this error:</p>
+
+<figure class="highlight"><pre><code class="language-error" data-lang="error">NoMethodError:
+  undefined method `employee_id' for #&lt;Department:0x00007fa6f330f768&gt;</code></pre></figure>
+
+<p>Let’s say our URL is <code class="language-plaintext highlighter-rouge">/employees?include=departments</code>. We’ve fetched all
+the <code class="language-plaintext highlighter-rouge">Employee</code>s and all the <code class="language-plaintext highlighter-rouge">Department</code>s, now we need to associate each
+<code class="language-plaintext highlighter-rouge">Department</code> with its relevant <code class="language-plaintext highlighter-rouge">Employee</code>. Normally we’d do that by
+looking at the <code class="language-plaintext highlighter-rouge">employee_id</code> foreign key on <code class="language-plaintext highlighter-rouge">Department</code>, but this
+scenario has non-standard logic. Let’s tell Graphiti how to select
+relevant <code class="language-plaintext highlighter-rouge">Department</code>s for a given <code class="language-plaintext highlighter-rouge">Employee</code>:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">has_many</span> <span class="ss">:departments</span> <span class="k">do</span>
+  <span class="n">assign_each</span> <span class="k">do</span> <span class="o">|</span><span class="n">employee</span><span class="p">,</span> <span class="n">departments</span><span class="o">|</span>
+    <span class="n">departments</span><span class="p">.</span><span class="nf">select</span> <span class="k">do</span> <span class="o">|</span><span class="n">d</span><span class="o">|</span>
+      <span class="n">employee_ids</span> <span class="o">=</span> <span class="n">d</span><span class="p">.</span><span class="nf">positions</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:employee_id</span><span class="p">).</span><span class="nf">flatten</span>
+      <span class="n">employee</span><span class="p">.</span><span class="nf">id</span><span class="p">.</span><span class="nf">in?</span><span class="p">(</span><span class="n">employee_ids</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>There’s one final step - because we’re assigning a department to an
+employee, we have to make sure that accessor exists:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/models/employee.rb</span>
+<span class="nb">attr_accessor</span> <span class="ss">:department</span></code></pre></figure>
+
+<p>And that’s it! Our test now passes.</p>
+
+<p>There’s a little bit of sleight-of-hand above though. Our filter joins
+to the <code class="language-plaintext highlighter-rouge">positions</code> table, and our assignment iterates over departments
+and calls <code class="language-plaintext highlighter-rouge">department.positions</code>. <strong>If we don’t eager load, we’ll cause
+an N+!</strong>!</p>
+
+<p>There are two solutions to this. The first is to simple change <code class="language-plaintext highlighter-rouge">.joins</code>
+to <code class="language-plaintext highlighter-rouge">.eager_load</code>:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">scope</span><span class="p">.</span><span class="nf">eager_load</span><span class="p">(</span><span class="ss">:positions</span><span class="p">).</span><span class="nf">merge</span><span class="p">(</span><span class="no">Position</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">employee_id: </span><span class="n">value</span><span class="p">))</span></code></pre></figure>
+
+<p>This ensures that not only are we joining on the <code class="language-plaintext highlighter-rouge">positions</code> table,
+we’ll eagler load the <code class="language-plaintext highlighter-rouge">positions</code> <em>relationship</em> and avoid the N+1.</p>
+
+<p>If you’re a stickler, though, you may have a nitpick. For one, if
+we’re hitting <code class="language-plaintext highlighter-rouge">/departments?filter[employee_id]</code> directly there is no
+need to eager load <code class="language-plaintext highlighter-rouge">positions</code> because we’re never associating to an
+<code class="language-plaintext highlighter-rouge">Employee</code>. We’re paying a performance penalty when we don’t have to.</p>
+
+<p>OK, let’s keep our filter <code class="language-plaintext highlighter-rouge">.joins</code>. We just have to tell Graphiti to
+switch it to <code class="language-plaintext highlighter-rouge">.eager_load</code> when sideloading through <code class="language-plaintext highlighter-rouge">EmployeeResource</code>:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">has_many</span> <span class="ss">:departments</span> <span class="k">do</span>
+  <span class="c1"># ... code ...</span>
+
+  <span class="n">pre_load</span> <span class="k">do</span> <span class="o">|</span><span class="n">proxy</span><span class="p">,</span> <span class="n">employees</span><span class="o">|</span>
+    <span class="n">proxy</span><span class="p">.</span><span class="nf">scope</span><span class="p">.</span><span class="nf">object</span> <span class="o">=</span> <span class="n">proxy</span><span class="p">.</span><span class="nf">scope</span><span class="p">.</span><span class="nf">object</span><span class="p">.</span><span class="nf">eager_load</span><span class="p">(</span><span class="ss">:positions</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>The <code class="language-plaintext highlighter-rouge">pre_load</code> hook fires after we’ve built up the scope, but before we
+resolve it (before actually firing the query). It yields a <code class="language-plaintext highlighter-rouge">proxy</code>
+object that we can modify - here we’re modifying the scope to eager load
+positions.</p>
+
+<p>It’s up to you if you care about this scenario - you may want to start
+with <code class="language-plaintext highlighter-rouge">.eager_load</code> and only embrace to the extra work of <code class="language-plaintext highlighter-rouge">pre_load</code> when
+you really need it.</p>
+
+<p>The trick to these customizations is to think in Links. Resources
+connect to each other with URLs - what would the query parameters of the
+URL be? In this case, <code class="language-plaintext highlighter-rouge">filter?[employee_id]=123</code>. After that, we just
+have to define how to associate relevant objects. Even with complex
+associations hopping several levels, the same logic applies.</p>
+
+<p>See the final code <a href="https://github.com/graphiti-api/employee_directory/commit/b187127d60ea67ef4c2a326721caeaad21ed7ec9">here</a>.</p>
+
+<p><br />
+<br /></p>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="/1.13/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="/1.13/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="/1.13/guides">Guides</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Contact</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://discord.gg/wgqkMBsSRV">Discord Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Email</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>
