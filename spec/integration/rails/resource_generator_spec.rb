@@ -94,6 +94,51 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
+    context "when --controller is given" do
+      before do
+        stub_const("ApplicationResource", Class.new(Graphiti::Resource) {
+          self.abstract_class = true
+          self.endpoint_namespace = "/api/v1"
+        })
+      end
+
+      it "generates the controller under that name" do
+        generate!("Post", "title:string", "--controller", "Api::V1::Posts")
+
+        controller = generated("app/controllers/api/v1/posts_controller.rb")
+        expect(controller).to include("class Api::V1::PostsController < ApplicationController")
+        expect(controller).to include("PostResource")
+      end
+
+      it "points the route at it, since the name no longer matches the resource" do
+        generate!("Post", "title:string", "--controller", "Api::V1::Posts")
+
+        expect(generated("config/routes.rb"))
+          .to include(%(resources :posts, controller: "api/v1/posts"))
+      end
+
+      it "accepts the name with or without the Controller suffix" do
+        generate!("Post", "title:string", "--controller", "Api::V1::PostsController")
+
+        expect(generated("app/controllers/api/v1/posts_controller.rb"))
+          .to include("class Api::V1::PostsController")
+      end
+
+      it "singularizes to the same controller a plural name would give" do
+        generate!("Post", "title:string", "--controller", "Api::V1::Post")
+
+        expect(generated("app/controllers/api/v1/posts_controller.rb"))
+          .to include("class Api::V1::PostsController")
+      end
+
+      it "leaves the resource itself unnamespaced" do
+        generate!("Post", "title:string", "--controller", "Api::V1::Posts")
+
+        expect(generated("app/resources/post_resource.rb"))
+          .to include("class PostResource < ApplicationResource")
+      end
+    end
+
     context "when the app has no ApplicationResource yet" do
       before do
         hide_const("ApplicationResource")

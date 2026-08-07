@@ -32,6 +32,12 @@ module Graphiti
       aliases: ["--model", "-m"],
       desc: "Specify to use attributes from a particular model"
 
+    # No short alias: -c is already --omit-comments.
+    class_option :controller,
+      banner: "Name",
+      type: :string,
+      desc: "Generate the controller under this name instead of the resource's, e.g. Api::V1::Posts"
+
     desc "This generator creates a resource file at app/resources, as well as corresponding controller/specs/route/etc"
     def generate_all
       generate_model
@@ -125,8 +131,23 @@ module Graphiti
       defined?(::Responders)
     end
 
+    # Api::V1::Posts, Api::V1::PostsController and api/v1/posts all name the
+    # same controller. Normalizing here means the class name, the file path and
+    # the route all come from one place.
+    def controller_class_name
+      @controller_class_name ||= begin
+        given = options[:controller]
+        base = given ? given.sub(/Controller\z/, "").camelize : model_klass.name
+        "#{base.pluralize}Controller"
+      end
+    end
+
+    def controller_path
+      controller_class_name.sub(/Controller\z/, "").underscore
+    end
+
     def generate_controller
-      to = File.join("app/controllers", class_path, "#{file_name.pluralize}_controller.rb")
+      to = File.join("app/controllers", "#{controller_path}_controller.rb")
       template("controller.rb.erb", to)
     end
 
@@ -142,6 +163,9 @@ module Graphiti
 
     def generate_route
       code = "resources :#{file_name.pluralize}"
+      # Rails would otherwise infer the controller from the route name, which
+      # is only right when the controller was named after the resource.
+      code << %(, controller: "#{controller_path}") if options[:controller]
       code << %(, only: [#{actions.map { |a| ":#{a}" }.join(", ")}]) if actions.length < 5
       code << "\n"
       inject_into_file "config/routes.rb", after: /ApplicationResource.*$\n/ do

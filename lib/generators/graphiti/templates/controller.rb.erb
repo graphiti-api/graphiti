@@ -1,5 +1,5 @@
 <% module_namespacing do -%>
-class <%= model_klass.name.pluralize %>Controller < ApplicationController
+class <%= controller_class_name %> < ApplicationController
   <%- if actions?('index') -%>
   def index
     <%= file_name.pluralize %> = <%= resource_klass %>.all(params)
