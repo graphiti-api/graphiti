@@ -155,7 +155,17 @@ const config = {
         {href: 'https://discord.gg/wgqkMBsSRV', label: 'Discord', position: 'right'},
       ],
     },
-    footer: {style: 'dark', copyright: `Graphiti is released under the MIT license.`},
+    footer: {
+      style: 'dark',
+      copyright: [
+        'Originally created by <a href="https://github.com/richmolj">Lee Richmond</a>,',
+        '<a href="https://github.com/wadetandy">Wade Tandy</a>, and',
+        '<a href="https://github.com/wagenet">Peter Wagenet</a>.',
+        'Maintained by <a href="https://github.com/jkeen">Jeff Keen</a>',
+        'with <a href="https://github.com/graphiti-api/graphiti/graphs/contributors">many contributors</a>.',
+        '<br />Graphiti is released under the MIT license.',
+      ].join(' '),
+    },
     prism: {theme: themes.github, darkTheme: themes.dracula, additionalLanguages: ['ruby', 'bash', 'json', 'http']},
   },
 };
