@@ -11,6 +11,7 @@ require "graphiti/spec_helpers/helpers"
 require "graphiti/spec_helpers/node"
 require "graphiti/spec_helpers/errors_proxy"
 require "graphiti/spec_helpers/errors"
+require "graphiti/spec_helpers/matchers"
 
 module Graphiti
   module SpecHelpers
