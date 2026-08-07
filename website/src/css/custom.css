@@ -47,3 +47,12 @@
 .markdown h4,
 .markdown h5,
 .markdown h6 { font-weight: 700; }
+
+/* Infima aligns inline code to `middle`, which centres the padded box on the
+   parent's x-height rather than matching baselines. Roboto Mono's descenders
+   then push the glyphs visibly below the surrounding prose. Baseline puts the
+   letters back on the line and lets the padding grow around them. */
+.markdown code:not([class*='language-']) {
+  vertical-align: baseline;
+  padding: 0.15em 0.3em;
+}

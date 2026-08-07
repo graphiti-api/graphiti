@@ -26,10 +26,11 @@ const config = {
           routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/graphiti-api/graphiti/tree/main/website/',
-          // Unversioned docs serve at the root. Once `npm run docusaurus
+          // Unversioned docs serve at the root, and would otherwise be
+          // labelled "Next" in the dropdown. Once `npm run docusaurus
           // docs:version 2.0` cuts a version, that becomes the root and the
-          // working copy moves to /next — add the `versions` override then.
-          
+          // working copy moves to /next.
+          versions: {current: {label: '2.0 beta'}},
         },
         blog: false,
         theme: {customCss: require.resolve('./src/css/custom.css')},
@@ -50,7 +51,7 @@ const config = {
           {from: ['/guides/overview'], to: '/concepts/overview'},
           {from: ['/guides/why'], to: '/reference/why'},
           {from: ['/guides/vandal'], to: '/reference/vandal'},
-          {from: ['/guides/upgrading', '/guides/upgrading-2-0'], to: '/reference/upgrading-2-0'},
+          {from: ['/guides/upgrading', '/guides/upgrading-2-0', '/reference/upgrading-2-0', '/upgrading/controllers', '/upgrading/testing', '/upgrading/persistence-hooks', '/upgrading/exception-handling', '/upgrading/belongs-to-linkage', '/upgrading/without-rails'], to: '/upgrading'},
           {from: ['/guides/getting-started/installation'], to: '/getting-started/installation'},
 
           {from: ['/guides/concepts/resources'], to: '/concepts/resources'},
@@ -119,15 +120,11 @@ const config = {
           position: 'right',
           // 1.x stays as the original Jekyll site, frozen under /1.13.
           //
-          // Link the guides index rather than /1.13/: static hosts read the
-          // dot in "1.13" as a file extension, so /1.13/ never falls through
-          // to its index.html the way /1.13/guides/ does.
-          //
           // target '_self' is required. Without it the router treats this as
           // an in-app route, finds no match, and renders the 404 page even
           // though the file is served fine.
           dropdownItemsAfter: [
-            {href: '/1.13/guides/', label: '1.x', target: '_self'},
+            {href: '/1.13/', label: '1.x', target: '_self'},
           ],
         },
         {href: 'https://github.com/graphiti-api/graphiti', label: 'GitHub', position: 'right'},

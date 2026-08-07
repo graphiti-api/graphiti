@@ -9,7 +9,7 @@ slug: /
 # Graphiti
 
 :::info These are the 2.0 docs
-Graphiti 2.0 folds `graphiti-rails`, `graphiti_spec_helpers` and `graphiti_errors` into the main gem, and requires Ruby 3.2+ and ActiveSupport 7.1+. Rails is optional, and 7.1+ if you use it. Coming from 1.x? Start with the **[2.0 upgrade guide](/reference/upgrading-2-0)**. Docs for 1.x are in the version picker.
+Graphiti 2.0 folds `graphiti-rails`, `graphiti_spec_helpers` and `graphiti_errors` into the main gem, and requires Ruby 3.2+ and ActiveSupport 7.1+. Rails is optional, and 7.1+ if you use it. Coming from 1.x? Start with the **[2.0 upgrade guide](/upgrading)**. Docs for 1.x are in the version picker.
 :::
 
 Graphiti sits on top of your models and exposes them over a [JSON:API](https://jsonapi.org)-compliant interface. You define Resources instead of controllers and serializers, and get filtering, sorting, pagination, sparse fieldsets, statistics, and nested reads and writes across relationships, all over one endpoint.
@@ -304,4 +304,4 @@ proxy.save(action: :update)
 
 ## Upgrading from 1.x
 
-The [2.0 upgrade guide](/reference/upgrading-2-0) covers the whole migration: the three gems that folded into core, the deprecated spellings that still work but warn, and the two real behavior changes. Controllers now opt in via `Graphiti::Rails::Controller`, and `around_persistence` receives the model rather than an attributes hash.
+The [2.0 upgrade guide](/upgrading) covers the whole migration: the three gems that folded into core, the deprecated spellings that still work but warn, and the two real behavior changes. Controllers now opt in via `Graphiti::Rails::Controller`, and `around_persistence` receives the model rather than an attributes hash.

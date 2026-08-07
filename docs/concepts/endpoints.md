@@ -72,7 +72,7 @@ our application generator):
 
 ```ruby
 class ApplicationController < ActionController::API
-  include Graphiti::Rails
+  include Graphiti::Rails::Controller
 
   # ... code ...
 end

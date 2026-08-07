@@ -3,6 +3,7 @@ module.exports = {
   docs: [
     'intro',
     'getting-started/installation',
+    'upgrading',
     'concepts/overview',
     {
       type: 'category',
@@ -73,7 +74,6 @@ module.exports = {
       type: 'category',
       label: 'More',
       items: [
-        'reference/upgrading-2-0',
         'reference/vandal',
         'reference/why',
       ],
