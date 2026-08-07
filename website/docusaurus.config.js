@@ -11,6 +11,17 @@ const codeBlockTheme = (theme, backgroundColor) => ({
 // paths. Always has a trailing slash.
 const baseUrl = process.env.DOCS_BASE_URL || '/';
 
+// The theme's strikethrough and underline on diff lines are inline styles, so
+// CSS cannot undo them. Colour and the +/- signs already carry it.
+const withoutDiffDecoration = (theme) => ({
+  ...theme,
+  styles: theme.styles.map(({types, style}) =>
+    types.some((type) => type === 'inserted' || type === 'deleted')
+      ? {types, style: {...style, textDecorationLine: undefined}}
+      : {types, style}
+  ),
+});
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Graphiti',
@@ -176,9 +187,9 @@ const config = {
       ].join(' '),
     },
     prism: {
-      theme: themes.oneLight,
-      darkTheme: codeBlockTheme(themes.oneDark, '#21252b'),
-      additionalLanguages: ['ruby', 'bash', 'json', 'http'],
+      theme: withoutDiffDecoration(themes.oneLight),
+      darkTheme: withoutDiffDecoration(codeBlockTheme(themes.oneDark, '#21252b')),
+      additionalLanguages: ['ruby', 'bash', 'json', 'http', 'diff'],
     },
   },
 };

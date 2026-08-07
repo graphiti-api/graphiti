@@ -13,9 +13,8 @@ Four things, and three of them fail loudly if you skip them.
 
 **1. Drop three gems.** `graphiti-rails`, `graphiti_spec_helpers` and `graphiti_errors` are now part of `graphiti` itself.
 
-```diff
-# Gemfile
-+ gem "graphiti"
+```diff title="Gemfile"
++ gem "graphiti", "~> 2.0.0.beta" # follows the betas and picks up 2.0 final when it ships
 - gem "graphiti-rails"
 - gem "graphiti_spec_helpers"
 - gem "graphiti_errors"
@@ -38,7 +37,7 @@ If the controller already has `include Graphiti::Rails`, replace it with `includ
 
 Until 2.0, Graphiti added itself to **every** controller in the application: an `around_action` wrapping each request in a Graphiti context, another wrapping it in the debugger, and a catch-all exception handler, on Devise controllers, admin controllers, HTML pages, everything.
 
-`Graphiti::Rails::Controller` now bundles all of it, and including it is required. If you include it in `ApplicationController` that would matches 1.x behavior. Including it in an API base class scopes it and leaves the rest of the app alone. A controller without it gets no Graphiti context, no debugger, and none of Graphiti's exception handlers, so if a resource action sees an empty `Graphiti.context`, this include is what is missing.
+`Graphiti::Rails::Controller` now bundles all of it, and including it is required. Including it in `ApplicationController` matches 1.x behavior. Including it in an API base class scopes it and leaves the rest of the app alone. A controller without it gets no Graphiti context, no debugger, and none of Graphiti's exception handlers, so if a resource action sees an empty `Graphiti.context`, this include is what is missing.
 
 The class-level DSL travels with it, which is the one failure you see before a request is ever served:
 
