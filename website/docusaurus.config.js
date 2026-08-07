@@ -144,11 +144,15 @@ const config = {
           position: 'right',
           // 1.x stays as the original Jekyll site, frozen under /1.13.
           //
-          // target '_self' is required. Without it the router treats this as
-          // an in-app route, finds no match, and renders the 404 page even
-          // though the file is served fine.
+          // The pathname:// prefix is required. It is Docusaurus' escape hatch
+          // for a path that is served statically but is not an app route:
+          // without it the link renders as a react-router push, which finds no
+          // match and shows the 404 page even though the file is served fine.
+          // The prefix is stripped before baseUrl is applied, and it also makes
+          // the link count as external, hence target '_self' to keep it from
+          // opening in a new tab.
           dropdownItemsAfter: [
-            {href: '/1.13/', label: '1.x', target: '_self'},
+            {href: 'pathname:///1.13/', label: '1.x', target: '_self'},
           ],
         },
         {href: 'https://github.com/graphiti-api/graphiti', label: 'GitHub', position: 'right'},
