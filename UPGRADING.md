@@ -2,7 +2,7 @@
 
 ## 1.x to 2.0
 
-Graphiti 2.0 requires **Ruby 3.2+** and **Rails 7.1+**. Ruby 3.1 and earlier are past end of life, and Rails 6.1 and 7.0 do not support Ruby 3.2. Apps that cannot move yet should stay on the 1.x branch, which remains open for hotfixes.
+Graphiti 2.0 requires **Ruby 3.2+** and **ActiveSupport 7.1+**. Rails is not a dependency, but if you use it, 7.1+. Ruby 3.1 and earlier are past end of life, and Rails 6.1 and 7.0 do not support Ruby 3.2. Apps that cannot move yet should stay on the 1.x branch, which remains open for hotfixes.
 
 ## What you have to change
 
@@ -129,7 +129,7 @@ This has to be a request spec — exceptions are rendered in Rack middleware, wh
 
 ## Persistence hooks
 
-Attributes are now assigned to the model once, up front, before the persistence hooks run — which is what lets `build` and `find` hand you the model before anything is written. See the [lifecycle hooks guide](https://www.graphiti.dev/guides/concepts/resources#persistence-lifecycle-hooks) for what that enables.
+Attributes are now assigned to the model once, up front, before the persistence hooks run — which is what lets `build` and `find` hand you the model before anything is written. See the [lifecycle hooks guide](https://www.graphiti.dev/concepts/resources#persistence-lifecycle-hooks) for what that enables.
 
 That changes one hook.
 

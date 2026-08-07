@@ -1,0 +1,49 @@
+/* Palette ported from the Jekyll site so this still reads as Graphiti. */
+@import url('https://fonts.googleapis.com/css2?family=Bungee&family=Roboto:wght@400;500;900&family=Roboto+Mono:wght@400;500&display=swap');
+
+:root {
+  --ifm-color-primary: #e0289d;
+  --ifm-color-primary-dark: #ca248d;
+  --ifm-color-primary-darker: #bf2289;
+  --ifm-color-primary-darkest: #9d1c71;
+  --ifm-color-primary-light: #ff66d9;
+  --ifm-color-primary-lighter: #ff7cdf;
+  --ifm-color-primary-lightest: #ffa3e9;
+
+  --ifm-font-family-base: 'Roboto', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --ifm-heading-font-family: 'Roboto', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --ifm-font-family-monospace: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Roboto Black */
+  --ifm-heading-font-weight: 900;
+
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 102, 217, 0.12);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #ff66d9;
+  --ifm-color-primary-dark: #ff45d1;
+  --ifm-color-primary-darker: #ff34cd;
+  --ifm-color-primary-darkest: #f800bd;
+  --ifm-color-primary-light: #ff87e1;
+  --ifm-color-primary-lighter: #ff98e5;
+  --ifm-color-primary-lightest: #ffcbf1;
+
+  --ifm-background-color: #292e33;
+  --ifm-navbar-background-color: #292e33;
+  --ifm-footer-background-color: #21252a;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 102, 217, 0.2);
+}
+
+.navbar__title { font-family: 'Bungee', cursive; font-weight: 400; font-size: 1.35rem; }
+
+/* Black sets tight at display sizes and needs more room above it than a
+   lighter face would. The smallest headings drop to Bold so a dense
+   reference page doesn't turn into a wall of Black. */
+.markdown h1 { letter-spacing: -0.015em; }
+.markdown h2,
+.markdown h3 { letter-spacing: -0.01em; margin-top: 2rem; }
+.markdown h4,
+.markdown h5,
+.markdown h6 { font-weight: 700; }

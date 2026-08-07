@@ -230,7 +230,7 @@ Request:
 
 
 
-[Graphiti Guides](https://www.graphiti.dev/guides/)
+[Graphiti Documentation](https://www.graphiti.dev/)
 
 [Join the Discord](https://discord.gg/wgqkMBsSRV)
 

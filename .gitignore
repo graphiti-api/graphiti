@@ -15,3 +15,10 @@ spec/.rspec-examples
 spec/dummy/log/*
 *~
 .vscode/
+
+# Docusaurus
+website/build/
+website/.docusaurus/
+
+.DS_Store
+.idea/
