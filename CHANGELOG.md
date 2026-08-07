@@ -1,5 +1,12 @@
 graphiti changelog
 
+## [1.13.2](https://github.com/graphiti-api/graphiti/compare/v1.13.1...v1.13.2) (2026-08-07)
+
+
+### Bug Fixes
+
+* drop the relationship guard install notice ([65b8be6](https://github.com/graphiti-api/graphiti/commit/65b8be65455a7d034c9dca082434c1dbfe610a7a))
+
 ## [1.13.1](https://github.com/graphiti-api/graphiti/compare/v1.13.0...v1.13.1) (2026-08-02)
 
 
