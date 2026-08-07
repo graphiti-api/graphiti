@@ -1,6 +1,11 @@
 // @ts-check
 const {themes} = require('prism-react-renderer');
 
+const codeBlockTheme = (theme, backgroundColor) => ({
+  ...theme,
+  plain: {...theme.plain, backgroundColor},
+});
+
 // Docusaurus prepends baseUrl to navbar and Link hrefs, but not to raw HTML
 // like announcementBar content, so that markup has to build its own absolute
 // paths. Always has a trailing slash.
@@ -170,7 +175,11 @@ const config = {
         '<br />Graphiti is released under the MIT license.',
       ].join(' '),
     },
-    prism: {theme: themes.github, darkTheme: themes.dracula, additionalLanguages: ['ruby', 'bash', 'json', 'http']},
+    prism: {
+      theme: themes.oneLight,
+      darkTheme: codeBlockTheme(themes.oneDark, '#21252b'),
+      additionalLanguages: ['ruby', 'bash', 'json', 'http'],
+    },
   },
 };
 

@@ -21,7 +21,7 @@
   --docusaurus-highlighted-code-line-bg: rgba(255, 102, 217, 0.12);
 }
 
-[data-theme='dark'] {
+html[data-theme='dark'] {
   --ifm-color-primary: #ff66d9;
   --ifm-color-primary-dark: #ff45d1;
   --ifm-color-primary-darker: #ff34cd;
@@ -32,8 +32,11 @@
 
   --ifm-background-color: #292e33;
   --ifm-navbar-background-color: #292e33;
-  --ifm-footer-background-color: #21252a;
   --docusaurus-highlighted-code-line-bg: rgba(255, 102, 217, 0.2);
+}
+
+html[data-theme='dark'] .footer--dark {
+  --ifm-footer-background-color: #21252a;
 }
 
 .navbar__title { font-family: 'Bungee', cursive; font-weight: 400; font-size: 1.35rem; }
