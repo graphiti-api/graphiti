@@ -1,5 +1,19 @@
 graphiti changelog
 
+# [2.0.0-beta.5](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.4...v2.0.0-beta.5) (2026-08-07)
+
+
+### Bug Fixes
+
+* drop the relationship guard install notice ([c204312](https://github.com/graphiti-api/graphiti/commit/c20431214e126cb8e72c82022ee4c852b10a024b))
+* keep rake task helpers out of the global namespace ([0a41a60](https://github.com/graphiti-api/graphiti/commit/0a41a6022fa4c9151948714c31db367aee330e22)), closes [graphiti-api/graphiti-rails#91](https://github.com/graphiti-api/graphiti-rails/issues/91)
+
+
+### Features
+
+* add rspec matchers for resource relationships and attributes ([70525f7](https://github.com/graphiti-api/graphiti/commit/70525f7e10c511aa0c867ecc873f63f1790b8247)), closes [graphiti-api/graphiti_spec_helpers#14](https://github.com/graphiti-api/graphiti_spec_helpers/issues/14)
+* let the resource generator name the controller ([6ea7141](https://github.com/graphiti-api/graphiti/commit/6ea714181f3da011cae9f42477b4c3681a7a90ff)), closes [graphiti-api/graphiti-rails#53](https://github.com/graphiti-api/graphiti-rails/issues/53)
+
 # [2.0.0-beta.4](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.3...v2.0.0-beta.4) (2026-08-07)
 
 
