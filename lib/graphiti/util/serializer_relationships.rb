@@ -109,7 +109,27 @@ module Graphiti
         sideload_ref = @sideload
         resource_class_ref = @resource_class
         ->(_) {
-          records = @object.public_send(sideload_ref.association_name)
+          begin
+            records = @object.public_send(sideload_ref.association_name)
+          rescue NoMethodError => error
+            # #receiver raises ArgumentError when the error was built by hand
+            # rather than raised by a failed call, and a hand-built one can
+            # still carry a matching #name.
+            receiver = begin
+              error.receiver
+            rescue ArgumentError
+              nil
+            end
+
+            raise unless error.name == sideload_ref.association_name &&
+              receiver.equal?(@object)
+
+            # A private method exists, so "has no such method" would be a lie.
+            raise if @object.respond_to?(sideload_ref.association_name, true)
+
+            raise Errors::MissingRelationshipMethod
+              .new(resource_class_ref, sideload_ref, @object)
+          end
 
           if records
             if records.respond_to?(:to_ary)

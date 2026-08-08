@@ -530,4 +530,83 @@ RSpec.describe "relationship identifiers" do
     end
   end
 
+  describe "a relationship the model has no method for" do
+    let(:resource) do
+      Class.new(PORO::TeamResource) do
+        def self.name
+          "PORO::TeamResource"
+        end
+
+        has_many :employees, resource_ids: true
+      end
+    end
+
+    it "names the resource and the relationship" do
+      expect { render }.to raise_error(
+        Graphiti::Errors::MissingRelationshipMethod,
+        /PORO::TeamResource: relationship :employees is declared, but PORO::Team has no #employees method/
+      )
+    end
+
+    it "explains that resource_ids is what makes every render read the association" do
+      expect { render }.to raise_error(
+        Graphiti::Errors::MissingRelationshipMethod,
+        /resource_ids is set on this relationship, so every render reads the association/
+      )
+    end
+
+    context "when the association exists but raises NoMethodError itself" do
+      before do
+        allow_any_instance_of(PORO::Team).to receive(:employees) do
+          nil.some_undefined_method
+        end
+      end
+
+      it "lets the original error through" do
+        expect { render }.to raise_error(NoMethodError, /some_undefined_method/)
+      end
+    end
+
+    # #receiver raises rather than returning nil for one of these, so the
+    # guard cannot reach for it before knowing the error came from a call.
+    context "when the association raises a hand-built NoMethodError naming itself" do
+      before do
+        allow_any_instance_of(PORO::Team).to receive(:employees) do
+          raise NoMethodError.new("custom boom", :employees)
+        end
+      end
+
+      it "lets the original error through" do
+        expect { render }.to raise_error(NoMethodError, /custom boom/)
+      end
+    end
+
+    context "when the association method exists but is private" do
+      let(:resource) do
+        Class.new(PORO::TeamResource) do
+          def self.name
+            "PORO::TeamResource"
+          end
+
+          has_many :employees, resource_ids: true
+        end
+      end
+
+      before do
+        PORO::Team.class_eval do
+          private def employees
+            []
+          end
+        end
+      end
+
+      after do
+        PORO::Team.send(:remove_method, :employees)
+      end
+
+      it "does not claim the method is missing" do
+        expect { render }.to raise_error(NoMethodError, /private method/)
+      end
+    end
+  end
 end

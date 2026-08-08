@@ -708,6 +708,34 @@ module Graphiti
       end
     end
 
+    class MissingRelationshipMethod < Base
+      def initialize(resource_class, sideload, model)
+        @resource_class = resource_class
+        @sideload = sideload
+        @model = model
+      end
+
+      def message
+        <<~MSG
+          #{@resource_class.name}: relationship #{@sideload.name.inspect} is declared, but #{@model.class.name} has no ##{@sideload.association_name} method.
+
+          Rendering the relationship reads the association off the model. Define ##{@sideload.association_name} on #{@model.class.name}, point the relationship at the real association with `as:`, or remove the relationship.
+          #{resource_ids_note}
+        MSG
+      end
+
+      private
+
+      def resource_ids_note
+        return "" unless @sideload.render_resource_ids?
+
+        <<~MSG
+
+          resource_ids is set on this relationship, so every render reads the association, not just requests that include it. See www.graphiti.dev/concepts/relationships#customizing-relationships.
+        MSG
+      end
+    end
+
     class MissingDependentFilter < Base
       def initialize(resource, filters)
         @resource = resource
