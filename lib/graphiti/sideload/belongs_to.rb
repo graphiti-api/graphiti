@@ -3,40 +3,33 @@ class Graphiti::Sideload::BelongsTo < Graphiti::Sideload
     :belongs_to
   end
 
-  def default_include_resource_ids?
-    linkage_from_foreign_key?
+  def default_render_resource_ids?
+    case parent_resource_class&.belongs_to_resource_ids_by_default
+    when :always then renderable_at_all?
+    when :never then false
+    else resource_ids_from_foreign_key?
+    end
   end
 
-  # The parent already carries the foreign key, and for a plain belongs_to
-  # that key *is* the related id, so linkage costs nothing. Anything that can
-  # change which record the relationship resolves to, or what type it carries,
-  # has to load the association instead:
-  #
-  #   - a scope/params block or a base_scope can filter out the record the
-  #     foreign key points at, so the key would claim a relationship the API
-  #     would not actually return
-  #   - a polymorphic target takes its type from the record, not from the
-  #     relationship, so the key alone cannot say what type the id has
-  #   - a remote resource has no local foreign key to read
-  #   - a custom primary_key points the relationship at some other column, so
-  #     the key holds that column's value rather than the related id
-  def linkage_from_foreign_key?
-    # Ask before resolving #resource: an unreadable relationship renders
-    # nothing, and its resource class may not even be inferrable.
-    return false unless readable?
-    return false unless foreign_key_is_related_id?
-    return false if polymorphic_child?
-    return false if self.class.scope_proc || self.class.params_proc
-    return false if @base_scope
-    return false if remote?
-    return false if resource.class.polymorphic.present?
-
-    true
+  def renderable_at_all?
+    readable_guarded? || readable?
   end
 
-  # The foreign key can stand in for the related id only when the two hold the
-  # same value. base_filter matches the key against primary_key, so pointing
-  # that at another column means the key holds that column instead.
+  def resource_ids_blocker
+    return :unreadable unless renderable_at_all?
+    return :custom_primary_key unless foreign_key_is_related_id?
+    return :polymorphic_child if polymorphic_child?
+    return :scope_block if self.class.scope_proc
+    return :params_block if self.class.params_proc
+    return :base_scope if @base_scope
+    return :remote if remote?
+    return :polymorphic_resource if resource.class.polymorphic.present?
+
+    nil
+  end
+
+  # base_filter matches the foreign key against primary_key, so a custom
+  # primary_key means the key holds that column's value, not the related id.
   def foreign_key_is_related_id?
     primary_key == :id
   end

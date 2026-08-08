@@ -68,9 +68,9 @@ module Graphiti
           # sideload can resolve it to something the foreign key alone would
           # not predict, so the loaded records win. Only the un-included case
           # is worth short-circuiting.
-          if sideload_ref.linkage_from_foreign_key? &&
+          if sideload_ref.resource_ids_from_foreign_key? &&
               !self_ref.send(:included_anywhere?, @proxy.query.include_hash, sideload_ref.name)
-            linkage always: sideload_ref.always_include_resource_ids? do
+            linkage always: sideload_ref.render_resource_ids? do
               foreign_key = @object.public_send(sideload_ref.foreign_key)
 
               unless foreign_key.nil?
@@ -81,7 +81,7 @@ module Graphiti
               end
             end
           else
-            linkage always: sideload_ref.always_include_resource_ids?
+            linkage always: sideload_ref.render_resource_ids?
           end
 
           if link_ref
@@ -107,8 +107,11 @@ module Graphiti
 
       def data_proc
         sideload_ref = @sideload
+        resource_class_ref = @resource_class
         ->(_) {
-          if (records = @object.public_send(sideload_ref.association_name))
+          records = @object.public_send(sideload_ref.association_name)
+
+          if records
             if records.respond_to?(:to_ary)
               records.each { |r| sideload_ref.resource.decorate_record(r) }
             else

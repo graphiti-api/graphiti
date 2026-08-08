@@ -128,9 +128,9 @@ It has to be a request spec. Exceptions are rendered in Rack middleware, which c
 Nothing to do here. These change what a client receives or when a callback runs, and none of them warns you, because none of them is a rename.
 
 <details>
-<summary>A `belongs_to` renders resource linkage in every payload, where 1.x sent only a link</summary>
+<summary>A `belongs_to` renders resource ids when its foreign key already holds them, where 1.x sent only a link</summary>
 
-A `belongs_to` now includes resource linkage in the payload by default, where 1.x sent only a link:
+A `belongs_to` now renders resource ids in the payload by default, where 1.x sent only a link:
 
 ```json
 "employee": { "data": { "type": "employees", "id": "1" }, "links": { "related": "..." } }
@@ -138,27 +138,29 @@ A `belongs_to` now includes resource linkage in the payload by default, where 1.
 
 The id comes from the foreign key already on the parent, so this costs no extra queries, and clients can resolve the relationship against data they already hold instead of following the link. `has_many` is unchanged, since answering there means a query per record.
 
-Not every `belongs_to` qualifies. A `scope` or `params` block, a `base_scope`, a polymorphic or remote target or a custom `primary_key` all mean the foreign key is not the related id, and those keep loading the association, so they stay opt-in as in 1.x.
+Not every `belongs_to` qualifies. A remote target or a custom `primary_key` mean the foreign key is not the related id, a polymorphic target means one rendered type cannot cover every record, and a `scope` or `params` block or a `base_scope` mean the key might not survive the filter. Rendering ids for those means loading the association, so they stay opt-in as in 1.x and render nothing until you ask.
 
-Relationships are marked `linkage: true` in `schema.json`, and the schema check reports a relationship that stops including it.
+Run [`bin/rake graphiti:audit`](/topics/debugging#graphiti-audit) to see where your API stands: it lists every relationship that renders no ids, and why.
 
 To go back to the old payload for one relationship:
 
 ```ruby
-belongs_to :employee, always_include_resource_ids: false
+belongs_to :employee, resource_ids: false
 ```
 
-Or for the whole API, on the resource everything inherits from. The same setting with `true` is the 2.0 replacement for the `Sideload::BelongsTo` monkey patch that [#167](https://github.com/graphiti-api/graphiti/issues/167) has been recommending, and it now covers every relationship type rather than only `belongs_to`:
+Or for the whole API, on the resource everything inherits from:
 
 ```ruby
 class ApplicationResource < Graphiti::Resource
   self.abstract_class = true
 
-  self.always_include_resource_ids_by_default = false
+  self.belongs_to_resource_ids_by_default = :never
 end
 ```
 
-How linkage is configured, and when a `belongs_to` cannot use its foreign key, is covered in [Customizing Relationships](/concepts/relationships#customizing-relationships).
+If you carry the `Sideload::BelongsTo` monkey patch from [#167](https://github.com/graphiti-api/graphiti/issues/167), delete it and set nothing. The default now covers the safe cases on its own. To force ids onto the rest the way the patch did, set `self.belongs_to_resource_ids_by_default = :always`, at a query per record for each one.
+
+The three settings, and when a `belongs_to` cannot use its foreign key, are covered in [Customizing Relationships](/concepts/relationships#belongs-to-resource-ids).
 
 </details>
 
@@ -224,6 +226,7 @@ Every name below still works, warns, and will be removed in the next major. They
 | `context_namespace` | `current_action` |
 | `Graphiti::Rails::DEPRECATOR` | `Graphiti::DEPRECATOR` (the old name still resolves) |
 | `require "graphiti_errors"`, `require "graphiti/responders"` | remove / no longer needed |
+| `always_include_resource_ids: true` on a relationship | `resource_ids: true` |
 
 `RSpec.describe PostResource, type: :resource` still picks up the resource-testing context automatically. That has not changed.
 
@@ -234,6 +237,9 @@ Every name below still works, warns, and will be removed in the next major. They
 | `include GraphitiErrors` | `register_exception` is available on every controller |
 | `GraphitiErrors::ExceptionHandler` | subclass `Graphiti::Rails::ExceptionHandler` |
 | `GraphitiErrors.enable!` / `.disable!` | `handle_request_exceptions` |
+| `self.always_include_resource_ids_by_default` | `self.belongs_to_resource_ids_by_default`, which takes `:foreign_key`, `:always` or `:never` |
+
+`always_include_resource_ids_by_default` only ever shipped in `2.0.0.beta.4`, so it is gone rather than deprecated and raises `NoMethodError` at class-definition time. It applied to every relationship type, and only a `belongs_to` can render resource ids without loading an association, so the replacement covers `belongs_to` alone. `= false` becomes `:never`. There is no equivalent of `= true`, because arming every collection API-wide is the behavior it was removed for. Use `:always` for `belongs_to`.
 
 ## Without Rails {#without-rails}
 

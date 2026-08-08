@@ -689,6 +689,25 @@ module Graphiti
       end
     end
 
+    class InvalidBelongsToResourceIds < Base
+      def initialize(resource_class, value)
+        @resource_class = resource_class
+        @value = value
+      end
+
+      def message
+        <<~MSG
+          #{@resource_class.name}: belongs_to_resource_ids_by_default must be one of :foreign_key, :always, or :never. Got #{@value.inspect}.
+
+            :foreign_key - render resource ids wherever the foreign key already holds the related id (default)
+            :always      - render them for every belongs_to, loading the association when the foreign key cannot answer
+            :never       - render none
+
+          To render resource ids for a collection, ask for it one relationship at a time with `resource_ids: true`.
+        MSG
+      end
+    end
+
     class MissingDependentFilter < Base
       def initialize(resource, filters)
         @resource = resource

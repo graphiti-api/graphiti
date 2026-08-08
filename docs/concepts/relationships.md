@@ -70,10 +70,20 @@ has_many :positions,
   writable: true,
   link: self.autolink, # default true
   single: false, # only allow this sideload when one employee
-  always_include_resource_ids: true # default: true for belongs_to, false otherwise
+  resource_ids: false
 ```
 
-`belongs_to` renders resource linkage by default, so a client can see which record a relationship points at without following the link:
+`resource_ids` is the one whose default depends on the relationship type:
+
+| type | renders resource ids by default |
+|---|---|
+| `belongs_to` | yes, when its foreign key already holds the related id |
+| `has_one` | no |
+| `has_many` | no |
+| `many_to_many` | no |
+| `polymorphic_belongs_to` | no |
+
+`belongs_to` renders them so a client can see which record a relationship points at without following the link:
 
 ```json
 "employee": {
@@ -82,19 +92,107 @@ has_many :positions,
 }
 ```
 
-That costs nothing, because the id is already on the parent as its foreign key. A `has_many` would have to run a query per record to answer the same question, so it stays off unless you ask for it.
+That costs nothing, because the id is already on the parent as its foreign key.
 
-A `belongs_to` falls back to loading the association when the foreign key cannot answer for it: a `params` block or `base_scope` can filter out the record the key points at, a polymorphic target takes its type from the record rather than the relationship, and a remote resource has no local key to read. Turning linkage on for those, or for a `has_many`, brings back the 1+N described in [#167](https://github.com/graphiti-api/graphiti/issues/167#issuecomment-686866646).
+No other relationship type has a free source for its ids. A collection accepts `resource_ids: true`, but that reads the association on every render of every parent record, whether or not the request wants the relationship. That is the N+1 from [#167](https://github.com/graphiti-api/graphiti/issues/167#issuecomment-686866646) on every response. Leave collections off and let clients `?include=` them.
 
-Set the default for every relationship on a resource, whatever its type:
+Not every `belongs_to` can use its foreign key. A `scope` or `params` block or a `base_scope` can filter out the record the key points at, a polymorphic target's type varies per record while rendered ids carry one type for the whole relationship, a remote resource has no local key to read, and a custom `primary_key` points the relationship at some other column. Those load the association instead, so they stay off by default too.
+
+<details>
+<summary>Which `belongs_to` declarations render resource ids, and which do not</summary>
 
 ```ruby
-class ApplicationResource < Graphiti::Resource
-  self.always_include_resource_ids_by_default = false
+# yes. employee_id is the employee's id, so the payload already has it
+belongs_to :employee
+
+# no. nothing renders at all, ids included
+belongs_to :employee, readable: false
+
+# no. employee_id holds a name, not the related id
+belongs_to :employee, primary_key: :first_name
+
+# no. the base scope can exclude the employee the key points at, and
+# graphiti cannot know whether it does without running it
+belongs_to :employee, base_scope: -> { Employee.all }
+
+# no. a remote resource has no local foreign key to read
+belongs_to :employee, remote: "http://foo.com/employees"
+
+# no. the record's own class decides its type, so the key gives an id
+# with no type to pair it with
+belongs_to :employee, resource: CreditCardResource
+
+# no. the scope can exclude the employee the key points at, and graphiti
+# cannot know whether it does without running it
+belongs_to :employee do
+  scope { |ids| {type: :employees, conditions: {id: ids}} }
+end
+
+# no. same, a params filter can exclude the employee the key points at
+belongs_to :employee do
+  params { |hash, positions| hash[:filter][:active] = true }
+end
+
+# no. credit_card_type is local, but rendered ids carry one type for the
+# whole relationship and this one's varies per record
+polymorphic_belongs_to :credit_card do
+  group_by(:credit_card_type) do
+    on(:Visa).belongs_to :visa, resource: VisaResource
+  end
 end
 ```
 
-Subclasses inherit it, and a relationship passing `always_include_resource_ids` explicitly still wins.
+Watch for the `scope`, `params` and `base_scope` cases. Nothing about those declarations looks like it concerns resource ids, so adding a scope block to filter a relationship also stops its ids from rendering.
+
+If you keep a `schema.json`, the schema check catches that. A relationship that renders resource ids is marked `linkage: true`, and one that stops rendering them is reported as a breaking change. Gaining them is additive and passes.
+
+To render ids anyway, opt in on the relationship and accept the query:
+
+```ruby
+belongs_to :employee, resource_ids: true do
+  scope { |ids| {type: :employees, conditions: {id: ids}} }
+end
+```
+
+Know what that buys for the `scope`, `params` and `base_scope` cases. Rendering reads the association off the model, which does not apply the block, so if the block narrows what sideloading returns, the ids will disagree with it. Opting in there says you know the two agree. A `primary_key`, polymorphic or remote relationship does resolve to the right id this way.
+
+</details>
+
+### belongs_to_resource_ids_by_default {#belongs-to-resource-ids}
+
+To change how far a `belongs_to` goes, across a whole API, set it on the resource everything inherits from:
+
+```ruby
+class ApplicationResource < Graphiti::Resource
+  self.belongs_to_resource_ids_by_default = :foreign_key
+end
+```
+
+| | |
+|---|---|
+| `:foreign_key` | Default. Render resource ids wherever the foreign key already holds the related id, and never run an extra query. |
+| `:always` | Render them for every `belongs_to`, loading the association when the foreign key cannot answer. A query per record, per relationship, on every render. |
+| `:never` | Render none. This is the 1.x payload. |
+
+Subclasses inherit it, and a relationship passing `resource_ids` explicitly still wins.
+
+All three describe requests that do not include the relationship. A relationship the request does include renders its ids whatever this is set to, `:never` included, because the records are already loaded and sitting in `included`.
+
+#### What a client sees {#relationship-payload-shapes}
+
+A client never has to work out which rule applied. The relationship object says what it knows:
+
+```json
+"employee": { "data": { "type": "employees", "id": "1" } }   // here is the id
+"employee": { "links": { "related": "..." } }                 // fetch it yourself
+"employee": { "meta": { "included": false } }                 // neither
+```
+
+The last shape appears only when a relationship has no ids **and** no link, which usually means `link: false`. It is not a general "was this sideloaded" flag. Relationships are autolinked by default, so the link shape is the one you normally see.
+
+The setting covers `belongs_to` and `polymorphic_belongs_to`, and no collection, deliberately. An API-wide `:always` on collections would be the N+1 from [#167](https://github.com/graphiti-api/graphiti/issues/167#issuecomment-686866646) applied everywhere at once.
+
+`:always` renders ids by loading the association, so a relationship naming a method the model does not have raises on every render once you set it.
 
 ### Conditional Relationships {#conditional-relationships}
 
@@ -221,7 +319,7 @@ Defaults to these common options:
 has_many :positions,
   foreign_key: :employee_id,
   primary_key: :id,
-  always_include_resource_ids: false,
+  resource_ids: false,
   resource: PositionResource
 ```
 
@@ -265,7 +363,7 @@ Defaults to these common options:
 belongs_to :employee,
   foreign_key: :employee_id,
   primary_key: :id,
-  always_include_resource_ids: false,
+  resource_ids: true,
   resource: EmployeeResource
 ```
 

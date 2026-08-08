@@ -6,6 +6,16 @@ module Graphiti
       DEFAULT_MAX_PAGE_SIZE = 1_000
 
       module Overrides
+        BELONGS_TO_RESOURCE_IDS_VALUES = [:foreign_key, :always, :never].freeze
+
+        def belongs_to_resource_ids_by_default=(val)
+          unless BELONGS_TO_RESOURCE_IDS_VALUES.include?(val)
+            raise Errors::InvalidBelongsToResourceIds.new(self, val)
+          end
+
+          super
+        end
+
         def serializer=(val)
           if val
             if super(Class.new(val))
@@ -90,7 +100,7 @@ module Graphiti
           :attributes_schema_by_default,
           :relationships_readable_by_default,
           :relationships_writable_by_default,
-          :always_include_resource_ids_by_default,
+          :belongs_to_resource_ids_by_default,
           :filters_accept_nil_by_default,
           :filters_deny_empty_by_default,
           :graphql_entrypoint,
@@ -116,6 +126,7 @@ module Graphiti
           default(klass, :attributes_schema_by_default, true)
           default(klass, :relationships_readable_by_default, true)
           default(klass, :relationships_writable_by_default, true)
+          default(klass, :belongs_to_resource_ids_by_default, :foreign_key)
           default(klass, :filters_accept_nil_by_default, false)
           default(klass, :filters_deny_empty_by_default, false)
 

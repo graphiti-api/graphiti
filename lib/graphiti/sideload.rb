@@ -20,6 +20,7 @@ module Graphiti
     def initialize(name, opts)
       @name = name
       validate_options!(opts)
+      translate_deprecated_options!(opts)
       @parent_resource_class = opts[:parent_resource]
       @resource_class_name = opts[:resource]
       @primary_key = opts[:primary_key]
@@ -42,7 +43,7 @@ module Graphiti
       @group_name = opts[:group_name]
       @polymorphic_child = opts[:polymorphic_child]
       @parent = opts[:parent]
-      @always_include_resource_ids = opts[:always_include_resource_ids]
+      @render_resource_ids = opts[:resource_ids]
 
       if polymorphic_child?
         parent.resource.polymorphic << resource_class
@@ -110,6 +111,31 @@ module Graphiti
       dynamic_flag?(@readable) || dynamic_flag?(@writable)
     end
 
+    def readable_guarded?
+      dynamic_flag?(@readable)
+    end
+
+    def readable_guard_name
+      @readable.to_sym if @readable.is_a?(Symbol) || @readable.is_a?(String)
+    end
+
+    def non_default_options
+      options = {}
+      options[:as] = association_name if @as
+      options[:primary_key] = primary_key unless primary_key == :id
+      options[:single] = true if single?
+      options[:remote] = @remote if remote?
+      options[:link] = @link unless @link.nil?
+      options[:readable] = @readable unless @readable.nil? || @readable == true
+      options[:writable] = @writable unless @writable.nil? || @writable == true
+      options[:resource_ids] = @render_resource_ids unless @render_resource_ids.nil?
+      options
+    end
+
+    def customized_base_scope?
+      !!@base_scope
+    end
+
     def single?
       !!@single
     end
@@ -122,24 +148,21 @@ module Graphiti
       !!@polymorphic_as
     end
 
-    # False everywhere but a plain belongs_to - see
-    # Sideload::BelongsTo#linkage_from_foreign_key?.
-    def linkage_from_foreign_key?
-      false
+    def resource_ids_from_foreign_key?
+      resource_ids_blocker.nil?
     end
 
-    # nil at either of the first two levels means "not specified" rather
-    # than "false".
-    def always_include_resource_ids?
-      return !!@always_include_resource_ids unless @always_include_resource_ids.nil?
-
-      configured = parent_resource_class&.always_include_resource_ids_by_default
-      return !!configured unless configured.nil?
-
-      default_include_resource_ids?
+    def resource_ids_blocker
+      :no_foreign_key_on_parent
     end
 
-    def default_include_resource_ids?
+    def render_resource_ids?
+      return !!@render_resource_ids unless @render_resource_ids.nil?
+
+      default_render_resource_ids?
+    end
+
+    def default_render_resource_ids?
       false
     end
 
@@ -432,6 +455,18 @@ module Graphiti
         end
       end
       false
+    end
+
+    def translate_deprecated_options!(opts)
+      return unless opts.key?(:always_include_resource_ids)
+
+      Graphiti::DEPRECATOR.deprecation_warning(
+        :always_include_resource_ids,
+        "Use :resource_ids instead (#{opts[:parent_resource]&.name}##{@name})"
+      )
+
+      value = opts.delete(:always_include_resource_ids)
+      opts[:resource_ids] = value unless opts.key?(:resource_ids)
     end
 
     def validate_options!(opts)

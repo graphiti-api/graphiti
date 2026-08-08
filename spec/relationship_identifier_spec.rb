@@ -105,14 +105,14 @@ RSpec.describe "relationship identifiers" do
       end
     end
 
-    context "without include directive and always_include_resource_ids: true" do
+    context "without include directive and resource_ids: true" do
       let(:resource) do
         Class.new(PORO::TeamResource) do
           def self.name
             "PORO::TeamResource"
           end
 
-          has_many :employees, always_include_resource_ids: true do
+          has_many :employees, resource_ids: true do
             scope do |employee_ids|
               {
                 type: :employees,
@@ -233,14 +233,14 @@ RSpec.describe "relationship identifiers" do
       end
     end
 
-    context "with always_include_resource_ids: false" do
+    context "with resource_ids: false" do
       let(:resource) do
         Class.new(PORO::PositionResource) do
           def self.name
             "PORO::PositionResource"
           end
 
-          belongs_to :employee, always_include_resource_ids: false do
+          belongs_to :employee, resource_ids: false do
             scope do |employee_ids|
               {
                 type: :employees,
@@ -264,14 +264,14 @@ RSpec.describe "relationship identifiers" do
       end
     end
 
-    context "with always_include_resource_ids_by_default" do
+    context "with belongs_to_resource_ids_by_default = :always" do
       let(:resource) do
         Class.new(PORO::PositionResource) do
           def self.name
             "PORO::PositionResource"
           end
 
-          self.always_include_resource_ids_by_default = true
+          self.belongs_to_resource_ids_by_default = :always
 
           belongs_to :employee do
             scope do |employee_ids|
@@ -305,9 +305,9 @@ RSpec.describe "relationship identifiers" do
               "PORO::PositionResource"
             end
 
-            self.always_include_resource_ids_by_default = true
+            self.belongs_to_resource_ids_by_default = :always
 
-            belongs_to :employee, always_include_resource_ids: false do
+            belongs_to :employee, resource_ids: false do
               scope do |employee_ids|
                 {
                   type: :employees,
@@ -326,11 +326,208 @@ RSpec.describe "relationship identifiers" do
       end
     end
 
-    context "when always_include_resource_ids_by_default is unset" do
-      it "is nil, leaving the decision to the relationship type" do
-        expect(PORO::PositionResource.always_include_resource_ids_by_default)
-          .to be_nil
+    context "when the relationship is unreadable" do
+      let(:resource) do
+        Class.new(PORO::PositionResource) do
+          def self.name
+            "PORO::PositionResource"
+          end
+
+          belongs_to :employee, readable: false
+        end
+      end
+
+      it "renders no resource ids, and no relationship at all" do
+        render
+
+        jsonapi_data.each do |record|
+          expect(record.relationships).to_not have_key("employee")
+        end
+      end
+
+      it "does not treat the foreign key as a source for them" do
+        expect(resource.sideloads[:employee].render_resource_ids?).to eq(false)
+      end
+    end
+
+    context "when the relationship is guarded" do
+      let(:resource) do
+        Class.new(PORO::PositionResource) do
+          def self.name
+            "PORO::PositionResource"
+          end
+
+          belongs_to :employee, readable: :admin?
+
+          def admin?
+            context.current_user == "admin"
+          end
+        end
+      end
+
+      # Schema generation asks every relationship whether it renders resource
+      # ids, with no request to evaluate the guard against.
+      it "answers without running the guard" do
+        expect {
+          Graphiti.with_context(nil) do
+            expect(resource.sideloads[:employee].render_resource_ids?).to eq(true)
+          end
+        }.to_not raise_error
+      end
+
+      it "still omits the relationship when the guard denies at render time" do
+        Graphiti.with_context(OpenStruct.new(current_user: "basic")) do
+          render
+        end
+
+        jsonapi_data.each do |record|
+          expect(record.relationships).to_not have_key("employee")
+        end
+      end
+    end
+
+    context "with belongs_to_resource_ids_by_default = :never" do
+      let(:resource) do
+        Class.new(PORO::PositionResource) do
+          def self.name
+            "PORO::PositionResource"
+          end
+
+          self.belongs_to_resource_ids_by_default = :never
+
+          belongs_to :employee
+        end
+      end
+
+      it "renders no resource ids" do
+        render
+
+        jsonapi_data.each do |record|
+          expect(record.relationships["employee"].keys).to_not include("data")
+        end
+      end
+
+      it "still renders them when the request includes the relationship" do
+        params[:include] = "employee"
+        render
+
+        jsonapi_data.each do |record|
+          expect(record.relationships["employee"]["data"][:id]).to eq("1")
+        end
+      end
+    end
+
+    context "with belongs_to_resource_ids_by_default = :always" do
+      context "and the relationship is unreadable" do
+        let(:resource) do
+          Class.new(PORO::PositionResource) do
+            def self.name
+              "PORO::PositionResource"
+            end
+
+            self.belongs_to_resource_ids_by_default = :always
+
+            belongs_to :employee, readable: false
+          end
+        end
+
+        # Advertising linkage the render can never emit would put schema.json
+        # permanently at odds with the payload.
+        it "does not claim resource ids for a relationship that renders nothing" do
+          expect(resource.sideloads[:employee].render_resource_ids?).to eq(false)
+
+          render
+          jsonapi_data.each do |record|
+            expect(record.relationships).to_not have_key("employee")
+          end
+        end
+      end
+
+      context "and the relationship is a polymorphic_belongs_to" do
+        let(:visa_resource) { PORO::VisaResource }
+
+        let(:resource) do
+          visa = PORO::VisaResource
+          Class.new(PORO::EmployeeResource) do
+            def self.name
+              "PORO::EmployeeResource"
+            end
+
+            self.belongs_to_resource_ids_by_default = :always
+
+            polymorphic_belongs_to :credit_card do
+              group_by(:credit_card_type) do
+                on(:Visa).belongs_to :visa, resource: visa
+              end
+            end
+          end
+        end
+
+        it "is covered, since it is a belongs_to" do
+          expect(resource.sideloads[:credit_card].render_resource_ids?).to eq(true)
+        end
+      end
+    end
+
+    context "when belongs_to_resource_ids_by_default is unset" do
+      it "is :foreign_key, leaving the decision to the key itself" do
+        expect(PORO::PositionResource.belongs_to_resource_ids_by_default).to eq(:foreign_key)
+      end
+    end
+
+    context "when belongs_to_resource_ids_by_default is nil" do
+      it "is rejected rather than treated as unspecified" do
+        expect {
+          Class.new(PORO::PositionResource) { self.belongs_to_resource_ids_by_default = nil }
+        }.to raise_error(Graphiti::Errors::InvalidBelongsToResourceIds)
+      end
+    end
+
+    context "when belongs_to_resource_ids_by_default is given something else" do
+      it "rejects a boolean rather than guessing which state it meant" do
+        expect {
+          Class.new(PORO::PositionResource) { self.belongs_to_resource_ids_by_default = true }
+        }.to raise_error(
+          Graphiti::Errors::InvalidBelongsToResourceIds,
+          /must be one of :foreign_key, :always, or :never/
+        )
       end
     end
   end
+
+  describe "the 2.x names" do
+    def silenced
+      Graphiti::DEPRECATOR.silence { yield }
+    end
+
+    it "translates the relationship option, which meant the same thing" do
+      resource = silenced do
+        Class.new(PORO::TeamResource) do
+          has_many :employees, always_include_resource_ids: true
+        end
+      end
+
+      expect(resource.sideloads[:employees].render_resource_ids?).to eq(true)
+    end
+
+    it "warns when the relationship option is used" do
+      expect(Graphiti::DEPRECATOR).to receive(:deprecation_warning)
+        .with(:always_include_resource_ids, /Use :resource_ids instead/)
+
+      Class.new(PORO::TeamResource) do
+        has_many :employees, always_include_resource_ids: true
+      end
+    end
+
+    it "lets the new option win when both are passed" do
+      resource = silenced do
+        Class.new(PORO::TeamResource) do
+          has_many :employees, always_include_resource_ids: true, resource_ids: false
+        end
+      end
+
+      expect(resource.sideloads[:employees].render_resource_ids?).to eq(false)
+    end
+  end
+
 end

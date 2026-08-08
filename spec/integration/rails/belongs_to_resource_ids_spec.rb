@@ -35,7 +35,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             "PositionResource"
           end
 
-          belongs_to :employee, always_include_resource_ids: true
+          belongs_to :employee, resource_ids: true
         end
       end
 
@@ -79,10 +79,10 @@ if ENV["APPRAISAL_INITIALIZED"]
             "PositionResource"
           end
 
-          belongs_to :employee, always_include_resource_ids: true
+          belongs_to :employee, resource_ids: true
         end
         loaded.sideloads[:employee]
-          .define_singleton_method(:linkage_from_foreign_key?) { false }
+          .define_singleton_method(:resource_ids_from_foreign_key?) { false }
 
         expect(from_foreign_key).to eq(linkage_for(loaded))
       end
@@ -108,7 +108,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           end
         end
 
-        expect(sideload.linkage_from_foreign_key?).to eq(false)
+        expect(sideload.resource_ids_from_foreign_key?).to eq(false)
       end
 
       it "loads the association when a base_scope is present" do
@@ -116,7 +116,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           belongs_to :employee, base_scope: -> { Employee.all }
         end
 
-        expect(sideload.linkage_from_foreign_key?).to eq(false)
+        expect(sideload.resource_ids_from_foreign_key?).to eq(false)
       end
 
       it "loads the association when the target resource is polymorphic" do
@@ -124,7 +124,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           belongs_to :employee, resource: TaskResource
         end
 
-        expect(sideload.linkage_from_foreign_key?).to eq(false)
+        expect(sideload.resource_ids_from_foreign_key?).to eq(false)
       end
     end
 
@@ -146,7 +146,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             resource: RegionResource,
             foreign_key: :region_name,
             primary_key: :name,
-            always_include_resource_ids: true
+            resource_ids: true
         end
       end
 
@@ -172,7 +172,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     context "for relationship types other than belongs_to" do
       it "never derives linkage from a foreign key" do
-        expect(EmployeeResource.sideloads[:positions].linkage_from_foreign_key?)
+        expect(EmployeeResource.sideloads[:positions].resource_ids_from_foreign_key?)
           .to eq(false)
       end
     end

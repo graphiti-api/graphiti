@@ -1032,7 +1032,7 @@ RSpec.describe Graphiti::SchemaDiff do
     context "when relationship stops including resource linkage" do
       before do
         resource_a.has_many :positions,
-          always_include_resource_ids: true,
+          resource_ids: true,
           resource: position_resource
         resource_b.has_many :positions,
           resource: position_resource
@@ -1050,7 +1050,7 @@ RSpec.describe Graphiti::SchemaDiff do
         resource_a.has_many :positions,
           resource: position_resource
         resource_b.has_many :positions,
-          always_include_resource_ids: true,
+          resource_ids: true,
           resource: position_resource
       end
 
