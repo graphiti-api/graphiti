@@ -50,7 +50,7 @@ RSpec.describe "relationship identifiers" do
 
       it "does not include anything" do
         expect do
-          included("employees")
+          jsonapi_included("employees")
         end.to raise_error(Graphiti::SpecHelpers::Errors::NoSideloads)
       end
 
@@ -92,7 +92,7 @@ RSpec.describe "relationship identifiers" do
       end
 
       it "includes employees" do
-        expect(included("employees").map(&:id)).to eq([1, 2])
+        expect(jsonapi_included("employees").map(&:id)).to eq([1, 2])
       end
 
       it "includes relationship identifiers" do
@@ -130,7 +130,7 @@ RSpec.describe "relationship identifiers" do
 
       it "does not include anything" do
         expect do
-          included("employees")
+          jsonapi_included("employees")
         end.to raise_error(Graphiti::SpecHelpers::Errors::NoSideloads)
       end
 
@@ -162,7 +162,7 @@ RSpec.describe "relationship identifiers" do
       end
 
       it "works" do
-        expect(included("employees").map(&:id)).to eq([1])
+        expect(jsonapi_included("employees").map(&:id)).to eq([1])
       end
 
       it "has relationship identifiers" do

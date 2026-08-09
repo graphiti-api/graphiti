@@ -134,7 +134,6 @@ require 'graphiti/spec_helpers/rspec'
 RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
   config.include Graphiti::SpecHelpers::RSpec
-  config.include Graphiti::SpecHelpers::Sugar
   config.include Graphiti::Rails::TestHelpers, type: :request
 
   # Clean your DB between test runs
@@ -163,8 +162,6 @@ These helpers ship with Graphiti, under `Graphiti::SpecHelpers`.
 
 ### #jsonapi_data {#jsonapi-data}
 
-> Note: for brevity, this method is aliased to `d`
-
 The `jsonapi_data` method will parse response data and return a normalized object (`Graphiti::SpecHelpers::Node`). Assert against this the same way you assert against JSON:
 
 ```ruby
@@ -183,7 +180,7 @@ expect(data.first_name).to eq('Jane')
 To grab a relationship:
 
 ```ruby
-sideload = d[0].sideload(:comments)
+sideload = jsonapi_data[0].sideload(:comments)
 expect(sideload.id).to eq(123)
 expect(sideload.jsonapi_type).to eq('comments')
 expect(sideload.body).to eq('body')
@@ -196,7 +193,7 @@ The `sideload` method accepts the *name of the relationship*. It returns a norma
 To grab a Link:
 
 ```ruby
-d[0].link(:comments, :related)
+jsonapi_data[0].link(:comments, :related)
 ```
 
 This accepts the relationship name and the link type. It will return the link URL.
@@ -205,27 +202,25 @@ This accepts the relationship name and the link type. It will return the link UR
 
 To see the raw JSON response, use `json`.
 
-### #date and #datetime {#date-and-datetime}
+### #json_date and #json_datetime {#date-and-datetime}
 
 In Graphiti, datetimes are rendered in [ISO 8601 format](https://www.iso.org/iso-8601-date-and-time-format.html). This means that straight date comparisons will fail:
 
 ```ruby
 # WRONG
-expect(d[0].created_at).to eq(post.created_at)
+expect(jsonapi_data[0].created_at).to eq(post.created_at)
 ```
 
-Instead, use the `datetime` helper to convert to ISO 8601 and compare apples to apples:
+Instead, use the `json_datetime` helper to convert to ISO 8601 and compare apples to apples:
 
 ```ruby
 # RIGHT
-expect(d[0].created_at).to eq(datetime(post.created_at))
+expect(jsonapi_data[0].created_at).to eq(json_datetime(post.created_at))
 ```
 
-Similarly, there's a `date` helper as well.
+Similarly, there's a `json_date` helper as well.
 
 ### #jsonapi_errors {#jsonapi-errors}
-
-> This method is aliased to `errors` for brevity
 
 To parse an [Errors Payload](http://jsonapi.org/format/#errors):
 
@@ -261,7 +256,7 @@ Resource tests have two helpers, both different ways to execute a query.
 ```ruby
 it 'works' do
   render
-  expect(d[0].first_name).to eq('Jane')
+  expect(jsonapi_data[0].first_name).to eq('Jane')
   json # => { data: { type: 'employees', ... } }
 end
 ```
@@ -273,6 +268,33 @@ it 'works' do
   render
   expect(records.map(&:id)).to eq([1, 2, 3])
 end
+```
+
+### Resource Matchers {#resource-matchers}
+
+For one-line assertions about a Resource's shape, use the built-in matchers. They're included automatically in `type: :resource` specs and expect a Resource instance as the subject:
+
+```ruby
+RSpec.describe PostResource, type: :resource do
+  subject { described_class.new }
+
+  it { is_expected.to belong_to_resource(:author) }
+  it { is_expected.to have_many_resources(:comments) }
+  it { is_expected.to have_one_resource(:detail) }
+  it { is_expected.to expose_attribute(:title, :string) }
+  it { is_expected.to filter_attribute(:title, :string) }
+end
+```
+
+Each matcher accepts `with_options` to assert configuration:
+
+```ruby
+it do
+  is_expected.to belong_to_resource(:author)
+    .with_options(foreign_key: :author_id, resource: AuthorResource)
+end
+
+it { is_expected.to expose_attribute(:title, :string).with_options(writable: false) }
 ```
 
 ### API Test Helpers {#api-test-helpers}
@@ -378,7 +400,7 @@ describe 'filtering' do
 
     it 'works' do
       render
-      expect(d.map(&:id)).to eq([employee2.id])
+      expect(jsonapi_data.map(&:id)).to eq([employee2.id])
     end
   end
 end
@@ -401,7 +423,7 @@ describe 'sorting' do
 
       it 'works' do
         render
-        expect(d.map(&:id)).to eq([
+        expect(jsonapi_data.map(&:id)).to eq([
           employee1.id,
           employee2.id
         ])
@@ -415,7 +437,7 @@ describe 'sorting' do
 
       it 'works' do
         render
-        expect(d.map(&:id)).to eq([
+        expect(jsonapi_data.map(&:id)).to eq([
           employee2.id,
           employee1.id
         ])
@@ -447,7 +469,7 @@ describe 'sideloading' do
 
     it 'returns position with historical index == 1' do
       render
-      sl = d[0].sideload(:current_position)
+      sl = jsonapi_data[0].sideload(:current_position)
       expect(sl.jsonapi_type).to eq('positions')
       expect(sl.id).to eq(pos2.id)
     end
@@ -669,9 +691,9 @@ RSpec.describe "employees#index", type: :request do
       expect(EmployeeResource).to receive(:all).and_call_original
       make_request
       expect(response.status).to eq(200)
-      expect(d.map(&:jsonapi_type).uniq)
+      expect(jsonapi_data.map(&:jsonapi_type).uniq)
         .to match_array(['employees'])
-      expect(d.map(&:id))
+      expect(jsonapi_data.map(&:id))
         .to match_array([employee1.id, employee2.id])
     end
   end
@@ -694,8 +716,8 @@ describe 'basic fetch' do
     expect(EmployeeResource).to receive(:find).and_call_original
     make_request
     expect(response.status).to eq(200)
-    expect(d.jsonapi_type).to eq('employees')
-    expect(d.id).to eq(employee.id)
+    expect(jsonapi_data.jsonapi_type).to eq('employees')
+    expect(jsonapi_data.id).to eq(employee.id)
   end
 end
 ```
@@ -843,7 +865,7 @@ it 'works' do
   Graphiti.with_context ctx do
     render
   end
-  expect(d[0].salary).to eq(100_000)
+  expect(jsonapi_data[0].salary).to eq(100_000)
 end
 ```
 

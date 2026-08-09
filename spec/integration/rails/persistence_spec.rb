@@ -1166,9 +1166,9 @@ if ENV["APPRAISAL_INITIALIZED"]
       # NB - should only sideload updated position, not all positions
       it "sideloads the objects in response" do
         make_request
-        expect(included("positions").length).to eq(1)
-        expect(included("positions")[0].id).to eq(position2.id)
-        expect(included("departments").length).to eq(1)
+        expect(jsonapi_included("positions").length).to eq(1)
+        expect(jsonapi_included("positions")[0].id).to eq(position2.id)
+        expect(jsonapi_included("departments").length).to eq(1)
       end
     end
 

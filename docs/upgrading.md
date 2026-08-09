@@ -214,6 +214,7 @@ Every name below still works, warns, and will be removed in the next major. They
 | --- | --- |
 | `require "graphiti_spec_helpers/rspec"` | `require "graphiti/spec_helpers/rspec"` |
 | `GraphitiSpecHelpers::RSpec` / `::Sugar` / `::Errors::*` | `Graphiti::SpecHelpers::*` |
+| `include Graphiti::SpecHelpers::Sugar` (`d`, `included`, `errors`, `dt`) | call `jsonapi_data`, `jsonapi_included`, `jsonapi_errors`, `json_datetime` directly |
 | `require "graphiti-rails"` | remove / no longer needed |
 | `include Graphiti::Rails` | `include Graphiti::Rails::Controller`|
 | `include Graphiti::Responders` | `include Graphiti::Rails::Responders` |

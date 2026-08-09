@@ -11,7 +11,7 @@ RSpec.describe <%= resource_class %>, type: :resource do
       expect(data.jsonapi_type).to eq('<%= type %>')
       <%- attributes.each do |a| -%>
       <%- if [:created_at, :updated_at].include?(a.name.to_sym) -%>
-      expect(data.<%= a.name %>).to eq(datetime(<%= file_name %>.<%= a.name %>))
+      expect(data.<%= a.name %>).to eq(json_datetime(<%= file_name %>.<%= a.name %>))
       <%- else -%>
       expect(data.<%= a.name %>).to eq(<%= file_name %>.<%= a.name %>)
       <%- end -%>
@@ -31,7 +31,7 @@ RSpec.describe <%= resource_class %>, type: :resource do
 
       it 'works' do
         render
-        expect(d.map(&:<%= id_or_rawid %>)).to eq([<%= var %>2.id])
+        expect(jsonapi_data.map(&:<%= id_or_rawid %>)).to eq([<%= var %>2.id])
       end
     end
   end
@@ -48,7 +48,7 @@ RSpec.describe <%= resource_class %>, type: :resource do
 
         it 'works' do
           render
-          expect(d.map(&:<%= id_or_rawid %>)).to eq([
+          expect(jsonapi_data.map(&:<%= id_or_rawid %>)).to eq([
             <%= var %>1.id,
             <%= var %>2.id
           ]<%= sort_raw_ids %>)
@@ -62,7 +62,7 @@ RSpec.describe <%= resource_class %>, type: :resource do
 
         it 'works' do
           render
-          expect(d.map(&:<%= id_or_rawid %>)).to eq([
+          expect(jsonapi_data.map(&:<%= id_or_rawid %>)).to eq([
             <%= var %>2.id,
             <%= var %>1.id
           ]<%= sort_raw_ids_descending %>)

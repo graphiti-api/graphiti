@@ -105,7 +105,7 @@ RSpec.describe "serialization" do
       it "can call methods on the resource" do
         define_resource
         render
-        expect(d[0].foo).to eq("foo!")
+        expect(jsonapi_data[0].foo).to eq("foo!")
       end
 
       context "when application serializer defined" do
@@ -117,7 +117,7 @@ RSpec.describe "serialization" do
 
           it "can call methods on the namespaced ApplicationSerializer" do
             render
-            expect(d[0].foo).to eq("bar!")
+            expect(jsonapi_data[0].foo).to eq("bar!")
           end
         end
 
@@ -131,7 +131,7 @@ RSpec.describe "serialization" do
 
           it "can call methods on ApplicationSerializer" do
             render
-            expect(d[0].foo).to eq("bar!")
+            expect(jsonapi_data[0].foo).to eq("bar!")
           end
         end
 
@@ -141,7 +141,7 @@ RSpec.describe "serialization" do
           it "cannot call methods on ApplicationSerializer" do
             define_resource
             render
-            expect(d[0].foo).to eq("foo!")
+            expect(jsonapi_data[0].foo).to eq("foo!")
           end
         end
       end

@@ -464,7 +464,7 @@ RSpec.describe "filtering" do
 
       it "works" do
         render
-        sl = d[0].sideload(:positions)
+        sl = jsonapi_data[0].sideload(:positions)
         expect(sl.map(&:id)).to eq([pos2.id])
       end
     end
@@ -491,7 +491,7 @@ RSpec.describe "filtering" do
 
       it "works" do
         render
-        positions = d[0].sideload(:positions)
+        positions = jsonapi_data[0].sideload(:positions)
         expect(positions[0].sideload(:department)).to be_nil
         expect(positions[1].sideload(:department).id).to eq(department2.id)
       end
@@ -507,7 +507,7 @@ RSpec.describe "filtering" do
 
         it "works" do
           render
-          positions = d[0].sideload(:positions)
+          positions = jsonapi_data[0].sideload(:positions)
           expect(positions[0].sideload(:department).id).to eq(department2.id)
           expect(positions[1].sideload(:department)).to be_nil
         end
@@ -524,7 +524,7 @@ RSpec.describe "filtering" do
 
         it "works" do
           render
-          positions = d[0].sideload(:positions)
+          positions = jsonapi_data[0].sideload(:positions)
           expect(positions.map(&:id)).to eq([2])
           expect(positions[0].sideload(:department).id).to eq(department2.id)
         end

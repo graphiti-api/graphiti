@@ -49,7 +49,6 @@ module Graphiti
 
             RSpec.configure do |config|
               config.include Graphiti::SpecHelpers::RSpec
-              config.include Graphiti::SpecHelpers::Sugar
             end
 
             Graphiti::SpecHelpers::RSpec.schema!

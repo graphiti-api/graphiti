@@ -68,7 +68,7 @@ RSpec.describe "sideloading" do
     it "works" do
       params[:include] = "positions"
       render
-      expect(included("positions").map(&:id)).to eq([1, 2])
+      expect(jsonapi_included("positions").map(&:id)).to eq([1, 2])
     end
 
     context "and deep querying" do
@@ -79,7 +79,7 @@ RSpec.describe "sideloading" do
 
       it "works" do
         render
-        expect(included("positions").map(&:id)).to eq([2, 1])
+        expect(jsonapi_included("positions").map(&:id)).to eq([2, 1])
       end
     end
 
@@ -171,7 +171,7 @@ RSpec.describe "sideloading" do
 
     it "works" do
       render
-      expect(included("positions").map(&:id)).to eq([1, 2])
+      expect(jsonapi_included("positions").map(&:id)).to eq([1, 2])
     end
   end
 
@@ -196,7 +196,7 @@ RSpec.describe "sideloading" do
 
     it "works" do
       render
-      expect(included("positions").map(&:id)).to eq([2, 1])
+      expect(jsonapi_included("positions").map(&:id)).to eq([2, 1])
     end
   end
 
@@ -210,7 +210,7 @@ RSpec.describe "sideloading" do
 
     it "works" do
       render
-      expect(included("positions").map(&:id)).to eq([2, 1])
+      expect(jsonapi_included("positions").map(&:id)).to eq([2, 1])
     end
   end
 
@@ -231,7 +231,7 @@ RSpec.describe "sideloading" do
 
     it "works" do
       render
-      expect(included("positions").map(&:id)).to eq([1, 2])
+      expect(jsonapi_included("positions").map(&:id)).to eq([1, 2])
     end
 
     context "when custom foreign key given" do
@@ -254,7 +254,7 @@ RSpec.describe "sideloading" do
 
       it "is used" do
         render
-        expect(included("positions").map(&:id)).to eq([1, 2])
+        expect(jsonapi_included("positions").map(&:id)).to eq([1, 2])
       end
     end
   end
@@ -286,7 +286,7 @@ RSpec.describe "sideloading" do
 
     it "works" do
       render
-      expect(included("employees").map(&:id)).to eq([1])
+      expect(jsonapi_included("employees").map(&:id)).to eq([1])
     end
   end
 
@@ -308,7 +308,7 @@ RSpec.describe "sideloading" do
 
     it "works" do
       render
-      expect(included("bios").map(&:id)).to eq([1])
+      expect(jsonapi_included("bios").map(&:id)).to eq([1])
     end
   end
 
@@ -330,7 +330,7 @@ RSpec.describe "sideloading" do
 
     it "works" do
       render
-      expect(included("teams").map(&:id)).to eq([1, 2])
+      expect(jsonapi_included("teams").map(&:id)).to eq([1, 2])
     end
   end
 
@@ -364,12 +364,12 @@ RSpec.describe "sideloading" do
       expect(credit_card(1)).to eq({
         "type" => "mastercards", "id" => "1"
       })
-      expect(included[0].jsonapi_type).to eq("visas")
-      expect(included[0].relationships).to eq({
+      expect(jsonapi_included[0].jsonapi_type).to eq("visas")
+      expect(jsonapi_included[0].relationships).to eq({
         "visa_rewards" => {"meta" => {"included" => false}}
       })
-      expect(included[1].jsonapi_type).to eq("mastercards")
-      expect(included[1].relationships).to eq({
+      expect(jsonapi_included[1].jsonapi_type).to eq("mastercards")
+      expect(jsonapi_included[1].relationships).to eq({
         "commercials" => {"meta" => {"included" => false}}
       })
     end
@@ -440,9 +440,9 @@ RSpec.describe "sideloading" do
 
       it "does not blow up" do
         render
-        expect(d[0].link(:credit_card, :related)).to be_present
-        expect(d[1].link(:credit_card, :related)).to be_present
-        expect(d[2].link(:credit_card, :related)).to be_nil
+        expect(jsonapi_data[0].link(:credit_card, :related)).to be_present
+        expect(jsonapi_data[1].link(:credit_card, :related)).to be_present
+        expect(jsonapi_data[2].link(:credit_card, :related)).to be_nil
       end
     end
 
@@ -459,7 +459,7 @@ RSpec.describe "sideloading" do
 
       it "does not add excluded relationships" do
         render
-        expect(included.map(&:jsonapi_type)).to contain_exactly("visas")
+        expect(jsonapi_included.map(&:jsonapi_type)).to contain_exactly("visas")
       end
     end
 
@@ -477,7 +477,7 @@ RSpec.describe "sideloading" do
 
       it "only builds specified relationships" do
         render
-        expect(included.map(&:jsonapi_type)).to contain_exactly("visas", "mastercards")
+        expect(jsonapi_included.map(&:jsonapi_type)).to contain_exactly("visas", "mastercards")
       end
     end
 
@@ -515,16 +515,16 @@ RSpec.describe "sideloading" do
         expect(payment_processor(2)).to eq({
           "type" => "paypals", "id" => "1"
         })
-        expect(included[0].jsonapi_type).to eq("visas")
-        expect(included[0].relationships).to eq({
+        expect(jsonapi_included[0].jsonapi_type).to eq("visas")
+        expect(jsonapi_included[0].relationships).to eq({
           "visa_rewards" => {"meta" => {"included" => false}}
         })
-        expect(included[1].jsonapi_type).to eq("mastercards")
-        expect(included[1].relationships).to eq({
+        expect(jsonapi_included[1].jsonapi_type).to eq("mastercards")
+        expect(jsonapi_included[1].relationships).to eq({
           "commercials" => {"meta" => {"included" => false}}
         })
-        expect(included[2].jsonapi_type).to eq("paypals")
-        expect(included[2].relationships).to be_nil
+        expect(jsonapi_included[2].jsonapi_type).to eq("paypals")
+        expect(jsonapi_included[2].relationships).to be_nil
       end
 
       it "works" do
@@ -623,7 +623,7 @@ RSpec.describe "sideloading" do
 
     it "is ignored for sideloads" do
       render
-      expect(included("positions").map(&:id)).to match_array([1, 2])
+      expect(jsonapi_included("positions").map(&:id)).to match_array([1, 2])
     end
   end
 
@@ -671,8 +671,8 @@ RSpec.describe "sideloading" do
 
     it "works" do
       render
-      expect(included("positions").map(&:id)).to match_array([1, 2])
-      expect(included("departments").map(&:id)).to match_array([1, 2])
+      expect(jsonapi_included("positions").map(&:id)).to match_array([1, 2])
+      expect(jsonapi_included("departments").map(&:id)).to match_array([1, 2])
     end
   end
 
@@ -707,7 +707,7 @@ RSpec.describe "sideloading" do
     it "works" do
       params[:page][:positions] = {size: 1}
       render
-      expect(included("positions").map(&:id)).to match_array([2])
+      expect(jsonapi_included("positions").map(&:id)).to match_array([2])
     end
 
     context "with offset" do
@@ -717,7 +717,7 @@ RSpec.describe "sideloading" do
 
       it "works" do
         render
-        expect(included("positions").map(&:id)).to match_array([1])
+        expect(jsonapi_included("positions").map(&:id)).to match_array([1])
       end
     end
 
@@ -729,7 +729,7 @@ RSpec.describe "sideloading" do
 
       it "works" do
         render
-        expect(included("positions").map(&:id)).to match_array([1])
+        expect(jsonapi_included("positions").map(&:id)).to match_array([1])
       end
     end
   end
@@ -757,7 +757,7 @@ RSpec.describe "sideloading" do
 
       it "works" do
         render
-        expect(included("positions").map(&:id)).to match_array([1, 2])
+        expect(jsonapi_included("positions").map(&:id)).to match_array([1, 2])
       end
 
       context "but primary key is nil" do
@@ -793,7 +793,7 @@ RSpec.describe "sideloading" do
 
           it "works" do
             render
-            sl = d[0].sideload(:positions)
+            sl = jsonapi_data[0].sideload(:positions)
             expect(sl.map(&:id)).to eq([position1.id, position2.id])
           end
         end
@@ -838,7 +838,7 @@ RSpec.describe "sideloading" do
 
         it "is respected" do
           render
-          expect(included("positions").map(&:id)).to match_array([2])
+          expect(jsonapi_included("positions").map(&:id)).to match_array([2])
         end
       end
 
@@ -853,7 +853,7 @@ RSpec.describe "sideloading" do
 
         it "is respected" do
           render
-          expect(included("positions").map(&:id)).to match_array([2])
+          expect(jsonapi_included("positions").map(&:id)).to match_array([2])
         end
       end
     end
@@ -883,7 +883,7 @@ RSpec.describe "sideloading" do
 
       it "works" do
         render
-        expect(included("departments").map(&:id)).to match_array([1, 2])
+        expect(jsonapi_included("departments").map(&:id)).to match_array([1, 2])
       end
 
       context "but the foreign key is nil" do
@@ -895,8 +895,8 @@ RSpec.describe "sideloading" do
         it "returns nil without querying" do
           expect(department_resource).to_not receive(:all)
           render
-          expect(d[0].sideload("department")).to be_nil
-          expect(d[1].sideload("department")).to be_nil
+          expect(jsonapi_data[0].sideload("department")).to be_nil
+          expect(jsonapi_data[1].sideload("department")).to be_nil
         end
 
         context "but params customization" do
@@ -921,7 +921,7 @@ RSpec.describe "sideloading" do
 
           it "works" do
             render
-            sl = d[0].sideload(:department)
+            sl = jsonapi_data[0].sideload(:department)
             expect(sl.id).to eq(department.id)
           end
 
@@ -932,7 +932,7 @@ RSpec.describe "sideloading" do
 
             it "works" do
               render
-              sl = d[0].sideload(:department)
+              sl = jsonapi_data[0].sideload(:department)
               expect(sl.id).to eq(department.id)
             end
           end
@@ -950,7 +950,7 @@ RSpec.describe "sideloading" do
 
         it "is respected" do
           render
-          expect(included("departments").map(&:id)).to match_array([2])
+          expect(jsonapi_included("departments").map(&:id)).to match_array([2])
         end
       end
 
@@ -965,7 +965,7 @@ RSpec.describe "sideloading" do
 
         it "is respected" do
           render
-          expect(included("departments").map(&:id)).to match_array([2])
+          expect(jsonapi_included("departments").map(&:id)).to match_array([2])
         end
       end
     end
@@ -993,7 +993,7 @@ RSpec.describe "sideloading" do
 
       it "works" do
         render
-        expect(included("bios").map(&:id)).to match_array([1])
+        expect(jsonapi_included("bios").map(&:id)).to match_array([1])
       end
 
       context "and params customization" do
@@ -1007,7 +1007,7 @@ RSpec.describe "sideloading" do
 
         it "is respected" do
           render
-          expect(included("bios").map(&:id)).to match_array([2])
+          expect(jsonapi_included("bios").map(&:id)).to match_array([2])
         end
       end
 
@@ -1022,7 +1022,7 @@ RSpec.describe "sideloading" do
 
         it "is respected" do
           render
-          expect(included("bios").map(&:id)).to match_array([2])
+          expect(jsonapi_included("bios").map(&:id)).to match_array([2])
         end
       end
     end
@@ -1091,7 +1091,7 @@ RSpec.describe "sideloading" do
 
     it "has all correct assocations" do
       render
-      sl = d[0].sideload(:current_position)
+      sl = jsonapi_data[0].sideload(:current_position)
       expect(sl.id).to eq(1)
       expect(sl.jsonapi_type).to eq("positions")
       expect(sl.sideload(:department)).to be_present

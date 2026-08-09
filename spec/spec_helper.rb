@@ -18,7 +18,6 @@ require "base64"
 
 RSpec.configure do |config|
   config.include Graphiti::SpecHelpers::RSpec
-  config.include Graphiti::SpecHelpers::Sugar
 
   config.after do
     PORO::DB.clear

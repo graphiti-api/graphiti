@@ -125,11 +125,10 @@ describe Graphiti::SpecHelpers do
       end
 
       it "returns a node" do
-        d = jsonapi_data
-        expect(d.is_a?(Graphiti::SpecHelpers::Node)).to eq(true)
-        expect(d.id).to eq(100)
-        expect(d.jsonapi_type).to eq("employees")
-        expect(d.first_name).to eq("John")
+        expect(jsonapi_data.is_a?(Graphiti::SpecHelpers::Node)).to eq(true)
+        expect(jsonapi_data.id).to eq(100)
+        expect(jsonapi_data.jsonapi_type).to eq("employees")
+        expect(jsonapi_data.first_name).to eq("John")
       end
 
       context "when trying to access missing attribute" do
@@ -143,13 +142,12 @@ describe Graphiti::SpecHelpers do
 
     context "when data is an array" do
       it "returns an array of nodes" do
-        d = jsonapi_data
-        expect(d.is_a?(Array)).to eq(true)
-        expect(d.length).to eq(1)
-        expect(d[0].is_a?(Graphiti::SpecHelpers::Node)).to eq(true)
-        expect(d[0].id).to eq(100)
-        expect(d[0].jsonapi_type).to eq("employees")
-        expect(d[0].first_name).to eq("John")
+        expect(jsonapi_data.is_a?(Array)).to eq(true)
+        expect(jsonapi_data.length).to eq(1)
+        expect(jsonapi_data[0].is_a?(Graphiti::SpecHelpers::Node)).to eq(true)
+        expect(jsonapi_data[0].id).to eq(100)
+        expect(jsonapi_data[0].jsonapi_type).to eq("employees")
+        expect(jsonapi_data[0].first_name).to eq("John")
       end
     end
 

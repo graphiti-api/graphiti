@@ -174,7 +174,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           it "allows sideloading nested records" do
             make_request
 
-            expect(included("departments")[0].attributes).to eq({
+            expect(jsonapi_included("departments")[0].attributes).to eq({
               "id" => department.id.to_s,
               "name" => department.name,
               "jsonapi_type" => "departments"
@@ -238,7 +238,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         it "includes requested sideloads and their requested fields" do
           make_request
 
-          expect(included("salaries").first.attributes).to eq({
+          expect(jsonapi_included("salaries").first.attributes).to eq({
             "id" => salary.id.to_s,
             "jsonapi_type" => "salaries",
             "base_rate" => 80.0
@@ -321,10 +321,10 @@ if ENV["APPRAISAL_INITIALIZED"]
           it "sideloads the updated objects plus included objects" do
             make_request
 
-            expect(included("teams").length).to eq(2)
-            expect(included("positions").length).to eq(2)
-            expect(included("departments").length).to eq(1)
-            expect(included("salaries").length).to eq(1)
+            expect(jsonapi_included("teams").length).to eq(2)
+            expect(jsonapi_included("positions").length).to eq(2)
+            expect(jsonapi_included("departments").length).to eq(1)
+            expect(jsonapi_included("salaries").length).to eq(1)
           end
         end
       end

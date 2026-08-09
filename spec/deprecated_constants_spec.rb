@@ -33,6 +33,28 @@ RSpec.describe "deprecated constants" do
     GraphitiSpecHelpers::Node
   end
 
+  describe "Graphiti::SpecHelpers::Sugar" do
+    it "warns on include but the aliases still work" do
+      expect(Graphiti::DEPRECATOR).to receive(:warn).once.and_return(nil)
+
+      klass = Class.new {
+        include Graphiti::SpecHelpers::Sugar
+
+        def jsonapi_data
+          "data"
+        end
+
+        def jsonapi_errors
+          "errors"
+        end
+      }
+      instance = klass.new
+
+      expect(instance.d).to eq("data")
+      expect(instance.errors).to eq("errors")
+    end
+  end
+
   describe "the bare shared context names" do
     it "are still registered alongside the graphiti-prefixed ones" do
       registry = ::RSpec.world.shared_example_group_registry.send(:shared_example_groups)[:main]

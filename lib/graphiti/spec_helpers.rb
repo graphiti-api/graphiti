@@ -26,6 +26,11 @@ module Graphiti
     end
 
     module Sugar
+      def self.included(base)
+        Graphiti::DEPRECATOR.warn("Graphiti::SpecHelpers::Sugar is deprecated. Call jsonapi_data, jsonapi_included, jsonapi_errors, json_date and json_datetime directly.")
+        super
+      end
+
       def d
         jsonapi_data
       end
