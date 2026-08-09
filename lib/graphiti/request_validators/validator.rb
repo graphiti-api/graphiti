@@ -11,10 +11,12 @@ module Graphiti
       end
 
       def validate
+        validate_page
+
         # Right now, all requests - even reads - go through the validator
         # In the future these should have their own validation logic, but
         # for now we can just bypass
-        return true unless @params.has_key?(:data)
+        return errors.blank? unless @params.has_key?(:data)
 
         resource = @root_resource
 
@@ -47,6 +49,13 @@ module Graphiti
       end
 
       private
+
+      def validate_page
+        page = @params[:page]
+        return if page.nil? || page.respond_to?(:each_pair)
+
+        @errors.add(:page, :invalid, message: "must be an object")
+      end
 
       def process_relationships(resource, relationships, payload_path)
         relationships.each_key do |name|
