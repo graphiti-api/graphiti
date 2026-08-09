@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rescue_registry", "~> 1.0"
   spec.add_dependency "concurrent-ruby", ">= 1.2", "< 2.0"
   spec.add_dependency "activesupport", ">= 7.1"
-  # Bundled (no longer default) as of Ruby 3.5; graphiti uses OpenStruct in lib/
+  # Bundled (no longer default) as of Ruby 4.0; graphiti uses OpenStruct in lib/
   spec.add_dependency "ostruct", ">= 0.5"
 
   spec.add_development_dependency "faraday", "~> 0.15"
