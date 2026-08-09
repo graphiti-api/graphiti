@@ -15,4 +15,3 @@ spec/.rspec-examples
 spec/dummy/log/*
 *~
 .vscode/
-.DS_Store
