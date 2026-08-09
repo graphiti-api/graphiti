@@ -178,6 +178,8 @@ Subclasses inherit it, and a relationship passing `resource_ids` explicitly stil
 
 All three describe requests that do not include the relationship. A relationship the request does include renders its ids whatever this is set to, `:never` included, because the records are already loaded and sitting in `included`.
 
+Before flipping the setting, [`bin/rake graphiti:audit`](/topics/debugging#graphiti-audit) reports how every relationship renders resource ids today and which would start loading the association.
+
 #### What a client sees {#relationship-payload-shapes}
 
 A client never has to work out which rule applied. The relationship object says what it knows:

@@ -172,6 +172,32 @@ Which add Debugger output as well.
 The `PATH` should not contain the domain unless you want to hit a live
 API instead of a test server.
 
+#### graphiti:audit {#graphiti-audit}
+
+> `bin/rake graphiti:audit`
+
+Audits every relationship declared across your resources. It reports anything that will raise at request time, relationships that load an association just to render resource ids, and `belongs_to` relationships that render no ids unless included. A checklist at the end shows what was checked:
+
+```
+ERROR will raise when the relationship is included: the model has no association method
+
+  EmployeeResource
+    has_many :positions  Employee has no #positions method
+
+  fix: define it, point the relationship at the real association with `as:`, or remove the relationship
+
+checks
+
+  ✓ all relationships inspectable
+  ✗ 1 association method missing
+  ✓ all readable guards defined
+  ✓ all sideload filters declared
+
+graphiti: 12 resources, 40 relationships, 1 error.
+```
+
+The task exits nonzero when there are errors, so it can hold the line in CI. Run it before and after flipping [belongs_to_resource_ids_by_default](/concepts/relationships#belongs-to-resource-ids) to see exactly what the setting changes.
+
 #### graphiti:benchmark {#graphiti-benchmark}
 
 > `bin/rake graphiti:benchmark[PATH,NUM_REQUESTS]`

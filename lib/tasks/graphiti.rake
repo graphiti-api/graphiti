@@ -16,6 +16,15 @@ namespace :graphiti do
     Graphiti::Debugger.flush if debug
   end
 
+  desc "Audit every relationship: what will raise, what loads to render ids, which render no ids, and which checks passed."
+  task audit: [:environment] do
+    helpers.setup_rails!
+    rows = Graphiti::Audit.run
+    puts Graphiti::Audit::Report.new(rows).to_s
+
+    exit 1 if rows.any?(&:error?)
+  end
+
   desc "Execute benchmark without web server."
   task :benchmark, [:path, :requests] => [:environment] do |_, args|
     helpers.setup_rails!
