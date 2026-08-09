@@ -1,5 +1,20 @@
 graphiti changelog
 
+# [2.0.0-beta.6](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.5...v2.0.0-beta.6) (2026-08-09)
+
+
+### Bug Fixes
+
+* reject invalid page parameters ([#537](https://github.com/graphiti-api/graphiti/issues/537)) ([bb3698b](https://github.com/graphiti-api/graphiti/commit/bb3698b52911c658c5d023ad8fd55b5106195001)), closes [#347](https://github.com/graphiti-api/graphiti/issues/347)
+* treat empty polymorphic configuration as unset ([#538](https://github.com/graphiti-api/graphiti/issues/538)) ([5c17899](https://github.com/graphiti-api/graphiti/commit/5c1789993fbb4638d4443cf014b8bef358addb80)), closes [#199](https://github.com/graphiti-api/graphiti/issues/199)
+
+
+### Features
+
+* Add graphiti:audit task to audit resources for issues ([84436ea](https://github.com/graphiti-api/graphiti/commit/84436eab7c7d0713ec6f355b62ba8b06913ee31a))
+* raise MissingRelationshipMethod when rendering reads an association the model does not define ([1c41cee](https://github.com/graphiti-api/graphiti/commit/1c41cee787b4f747d2906b2230f8fb926e3d887d))
+* rename always_include_resource_ids to resource_ids, with a belongs_to_resource_ids_by_default setting ([8b11151](https://github.com/graphiti-api/graphiti/commit/8b111516822f6fc6e3675b59941688791cb34e74))
+
 # [2.0.0-beta.5](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.4...v2.0.0-beta.5) (2026-08-07)
 
 
