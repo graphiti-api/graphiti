@@ -1,5 +1,13 @@
 graphiti changelog
 
+## [1.13.3](https://github.com/graphiti-api/graphiti/compare/v1.13.2...v1.13.3) (2026-08-09)
+
+
+### Bug Fixes
+
+* reject invalid page parameters ([#537](https://github.com/graphiti-api/graphiti/issues/537)) ([fbb5683](https://github.com/graphiti-api/graphiti/commit/fbb5683393301e17ffcea84990ac5a95bdd3e15f)), closes [#347](https://github.com/graphiti-api/graphiti/issues/347)
+* treat empty polymorphic configuration as unset ([#538](https://github.com/graphiti-api/graphiti/issues/538)) ([a27eeea](https://github.com/graphiti-api/graphiti/commit/a27eeea6eeb72749376c1f7959cadc89012142b9)), closes [#199](https://github.com/graphiti-api/graphiti/issues/199)
+
 ## [1.13.2](https://github.com/graphiti-api/graphiti/compare/v1.13.1...v1.13.2) (2026-08-07)
 
 
