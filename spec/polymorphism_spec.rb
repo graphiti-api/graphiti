@@ -55,7 +55,7 @@ RSpec.describe "polymorphic resource behavior" do
       context "when unknown model returned" do
         around do |e|
           original = PORO::CreditCardResource.polymorphic
-          PORO::CreditCardResource.polymorphic = []
+          PORO::CreditCardResource.polymorphic = [PORO::VisaResource]
           begin
             e.run
           ensure
@@ -67,6 +67,24 @@ RSpec.describe "polymorphic resource behavior" do
           expect {
             resource.all.to_a
           }.to raise_error(Graphiti::Errors::PolymorphicResourceChildNotFound)
+        end
+      end
+
+      context "when no subclasses are configured" do
+        around do |e|
+          original = PORO::CreditCardResource.polymorphic
+          PORO::CreditCardResource.polymorphic = []
+          begin
+            e.run
+          ensure
+            PORO::CreditCardResource.polymorphic = original
+          end
+        end
+
+        it "behaves like a non-polymorphic resource" do
+          expect(PORO::CreditCardResource).not_to be_polymorphic
+          expect { resource.all.to_a }.not_to raise_error
+          expect(resource.new.serializer_for(mastercard)).to eq(resource.serializer)
         end
       end
     end

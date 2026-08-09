@@ -8,6 +8,8 @@ module Graphiti
       end
 
       def serializer_for(model)
+        return super unless self.class.polymorphic?
+
         if polymorphic_child?
           serializer
         else
@@ -17,10 +19,14 @@ module Graphiti
       end
 
       def associate_all(*args)
+        return super unless self.class.polymorphic?
+
         _associate(:associate_all, *args)
       end
 
       def associate(*args)
+        return super unless self.class.polymorphic?
+
         _associate(:associate, *args)
       end
 
@@ -34,6 +40,8 @@ module Graphiti
 
       module ClassMethods
         def inherited(klass)
+          return super unless polymorphic?
+
           klass.type = nil
           klass.model = klass.infer_model
           klass.endpoint = klass.infer_endpoint
@@ -42,6 +50,8 @@ module Graphiti
         end
 
         def sideload(name)
+          return super unless polymorphic?
+
           if (split_on = name.to_s.split(/^on__/)).length > 1
             on_type, name = split_on[1].split("--").map(&:to_sym)
           end
