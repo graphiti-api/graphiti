@@ -21,6 +21,7 @@
   },
   "release": {
     "branches": [
+      "1.x",
       "main",
       {
         "name": "beta",
