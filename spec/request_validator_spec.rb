@@ -54,6 +54,22 @@ RSpec.describe Graphiti::RequestValidator do
       end
     end
 
+    context "when page is not an object" do
+      let(:payload) { {page: "1"} }
+
+      it "adds a page error" do
+        expect(validate).to eq false
+        expect(instance.errors).to be_added(:page, :invalid)
+        expect(instance.errors.full_messages).to eq ["page must be an object"]
+      end
+
+      it "raises InvalidRequest when using validate!" do
+        expect {
+          instance.validate!
+        }.to raise_error(Graphiti::Errors::InvalidRequest, /page must be an object/)
+      end
+    end
+
     context "when missing type" do
       let(:payload) do
         {
