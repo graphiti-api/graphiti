@@ -41,25 +41,30 @@ jobs:
           - { ruby: "3.2", gemfile: Gemfile, appraisal: false }
           - { ruby: "3.3", gemfile: Gemfile, appraisal: false }
           - { ruby: "3.4", gemfile: Gemfile, appraisal: false }
+          - { ruby: "3.5", gemfile: Gemfile, appraisal: false }
           - { ruby: ruby-head, gemfile: Gemfile, appraisal: false }
 
           # Rails 7.1 - the floor
           - { ruby: "3.2", gemfile: gemfiles/rails_7_1.gemfile, appraisal: true }
           - { ruby: "3.4", gemfile: gemfiles/rails_7_1.gemfile, appraisal: true }
+          - { ruby: "3.5", gemfile: gemfiles/rails_7_1.gemfile, appraisal: true }
 
           # Rails 7.2
           - { ruby: "3.2", gemfile: gemfiles/rails_7_2.gemfile, appraisal: true }
           - { ruby: "3.4", gemfile: gemfiles/rails_7_2.gemfile, appraisal: true }
+          - { ruby: "3.5", gemfile: gemfiles/rails_7_2.gemfile, appraisal: true }
           - { ruby: ruby-head, gemfile: gemfiles/rails_7_2.gemfile, appraisal: true }
 
           # Rails 8.0
           - { ruby: "3.2", gemfile: gemfiles/rails_8_0.gemfile, appraisal: true }
           - { ruby: "3.4", gemfile: gemfiles/rails_8_0.gemfile, appraisal: true }
+          - { ruby: "3.5", gemfile: gemfiles/rails_8_0.gemfile, appraisal: true }
           - { ruby: ruby-head, gemfile: gemfiles/rails_8_0.gemfile, appraisal: true }
 
           # Rails 8.1
           - { ruby: "3.2", gemfile: gemfiles/rails_8_1.gemfile, appraisal: true }
           - { ruby: "3.4", gemfile: gemfiles/rails_8_1.gemfile, appraisal: true }
+          - { ruby: "3.5", gemfile: gemfiles/rails_8_1.gemfile, appraisal: true }
           - { ruby: ruby-head, gemfile: gemfiles/rails_8_1.gemfile, appraisal: true }
 
     continue-on-error: ${{ matrix.ruby == 'ruby-head' }}
