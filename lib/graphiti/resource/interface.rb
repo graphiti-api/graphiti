@@ -17,7 +17,7 @@ module Graphiti
 
         # @api private
         def _all(params, opts, base_scope)
-          runner = Runner.new(self, params, opts.delete(:query), :all)
+          runner = Runner.new(self, params, query: opts.delete(:query), action: :all)
           opts[:params] = params
           runner.proxy(base_scope, opts.merge(caching_options))
         end
@@ -36,7 +36,7 @@ module Graphiti
           params[:filter] ||= {}
           params[:filter][:id] = id if id
 
-          runner = Runner.new(self, params, nil, :find)
+          runner = Runner.new(self, params, action: :find)
 
           find_options = {
             single: true,
@@ -56,7 +56,7 @@ module Graphiti
         # Wrap models fetched outside graphiti so they render like any other proxy
         def wrap(models, base_scope = nil)
           validate_wrap_models!(models)
-          runner = Runner.new(self, {}, nil, :find)
+          runner = Runner.new(self, {}, action: :find)
           runner.proxy(base_scope, bypass_required_filters: true).tap do |proxy|
             proxy.data = models
           end

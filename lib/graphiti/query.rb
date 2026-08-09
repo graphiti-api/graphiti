@@ -4,8 +4,15 @@ module Graphiti
   class Query
     attr_reader :resource, :association_name, :params, :action
 
-    # TODO: make the trailing optionals keywords once the satellite gems are rolled in - see Runner#query for the nil-padding this forces
-    def initialize(resource, params, association_name = nil, nested_include = nil, parents = [], action = nil)
+    def initialize(resource, params, *positional, association_name: nil, nested_include: nil, parents: [], action: nil)
+      if positional.any?
+        Graphiti::DEPRECATOR.warn("Passing Query.new trailing arguments positionally is deprecated. Use association_name:/nested_include:/parents:/action: keywords.")
+        association_name ||= positional[0]
+        nested_include ||= positional[1]
+        parents = positional[2] if positional.length > 2
+        action ||= positional[3]
+      end
+
       @resource = resource
       @association_name = association_name
       @params = params
@@ -110,9 +117,10 @@ module Graphiti
             relationship_name = sideload ? sideload.name : key
             hash[relationship_name] = Query.new sl_resource,
               @params,
-              key,
-              sub_hash,
-              query_parents, :all
+              association_name: key,
+              nested_include: sub_hash,
+              parents: query_parents,
+              action: :all
           else
             handle_missing_sideload(key)
           end
@@ -122,6 +130,10 @@ module Graphiti
 
     def parents
       @parents ||= []
+    end
+
+    def root
+      parents.first || self
     end
 
     def fields

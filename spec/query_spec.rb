@@ -953,12 +953,23 @@ RSpec.describe Graphiti::Query do
     end
   end
 
+  describe "deprecated positional arguments" do
+    it "warns and maps them to keywords" do
+      expect(Graphiti::DEPRECATOR).to receive(:warn).once.and_return(nil)
+
+      query = described_class.new(resource, params, :positions, nil, [], :create)
+
+      expect(query.association_name).to eq(:positions)
+      expect(query.action).to eq(:create)
+    end
+  end
+
   describe "#action" do
     subject { instance.action }
     let(:provided_action) { :create }
 
     context "when provided explicitly" do
-      let(:instance) { described_class.new(resource, params, nil, nil, [], provided_action) }
+      let(:instance) { described_class.new(resource, params, action: provided_action) }
       it { is_expected.to eq(provided_action) }
 
       context "and the action provided is show" do
