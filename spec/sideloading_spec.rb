@@ -1147,6 +1147,42 @@ RSpec.describe "sideloading" do
         expect(relationships["custom_department"]["data"]).to be_present
       end
 
+      context "and concurrency is enabled" do
+        before do
+          allow(Graphiti.config).to receive(:concurrency).and_return(true)
+        end
+
+        it "renders complete relationship data through the promise path" do
+          render
+
+          relationships = squashed_position1["relationships"]
+          expect(relationships["custom_department"]["data"]).to be_present
+        end
+      end
+    end
+
+    it "resolves one instance per row within a resource" do
+      proxy = resource.all(params)
+      employee = proxy.data[0]
+      twin = employee.positions.find { |position| position.id == employee.current_position.id }
+
+      expect(employee.current_position).to equal(twin)
+    end
+
+    it "keeps instances separate across resources serving the same model" do
+      variant = Class.new(position_resource) do
+        def self.name
+          "PORO::SpecialPositionResource"
+        end
+      end
+      resource.sideloads.delete(:current_position)
+      resource.has_one :current_position, resource: variant
+
+      proxy = resource.all(params)
+      employee = proxy.data[0]
+      twin = employee.positions.find { |position| position.id == employee.current_position.id }
+
+      expect(employee.current_position).to_not equal(twin)
     end
 
     describe "across requests" do

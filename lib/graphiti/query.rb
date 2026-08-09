@@ -28,10 +28,11 @@ module Graphiti
       !!@association_name
     end
 
+    # Concurrent::Map because sideload scopes resolve on pool threads
     def entity_map
-      return parents.first.entity_map if parents.any?
+      return root.entity_map unless root == self
 
-      @entity_map ||= {}
+      @entity_map ||= Concurrent::Map.new
     end
 
     def top_level?

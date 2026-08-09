@@ -162,12 +162,14 @@ module Graphiti
     end
 
     # Must run before sideloads assign, so every include path populates the
-    # canonical instance.
+    # canonical instance. The resource class in the key keeps two resources
+    # serving the same model from sharing an instance and a serializer.
     def deduplicate_entities!(resolved)
       resolved.map! do |record|
         next record unless record.respond_to?(:id) && !record.id.nil?
 
-        @query.entity_map[[record.class, record.id]] ||= record
+        key = [@resource.class, record.class, record.id]
+        @query.entity_map.compute_if_absent(key) { record }
       end
     end
 
