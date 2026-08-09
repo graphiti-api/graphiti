@@ -21,6 +21,10 @@ module Graphiti
           send(:prepend, Polymorphism)
         end
 
+        def polymorphic?
+          polymorphic.present?
+        end
+
         def type=(val)
           val = val&.to_sym
           if (val = super)
