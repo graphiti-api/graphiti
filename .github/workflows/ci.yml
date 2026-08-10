@@ -81,6 +81,35 @@ jobs:
           bundler-cache: true
       - name: Run tests
         run: bundle exec rspec
+  example-app:
+    name: "Example app (employee_directory)"
+    runs-on: ubuntu-latest
+    # The example app lives in its own repo and can lag behind; it is an
+    # integration canary, not a merge gate.
+    continue-on-error: true
+    env:
+      GRAPHITI_PATH: ${{ github.workspace }}/graphiti
+      BUNDLE_FROZEN: "false" # the path override rewrites the checked-in lockfile
+    defaults:
+      run:
+        working-directory: employee_directory
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          path: graphiti
+      - uses: actions/checkout@v3
+        with:
+          repository: graphiti-api/employee_directory
+          path: employee_directory
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+      - name: Bundle against this graphiti
+        run: bundle install
+      - name: Run the example app suite
+        run: |
+          bundle exec rails db:test:prepare
+          bundle exec rspec
   publish:
     name: Release
     runs-on: ubuntu-latest
