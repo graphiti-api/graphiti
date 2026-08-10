@@ -7,7 +7,7 @@
 
 
 [![discord](https://img.shields.io/badge/community-discord-8A2BE2?logo=discord)](https://discord.gg/wgqkMBsSRV)
-[![guides](https://img.shields.io/badge/guides-https://www.graphiti.dev-F565A5)](https://www.graphiti.dev)
+[![guides](https://img.shields.io/badge/guides-https://graphiti.dev-F565A5)](https://graphiti.dev)
 
 
 
@@ -29,11 +29,11 @@ class EmployeeResource < ApplicationResource
 end
 ```
 
-That Resource serves `?filter[age][gt]=30`, `?sort=-age`, `?page[size]=10`, `?include=positions` and more, without writing any of them. See [graphiti.dev](https://www.graphiti.dev/) for the whole loop, or the [example app](https://github.com/graphiti-api/employee_directory/) for a full working API.
+That Resource serves `?filter[age][gt]=30`, `?sort=-age`, `?page[size]=10`, `?include=positions` and more, without writing any of them. See [graphiti.dev](https://graphiti.dev/) for the whole loop, or the [example app](https://github.com/graphiti-api/employee_directory/) for a full working API.
 
 ### Documentation
 
-Docs live at [graphiti.dev](https://www.graphiti.dev/) and are rendered from this repo: the markdown is in [`/docs`](docs), and the Docusaurus site that serves it is in [`/website`](website). Fixes and improvements are welcome (every page has an "Edit this page" link at the bottom, which makes opening a PR with a change easy).
+Docs live at [graphiti.dev](https://graphiti.dev/) and are rendered from this repo: the markdown is in [`/docs`](docs), and the Docusaurus site that serves it is in [`/website`](website). Fixes and improvements are welcome (every page has an "Edit this page" link at the bottom, which makes opening a PR with a change easy).
 
 To preview locally:
 

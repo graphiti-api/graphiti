@@ -270,7 +270,7 @@ module Graphiti
           #{@resource_class.name}: error occurred while sideloading "#{@sideload_name}"!
 
           The error was raised while attempting to build query parameters for the associated Resource.
-          Read more about sideload scoping here: www.graphiti.dev/concepts/relationships#customizing-scope
+          Read more about sideload scoping here: graphiti.dev/concepts/relationships#customizing-scope
 
           A good way to debug is to put a debugger within the 'params' block.
 
@@ -294,7 +294,7 @@ module Graphiti
 
           The error was raised while attempting to build the scope for the associated Resource.
 
-          Read more about sideload scoping here: www.graphiti.dev/concepts/relationships#customizing-scope
+          Read more about sideload scoping here: graphiti.dev/concepts/relationships#customizing-scope
 
           Here's the original, underlying error:
 
@@ -315,7 +315,7 @@ module Graphiti
           #{@resource_class.name}: error occurred while sideloading "#{@sideload_name}"!
 
           The error was raised while attempting to assign relevant model instances. Read
-          more about sideload assignment here: www.graphiti.dev/concepts/relationships#customizing-assignment
+          more about sideload assignment here: graphiti.dev/concepts/relationships#customizing-assignment
 
           A good way to debug is to put a debugger within the 'assign' block.
 
@@ -449,7 +449,7 @@ module Graphiti
 
           self.validate_endpoints = false
 
-          See https://www.graphiti.dev/concepts/links for more information.
+          See https://graphiti.dev/concepts/links for more information.
 
           The current endpoints allowed for this resource are: #{@resource_class.endpoints.inspect}
         MSG
@@ -731,7 +731,7 @@ module Graphiti
 
         <<~MSG
 
-          resource_ids is set on this relationship, so every render reads the association, not just requests that include it. See www.graphiti.dev/concepts/relationships#customizing-relationships.
+          resource_ids is set on this relationship, so every render reads the association, not just requests that include it. See graphiti.dev/concepts/relationships#customizing-relationships.
         MSG
       end
     end

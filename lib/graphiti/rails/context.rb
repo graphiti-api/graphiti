@@ -1,6 +1,6 @@
 module Graphiti
   module Rails
-    # Wraps controller actions in a [Graphiti Context](https://www.graphiti.dev/concepts/resources#context) which points to the
+    # Wraps controller actions in a [Graphiti Context](https://graphiti.dev/concepts/resources#context) which points to the
     # controller instance by default.
     module Context
       def self.included(klass)

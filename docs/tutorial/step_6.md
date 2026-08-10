@@ -60,7 +60,7 @@ API, and was re-used in our factory.
 
 #### Digging Deeper 🧐
 
-Resources come with [Lifecycle Hooks](https://www.graphiti.dev/guides/concepts/persisting#persistence-lifecycle-hooks), similar to ActiveRecord [Callbacks](https://guides.rubyonrails.org/active_record_callbacks.html).
+Resources come with [Lifecycle Hooks](https://graphiti.dev/guides/concepts/persisting#persistence-lifecycle-hooks), similar to ActiveRecord [Callbacks](https://guides.rubyonrails.org/active_record_callbacks.html).
 
 Those callbacks have gotten a bad reputation. This is because your Model
 can be - is supposed to be - used in a variety of contexts across your

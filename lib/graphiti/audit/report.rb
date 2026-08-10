@@ -71,7 +71,7 @@ module Graphiti
           lines_grouped_by_resource(rows.map { |row| [row, nil] }) +
           ["  #{paint("That is a query per record rendered.", :dim)}",
             fix_line("preload the association in base_scope, or drop `resource_ids`"),
-            "  #{paint("See www.graphiti.dev/concepts/relationships#customizing-relationships", :dim)}",
+            "  #{paint("See graphiti.dev/concepts/relationships#customizing-relationships", :dim)}",
             ""]
       end
 
@@ -95,7 +95,7 @@ module Graphiti
           ["",
             "  #{paint("Either would load the association on every render. That potential performance cost is why ids are opt-in.", :dim)}",
             "  #{paint("Preloading the association in base_scope keeps that load cheap.", :dim)}",
-            "  #{paint("See www.graphiti.dev/concepts/relationships#belongs-to-resource-ids", :dim)}",
+            "  #{paint("See graphiti.dev/concepts/relationships#belongs-to-resource-ids", :dim)}",
             ""]
       end
 

@@ -123,7 +123,7 @@ without Graphiti first.
 We could have changed the above to ActiveRecord scopes like
 `.order_by_title(title)`, making the wiring code even simpler. Consider
 doing this when the logic is reusable or particlar complex, but be aware
-of the tradeoffs of [double-testing units](https://www.graphiti.dev/guides/concepts/testing#double-testing-units).
+of the tradeoffs of [double-testing units](https://graphiti.dev/guides/concepts/testing#double-testing-units).
 
 
   <h2 id="next">
