@@ -65,7 +65,7 @@ The Rails integration specs are gated behind an environment variable and are
 covering none of the ActiveRecord adapter:
 
 ```sh
-BUNDLE_GEMFILE=gemfiles/rails_8_0_graphiti_rails.gemfile \
+BUNDLE_GEMFILE=gemfiles/rails_8_0.gemfile \
   APPRAISAL_INITIALIZED=1 \
   bundle exec rspec spec/integration/rails/
 ```
@@ -75,3 +75,5 @@ Lint with:
 ```sh
 bundle exec standardrb
 ```
+
+CI fails PRs that don't pass lint, and almost everything standard flags is auto-fixable — run `bundle exec standardrb --fix` before pushing. (A bare `rake` also runs lint before the specs.)

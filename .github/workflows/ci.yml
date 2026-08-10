@@ -21,7 +21,11 @@ jobs:
           ruby-version: "3.2"
           bundler-cache: true
       - name: Run standardrb
-        run: bundle exec standardrb --no-fix --format progress
+        run: |
+          bundle exec standardrb --no-fix --format progress || {
+            echo "::error::Lint failed. Almost everything standard flags is auto-fixable — run 'bundle exec standardrb --fix' locally and push the result."
+            exit 1
+          }
   test:
     name: "Tests - ${{ matrix.ruby }} | ${{ matrix.gemfile }}"
     runs-on: ubuntu-latest
