@@ -132,7 +132,12 @@
         }
       ],
       "semantic-release-rubygem",
-      "@semantic-release/github",
+      [
+        "@semantic-release/github",
+        {
+          "successCommentCondition": "<% return !branch.prerelease; %>"
+        }
+      ],
       [
         "@semantic-release/git",
         {
