@@ -1,5 +1,14 @@
 graphiti changelog
 
+# [2.0.0-beta.7](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.6...v2.0.0-beta.7) (2026-08-10)
+
+
+### Features
+
+* dedupe under concurrency and across distinct resources ([800b1a2](https://github.com/graphiti-api/graphiti/commit/800b1a2bf9bb59702efd00afe8e4f54ae06b500e))
+* deduplicate sideloaded entities across include paths ([0c2829a](https://github.com/graphiti-api/graphiti/commit/0c2829a634e9b96e2403ff168be9a48c6a663c78))
+* deprecate SpecHelpers::Sugar in favor of the full helper names ([b155849](https://github.com/graphiti-api/graphiti/commit/b155849f55fe84b2d0911fa4681d82682dfa39ae))
+
 # [2.0.0-beta.6](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.5...v2.0.0-beta.6) (2026-08-09)
 
 
