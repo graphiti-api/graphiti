@@ -55,7 +55,7 @@ module Graphiti
 
       @uri_decoder = infer_uri_decoder
 
-      # FIXME: Don't duplicate graphiti-rails efforts
+      # FIXME: Don't duplicate the Railtie's initializer
       if defined?(::Rails.root) && (root = ::Rails.root)
         config_file = root.join(".graphiticfg.yml")
         if config_file.exist?
@@ -132,6 +132,6 @@ module Graphiti
     end
   end
 
-  msg = "Use graphiti-rails's `config.graphiti.respond_to_formats`"
+  msg = "Use `config.graphiti.respond_to_formats`"
   DEPRECATOR.deprecate_methods(Configuration, respond_to: msg, "respond_to=": msg)
 end

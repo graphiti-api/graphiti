@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Graphiti on Sinatra</title>
+<style>
+  body { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; margin: 2rem auto; max-width: 60rem; padding: 0 1rem; background: #16161d; color: #d6d6e0; }
+  h1 { font-size: 1.2rem; }
+  p { color: #8b8b99; }
+  a { color: #7aa2f7; }
+  ul { list-style: none; padding: 0; }
+  li { margin: 0.4rem 0; }
+  button { font: inherit; color: #7aa2f7; background: #1f1f2b; border: 1px solid #33334a; border-radius: 6px; padding: 0.4rem 0.7rem; cursor: pointer; text-align: left; width: 100%; }
+  button:hover { border-color: #7aa2f7; }
+  #status { margin: 1rem 0 0.5rem; color: #8b8b99; }
+  pre { background: #1f1f2b; border: 1px solid #33334a; border-radius: 6px; padding: 1rem; overflow-x: auto; min-height: 8rem; }
+</style>
+</head>
+<body>
+<h1>Graphiti on Sinatra</h1>
+<p>Graphiti serving JSON:API without Rails. Click an endpoint to fetch it live — filtering, sorting, pagination and sideloads all come from the Resource definitions in <a href="https://github.com/graphiti-api/graphiti/blob/main/examples/sinatra/app.rb">app.rb</a>.</p>
+<ul id="endpoints">
+  <li><button data-url="/api/v1/employees">/api/v1/employees</button></li>
+  <li><button data-url="/api/v1/employees?filter[age][gt]=30">/api/v1/employees?filter[age][gt]=30</button></li>
+  <li><button data-url="/api/v1/employees?sort=-age&page[size]=2">/api/v1/employees?sort=-age&amp;page[size]=2</button></li>
+  <li><button data-url="/api/v1/employees?include=positions.department">/api/v1/employees?include=positions.department</button></li>
+  <li><button data-url="/api/v1/employees/1">/api/v1/employees/1</button></li>
+  <li><button data-url="/api/v1/employees/999">/api/v1/employees/999 (a JSON:API 404)</button></li>
+</ul>
+<div id="status">Response appears here.</div>
+<pre id="output"></pre>
+<script>
+  const status = document.getElementById("status");
+  const output = document.getElementById("output");
+  document.getElementById("endpoints").addEventListener("click", async (event) => {
+    const url = event.target.dataset.url;
+    if (!url) return;
+    status.textContent = `GET ${url} …`;
+    const response = await fetch(url);
+    status.textContent = `GET ${url} → ${response.status}`;
+    const body = await response.text();
+    try {
+      output.textContent = JSON.stringify(JSON.parse(body), null, 2);
+    } catch {
+      output.textContent = body;
+    }
+  });
+</script>
+</body>
+</html>

@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, beta]
   pull_request: {}
   workflow_dispatch: {}
 
@@ -15,145 +15,62 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.0"
+          ruby-version: "3.2"
           bundler-cache: true
       - name: Run standardrb
-        run: bundle exec standardrb --no-fix --format progress
+        run: |
+          bundle exec standardrb --no-fix --format progress || {
+            echo "::error::Lint failed. Almost everything standard flags is auto-fixable — run 'bundle exec standardrb --fix' locally and push the result."
+            exit 1
+          }
   test:
-    name: "Tests - ${{ matrix.ruby }} | ${{ matrix.gemfile }} | Appraisal: ${{ matrix.appraisal }}"
+    name: "Tests - ${{ matrix.ruby }} | ${{ matrix.gemfile }}"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      # Every cell is listed explicitly rather than built from a cross product
+      # plus `exclude:`. An exclude row naming a gemfile that does not exist is
+      # silently ignored, which is how this matrix carried four dead rows for a
+      # "rails_7_0_graphiti_rails.gemfile" that was never generated. A bad
+      # gemfile path in an include row fails the job loudly instead.
+      #
+      # Ruby coverage per Rails version tracks that version's own supported
+      # range; see Appraisals for the matching sqlite3 constraints.
       matrix:
-        ruby:
-          - "2.7"
-          - "3.0"
-          - "3.1"
-          - "3.2"
-          - "3.3"
-          - "3.4"
-        gemfile:
-          - Gemfile
-          - gemfiles/rails_5_2.gemfile
-          - gemfiles/rails_6.gemfile
-          - gemfiles/rails_7.gemfile
-          - gemfiles/rails_5_2_graphiti_rails.gemfile
-          - gemfiles/rails_6_graphiti_rails.gemfile
-          - gemfiles/rails_7_graphiti_rails.gemfile
-          - gemfiles/rails_7_1_graphiti_rails.gemfile
-          - gemfiles/rails_7_2_graphiti_rails.gemfile
-          - gemfiles/rails_8_0_graphiti_rails.gemfile
-          - gemfiles/rails_8_1_graphiti_rails.gemfile
-        appraisal:
-          - true
-          - false
         include:
-          - ruby: ruby-head
-            gemfile: gemfiles/rails_7_1.gemfile
-            appraisal: true
-          - ruby: ruby-head
-            gemfile: gemfiles/rails_7_2_graphiti_rails.gemfile
-            appraisal: true
-          - ruby: ruby-head
-            gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
-            appraisal: true
-          - ruby: ruby-head
-            gemfile: gemfiles/rails_8_1_graphiti_rails.gemfile
-            appraisal: true
-          - ruby: ruby-head
-            gemfile: Gemfile
-            appraisal: false
-        exclude:
-          # Skip some extra variants
-          - gemfile: Gemfile
-            appraisal: true
-          - gemfile: gemfiles/rails_5_2.gemfile
-            appraisal: false
-          - gemfile: gemfiles/rails_6.gemfile
-            appraisal: false
-          - gemfile: gemfiles/rails_7.gemfile
-            appraisal: false
-          - gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
-            appraisal: false
-          - gemfile: gemfiles/rails_6_graphiti_rails.gemfile
-            appraisal: false
-          - gemfile: gemfiles/rails_7_graphiti_rails.gemfile
-            appraisal: false
-          - gemfile: gemfiles/rails_7_1_graphiti_rails.gemfile
-            appraisal: false
-          - gemfile: gemfiles/rails_7_2_graphiti_rails.gemfile
-            appraisal: false
-          - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
-            appraisal: false
-          - gemfile: gemfiles/rails_8_1_graphiti_rails.gemfile
-            appraisal: false
+          # No Rails - the library on its own, across every supported Ruby
+          - { ruby: "3.2", gemfile: Gemfile, appraisal: false }
+          - { ruby: "3.3", gemfile: Gemfile, appraisal: false }
+          - { ruby: "3.4", gemfile: Gemfile, appraisal: false }
+          - { ruby: "4.0", gemfile: Gemfile, appraisal: false }
+          - { ruby: ruby-head, gemfile: Gemfile, appraisal: false }
 
-          # Rails 8.1 needs ruby 3.2 +
-          - gemfile: gemfiles/rails_8_1_graphiti_rails.gemfile
-            ruby: 2.7
-          - gemfile: gemfiles/rails_8_1_graphiti_rails.gemfile
-            ruby: 3.0
-          - gemfile: gemfiles/rails_8_1_graphiti_rails.gemfile
-            ruby: 3.1
+          # Rails 7.1 - the floor
+          - { ruby: "3.2", gemfile: gemfiles/rails_7_1.gemfile, appraisal: true }
+          - { ruby: "3.4", gemfile: gemfiles/rails_7_1.gemfile, appraisal: true }
+          - { ruby: "4.0", gemfile: gemfiles/rails_7_1.gemfile, appraisal: true }
 
-          # Rails 8 needs ruby 3.2 +
-          - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
-            ruby: 2.7
-          - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
-            ruby: 3.0
-          - gemfile: gemfiles/rails_8_0_graphiti_rails.gemfile
-            ruby: 3.1
+          # Rails 7.2
+          - { ruby: "3.2", gemfile: gemfiles/rails_7_2.gemfile, appraisal: true }
+          - { ruby: "3.4", gemfile: gemfiles/rails_7_2.gemfile, appraisal: true }
+          - { ruby: "4.0", gemfile: gemfiles/rails_7_2.gemfile, appraisal: true }
+          - { ruby: ruby-head, gemfile: gemfiles/rails_7_2.gemfile, appraisal: true }
 
-          # Rails 7.2 needs ruby 3.1 +
-          - gemfile: gemfiles/rails_7_2_graphiti_rails.gemfile
-            ruby: 2.7
-          - gemfile: gemfiles/rails_7_2_graphiti_rails.gemfile
-            ruby: 3.0
+          # Rails 8.0
+          - { ruby: "3.2", gemfile: gemfiles/rails_8_0.gemfile, appraisal: true }
+          - { ruby: "3.4", gemfile: gemfiles/rails_8_0.gemfile, appraisal: true }
+          - { ruby: "4.0", gemfile: gemfiles/rails_8_0.gemfile, appraisal: true }
+          - { ruby: ruby-head, gemfile: gemfiles/rails_8_0.gemfile, appraisal: true }
 
-          # Rails 7.1 needs ruby 3.0 +
-          - gemfile: gemfiles/rails_7_1_graphiti_rails.gemfile
-            ruby: 2.7
-          - gemfile: gemfiles/rails_7_1_graphiti_rails.gemfile
-            ruby: 3.0
+          # Rails 8.1
+          - { ruby: "3.2", gemfile: gemfiles/rails_8_1.gemfile, appraisal: true }
+          - { ruby: "3.4", gemfile: gemfiles/rails_8_1.gemfile, appraisal: true }
+          - { ruby: "4.0", gemfile: gemfiles/rails_8_1.gemfile, appraisal: true }
+          - { ruby: ruby-head, gemfile: gemfiles/rails_8_1.gemfile, appraisal: true }
 
-          # Rails 7.0 needs ruby 3.1 +
-          - gemfile: gemfiles/rails_7_0_graphiti_rails.gemfile
-            ruby: 3.2
-          - gemfile: gemfiles/rails_7_0_graphiti_rails.gemfile
-            ruby: 3.3
-          - gemfile: gemfiles/rails_7_0_graphiti_rails.gemfile
-            ruby: 3.4
-
-          # Rails 6 needs < ruby 3.4
-          - gemfile: gemfiles/rails_6.gemfile
-            ruby: 3.4
-          - gemfile: gemfiles/rails_6_graphiti_rails.gemfile
-            ruby: 3.4
-
-          # Rails 5 can't run on Ruby 3
-          - gemfile: gemfiles/rails_5_2.gemfile
-            ruby: 3.0
-          - gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
-            ruby: 3.0
-          - gemfile: gemfiles/rails_5_2.gemfile
-            ruby: 3.1
-          - gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
-            ruby: 3.1
-          - gemfile: gemfiles/rails_5_2.gemfile
-            ruby: 3.2
-          - gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
-            ruby: 3.2
-          - gemfile: gemfiles/rails_5_2.gemfile
-            ruby: 3.3
-          - gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
-            ruby: 3.3
-          - gemfile: gemfiles/rails_5_2.gemfile
-            ruby: 3.4
-          - gemfile: gemfiles/rails_5_2_graphiti_rails.gemfile
-            ruby: 3.4
     continue-on-error: ${{ matrix.ruby == 'ruby-head' }}
     env: # $BUNDLE_GEMFILE must be set at the job level, so it is set for all steps
       BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gemfile }}
@@ -161,16 +78,66 @@ jobs:
       - name: Set up Appraisal
         if: matrix.appraisal
         run: echo "APPRAISAL_INITIALIZED=true" >> $GITHUB_ENV
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
       - name: Run tests
         run: bundle exec rspec
+  example-app:
+    name: "Example app (employee_directory)"
+    runs-on: ubuntu-latest
+    # The example app lives in its own repo and can lag behind; it is an
+    # integration canary, not a merge gate.
+    continue-on-error: true
+    env:
+      GRAPHITI_PATH: ${{ github.workspace }}/graphiti
+      BUNDLE_FROZEN: "false" # the path override rewrites the checked-in lockfile
+    defaults:
+      run:
+        working-directory: employee_directory
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: graphiti
+      - uses: actions/checkout@v4
+        with:
+          repository: graphiti-api/employee_directory
+          path: employee_directory
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+      - name: Bundle against this graphiti
+        run: bundle install
+      - name: Run the example app suite
+        run: |
+          bundle exec rails db:test:prepare
+          bundle exec rspec
+  examples:
+    name: "Examples (plain ruby, sinatra)"
+    runs-on: ubuntu-latest
+    # In-tree examples run against the working copy via their path: Gemfiles.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+      - name: Run the plain ruby example
+        working-directory: examples/plain_ruby
+        run: |
+          bundle install
+          bundle exec ruby index.rb
+      - name: Run the sinatra example
+        working-directory: examples/sinatra
+        run: |
+          bundle install
+          bundle exec ruby smoke.rb
   publish:
     name: Release
     runs-on: ubuntu-latest
+    # Only main auto-releases. Beta releases are cut by manually running
+    # "Generate New Release" with the beta branch selected.
     if: github.ref == 'refs/heads/main'
     needs: [test]
     steps:
@@ -178,4 +145,7 @@ jobs:
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: Generate New Release
+          # Without an explicit ref the dispatch runs against the default
+          # branch rather than the branch that triggered it.
+          ref: ${{ github.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}

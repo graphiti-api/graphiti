@@ -83,7 +83,7 @@ RSpec.describe Graphiti::RequestValidator do
 
       it "adds corresponding error" do
         expect(validate).to eq(false)
-        expect(instance.errors).to be_added(:'data.type', :missing)
+        expect(instance.errors).to be_added(:"data.type", :missing)
       end
     end
 
@@ -112,7 +112,7 @@ RSpec.describe Graphiti::RequestValidator do
         it "has an unknown attribute error" do
           expect(validate).to eq false
 
-          expect(instance.errors).to be_added(:'data.attributes.something_wrong', :unknown_attribute)
+          expect(instance.errors).to be_added(:"data.attributes.something_wrong", :unknown_attribute)
         end
       end
 
@@ -124,7 +124,7 @@ RSpec.describe Graphiti::RequestValidator do
         it "has an unwritable attribute error" do
           expect(validate).to eq false
 
-          expect(instance.errors).to be_added(:'data.attributes.created_at', :unwritable_attribute)
+          expect(instance.errors).to be_added(:"data.attributes.created_at", :unwritable_attribute)
         end
       end
 
@@ -141,7 +141,7 @@ RSpec.describe Graphiti::RequestValidator do
           it "has an unwritable attribute error" do
             expect(validate).to eq false
 
-            expect(instance.errors).to be_added(:'data.attributes.salary', :unwritable_attribute)
+            expect(instance.errors).to be_added(:"data.attributes.salary", :unwritable_attribute)
           end
         end
 
@@ -190,7 +190,7 @@ RSpec.describe Graphiti::RequestValidator do
             it "has an unwritable attribute error" do
               expect(validate).to eq false
               expect(instance.errors)
-                .to be_added(:'data.attributes.salary', :unwritable_attribute)
+                .to be_added(:"data.attributes.salary", :unwritable_attribute)
             end
           end
         end
@@ -227,7 +227,7 @@ RSpec.describe Graphiti::RequestValidator do
           it "is still applied" do
             expect(validate).to eq false
             expect(instance.errors)
-              .to be_added(:'data.attributes.salary', :unwritable_attribute)
+              .to be_added(:"data.attributes.salary", :unwritable_attribute)
           end
         end
 
@@ -241,7 +241,7 @@ RSpec.describe Graphiti::RequestValidator do
           it "is still applied" do
             expect(validate).to eq false
             expect(instance.errors)
-              .to be_added(:'data.attributes.salary', :unwritable_attribute)
+              .to be_added(:"data.attributes.salary", :unwritable_attribute)
           end
         end
       end
@@ -255,7 +255,7 @@ RSpec.describe Graphiti::RequestValidator do
           it "has a attribute access error" do
             expect(validate).to eq false
 
-            expect(instance.errors).to be_added(:'data.attributes.age', :type_error)
+            expect(instance.errors).to be_added(:"data.attributes.age", :type_error)
             expect(instance.errors.full_messages).to eq(["data.attributes.age should be type integer"])
           end
         end
@@ -325,16 +325,16 @@ RSpec.describe Graphiti::RequestValidator do
           {
             data: {
               type: "employees",
-              'temp-id': "23498s",
+              "temp-id": "23498s",
               attributes: {},
               relationships: {
                 positions: {
                   data: [{
-                    'temp-id': "abc123",
+                    "temp-id": "abc123",
                     type: "positions",
                     method: "create"
                   }, {
-                    'temp-id': "def456",
+                    "temp-id": "def456",
                     type: "positions",
                     method: "create"
                   }]
@@ -343,14 +343,14 @@ RSpec.describe Graphiti::RequestValidator do
             },
             included: [
               {
-                'temp-id': "abc123",
+                "temp-id": "abc123",
                 type: "positions",
                 attributes: {
                   title: "foo"
                 }
               },
               {
-                'temp-id': "def456",
+                "temp-id": "def456",
                 type: "positions",
                 attributes: {
                   title: "bar"
@@ -374,11 +374,11 @@ RSpec.describe Graphiti::RequestValidator do
 
             payload[:data][:relationships][:positions_2] = {
               data: [{
-                'temp-id': "abc123",
+                "temp-id": "abc123",
                 type: "positions",
                 method: "create"
               }, {
-                'temp-id': "def456",
+                "temp-id": "def456",
                 type: "positions",
                 method: "create"
               }]
@@ -389,8 +389,8 @@ RSpec.describe Graphiti::RequestValidator do
             expect(validate).to eq false
             expect(instance.errors.count).to eq 2
 
-            expect(instance.errors).to be_added(:'data.relationships.positions', :unwritable_relationship)
-            expect(instance.errors).to be_added(:'data.relationships.positions_2', :unwritable_relationship)
+            expect(instance.errors).to be_added(:"data.relationships.positions", :unwritable_relationship)
+            expect(instance.errors).to be_added(:"data.relationships.positions_2", :unwritable_relationship)
           end
         end
 
@@ -402,7 +402,7 @@ RSpec.describe Graphiti::RequestValidator do
           it "includes the error" do
             expect(validate).to eq false
 
-            expect(instance.errors).to be_added(:'included.0.attributes.something', :unknown_attribute)
+            expect(instance.errors).to be_added(:"included.0.attributes.something", :unknown_attribute)
           end
 
           context "there are bad attributes in multiple items" do
@@ -415,9 +415,9 @@ RSpec.describe Graphiti::RequestValidator do
               expect(validate).to eq false
 
               expect(instance.errors.count).to eq 3
-              expect(instance.errors).to be_added(:'data.attributes.something', :unknown_attribute)
-              expect(instance.errors).to be_added(:'included.0.attributes.something', :unknown_attribute)
-              expect(instance.errors).to be_added(:'included.1.attributes.something', :unknown_attribute)
+              expect(instance.errors).to be_added(:"data.attributes.something", :unknown_attribute)
+              expect(instance.errors).to be_added(:"included.0.attributes.something", :unknown_attribute)
+              expect(instance.errors).to be_added(:"included.1.attributes.something", :unknown_attribute)
             end
           end
         end
@@ -447,7 +447,7 @@ RSpec.describe Graphiti::RequestValidator do
 
         it "has an unknown relationship error" do
           expect(validate).to eq false
-          expect(instance.errors).to be_added(:'data.relationships.pets', :invalid_relationship)
+          expect(instance.errors).to be_added(:"data.relationships.pets", :invalid_relationship)
         end
 
         it "raises InvalidRequest when using validate!" do
@@ -470,7 +470,7 @@ RSpec.describe Graphiti::RequestValidator do
               relationships: {
                 positions: {
                   data: [{
-                    'temp-id': "abc123",
+                    "temp-id": "abc123",
                     type: "positions",
                     method: "create"
                   }]
@@ -479,7 +479,7 @@ RSpec.describe Graphiti::RequestValidator do
             },
             included: [
               {
-                'temp-id': "abc123",
+                "temp-id": "abc123",
                 type: "positions",
                 attributes: {title: "foo"}
               }

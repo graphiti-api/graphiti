@@ -17,7 +17,7 @@ module Graphiti
 
         # @api private
         def _all(params, opts, base_scope)
-          runner = Runner.new(self, params, opts.delete(:query), :all)
+          runner = Runner.new(self, params, query: opts.delete(:query), action: :all)
           opts[:params] = params
           runner.proxy(base_scope, opts.merge(caching_options))
         end
@@ -36,7 +36,7 @@ module Graphiti
           params[:filter] ||= {}
           params[:filter][:id] = id if id
 
-          runner = Runner.new(self, params, nil, :find)
+          runner = Runner.new(self, params, action: :find)
 
           find_options = {
             single: true,
@@ -50,13 +50,13 @@ module Graphiti
         def build(params, base_scope = nil)
           validate_request!(params)
           runner = Runner.new(self, params)
-          runner.proxy(base_scope, single: true, raise_on_missing: true)
+          runner.proxy(base_scope, single: true, raise_on_missing: true, assign_action: :create)
         end
 
         # Wrap models fetched outside graphiti so they render like any other proxy
         def wrap(models, base_scope = nil)
           validate_wrap_models!(models)
-          runner = Runner.new(self, {}, nil, :find)
+          runner = Runner.new(self, {}, action: :find)
           runner.proxy(base_scope, bypass_required_filters: true).tap do |proxy|
             proxy.data = models
           end
@@ -84,8 +84,8 @@ module Graphiti
 
           if context&.respond_to?(:request)
             path = context.request.env["PATH_INFO"]
-            unless allow_request?(path, params, context_namespace)
-              raise Errors::InvalidEndpoint.new(self, path, context_namespace)
+            unless allow_request?(path, params, current_action)
+              raise Errors::InvalidEndpoint.new(self, path, current_action)
             end
           end
         end

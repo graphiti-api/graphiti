@@ -3,7 +3,7 @@ module Graphiti
     attr_reader :resources
 
     def self.generate(resources = nil)
-      # TODO: Maybe handle this in graphiti-rails
+      # TODO: Maybe handle this in the Rails integration
       ::Rails.application.eager_load! if defined?(::Rails)
       resources ||= Graphiti.resources.reject(&:abstract_class?)
       resources.reject! { |r| r.name.nil? }
@@ -249,6 +249,10 @@ module Graphiti
 
           if config.guarded?
             schema[:guard] = true
+          end
+
+          if config.render_resource_ids?
+            schema[:linkage] = true
           end
 
           r[name] = schema

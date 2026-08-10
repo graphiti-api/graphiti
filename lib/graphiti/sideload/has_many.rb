@@ -2,7 +2,7 @@ class Graphiti::Sideload::HasMany < Graphiti::Sideload
   def initialize(name, opts)
     @inverse_filter = opts[:inverse_filter]
 
-    super(name, opts)
+    super
   end
 
   def type

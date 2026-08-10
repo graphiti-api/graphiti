@@ -37,15 +37,27 @@ RSpec.describe Graphiti::Runner do
       subject(:query) { proxy.query }
 
       context "when an action is provided" do
-        let(:instance) { described_class.new(resource_class, params, nil, :action) }
+        let(:instance) { described_class.new(resource_class, params, action: :action) }
         it { expect(query.action).to eq(:action) }
       end
 
       context "when a query is provided" do
         let(:provided_query) { double(:provided_query) }
-        let(:instance) { described_class.new(resource_class, params, provided_query) }
+        let(:instance) { described_class.new(resource_class, params, query: provided_query) }
 
         it { is_expected.to eq(provided_query) }
+      end
+
+      context "when query and action are provided positionally" do
+        let(:provided_query) { double(:provided_query) }
+
+        it "warns and maps them to keywords" do
+          expect(Graphiti::DEPRECATOR).to receive(:warn).once.and_return(nil)
+
+          runner = described_class.new(resource_class, params, provided_query, :action)
+
+          expect(runner.query).to eq(provided_query)
+        end
       end
     end
   end

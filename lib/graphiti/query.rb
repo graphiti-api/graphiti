@@ -4,7 +4,15 @@ module Graphiti
   class Query
     attr_reader :resource, :association_name, :params, :action
 
-    def initialize(resource, params, association_name = nil, nested_include = nil, parents = [], action = nil)
+    def initialize(resource, params, *positional, association_name: nil, nested_include: nil, parents: [], action: nil)
+      if positional.any?
+        Graphiti::DEPRECATOR.warn("Passing Query.new trailing arguments positionally is deprecated. Use association_name:/nested_include:/parents:/action: keywords.")
+        association_name ||= positional[0]
+        nested_include ||= positional[1]
+        parents = positional[2] if positional.length > 2
+        action ||= positional[3]
+      end
+
       @resource = resource
       @association_name = association_name
       @params = params
@@ -18,6 +26,13 @@ module Graphiti
 
     def association?
       !!@association_name
+    end
+
+    # Concurrent::Map because sideload scopes resolve on pool threads
+    def entity_map
+      return root.entity_map unless root == self
+
+      @entity_map ||= Concurrent::Map.new
     end
 
     def top_level?
@@ -109,9 +124,10 @@ module Graphiti
             relationship_name = sideload ? sideload.name : key
             hash[relationship_name] = Query.new sl_resource,
               @params,
-              key,
-              sub_hash,
-              query_parents, :all
+              association_name: key,
+              nested_include: sub_hash,
+              parents: query_parents,
+              action: :all
           else
             handle_missing_sideload(key)
           end
@@ -121,6 +137,10 @@ module Graphiti
 
     def parents
       @parents ||= []
+    end
+
+    def root
+      parents.first || self
     end
 
     def fields
@@ -208,14 +228,14 @@ module Graphiti
         allowlist = nil
         if @resource.context&.respond_to?(:sideload_allowlist)
           allowlist = @resource.context.sideload_allowlist
-          allowlist = allowlist[@resource.context_namespace] if allowlist
+          allowlist = allowlist[@resource.current_action] if allowlist
         end
 
         scrubbed = allowlist ? Util::IncludeParams.scrub(requested, allowlist) : requested
 
         scrubbed.filter do |key, value|
           sideload = @resource.class.sideload(key)
-          sideload.nil? ? true : sideload.readable?
+          sideload.nil? || sideload.readable?
         end
       end
     end
@@ -291,7 +311,7 @@ module Graphiti
       return false unless association?
 
       split = name.to_s.split(".")
-      query_names = split[0..split.length - 2].map(&:to_sym)
+      query_names = split[0..-2].map(&:to_sym)
       my_names = parents.map(&:association_name).compact + [association_name].compact
       query_names == my_names
     end
@@ -323,7 +343,7 @@ module Graphiti
     end
 
     def sort_hash(attr)
-      value = attr[0] == "-" ? :desc : :asc
+      value = (attr[0] == "-") ? :desc : :asc
       key = attr.sub("-", "").to_sym
 
       {key => value}

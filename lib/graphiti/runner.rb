@@ -3,12 +3,17 @@ module Graphiti
     attr_reader :params
     attr_reader :deserialized_payload
 
-    def initialize(resource_class, params, query = nil, action = nil)
+    def initialize(resource_class, params, *positional, query: nil, action: nil)
+      if positional.any?
+        Graphiti::DEPRECATOR.warn("Passing query/action to Runner.new positionally is deprecated. Use query:/action: keywords.")
+        query ||= positional[0]
+        action ||= positional[1]
+      end
+
       @resource_class = resource_class
       @params = params
       @query = query
       @action = action
-
       validator = RequestValidator.new(jsonapi_resource, params, action)
       validator.validate!
 
@@ -30,7 +35,7 @@ module Graphiti
     end
 
     def query
-      @query ||= Query.new(jsonapi_resource, params, nil, nil, [], @action)
+      @query ||= Query.new(jsonapi_resource, params, action: @action)
     end
 
     def query_hash
@@ -77,6 +82,7 @@ module Graphiti
         payload: deserialized_payload,
         single: opts[:single],
         raise_on_missing: opts[:raise_on_missing],
+        assign_action: opts[:assign_action],
         cache: opts[:cache],
         cache_expires_in: opts[:cache_expires_in],
         cache_tag: opts[:cache_tag]

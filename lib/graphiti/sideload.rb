@@ -20,6 +20,7 @@ module Graphiti
     def initialize(name, opts)
       @name = name
       validate_options!(opts)
+      translate_deprecated_options!(opts)
       @parent_resource_class = opts[:parent_resource]
       @resource_class_name = opts[:resource]
       @primary_key = opts[:primary_key]
@@ -42,7 +43,7 @@ module Graphiti
       @group_name = opts[:group_name]
       @polymorphic_child = opts[:polymorphic_child]
       @parent = opts[:parent]
-      @always_include_resource_ids = opts[:always_include_resource_ids]
+      @render_resource_ids = opts[:resource_ids]
 
       if polymorphic_child?
         parent.resource.polymorphic << resource_class
@@ -110,6 +111,31 @@ module Graphiti
       dynamic_flag?(@readable) || dynamic_flag?(@writable)
     end
 
+    def readable_guarded?
+      dynamic_flag?(@readable)
+    end
+
+    def readable_guard_name
+      @readable.to_sym if @readable.is_a?(Symbol) || @readable.is_a?(String)
+    end
+
+    def non_default_options
+      options = {}
+      options[:as] = association_name if @as
+      options[:primary_key] = primary_key unless primary_key == :id
+      options[:single] = true if single?
+      options[:remote] = @remote if remote?
+      options[:link] = @link unless @link.nil?
+      options[:readable] = @readable unless @readable.nil? || @readable == true
+      options[:writable] = @writable unless @writable.nil? || @writable == true
+      options[:resource_ids] = @render_resource_ids unless @render_resource_ids.nil?
+      options
+    end
+
+    def customized_base_scope?
+      !!@base_scope
+    end
+
     def single?
       !!@single
     end
@@ -122,8 +148,22 @@ module Graphiti
       !!@polymorphic_as
     end
 
-    def always_include_resource_ids?
-      !!@always_include_resource_ids
+    def resource_ids_from_foreign_key?
+      resource_ids_blocker.nil?
+    end
+
+    def resource_ids_blocker
+      :no_foreign_key_on_parent
+    end
+
+    def render_resource_ids?
+      return !!@render_resource_ids unless @render_resource_ids.nil?
+
+      default_render_resource_ids?
+    end
+
+    def default_render_resource_ids?
+      false
     end
 
     def link?
@@ -292,48 +332,19 @@ module Graphiti
       children.replace(associated) if track_associated
     end
 
-    # Synchronous counterpart to #future_resolve, used when concurrency is off.
-    # Mirrors #future_resolve but resolves inline via the synchronous
-    # Scope#resolve / #load paths (no promises). See Scope#sync_resolve_sideloads.
     def resolve(parents, query, graph_parent)
-      return future_resolve(parents, query, graph_parent).value! if Graphiti.config.concurrency
-
-      if single? && parents.length > 1
-        raise Errors::SingularSideload.new(self, parents.length)
-      end
-
-      if self.class.scope_proc
-        sideload_scope = fire_scope(parents)
-        sideload_scope = Scope.new sideload_scope,
-          resource,
-          query,
-          parent: graph_parent,
-          sideload: self,
-          sideload_parent_length: parents.length,
-          default_paginate: false
-        sideload_scope.resolve do |sideload_results|
-          fire_assign(parents, sideload_results)
-        end
+      if Graphiti.config.concurrency
+        future_resolve(parents, query, graph_parent).value!
       else
-        load(parents, query, graph_parent)
+        sync_resolve(parents, query, graph_parent)
       end
     end
 
     def future_resolve(parents, query, graph_parent)
-      if single? && parents.length > 1
-        raise Errors::SingularSideload.new(self, parents.length)
-      end
+      assert_singular!(parents)
 
       if self.class.scope_proc
-        sideload_scope = fire_scope(parents)
-        sideload_scope = Scope.new sideload_scope,
-          resource,
-          query,
-          parent: graph_parent,
-          sideload: self,
-          sideload_parent_length: parents.length,
-          default_paginate: false
-        sideload_scope.future_resolve do |sideload_results|
+        build_sideload_scope(parents, query, graph_parent).future_resolve do |sideload_results|
           fire_assign(parents, sideload_results)
         end
       else
@@ -401,6 +412,37 @@ module Graphiti
 
     private
 
+    # Synchronous counterpart to #future_resolve, used when concurrency is off.
+    # Resolves inline via the synchronous Scope#resolve / #load paths (no
+    # promises). See Scope#sync_resolve_sideloads.
+    def sync_resolve(parents, query, graph_parent)
+      assert_singular!(parents)
+
+      if self.class.scope_proc
+        build_sideload_scope(parents, query, graph_parent).resolve do |sideload_results|
+          fire_assign(parents, sideload_results)
+        end
+      else
+        load(parents, query, graph_parent)
+      end
+    end
+
+    def assert_singular!(parents)
+      if single? && parents.length > 1
+        raise Errors::SingularSideload.new(self, parents.length)
+      end
+    end
+
+    def build_sideload_scope(parents, query, graph_parent)
+      Scope.new fire_scope(parents),
+        resource,
+        query,
+        parent: graph_parent,
+        sideload: self,
+        sideload_parent_length: parents.length,
+        default_paginate: false
+    end
+
     def future_load(parents, query, graph_parent)
       proxy = build_resource_proxy(parents, query, graph_parent)
       proxy.respond_to?(:future_resolve_data) ? proxy.future_resolve_data : Concurrent::Promises.fulfilled_future(proxy)
@@ -413,6 +455,18 @@ module Graphiti
         end
       end
       false
+    end
+
+    def translate_deprecated_options!(opts)
+      return unless opts.key?(:always_include_resource_ids)
+
+      Graphiti::DEPRECATOR.deprecation_warning(
+        :always_include_resource_ids,
+        "Use :resource_ids instead (#{opts[:parent_resource]&.name}##{@name})"
+      )
+
+      value = opts.delete(:always_include_resource_ids)
+      opts[:resource_ids] = value unless opts.key?(:resource_ids)
     end
 
     def validate_options!(opts)

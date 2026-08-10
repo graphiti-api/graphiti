@@ -1,5 +1,127 @@
 graphiti changelog
 
+# [2.0.0-beta.8](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.7...v2.0.0-beta.8) (2026-08-10)
+
+
+### Bug Fixes
+
+* accept a single value for array filters ([#517](https://github.com/graphiti-api/graphiti/issues/517)) ([ee685b6](https://github.com/graphiti-api/graphiti/commit/ee685b625e967a8225d48b486bd093e3a6970176))
+* accept a single value for array filters ([#517](https://github.com/graphiti-api/graphiti/issues/517)) ([23f3e80](https://github.com/graphiti-api/graphiti/commit/23f3e80b583b0bf0843d8bb9334970ae56d83299))
+* drop the relationship guard install notice ([65b8be6](https://github.com/graphiti-api/graphiti/commit/65b8be65455a7d034c9dca082434c1dbfe610a7a))
+* reject invalid page parameters ([#537](https://github.com/graphiti-api/graphiti/issues/537)) ([fbb5683](https://github.com/graphiti-api/graphiti/commit/fbb5683393301e17ffcea84990ac5a95bdd3e15f)), closes [#347](https://github.com/graphiti-api/graphiti/issues/347)
+* treat empty polymorphic configuration as unset ([#538](https://github.com/graphiti-api/graphiti/issues/538)) ([a27eeea](https://github.com/graphiti-api/graphiti/commit/a27eeea6eeb72749376c1f7959cadc89012142b9)), closes [#199](https://github.com/graphiti-api/graphiti/issues/199)
+* typecast null values in filter lists ([#515](https://github.com/graphiti-api/graphiti/issues/515)) ([3756fd1](https://github.com/graphiti-api/graphiti/commit/3756fd12c48d2fb3cf5e2d40c38aab92f12218b0))
+* typecast null values in filter lists ([#515](https://github.com/graphiti-api/graphiti/issues/515)) ([3dcf4c8](https://github.com/graphiti-api/graphiti/commit/3dcf4c868abb12eb6b6d59cd0814b227d4838ece))
+
+
+### Features
+
+* add full set of commented-out Resource defaults in ApplicationResource when using the generator ([367678e](https://github.com/graphiti-api/graphiti/commit/367678eb3c2c737331f8edb00e00e70483a778b4))
+* **generators:** explicit rendering by default, respond_with only when Responders is included ([70741fe](https://github.com/graphiti-api/graphiti/commit/70741fef2a3a585bbef32c3e535027ff610fda77))
+* in-tree plain ruby and sinatra examples ([b92c6d9](https://github.com/graphiti-api/graphiti/commit/b92c6d9af22f759cc1f1eaccc250ecd04901e2aa))
+* ship the Rails application template in this repo ([76d5329](https://github.com/graphiti-api/graphiti/commit/76d53291f94c576792e3649044784f88fbaa47a7))
+
+# [2.0.0-beta.7](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.6...v2.0.0-beta.7) (2026-08-10)
+
+
+### Features
+
+* dedupe under concurrency and across distinct resources ([800b1a2](https://github.com/graphiti-api/graphiti/commit/800b1a2bf9bb59702efd00afe8e4f54ae06b500e))
+* deduplicate sideloaded entities across include paths ([0c2829a](https://github.com/graphiti-api/graphiti/commit/0c2829a634e9b96e2403ff168be9a48c6a663c78))
+* deprecate SpecHelpers::Sugar in favor of the full helper names ([b155849](https://github.com/graphiti-api/graphiti/commit/b155849f55fe84b2d0911fa4681d82682dfa39ae))
+
+# [2.0.0-beta.6](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.5...v2.0.0-beta.6) (2026-08-09)
+
+
+### Bug Fixes
+
+* reject invalid page parameters ([#537](https://github.com/graphiti-api/graphiti/issues/537)) ([bb3698b](https://github.com/graphiti-api/graphiti/commit/bb3698b52911c658c5d023ad8fd55b5106195001)), closes [#347](https://github.com/graphiti-api/graphiti/issues/347)
+* treat empty polymorphic configuration as unset ([#538](https://github.com/graphiti-api/graphiti/issues/538)) ([5c17899](https://github.com/graphiti-api/graphiti/commit/5c1789993fbb4638d4443cf014b8bef358addb80)), closes [#199](https://github.com/graphiti-api/graphiti/issues/199)
+
+
+### Features
+
+* Add graphiti:audit task to audit resources for issues ([84436ea](https://github.com/graphiti-api/graphiti/commit/84436eab7c7d0713ec6f355b62ba8b06913ee31a))
+* raise MissingRelationshipMethod when rendering reads an association the model does not define ([1c41cee](https://github.com/graphiti-api/graphiti/commit/1c41cee787b4f747d2906b2230f8fb926e3d887d))
+* rename always_include_resource_ids to resource_ids, with a belongs_to_resource_ids_by_default setting ([8b11151](https://github.com/graphiti-api/graphiti/commit/8b111516822f6fc6e3675b59941688791cb34e74))
+
+# [2.0.0-beta.5](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.4...v2.0.0-beta.5) (2026-08-07)
+
+
+### Bug Fixes
+
+* drop the relationship guard install notice ([c204312](https://github.com/graphiti-api/graphiti/commit/c20431214e126cb8e72c82022ee4c852b10a024b))
+* keep rake task helpers out of the global namespace ([0a41a60](https://github.com/graphiti-api/graphiti/commit/0a41a6022fa4c9151948714c31db367aee330e22)), closes [graphiti-api/graphiti-rails#91](https://github.com/graphiti-api/graphiti-rails/issues/91)
+
+
+### Features
+
+* add rspec matchers for resource relationships and attributes ([70525f7](https://github.com/graphiti-api/graphiti/commit/70525f7e10c511aa0c867ecc873f63f1790b8247)), closes [graphiti-api/graphiti_spec_helpers#14](https://github.com/graphiti-api/graphiti_spec_helpers/issues/14)
+* let the resource generator name the controller ([6ea7141](https://github.com/graphiti-api/graphiti/commit/6ea714181f3da011cae9f42477b4c3681a7a90ff)), closes [graphiti-api/graphiti-rails#53](https://github.com/graphiti-api/graphiti-rails/issues/53)
+
+# [2.0.0-beta.4](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.3...v2.0.0-beta.4) (2026-08-07)
+
+
+### Bug Fixes
+
+* a subclass redeclaring a relationship reaches its serializer ([976dbc4](https://github.com/graphiti-api/graphiti/commit/976dbc47e7bbf951da925a13a34f1bc9679470f8))
+* make each appraisal test the Rails version it is named for ([9e00652](https://github.com/graphiti-api/graphiti/commit/9e00652e124a411a2916d0fef52dc4fd2dc59020))
+* require active_support so graphiti boots without Rails ([d431a03](https://github.com/graphiti-api/graphiti/commit/d431a0328fb4071429f39f4c69cda9c6cee308f2))
+
+
+### Code Refactoring
+
+* bridge the remaining 1.x names ([3d80ef9](https://github.com/graphiti-api/graphiti/commit/3d80ef98cf765a152032b7fed89b3cdc10be23dc))
+
+
+### Features
+
+* belongs_to renders resource linkage by default ([024824d](https://github.com/graphiti-api/graphiti/commit/024824d319619811ade886c72ce345cfeb584dbc)), closes [#168](https://github.com/graphiti-api/graphiti/issues/168) [#185](https://github.com/graphiti-api/graphiti/issues/185) [#167](https://github.com/graphiti-api/graphiti/issues/167) [#167](https://github.com/graphiti-api/graphiti/issues/167)
+* fold graphiti_spec_helpers into graphiti ([da955a1](https://github.com/graphiti-api/graphiti/commit/da955a1e090ba44be31bf043ed90baa6661a4772))
+* fold graphiti-rails into graphiti ([7740f8a](https://github.com/graphiti-api/graphiti/commit/7740f8a5803f1fbf02ef4e27d8baa6e0809d2b43)), closes [graphiti-rails#52](https://github.com/graphiti-rails/issues/52)
+* handle exceptions with rescue_registry, fold in graphiti_errors ([e48171c](https://github.com/graphiti-api/graphiti/commit/e48171c117e7b8141fb6f966a972b0c1cd50c5ab))
+* require Ruby 3.2 and Rails 7.1 ([635b249](https://github.com/graphiti-api/graphiti/commit/635b249a99f7d1ef726ae2328707ee6210cc0608))
+
+
+### BREAKING CHANGES
+
+* nothing removed, everything warns and goes away in 3.0. Except `include GraphitiErrors`, which now raises, as rescue_registry replaced it, so there's nothing to point it at.
+* graphiti_errors is no longer a dependency and must be removed from the Gemfile, along with any `include GraphitiErrors`.
+
+GraphitiErrors::Validation::Serializer is now Graphiti::ErrorSerializers::Validation, and GraphitiErrors.enable!/disable! becomes handle_request_exceptions. 409 responses now report code "conflict" and title "Conflict Error".
+* Ruby >= 3.2 and Rails >= 7.1 are now required.
+* remove graphiti-rails from your Gemfile. Controllers serving Graphiti resources must `include Graphiti::Rails::Controller` — previously every controller received it whether it wanted it or not. Graphiti::Responders is now Graphiti::Rails::Responders.
+* remove graphiti_spec_helpers from your Gemfile. Prefer Graphiti::SpecHelpers and "graphiti/spec_helpers/rspec"; the old namespace and require paths still resolve, warn, and are removed in 3.0.
+
+# [2.0.0-beta.3](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.2...v2.0.0-beta.3) (2026-07-31)
+
+
+### Features
+
+* carry the assigned model on the resource, not through override signatures ([8ad848d](https://github.com/graphiti-api/graphiti/commit/8ad848d9bcd24cd63efb67e8ce32d5c8f3cfe147))
+
+# [2.0.0-beta.2](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.1...v2.0.0-beta.2) (2026-07-30)
+
+
+### Features
+
+* add Resource.wrap as an easy way to use graphiti serialization on models fetched via other means (and not via graphiti's finders) ([#513](https://github.com/graphiti-api/graphiti/issues/513)) ([fcd19e2](https://github.com/graphiti-api/graphiti/commit/fcd19e2d023091d85947dbdd89259b587e0f582b))
+* deprecate mutating attributes in around_persistence hooks ([#514](https://github.com/graphiti-api/graphiti/issues/514)) [skip ci] ([8410ab0](https://github.com/graphiti-api/graphiti/commit/8410ab0a916077601cf85d8260a05ef9098149eb))
+
+# [2.0.0-beta.1](https://github.com/graphiti-api/graphiti/compare/v1.12.2...v2.0.0-beta.1) (2026-07-30)
+
+
+### Features
+
+* drop Ruby 2.7 and Rails 5.2 support ([e905ddb](https://github.com/graphiti-api/graphiti/commit/e905ddb5c842299ffbfe5ec3c4ff98ec9b603a51))
+* the model you inspect is the model that saves ([#465](https://github.com/graphiti-api/graphiti/issues/465)) ([a905fff](https://github.com/graphiti-api/graphiti/commit/a905fffc3a2aa5e663ff4cadcd632e68f053c81a))
+
+
+### BREAKING CHANGES
+
+* around_persistence hooks receive the assigned model instead of the attributes hash. Move attribute-hash modifications to before_attributes, or set values on the model. Custom create/update overrides that should receive a pre-assigned model must accept an assigned_model: keyword. See UPGRADING.md
+* Ruby >= 3.0 / Rails >= 6 are now required.
+
 ## [1.13.3](https://github.com/graphiti-api/graphiti/compare/v1.13.2...v1.13.3) (2026-08-09)
 
 
@@ -22,6 +144,7 @@ graphiti changelog
 
 * accept a single value for array filters ([#517](https://github.com/graphiti-api/graphiti/issues/517)) ([23f3e80](https://github.com/graphiti-api/graphiti/commit/23f3e80b583b0bf0843d8bb9334970ae56d83299))
 * typecast null values in filter lists ([#515](https://github.com/graphiti-api/graphiti/issues/515)) ([3dcf4c8](https://github.com/graphiti-api/graphiti/commit/3dcf4c868abb12eb6b6d59cd0814b227d4838ece))
+
 
 # [1.13.0](https://github.com/graphiti-api/graphiti/compare/v1.12.2...v1.13.0) (2026-07-30)
 

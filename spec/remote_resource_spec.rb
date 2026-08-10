@@ -403,7 +403,7 @@ RSpec.describe "remote resources" do
 
         context "and there is nested pagination" do
           before do
-            params[:page] = {'positions.size': 5, 'positions.number': 2}
+            params[:page] = {"positions.size": 5, "positions.number": 2}
           end
 
           it "is passed to the remote API" do
@@ -413,7 +413,7 @@ RSpec.describe "remote resources" do
 
         context "and there are nested filters" do
           before do
-            params[:filter] = {'positions.title': {suffix: "a"}}
+            params[:filter] = {"positions.title": {suffix: "a"}}
           end
 
           it "is passed to the remote API" do
@@ -512,8 +512,8 @@ RSpec.describe "remote resources" do
     context "when pagination params" do
       before do
         params[:page] = {
-          'positions.department.size': 3,
-          'positions.department.teams.size': 2
+          "positions.department.size": 3,
+          "positions.department.teams.size": 2
         }
       end
 
@@ -525,8 +525,8 @@ RSpec.describe "remote resources" do
     context "when filter params" do
       before do
         params[:filter] = {
-          'positions.department.name': "foo",
-          'positions.department.teams.id': "4"
+          "positions.department.name": "foo",
+          "positions.department.teams.id": "4"
         }
       end
 
@@ -640,7 +640,7 @@ RSpec.describe "remote resources" do
       context "and there is a nested filter" do
         before do
           params[:include] = "positions.department"
-          params[:filter] = {'positions.department.name': "foo"}
+          params[:filter] = {"positions.department.name": "foo"}
         end
 
         it "queries correctly" do
@@ -652,7 +652,7 @@ RSpec.describe "remote resources" do
       context "and there is nested pagination" do
         before do
           params[:include] = "positions.department"
-          params[:page] = {'positions.department.size': 2}
+          params[:page] = {"positions.department.size": 2}
         end
 
         it "queries correctly" do

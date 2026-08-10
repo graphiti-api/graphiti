@@ -29,6 +29,26 @@ RSpec.describe Graphiti::Scope do
       expect(instance.resolve).to eq([])
     end
 
+    context "when given a block" do
+      let(:results) { [double.as_null_object] }
+
+      it "yields the resolved results" do
+        yielded = nil
+        instance.resolve { |records| yielded = records }
+        expect(yielded).to eq(results)
+      end
+
+      context "when Graphiti.config.concurrency is true" do
+        before { allow(Graphiti.config).to receive(:concurrency).and_return(true) }
+
+        it "yields the resolved results" do
+          yielded = nil
+          instance.resolve { |records| yielded = records }
+          expect(yielded).to eq(results)
+        end
+      end
+    end
+
     context "when sideloading" do
       let(:sideload) { double(shared_remote?: false, name: :positions) }
       let(:results) { [double.as_null_object] }

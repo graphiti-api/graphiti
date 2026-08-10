@@ -19,7 +19,14 @@ module Graphiti
       private
 
       def apply?(sideload)
-        @serializer.relationship_blocks[sideload.name].nil?
+        return true if @serializer.relationship_blocks[sideload.name].nil?
+
+        # A subclass inherits its parent's relationship blocks, each closed
+        # over the parent's sideload. Redeclaring the relationship has to
+        # replace that block or the override never reaches the payload.
+        # Anything not generated here was written by hand, so leave it.
+        applied = @serializer.relationship_sideloads[sideload.name]
+        !applied.nil? && !applied.equal?(sideload)
       end
     end
 
@@ -32,6 +39,10 @@ module Graphiti
 
       def apply
         sideload = @sideload
+        # Reassign rather than mutate: ancestors share the hash by reference
+        # until a subclass writes to it.
+        @serializer.relationship_sideloads =
+          @serializer.relationship_sideloads.merge(@sideload.name => @sideload)
         @serializer.relationship(@sideload.name, if: -> { sideload.readable? }, &block)
       end
 
@@ -53,9 +64,25 @@ module Graphiti
         proc do
           data { instance_eval(&data_proc_ref) }
 
-          # include relationship links for belongs_to relationships
-          # https://github.com/graphiti-api/graphiti/issues/167
-          linkage always: sideload_ref.always_include_resource_ids?
+          # An included relationship is already loaded, and a customized
+          # sideload can resolve it to something the foreign key alone would
+          # not predict, so the loaded records win. Only the un-included case
+          # is worth short-circuiting.
+          if sideload_ref.resource_ids_from_foreign_key? &&
+              !self_ref.send(:included_anywhere?, @proxy.query.include_hash, sideload_ref.name)
+            linkage always: sideload_ref.render_resource_ids? do
+              foreign_key = @object.public_send(sideload_ref.foreign_key)
+
+              unless foreign_key.nil?
+                {
+                  type: sideload_ref.resource.type,
+                  id: foreign_key.to_s
+                }
+              end
+            end
+          else
+            linkage always: sideload_ref.render_resource_ids?
+          end
 
           if link_ref
             if @proxy.query.links?
@@ -69,10 +96,42 @@ module Graphiti
         end
       end
 
+      # A relationship nested under another one is still loaded and can still
+      # be narrowed by a deep filter, so the foreign key is not a safe
+      # stand-in for what the request actually returns.
+      def included_anywhere?(include_hash, name)
+        include_hash.any? do |key, nested|
+          key == name || included_anywhere?(nested, name)
+        end
+      end
+
       def data_proc
         sideload_ref = @sideload
+        resource_class_ref = @resource_class
         ->(_) {
-          if (records = @object.public_send(sideload_ref.association_name))
+          begin
+            records = @object.public_send(sideload_ref.association_name)
+          rescue NoMethodError => error
+            # #receiver raises ArgumentError when the error was built by hand
+            # rather than raised by a failed call, and a hand-built one can
+            # still carry a matching #name.
+            receiver = begin
+              error.receiver
+            rescue ArgumentError
+              nil
+            end
+
+            raise unless error.name == sideload_ref.association_name &&
+              receiver.equal?(@object)
+
+            # A private method exists, so "has no such method" would be a lie.
+            raise if @object.respond_to?(sideload_ref.association_name, true)
+
+            raise Errors::MissingRelationshipMethod
+              .new(resource_class_ref, sideload_ref, @object)
+          end
+
+          if records
             if records.respond_to?(:to_ary)
               records.each { |r| sideload_ref.resource.decorate_record(r) }
             else
@@ -85,7 +144,7 @@ module Graphiti
       end
 
       def eagerly_validate_links?
-        # TODO: Maybe handle this in graphiti-rails
+        # TODO: Maybe handle this in the Rails integration
         if defined?(::Rails) && (app = ::Rails.application)
           app.config.eager_load
         else
@@ -114,7 +173,7 @@ module Graphiti
       def validate_link_for_sideload!(sideload)
         return if sideload.resource.remote?
 
-        action = sideload.type == :belongs_to ? :show : :index
+        action = (sideload.type == :belongs_to) ? :show : :index
         cache_key = :"#{@sideload.object_id}-#{action}"
         return if self.class.validated_link_cache.include?(cache_key)
         prc = Graphiti.config.context_for_endpoint

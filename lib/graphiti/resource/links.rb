@@ -41,7 +41,7 @@ module Graphiti
       def infer_endpoint
         return unless name
 
-        path = "/#{name.gsub("Resource", "").pluralize.underscore}".to_sym
+        path = :"/#{name.gsub("Resource", "").pluralize.underscore}"
         {
           path: path,
           full_path: full_path_for(path),

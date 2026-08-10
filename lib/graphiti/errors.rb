@@ -270,7 +270,7 @@ module Graphiti
           #{@resource_class.name}: error occurred while sideloading "#{@sideload_name}"!
 
           The error was raised while attempting to build query parameters for the associated Resource.
-          Read more about sideload scoping here: www.graphiti.dev/guides/concepts/resources#customizing-scope
+          Read more about sideload scoping here: graphiti.dev/concepts/relationships#customizing-scope
 
           A good way to debug is to put a debugger within the 'params' block.
 
@@ -294,7 +294,7 @@ module Graphiti
 
           The error was raised while attempting to build the scope for the associated Resource.
 
-          Read more about sideload scoping here: www.graphiti.dev/guides/concepts/resources#customizing-scope
+          Read more about sideload scoping here: graphiti.dev/concepts/relationships#customizing-scope
 
           Here's the original, underlying error:
 
@@ -315,7 +315,7 @@ module Graphiti
           #{@resource_class.name}: error occurred while sideloading "#{@sideload_name}"!
 
           The error was raised while attempting to assign relevant model instances. Read
-          more about sideload assignment here: www.graphiti.dev/guides/concepts/resources#customizing-assignment
+          more about sideload assignment here: graphiti.dev/concepts/relationships#customizing-assignment
 
           A good way to debug is to put a debugger within the 'assign' block.
 
@@ -449,7 +449,7 @@ module Graphiti
 
           self.validate_endpoints = false
 
-          See https://www.graphiti.dev/guides/concepts/links for more information.
+          See https://graphiti.dev/concepts/links for more information.
 
           The current endpoints allowed for this resource are: #{@resource_class.endpoints.inspect}
         MSG
@@ -689,6 +689,53 @@ module Graphiti
       end
     end
 
+    class InvalidBelongsToResourceIds < Base
+      def initialize(resource_class, value)
+        @resource_class = resource_class
+        @value = value
+      end
+
+      def message
+        <<~MSG
+          #{@resource_class.name}: belongs_to_resource_ids_by_default must be one of :foreign_key, :always, or :never. Got #{@value.inspect}.
+
+            :foreign_key - render resource ids wherever the foreign key already holds the related id (default)
+            :always      - render them for every belongs_to, loading the association when the foreign key cannot answer
+            :never       - render none
+
+          To render resource ids for a collection, ask for it one relationship at a time with `resource_ids: true`.
+        MSG
+      end
+    end
+
+    class MissingRelationshipMethod < Base
+      def initialize(resource_class, sideload, model)
+        @resource_class = resource_class
+        @sideload = sideload
+        @model = model
+      end
+
+      def message
+        <<~MSG
+          #{@resource_class.name}: relationship #{@sideload.name.inspect} is declared, but #{@model.class.name} has no ##{@sideload.association_name} method.
+
+          Rendering the relationship reads the association off the model. Define ##{@sideload.association_name} on #{@model.class.name}, point the relationship at the real association with `as:`, or remove the relationship.
+          #{resource_ids_note}
+        MSG
+      end
+
+      private
+
+      def resource_ids_note
+        return "" unless @sideload.render_resource_ids?
+
+        <<~MSG
+
+          resource_ids is set on this relationship, so every render reads the association, not just requests that include it. See graphiti.dev/concepts/relationships#customizing-relationships.
+        MSG
+      end
+    end
+
     class MissingDependentFilter < Base
       def initialize(resource, filters)
         @resource = resource
@@ -862,7 +909,7 @@ module Graphiti
       def initialize(resource, filter_names, required)
         @resource = resource
         @filter_names = filter_names
-        @required_label = required == :all ? "All" : "One"
+        @required_label = (required == :all) ? "All" : "One"
       end
 
       def message

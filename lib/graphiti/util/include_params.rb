@@ -7,9 +7,9 @@ module Graphiti
         #
         #   GET /posts?include=comments.author
         #
-        # But our resource had this code:
+        # But the controller had this code:
         #
-        #   sideload_allowlist({ index: [:comments] })
+        #   self.sideload_allowlist = {index: [:comments]}
         #
         # We should drop the 'author' sideload from the request.
         #

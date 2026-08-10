@@ -5,7 +5,7 @@ require "pry"
 
 require "logger"
 require "active_model"
-require "graphiti_spec_helpers/rspec"
+require "graphiti/spec_helpers/rspec"
 require "graphiti"
 # Avoiding loading classes before we're ready
 Graphiti::Resource.autolink = false
@@ -17,8 +17,7 @@ require "faraday"
 require "base64"
 
 RSpec.configure do |config|
-  config.include GraphitiSpecHelpers::RSpec
-  config.include GraphitiSpecHelpers::Sugar
+  config.include Graphiti::SpecHelpers::RSpec
 
   config.after do
     PORO::DB.clear
@@ -76,14 +75,4 @@ if ENV["APPRAISAL_INITIALIZED"]
   ActiveRecord::Base.establish_connection adapter: "sqlite3",
     database: ":memory:"
   Dir[File.dirname(__FILE__) + "/fixtures/**/*.rb"].sort.each { |f| require f }
-end
-
-if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("3.2.0")
-  unless defined?(::ActionDispatch::Journey)
-    require "uri"
-    # NOTE: `decode_www_form_component` isn't an ideal default for production,
-    # because it varies slightly compared to typical uri parameterization,
-    # but it will allow tests to pass in non-rails contexts.
-    Graphiti.config.uri_decoder = URI.method(:decode_www_form_component)
-  end
 end

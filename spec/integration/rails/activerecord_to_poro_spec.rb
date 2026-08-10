@@ -1,6 +1,6 @@
 if ENV["APPRAISAL_INITIALIZED"]
   RSpec.describe "associating an ActiveRecord to a PORO", type: :controller do
-    include GraphitiSpecHelpers
+    include Graphiti::SpecHelpers
 
     module ARToPORO
       class AuthorResource < Legacy::ApplicationResource
@@ -46,7 +46,7 @@ if ENV["APPRAISAL_INITIALIZED"]
     context "when has_many" do
       it "works" do
         do_index({include: "books"})
-        sl = d[0].sideload(:books)
+        sl = jsonapi_data[0].sideload(:books)
         expect(sl.map(&:id)).to eq([book.id])
         expect(sl[0].jsonapi_type).to eq("books")
       end
@@ -55,7 +55,7 @@ if ENV["APPRAISAL_INITIALIZED"]
     context "when belongs_to" do
       it "works" do
         do_index({include: "state"})
-        sl = d[0].sideload(:state)
+        sl = jsonapi_data[0].sideload(:state)
         expect(sl.id).to eq(state.id)
         expect(sl.jsonapi_type).to eq("states")
       end

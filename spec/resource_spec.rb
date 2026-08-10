@@ -416,10 +416,10 @@ RSpec.describe Graphiti::Resource do
       dbl = double
       instance.with_context(dbl, :index) do
         expect(instance.context).to eq(dbl)
-        expect(instance.context_namespace).to eq(:index)
+        expect(instance.current_action).to eq(:index)
       end
       expect(instance.context).to be_nil
-      expect(instance.context_namespace).to be_nil
+      expect(instance.current_action).to be_nil
     end
 
     context "when an error" do
@@ -436,7 +436,17 @@ RSpec.describe Graphiti::Resource do
           end
         }.to raise_error("foo")
         expect(instance.context).to eq("orig")
-        expect(instance.context_namespace).to eq("orig namespace")
+        expect(instance.current_action).to eq("orig namespace")
+      end
+    end
+  end
+
+  describe "#context_namespace" do
+    it "is a deprecated alias of #current_action" do
+      instance.with_context(double, :index) do
+        expect(Graphiti::DEPRECATOR).to receive(:deprecation_warning)
+          .with(:context_namespace, /current_action/)
+        expect(instance.context_namespace).to eq(:index)
       end
     end
   end
@@ -963,9 +973,9 @@ RSpec.describe Graphiti::Resource do
 
     it "infers from name" do
       expect(klass.endpoint).to eq({
-        path: :'/employees',
-        full_path: :'/employees',
-        url: :'/employees',
+        path: :"/employees",
+        full_path: :"/employees",
+        url: :"/employees",
         actions: [:index, :show, :create, :update, :destroy]
       })
     end
@@ -976,11 +986,11 @@ RSpec.describe Graphiti::Resource do
       end
 
       it "is applied to url" do
-        expect(klass.endpoint[:url]).to eq(:'http://example.com/employees')
+        expect(klass.endpoint[:url]).to eq(:"http://example.com/employees")
       end
 
       it "is NOT applied to full_path" do
-        expect(klass.endpoint[:full_path]).to eq(:'/employees')
+        expect(klass.endpoint[:full_path]).to eq(:"/employees")
       end
     end
 
@@ -990,11 +1000,11 @@ RSpec.describe Graphiti::Resource do
       end
 
       it "is applied to full_path" do
-        expect(klass.endpoint[:full_path]).to eq(:'/api/v1/employees')
+        expect(klass.endpoint[:full_path]).to eq(:"/api/v1/employees")
       end
 
       it "is applied to url" do
-        expect(klass.endpoint[:url]).to eq(:'/api/v1/employees')
+        expect(klass.endpoint[:url]).to eq(:"/api/v1/employees")
       end
     end
 
@@ -1009,9 +1019,9 @@ RSpec.describe Graphiti::Resource do
 
       it "adds to path" do
         expect(klass.endpoint).to eq({
-          path: :'/poro/employees',
-          full_path: :'/poro/employees',
-          url: :'/poro/employees',
+          path: :"/poro/employees",
+          full_path: :"/poro/employees",
+          url: :"/poro/employees",
           actions: [:index, :show, :create, :update, :destroy]
         })
       end
@@ -1028,7 +1038,7 @@ RSpec.describe Graphiti::Resource do
     end
 
     it "infers path from name" do
-      expect(instance.endpoint[:path]).to eq(:'/employees')
+      expect(instance.endpoint[:path]).to eq(:"/employees")
     end
 
     it "defaults actions" do
@@ -1047,7 +1057,7 @@ RSpec.describe Graphiti::Resource do
       end
 
       it "infers path from module + name" do
-        expect(instance.endpoint[:path]).to eq(:'/poro/employees')
+        expect(instance.endpoint[:path]).to eq(:"/poro/employees")
       end
     end
   end
@@ -1281,7 +1291,7 @@ RSpec.describe Graphiti::Resource do
               }.to raise_error(Graphiti::Errors::InvalidEndpoint) { |error|
                 expect(error.message).to include("QueryAllSpec::EmployeeResource cannot be called directly from endpoint /api/v1/employees")
                 expect(error.message).to include("self.validate_endpoints = false")
-                expect(error.message).to include("https://www.graphiti.dev/guides/concepts/links")
+                expect(error.message).to include("https://graphiti.dev/concepts/links")
               }
             end
           end

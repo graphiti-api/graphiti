@@ -43,7 +43,7 @@ module Graphiti
       # @return [Hash] the merged hash
       # @api private
       def self.deep_merge!(hash, other)
-        merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
+        merger = proc { |key, v1, v2| (Hash === v1 && Hash === v2) ? v1.merge(v2, &merger) : v2 }
         hash.merge!(other, &merger)
       end
 
@@ -55,8 +55,15 @@ module Graphiti
         else
           {}.tap do |duped|
             hash.each_pair do |key, value|
-              value = deep_dup(value) if value.is_a?(Hash)
-              value = value.dup if value&.respond_to?(:dup) && ![Symbol, Integer].include?(value.class)
+              value = if value.is_a?(Hash)
+                deep_dup(value)
+              elsif value.is_a?(Array)
+                value.map { |element| element.is_a?(Hash) ? deep_dup(element) : element }
+              elsif value&.respond_to?(:dup) && ![Symbol, Integer].include?(value.class)
+                value.dup
+              else
+                value
+              end
               duped[key] = value
             end
           end

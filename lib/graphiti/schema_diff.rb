@@ -106,6 +106,10 @@ module Graphiti
           @errors << "#{old_resource[:name]}: relationship #{name.inspect} became guarded."
         end
 
+        if old_rel[:linkage] && !new_rel[:linkage]
+          @errors << "#{old_resource[:name]}: relationship #{name.inspect} no longer includes resource linkage."
+        end
+
         if new_rel[:resource] != old_rel[:resource]
           @errors << "#{old_resource[:name]}: relationship #{name.inspect} changed resource from #{old_rel[:resource]} to #{new_rel[:resource]}."
         end

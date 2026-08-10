@@ -51,7 +51,7 @@ module PORO
 
       def all(params)
         target_types = params[:type]
-        records = data.select { |k, v| Array(target_types).include?(k) }
+        records = data.slice(*Array(target_types))
         return [] unless records
         records = records.map { |type, records_for_type|
           records_for_type.map { |attrs| klasses[type].new(attrs) }
@@ -101,7 +101,7 @@ module PORO
         return records unless params[:per]
         records = records[params[:offset]..records.length] if params[:offset]
 
-        start_at = (params[:page] - 1) * (params[:per])
+        start_at = (params[:page] - 1) * params[:per]
         end_at = (params[:page] * params[:per]) - 1
         return [] if end_at < 0
         records[start_at..end_at]
@@ -111,6 +111,7 @@ module PORO
 
   class Base
     include ActiveModel::Validations
+
     attr_accessor :id
 
     def self.create(attrs = {})

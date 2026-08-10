@@ -28,7 +28,7 @@ module Graphiti
           expires_in: proxy.cache_expires_in,
           etag: proxy.etag,
           miss_count: last_version[:miss_count].to_i + (changed_key? ? 1 : 0),
-          hit_count: last_version[:hit_count].to_i + (!changed_key? && !new_key? ? 1 : 0),
+          hit_count: last_version[:hit_count].to_i + ((!changed_key? && !new_key?) ? 1 : 0),
           request_count: last_version[:request_count].to_i + (last_version.present? ? 1 : 0)
         }
       end
@@ -76,8 +76,8 @@ module Graphiti
       end
 
       def changes
-        sub_keys_old = last_version[:cache_key]&.scan(/\w+\/query-[a-z0-9-]+\/args-[a-z0-9-]+/).to_a || []
-        sub_keys_new = current_version[:cache_key]&.scan(/\w+\/query-[a-z0-9-]+\/args-[a-z0-9-]+/).to_a || []
+        sub_keys_old = last_version[:cache_key]&.scan(/\w+\/query-[a-z0-9-]+\/args-[a-z0-9-]+/).to_a
+        sub_keys_new = current_version[:cache_key]&.scan(/\w+\/query-[a-z0-9-]+\/args-[a-z0-9-]+/).to_a
 
         [sub_keys_old, sub_keys_new]
       end

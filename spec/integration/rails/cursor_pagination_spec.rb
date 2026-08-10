@@ -1,6 +1,6 @@
 if ENV["APPRAISAL_INITIALIZED"]
   RSpec.describe "cursor pagination", type: :controller do
-    include GraphitiSpecHelpers
+    include Graphiti::SpecHelpers
 
     controller(ApplicationController) do
       def index
@@ -41,7 +41,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       JSON.parse(Base64.decode64(cursor)).deep_symbolize_keys
     end
 
-    # don't go through 'd' helper b/c it is memoized
+    # don't go through jsonapi_data b/c it is memoized
     def ids
       json["data"].map { |d| d["id"].to_i }
     end

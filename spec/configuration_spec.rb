@@ -2,6 +2,17 @@ require "spec_helper"
 require "pathname"
 
 RSpec.describe Graphiti::Configuration do
+  RSpec.shared_context "preserving Graphiti.logger" do
+    around do |e|
+      orig = Graphiti.logger
+      begin
+        e.run
+      ensure
+        Graphiti.logger = orig
+      end
+    end
+  end
+
   RSpec.shared_context "with config" do |name|
     around do |e|
       orig = Graphiti.config.send(name)
@@ -26,6 +37,8 @@ RSpec.describe Graphiti::Configuration do
 
   # FIXME: Deprecated
   describe "when rails is defined" do
+    include_context "preserving Graphiti.logger"
+
     let(:logger) { double(debug?: false) }
 
     let(:rails) do
@@ -106,6 +119,8 @@ RSpec.describe Graphiti::Configuration do
 
     # FIXME: Deprecated
     context "when Rails is defined" do
+      include_context "preserving Graphiti.logger"
+
       before do
         rails = double(root: Pathname.new("/foo/bar"), logger: double.as_null_object)
         stub_const("::Rails", rails)

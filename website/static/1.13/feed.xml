@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="/1.13/feed.xml" rel="self" type="application/atom+xml" /><link href="/1.13/" rel="alternate" type="text/html" /><updated>2026-08-06T14:52:03-05:00</updated><id>/1.13/feed.xml</id><title type="html">Graphiti</title><subtitle>Stylish Graph APIs
+</subtitle><entry><title type="html">Tutorial Write-Ups Are Out!</title><link href="/1.13/2019/10/14/tutorial.html" rel="alternate" type="text/html" title="Tutorial Write-Ups Are Out!" /><published>2019-10-14T00:00:00-05:00</published><updated>2019-10-14T00:00:00-05:00</updated><id>/1.13/2019/10/14/tutorial</id><content type="html" xml:base="/1.13/2019/10/14/tutorial.html"><![CDATA[<p>Though we’ve long had a <a href="https://github.com/graphiti-api/employee_directory">sample application</a> with step-by-step diffs, we’ve been missing a full walkthrough. That now exists! Start with <a href="/1.13/tutorial/step_0">Step 0: Bootstrapping</a>.</p>
+
+<p>These write-ups will tell you the relevant code and commands, but
+they’ll also give helpful context around the decisions Graphiti makes.
+Even if you’re already a Graphiti user, I suggest checking it out!</p>
+
+<p><br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br /></p>]]></content><author><name>Lee Richmond</name></author><summary type="html"><![CDATA[Though we’ve long had a sample application with step-by-step diffs, we’ve been missing a full walkthrough. That now exists! Start with Step 0: Bootstrapping.]]></summary></entry><entry><title type="html">Graphiti 1.2 Released</title><link href="/1.13/2019/05/20/graphiti-1-2.html" rel="alternate" type="text/html" title="Graphiti 1.2 Released" /><published>2019-05-20T00:00:00-05:00</published><updated>2019-05-20T00:00:00-05:00</updated><id>/1.13/2019/05/20/graphiti-1-2</id><content type="html" xml:base="/1.13/2019/05/20/graphiti-1-2.html"><![CDATA[<p>I’m thrilled to announce much-needed, much-improved Rails integration,
+courtesy of the amazing <a href="https://github.com/wagenet">Peter Wagenet</a> and
+the new <a href="https://github.com/graphiti-api/graphiti-rails">graphiti-rails</a> gem.
+This gives us better error handling, tighter controllers, and a solid
+foundation for the codebase moving forward.</p>
+
+<p>You’ll be especially happy about this release if you’ve ever tried to
+add error-handling middleware. Because prior versions of Graphiti used
+<code class="language-plaintext highlighter-rouge">rescue_from</code> in <code class="language-plaintext highlighter-rouge">ApplicationController</code>, we intercepted errors before
+other middleware had access to them. Now everything just works.</p>
+
+<p>As part of this upgrade, we’re switching from <code class="language-plaintext highlighter-rouge">GraphitiErrors</code> to
+<a href="https://github.com/wagenet/rescue_registry">RescueRegistry</a>. Think of
+<code class="language-plaintext highlighter-rouge">RescueRegistry</code> as a well-refactored version of <code class="language-plaintext highlighter-rouge">GraphitiErrors</code>, available to
+even non-Graphiti developers.</p>
+
+<p>Though you don’t have to do anything to upgrade to Graphiti 1.2, this release will start throwing deprecation notices around <code class="language-plaintext highlighter-rouge">ApplicationController</code>. Don’t worry, the required changes are quite minor and spelled out in the <a href="/1.13/guides/graphiti-rails-migration">graphiti-rails migration guide</a>.</p>
+
+<p>I’m quite happy with how this effort turned out. This release dramatically improves our integration with Rails internals, and I think everyone involved learned a lot. I’m honored to work with such talented developers in our open-source community ❤️</p>
+
+<p>If you have any further questions, check out the <code class="language-plaintext highlighter-rouge">#dev</code> or <code class="language-plaintext highlighter-rouge">#rails</code>
+channels in our <a href="https://discord.gg/wgqkMBsSRV">Discord Chat</a></p>
+
+<p><br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br /></p>]]></content><author><name>Lee Richmond</name></author><summary type="html"><![CDATA[I’m thrilled to announce much-needed, much-improved Rails integration, courtesy of the amazing Peter Wagenet and the new graphiti-rails gem. This gives us better error handling, tighter controllers, and a solid foundation for the codebase moving forward.]]></summary></entry><entry><title type="html">Graphiti 1.1 Released</title><link href="/1.13/2019/05/08/graphiti-1-1.html" rel="alternate" type="text/html" title="Graphiti 1.1 Released" /><published>2019-05-08T00:00:00-05:00</published><updated>2019-05-08T00:00:00-05:00</updated><id>/1.13/2019/05/08/graphiti-1-1</id><content type="html" xml:base="/1.13/2019/05/08/graphiti-1-1.html"><![CDATA[<p>Our first minor version bump centers around an important update:
+<strong>better errors for clients</strong>. This is the first phase of work to allow us to provide more actionable errors to API users who might not also be developers of the API itself. This was brought to us by Graphiti maintainer <a href="https://github.com/wadetandy">Wade Tandy</a>.</p>
+
+<p>Previously, when a client sent a bad write request to the server -
+unwritable attributes/relationships, or bad types - we would render the
+same generic 500 error JSON. We now render helpful error messages, so
+third-party clients know how to correct their requests.</p>
+
+<p>This is currently only affecting invalid writes, but the foundation laid
+will be extendable to reads as well.</p>
+
+<p><br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br /></p>]]></content><author><name>Lee Richmond</name></author><summary type="html"><![CDATA[Our first minor version bump centers around an important update: better errors for clients. This is the first phase of work to allow us to provide more actionable errors to API users who might not also be developers of the API itself. This was brought to us by Graphiti maintainer Wade Tandy.]]></summary></entry><entry><title type="html">Graphiti 1.0 Released 🎉</title><link href="/1.13/2019/03/31/graphiti-1-0.html" rel="alternate" type="text/html" title="Graphiti 1.0 Released 🎉" /><published>2019-03-31T00:00:00-05:00</published><updated>2019-03-31T00:00:00-05:00</updated><id>/1.13/2019/03/31/graphiti-1-0</id><content type="html" xml:base="/1.13/2019/03/31/graphiti-1-0.html"><![CDATA[<p>This project has gone through a number of iterations over the past three years. I’m happy to say we’ve now released 1.0, committing to semantic versioning. Graphiti has now seen enough use, across a wide variety of scenarios, that we can commit to no backwards-incompatible changes for a long while, and a changelog for future releases.</p>
+
+<p>We’ll be writing more in this blog about our future roadmap. Stay tuned!</p>
+
+<p><br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br /></p>]]></content><author><name>Lee Richmond</name></author><summary type="html"><![CDATA[This project has gone through a number of iterations over the past three years. I’m happy to say we’ve now released 1.0, committing to semantic versioning. Graphiti has now seen enough use, across a wide variety of scenarios, that we can commit to no backwards-incompatible changes for a long while, and a changelog for future releases.]]></summary></entry></feed>

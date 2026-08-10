@@ -1,0 +1,79 @@
+<% module_namespacing do -%>
+class <%= controller_class_name %> < ApplicationController
+  <%- if actions?('index') -%>
+  <%- if responders? -%>
+  def index
+    <%= file_name.pluralize %> = <%= resource_klass %>.all(params)
+    respond_with(<%= file_name.pluralize %>)
+  end
+  <%- else -%>
+  <%- unless omit_comments? -%>
+  # With Graphiti::Rails::Responders included, these blocks collapse to
+  # respond_with(<%= file_name.pluralize %>). See https://graphiti.dev/getting-started/installation#responders
+  <%- end -%>
+  def index
+    <%= file_name.pluralize %> = <%= resource_klass %>.all(params)
+
+    respond_to do |format|
+      format.jsonapi { render jsonapi: <%= file_name.pluralize %> }
+      format.json { render json: <%= file_name.pluralize %> }
+    end
+  end
+  <%- end -%>
+  <%- end -%>
+  <%- if actions?('show') -%>
+
+  <%- if responders? -%>
+  def show
+    <%= file_name %> = <%= resource_klass %>.find(params)
+    respond_with(<%= file_name %>)
+  end
+  <%- else -%>
+  def show
+    <%= file_name %> = <%= resource_klass %>.find(params)
+
+    respond_to do |format|
+      format.jsonapi { render jsonapi: <%= file_name %> }
+      format.json { render json: <%= file_name %> }
+    end
+  end
+  <%- end -%>
+  <%- end -%>
+  <%- if actions?('create') -%>
+
+  def create
+    <%= file_name %> = <%= resource_klass %>.build(params)
+
+    if <%= file_name %>.save
+      render jsonapi: <%= file_name %>, status: 201
+    else
+      render jsonapi_errors: <%= file_name %>
+    end
+  end
+  <%- end -%>
+  <%- if actions?('update') -%>
+
+  def update
+    <%= file_name %> = <%= resource_klass %>.find(params)
+
+    if <%= file_name %>.update_attributes
+      render jsonapi: <%= file_name %>
+    else
+      render jsonapi_errors: <%= file_name %>
+    end
+  end
+  <%- end -%>
+  <%- if actions?('destroy') -%>
+
+  def destroy
+    <%= file_name %> = <%= resource_klass %>.find(params)
+
+    if <%= file_name %>.destroy
+      render jsonapi: { meta: {} }, status: 200
+    else
+      render jsonapi_errors: <%= file_name %>
+    end
+  end
+  <%- end -%>
+end
+<% end -%>

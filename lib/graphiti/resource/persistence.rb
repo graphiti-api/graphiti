@@ -65,50 +65,73 @@ module Graphiti
         def add_callback(kind, lifecycle, method, only, &blk)
           config[:callbacks][kind] ||= {}
           config[:callbacks][kind][lifecycle] ||= []
-          config[:callbacks][kind][lifecycle] << {callback: (method || blk), only: Array(only)}
+          config[:callbacks][kind][lifecycle] << {callback: method || blk, only: Array(only)}
         end
       end
 
-      def create(create_params, meta = nil)
-        model_instance = nil
-        snapshot = attributes_snapshot(:create, create_params)
+      # +model_instance+ is the already-built model from a previous #assign
+      # (see ResourceProxy#assign_attributes). When given, attributes are
+      # applied to it rather than to a freshly built/found model.
+      def assign(assign_params, meta = nil, action_name = nil, model_instance: nil)
+        # Only update strips :id (it identifies the record to find) - a create
+        # payload may legitimately carry a client-supplied id to assign.
+        if action_name == :update
+          id = assign_params[:id]
+          assign_params = assign_params.except(:id)
+        end
 
-        run_callbacks :persistence, :create, create_params, meta do
-          warn_attributes_mutated_in_around_persistence(:create, snapshot, create_params)
-
-          run_callbacks :attributes, :create, create_params, meta do |params|
-            model_instance = call_with_meta(:build, model, meta)
-            call_with_meta(:assign_attributes, model_instance, params, meta)
-            model_instance
+        run_callbacks :attributes, action_name, assign_params, meta do |params|
+          model_instance ||= if action_name == :update
+            self.class._find(id: id).data
+          else
+            call_with_meta(:build, model, meta)
           end
+          call_with_meta(:assign_attributes, model_instance, params, meta)
+          model_instance
+        end
 
+        model_instance
+      end
+
+      # The model built by a prior ResourceProxy#assign_attributes, present
+      # for the duration of the save that persists it
+      attr_reader :assigned_model
+
+      # @api private
+      def with_assigned_model(model)
+        @assigned_model = model
+        yield
+      ensure
+        @assigned_model = nil
+      end
+
+      # Attributes are assigned before the persistence callbacks fire, so
+      # around_persistence receives the assigned model - its pre-yield
+      # position is the last chance to touch the model before save, inside
+      # the transaction. Modify attributes in before_attributes instead.
+      def create(create_params, meta = nil)
+        model_instance = assigned_model || assign(create_params, meta, :create)
+
+        run_callbacks :persistence, :create, model_instance, meta do
           run_callbacks :save, :create, model_instance, meta do
             model_instance = call_with_meta(:save, model_instance, meta)
           end
 
           model_instance
         end
+
+        model_instance
       end
 
       def update(update_params, meta = nil)
-        model_instance = nil
-        id = update_params[:id]
-        update_params = update_params.except(:id)
+        model_instance = assigned_model || assign(update_params, meta, :update)
 
-        snapshot = attributes_snapshot(:update, update_params)
-
-        run_callbacks :persistence, :update, update_params, meta do
-          warn_attributes_mutated_in_around_persistence(:update, snapshot, update_params)
-
-          run_callbacks :attributes, :update, update_params, meta do |params|
-            model_instance = self.class._find(id: id).data
-            call_with_meta(:assign_attributes, model_instance, params, meta)
-            model_instance
-          end
-
+        run_callbacks :persistence, :update, model_instance, meta do
           run_callbacks :save, :update, model_instance, meta do
             model_instance = call_with_meta(:save, model_instance, meta)
           end
+
+          model_instance
         end
 
         model_instance
@@ -139,37 +162,6 @@ module Graphiti
       end
 
       private
-
-      # In Graphiti 2.0, attributes are assigned to the model before the
-      # persistence hooks fire, so hash modifications made by an
-      # around_persistence hook before its yield will no longer be applied.
-      # Snapshot-and-compare detects exactly those hooks: the comparison
-      # happens before any attributes-phase callback has run, so hooks that
-      # only wrap their yield never trigger the warning.
-      def attributes_snapshot(action, params)
-        return unless around_persistence_hooks?(action)
-        Util::Hash.deep_dup(params)
-      end
-
-      def around_persistence_hooks?(action)
-        hooks = self.class.config[:callbacks][:persistence].try(:[], :around) || []
-        hooks.any? { |hook| hook[:only].include?(action) }
-      end
-
-      def warn_attributes_mutated_in_around_persistence(action, snapshot, params)
-        return if snapshot.nil? || snapshot == params
-
-        changed_keys = (snapshot.keys | params.keys).reject { |key| snapshot[key] == params[key] }
-        Graphiti::DEPRECATOR.warn(<<~MSG)
-          #{self.class}'s around_persistence hook modified the attributes hash before yield (changed keys: #{changed_keys.map(&:inspect).join(", ")}). In Graphiti 2.0, attributes are assigned to the model before persistence hooks run, and these modifications will be silently ignored. Move the modification to a hook that runs before assignment:
-
-            before_attributes do |attributes|
-              attributes[#{changed_keys.first.inspect}] = ...
-            end
-
-          or set the value on the model itself in a before_save hook. See UPGRADING.md in the Graphiti 2.0 release.
-        MSG
-      end
 
       def run_callbacks(kind, action, *args)
         fire_around_callbacks(kind, action, *args) do |*yieldargs|
