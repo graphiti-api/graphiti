@@ -2,6 +2,10 @@
 title: 'Installation'
 ---
 
+:::info Requirements
+Graphiti 2.0 requires Ruby 3.2+ and ActiveSupport 7.1+. Rails is optional, and 7.1+ if you use it. Coming from 1.x? Remove `graphiti-rails`, `graphiti_spec_helpers` and `graphiti_errors` from your Gemfile: they're part of the main gem now, and the [upgrade guide](/upgrading) covers the rest.
+:::
+
 ## From Scratch {#from-scratch}
 
 The easiest way to start from scratch is to use the application

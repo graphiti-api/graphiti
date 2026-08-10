@@ -8,10 +8,6 @@ slug: /
 
 # Graphiti
 
-:::info These are the 2.0 docs
-Graphiti 2.0 folds `graphiti-rails`, `graphiti_spec_helpers` and `graphiti_errors` into the main gem, and requires Ruby 3.2+ and ActiveSupport 7.1+. Rails is optional, and 7.1+ if you use it. Coming from 1.x? Start with the **[2.0 upgrade guide](/upgrading)**. Docs for 1.x are in the version picker.
-:::
-
 Graphiti is a serialization (and de-serialization) library for Ruby, with integrations for Rails included.
 
 It's built on the [JSON:API](https://jsonapi.org) spec, which settles the decisions every API accumulates: response shapes, filtering, sorting, pagination, error formats, and how related data rides along. Your client layer (often a javascript single page app) speaks this protocol in return. It isn't complicated, so client logic can be hand-rolled or you can use one of the [many available libraries](https://jsonapi.org/implementations/#client-libraries) that work with the standard.

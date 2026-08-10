@@ -52,7 +52,7 @@ const config = {
           path: '../docs',
           routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
-          editUrl: 'https://github.com/graphiti-api/graphiti/tree/main/website/',
+          editUrl: 'https://github.com/graphiti-api/graphiti/tree/main/docs/',
           // Unversioned docs serve at the root, and would otherwise be
           // labelled "Next" in the dropdown. Once `npm run docusaurus
           // docs:version 2.0` cuts a version, that becomes the root and the
@@ -139,8 +139,8 @@ const config = {
   themeConfig: {
     announcementBar: {
       // Changing the id un-dismisses the bar for everyone who has closed it.
-      id: 'graphiti-2-0-beta',
-      content: `Graphiti 2.0 is in beta, and the docs have been reorganized to describe it. <a href="${baseUrl}1.13/">Docs for 1.x</a>.`,
+      id: 'graphiti-2-0-beta-upgrade',
+      content: `Graphiti 2.0 is in beta. Coming from 1.x? Start with the <a href="${baseUrl}upgrading">upgrade guide</a>.`,
       isCloseable: true,
     },
     colorMode: {
