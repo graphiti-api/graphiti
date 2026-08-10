@@ -12,13 +12,13 @@ The easiest way to start from scratch is to use the application
 template:
 
 ```bash
-$ rails new blog --api -m https://raw.githubusercontent.com/graphiti-api/graphiti_rails_template/master/all.rb
+$ rails new blog --api -m https://raw.githubusercontent.com/graphiti-api/graphiti/main/templates/rails/all.rb
 ```
 
 Alternatively, download and point to the template locally:
 
 ```bash
-$ curl -O https://raw.githubusercontent.com/graphiti-api/graphiti_rails_template/master/all.rb
+$ curl -O https://raw.githubusercontent.com/graphiti-api/graphiti/main/templates/rails/all.rb
 $ rails new blog --api -m all.rb
 ```
 
