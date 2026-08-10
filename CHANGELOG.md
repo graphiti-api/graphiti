@@ -1,5 +1,26 @@
 graphiti changelog
 
+# [2.0.0-beta.8](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.7...v2.0.0-beta.8) (2026-08-10)
+
+
+### Bug Fixes
+
+* accept a single value for array filters ([#517](https://github.com/graphiti-api/graphiti/issues/517)) ([ee685b6](https://github.com/graphiti-api/graphiti/commit/ee685b625e967a8225d48b486bd093e3a6970176))
+* accept a single value for array filters ([#517](https://github.com/graphiti-api/graphiti/issues/517)) ([23f3e80](https://github.com/graphiti-api/graphiti/commit/23f3e80b583b0bf0843d8bb9334970ae56d83299))
+* drop the relationship guard install notice ([65b8be6](https://github.com/graphiti-api/graphiti/commit/65b8be65455a7d034c9dca082434c1dbfe610a7a))
+* reject invalid page parameters ([#537](https://github.com/graphiti-api/graphiti/issues/537)) ([fbb5683](https://github.com/graphiti-api/graphiti/commit/fbb5683393301e17ffcea84990ac5a95bdd3e15f)), closes [#347](https://github.com/graphiti-api/graphiti/issues/347)
+* treat empty polymorphic configuration as unset ([#538](https://github.com/graphiti-api/graphiti/issues/538)) ([a27eeea](https://github.com/graphiti-api/graphiti/commit/a27eeea6eeb72749376c1f7959cadc89012142b9)), closes [#199](https://github.com/graphiti-api/graphiti/issues/199)
+* typecast null values in filter lists ([#515](https://github.com/graphiti-api/graphiti/issues/515)) ([3756fd1](https://github.com/graphiti-api/graphiti/commit/3756fd12c48d2fb3cf5e2d40c38aab92f12218b0))
+* typecast null values in filter lists ([#515](https://github.com/graphiti-api/graphiti/issues/515)) ([3dcf4c8](https://github.com/graphiti-api/graphiti/commit/3dcf4c868abb12eb6b6d59cd0814b227d4838ece))
+
+
+### Features
+
+* add full set of commented-out Resource defaults in ApplicationResource when using the generator ([367678e](https://github.com/graphiti-api/graphiti/commit/367678eb3c2c737331f8edb00e00e70483a778b4))
+* **generators:** explicit rendering by default, respond_with only when Responders is included ([70741fe](https://github.com/graphiti-api/graphiti/commit/70741fef2a3a585bbef32c3e535027ff610fda77))
+* in-tree plain ruby and sinatra examples ([b92c6d9](https://github.com/graphiti-api/graphiti/commit/b92c6d9af22f759cc1f1eaccc250ecd04901e2aa))
+* ship the Rails application template in this repo ([76d5329](https://github.com/graphiti-api/graphiti/commit/76d53291f94c576792e3649044784f88fbaa47a7))
+
 # [2.0.0-beta.7](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.6...v2.0.0-beta.7) (2026-08-10)
 
 
