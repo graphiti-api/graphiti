@@ -101,6 +101,30 @@ GraphitiErrors::Validation::Serializer is now Graphiti::ErrorSerializers::Valida
 * around_persistence hooks receive the assigned model instead of the attributes hash. Move attribute-hash modifications to before_attributes, or set values on the model. Custom create/update overrides that should receive a pre-assigned model must accept an assigned_model: keyword. See UPGRADING.md
 * Ruby >= 3.0 / Rails >= 6 are now required.
 
+## [1.13.3](https://github.com/graphiti-api/graphiti/compare/v1.13.2...v1.13.3) (2026-08-09)
+
+
+### Bug Fixes
+
+* reject invalid page parameters ([#537](https://github.com/graphiti-api/graphiti/issues/537)) ([fbb5683](https://github.com/graphiti-api/graphiti/commit/fbb5683393301e17ffcea84990ac5a95bdd3e15f)), closes [#347](https://github.com/graphiti-api/graphiti/issues/347)
+* treat empty polymorphic configuration as unset ([#538](https://github.com/graphiti-api/graphiti/issues/538)) ([a27eeea](https://github.com/graphiti-api/graphiti/commit/a27eeea6eeb72749376c1f7959cadc89012142b9)), closes [#199](https://github.com/graphiti-api/graphiti/issues/199)
+
+## [1.13.2](https://github.com/graphiti-api/graphiti/compare/v1.13.1...v1.13.2) (2026-08-07)
+
+
+### Bug Fixes
+
+* drop the relationship guard install notice ([65b8be6](https://github.com/graphiti-api/graphiti/commit/65b8be65455a7d034c9dca082434c1dbfe610a7a))
+
+## [1.13.1](https://github.com/graphiti-api/graphiti/compare/v1.13.0...v1.13.1) (2026-08-02)
+
+
+### Bug Fixes
+
+* accept a single value for array filters ([#517](https://github.com/graphiti-api/graphiti/issues/517)) ([23f3e80](https://github.com/graphiti-api/graphiti/commit/23f3e80b583b0bf0843d8bb9334970ae56d83299))
+* typecast null values in filter lists ([#515](https://github.com/graphiti-api/graphiti/issues/515)) ([3dcf4c8](https://github.com/graphiti-api/graphiti/commit/3dcf4c868abb12eb6b6d59cd0814b227d4838ece))
+
+
 # [1.13.0](https://github.com/graphiti-api/graphiti/compare/v1.12.2...v1.13.0) (2026-07-30)
 
 
