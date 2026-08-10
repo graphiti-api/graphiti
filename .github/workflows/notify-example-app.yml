@@ -1,0 +1,18 @@
+name: Notify example app
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  dispatch:
+    name: Dispatch employee_directory update
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send repository_dispatch
+        run: |
+          gh api -X POST repos/graphiti-api/employee_directory/dispatches \
+            -f event_type=graphiti-release \
+            -f 'client_payload[version]=${{ github.event.release.tag_name }}'
+        env:
+          GH_TOKEN: ${{ secrets.EXAMPLE_APP_TOKEN }}
