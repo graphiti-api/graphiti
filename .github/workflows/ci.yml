@@ -15,7 +15,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.2"
@@ -78,7 +78,7 @@ jobs:
       - name: Set up Appraisal
         if: matrix.appraisal
         run: echo "APPRAISAL_INITIALIZED=true" >> $GITHUB_ENV
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
@@ -98,10 +98,10 @@ jobs:
       run:
         working-directory: employee_directory
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           path: graphiti
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: graphiti-api/employee_directory
           path: employee_directory
@@ -119,7 +119,7 @@ jobs:
     runs-on: ubuntu-latest
     # In-tree examples run against the working copy via their path: Gemfiles.
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
