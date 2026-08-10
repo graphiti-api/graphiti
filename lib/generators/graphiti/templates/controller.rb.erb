@@ -1,25 +1,43 @@
 <% module_namespacing do -%>
 class <%= controller_class_name %> < ApplicationController
   <%- if actions?('index') -%>
+  <%- if responders? -%>
   def index
     <%= file_name.pluralize %> = <%= resource_klass %>.all(params)
-    <%- if responders? -%>
     respond_with(<%= file_name.pluralize %>)
-    <%- else -%>
-    render jsonapi: <%= file_name.pluralize %>
-    <%- end -%>
   end
+  <%- else -%>
+  <%- unless omit_comments? -%>
+  # With Graphiti::Rails::Responders included, these blocks collapse to
+  # respond_with(<%= file_name.pluralize %>). See https://graphiti.dev/getting-started/installation#responders
+  <%- end -%>
+  def index
+    <%= file_name.pluralize %> = <%= resource_klass %>.all(params)
+
+    respond_to do |format|
+      format.jsonapi { render jsonapi: <%= file_name.pluralize %> }
+      format.json { render json: <%= file_name.pluralize %> }
+    end
+  end
+  <%- end -%>
   <%- end -%>
   <%- if actions?('show') -%>
 
+  <%- if responders? -%>
   def show
     <%= file_name %> = <%= resource_klass %>.find(params)
-    <%- if responders? -%>
     respond_with(<%= file_name %>)
-    <%- else -%>
-    render jsonapi: <%= file_name %>
-    <%- end -%>
   end
+  <%- else -%>
+  def show
+    <%= file_name %> = <%= resource_klass %>.find(params)
+
+    respond_to do |format|
+      format.jsonapi { render jsonapi: <%= file_name %> }
+      format.json { render json: <%= file_name %> }
+    end
+  end
+  <%- end -%>
   <%- end -%>
   <%- if actions?('create') -%>
 

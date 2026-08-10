@@ -127,8 +127,11 @@ module Graphiti
       end
     end
 
+    # Generated controllers only use respond_with when it will actually work:
+    # the responders gem being installed is not enough, the controller chain
+    # must include Graphiti::Rails::Responders.
     def responders?
-      defined?(::Responders)
+      "ApplicationController".safe_constantize&.include?(Graphiti::Rails::Responders)
     end
 
     # Api::V1::Posts, Api::V1::PostsController and api/v1/posts all name the

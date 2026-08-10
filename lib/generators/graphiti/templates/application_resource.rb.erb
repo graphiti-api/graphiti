@@ -12,4 +12,16 @@ class ApplicationResource < Graphiti::Resource
   self.adapter = Graphiti::Adapters::ActiveRecord
   self.base_url = Rails.application.routes.default_url_options[:host]
   self.endpoint_namespace = '<%= api_namespace %>'
+  <%- unless omit_comments? -%>
+
+  # Defaults every Resource inherits. These are already the values shown;
+  # uncomment to change them API-wide, or set them on individual Resources.
+  # See https://graphiti.dev/concepts/resources
+  #
+  # self.attributes_readable_by_default = true
+  # self.attributes_writable_by_default = true
+  # self.attributes_sortable_by_default = true
+  # self.attributes_filterable_by_default = true
+  # self.default_page_size = 20
+  <%- end -%>
 end
