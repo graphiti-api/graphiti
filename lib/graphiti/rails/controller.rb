@@ -17,6 +17,9 @@ module Graphiti
       included do
         include Graphiti::Rails::Context
         include Graphiti::Rails::Debugging
+        # ActionController::API strips this out, but Graphiti serves multiple
+        # formats (jsonapi/json/xml), so respond_to has to work everywhere.
+        include ActionController::MimeResponds
 
         # Broad, but the handler only renders formats listed in
         # config.graphiti.handled_exception_formats and hands everything else

@@ -92,8 +92,7 @@ always write files manually or [submit an issue](https://github.com/graphiti-api
 
 ### Responders {#responders}
 
-Graphiti supports JSONAPI, simple JSON, and XML. You can do this
-manually when inheriting from `ActionController::Base`
+Graphiti supports JSONAPI, simple JSON, and XML. `Graphiti::Rails::Controller` carries `ActionController::MimeResponds`, so `respond_to` works even in API-only apps:
 
 ```ruby
 def index
@@ -107,8 +106,7 @@ def index
 end
 ```
 
-But we can inherit from `ActionController::API` while avoiding this
-boilerplate with with the [Responders](https://github.com/plataformatec/responders) gem:
+The [Responders](https://github.com/heartcombo/responders) gem collapses that boilerplate:
 
 ```ruby
 def index

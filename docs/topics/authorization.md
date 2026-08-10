@@ -73,7 +73,7 @@ Because `context` is the controller in Rails, per-record authorization stays whe
 def show
   post = PostResource.find(params)
   authorize post.data
-  respond_with(post)
+  render jsonapi: post
 end
 ```
 

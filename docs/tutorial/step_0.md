@@ -88,12 +88,11 @@ Finally, there's some boilerplate in `ApplicationController`:
 
 ```ruby
 class ApplicationController < ActionController::API
-  # Support JSON, XML, JSON:API
-  include Graphiti::Rails::Responders
+  include Graphiti::Rails::Controller
 end
 ```
 
-This gets `respond_with` working, via the [Responders gem](https://github.com/plataformatec/responders). To render simple nested JSON like default Rails, we'll only need to add `.json` to the URL.
+This wires Graphiti into the request cycle: the Graphiti context, the debugger, JSON:API error rendering, and `respond_to` (which `ActionController::API` normally strips out). Controllers render with `render jsonapi:`, and to render simple nested JSON like default Rails, we'll only need to add `.json` to the URL. (Prefer writing `respond_with(posts)`? The optional [responders integration](/getting-started/installation#responders) is one gem and one include away.)
 
 That's it for basic setup!
 

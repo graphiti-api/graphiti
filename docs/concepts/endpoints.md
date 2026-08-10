@@ -62,7 +62,11 @@ resources :posts, only: [:index]
 class PostsController < ApplicationController
   def index
     posts = PostResource.all(params)
-    respond_with(posts)
+
+    respond_to do |format|
+      format.jsonapi { render jsonapi: posts }
+      format.json { render json: posts }
+    end
   end
 end
 ```
@@ -78,8 +82,9 @@ class ApplicationController < ActionController::API
 end
 ```
 
-This gives us [#sideload_allowlist](#sideload-allowlist) and sets the
-[context](/concepts/resources#context).
+This gives us [#sideload_allowlist](#sideload-allowlist), sets the
+[context](/concepts/resources#context), and makes `respond_to` available
+in API-only controllers.
 
 ## Customizing Resources {#customizing-resources}
 
@@ -96,7 +101,11 @@ Posts with a certain number of upvotes get returned:
 def index
   base_scope = Post.where("upvotes > ?", 100)
   posts = PostResource.all(params, base_scope)
-  respond_with(posts)
+
+  respond_to do |format|
+    format.jsonapi { render jsonapi: posts }
+    format.json { render json: posts }
+  end
 end
 ```
 
@@ -151,7 +160,7 @@ def index
   posts = PostResource.all(params)
 
   if stale?(posts.data)
-    respond_with(posts)
+    render jsonapi: posts
   end
 end
 ```
@@ -167,7 +176,7 @@ query altogether by checking when the last ingestion ran:
 def index
   if stale?(EmployeeIngestion.last)
     employees = EmployeeResource.all(params)
-    respond_with(employees)
+    render jsonapi: employees
   end
 end
 ```

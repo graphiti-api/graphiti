@@ -261,7 +261,7 @@ Pass a second argument to `.all` to override the base scope for a single call:
 class InactivePostsController < PostsController
   def index
     posts = PostResource.all(params, Post.where(active: false))
-    respond_with(posts)
+    render jsonapi: posts
   end
 end
 ```
