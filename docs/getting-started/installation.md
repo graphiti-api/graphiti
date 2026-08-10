@@ -183,5 +183,4 @@ end
 
 ## Without Rails {#without-rails}
 
-You can use Graphiti in any plain `.rb` file. To see this in action,
-check out the [Plain Ruby Sample App](https://github.com/graphiti-api/plain_ruby_example).
+You can use Graphiti in any plain `.rb` file, or serve it from any Rack framework. Both live in the repo's [`examples/`](https://github.com/graphiti-api/graphiti/tree/main/examples) directory: [`plain_ruby`](https://github.com/graphiti-api/graphiti/tree/main/examples/plain_ruby) is Graphiti in a single script, and [`sinatra`](https://github.com/graphiti-api/graphiti/tree/main/examples/sinatra) serves JSON:API endpoints from a Sinatra app, including error rendering via `rescue_registry`.

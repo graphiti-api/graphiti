@@ -22,3 +22,5 @@ website/.docusaurus/
 
 .DS_Store
 .idea/
+examples/*/Gemfile.lock
+examples/sinatra/*.sqlite3*

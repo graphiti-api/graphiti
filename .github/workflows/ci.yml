@@ -110,6 +110,25 @@ jobs:
         run: |
           bundle exec rails db:test:prepare
           bundle exec rspec
+  examples:
+    name: "Examples (plain ruby, sinatra)"
+    runs-on: ubuntu-latest
+    # In-tree examples run against the working copy via their path: Gemfiles.
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+      - name: Run the plain ruby example
+        working-directory: examples/plain_ruby
+        run: |
+          bundle install
+          bundle exec ruby index.rb
+      - name: Run the sinatra example
+        working-directory: examples/sinatra
+        run: |
+          bundle install
+          bundle exec ruby smoke.rb
   publish:
     name: Release
     runs-on: ubuntu-latest

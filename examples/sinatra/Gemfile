@@ -1,0 +1,10 @@
+source "https://rubygems.org"
+
+gem "graphiti", path: "../.."
+gem "sinatra"
+gem "rackup"
+gem "puma"
+gem "activerecord"
+gem "sqlite3"
+gem "kaminari"
+gem "rack-test"
