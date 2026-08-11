@@ -4,11 +4,22 @@
 module Graphiti
   class Debugger
     class << self
-      attr_accessor :enabled, :chunks, :debug_models, :preserve, :pry
+      attr_accessor :enabled, :debug_models, :preserve, :pry
     end
-    self.chunks = []
+
+    CHUNKS = :__graphiti_debugger_chunks
+    private_constant :CHUNKS
 
     class << self
+      # Pool threads inherit this through the thread-local copy Scope#future_with_context makes, so their chunks reach the right request.
+      def chunks
+        Thread.current[CHUNKS] ||= Concurrent::Array.new
+      end
+
+      def chunks=(value)
+        Thread.current[CHUNKS] = value
+      end
+
       def on_data(name, start, stop, id, payload)
         return [] unless enabled
 
@@ -179,14 +190,15 @@ module Graphiti
       end
 
       def graph_statements
-        @chunks.each do |chunk|
+        statements = chunks
+        statements.each do |chunk|
           if (parent = chunk[:parent])
-            relevant = chunks.find { |c| c[:resource] == parent }
+            relevant = statements.find { |c| c[:resource] == parent }
             relevant[:children].unshift(chunk) if relevant
           end
         end
-        @chunks.reject! { |c| !!c[:parent] }
-        @chunks
+        statements.reject! { |c| !!c[:parent] }
+        statements
       end
 
       def chunk_to_hash(chunk)
