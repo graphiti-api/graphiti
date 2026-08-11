@@ -292,48 +292,19 @@ module Graphiti
       children.replace(associated) if track_associated
     end
 
-    # Synchronous counterpart to #future_resolve, used when concurrency is off.
-    # Mirrors #future_resolve but resolves inline via the synchronous
-    # Scope#resolve / #load paths (no promises). See Scope#sync_resolve_sideloads.
     def resolve(parents, query, graph_parent)
-      return future_resolve(parents, query, graph_parent).value! if Graphiti.config.concurrency
-
-      if single? && parents.length > 1
-        raise Errors::SingularSideload.new(self, parents.length)
-      end
-
-      if self.class.scope_proc
-        sideload_scope = fire_scope(parents)
-        sideload_scope = Scope.new sideload_scope,
-          resource,
-          query,
-          parent: graph_parent,
-          sideload: self,
-          sideload_parent_length: parents.length,
-          default_paginate: false
-        sideload_scope.resolve do |sideload_results|
-          fire_assign(parents, sideload_results)
-        end
+      if Graphiti.config.concurrency
+        future_resolve(parents, query, graph_parent).value!
       else
-        load(parents, query, graph_parent)
+        sync_resolve(parents, query, graph_parent)
       end
     end
 
     def future_resolve(parents, query, graph_parent)
-      if single? && parents.length > 1
-        raise Errors::SingularSideload.new(self, parents.length)
-      end
+      assert_singular!(parents)
 
       if self.class.scope_proc
-        sideload_scope = fire_scope(parents)
-        sideload_scope = Scope.new sideload_scope,
-          resource,
-          query,
-          parent: graph_parent,
-          sideload: self,
-          sideload_parent_length: parents.length,
-          default_paginate: false
-        sideload_scope.future_resolve do |sideload_results|
+        build_sideload_scope(parents, query, graph_parent).future_resolve do |sideload_results|
           fire_assign(parents, sideload_results)
         end
       else
@@ -400,6 +371,34 @@ module Graphiti
     end
 
     private
+
+    def sync_resolve(parents, query, graph_parent)
+      assert_singular!(parents)
+
+      if self.class.scope_proc
+        build_sideload_scope(parents, query, graph_parent).resolve do |sideload_results|
+          fire_assign(parents, sideload_results)
+        end
+      else
+        load(parents, query, graph_parent)
+      end
+    end
+
+    def assert_singular!(parents)
+      if single? && parents.length > 1
+        raise Errors::SingularSideload.new(self, parents.length)
+      end
+    end
+
+    def build_sideload_scope(parents, query, graph_parent)
+      Scope.new fire_scope(parents),
+        resource,
+        query,
+        parent: graph_parent,
+        sideload: self,
+        sideload_parent_length: parents.length,
+        default_paginate: false
+    end
 
     def future_load(parents, query, graph_parent)
       proxy = build_resource_proxy(parents, query, graph_parent)
