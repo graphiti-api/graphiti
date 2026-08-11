@@ -108,10 +108,10 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
   end
 
   def resolve(parents, query, graph_parent)
-    if Graphiti.config.concurrency
-      future_resolve(parents, query, graph_parent).value!
-    else
+    if ::Graphiti::Scope.resolve_synchronously?
       sync_resolve(parents, query, graph_parent)
+    else
+      future_resolve(parents, query, graph_parent).value!
     end
   end
 
