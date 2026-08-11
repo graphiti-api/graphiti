@@ -240,9 +240,11 @@ module Graphiti
     end
 
     def load(parents, query, graph_parent)
-      return build_resource_proxy(parents, query, graph_parent).to_a unless Graphiti.config.concurrency
-
-      future_load(parents, query, graph_parent).value!
+      if Scope.resolve_synchronously?
+        build_resource_proxy(parents, query, graph_parent).to_a
+      else
+        future_load(parents, query, graph_parent).value!
+      end
     end
 
     # Override in subclass
@@ -293,10 +295,10 @@ module Graphiti
     end
 
     def resolve(parents, query, graph_parent)
-      if Graphiti.config.concurrency
-        future_resolve(parents, query, graph_parent).value!
-      else
+      if Scope.resolve_synchronously?
         sync_resolve(parents, query, graph_parent)
+      else
+        future_resolve(parents, query, graph_parent).value!
       end
     end
 
