@@ -1,3 +1,5 @@
+require "bundler"
+
 RSpec.describe "graphiti without Rails" do
   describe "the gemspec" do
     let(:gemspec) do
@@ -55,8 +57,12 @@ RSpec.describe "graphiti without Rails" do
         RUBY
 
         output = nil
-        IO.popen(["ruby", "-I", File.expand_path("../lib", __dir__), "-e", script], err: [:child, :out]) do |io|
-          output = io.read
+        # Without this the child inherits RUBYOPT=-rbundler/setup and loads this
+        # suite's bundle, which is the opposite of what the test is checking.
+        Bundler.with_unbundled_env do
+          IO.popen(["ruby", "-I", File.expand_path("../lib", __dir__), "-e", script], err: [:child, :out]) do |io|
+            output = io.read
+          end
         end
 
         expect($?).to be_success, "subprocess failed:\n#{output}"
