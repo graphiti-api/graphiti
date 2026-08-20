@@ -318,6 +318,12 @@ RSpec.describe Graphiti::Scope do
             instance.resolve_sideloads(results)
           end
 
+          it "does not hand back the query's sideloads" do
+            allow(sideload).to receive(:resolve)
+
+            expect(instance.resolve_sideloads(results)).to be_nil
+          end
+
           it "does not clear thread locals" do
             Thread.current[:foo] = "bar"
 
