@@ -87,13 +87,20 @@ module Graphiti
     end
 
     def debug=(val)
-      @debug = val
-      Debugger.enabled = val
+      @debug = coerce_flag(val)
+      Debugger.enabled = @debug
     end
 
     def debug_models=(val)
-      @debug_models = val
-      Debugger.debug_models = val
+      @debug_models = coerce_flag(val)
+      Debugger.debug_models = @debug_models
+    end
+
+    # every value comes back from ENV as a string and "false" is truthy
+    def coerce_flag(val)
+      return false if ["false", "0", ""].include?(val.to_s.strip.downcase)
+
+      !!val
     end
 
     def with_option(key, value)
