@@ -260,8 +260,11 @@ RSpec.describe Graphiti::Scope do
               expect { instance.resolve_sideloads(results) }.not_to raise_error
             end
 
-            it "flattens the nested sideload promises" do
-              expect(instance.resolve_sideloads(results)).to contain_exactly(position_results)
+            it "resolves every nested sideload" do
+              instance.resolve_sideloads(results)
+
+              expect(position_resource).to have_received(:resolve)
+              expect(department_resource).to have_received(:resolve)
             end
           end
 

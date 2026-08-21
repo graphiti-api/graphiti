@@ -80,6 +80,9 @@ module Graphiti
       else
         future_resolve_sideloads(results).value!
       end
+
+      # Never return the sideloads hash, a caller mutating it would mess up the cache key
+      nil
     end
 
     def future_resolve(&blk)
@@ -157,10 +160,6 @@ module Graphiti
         Graphiti.config.before_sideload&.call(Graphiti.context)
         sideload.resolve(results, sideload_query, @resource)
       end
-
-      # Match pre-1.8 semantics: the non-concurrent resolve_sideloads returned
-      # nil (not the sideloads Hash). Callers don't rely on the return value.
-      nil
     end
 
     # Resolve this scope's own data: run hooks, resolve the resource, and
@@ -221,6 +220,8 @@ module Graphiti
         end
         sideload_promises << promise.flat
       end
+
+      return sideload_promises.first if sideload_promises.one?
 
       Concurrent::Promises.zip_futures_on(self.class.global_thread_pool_executor, *sideload_promises)
         .rescue_on(self.class.global_thread_pool_executor) do |*reasons|
