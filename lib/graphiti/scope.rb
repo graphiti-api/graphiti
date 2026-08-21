@@ -187,11 +187,14 @@ module Graphiti
     # canonical instance. The resource class in the key keeps two resources
     # serving the same model from sharing an instance and a serializer.
     def deduplicate_entities!(resolved)
+      # Nested maps are built once, a composite key meant a new array for every record
+      by_model = @query.entity_map.compute_if_absent(@resource.class) { Concurrent::Map.new }
+
       resolved.map! do |record|
         next record unless record.respond_to?(:id) && !record.id.nil?
 
-        key = [@resource.class, record.class, record.id]
-        @query.entity_map.compute_if_absent(key) { record }
+        by_id = by_model.compute_if_absent(record.class) { Concurrent::Map.new }
+        by_id.compute_if_absent(record.id) { record }
       end
     end
 
