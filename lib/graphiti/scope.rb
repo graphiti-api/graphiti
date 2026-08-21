@@ -65,12 +65,9 @@ module Graphiti
     end
 
     def resolve(&blk)
-      # When concurrency is disabled, take a synchronous path that mirrors the
-      # pre-1.8 semantics. This avoids allocating Concurrent::Promises futures,
-      # Thread/Fiber storage snapshots, and Rails executor wrappers on every
-      # request purely to drive a thread pool that is intentionally synchronous.
+      # The caller blocks on .value! either way, so concurrency only benefits parallel sideloads
       # See https://github.com/graphiti-api/graphiti/issues/505
-      if self.class.resolve_synchronously?
+      if self.class.resolve_synchronously? || !applicable_sideloads?
         sync_resolve(&blk)
       else
         future_resolve(&blk).value!
@@ -196,6 +193,12 @@ module Graphiti
         by_id = by_model.compute_if_absent(record.class) { Concurrent::Map.new }
         by_id.compute_if_absent(record.id) { record }
       end
+    end
+
+    # Nothing to post to the pool means the future would wrap work already done.
+    def applicable_sideloads?
+      each_applicable_sideload { return true }
+      false
     end
 
     def each_applicable_sideload
