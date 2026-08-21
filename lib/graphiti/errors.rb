@@ -708,6 +708,22 @@ module Graphiti
       end
     end
 
+    class UnselectedForeignKey < Base
+      def initialize(resource_class, sideload, model)
+        @resource_class = resource_class
+        @sideload = sideload
+        @model = model
+      end
+
+      def message
+        <<~MSG
+          #{@resource_class.name}: rendering resource linkage for relationship #{@sideload.name.inspect} reads ##{@sideload.foreign_key} off #{@model.class.name}, but that attribute is not loaded.
+
+          Keep #{@sideload.foreign_key} in the selected columns, or turn linkage off with `resource_ids: false` on the relationship or `self.belongs_to_resource_ids_by_default = :never` on the resource.
+        MSG
+      end
+    end
+
     class MissingRelationshipMethod < Base
       def initialize(resource_class, sideload, model)
         @resource_class = resource_class

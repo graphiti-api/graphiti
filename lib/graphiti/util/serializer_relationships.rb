@@ -57,6 +57,7 @@ module Graphiti
       def block
         link_ref = link?
         sideload_ref = @sideload
+        resource_class_ref = @resource_class
         data_proc_ref = data_proc
         self_ref = self
         validate_link! if eagerly_validate_links?
@@ -71,7 +72,15 @@ module Graphiti
           if sideload_ref.resource_ids_from_foreign_key? &&
               !self_ref.send(:included_anywhere?, @proxy.query.include_hash, sideload_ref.name)
             linkage always: sideload_ref.render_resource_ids? do
-              foreign_key = @object.public_send(sideload_ref.foreign_key)
+              foreign_key = begin
+                @object.public_send(sideload_ref.foreign_key)
+              rescue NoMethodError => error
+                raise unless defined?(ActiveModel::MissingAttributeError) &&
+                  error.is_a?(ActiveModel::MissingAttributeError)
+
+                raise Errors::UnselectedForeignKey
+                  .new(resource_class_ref, sideload_ref, @object)
+              end
 
               unless foreign_key.nil?
                 {

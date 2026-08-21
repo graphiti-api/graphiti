@@ -88,6 +88,28 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
+    context "when the base scope does not select the foreign key" do
+      let(:resource_class) do
+        Class.new(PositionResource) do
+          def self.name
+            "PositionResource"
+          end
+
+          def base_scope
+            Position.select(:id, :title)
+          end
+
+          belongs_to :employee, resource_ids: true
+        end
+      end
+
+      it "raises an error naming the opt-out" do
+        expect {
+          linkage_for(resource_class)
+        }.to raise_error(Graphiti::Errors::UnselectedForeignKey, /resource_ids: false/)
+      end
+    end
+
     context "when the relationship could resolve to a different record" do
       def sideload_for(&blk)
         klass = Class.new(PositionResource) do
