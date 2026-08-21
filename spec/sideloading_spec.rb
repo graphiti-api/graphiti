@@ -421,6 +421,27 @@ RSpec.describe "sideloading" do
       end
     end
 
+    context "when multiple children error under concurrency" do
+      before do
+        allow(Graphiti.config).to receive(:concurrency).and_return(true)
+        resource.polymorphic_belongs_to :credit_card do
+          group_by(:credit_card_type, except: [:Paypal]) do
+            on(:Visa)
+            on(:Mastercard)
+          end
+        end
+        resource.sideloads[:credit_card].children.each_value do |child|
+          allow(child).to receive(:future_resolve) do
+            Concurrent::Promises.future { raise "#{child.group_name} failed" }
+          end
+        end
+      end
+
+      it "raises the first child's error, not an aggregate" do
+        expect { render }.to raise_error(RuntimeError, "Visa failed")
+      end
+    end
+
     context "when linking unknown type" do
       before do
         Graphiti::Resource.autolink = true

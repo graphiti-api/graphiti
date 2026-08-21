@@ -120,7 +120,14 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
     each_resolvable_group(parents, query) do |child, group, child_query|
       promises << child.future_resolve(group, child_query, graph_parent)
     end
-    Concurrent::Promises.zip(*promises)
+    return promises.first if promises.one?
+
+    executor = ::Graphiti::Scope.global_thread_pool_executor
+    Concurrent::Promises.zip_futures_on(executor, *promises)
+      .rescue_on(executor) do |*reasons|
+        first_error = reasons.find { |reason| reason.is_a?(Exception) }
+        raise first_error
+      end
   end
 
   private
