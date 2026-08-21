@@ -33,7 +33,7 @@ require "jsonapi/serializable"
 # either way, whichever copy wins.
 {
   "graphiti_spec_helpers" => 'The "graphiti_spec_helpers/rspec" require and the GraphitiSpecHelpers namespace are unchanged.',
-  "graphiti-rails" => 'Graphiti::Rails and its config.graphiti options are unchanged. Drop the "graphiti-rails" require if you have one.',
+  "graphiti-rails" => 'Graphiti::Rails and its config.graphiti options are unchanged. Drop the "graphiti-rails" require if you have one, and add `include Graphiti::Rails::Controller` to controllers serving Graphiti resources. graphiti-rails installed that on every controller automatically. See graphiti.dev/upgrading.',
   "graphiti_errors" => "Exception handling now goes through rescue_registry. Remove `include GraphitiErrors` from your controllers — Graphiti registers its own handlers, and you can add yours with `register_exception`."
 }.each do |gem_name, guidance|
   next unless Gem.loaded_specs.key?(gem_name)
