@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Boogaloo" rel="stylesheet">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/1.13/assets/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/1.13/assets/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/1.13/assets/favicons/favicon-16x16.png">
+  <link rel="manifest" href="/1.13/assets/favicons/site.webmanifest">
+  <link rel="mask-icon" href="/1.13/assets/favicons/safari-pinned-tab.svg" color="#F86DA7">
+  <link rel="shortcut icon" href="/1.13/assets/favicons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#F86DA7">
+  <meta name="msapplication-config" content="/1.13/assets/favicons/browserconfig.xml">
+  <meta name="theme-color" content="#F86DA7">
+
+  <title>Graphiti</title>
+  <meta name="description" content="Stylish Graph APIs">
+
+  <link rel="stylesheet" href="/1.13/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/1.13/feed.xml">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-127904727-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-127904727-1');
+  </script>
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <a href="/1.13/1.13" class="navbar-brand">
+        <img alt="logo" src="/1.13/assets/img/logo.png">
+      </a>
+    </div>
+    <nav class="" role="navigation">
+      <ul class="nav navbar-nav nav-links">
+        <li>
+          <a class="quickstart nav-link" href="/1.13/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="guides nav-link" href="/1.13/guides">Guides</a>
+        </li>
+        <li>
+          <a class="tutorial nav-link" href="/1.13/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="spraypaint nav-link" href="/1.13/js">Spraypaint</a>
+        </li>
+      </ul>
+      <ul class="nav gh navbar-nav navbar-right visible-lg visible-md">
+        <li>
+          <span class="star">⭐</span>
+          <a href="https://github.com/graphiti-api/graphiti">
+            <img alt="github-star" style="margin-right: 65px;margin-top: -20px" src="/1.13/assets/img/gh.png">
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="toc col-md-3">
+  <h1 id="backends-and-models">Backends and Models</h1>
+
+  <ul>
+    <li>1 <a href="#overview">Overview</a>
+      <ul>
+        <li><a href="#activerecord">ActiveRecord</a></li>
+        <li><a href="#model-requirements">Model Requirements</a></li>
+        <li><a href="#validations">Validations</a></li>
+      </ul>
+    </li>
+    <li>2 <a href="#model-implementations">Model Implementations</a>
+      <ul>
+        <li><a href="#poro">PORO</a></li>
+        <li><a href="#activemodel-model">ActiveModel::Model</a></li>
+        <li><a href="#dry-struct">Dry::Struct</a></li>
+      </ul>
+    </li>
+    <li>3 <a href="#model-tips">Model Tips</a>
+      <ul>
+        <li><a href="#id-less-models">ID-less Models</a></li>
+      </ul>
+    </li>
+  </ul>
+</div>
+
+<div class="col-md-8">
+
+<a class="anchor" id="overview" />
+  <a class="header" href="#overview">
+    <h2>
+      Overview
+    </h2>
+  </a>
+
+  <p>A Resource <em>queries</em> and <em>persists</em> to a <strong>Backend</strong>. It returns
+<strong>Models</strong> from the Backend response, which get <em>serialized</em>. In this way, it is
+an implementation of the <a href="https://martinfowler.com/eaaCatalog/repository.html">Repository Pattern</a>.</p>
+
+  <p>This is best illustrated in code. Let’s say we have a Backend class
+that accepts a hash of options to perform a query:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">results</span> <span class="o">=</span> <span class="no">Backend</span><span class="p">.</span><span class="nf">query</span> <span class="p">\</span>
+  <span class="ss">conditions: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Jane'</span> <span class="p">},</span>
+  <span class="ss">sort: </span><span class="p">{</span> <span class="ss">created_at: :asc</span> <span class="p">}</span>
+
+<span class="n">results</span> <span class="c1"># [{ id: 1, name: 'Jane', rank: 83 }, ...]</span></code></pre></figure>
+
+  <p>And a PORO Model that encapsulates those results, holding business logic:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Employee</span>
+  <span class="nb">attr_accessor</span> <span class="ss">:id</span><span class="p">,</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:rank</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">attrs</span> <span class="o">=</span> <span class="p">{})</span>
+    <span class="n">attrs</span><span class="p">.</span><span class="nf">each_pair</span> <span class="p">{</span> <span class="o">|</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="o">|</span> <span class="nb">send</span><span class="p">(</span><span class="ss">:"</span><span class="si">#{</span><span class="n">k</span><span class="si">}</span><span class="ss">="</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">exemplary?</span>
+    <span class="n">rank</span> <span class="o">&gt;</span> <span class="mi">80</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Meaning that normally, our code would look something like:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">results</span> <span class="o">=</span> <span class="no">Backend</span><span class="p">.</span><span class="nf">query</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="n">employees</span> <span class="o">=</span> <span class="n">results</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">r</span><span class="o">|</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="p">}</span>
+<span class="n">employees</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:exemplary?</span><span class="p">)</span> <span class="c1"># =&gt; [true, false, ...]</span></code></pre></figure>
+
+  <p>Let’s wire-up that same code to a Resource:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="c1"># We'll be coding the logic manually</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">adapter</span> <span class="o">=</span> <span class="no">Graphiti</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">Null</span>
+
+  <span class="n">attribute</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:string</span>
+
+  <span class="c1"># The blank scope we start with</span>
+  <span class="k">def</span> <span class="nf">base_scope</span>
+    <span class="p">{</span> <span class="ss">conditions: </span><span class="p">{},</span> <span class="ss">sort: </span><span class="p">{}</span>  <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Merge filters into the hash based on request params</span>
+  <span class="n">filter</span> <span class="ss">:name</span> <span class="k">do</span>
+    <span class="n">eq</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+      <span class="n">scope</span><span class="p">[</span><span class="ss">:conditions</span><span class="p">].</span><span class="nf">merge!</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+      <span class="n">scope</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Set sort based on request params</span>
+  <span class="n">sort</span> <span class="ss">:name</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">direction</span><span class="o">|</span>
+    <span class="n">scope</span><span class="p">[</span><span class="ss">:sort</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">name: </span><span class="n">direction</span> <span class="p">}</span>
+    <span class="n">scope</span>
+  <span class="k">end</span>
+
+  <span class="c1"># 'scope' here is our hash</span>
+  <span class="c1"># We pass it to Backend.query, and return Models</span>
+  <span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="no">Backend</span><span class="p">.</span><span class="nf">query</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">r</span><span class="o">|</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>As you see above, a <strong>scope</strong> can be anything from an
+<code class="language-plaintext highlighter-rouge">ActiveRecord::Relation</code> to a plain Ruby Hash. We want to adjust
+<em>something</em> based on the request parameters and pass it to our backend.
+From the raw backend results, we can instantiate Models. <strong>Note that we
+always return the full scope at the end of each block.</strong></p>
+
+  <p>Of course, most Backends have predictable and consistent interfaces. It
+would be a pain to manually write this code for every Resource. So
+instead we could build an <strong>Adapter</strong> to DRY this logic:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">EmployeeResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">adapter</span> <span class="o">=</span> <span class="no">BackendAdapter</span>
+  <span class="n">attribute</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:string</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>In summary: a Resource builds a query that is sent to a Backend. The
+backend executes the query, and we instantiate Models from the raw
+results.</p>
+
+<a class="anchor" id="activerecord" />
+  <a class="header" href="#activerecord">
+    <h3>
+      ActiveRecord
+    </h3>
+  </a>
+
+  <p>From the <a href="https://guides.rubyonrails.org/active_record_basics.html#the-active-record-pattern">ActiveRecord Guides</a>:</p>
+
+  <blockquote>
+    <p><em><a href="https://www.martinfowler.com/eaaCatalog/activeRecord.html">Active Record was described by Martin Fowler</a> in his book Patterns of Enterprise Application Architecture. In Active Record, objects carry both persistent data and behavior which operates on that data. Active Record takes the opinion that ensuring data access logic as part of the object will educate users of that object on how to write to and read from the database.</em></p>
+  </blockquote>
+
+  <p>In other words, ActiveRecord <strong>combines</strong> a Backend and Model.
+Opinions on this <a href="https://blog.lelonek.me/why-is-your-rails-application-still-coupled-to-activerecord-efe34d657c91">vary</a>,
+but Graphiti supports either approach: we can separate data and business layers, or
+combine them. See the ActiveRecord doppelgänger of the above at our
+<a href="/1.13/cheatsheet">Resource cheatsheet</a>.</p>
+
+<a class="anchor" id="model-requirements" />
+  <a class="header" href="#model-requirements">
+    <h3>
+      Model Requirements
+    </h3>
+  </a>
+
+  <p>The only hard requirement of a Model is that it responds to <code class="language-plaintext highlighter-rouge">id</code>. We use
+<code class="language-plaintext highlighter-rouge">model.id</code> to determine uniqueness when rendering a JSONAPI response.
+<strong>You will get incorrect results if <code class="language-plaintext highlighter-rouge">model.id</code> is not unique</strong>.</p>
+
+  <p>Models should also respond to any readable attributes. Remember that:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">attribute</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:string</span></code></pre></figure>
+
+  <p>Is the same as</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># @object is your Model instance</span>
+<span class="n">attribute</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:string</span> <span class="k">do</span>
+  <span class="vi">@object</span><span class="p">.</span><span class="nf">name</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>If your Model does not respond to <code class="language-plaintext highlighter-rouge">#name</code>, either pass a block to <code class="language-plaintext highlighter-rouge">attribute</code> or
+look into <a href="https://blog.bigbinary.com/2012/01/08/alias-vs-alias-method.html">aliasing</a>.</p>
+
+<a class="anchor" id="validations" />
+  <a class="header" href="#validations">
+    <h4>
+      Validations
+    </h4>
+  </a>
+
+  <p>Graphiti will perform validations on your models during write requests,
+returning a <a href="http://jsonapi.org/format/#errors">JSONAPI-compliant errors payload</a>.
+To get this functionality, your model must adhere to the
+<a href="https://api.rubyonrails.org/classes/ActiveModel/Validations.html">ActiveModel::Validations API</a>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">model</span><span class="p">.</span><span class="nf">valid?</span>
+<span class="n">object</span><span class="p">.</span><span class="nf">errors</span><span class="p">.</span><span class="nf">messages</span><span class="p">.</span><span class="nf">each_pair</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span></code></pre></figure>
+
+  <p>It is highly recommended to mix in:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Employee</span>
+  <span class="kp">include</span> <span class="no">ActiveModel</span><span class="o">::</span><span class="no">Validations</span>
+<span class="k">end</span></code></pre></figure>
+
+<a class="anchor" id="model-implementations" />
+  <a class="header" href="#model-implementations">
+    <h2>
+      Model Implementations
+    </h2>
+  </a>
+
+  <p>Because our default is ActiveRecord, it may be unclear what other Models
+look like. Graphiti itself has no opinion about your Model layer, but
+below are a few examples.</p>
+
+<a class="anchor" id="poro" />
+  <a class="header" href="#poro">
+    <h3>
+      2.1 PORO
+    </h3>
+  </a>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Employee</span>
+  <span class="nb">attr_accessor</span> <span class="ss">:id</span><span class="p">,</span>
+    <span class="ss">:first_name</span><span class="p">,</span>
+    <span class="ss">:last_name</span><span class="p">,</span>
+    <span class="ss">:age</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">attrs</span> <span class="o">=</span> <span class="p">{})</span>
+    <span class="n">attrs</span><span class="p">.</span><span class="nf">each_pair</span> <span class="p">{</span> <span class="o">|</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="o">|</span> <span class="nb">send</span><span class="p">(</span><span class="ss">:"</span><span class="si">#{</span><span class="n">k</span><span class="si">}</span><span class="ss">="</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>This is a common Ruby example. <code class="language-plaintext highlighter-rouge">attr_accessor</code> defines getters and
+setters for our properties, and we assign those properties in the
+constructor:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">e</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">id: </span><span class="mi">1</span><span class="p">,</span> <span class="ss">first_name: </span><span class="s1">'Jane'</span><span class="p">)</span>
+<span class="n">e</span><span class="p">.</span><span class="nf">first_name</span> <span class="c1"># =&gt; 'Jane'</span></code></pre></figure>
+
+<a class="anchor" id="activemodel-model" />
+  <a class="header" href="#activemodel-model">
+    <h3>
+      2.2 ActiveModel::Model
+    </h3>
+  </a>
+
+  <p>A simple abstraction of the above is <a href="https://api.rubyonrails.org/classes/ActiveModel/Model.html">ActiveModel::Model</a>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Employee</span>
+  <span class="kp">include</span> <span class="no">ActiveModel</span><span class="o">::</span><span class="no">Model</span>
+
+  <span class="nb">attr_accessor</span> <span class="ss">:id</span><span class="p">,</span>
+    <span class="ss">:first_name</span><span class="p">,</span>
+    <span class="ss">:last_name</span><span class="p">,</span>
+    <span class="ss">:age</span>
+<span class="k">end</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">e</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">id: </span><span class="mi">1</span><span class="p">,</span> <span class="ss">first_name: </span><span class="s1">'Jane'</span><span class="p">)</span>
+<span class="n">e</span><span class="p">.</span><span class="nf">first_name</span> <span class="c1"># =&gt; 'Jane'</span></code></pre></figure>
+
+<a class="anchor" id="dry-struct" />
+  <a class="header" href="#dry-struct">
+    <h3>
+      2.3 Dry::Struct
+    </h3>
+  </a>
+
+  <p><a href="https://dry-rb.org/gems/dry-types">dry-types</a> is a dependency of Graphiti and successor to the popular <a href="https://github.com/solnic/virtus">Virtus</a>.</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Types</span>
+  <span class="kp">include</span> <span class="no">Dry</span><span class="o">::</span><span class="no">Types</span><span class="p">.</span><span class="nf">module</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Employee</span> <span class="o">&lt;</span> <span class="no">Dry</span><span class="o">::</span><span class="no">Struct</span>
+  <span class="n">attribute</span> <span class="ss">:id</span><span class="p">,</span> <span class="no">Types</span><span class="o">::</span><span class="no">Integer</span>
+  <span class="n">attribute</span> <span class="ss">:first_name</span><span class="p">,</span> <span class="no">Types</span><span class="o">::</span><span class="no">String</span>
+  <span class="n">attribute</span> <span class="ss">:last_name</span><span class="p">,</span> <span class="no">Types</span><span class="o">::</span><span class="no">Integer</span>
+  <span class="n">attribute</span> <span class="ss">:age</span><span class="p">,</span> <span class="no">Types</span><span class="o">::</span><span class="no">Integer</span>
+<span class="k">end</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">e</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">id: </span><span class="mi">1</span><span class="p">,</span> <span class="ss">first_name: </span><span class="s1">'Jane'</span><span class="p">)</span>
+<span class="n">e</span><span class="p">.</span><span class="nf">first_name</span> <span class="c1"># =&gt; 'Jane'</span></code></pre></figure>
+
+<a class="anchor" id="model-tips" />
+  <a class="header" href="#model-tips">
+    <h2>
+      3 Model Tips
+    </h2>
+  </a>
+
+<a class="anchor" id="id-less-models" />
+  <a class="header" href="#id-less-models">
+    <h3>
+      ID-less Models
+    </h3>
+  </a>
+
+  <p>If your Model does not have an <code class="language-plaintext highlighter-rouge">id</code> property, using a random UUID is
+perfectly acceptable:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">id</span>
+  <span class="vi">@id</span> <span class="o">||=</span> <span class="no">SecureRandom</span><span class="p">.</span><span class="nf">uuid</span>
+<span class="k">end</span></code></pre></figure>
+
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="/1.13/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="/1.13/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="/1.13/guides">Guides</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Contact</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://discord.gg/wgqkMBsSRV">Discord Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Email</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>
