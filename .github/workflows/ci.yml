@@ -139,7 +139,7 @@ jobs:
     # Only main auto-releases. Beta releases are cut by manually running
     # "Generate New Release" with the beta branch selected.
     if: github.ref == 'refs/heads/main'
-    needs: [test]
+    needs: [lint, test]
     steps:
       - name: Dispatch Release
         uses: benc-uk/workflow-dispatch@v1
