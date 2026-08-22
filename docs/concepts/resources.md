@@ -649,26 +649,38 @@ end
 
 ## Concurrency {#concurrency}
 
+Under Rails, concurrency turns on by default when `::Rails.application.config.cache_classes` is `true` (the default for staging and production). Sibling sideloads then load concurrently, so a `Post` sideloading `Comments` and `Author` loads both at the same time. Your initializer runs after that default lands, so it always has the last word. That cuts both ways, since an unconditional `c.concurrency = true` forces it on everywhere, development and test included.
+
 ```ruby
 # config/initializers/graphiti.rb
 Graphiti.configure do |c|
-  c.concurrency = false
+  # c.concurrency = false
+  c.concurrency_max_threads = ENV.fetch("GRAPHITI_CONCURRENCY_MAX_THREADS", 4).to_i
 end
 ```
 
-Under Rails, concurrency turns on by default when `::Rails.application.config.cache_classes` is `true` (the default for staging and production). Sibling sideloads then load concurrently, so a `Post` sideloading `Comments` and `Author` loads both at the same time.
+Sideloads share a pool of `concurrency_max_threads` threads (default 4) per process. Whatever the request thread knew, the sideload knows too. `Graphiti.context`, fiber-locals and `ActiveSupport::CurrentAttributes` all carry over so `Current.user` works inside a sideload. Assignments made inside a sideload don't travel back.
 
-Concurrency runs sideloads in new Threads, so thread locals are dropped. Use `Graphiti.context` instead of `Thread.current` for anything that needs to survive a sideload:
+### Sizing the connection pool {#concurrency-pool-sizing}
 
-```ruby
-# BAD:
-Thread.current[:foo] = "bar"
-Thread.current[:foo] # => will be nil when sideloading!
+Every thread talking to the database holds its own connection, and concurrent sideloads are extra threads. The connection pool has to cover both.
 
-# GOOD:
-Graphiti.context[:foo] = "bar"
-Graphiti.context[:foo] # => "bar", even when sideloading
+```yaml
+# database.yml
+pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5).to_i + 4 + 1 %>
 ```
+
+That's web threads plus `concurrency_max_threads` plus a spare. Rails uses the same rule for its [async query executor](https://guides.rubyonrails.org/configuring.html#config-active-record-async-query-executor), and the default of 4 comes from there too.
+
+When the pool is too small you get `ActiveRecord::ConnectionTimeoutError` ("all pooled connections were in use"). It only shows up once traffic is heavy enough to drain the pool, so an undersized app can run happily for months. (So check `database.yml` and make sure `pool` reads the variable your deploys actually set.)
+
+The pool that drains is ActiveRecord's connection pool. Web threads and concurrent sideload threads all draw from it, which is why the formula above adds `concurrency_max_threads`. Shrinking `concurrency_max_threads` is always safe. When Graphiti's pool fills up, extra sideloads just run on the request thread on its already-counted connection, so you lose some parallelism and nothing else. Raising it is what needs care, since every sideload thread is one more claim on connections, and the formula has to grow with it.
+
+The database server has its own ceiling, `max_connections` in Postgres. Every Ruby process brings a full pool, so weigh that limit against your process count, meaning Puma `workers` (`WEB_CONCURRENCY`) times your server count, plus each job worker process, all multiplied by `pool`.
+
+`bin/rake graphiti:audit` checks the formula against this environment's numbers.
+
+The analysis behind these numbers is in [#469](https://github.com/graphiti-api/graphiti/issues/469), worth reading in full if you're debugging connection errors.
 
 ## Adapters {#adapters}
 
