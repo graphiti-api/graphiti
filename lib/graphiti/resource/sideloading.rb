@@ -126,11 +126,11 @@ module Graphiti
         end
 
         # If eager loading, ensure routes are loaded first, then apply
-        # This happens in Railtie
+        # This happens in Railtie. Setup runs once, so classes redefined by a reload apply at definition.
         def eagerly_apply_sideload?(sideload)
           # TODO: Maybe handle this in the Rails integration
           if defined?(::Rails) && (app = ::Rails.application)
-            app.config.eager_load ? false : true
+            app.config.eager_load ? Graphiti.setup? : true
           else
             sideload.resource_class_loaded?
           end

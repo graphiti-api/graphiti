@@ -41,9 +41,11 @@ RSpec.configure do |config|
   # earlier examples defined - which makes results depend on spec order.
   config.around do |example|
     registered = Graphiti.resources.dup
+    setup_was = Graphiti.setup?
     example.run
   ensure
     Graphiti.resources.replace(registered)
+    Graphiti.instance_variable_set(:@setup, setup_was)
   end
 
   config.filter_run_when_matching :focus

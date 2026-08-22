@@ -149,6 +149,11 @@ module Graphiti
     resources.each do |r|
       r.apply_sideloads_to_serializer
     end
+    @setup = true
+  end
+
+  def self.setup?
+    !!@setup
   end
 
   def self.cache=(val)

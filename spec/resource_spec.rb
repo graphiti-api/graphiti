@@ -63,6 +63,7 @@ RSpec.describe Graphiti::Resource do
           rails = double \
             application: double(config: double(eager_load: true))
           stub_const("Rails", rails.as_null_object)
+          Graphiti.instance_variable_set(:@setup, false)
         end
 
         it "applies to the subclass's serializer via setup!" do
@@ -119,10 +120,20 @@ RSpec.describe Graphiti::Resource do
         context "and eager loading" do
           let(:eager_load) { true }
 
+          before do
+            Graphiti.instance_variable_set(:@setup, false)
+          end
+
           it "does NOT assign relationships to the serializer" do
             klass.has_many :positions, resource: PORO::PositionResource
             expect(klass.serializer.relationship_blocks).to be_blank
             Graphiti.setup!
+            expect(klass.serializer.relationship_blocks).to_not be_blank
+          end
+
+          it "assigns relationships at definition once setup! has run" do
+            Graphiti.setup!
+            klass.has_many :positions, resource: PORO::PositionResource
             expect(klass.serializer.relationship_blocks).to_not be_blank
           end
         end
