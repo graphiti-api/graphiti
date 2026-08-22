@@ -538,8 +538,8 @@ RSpec.describe Graphiti::Resource do
   end
 
   describe "#relationship_links" do
-    it "defaults" do
-      expect(instance.relationship_links).to eq(true)
+    it "inherits the base setting" do
+      expect(instance.relationship_links).to eq(Graphiti::Resource.relationship_links)
     end
 
     it "is inherited" do
@@ -551,6 +551,17 @@ RSpec.describe Graphiti::Resource do
       expect {
         klass.relationship_links = :never
       }.to raise_error(Graphiti::Errors::InvalidLinkRendering, /relationship_links must be true, false, or :on_demand/)
+    end
+  end
+
+  describe "the deprecated autolink setting" do
+    it "reads and writes through to relationship_links" do
+      klass.autolink = false
+      expect(klass.relationship_links).to eq(false)
+      expect(klass.autolink?).to eq(false)
+
+      klass.relationship_links = :on_demand
+      expect(klass.autolink).to eq(true)
     end
   end
 

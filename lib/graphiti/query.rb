@@ -2,6 +2,9 @@ require "digest"
 
 module Graphiti
   class Query
+    TRUTHY_LINKS = [true, "true"].freeze
+    LINKLESS_FORMATS = [:json, :xml, "json", "xml"].freeze
+
     attr_reader :resource, :association_name, :params, :action
 
     def initialize(resource, params, *positional, association_name: nil, nested_include: nil, parents: [], action: nil)
@@ -40,13 +43,22 @@ module Graphiti
       !association?
     end
 
-    def links?
-      return false if [:json, :xml, "json", "xml"].include?(params[:format])
-      if @resource.relationship_links == :on_demand
-        [true, "true"].include?(@params[:links])
-      else
-        @resource.relationship_links
-      end
+    def links_requested?
+      return @links_requested if defined?(@links_requested)
+
+      @links_requested = TRUTHY_LINKS.include?(@params[:links])
+    end
+
+    def suppress_links?
+      return @suppress_links if defined?(@suppress_links)
+
+      @suppress_links = LINKLESS_FORMATS.include?(params[:format])
+    end
+
+    def render_link?(mode)
+      return false if suppress_links?
+
+      (mode == :on_demand) ? links_requested? : mode == true
     end
 
     def pagination_links?
@@ -267,7 +279,7 @@ module Graphiti
     def query_cache_key
       attrs = {extra_fields: extra_fields,
                fields: fields,
-               links: links?,
+               links: suppress_links? ? :none : links_requested?,
                pagination_links: pagination_links?,
                format: params[:format]}
 

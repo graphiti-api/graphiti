@@ -26,10 +26,8 @@ module Graphiti
         :base_url,
         :endpoint_namespace,
         :secondary_endpoints,
-        :autolink,
         :validate_endpoints
       self.secondary_endpoints = []
-      self.autolink = true
       self.validate_endpoints = true
 
       class << self
@@ -38,6 +36,19 @@ module Graphiti
     end
 
     class_methods do
+      # Deprecated. Folded into relationship_links. Remove in 3.0.
+      def autolink
+        relationship_links != false
+      end
+
+      def autolink=(val)
+        self.relationship_links = val ? true : false
+      end
+
+      def autolink?
+        autolink
+      end
+
       def infer_endpoint
         return unless name
 
@@ -101,4 +112,8 @@ module Graphiti
       end
     end
   end
+
+  msg = "Use `self.relationship_links` (true, false, or :on_demand)"
+  DEPRECATOR.deprecate_methods(Links::ClassMethods,
+    autolink: msg, "autolink=": msg, autolink?: msg)
 end

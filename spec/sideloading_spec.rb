@@ -444,7 +444,7 @@ RSpec.describe "sideloading" do
 
     context "when linking unknown type" do
       before do
-        Graphiti::Resource.autolink = true
+        Graphiti::Resource.relationship_links = true
         params.delete(:include)
         params[:links] = true
         resource.polymorphic_belongs_to :credit_card do
@@ -456,7 +456,7 @@ RSpec.describe "sideloading" do
       end
 
       after do
-        Graphiti::Resource.autolink = false
+        Graphiti::Resource.relationship_links = false
       end
 
       it "does not blow up" do

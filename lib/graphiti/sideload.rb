@@ -2,6 +2,7 @@ module Graphiti
   class Sideload
     HOOK_ACTIONS = [:save, :create, :update, :destroy, :disassociate]
     TYPES = [:has_many, :belongs_to, :has_one, :many_to_many]
+    LINK_MODES = [true, false, :on_demand].freeze
 
     attr_reader :name,
       :parent_resource_class,
@@ -31,6 +32,9 @@ module Graphiti
       @writable = opts[:writable]
       @as = opts[:as]
       @link = opts[:link]
+      unless @link.nil? || LINK_MODES.include?(@link)
+        raise Errors::InvalidLinkRendering.new(@parent_resource_class, :"#{name} link", @link)
+      end
       @single = opts[:single]
       @remote = opts[:remote]
       apply_belongs_to_many_filter if type == :many_to_many
@@ -166,14 +170,16 @@ module Graphiti
       false
     end
 
-    def link?
-      return true if link_proc
+    # A custom link block means the author wants the link, so a false default does not silence it.
+    def link_mode
+      return @link unless @link.nil?
 
-      if @link.nil?
-        !!@parent_resource_class.autolink
-      else
-        !!@link
-      end
+      default = @parent_resource_class.relationship_links
+      (link_proc && default == false) ? true : default
+    end
+
+    def link?
+      link_mode != false
     end
 
     def link_filter(parents)

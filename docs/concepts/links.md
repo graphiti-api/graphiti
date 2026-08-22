@@ -65,10 +65,11 @@ has_many :comments do
 end
 ```
 
-To avoid a Relationship Link altogether:
+Every relationship link has one of three modes: `true` (always rendered), `false` (no link at all), or `:on_demand` (rendered when the request asks with `?links=true`). The resource's [`relationship_links`](#relationship-links) sets the default mode, and the `link:` option overrides it per relationship:
 
 ```ruby
-has_many :comments, link: false
+has_many :comments, link: false       # no link, whatever the resource default
+has_many :comments, link: :on_demand  # only with ?links=true
 ```
 
 ## Resource Endpoints {#resource-endpoints}
@@ -138,15 +139,24 @@ secondary_endpoint '/top_posts', [:index]
 
 ## Configuration {#configuration}
 
-### Autolinking {#autolinking}
+### Relationship Links {#relationship-links}
 
-To turn off automatically generated links:
+`relationship_links` is the default mode for every relationship link on the resource, taking the same three values as the per-relationship `link:` option. To turn links off unless a relationship opts in:
 
 ```ruby
 class ApplicationResource < Graphiti::Resource
-  self.autolink = false
+  self.relationship_links = false
+end
+
+class PostResource < ApplicationResource
+  has_many :comments               # no link
+  has_many :top_comments, link: true  # rendered
 end
 ```
+
+A relationship with a custom `link do ... end` block is treated as `link: true` under a `false` default, on the theory that writing the block means wanting the link.
+
+(`self.autolink` was the 1.x name for the `false`/`true` half of this setting. It still works, warns, and will be removed in 3.0.)
 
 ### Endpoint Validation {#endpoint-validation}
 
@@ -168,7 +178,7 @@ class ApplicationResource < Graphiti::Resource
 end
 ```
 
-`relationship_links` accepts `true` (always render, the default), `false` (never render), or `:on_demand`. Set it on `ApplicationResource` to apply everywhere, or on an individual resource to override.
+`relationship_links` accepts `true` (always render, the default), `false` (no links), or `:on_demand`. Set it on `ApplicationResource` to apply everywhere, on an individual resource to override, or per relationship with `link:`. A relationship whose only content would be an unrequested on-demand link is omitted from the payload entirely, since JSON:API forbids empty relationship objects.
 
 ### Pagination Links {#pagination-links}
 

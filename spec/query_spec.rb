@@ -897,8 +897,10 @@ RSpec.describe Graphiti::Query do
     end
   end
 
-  describe "#links?" do
-    subject { instance.links? }
+  describe "#render_link?" do
+    subject { instance.render_link?(mode) }
+
+    let(:mode) { true }
 
     it { is_expected.to eq(true) }
 
@@ -918,18 +920,14 @@ RSpec.describe Graphiti::Query do
       it { is_expected.to eq(false) }
     end
 
-    context "when relationship_links is false" do
-      before do
-        employee_resource.relationship_links = false
-      end
+    context "when mode is false" do
+      let(:mode) { false }
 
       it { is_expected.to eq(false) }
     end
 
-    context "when relationship_links is :on_demand" do
-      before do
-        employee_resource.relationship_links = :on_demand
-      end
+    context "when mode is :on_demand" do
+      let(:mode) { :on_demand }
 
       context "and requested" do
         context "as string" do
@@ -942,7 +940,7 @@ RSpec.describe Graphiti::Query do
 
         context "as boolean" do
           before do
-            params[:links] = "true"
+            params[:links] = true
           end
 
           it { is_expected.to eq(true) }

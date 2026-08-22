@@ -122,11 +122,14 @@ RSpec.describe Graphiti::Configuration do
 
   describe "deprecated resource-level settings" do
     around do |e|
+      relationship_links = Graphiti::Resource.relationship_links
+      page_links = Graphiti::Resource.page_links
+      typecast_reads = Graphiti::Resource.typecast_reads
       e.run
     ensure
-      Graphiti::Resource.relationship_links = true
-      Graphiti::Resource.page_links = false
-      Graphiti::Resource.typecast_reads = true
+      Graphiti::Resource.relationship_links = relationship_links
+      Graphiti::Resource.page_links = page_links
+      Graphiti::Resource.typecast_reads = typecast_reads
     end
 
     describe "#typecast_reads" do

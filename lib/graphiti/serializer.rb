@@ -1,5 +1,7 @@
 module Graphiti
   class Serializer < JSONAPI::Serializable::Resource
+    UNREQUESTED_LINKS = [false, nil, "false"].freeze
+
     include Graphiti::Extensions::BooleanAttribute
     include Graphiti::Extensions::ExtraAttribute
     include Graphiti::SerializableHash
@@ -100,17 +102,21 @@ module Graphiti
       hash[:links] = @resource.links(@object) if @resource.links?
     end
 
+    # A relationship whose only content would be an unrequested on-demand link
+    # serializes as an empty stub, which JSON:API forbids.
     def strip_relationships!(hash)
-      hash[:relationships]&.select! do |name, payload|
-        payload.key?(:data)
+      hash[:relationships]&.reject! do |name, payload|
+        next false if payload.key?(:data) || payload.key?(:links)
+
+        self.class.relationship_sideloads[name]&.link_mode == :on_demand
       end
     end
 
     def strip_relationships?
-      return false unless @proxy&.query&.resource&.relationship_links == :on_demand
-      params = Graphiti.context[:object]&.params || {}
+      context = Graphiti.context[:object]
+      params = context.params if context.respond_to?(:params)
 
-      [false, nil, "false"].include?(params[:links])
+      UNREQUESTED_LINKS.include?(params && params[:links])
     end
   end
 end

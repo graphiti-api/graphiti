@@ -57,7 +57,6 @@ module Graphiti
       private
 
       def block
-        link_ref = link?
         sideload_ref = @sideload
         resource_class_ref = @resource_class
         data_proc_ref = data_proc
@@ -95,13 +94,11 @@ module Graphiti
             linkage always: sideload_ref.render_resource_ids?
           end
 
-          if link_ref
-            if @proxy.query.links?
-              self_ref.send(:validate_link!) unless self_ref.send(:eagerly_validate_links?)
+          if @proxy.query.render_link?(sideload_ref.link_mode) && self_ref.send(:linkable?)
+            self_ref.send(:validate_link!) unless self_ref.send(:eagerly_validate_links?)
 
-              link(:related) do
-                ::Graphiti::Util::Link.new(sideload_ref, @object).generate
-              end
+            link(:related) do
+              ::Graphiti::Util::Link.new(sideload_ref, @object).generate
             end
           end
         end
@@ -164,7 +161,7 @@ module Graphiti
       end
 
       def validate_link!
-        return unless link?
+        return unless @sideload.link? && linkable?
         return unless @resource_class.validate_endpoints?
         return if @sideload.link_proc
 
@@ -194,14 +191,16 @@ module Graphiti
         self.class.validated_link_cache << cache_key
       end
 
-      def link?
-        return true if @sideload.link_proc
+      # Checked lazily so a sideload with no endpoint only raises when a link is actually wanted.
+      def linkable?
+        return @linkable if defined?(@linkable)
 
-        if @sideload.respond_to?(:children)
-          @sideload.link? &&
-            @sideload.children.values.all? { |c| !c.resource.endpoint.nil? }
+        @linkable = if @sideload.link_proc
+          true
+        elsif @sideload.respond_to?(:children)
+          @sideload.children.values.all? { |c| !c.resource.endpoint.nil? }
         else
-          !!(@sideload.link? && @sideload.resource.endpoint)
+          !@sideload.resource.endpoint.nil?
         end
       end
     end

@@ -1177,9 +1177,9 @@ RSpec.describe "serialization" do
       Graphiti.config.context_for_endpoint = nil
     end
 
-    context "when not autolinked by default" do
+    context "when links are off by default" do
       before do
-        resource.autolink = false
+        resource.relationship_links = false
       end
 
       it "does not generate links by default" do
@@ -1234,9 +1234,46 @@ RSpec.describe "serialization" do
       end
     end
 
+    context "when a relationship overrides the resource default" do
+      context "with link: :on_demand on an always-linked resource" do
+        before do
+          resource.relationship_links = true
+          resource.has_many :positions, link: :on_demand
+        end
+
+        it "strips the relationship by default" do
+          render
+          expect(positions).to be_nil
+        end
+
+        context "and links are requested" do
+          before do
+            params[:links] = true
+          end
+
+          it "renders the link" do
+            render
+            expect(positions["links"]["related"]).to be_present
+          end
+        end
+      end
+
+      context "with link: true on an on-demand resource" do
+        before do
+          resource.relationship_links = :on_demand
+          resource.has_many :positions, link: true
+        end
+
+        it "renders the link without being asked" do
+          render
+          expect(positions["links"]["related"]).to be_present
+        end
+      end
+    end
+
     describe "placeholder relationships" do
       before do
-        resource.has_many :positions, link: true
+        resource.has_many :positions
       end
 
       context "when links on demand" do
@@ -1292,7 +1329,6 @@ RSpec.describe "serialization" do
       end
 
       before do
-        resource.autolink = true
         resource.relationship_links = :on_demand
         params[:include] = "positions"
         resource.has_many :positions, resource: position_resource
@@ -1323,9 +1359,9 @@ RSpec.describe "serialization" do
       end
     end
 
-    context "when autolinked by default" do
+    context "when links are on by default" do
       before do
-        resource.autolink = true
+        resource.relationship_links = true
       end
 
       context "and a has_many relationship" do

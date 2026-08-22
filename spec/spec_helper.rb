@@ -8,7 +8,7 @@ require "active_model"
 require "graphiti/spec_helpers/rspec"
 require "graphiti"
 # Avoiding loading classes before we're ready
-Graphiti::Resource.autolink = false
+Graphiti::Resource.relationship_links = false
 require "fixtures/poro"
 Graphiti.setup!
 

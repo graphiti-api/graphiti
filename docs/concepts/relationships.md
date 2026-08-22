@@ -68,7 +68,7 @@ has_many :positions,
   resource: EmployeeResource,
   readable: true,
   writable: true,
-  link: self.autolink, # default true
+  link: self.relationship_links, # the resource default mode, normally true
   single: false, # only allow this sideload when one employee
   resource_ids: false
 ```
@@ -190,7 +190,7 @@ A client never has to work out which rule applied. The relationship object says 
 "employee": { "meta": { "included": false } }                 // neither
 ```
 
-The last shape appears only when a relationship has no ids **and** no link, which usually means `link: false`. It is not a general "was this sideloaded" flag. Relationships are autolinked by default, so the link shape is the one you normally see.
+The last shape appears only when a relationship has no ids **and** no link, which usually means `link: false`. It is not a general "was this sideloaded" flag. Relationships are linked by default, so the link shape is the one you normally see.
 
 The setting covers `belongs_to` and `polymorphic_belongs_to`, and no collection, deliberately. An API-wide `:always` on collections would be the N+1 from [#167](https://github.com/graphiti-api/graphiti/issues/167#issuecomment-686866646) applied everywhere at once.
 

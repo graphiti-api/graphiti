@@ -6,7 +6,11 @@ require "ostruct"
 require "bigdecimal"
 require "active_model"
 require "graphiti"
-Graphiti::Resource.autolink = false if Graphiti::Resource.respond_to?(:autolink=)
+if Graphiti::Resource.respond_to?(:relationship_links=)
+  Graphiti::Resource.relationship_links = false
+elsif Graphiti::Resource.respond_to?(:autolink=)
+  Graphiti::Resource.autolink = false
+end
 require File.expand_path("spec/fixtures/poro.rb", Dir.pwd)
 Graphiti.setup!
 require File.expand_path("scenarios.rb", __dir__)
