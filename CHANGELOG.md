@@ -1,5 +1,26 @@
 graphiti changelog
 
+# [2.0.0-beta.9](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.8...v2.0.0-beta.9) (2026-08-22)
+
+
+### Bug Fixes
+
+* bridge the last 1.x names that died with a bare NameError ([34e1dbd](https://github.com/graphiti-api/graphiti/commit/34e1dbd3e34bb8e6be56292c51fcb32674f75995))
+* build the entity map when the root query is, not on first use ([134d18b](https://github.com/graphiti-api/graphiti/commit/134d18b12b9ebb6903cca813209f60e5626b25a6))
+* coerce debug flags from env strings ([46be6aa](https://github.com/graphiti-api/graphiti/commit/46be6aa05d4e2a9e5d6b2562f223b4b05582bb39))
+* keep a customized sideload's instances out of entity dedup ([b1beee3](https://github.com/graphiti-api/graphiti/commit/b1beee3288fae2b20b009983aaa2f6c71189e2ca))
+* raise a more helpful named error when belongs_to linkage reads an unselected foreign key ([f59ea0b](https://github.com/graphiti-api/graphiti/commit/f59ea0bda94b388b1c2c0ae0e50b258f8ce0eb11))
+* resolve inline when already on a sideload pool thread ([11c9de7](https://github.com/graphiti-api/graphiti/commit/11c9de7fb4bfc2d83b02aaba3e58c1f94c84cec4))
+* scope debugger chunks to the request rather than the class ([9a77896](https://github.com/graphiti-api/graphiti/commit/9a77896c6e56d23b89d0a2aef358d8e8e0c28c54))
+* surface the first child error from concurrent polymorphic sideloads ([5a08c0e](https://github.com/graphiti-api/graphiti/commit/5a08c0edab2bc1ee0c87c6abbe1067297569411e))
+
+
+### Performance Improvements
+
+* nest the entity map instead of keying it by an array ([20bf625](https://github.com/graphiti-api/graphiti/commit/20bf6259d0347b02568b7d47054bb799e69629c3))
+* skip the promise machinery when nothing is sideloaded ([d879923](https://github.com/graphiti-api/graphiti/commit/d879923070a35d1a0e908b2d04746aa81effb262))
+* skip zipping a lone sideload promise ([7ef2cea](https://github.com/graphiti-api/graphiti/commit/7ef2cea654c48175504105f907b5b651c9fcdaf3))
+
 # [2.0.0-beta.8](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.7...v2.0.0-beta.8) (2026-08-10)
 
 
