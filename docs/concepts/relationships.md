@@ -501,31 +501,31 @@ class TeamResource < ApplicationResource
   many_to_many :employees
 end
 # Generates the Link
-# /teams?filter[team_id]=1,2,3
+# /employees?filter[team_id]=1,2,3
 ```
 
 The `many_to_many` call will automatically add a Filter to the associated resource. The logic for that filter, in the case of `ActiveRecord`:
 
 ```ruby
-# app/resources/employee_resource.rb
+# app/resources/team_resource.rb
 
-filter :team_id, :integer do
+filter :employee_id, :integer do
   eq do |scope, value|
     scope
       .includes(:team_memberships)
-      .where(team_memberships: { team_id: value }
+      .where(team_memberships: { employee_id: value })
   end
 end
 ```
 
 To customize the foreign key, you will need to specify a hash rather
-than a symbol. The hash key is the relationship name, so the above is
+than a symbol. The hash key is the join association name, so the above is
 equivalent to
 
 ```ruby
 # app/resources/employee_resource.rb
 
-many_to_many :teams, foreign_key: { team_memberships: :team_id }
+many_to_many :teams, foreign_key: { team_memberships: :employee_id }
 ```
 
 If using ActiveRecord, and the API relationship name does not match your
