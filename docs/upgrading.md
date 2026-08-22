@@ -207,6 +207,13 @@ The hooks and their order are covered in [Persistence Lifecycle Hooks](/concepts
 
 </details>
 
+<details>
+<summary>`ActiveSupport::CurrentAttributes` now flow into concurrent sideloads</summary>
+
+Since 1.8, `Current` was empty inside a concurrent sideload, so `Current.user` read nothing in production. It now reads what it did in the controller. Workarounds that resolved `Current` values on the request thread can go. See [Concurrency](/concepts/resources#concurrency).
+
+</details>
+
 ## Deprecations you should fix {#deprecations-you-should-fix}
 
 Every name below still works, warns, and will be removed in the next major. They're easy fixes though, so why not now?

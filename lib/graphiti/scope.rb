@@ -257,21 +257,48 @@ module Graphiti
           end
         end
 
+      current_attributes = current_attributes_snapshot
+
       Concurrent::Promises.future_on(
-        self.class.global_thread_pool_executor, Thread.current.object_id, thread_storage, fiber_storage, *args
-      ) do |thread_id, thread_storage, fiber_storage, *args|
+        self.class.global_thread_pool_executor, Thread.current.object_id, thread_storage, fiber_storage, current_attributes, *args
+      ) do |thread_id, thread_storage, fiber_storage, current_attributes, *args|
         self.class.marking_pool_thread do
           wrap_in_rails_executor do
             with_thread_locals(thread_storage) do
               with_fiber_locals(fiber_storage) do
-                Graphiti.broadcast(:global_thread_pool_task_run, self.class.global_thread_pool_stats) do
-                  yield(*args)
+                with_current_attributes(current_attributes) do
+                  Graphiti.broadcast(:global_thread_pool_task_run, self.class.global_thread_pool_stats) do
+                    yield(*args)
+                  end
                 end
               end
             end
           end
         end
       end
+    end
+
+    def current_attributes_snapshot
+      return unless defined?(ActiveSupport::CurrentAttributes)
+
+      snapshot = {}
+      klasses = ActiveSupport::CurrentAttributes.subclasses
+      while (klass = klasses.shift)
+        klasses.concat(klass.subclasses)
+        attributes = klass.attributes
+        snapshot[klass] = attributes.dup if attributes.any?
+      end
+      snapshot
+    end
+
+    # Restored inside the Rails executor, whose entry hands the pool thread a
+    # fresh Current. Restoring through set scopes the values to the block.
+    def with_current_attributes(snapshot, &block)
+      return yield if snapshot.nil? || snapshot.empty?
+
+      klass, attributes = snapshot.first
+      rest = snapshot.except(klass)
+      klass.set(attributes) { with_current_attributes(rest, &block) }
     end
 
     def with_thread_locals(thread_locals)
