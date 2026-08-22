@@ -69,13 +69,28 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     context "Graphiti::Errors::RecordNotFound" do
-      let(:error) { Graphiti::Errors::RecordNotFound.new }
+      let(:error) { Graphiti::Errors::RecordNotFound.new("employees", 123) }
 
-      it "renders a 404" do
+      it "renders a 404 with the exception message as detail" do
         get_errors
 
         expect(response.status).to eq(404)
         expect(json["errors"][0]["code"]).to eq("not_found")
+        expect(json["errors"][0]["detail"])
+          .to eq("The referenced resource 'employees' with id '123' could not be found.")
+      end
+    end
+
+    context "a client-caused query error" do
+      let(:error) do
+        Graphiti::Errors::InvalidInclude.new(PORO::EmployeeResource.new, "foo")
+      end
+
+      it "renders a 400 with the exception message as detail" do
+        get_errors
+
+        expect(response.status).to eq(400)
+        expect(json["errors"][0]["detail"]).to match(/"foo" is not supported/)
       end
     end
 

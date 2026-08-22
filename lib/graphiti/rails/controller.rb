@@ -30,14 +30,32 @@ module Graphiti
 
         register_exception Graphiti::Errors::InvalidRequest,
           status: 400, handler: Graphiti::Rails::InvalidRequestHandler
+        register_exception Graphiti::Errors::RemoteWrite,
+          status: 400, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
+        register_exception Graphiti::Errors::SingularSideload,
+          status: 400, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
+        register_exception Graphiti::Errors::InvalidInclude,
+          status: 400, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
+        register_exception Graphiti::Errors::UnsupportedSort,
+          status: 400, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
+        register_exception Graphiti::Errors::UnsupportedOperator,
+          status: 400, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
+        register_exception Graphiti::Errors::InvalidFilterValue,
+          status: 400, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
+        register_exception Graphiti::Errors::RequiredFilter,
+          status: 400, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
+        register_exception Graphiti::Errors::UnsupportedPageSize,
+          status: 400, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
+        register_exception Graphiti::Errors::UnsupportedBeforeCursor,
+          status: 400, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
+        register_exception Graphiti::Errors::FilterGroupMissingRequiredFilters,
+          status: 400, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
+
+        register_exception Graphiti::Errors::RecordNotFound,
+          status: 404, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
+
         register_exception Graphiti::Errors::ConflictRequest,
           status: 409, handler: Graphiti::Rails::ConflictRequestHandler
-        register_exception Graphiti::Errors::RecordNotFound,
-          status: 404, handler: Graphiti::Rails::ExceptionHandler
-        register_exception Graphiti::Errors::RemoteWrite,
-          status: 400, handler: Graphiti::Rails::ExceptionHandler
-        register_exception Graphiti::Errors::SingularSideload,
-          status: 400, handler: Graphiti::Rails::ExceptionHandler
       end
     end
   end
