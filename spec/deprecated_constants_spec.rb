@@ -90,9 +90,18 @@ RSpec.describe "deprecated constants" do
 
     # The mixin and its exception handlers are replaced by rescue_registry, not
     # renamed, so there is nothing for them to point at.
-    it "does not resurrect the rest of GraphitiErrors" do
-      expect(GraphitiErrors).to_not respond_to(:disable!)
+    it "does not resurrect the exception handlers" do
       expect(defined?(GraphitiErrors::ExceptionHandler)).to be_nil
+    end
+
+    it "still answers #rendered_errors with the payload" do
+      serializer = Graphiti::ErrorSerializers::InvalidRequest
+        .new(double(details: {}, messages: {}))
+
+      expect(Graphiti::DEPRECATOR).to receive(:deprecation_warning)
+        .with("#rendered_errors", a_string_including("#errors"))
+
+      expect(serializer.rendered_errors).to eq([])
     end
   end
 

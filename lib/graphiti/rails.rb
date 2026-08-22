@@ -31,6 +31,13 @@ module Graphiti
     autoload :Responders, "graphiti/rails/responders"
     autoload :TestHelpers, "graphiti/rails/test_helpers"
 
+    # Deprecated. Backed graphiti-rails' enable!/disable! spec toggles. Remove in 3.0.
+    GraphitiErrorsTesting = ActiveSupport::Deprecation::DeprecatedConstantProxy.new(
+      "Graphiti::Rails::GraphitiErrorsTesting",
+      "Graphiti::Rails::TestHelpers",
+      DEPRECATOR
+    )
+
     # @!attribute self.handled_exception_formats
     # A list of formats as symbols whose exceptions will be handled by Graphiti. See {Railtie}.
     cattr_accessor :handled_exception_formats, default: []
@@ -45,6 +52,13 @@ module Graphiti
   Responders = ActiveSupport::Deprecation::DeprecatedConstantProxy.new(
     "Graphiti::Responders",
     "Graphiti::Rails::Responders",
+    DEPRECATOR
+  )
+
+  # Deprecated. Core's railtie merged into graphiti-rails'. Remove in 3.0.
+  Railtie = ActiveSupport::Deprecation::DeprecatedConstantProxy.new(
+    "Graphiti::Railtie",
+    "Graphiti::Rails::Railtie",
     DEPRECATOR
   )
 end

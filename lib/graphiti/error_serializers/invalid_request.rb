@@ -36,6 +36,12 @@ module Graphiti
         end
       end
 
+      # graphiti_errors named the payload this. Remove in 3.0.
+      def rendered_errors
+        Graphiti::DEPRECATOR.deprecation_warning("#rendered_errors", "use #errors")
+        errors
+      end
+
       private
 
       def code

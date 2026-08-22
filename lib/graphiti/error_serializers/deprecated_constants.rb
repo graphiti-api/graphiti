@@ -23,6 +23,29 @@ module GraphitiErrors
     MSG
   end
 
+  # The old global rendering toggle, most often flipped in specs.
+  class << self
+    def enable!
+      Graphiti::DEPRECATOR.deprecation_warning("GraphitiErrors.enable!", "wrap the request in Graphiti::Rails::TestHelpers#handle_request_exceptions instead")
+      test_helpers.handle_request_exceptions(true)
+    end
+
+    def disable!
+      Graphiti::DEPRECATOR.deprecation_warning("GraphitiErrors.disable!", "wrap the request in Graphiti::Rails::TestHelpers#handle_request_exceptions instead")
+      test_helpers.handle_request_exceptions(false)
+    end
+
+    def disabled?
+      !test_helpers.handle_request_exceptions?
+    end
+
+    private
+
+    def test_helpers
+      @test_helpers ||= Object.new.extend(Graphiti::Rails::TestHelpers)
+    end
+  end
+
   module Validation; end
 
   module InvalidRequest; end
