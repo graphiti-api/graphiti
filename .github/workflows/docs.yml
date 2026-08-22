@@ -1,20 +1,23 @@
 name: Docs
 
-# Publishes the documentation site from beta. graphiti.dev now points at this
-# repo via website/static/CNAME, so this deploy is the live site: the 1.x
-# Jekyll site is frozen under website/static/1.13 and ships with every build,
-# and graphiti-api.github.io no longer serves the domain.
+# Publishes the documentation site from beta, and from main once 2.0 lands
+# there. graphiti.dev now points at this repo via website/static/CNAME, so this
+# deploy is the live site: the 1.x Jekyll site is frozen under
+# website/static/1.13 and ships with every build, and graphiti-api.github.io no
+# longer serves the domain.
 on:
   push:
-    branches: [beta]
+    branches: [beta, main]
     paths:
       - 'docs/**'
       - 'website/**'
       - '.github/workflows/docs.yml'
   workflow_dispatch: {}
 
+# One static group: deploys from different branches force-push the same
+# gh-pages branch, so they must not interleave.
 concurrency:
-  group: docs-${{ github.ref }}
+  group: docs
   cancel-in-progress: true
 
 permissions:
