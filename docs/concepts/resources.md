@@ -140,6 +140,18 @@ Edit an implementation in place. Here, `:string` is made to render as an integer
 Graphiti::Types[:string][:read] = Dry::Types['coercible.integer']
 ```
 
+#### Disabling Read Typecasting {#typecast-reads}
+
+To serialize values exactly as the model returns them, skipping the type's `read` coercion:
+
+```ruby
+class ApplicationResource < Graphiti::Resource
+  self.typecast_reads = false
+end
+```
+
+Defaults to `true`. Like the other class attributes it inherits, so it can be turned off app-wide or per resource. Writes and filters still coerce.
+
 #### Enum Types {#enum-types}
 
 `string_enum` and `integer_enum` behave like `string` and `integer`, except declaring one (as an attribute or a filter) requires the `allow:` option, the list of acceptable values:

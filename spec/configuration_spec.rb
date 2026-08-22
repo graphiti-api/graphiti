@@ -2,17 +2,6 @@ require "spec_helper"
 require "pathname"
 
 RSpec.describe Graphiti::Configuration do
-  RSpec.shared_context "preserving Graphiti.logger" do
-    around do |e|
-      orig = Graphiti.logger
-      begin
-        e.run
-      ensure
-        Graphiti.logger = orig
-      end
-    end
-  end
-
   RSpec.shared_context "with config" do |name|
     around do |e|
       orig = Graphiti.config.send(name)
@@ -32,54 +21,6 @@ RSpec.describe Graphiti::Configuration do
       e.run
     ensure
       Graphiti.instance_variable_set(:@config, orig)
-    end
-  end
-
-  # FIXME: Deprecated
-  describe "when rails is defined" do
-    include_context "preserving Graphiti.logger"
-
-    let(:logger) { double(debug?: false) }
-
-    let(:rails) do
-      double(root: Pathname.new("/foo/bar"), logger: logger)
-    end
-
-    before do
-      stub_const("::Rails", rails)
-      Graphiti.instance_variable_set(:@config, nil)
-    end
-
-    after do
-      Graphiti.instance_variable_set(:@config, nil)
-    end
-
-    describe "#schema_path" do
-      it "defaults" do
-        expect(Graphiti.config.schema_path.to_s)
-          .to eq("/foo/bar/public/schema.json")
-      end
-    end
-
-    describe "#debug" do
-      subject { Graphiti.config.debug }
-
-      # FIXME: Deprecated
-      context "when rails logger is debug level" do
-        let(:logger) { double(debug?: true) }
-
-        it { is_expected.to eq(true) }
-      end
-
-      # FIXME: Deprecated
-      context "when rails logger is not debug level" do
-        it { is_expected.to eq(false) }
-      end
-    end
-
-    it "sets the graphiti logger to the rails logger" do
-      Graphiti.config
-      expect(Graphiti.logger).to eq(rails.logger)
     end
   end
 
@@ -115,22 +56,6 @@ RSpec.describe Graphiti::Configuration do
     it "returns value when value set" do
       Graphiti.config.schema_path = "foo"
       expect(Graphiti.config.schema_path).to eq("foo")
-    end
-
-    # FIXME: Deprecated
-    context "when Rails is defined" do
-      include_context "preserving Graphiti.logger"
-
-      before do
-        rails = double(root: Pathname.new("/foo/bar"), logger: double.as_null_object)
-        stub_const("::Rails", rails)
-        Graphiti.instance_variable_set(:@config, nil)
-      end
-
-      it "defaults" do
-        expect(Graphiti.config.schema_path.to_s)
-          .to eq("/foo/bar/public/schema.json")
-      end
     end
   end
 
@@ -195,12 +120,21 @@ RSpec.describe Graphiti::Configuration do
     end
   end
 
-  describe "deprecated link settings" do
+  describe "deprecated resource-level settings" do
     around do |e|
       e.run
     ensure
       Graphiti::Resource.relationship_links = true
       Graphiti::Resource.page_links = false
+      Graphiti::Resource.typecast_reads = true
+    end
+
+    describe "#typecast_reads" do
+      it "maps to Resource.typecast_reads" do
+        Graphiti.config.typecast_reads = false
+        expect(Graphiti::Resource.typecast_reads).to eq(false)
+        expect(Graphiti.config.typecast_reads).to eq(false)
+      end
     end
 
     describe "#links_on_demand" do

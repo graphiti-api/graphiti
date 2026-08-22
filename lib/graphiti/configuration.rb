@@ -24,7 +24,6 @@ module Graphiti
 
     attr_accessor :respond_to
     attr_accessor :context_for_endpoint
-    attr_accessor :typecast_reads
     attr_accessor :raise_on_missing_sidepost
     attr_accessor :before_sideload
 
@@ -41,29 +40,12 @@ module Graphiti
       @concurrency = false
       @concurrency_max_threads = 4
       @respond_to = [:json, :jsonapi, :xml]
-      @typecast_reads = true
       @raise_on_missing_sidepost = true
       @cache_rendering = false
       self.debug = ENV.fetch("GRAPHITI_DEBUG", true)
       self.debug_models = ENV.fetch("GRAPHITI_DEBUG_MODELS", false)
 
       @uri_decoder = infer_uri_decoder
-
-      # FIXME: Don't duplicate the Railtie's initializer
-      if defined?(::Rails.root) && (root = ::Rails.root)
-        config_file = root.join(".graphiticfg.yml")
-        if config_file.exist?
-          cfg = YAML.load_file(config_file)
-          @schema_path = root.join("public#{cfg["namespace"]}/schema.json")
-        else
-          @schema_path = root.join("public/schema.json")
-        end
-
-        if (logger = ::Rails.logger)
-          self.debug = logger.debug? && debug
-          Graphiti.logger = logger
-        end
-      end
     end
 
     def cache_rendering?
@@ -103,6 +85,14 @@ module Graphiti
       yield
     ensure
       send(:"#{key}=", original)
+    end
+
+    def typecast_reads
+      Resource.typecast_reads
+    end
+
+    def typecast_reads=(val)
+      Resource.typecast_reads = val
     end
 
     def links_on_demand
@@ -172,7 +162,10 @@ module Graphiti
 
   relationship_msg = "Set `self.relationship_links` (true, false, or :on_demand) on your resource"
   pagination_msg = "Set `self.page_links` (true, false, or :on_demand) on your resource"
+  typecast_msg = "Set `self.typecast_reads` on your resource"
   DEPRECATOR.deprecate_methods(Configuration,
+    typecast_reads: typecast_msg,
+    "typecast_reads=": typecast_msg,
     links_on_demand: relationship_msg,
     "links_on_demand=": relationship_msg,
     pagination_links: pagination_msg,

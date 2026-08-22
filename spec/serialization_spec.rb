@@ -159,6 +159,18 @@ RSpec.describe "serialization" do
           render
           expect(attributes["age"]).to eq("1")
         end
+
+        context "when the resource disables typecast_reads" do
+          before do
+            resource.typecast_reads = false
+          end
+
+          it "does not coerce" do
+            PORO::Employee.create(age: 1)
+            render
+            expect(attributes["age"]).to eq(1)
+          end
+        end
       end
 
       context "when integer" do

@@ -128,7 +128,8 @@ module Graphiti
           :graphql_entrypoint,
           :cursor_paginatable,
           :page_links,
-          :relationship_links
+          :relationship_links,
+          :typecast_reads
 
         class << self
           prepend Overrides
@@ -138,6 +139,7 @@ module Graphiti
         # so the deprecated Graphiti.config setters can still act globally.
         self.page_links = false
         self.relationship_links = true
+        self.typecast_reads = true
 
         def self.inherited(klass)
           super

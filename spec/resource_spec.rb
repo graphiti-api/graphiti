@@ -531,6 +531,12 @@ RSpec.describe Graphiti::Resource do
     end
   end
 
+  describe "#typecast_reads" do
+    it "defaults" do
+      expect(instance.typecast_reads).to eq(true)
+    end
+  end
+
   describe "#relationship_links" do
     it "defaults" do
       expect(instance.relationship_links).to eq(true)
