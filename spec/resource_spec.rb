@@ -40,6 +40,40 @@ RSpec.describe Graphiti::Resource do
       end
     end
 
+    describe "an abstract resource declaring relationships" do
+      let(:app_resource) do
+        Class.new(described_class) do
+          self.abstract_class = true
+          has_many :positions, resource: PORO::PositionResource
+        end
+      end
+
+      it "does not raise" do
+        expect { app_resource }.to_not raise_error
+        expect(app_resource.serializer).to be_nil
+      end
+
+      it "applies the relationship to a subclass's serializer" do
+        klass = Class.new(app_resource)
+        expect(klass.serializer.relationship_blocks.keys).to include(:positions)
+      end
+
+      context "when rails eager loading" do
+        before do
+          rails = double \
+            application: double(config: double(eager_load: true))
+          stub_const("Rails", rails.as_null_object)
+        end
+
+        it "applies to the subclass's serializer via setup!" do
+          klass = Class.new(app_resource)
+          expect(klass.serializer.relationship_blocks).to be_blank
+          expect { Graphiti.setup! }.to_not raise_error
+          expect(klass.serializer.relationship_blocks.keys).to include(:positions)
+        end
+      end
+    end
+
     describe "a further descendant of ApplicationResource" do
       let(:app_resource) do
         Class.new(described_class) do

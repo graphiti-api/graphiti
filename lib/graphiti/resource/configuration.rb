@@ -140,6 +140,13 @@ module Graphiti
           end
           klass.stat total: [:count]
 
+          # An abstract parent has no serializer for its sideloads, so the subclass applies them here.
+          if abstract_class?
+            klass.config[:sideloads].each_pair do |name, sideload|
+              klass.apply_sideload_to_serializer(name) if klass.eagerly_apply_sideload?(sideload)
+            end
+          end
+
           if defined?(::Rails) && ::Rails.env.development?
             # Avoid adding dupe resources when re-autoloading
             Graphiti.resources.reject! { |r| r.name == klass.name }

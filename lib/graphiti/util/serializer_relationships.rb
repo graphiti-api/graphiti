@@ -8,6 +8,8 @@ module Graphiti
       end
 
       def apply
+        return unless @serializer
+
         @sideloads.each_pair do |name, sideload|
           if apply?(sideload)
             SerializerRelationship
