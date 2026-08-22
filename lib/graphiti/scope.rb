@@ -183,6 +183,8 @@ module Graphiti
     # canonical instance. The resource class in the key keeps two resources
     # serving the same model from sharing an instance and a serializer.
     def deduplicate_entities!(resolved)
+      return unless deduplicable?
+
       # Nested maps are built once, a composite key meant a new array for every record
       by_model = @query.entity_map.compute_if_absent(@resource.class) { Concurrent::Map.new }
 
@@ -192,6 +194,17 @@ module Graphiti
         by_id = by_model.compute_if_absent(record.class) { Concurrent::Map.new }
         by_id.compute_if_absent(record.id) { record }
       end
+    end
+
+    # A customized sideload can load a record another path would not, so it keeps its own instances.
+    def deduplicable?
+      sideload = @opts[:sideload]
+      return true unless sideload
+
+      sideload.scope_proc.nil? &&
+        sideload.params_proc.nil? &&
+        !sideload.customized_base_scope? &&
+        sideload.primary_key == :id
     end
 
     # Nothing to post to the pool means the future would wrap work already done.

@@ -1206,6 +1206,21 @@ RSpec.describe "sideloading" do
       expect(employee.current_position).to_not equal(twin)
     end
 
+    it "keeps instances separate when the sideload customizes its scope" do
+      resource.sideloads.delete(:current_position)
+      resource.has_one :current_position, resource: position_resource do
+        scope do |employee_ids|
+          {type: :positions, conditions: {employee_id: employee_ids}}
+        end
+      end
+
+      proxy = resource.all(params)
+      employee = proxy.data[0]
+      twin = employee.positions.find { |position| position.id == employee.current_position.id }
+
+      expect(employee.current_position).to_not equal(twin)
+    end
+
     describe "across requests" do
       it "uses a different sideloaded resource" do
         ctx = double(current_user: :admin)
