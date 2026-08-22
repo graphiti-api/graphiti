@@ -22,6 +22,10 @@ namespace :graphiti do
     rows = Graphiti::Audit.run
     puts Graphiti::Audit::Report.new(rows)
 
+    if (advisory = helpers.connection_pool_advisory)
+      puts advisory
+    end
+
     exit 1 if rows.any?(&:error?)
   end
 

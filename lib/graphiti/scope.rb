@@ -267,8 +267,10 @@ module Graphiti
             with_thread_locals(thread_storage) do
               with_fiber_locals(fiber_storage) do
                 with_current_attributes(current_attributes) do
-                  Graphiti.broadcast(:global_thread_pool_task_run, self.class.global_thread_pool_stats) do
-                    yield(*args)
+                  with_connection_pool_hint do
+                    Graphiti.broadcast(:global_thread_pool_task_run, self.class.global_thread_pool_stats) do
+                      yield(*args)
+                    end
                   end
                 end
               end
@@ -299,6 +301,22 @@ module Graphiti
       klass, attributes = snapshot.first
       rest = snapshot.except(klass)
       klass.set(attributes) { with_current_attributes(rest, &block) }
+    end
+
+    # A timeout inside a sideload task nearly always means database.yml's pool
+    # was not sized for the sideload threads, and the bare error does not say so.
+    def with_connection_pool_hint
+      yield
+    rescue => error
+      raise unless defined?(ActiveRecord::ConnectionTimeoutError) && error.is_a?(ActiveRecord::ConnectionTimeoutError)
+
+      hinted = error.exception(<<~MSG.strip)
+        #{error.message}
+
+        Raised while resolving a sideload concurrently. Each concurrent sideload holds its own database connection, so `pool` in database.yml must be at least web threads + concurrency_max_threads (#{Graphiti.config.concurrency_max_threads}) + 1. See graphiti.dev/concepts/resources#concurrency-pool-sizing.
+      MSG
+      hinted.set_backtrace(error.backtrace)
+      raise hinted
     end
 
     def with_thread_locals(thread_locals)

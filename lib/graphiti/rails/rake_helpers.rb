@@ -21,6 +21,23 @@ module Graphiti
         ::Rails.application.config.action_controller.perform_caching = false
       end
 
+      # The pool and RAILS_MAX_THREADS are read from this environment, and production may size both differently.
+      def connection_pool_advisory
+        return unless defined?(ActiveRecord::Base)
+
+        pool = ActiveRecord::Base.connection_db_config.pool
+        threads = ENV.fetch("RAILS_MAX_THREADS", 5).to_i
+        sideload_threads = Graphiti.config.concurrency_max_threads
+        needed = threads + sideload_threads + 1
+        return if pool.nil? || pool >= needed
+
+        "WARNING database.yml pool is #{pool} in this environment. With concurrency on (the production default), " \
+          "each sideload holds its own connection, so pool should be at least " \
+          "web threads (#{threads}) + concurrency_max_threads (#{sideload_threads}) + 1 = #{needed}. " \
+          "If production sizes these differently, check the numbers there. " \
+          "See graphiti.dev/concepts/resources#concurrency-pool-sizing."
+      end
+
       def make_request(path, debug = false)
         if path.split("/").length == 2
           path = "#{ApplicationResource.endpoint_namespace}#{path}"
