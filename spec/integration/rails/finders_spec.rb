@@ -130,13 +130,10 @@ if ENV["APPRAISAL_INITIALIZED"]
         let(:params) { {size: 1, number: 2} }
 
         around do |e|
-          original = Graphiti.config.pagination_links
-          begin
-            Graphiti.config.pagination_links = true
-            e.run
-          ensure
-            Graphiti.config.pagination_links = original
-          end
+          Legacy::AuthorResource.page_links = true
+          e.run
+        ensure
+          Legacy::AuthorResource.page_links = false
         end
 
         let(:links) do

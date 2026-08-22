@@ -236,6 +236,11 @@ Every name below still works, warns, and will be removed in the next major. They
 | `Graphiti::Rails::DEPRECATOR` | `Graphiti::DEPRECATOR` (the old name still resolves) |
 | `require "graphiti_errors"`, `require "graphiti/responders"` | remove / no longer needed |
 | `always_include_resource_ids: true` on a relationship | `resource_ids: true` |
+| `Graphiti.config.links_on_demand = true` | `self.relationship_links = :on_demand` on ApplicationResource |
+| `Graphiti.config.pagination_links = true` | `self.page_links = true` on ApplicationResource |
+| `Graphiti.config.pagination_links_on_demand = true` | `self.page_links = :on_demand` on ApplicationResource |
+
+The link settings became resource class attributes taking `true` (always render), `false` (never render), or `:on_demand` (only with `?links=true` / `?pagination_links=true`). Setting them on `ApplicationResource` reproduces the old global behavior, and individual resources can now override. `relationship_links = false` is new - before 2.0 there was no way to turn relationship links off entirely.
 
 `RSpec.describe PostResource, type: :resource` still picks up the resource-testing context automatically. That has not changed.
 

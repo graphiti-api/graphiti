@@ -7,10 +7,27 @@ module Graphiti
 
       module Overrides
         BELONGS_TO_RESOURCE_IDS_VALUES = [:foreign_key, :always, :never].freeze
+        LINK_RENDERING_VALUES = [true, false, :on_demand].freeze
 
         def belongs_to_resource_ids_by_default=(val)
           unless BELONGS_TO_RESOURCE_IDS_VALUES.include?(val)
             raise Errors::InvalidBelongsToResourceIds.new(self, val)
+          end
+
+          super
+        end
+
+        def page_links=(val)
+          unless LINK_RENDERING_VALUES.include?(val)
+            raise Errors::InvalidLinkRendering.new(self, :page_links, val)
+          end
+
+          super
+        end
+
+        def relationship_links=(val)
+          unless LINK_RENDERING_VALUES.include?(val)
+            raise Errors::InvalidLinkRendering.new(self, :relationship_links, val)
           end
 
           super
@@ -109,11 +126,18 @@ module Graphiti
           :filters_accept_nil_by_default,
           :filters_deny_empty_by_default,
           :graphql_entrypoint,
-          :cursor_paginatable
+          :cursor_paginatable,
+          :page_links,
+          :relationship_links
 
         class << self
           prepend Overrides
         end
+
+        # Assigned on the base class, not stamped per-subclass in .inherited,
+        # so the deprecated Graphiti.config setters can still act globally.
+        self.page_links = false
+        self.relationship_links = true
 
         def self.inherited(klass)
           super

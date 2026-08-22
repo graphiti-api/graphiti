@@ -918,15 +918,17 @@ RSpec.describe Graphiti::Query do
       it { is_expected.to eq(false) }
     end
 
-    context "when links_on_demand" do
-      around do |e|
-        original = Graphiti.config.links_on_demand
-        begin
-          Graphiti.config.links_on_demand = true
-          e.run
-        ensure
-          Graphiti.config.links_on_demand = original
-        end
+    context "when relationship_links is false" do
+      before do
+        employee_resource.relationship_links = false
+      end
+
+      it { is_expected.to eq(false) }
+    end
+
+    context "when relationship_links is :on_demand" do
+      before do
+        employee_resource.relationship_links = :on_demand
       end
 
       context "and requested" do
@@ -1027,24 +1029,11 @@ RSpec.describe Graphiti::Query do
 
   describe "#pagination_links?" do
     subject { instance.pagination_links? }
-    let(:pagination_links) { Graphiti.config.pagination_links }
-    let(:pagination_links_on_demand) { Graphiti.config.pagination_links_on_demand }
 
-    around do |e|
-      original_pagination_links = Graphiti.config.pagination_links
-      original_pagination_links_on_demand = Graphiti.config.pagination_links_on_demand
-      Graphiti.config.pagination_links = pagination_links
-      Graphiti.config.pagination_links_on_demand = pagination_links_on_demand
-      begin
-        e.run
-      ensure
-        Graphiti.config.pagination_links = original_pagination_links
-        Graphiti.config.pagination_links_on_demand = original_pagination_links_on_demand
+    context "when pagination_links is :on_demand" do
+      before do
+        employee_resource.page_links = :on_demand
       end
-    end
-
-    context "when pagination_links_on_demand" do
-      let(:pagination_links_on_demand) { true }
 
       context "when params ask for pagination" do
         let(:params) { {pagination_links: true} }
@@ -1059,13 +1048,15 @@ RSpec.describe Graphiti::Query do
 
     context "when action is equal to find" do
       let(:params) { {action: "show"} }
-      let(:pagination_links_on_demand) { false }
 
       it { is_expected.to eq(false) }
 
-      context "when pagination_links_on_demand and param is present" do
+      context "when pagination_links is :on_demand and param is present" do
         let(:params) { {action: "show", pagination_links: true} }
-        let(:pagination_links_on_demand) { true }
+
+        before do
+          employee_resource.page_links = :on_demand
+        end
 
         it { is_expected.to eq(false) }
       end
@@ -1073,17 +1064,16 @@ RSpec.describe Graphiti::Query do
 
     context "when action is equal to all" do
       let(:params) { {action: "index"} }
-      let(:pagination_links_on_demand) { false }
 
-      context "when is equal config.pagination_links is true" do
-        let(:pagination_links) { true }
+      context "when pagination_links is true" do
+        before do
+          employee_resource.page_links = true
+        end
 
         it { is_expected.to eq(true) }
       end
 
-      context "when is equal config.pagination_links is false" do
-        let(:pagination_links) { false }
-
+      context "when pagination_links is false" do
         it { is_expected.to eq(false) }
       end
     end

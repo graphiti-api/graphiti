@@ -1197,10 +1197,18 @@ RSpec.describe "serialization" do
             .to eq("/special/positions?blah=1")
         end
 
-        context "when links_on_demand" do
-          around do |e|
-            Graphiti.config.with_option(:links_on_demand, true) do
-              e.run
+        context "when the sideload resource renders links on demand" do
+          let(:position_resource) do
+            Class.new(PORO::PositionResource) do
+              self.relationship_links = :on_demand
+            end
+          end
+
+          before do
+            resource.has_many :positions, resource: position_resource do
+              link do |employee|
+                "/special/positions?blah=#{employee.id}"
+              end
             end
           end
 
@@ -1220,10 +1228,8 @@ RSpec.describe "serialization" do
       end
 
       context "when links on demand" do
-        around do |e|
-          Graphiti.config.with_option(:links_on_demand, true) do
-            e.run
-          end
+        before do
+          resource.relationship_links = :on_demand
         end
 
         context "and ?links param given" do
@@ -1246,12 +1252,6 @@ RSpec.describe "serialization" do
       end
 
       context "and links not on demand" do
-        around do |e|
-          Graphiti.config.with_option(:links_on_demand, false) do
-            e.run
-          end
-        end
-
         context "and a relationship is sideloaded" do
           before do
             params[:include] = "positions"
@@ -1273,14 +1273,17 @@ RSpec.describe "serialization" do
     end
 
     context "when only linking if requested" do
-      around do |e|
-        resource.autolink = true
-        params[:include] = "positions"
-        resource.has_many :positions
-
-        Graphiti.config.with_option(:links_on_demand, true) do
-          e.run
+      let(:position_resource) do
+        Class.new(PORO::PositionResource) do
+          self.relationship_links = :on_demand
         end
+      end
+
+      before do
+        resource.autolink = true
+        resource.relationship_links = :on_demand
+        params[:include] = "positions"
+        resource.has_many :positions, resource: position_resource
       end
 
       context "and not requested in url" do

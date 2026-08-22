@@ -107,7 +107,7 @@ module Graphiti
     end
 
     def strip_relationships?
-      return false unless Graphiti.config.links_on_demand
+      return false unless @proxy&.query&.resource&.relationship_links == :on_demand
       params = Graphiti.context[:object]&.params || {}
 
       [false, nil, "false"].include?(params[:links])

@@ -160,13 +160,15 @@ end
 
 ### Links-on-Demand {#links-on-demand}
 
-To only render links when requested in the URL with `?links=true`:
+To only render relationship links when requested in the URL with `?links=true`:
 
 ```ruby
-Graphiti.configure do |c|
-  c.links_on_demand = true
+class ApplicationResource < Graphiti::Resource
+  self.relationship_links = :on_demand
 end
 ```
+
+`relationship_links` accepts `true` (always render, the default), `false` (never render), or `:on_demand`. Set it on `ApplicationResource` to apply everywhere, or on an individual resource to override.
 
 ### Pagination Links {#pagination-links}
 
@@ -177,8 +179,8 @@ Requesting large collections can make for slow responses. [Pagination](https://j
 Every collection response returns pagination links:
 
 ```ruby
-Graphiti.configure do |c|
-  c.pagination_links = true
+class ApplicationResource < Graphiti::Resource
+  self.page_links = true
 end
 ```
 
@@ -187,10 +189,12 @@ end
 Links are rendered only when the request asks for them with `?pagination_links=true`. Worth doing when the collection is large: the `last` link needs a total count, so rendering links costs a `stat(:total, :count)` on every request that gets them.
 
 ```ruby
-Graphiti.configure do |c|
-  c.pagination_links_on_demand = true
+class ApplicationResource < Graphiti::Resource
+  self.page_links = :on_demand
 end
 ```
+
+Like `relationship_links`, `pagination_links` accepts `true`, `false` (the default), or `:on_demand`, and can be set per resource.
 
 Pagination links won't show up for *#show* actions.
 

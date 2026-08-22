@@ -708,6 +708,18 @@ module Graphiti
       end
     end
 
+    class InvalidLinkRendering < Base
+      def initialize(resource_class, attribute, value)
+        @resource_class = resource_class
+        @attribute = attribute
+        @value = value
+      end
+
+      def message
+        "#{@resource_class.name}: #{@attribute} must be true, false, or :on_demand. Got #{@value.inspect}."
+      end
+    end
+
     class UnselectedForeignKey < Base
       def initialize(resource_class, sideload, model)
         @resource_class = resource_class

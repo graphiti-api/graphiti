@@ -514,6 +514,40 @@ RSpec.describe Graphiti::Resource do
     end
   end
 
+  describe "#page_links" do
+    it "defaults" do
+      expect(instance.page_links).to eq(false)
+    end
+
+    it "accepts true, false, and :on_demand" do
+      klass.page_links = :on_demand
+      expect(klass.page_links).to eq(:on_demand)
+    end
+
+    it "rejects other values" do
+      expect {
+        klass.page_links = :always
+      }.to raise_error(Graphiti::Errors::InvalidLinkRendering, /page_links must be true, false, or :on_demand/)
+    end
+  end
+
+  describe "#relationship_links" do
+    it "defaults" do
+      expect(instance.relationship_links).to eq(true)
+    end
+
+    it "is inherited" do
+      klass.relationship_links = :on_demand
+      expect(Class.new(klass).relationship_links).to eq(:on_demand)
+    end
+
+    it "rejects other values" do
+      expect {
+        klass.relationship_links = :never
+      }.to raise_error(Graphiti::Errors::InvalidLinkRendering, /relationship_links must be true, false, or :on_demand/)
+    end
+  end
+
   describe "#type" do
     it "defaults" do
       expect(instance.type).to eq(:undefined_jsonapi_type)

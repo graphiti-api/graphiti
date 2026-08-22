@@ -195,6 +195,52 @@ RSpec.describe Graphiti::Configuration do
     end
   end
 
+  describe "deprecated link settings" do
+    around do |e|
+      e.run
+    ensure
+      Graphiti::Resource.relationship_links = true
+      Graphiti::Resource.page_links = false
+    end
+
+    describe "#links_on_demand" do
+      it "maps to Resource.relationship_links" do
+        Graphiti.config.links_on_demand = true
+        expect(Graphiti::Resource.relationship_links).to eq(:on_demand)
+        expect(Graphiti.config.links_on_demand).to eq(true)
+
+        Graphiti.config.links_on_demand = false
+        expect(Graphiti::Resource.relationship_links).to eq(true)
+        expect(Graphiti.config.links_on_demand).to eq(false)
+      end
+    end
+
+    describe "#pagination_links" do
+      it "maps to Resource.page_links" do
+        Graphiti.config.pagination_links = true
+        expect(Graphiti::Resource.page_links).to eq(true)
+        expect(Graphiti.config.pagination_links).to eq(true)
+      end
+
+      it "does not clobber :on_demand" do
+        Graphiti.config.pagination_links_on_demand = true
+        Graphiti.config.pagination_links = false
+        expect(Graphiti::Resource.page_links).to eq(:on_demand)
+      end
+    end
+
+    describe "#pagination_links_on_demand" do
+      it "maps to Resource.page_links" do
+        Graphiti.config.pagination_links_on_demand = true
+        expect(Graphiti::Resource.page_links).to eq(:on_demand)
+        expect(Graphiti.config.pagination_links_on_demand).to eq(true)
+
+        Graphiti.config.pagination_links_on_demand = false
+        expect(Graphiti::Resource.page_links).to eq(false)
+      end
+    end
+  end
+
   describe "#cache_rendering" do
     it "defaults" do
       expect(Graphiti.config.cache_rendering?).to eq(false)

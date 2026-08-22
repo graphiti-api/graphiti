@@ -42,20 +42,20 @@ module Graphiti
 
     def links?
       return false if [:json, :xml, "json", "xml"].include?(params[:format])
-      if Graphiti.config.links_on_demand
+      if @resource.relationship_links == :on_demand
         [true, "true"].include?(@params[:links])
       else
-        true
+        @resource.relationship_links
       end
     end
 
     def pagination_links?
       if action == :find
         false
-      elsif Graphiti.config.pagination_links_on_demand
+      elsif @resource.page_links == :on_demand
         [true, "true"].include?(@params[:pagination_links])
       else
-        Graphiti.config.pagination_links
+        @resource.page_links
       end
     end
 

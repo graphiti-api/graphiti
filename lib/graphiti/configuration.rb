@@ -24,9 +24,6 @@ module Graphiti
 
     attr_accessor :respond_to
     attr_accessor :context_for_endpoint
-    attr_accessor :links_on_demand
-    attr_accessor :pagination_links_on_demand
-    attr_accessor :pagination_links
     attr_accessor :typecast_reads
     attr_accessor :raise_on_missing_sidepost
     attr_accessor :before_sideload
@@ -44,9 +41,6 @@ module Graphiti
       @concurrency = false
       @concurrency_max_threads = 4
       @respond_to = [:json, :jsonapi, :xml]
-      @links_on_demand = false
-      @pagination_links_on_demand = false
-      @pagination_links = false
       @typecast_reads = true
       @raise_on_missing_sidepost = true
       @cache_rendering = false
@@ -111,6 +105,40 @@ module Graphiti
       send(:"#{key}=", original)
     end
 
+    def links_on_demand
+      Resource.relationship_links == :on_demand
+    end
+
+    def links_on_demand=(val)
+      if val
+        Resource.relationship_links = :on_demand
+      elsif Resource.relationship_links == :on_demand
+        Resource.relationship_links = true
+      end
+    end
+
+    def pagination_links
+      Resource.page_links == true
+    end
+
+    def pagination_links=(val)
+      return if Resource.page_links == :on_demand
+
+      Resource.page_links = !!val
+    end
+
+    def pagination_links_on_demand
+      Resource.page_links == :on_demand
+    end
+
+    def pagination_links_on_demand=(val)
+      if val
+        Resource.page_links = :on_demand
+      elsif Resource.page_links == :on_demand
+        Resource.page_links = false
+      end
+    end
+
     def uri_decoder=(decoder)
       unless decoder.respond_to?(:call)
         raise "uri_decoder must respond to `call`."
@@ -141,4 +169,14 @@ module Graphiti
 
   msg = "Use `config.graphiti.respond_to_formats`"
   DEPRECATOR.deprecate_methods(Configuration, respond_to: msg, "respond_to=": msg)
+
+  relationship_msg = "Set `self.relationship_links` (true, false, or :on_demand) on your resource"
+  pagination_msg = "Set `self.page_links` (true, false, or :on_demand) on your resource"
+  DEPRECATOR.deprecate_methods(Configuration,
+    links_on_demand: relationship_msg,
+    "links_on_demand=": relationship_msg,
+    pagination_links: pagination_msg,
+    "pagination_links=": pagination_msg,
+    pagination_links_on_demand: pagination_msg,
+    "pagination_links_on_demand=": pagination_msg)
 end
