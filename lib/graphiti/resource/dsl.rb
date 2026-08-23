@@ -40,8 +40,7 @@ module Graphiti
               required: required,
               schema: schema,
               operators: operators.to_hash,
-              allow_nil: opts.fetch(:allow_nil, filters_accept_nil_by_default),
-              deny_empty: opts.fetch(:deny_empty, filters_deny_empty_by_default)
+              blanks: blanks_for(name, opts)
             }
           elsif (type = args[0])
             attribute name, type, only: [:filterable], allow: opts[:allow]
@@ -206,6 +205,26 @@ module Graphiti
           end
         end
         private :relationship_option
+
+        def blanks_for(name, opts)
+          if opts.key?(:deny_empty)
+            DEPRECATOR.warn("The deny_empty: filter option is deprecated. Use blanks: :reject.")
+            return :reject if opts[:deny_empty]
+          end
+
+          if opts.key?(:allow_nil)
+            DEPRECATOR.warn("The allow_nil: filter option is deprecated. Use blanks: :as_nil.")
+            return opts[:allow_nil] ? :as_nil : :as_literal
+          end
+
+          blanks = opts.fetch(:blanks, filters_blanks_by_default)
+          unless Resource::BLANK_MODES.include?(blanks)
+            raise Errors::InvalidFilterBlanks.new(self, name, blanks)
+          end
+
+          blanks
+        end
+        private :blanks_for
       end
     end
   end

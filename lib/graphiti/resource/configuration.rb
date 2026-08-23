@@ -6,6 +6,7 @@ module Graphiti
       DEFAULT_MAX_PAGE_SIZE = 1_000
       LINK_MODES = [true, false, :on_demand].freeze
       BELONGS_TO_RESOURCE_IDS_MODES = [:foreign_key, :always, :never].freeze
+      BLANK_MODES = [:as_literal, :as_nil, :reject].freeze
 
       # Grouped for the ApplicationResource the install generator writes.
       SETTING_GROUPS = { # :nodoc:
@@ -27,8 +28,11 @@ module Graphiti
           }
         },
         filters: {
-          filters_accept_nil_by_default: {default: false},
-          filters_deny_empty_by_default: {default: false}
+          filters_blanks_by_default: {
+            default: :as_literal,
+            values: BLANK_MODES,
+            invalid: ->(klass, value) { Errors::InvalidFilterBlanks.new(klass, :filters_blanks_by_default, value) }
+          }
         },
         sorting: {
           default_sort: {default: nil, note: "per resource, e.g. [{id: :desc}]"}
@@ -190,6 +194,23 @@ module Graphiti
       end
 
       class_methods do
+        # Deprecated. Both folded into filters_blanks_by_default. Remove in 3.0.
+        def filters_accept_nil_by_default
+          filters_blanks_by_default == :as_nil
+        end
+
+        def filters_accept_nil_by_default=(val)
+          self.filters_blanks_by_default = val ? :as_nil : :as_literal
+        end
+
+        def filters_deny_empty_by_default
+          filters_blanks_by_default == :reject
+        end
+
+        def filters_deny_empty_by_default=(val)
+          self.filters_blanks_by_default = val ? :reject : :as_literal
+        end
+
         # Deprecated. Renamed to the page_ family. Remove in 3.0.
         def default_page_size
           page_default_size
@@ -395,8 +416,13 @@ module Graphiti
       end
     end
 
+    blanks_msg = "Use `self.filters_blanks_by_default` (:as_literal, :as_nil, or :reject)"
     page_msg = "Use `self.page_default_size`, `self.page_max_size` and `self.page_cursors`"
     DEPRECATOR.deprecate_methods(Configuration::ClassMethods,
+      filters_accept_nil_by_default: blanks_msg,
+      "filters_accept_nil_by_default=": blanks_msg,
+      filters_deny_empty_by_default: blanks_msg,
+      "filters_deny_empty_by_default=": blanks_msg,
       default_page_size: page_msg,
       "default_page_size=": page_msg,
       max_page_size: page_msg,

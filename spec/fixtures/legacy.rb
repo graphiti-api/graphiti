@@ -381,7 +381,7 @@ module Legacy
     attribute :created_at_date, :date, only: [:filterable]
     attribute :identifier, :uuid
 
-    filter :last_login, allow_nil: true
+    filter :last_login, blanks: :as_nil
 
     has_many :books
     belongs_to :state

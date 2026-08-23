@@ -710,6 +710,24 @@ module Graphiti
       end
     end
 
+    class InvalidFilterBlanks < Base
+      def initialize(resource_class, attribute, value)
+        @resource_class = resource_class
+        @attribute = attribute
+        @value = value
+      end
+
+      def message
+        <<~MSG
+          #{@resource_class.name}: #{@attribute} must be one of :as_literal, :as_nil, or :reject. Got #{@value.inspect}.
+
+            :as_literal - "null" and "" reach the filter as strings (default)
+            :as_nil     - "null" becomes nil, so the filter can query for NULL
+            :reject     - a blank value raises InvalidFilterValue
+        MSG
+      end
+    end
+
     class InvalidLinkRendering < Base
       def initialize(resource_class, attribute, value)
         @resource_class = resource_class

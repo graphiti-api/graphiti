@@ -24,8 +24,7 @@ RSpec.describe Graphiti::Resource do
         expect(klass.attributes_schema_by_default).to eq(true)
         expect(klass.relationships_readable_by_default).to eq(true)
         expect(klass.relationships_writable_by_default).to eq(true)
-        expect(klass.filters_accept_nil_by_default).to eq(false)
-        expect(klass.filters_deny_empty_by_default).to eq(false)
+        expect(klass.filters_blanks_by_default).to eq(:as_literal)
       end
 
       it "does not have serializer, type, model, or graphql_entrypoint" do
@@ -106,8 +105,7 @@ RSpec.describe Graphiti::Resource do
         expect(klass.attributes_schema_by_default).to eq(true)
         expect(klass.relationships_readable_by_default).to eq(true)
         expect(klass.relationships_writable_by_default).to eq(true)
-        expect(klass.filters_accept_nil_by_default).to eq(false)
-        expect(klass.filters_deny_empty_by_default).to eq(false)
+        expect(klass.filters_blanks_by_default).to eq(:as_literal)
       end
 
       context "when rails" do
@@ -203,8 +201,7 @@ RSpec.describe Graphiti::Resource do
             self.attributes_schema_by_default = false
             self.relationships_readable_by_default = false
             self.relationships_writable_by_default = false
-            self.filters_accept_nil_by_default = true
-            self.filters_deny_empty_by_default = true
+            self.filters_blanks_by_default = :reject
           end
         end
 
@@ -219,8 +216,7 @@ RSpec.describe Graphiti::Resource do
           expect(klass.attributes_schema_by_default).to eq(false)
           expect(klass.relationships_readable_by_default).to eq(false)
           expect(klass.relationships_writable_by_default).to eq(false)
-          expect(klass.filters_accept_nil_by_default).to eq(true)
-          expect(klass.filters_deny_empty_by_default).to eq(true)
+          expect(klass.filters_blanks_by_default).to eq(:reject)
         end
       end
 
@@ -362,8 +358,7 @@ RSpec.describe Graphiti::Resource do
             self.attributes_schema_by_default = false
             self.relationships_readable_by_default = false
             self.relationships_writable_by_default = false
-            self.filters_accept_nil_by_default = true
-            self.filters_deny_empty_by_default = true
+            self.filters_blanks_by_default = :reject
           end
         end
 
@@ -378,8 +373,7 @@ RSpec.describe Graphiti::Resource do
           expect(klass2.attributes_schema_by_default).to eq(false)
           expect(klass2.relationships_readable_by_default).to eq(false)
           expect(klass2.relationships_writable_by_default).to eq(false)
-          expect(klass2.filters_accept_nil_by_default).to eq(true)
-          expect(klass2.filters_deny_empty_by_default).to eq(true)
+          expect(klass2.filters_blanks_by_default).to eq(:reject)
         end
       end
 
@@ -524,6 +518,34 @@ RSpec.describe Graphiti::Resource do
       expect(klass.page_max_size).to eq(50)
       expect(klass.page_cursors).to eq(true)
       expect(klass.cursor_paginatable?).to eq(true)
+    end
+  end
+
+  describe "the deprecated filter blank settings" do
+    it "maps accept_nil onto the blanks modes" do
+      klass.filters_accept_nil_by_default = true
+      expect(klass.filters_blanks_by_default).to eq(:as_nil)
+      expect(klass.filters_accept_nil_by_default).to eq(true)
+
+      klass.filters_accept_nil_by_default = false
+      expect(klass.filters_blanks_by_default).to eq(:as_literal)
+    end
+
+    it "maps deny_empty onto the blanks modes" do
+      klass.filters_deny_empty_by_default = true
+      expect(klass.filters_blanks_by_default).to eq(:reject)
+      expect(klass.filters_deny_empty_by_default).to eq(true)
+
+      klass.filters_deny_empty_by_default = false
+      expect(klass.filters_blanks_by_default).to eq(:as_literal)
+    end
+  end
+
+  describe "#filters_blanks_by_default" do
+    it "rejects other values" do
+      expect {
+        klass.filters_blanks_by_default = :nope
+      }.to raise_error(Graphiti::Errors::InvalidFilterBlanks, /must be one of :as_literal, :as_nil, or :reject/)
     end
   end
 

@@ -140,7 +140,7 @@ module Graphiti
       end
 
       class FilterAttributeMatcher < ResourceDSLMatcher
-        GRAPHITI_OPTS = %i[allow deny single required allow_nil deny_empty].freeze
+        GRAPHITI_OPTS = %i[allow deny single required blanks].freeze
         GRAPHITI_CONFIG_KEY = :filters
         EXPECTED_ACTION = "filter"
       end
@@ -186,7 +186,7 @@ module Graphiti
       # @param [Symbol] type
       #
       # @example expect(subject).to filter_attribute(:name, :string)
-      # @example expect(subject).to filter_attribute(:name, :string).with_options(allow_nil: false)
+      # @example expect(subject).to filter_attribute(:name, :string).with_options(blanks: :as_nil)
       # @example expect(subject).not_to filter_attribute(:name, :string)
       def filter_attribute(attribute, type)
         FilterAttributeMatcher.new(attribute, type)

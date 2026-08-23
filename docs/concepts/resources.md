@@ -354,7 +354,7 @@ This supports `filter[name][fuzzy_match]=foo`.
 | `single` | Accept one value instead of an array. `boolean` filters are `single: true` by default. |
 | `required` | Reject the request if the filter is absent, e.g. `filter :customer_id, :string, required: true` (equivalently, `attribute :customer_id, :integer, filterable: :required`) |
 | `dependent` | Require other filters alongside this one, e.g. `filter :customer_id, :integer, dependent: [:customer_type]` paired with `filter :customer_type, :string, dependent: [:customer_id]`, so querying by id requires type, and vice versa |
-| `allow_nil` | Coerce an incoming `null` to Ruby `nil` instead of the string `"null"`. Default `false`. Set `self.filters_accept_nil_by_default = true` on a Resource to flip it for all of that Resource's filters. |
+| `blanks` | What to do with a blank value. `:as_literal` (default) takes `"null"` and `""` as strings, `:as_nil` coerces `"null"` to Ruby `nil` so the filter can query for NULL, and `:reject` raises `InvalidFilterValue` for `nil`, `""`, `[]` or `"null"`. Set `self.filters_blanks_by_default` on a Resource to change it for all of that Resource's filters. |
 
 ```ruby
 # Default behavior
