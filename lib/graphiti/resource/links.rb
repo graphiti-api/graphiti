@@ -26,9 +26,11 @@ module Graphiti
         :base_url,
         :endpoint_namespace,
         :secondary_endpoints,
-        :validate_endpoints
+        :validate_requests,
+        :validate_links
       self.secondary_endpoints = []
-      self.validate_endpoints = true
+      self.validate_requests = true
+      self.validate_links = true
 
       class << self
         prepend Overrides
@@ -47,6 +49,20 @@ module Graphiti
 
       def autolink?
         autolink
+      end
+
+      # Deprecated. Split into validate_requests and validate_links. Remove in 3.0.
+      def validate_endpoints
+        validate_requests && validate_links
+      end
+
+      def validate_endpoints=(val)
+        self.validate_requests = val
+        self.validate_links = val
+      end
+
+      def validate_endpoints?
+        validate_endpoints
       end
 
       def infer_endpoint
@@ -114,6 +130,10 @@ module Graphiti
   end
 
   msg = "Use `self.relationship_links` (true, false, or :on_demand)"
+  endpoints_msg = "Use `self.validate_requests` for inbound requests, `self.validate_links` for rendered links"
   DEPRECATOR.deprecate_methods(Links::ClassMethods,
-    autolink: msg, "autolink=": msg, autolink?: msg)
+    autolink: msg, "autolink=": msg, autolink?: msg,
+    validate_endpoints: endpoints_msg,
+    "validate_endpoints=": endpoints_msg,
+    validate_endpoints?: endpoints_msg)
 end

@@ -351,7 +351,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             attr_accessor :meta
           end
           self.model = ::Employee
-          self.validate_endpoints = false
+          self.validate_requests = false
 
           attribute :first_name, :string
 

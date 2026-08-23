@@ -1195,6 +1195,28 @@ RSpec.describe Graphiti::Resource do
     end
   end
 
+  describe ".validate_endpoints" do
+    let(:klass) { Class.new(Graphiti::Resource) }
+
+    it "defaults both halves on" do
+      expect(klass.validate_requests).to eq(true)
+      expect(klass.validate_links).to eq(true)
+      expect(klass.validate_endpoints).to eq(true)
+    end
+
+    it "sets both halves" do
+      klass.validate_endpoints = false
+      expect(klass.validate_requests).to eq(false)
+      expect(klass.validate_links).to eq(false)
+    end
+
+    it "reads false once either half is off" do
+      klass.validate_links = false
+      expect(klass.validate_endpoints).to eq(false)
+      expect(klass.validate_requests).to eq(true)
+    end
+  end
+
   describe "#base_scope" do
     let(:adapter) do
       Class.new(Graphiti::Adapters::Null) do
@@ -1386,7 +1408,7 @@ RSpec.describe Graphiti::Resource do
                 klass.all
               }.to raise_error(Graphiti::Errors::InvalidEndpoint) { |error|
                 expect(error.message).to include("QueryAllSpec::EmployeeResource cannot be called directly from endpoint /api/v1/employees")
-                expect(error.message).to include("self.validate_endpoints = false")
+                expect(error.message).to include("self.validate_requests = false")
                 expect(error.message).to include("https://graphiti.dev/concepts/links")
               }
             end
@@ -1436,14 +1458,14 @@ RSpec.describe Graphiti::Resource do
             end
           end
 
-          context "but endpoint checks are turned off" do
+          context "but request checks are turned off" do
             around do |e|
-              orig = klass.validate_endpoints
+              orig = klass.validate_requests
               begin
-                klass.validate_endpoints = false
+                klass.validate_requests = false
                 e.run
               ensure
-                klass.validate_endpoints = orig
+                klass.validate_requests = orig
               end
             end
 

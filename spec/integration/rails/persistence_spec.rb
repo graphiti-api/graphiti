@@ -109,7 +109,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       context "when reserved parameter used" do
         before do
           resource = Class.new(EmployeeResource) do
-            self.validate_endpoints = false
+            self.validate_requests = false
             attribute :page, :integer
           end
           allow(controller).to receive(:resource) { resource }
@@ -263,7 +263,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       context "when has_many" do
         let(:klass) do
           Class.new(EmployeeResource) do
-            self.validate_endpoints = false
+            self.validate_requests = false
           end
         end
 
@@ -318,7 +318,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       context "when belongs_to" do
         let(:klass) do
           Class.new(EmployeeResource) do
-            self.validate_endpoints = false
+            self.validate_requests = false
             belongs_to :classification, writable: false
           end
         end
@@ -363,7 +363,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       let(:klass) do
         Class.new(EmployeeResource) do
-          self.validate_endpoints = false
+          self.validate_requests = false
 
           after_graph_persist do |model|
             model.valid?(:after_graph_persisted)
@@ -450,7 +450,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       context "when belongs_to" do
         let(:klass) do
           Class.new(EmployeeResource) do
-            self.validate_endpoints = false
+            self.validate_requests = false
             attribute :classification_id, :integer, writable: false
           end
         end
@@ -518,7 +518,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       context "when has_many" do
         let(:klass) do
           Class.new(EmployeeResource) do
-            self.validate_endpoints = false
+            self.validate_requests = false
           end
         end
 

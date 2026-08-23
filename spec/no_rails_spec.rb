@@ -47,7 +47,7 @@ RSpec.describe "graphiti without Rails" do
           class Post < Graphiti::Resource
             self.adapter = Graphiti::Adapters::Null
             self.model = Struct.new(:id, :title, keyword_init: true)
-            self.validate_endpoints = false
+            self.validate_requests = false
             attribute :title, :string
             def base_scope = {}
             def resolve(_scope) = [model.new(id: 1, title: "Bare")]

@@ -221,7 +221,7 @@ module Graphiti
 
           Make sure the endpoint "#{@sideload.resource.endpoint[:full_path]}" exists with action #{@action.inspect}, or customize the endpoint for #{@sideload.resource.class.name}.
 
-          If you do not wish to generate a link, pass link: false or set self.relationship_links = false.
+          If you do not wish to generate a link, pass link: false or set self.relationship_links = false. To keep the link and stop checking it, set self.validate_links = false.
         MSG
       end
     end
@@ -255,6 +255,8 @@ module Graphiti
           Graphiti.config.context_for_endpoint must be set to enable link generation:
 
           Graphiti.config.context_for_endpoint = ->(path, action) { ... }
+
+          Or set self.validate_links = false to render links without checking them.
         MSG
       end
     end
@@ -445,9 +447,9 @@ module Graphiti
 
           secondary_endpoint '/my_url', [:index, :update]
 
-          Or disable endpoint validation for this resource:
+          Or disable request validation for this resource:
 
-          self.validate_endpoints = false
+          self.validate_requests = false
 
           See https://graphiti.dev/concepts/links for more information.
 

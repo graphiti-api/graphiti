@@ -6,7 +6,8 @@ module Graphiti
       included do
         self.adapter = Graphiti::Adapters::GraphitiAPI
         self.model = OpenStruct
-        self.validate_endpoints = false
+        self.validate_requests = false
+        self.validate_links = false
 
         class_attribute :timeout,
           :open_timeout

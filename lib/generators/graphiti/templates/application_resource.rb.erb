@@ -30,5 +30,16 @@ class ApplicationResource < Graphiti::Resource
   # self.filters_deny_empty_by_default      = false
   # self.default_page_size                  = 20
   # self.max_page_size                      = 1_000
+  # self.typecast_reads                     = true
+  # self.validate_requests                  = true
+  # self.validate_links                     = true
+  #
+  # Link rendering takes true (always), false (never), or :on_demand, which
+  # renders only when the request asks with ?links=true or
+  # ?pagination_links=true. A relationship overrides the resource default
+  # with `link:`.
+  #
+  # self.relationship_links                 = true
+  # self.page_links                         = false
   <%- end -%>
 end

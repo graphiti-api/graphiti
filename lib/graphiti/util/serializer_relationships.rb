@@ -162,7 +162,7 @@ module Graphiti
 
       def validate_link!
         return unless @sideload.link? && linkable?
-        return unless @resource_class.validate_endpoints?
+        return unless @resource_class.validate_links?
         return if @sideload.link_proc
 
         unless Graphiti.config.context_for_endpoint

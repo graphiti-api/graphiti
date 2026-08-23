@@ -160,13 +160,27 @@ A relationship with a custom `link do ... end` block is treated as `link: true` 
 
 ### Endpoint Validation {#endpoint-validation}
 
-To turn off Endpoint Validation:
+Endpoints are validated in two directions, each with its own setting.
+
+`validate_requests` guards what comes in. A Resource refuses to serve a request whose path and action are not among its [endpoints](#resource-endpoints), which is what stops one Resource being reached through another's route:
 
 ```ruby
 class ApplicationResource < Graphiti::Resource
-  self.validate_endpoints = false
+  self.validate_requests = false
 end
 ```
+
+`validate_links` guards what goes out. Before rendering a relationship link, Graphiti checks that the target endpoint is actually routable for the action the link needs, which is `:show` for a `belongs_to` and `:index` otherwise. You never serialize a link that 404s. Custom `link do ... end` blocks and remote Resources are skipped:
+
+```ruby
+class ApplicationResource < Graphiti::Resource
+  self.validate_links = false
+end
+```
+
+Turn off `validate_links` when your links point at endpoints another service serves, and you still want the inbound guard.
+
+(`self.validate_endpoints` set both at once. It still works, warns, and will be removed in 3.0.)
 
 ### Links-on-Demand {#links-on-demand}
 

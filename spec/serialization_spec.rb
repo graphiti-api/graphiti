@@ -1495,9 +1495,9 @@ RSpec.describe "serialization" do
             }
           end
 
-          context "when validating endpoints" do
+          context "when validating links" do
             before do
-              resource.validate_endpoints = true
+              resource.validate_links = true
             end
 
             it "raises error" do
@@ -1507,9 +1507,9 @@ RSpec.describe "serialization" do
             end
           end
 
-          context "when not validating endpoints" do
+          context "when not validating links" do
             before do
-              resource.validate_endpoints = false
+              resource.validate_links = false
             end
 
             it "does not raise error" do
@@ -1525,9 +1525,9 @@ RSpec.describe "serialization" do
             Graphiti.config.context_for_endpoint = nil
           end
 
-          context "when validating endpoints" do
+          context "when validating links" do
             before do
-              resource.validate_endpoints = true
+              resource.validate_links = true
             end
 
             it "raises error" do
@@ -1537,9 +1537,9 @@ RSpec.describe "serialization" do
             end
           end
 
-          context "when not validating endpoints" do
+          context "when not validating links" do
             before do
-              resource.validate_endpoints = false
+              resource.validate_links = false
             end
 
             it "does not raise error" do
@@ -1746,9 +1746,9 @@ RSpec.describe "serialization" do
             }
           end
 
-          context "when validating endpoints" do
+          context "when validating links" do
             before do
-              resource.validate_endpoints = true
+              resource.validate_links = true
             end
 
             it "raises error" do
@@ -1758,9 +1758,9 @@ RSpec.describe "serialization" do
             end
           end
 
-          context "when not validating endpoints" do
+          context "when not validating links" do
             before do
-              resource.validate_endpoints = false
+              resource.validate_links = false
             end
 
             it "does not raise error" do

@@ -80,7 +80,7 @@ module Graphiti
         end
 
         def validate_request!(params)
-          return if Graphiti.context[:graphql] || !validate_endpoints?
+          return if Graphiti.context[:graphql] || !validate_requests?
 
           if context&.respond_to?(:request)
             path = context.request.env["PATH_INFO"]

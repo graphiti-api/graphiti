@@ -88,7 +88,8 @@ module Graphiti
         self.adapter = Graphiti::Adapters::GraphitiAPI
         self.model = OpenStruct
         self.remote = remote_url
-        self.validate_endpoints = false
+        self.validate_requests = false
+        self.validate_links = false
       }
       name = "#{parent_resource_class.name}.#{@name}.remote"
       klass.class_eval("def self.name;'#{name}';end", __FILE__, __LINE__)

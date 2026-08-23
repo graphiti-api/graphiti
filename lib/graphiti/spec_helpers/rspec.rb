@@ -39,14 +39,17 @@ resource_testing = proc do
   let(:params) { {} }
 
   around do |e|
-    original = Graphiti::Resource.validate_endpoints
-    Graphiti::Resource.validate_endpoints = false
+    original_requests = Graphiti::Resource.validate_requests
+    original_links = Graphiti::Resource.validate_links
+    Graphiti::Resource.validate_requests = false
+    Graphiti::Resource.validate_links = false
 
     Graphiti.with_context graphiti_context do
       e.run
     end
   ensure
-    Graphiti::Resource.validate_endpoints = original
+    Graphiti::Resource.validate_requests = original_requests
+    Graphiti::Resource.validate_links = original_links
   end
 
   def graphiti_context

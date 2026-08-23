@@ -1326,7 +1326,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         let(:shop) { Legacy::Sales::Shop.create(name: "shop") }
 
         before do
-          allow(Legacy::Sales::ShopResource).to receive(:validate_endpoints?) { false }
+          allow(Legacy::Sales::ShopResource).to receive(:validate_requests?) { false }
           allow(controller).to receive(:resource).and_return(Legacy::Sales::ShopResource)
           Legacy::Sales::Stock.create(shop_id: shop.id, book_id: book1.id, amount: 2)
         end
@@ -1410,7 +1410,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           Legacy::UserResource.class_eval do
             many_to_many :books, resource: Legacy::BookResource
           end
-          allow(Legacy::BookResource).to receive(:validate_endpoints?) { false }
+          allow(Legacy::BookResource).to receive(:validate_requests?) { false }
           allow(controller).to receive(:resource) { Legacy::BookResource }
         end
 
@@ -1581,7 +1581,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           end
 
           it "still works" do
-            allow(Legacy::BookResource).to receive(:validate_endpoints?) { false }
+            allow(Legacy::BookResource).to receive(:validate_requests?) { false }
             allow(controller).to receive(:resource) { Legacy::BookResource }
             do_index({include: "tags"})
             sl = jsonapi_data[0].sideload(:tags)
@@ -1602,7 +1602,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             end
 
             it "still works" do
-              allow(Legacy::TagResource).to receive(:validate_endpoints?) { false }
+              allow(Legacy::TagResource).to receive(:validate_requests?) { false }
               allow(controller).to receive(:resource) { Legacy::TagResource }
               do_index({
                 filter: {

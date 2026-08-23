@@ -241,8 +241,11 @@ Every name below still works, warns, and will be removed in the next major. They
 | `Graphiti.config.pagination_links_on_demand = true` | `self.page_links = :on_demand` on ApplicationResource |
 | `Graphiti.config.typecast_reads = false` | `self.typecast_reads = false` on ApplicationResource |
 | `self.autolink = false` | `self.relationship_links = false` |
+| `self.validate_endpoints = false` | `self.validate_requests = false`, `self.validate_links = false` |
 
 The link settings became one per-link mode taking `true` (always render), `false` (no link), or `:on_demand` (only with `?links=true`, or `?pagination_links=true` for the pagination set). `self.relationship_links` on a resource sets the default mode for its relationships, `link:` on a relationship overrides it, and `self.pagination_links` does the same for pagination links with no per-item level. Setting them on `ApplicationResource` reproduces the old global behavior. Two things are new outright: `false` as a rendering mode (before 2.0 there was no way to turn links off entirely), and `link: :on_demand`.
+
+`validate_endpoints` did two unrelated jobs, so it split. `validate_requests` refuses requests to undeclared endpoints, and `validate_links` refuses to render links to unroutable ones. The old name sets both, and turning off link validation no longer disarms the inbound guard.
 
 One behavior shift: `link: true` on a resource now always renders, even when the resource is `:on_demand`. Under the old global `links_on_demand` it stayed hidden until `?links=true`, so change those to `link: :on_demand`.
 

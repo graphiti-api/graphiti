@@ -523,10 +523,13 @@ class ApplicationResource < Graphiti::Resource
   self.endpoint_namespace = '/api/v1'
 
   # Raise if a Resource is accessed from a URL it isn't allowlisted for
-  self.validate_endpoints = false
+  self.validate_requests = false
 
-  # Automatically generate JSONAPI links?
-  self.autolink = true
+  # Raise if a rendered link points at an endpoint that isn't routable
+  self.validate_links = false
+
+  # Render relationship links: true, false, or :on_demand
+  self.relationship_links = true
 end
 ```
 
