@@ -17,6 +17,7 @@ module Graphiti
         # In the future these should have their own validation logic, but
         # for now we can just bypass
         return errors.blank? unless @params.has_key?(:data)
+        return false unless validate_data_shape
 
         resource = @root_resource
         if @params[:data].has_key?(:type)
@@ -54,6 +55,14 @@ module Graphiti
         return if page.nil? || page.respond_to?(:each_pair)
 
         @errors.add(:page, :invalid, message: "must be an object")
+      end
+
+      def validate_data_shape
+        data = @params[:data]
+        return true if data.nil? || data.respond_to?(:each_pair)
+
+        @errors.add(:data, :invalid, message: "must be an object")
+        false
       end
 
       def process_relationships(resource, relationships, payload_path)

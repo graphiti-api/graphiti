@@ -70,6 +70,32 @@ RSpec.describe Graphiti::RequestValidator do
       end
     end
 
+    context "when data is not an object" do
+      let(:payload) { {data: [{type: "employees"}]} }
+
+      it "adds a data error" do
+        expect(validate).to eq false
+        expect(instance.errors).to be_added(:data, :invalid)
+        expect(instance.errors.full_messages).to eq ["data must be an object"]
+      end
+
+      it "raises InvalidRequest when using validate!" do
+        expect {
+          instance.validate!
+        }.to raise_error(Graphiti::Errors::InvalidRequest, /data must be an object/)
+      end
+
+      context "when updating" do
+        let(:action) { :update }
+        let(:payload) { {data: [{type: "employees", id: 1}], filter: {id: 1}} }
+
+        it "adds a data error instead of raising TypeError" do
+          expect(validate).to eq false
+          expect(instance.errors.full_messages).to eq ["data must be an object"]
+        end
+      end
+    end
+
     context "when missing type" do
       let(:payload) do
         {

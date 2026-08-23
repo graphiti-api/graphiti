@@ -2,7 +2,7 @@ module Graphiti
   module RequestValidators
     class UpdateValidator < Validator
       def validate
-        if required_payload? && payload_matches_endpoint?
+        if validate_data_shape && required_payload? && payload_matches_endpoint?
           super
         else
           false
