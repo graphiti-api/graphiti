@@ -30,7 +30,7 @@ module Graphiti
         @serializer.send(:"#{applied_method}=", [@name] | existing)
 
         @serializer.meta do
-          if !!@resource.try(:cursor_paginatable?) && !Graphiti.context[:graphql]
+          if !!@resource.try(:page_cursors?) && !Graphiti.context[:graphql]
             {cursor: cursor}
           end
         end

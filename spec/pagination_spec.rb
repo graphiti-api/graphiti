@@ -16,7 +16,7 @@ RSpec.describe "pagination" do
 
   it "applies default pagination" do
     resource.class_eval do
-      self.default_page_size = 2
+      self.page_default_size = 2
     end
     expect(ids.length).to eq(2)
   end
@@ -24,7 +24,7 @@ RSpec.describe "pagination" do
   context "when pagination disabled" do
     before do
       resource.class_eval do
-        self.default_page_size = 2
+        self.page_default_size = 2
       end
     end
 

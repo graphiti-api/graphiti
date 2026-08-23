@@ -4,9 +4,9 @@ module Graphiti
     PARAMS = [:number, :size, :offset, :before, :after]
 
     def apply
-      if size > resource.max_page_size
+      if size > resource.page_max_size
         raise Graphiti::Errors::UnsupportedPageSize
-          .new(size, resource.max_page_size)
+          .new(size, resource.page_max_size)
       elsif requested? && @opts[:sideload_parent_length].to_i > 1
         raise Graphiti::Errors::UnsupportedPagination
       else
@@ -100,7 +100,7 @@ module Graphiti
     end
 
     def size
-      (page_param[:size] || resource.default_page_size || DEFAULT_PAGE_SIZE).to_i
+      (page_param[:size] || resource.page_default_size || DEFAULT_PAGE_SIZE).to_i
     end
   end
 end

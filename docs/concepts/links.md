@@ -210,7 +210,7 @@ end
 
 #### When requested {#pagination-links-when-requested}
 
-Links are rendered only when the request asks for them with `?pagination_links=true`. Worth doing when the collection is large: the `last` link needs a total count, so rendering links costs a `stat(:total, :count)` on every request that gets them.
+Links are rendered only when the request asks for them with `?page_links=true` (`?pagination_links=true` is still accepted). Worth doing when the collection is large: the `last` link needs a total count, so rendering links costs a `stat(:total, :count)` on every request that gets them.
 
 ```ruby
 class ApplicationResource < Graphiti::Resource

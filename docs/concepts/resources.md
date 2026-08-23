@@ -494,7 +494,7 @@ class PostResource < ApplicationResource
   primary_endpoint '/posts', [:index, :show, :create, :update, :destroy]
 
   self.default_sort = [{ title: :asc }]  # default nil
-  self.default_page_size = 10             # default 20
+  self.page_default_size = 10             # default 20
 end
 ```
 

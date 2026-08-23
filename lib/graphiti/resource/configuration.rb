@@ -112,9 +112,9 @@ module Graphiti
           :polymorphic,
           :polymorphic_child,
           :serializer,
-          :default_page_size,
+          :page_default_size,
           :default_sort,
-          :max_page_size,
+          :page_max_size,
           :attributes_readable_by_default,
           :attributes_writable_by_default,
           :attributes_sortable_by_default,
@@ -126,7 +126,7 @@ module Graphiti
           :filters_accept_nil_by_default,
           :filters_deny_empty_by_default,
           :graphql_entrypoint,
-          :cursor_paginatable,
+          :page_cursors,
           :page_links,
           :relationship_links,
           :typecast_reads
@@ -145,7 +145,7 @@ module Graphiti
           super
           klass.config = Util::Hash.deep_dup(config)
           klass.adapter ||= Adapters::Abstract
-          klass.max_page_size ||= DEFAULT_MAX_PAGE_SIZE
+          klass.page_max_size ||= DEFAULT_MAX_PAGE_SIZE
           # re-assigning causes a new Class.new
           klass.serializer = (klass.serializer || klass.infer_serializer_superclass)
           klass.type ||= klass.infer_type
@@ -182,6 +182,35 @@ module Graphiti
       end
 
       class_methods do
+        # Deprecated. Renamed to the page_ family. Remove in 3.0.
+        def default_page_size
+          page_default_size
+        end
+
+        def default_page_size=(val)
+          self.page_default_size = val
+        end
+
+        def max_page_size
+          page_max_size
+        end
+
+        def max_page_size=(val)
+          self.page_max_size = val
+        end
+
+        def cursor_paginatable
+          page_cursors
+        end
+
+        def cursor_paginatable=(val)
+          self.page_cursors = val
+        end
+
+        def cursor_paginatable?
+          !!page_cursors
+        end
+
         def get_attr!(name, flag, opts = {})
           opts[:raise_error] = true
           get_attr(name, flag, opts)
@@ -365,5 +394,15 @@ module Graphiti
         self.class.default_filters
       end
     end
+
+    page_msg = "Use `self.page_default_size`, `self.page_max_size` and `self.page_cursors`"
+    DEPRECATOR.deprecate_methods(Configuration::ClassMethods,
+      default_page_size: page_msg,
+      "default_page_size=": page_msg,
+      max_page_size: page_msg,
+      "max_page_size=": page_msg,
+      cursor_paginatable: page_msg,
+      "cursor_paginatable=": page_msg,
+      cursor_paginatable?: page_msg)
   end
 end

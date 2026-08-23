@@ -8,7 +8,7 @@ RSpec.describe Graphiti::Scope do
 
   let(:resource) do
     Class.new(PORO::EmployeeResource) {
-      self.default_page_size = 1
+      self.page_default_size = 1
     }.new
   end
   let(:results) { [] }
@@ -94,7 +94,7 @@ RSpec.describe Graphiti::Scope do
       context "with concurrency" do
         let(:position_resource) do
           Class.new(PORO::PositionResource) do
-            self.default_page_size = 1
+            self.page_default_size = 1
           end.new
         end
 
@@ -229,12 +229,12 @@ RSpec.describe Graphiti::Scope do
             let(:params) { {include: {positions: {department: {}}}} }
             let(:position_resource) do
               Class.new(PORO::PositionResource) do
-                self.default_page_size = 1
+                self.page_default_size = 1
               end.new
             end
             let(:department_resource) do
               Class.new(PORO::DepartmentResource) do
-                self.default_page_size = 1
+                self.page_default_size = 1
               end.new
             end
             let(:department_sideload) { double("department", shared_remote?: false, name: :department) }

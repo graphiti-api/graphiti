@@ -61,7 +61,7 @@ module Graphiti
       starting_offset = 0
       page_param = @proxy.query.pagination
       if (page_number = page_param[:number])
-        page_size = page_param[:size] || @resource.default_page_size
+        page_size = page_param[:size] || @resource.page_default_size
         starting_offset = (page_number - 1) * page_size
       end
 

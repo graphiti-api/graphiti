@@ -637,7 +637,7 @@ RSpec.describe "sideloading" do
         allow_sideload :positions, class: Sideloading::PositionSideload
       end
       resource.class_eval do
-        self.default_page_size = 1
+        self.page_default_size = 1
       end
       params[:include] = "positions"
     end

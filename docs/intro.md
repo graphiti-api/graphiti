@@ -146,7 +146,7 @@ class EmployeeResource < ApplicationResource
   self.type = :employees # the JSONAPI type
 
   self.default_sort = [{ name: :desc }] # default nil
-  self.default_page_size = 10           # default 20
+  self.page_default_size = 10           # default 20
 
   attribute :name, :string
   attribute :age, :integer

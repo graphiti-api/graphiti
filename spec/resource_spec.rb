@@ -16,7 +16,7 @@ RSpec.describe Graphiti::Resource do
         expect(klass.adapter.ancestors[0])
           .to eq(Graphiti::Adapters::Abstract)
         expect(klass.default_sort).to be_nil
-        expect(klass.default_page_size).to be_nil
+        expect(klass.page_default_size).to be_nil
         expect(klass.attributes_readable_by_default).to eq(true)
         expect(klass.attributes_writable_by_default).to eq(true)
         expect(klass.attributes_sortable_by_default).to eq(true)
@@ -98,7 +98,7 @@ RSpec.describe Graphiti::Resource do
         expect(klass.adapter.ancestors[0])
           .to eq(Graphiti::Adapters::Abstract)
         expect(klass.default_sort).to be_nil
-        expect(klass.default_page_size).to be_nil
+        expect(klass.page_default_size).to be_nil
         expect(klass.attributes_readable_by_default).to eq(true)
         expect(klass.attributes_writable_by_default).to eq(true)
         expect(klass.attributes_sortable_by_default).to eq(true)
@@ -195,7 +195,7 @@ RSpec.describe Graphiti::Resource do
           Class.new(app_resource) do
             self.adapter = PORO::Adapter
             self.default_sort = [{name: :asc}]
-            self.default_page_size = 4
+            self.page_default_size = 4
             self.attributes_readable_by_default = false
             self.attributes_writable_by_default = false
             self.attributes_sortable_by_default = false
@@ -211,7 +211,7 @@ RSpec.describe Graphiti::Resource do
         it "works" do
           expect(klass.adapter).to eq(PORO::Adapter)
           expect(klass.default_sort).to eq([{name: :asc}])
-          expect(klass.default_page_size).to eq(4)
+          expect(klass.page_default_size).to eq(4)
           expect(klass.attributes_readable_by_default).to eq(false)
           expect(klass.attributes_writable_by_default).to eq(false)
           expect(klass.attributes_sortable_by_default).to eq(false)
@@ -354,7 +354,7 @@ RSpec.describe Graphiti::Resource do
           Class.new(app_resource) do
             self.adapter = PORO::Adapter
             self.default_sort = [{name: :asc}]
-            self.default_page_size = 4
+            self.page_default_size = 4
             self.attributes_readable_by_default = false
             self.attributes_writable_by_default = false
             self.attributes_sortable_by_default = false
@@ -370,7 +370,7 @@ RSpec.describe Graphiti::Resource do
         it "carries them over to the subclass" do
           expect(klass2.adapter).to eq(PORO::Adapter)
           expect(klass2.default_sort).to eq([{name: :asc}])
-          expect(klass2.default_page_size).to eq(4)
+          expect(klass2.page_default_size).to eq(4)
           expect(klass2.attributes_readable_by_default).to eq(false)
           expect(klass2.attributes_writable_by_default).to eq(false)
           expect(klass2.attributes_sortable_by_default).to eq(false)
@@ -502,15 +502,28 @@ RSpec.describe Graphiti::Resource do
     end
   end
 
-  describe "#default_page_size" do
+  describe "#page_default_size" do
     it "defaults" do
-      expect(instance.default_page_size).to be_nil
+      expect(instance.page_default_size).to be_nil
     end
   end
 
-  describe "#max_page_size" do
+  describe "#page_max_size" do
     it "defaults" do
-      expect(instance.max_page_size).to eq(1_000)
+      expect(instance.page_max_size).to eq(1_000)
+    end
+  end
+
+  describe "the deprecated page setting names" do
+    it "reads and writes through to the page_ family" do
+      klass.default_page_size = 5
+      klass.max_page_size = 50
+      klass.cursor_paginatable = true
+
+      expect(klass.page_default_size).to eq(5)
+      expect(klass.page_max_size).to eq(50)
+      expect(klass.page_cursors).to eq(true)
+      expect(klass.cursor_paginatable?).to eq(true)
     end
   end
 

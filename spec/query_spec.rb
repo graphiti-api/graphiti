@@ -1026,15 +1026,34 @@ RSpec.describe Graphiti::Query do
   end
 
   describe "#pagination_links?" do
-    subject { instance.pagination_links? }
+    it "is the deprecated name for #page_links?" do
+      employee_resource.page_links = true
+      expect(instance.pagination_links?).to eq(true)
+    end
+  end
 
-    context "when pagination_links is :on_demand" do
+  describe "#page_links?" do
+    subject { instance.page_links? }
+
+    context "when page_links is :on_demand" do
       before do
         employee_resource.page_links = :on_demand
       end
 
       context "when params ask for pagination" do
+        let(:params) { {page_links: true} }
+
+        it { is_expected.to eq(true) }
+      end
+
+      context "when params ask with the deprecated param name" do
         let(:params) { {pagination_links: true} }
+
+        it { is_expected.to eq(true) }
+      end
+
+      context "when params ask as a string" do
+        let(:params) { {page_links: "true"} }
 
         it { is_expected.to eq(true) }
       end

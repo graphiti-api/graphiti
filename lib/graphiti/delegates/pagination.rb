@@ -6,7 +6,7 @@ module Graphiti
       end
 
       def links?
-        @proxy.query.pagination_links? && @proxy.data.present?
+        @proxy.query.page_links? && @proxy.data.present?
       end
 
       def links
@@ -104,7 +104,7 @@ module Graphiti
 
       def page_size
         @page_size ||= (page_param[:size] ||
-                        @proxy.resource.default_page_size ||
+                        @proxy.resource.page_default_size ||
                         Graphiti::Scoping::Paginate::DEFAULT_PAGE_SIZE).to_i
       end
 

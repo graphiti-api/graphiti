@@ -2039,7 +2039,7 @@ RSpec.describe "serialization" do
 
       context "on the resource" do
         before do
-          resource.cursor_paginatable = true
+          resource.page_cursors = true
         end
 
         it "renders cursors" do
@@ -2057,7 +2057,7 @@ RSpec.describe "serialization" do
 
           context "and implicit page size" do
             before do
-              resource.default_page_size = 1
+              resource.page_default_size = 1
             end
 
             it "is respected in the offset" do

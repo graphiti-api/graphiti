@@ -645,7 +645,7 @@ RSpec.describe Graphiti::Schema do
 
     context "when a default page size" do
       before do
-        employee_resource.default_page_size = 10
+        employee_resource.page_default_size = 10
       end
 
       it "is present in the resource schema" do

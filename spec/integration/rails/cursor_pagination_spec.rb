@@ -28,12 +28,12 @@ if ENV["APPRAISAL_INITIALIZED"]
     let!(:author4) { Legacy::Author.create!(age: 30, last_login: 1.days.ago) }
 
     around do |e|
-      original = Legacy::AuthorResource.cursor_paginatable
-      Legacy::AuthorResource.cursor_paginatable = true
+      original = Legacy::AuthorResource.page_cursors
+      Legacy::AuthorResource.page_cursors = true
       begin
         e.run
       ensure
-        Legacy::AuthorResource.cursor_paginatable = original
+        Legacy::AuthorResource.page_cursors = original
       end
     end
 

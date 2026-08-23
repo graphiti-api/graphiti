@@ -111,8 +111,8 @@ module Graphiti
           config[:default_sort] = default_sort
         end
 
-        if r.default_page_size
-          config[:default_page_size] = r.default_page_size
+        if r.page_default_size
+          config[:default_page_size] = r.page_default_size
         end
 
         if r.polymorphic? && !r.polymorphic_child?

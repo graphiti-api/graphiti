@@ -61,14 +61,19 @@ module Graphiti
       (mode == :on_demand) ? links_requested? : mode == true
     end
 
-    def pagination_links?
+    def page_links?
       if action == :find
         false
       elsif @resource.page_links == :on_demand
-        [true, "true"].include?(@params[:pagination_links])
+        page_links_requested?
       else
         @resource.page_links
       end
+    end
+
+    def page_links_requested?
+      [@params[:page_links], @params[:pagination_links]]
+        .any? { |value| [true, "true"].include?(value) }
     end
 
     def debug_requested?
@@ -280,7 +285,7 @@ module Graphiti
       attrs = {extra_fields: extra_fields,
                fields: fields,
                links: suppress_links? ? :none : links_requested?,
-               pagination_links: pagination_links?,
+               page_links: page_links?,
                format: params[:format]}
 
       Digest::SHA1.hexdigest(attrs.to_s)
@@ -399,5 +404,9 @@ module Graphiti
         action
       end
     end
+
+    alias_method :pagination_links?, :page_links?
+    DEPRECATOR.deprecate_methods(self,
+      pagination_links?: "Use `page_links?`")
   end
 end
