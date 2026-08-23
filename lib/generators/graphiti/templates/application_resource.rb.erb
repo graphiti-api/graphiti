@@ -14,32 +14,14 @@ class ApplicationResource < Graphiti::Resource
   self.endpoint_namespace = '<%= api_namespace %>'
   <%- unless omit_comments? -%>
 
-  # Defaults every Resource inherits. These are already the values shown;
-  # uncomment to change them API-wide, or set them on individual Resources.
-  # See https://graphiti.dev/concepts/resources
-  #
-  # self.attributes_readable_by_default     = true
-  # self.attributes_writable_by_default     = true
-  # self.attributes_sortable_by_default     = true
-  # self.attributes_filterable_by_default   = true
-  # self.attributes_schema_by_default       = true
-  # self.relationships_readable_by_default  = true
-  # self.relationships_writable_by_default  = true
-  # self.belongs_to_resource_ids_by_default = :foreign_key
-  # self.filters_accept_nil_by_default      = false
-  # self.filters_deny_empty_by_default      = false
-  # self.page_default_size                  = 20
-  # self.page_max_size                      = 1_000
-  # self.typecast_reads                     = true
-  # self.validate_requests                  = true
-  # self.validate_links                     = true
-  #
-  # Link rendering takes true (always), false (never), or :on_demand, which
-  # renders only when the request asks with ?links=true or
-  # ?pagination_links=true. A relationship overrides the resource default
-  # with `link:`.
-  #
-  # self.relationship_links                 = true
-  # self.page_links                         = false
+  # Defaults every Resource inherits. Uncomment to change them API-wide, or set
+  # them on individual Resources. See https://graphiti.dev/concepts/resources
+  <%- resource_setting_groups.each_pair do |group, lines| -%>
+
+  # <%= group.to_s.humanize %>
+    <%- lines.each do |line| -%>
+  # <%= line %>
+    <%- end -%>
+  <%- end -%>
   <%- end -%>
 end

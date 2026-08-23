@@ -25,12 +25,8 @@ module Graphiti
       class_attribute :endpoint,
         :base_url,
         :endpoint_namespace,
-        :secondary_endpoints,
-        :validate_requests,
-        :validate_links
+        :secondary_endpoints
       self.secondary_endpoints = []
-      self.validate_requests = true
-      self.validate_links = true
 
       class << self
         prepend Overrides

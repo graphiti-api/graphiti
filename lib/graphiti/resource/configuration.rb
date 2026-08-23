@@ -4,33 +4,71 @@ module Graphiti
       extend ActiveSupport::Concern
 
       DEFAULT_MAX_PAGE_SIZE = 1_000
+      LINK_MODES = [true, false, :on_demand].freeze
+      BELONGS_TO_RESOURCE_IDS_MODES = [:foreign_key, :always, :never].freeze
+
+      # Grouped for the ApplicationResource the install generator writes.
+      SETTING_GROUPS = { # :nodoc:
+        attributes: {
+          attributes_readable_by_default: {default: true},
+          attributes_writable_by_default: {default: true},
+          attributes_sortable_by_default: {default: true},
+          attributes_filterable_by_default: {default: true},
+          attributes_schema_by_default: {default: true},
+          typecast_reads: {default: true}
+        },
+        relationships: {
+          relationships_readable_by_default: {default: true},
+          relationships_writable_by_default: {default: true},
+          belongs_to_resource_ids_by_default: {
+            default: :foreign_key,
+            values: BELONGS_TO_RESOURCE_IDS_MODES,
+            invalid: ->(klass, value) { Errors::InvalidBelongsToResourceIds.new(klass, value) }
+          }
+        },
+        filters: {
+          filters_accept_nil_by_default: {default: false},
+          filters_deny_empty_by_default: {default: false}
+        },
+        sorting: {
+          default_sort: {default: nil, note: "per resource, e.g. [{id: :desc}]"}
+        },
+        pagination: {
+          page_default_size: {default: nil, note: "unset falls back to 20"},
+          page_max_size: {default: DEFAULT_MAX_PAGE_SIZE, format: "1_000"},
+          page_cursors: {default: false, note: "render cursors for pagination"},
+          page_links: {
+            default: false,
+            values: LINK_MODES,
+            invalid: ->(klass, value) { Errors::InvalidLinkRendering.new(klass, :page_links, value) }
+          }
+        },
+        endpoints: {
+          validate_requests: {default: true, note: "refuse requests to undeclared endpoints"}
+        },
+        links: {
+          relationship_links: {
+            default: true,
+            values: LINK_MODES,
+            invalid: ->(klass, value) { Errors::InvalidLinkRendering.new(klass, :relationship_links, value) }
+          },
+          validate_links: {default: true, note: "refuse to render links to unroutable endpoints"}
+        }
+      }.freeze
+
+      SETTINGS = SETTING_GROUPS.values.reduce(:merge).freeze # :nodoc:
 
       module Overrides
-        BELONGS_TO_RESOURCE_IDS_VALUES = [:foreign_key, :always, :never].freeze
-        LINK_RENDERING_VALUES = [true, false, :on_demand].freeze
+        SETTINGS.each_pair do |name, setting|
+          next unless setting[:values]
 
-        def belongs_to_resource_ids_by_default=(val)
-          unless BELONGS_TO_RESOURCE_IDS_VALUES.include?(val)
-            raise Errors::InvalidBelongsToResourceIds.new(self, val)
+          define_method(:"#{name}=") do |val|
+            unless setting[:values].include?(val)
+              raise setting[:invalid].call(self, val)
+            end
+
+            super(val)
           end
-
-          super
-        end
-
-        def page_links=(val)
-          unless LINK_RENDERING_VALUES.include?(val)
-            raise Errors::InvalidLinkRendering.new(self, :page_links, val)
-          end
-
-          super
-        end
-
-        def relationship_links=(val)
-          unless LINK_RENDERING_VALUES.include?(val)
-            raise Errors::InvalidLinkRendering.new(self, :relationship_links, val)
-          end
-
-          super
         end
 
         def serializer=(val)
@@ -112,55 +150,25 @@ module Graphiti
           :polymorphic,
           :polymorphic_child,
           :serializer,
-          :page_default_size,
-          :default_sort,
-          :page_max_size,
-          :attributes_readable_by_default,
-          :attributes_writable_by_default,
-          :attributes_sortable_by_default,
-          :attributes_filterable_by_default,
-          :attributes_schema_by_default,
-          :relationships_readable_by_default,
-          :relationships_writable_by_default,
-          :belongs_to_resource_ids_by_default,
-          :filters_accept_nil_by_default,
-          :filters_deny_empty_by_default,
           :graphql_entrypoint,
-          :page_cursors,
-          :page_links,
-          :relationship_links,
-          :typecast_reads
+          *SETTINGS.keys
 
         class << self
           prepend Overrides
         end
 
-        # Assigned on the base class, not stamped per-subclass in .inherited,
-        # so the deprecated Graphiti.config setters can still act globally.
-        self.page_links = false
-        self.relationship_links = true
-        self.typecast_reads = true
+        SETTINGS.each_pair do |name, setting|
+          public_send(:"#{name}=", setting[:default])
+        end
 
         def self.inherited(klass)
           super
           klass.config = Util::Hash.deep_dup(config)
           klass.adapter ||= Adapters::Abstract
-          klass.page_max_size ||= DEFAULT_MAX_PAGE_SIZE
           # re-assigning causes a new Class.new
           klass.serializer = (klass.serializer || klass.infer_serializer_superclass)
           klass.type ||= klass.infer_type
           klass.graphql_entrypoint = klass.type.to_s.pluralize.to_sym
-          default(klass, :attributes_readable_by_default, true)
-          default(klass, :attributes_writable_by_default, true)
-          default(klass, :attributes_sortable_by_default, true)
-          default(klass, :attributes_filterable_by_default, true)
-          default(klass, :attributes_schema_by_default, true)
-          default(klass, :relationships_readable_by_default, true)
-          default(klass, :relationships_writable_by_default, true)
-          default(klass, :belongs_to_resource_ids_by_default, :foreign_key)
-          default(klass, :filters_accept_nil_by_default, false)
-          default(klass, :filters_deny_empty_by_default, false)
-
           unless klass.config[:attributes][:id]
             klass.attribute :id, :integer_id
           end
@@ -266,14 +274,6 @@ module Graphiti
 
           serializer_class
         end
-
-        def default(object, attr, value)
-          prior = object.send(attr)
-          unless prior || prior == false
-            object.send(:"#{attr}=", value)
-          end
-        end
-        private :default
 
         def config
           @config ||=

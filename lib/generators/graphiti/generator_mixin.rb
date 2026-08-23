@@ -33,6 +33,30 @@ module Graphiti
       methods.any? { |m| actions.include?(m) }
     end
 
+    def resource_setting_groups
+      name_width = Graphiti::Resource::SETTINGS.keys.map(&:length).max
+      assignments = Graphiti::Resource::SETTINGS.to_h do |name, setting|
+        value = setting[:format] || setting[:default].inspect
+        [name, "self.#{name.to_s.ljust(name_width)} = #{value}"]
+      end
+      hint_column = assignments.values.map(&:length).max + 2
+
+      Graphiti::Resource::SETTING_GROUPS.transform_values do |settings|
+        settings.map do |name, setting|
+          hint = resource_setting_hint(setting)
+          hint ? "#{assignments[name].ljust(hint_column)}# #{hint}" : assignments[name]
+        end
+      end
+    end
+
+    def resource_setting_hint(setting)
+      return setting[:note] if setting[:note]
+      return unless setting[:values]
+
+      setting[:values].map(&:inspect)
+        .to_sentence(two_words_connector: " or ", last_word_connector: ", or ")
+    end
+
     def graphiti_config
       File.exist?(".graphiticfg.yml") ? YAML.load_file(".graphiticfg.yml") : {}
     end

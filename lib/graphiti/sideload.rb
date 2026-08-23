@@ -2,7 +2,6 @@ module Graphiti
   class Sideload
     HOOK_ACTIONS = [:save, :create, :update, :destroy, :disassociate]
     TYPES = [:has_many, :belongs_to, :has_one, :many_to_many]
-    LINK_MODES = [true, false, :on_demand].freeze
 
     attr_reader :name,
       :parent_resource_class,
@@ -32,7 +31,7 @@ module Graphiti
       @writable = opts[:writable]
       @as = opts[:as]
       @link = opts[:link]
-      unless @link.nil? || LINK_MODES.include?(@link)
+      unless @link.nil? || Resource::LINK_MODES.include?(@link)
         raise Errors::InvalidLinkRendering.new(@parent_resource_class, :"#{name} link", @link)
       end
       @single = opts[:single]
