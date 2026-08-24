@@ -598,6 +598,15 @@ RSpec.describe Graphiti::Resource do
       klass.relationship_links = :on_demand
       expect(klass.autolink).to eq(true)
     end
+
+    it "leaves an on-demand mode alone" do
+      klass.relationship_links = :on_demand
+      klass.autolink = true
+      expect(klass.relationship_links).to eq(:on_demand)
+
+      klass.autolink = false
+      expect(klass.relationship_links).to eq(false)
+    end
   end
 
   describe "#type" do

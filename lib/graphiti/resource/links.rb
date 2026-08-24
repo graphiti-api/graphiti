@@ -39,7 +39,10 @@ module Graphiti
         relationship_links != false
       end
 
+      # true cannot express :on_demand, so it leaves an inherited on-demand mode alone.
       def autolink=(val)
+        return if val && relationship_links == :on_demand
+
         self.relationship_links = val ? true : false
       end
 
