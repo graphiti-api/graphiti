@@ -18,6 +18,9 @@ RSpec.describe Graphiti::Stats::Payload do
       stub_stat(:attr1, :count, 2)
       stub_stat(:attr1, :average, 1)
       stub_stat(:attr2, :maximum, 3)
+
+      stats_obj = double(nested_on: false)
+      allow(dsl).to receive(:stats).and_return({attr1: stats_obj, attr2: stats_obj})
     end
 
     it "generates the correct payload for each requested stat" do
