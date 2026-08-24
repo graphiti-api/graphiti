@@ -26,6 +26,16 @@ module Graphiti
     self.relationship_condition_blocks ||= {}
     self.relationship_sideloads ||= {}
 
+    # Keyed on the sideloads hash itself, which is reassigned whenever a
+    # relationship is applied, so the answer is recomputed exactly then.
+    def self.on_demand_links?
+      sideloads = relationship_sideloads
+      return @on_demand_links.last if @on_demand_links&.first.equal?(sideloads)
+
+      @on_demand_links = [sideloads, sideloads.each_value.any? { |sideload| sideload.link_mode == :on_demand }]
+      @on_demand_links.last
+    end
+
     def self.inherited(klass)
       super
       klass.class_eval do
@@ -113,6 +123,8 @@ module Graphiti
     end
 
     def strip_relationships?
+      return false unless self.class.on_demand_links?
+
       context = Graphiti.context[:object]
       params = context.params if context.respond_to?(:params)
 
