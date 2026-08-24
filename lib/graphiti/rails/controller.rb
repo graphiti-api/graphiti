@@ -48,6 +48,8 @@ module Graphiti
           status: 400, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
         register_exception Graphiti::Errors::UnsupportedBeforeCursor,
           status: 400, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
+        register_exception Graphiti::Errors::UnsupportedPagination,
+          status: 400, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
         register_exception Graphiti::Errors::FilterGroupMissingRequiredFilters,
           status: 400, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
 

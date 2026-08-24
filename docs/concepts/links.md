@@ -196,6 +196,8 @@ end
 
 ### Pagination Links {#pagination-links}
 
+The page params themselves, and cursors, are covered in [Pagination](/concepts/resources#pagination).
+
 Requesting large collections can make for slow responses. [Pagination](https://jsonapi.org/format/#fetching-pagination) breaks the response into smaller pieces, and pagination links tell the client how to walk them. They can appear in a response two ways.
 
 #### Showing by default {#pagination-links-showing-by-default}
@@ -218,7 +220,7 @@ class ApplicationResource < Graphiti::Resource
 end
 ```
 
-Like `relationship_links`, `pagination_links` accepts `true`, `false` (the default), or `:on_demand`, and can be set per resource.
+Like `relationship_links`, `page_links` accepts `true`, `false` (the default), or `:on_demand`, and can be set per resource.
 
 Pagination links won't show up for *#show* actions.
 

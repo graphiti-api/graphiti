@@ -137,7 +137,7 @@ A `belongs_to` now renders resource ids in the payload by default, where 1.x sen
 "employee": { "data": { "type": "employees", "id": "1" }, "links": { "related": "..." } }
 ```
 
-The id comes from the foreign key already on the parent, so this costs no extra queries, and clients can resolve the relationship against data they already hold instead of following the link. `has_many` is unchanged, since answering there means a query per record.
+The id comes from the foreign key already on the parent, so this costs no extra queries. `has_many` is unchanged, since answering there means a query per record.
 
 Not every `belongs_to` qualifies. A remote target or a custom `primary_key` mean the foreign key is not the related id, a polymorphic target means one rendered type cannot cover every record, and a `scope` or `params` block or a `base_scope` mean the key might not survive the filter. Rendering ids for those means loading the association, so they stay opt-in as in 1.x and render nothing until you ask.
 

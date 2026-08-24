@@ -418,6 +418,71 @@ end
 
 A `single: true` filter skips array parsing entirely and escapes the value for you, filtering on the string as given.
 
+### Pagination {#pagination}
+
+Collections are paginated by default, 20 records to a page:
+
+```ruby
+PostResource.all({ page: { number: 2, size: 10 } })
+# GET /posts?page[number]=2&page[size]=10
+```
+
+Two settings you might want to adjust, both usually set on `ApplicationResource`:
+
+```ruby
+class ApplicationResource < Graphiti::Resource
+  self.page_default_size = 10  # unset falls back to 20
+  self.page_max_size = 100     # default 1_000
+end
+```
+
+A request asking for more than `page_max_size` raises `Graphiti::Errors::UnsupportedPageSize` rather than quietly serving it.
+
+A sideload can be paginated only when there is a single parent record:
+
+```
+/employees/1?include=positions&page[positions][size]=2  # fine
+/employees?include=positions&page[positions][size]=2    # raises UnsupportedPagination
+```
+
+The second asks for two positions per employee, and one query with one `LIMIT` can only cap the whole result, not each employee's share of it. ActiveRecord has the same limitation. Where you need the shape anyway, a named relationship such as `has_one :top_position` gets you one row per parent.
+
+To paginate a scope your adapter cannot handle, override it on the Resource:
+
+```ruby
+paginate do |scope, current_page, per_page, offset|
+  scope.by_page(current_page, per_page)
+end
+```
+
+#### Cursors {#pagination-cursors}
+
+`page_cursors` renders a cursor in every record's `meta`, and the client pages by handing one back:
+
+```ruby
+class PostResource < ApplicationResource
+  self.page_cursors = true  # default false
+end
+```
+
+```json
+{
+  "id": "42",
+  "type": "posts",
+  "attributes": { "title": "Hello" },
+  "meta": { "cursor": "eyJvZmZzZXQiOjQxfQ==" }
+}
+```
+
+```ruby
+PostResource.all({ page: { after: "eyJvZmZzZXQiOjQxfQ==", size: 10 } })
+# GET /posts?page[after]=eyJvZmZzZXQiOjQxfQ%3D%3D&page[size]=10
+```
+
+`page[before]` walks backwards from a cursor. It cannot be combined with `page[number]`, which raises `Graphiti::Errors::UnsupportedBeforeCursor`.
+
+The links a client follows to page are separate, and covered in [Pagination Links](/concepts/links#pagination-links).
+
 ### Statistics {#statistics}
 
 ```ruby
@@ -522,11 +587,11 @@ class ApplicationResource < Graphiti::Resource
   #   end
   self.endpoint_namespace = '/api/v1'
 
-  # Raise if a Resource is accessed from a URL it isn't allowlisted for
-  self.validate_requests = false
+  # Refuse requests reaching this Resource from a URL it isn't allowlisted for
+  self.validate_requests = true
 
-  # Raise if a rendered link points at an endpoint that isn't routable
-  self.validate_links = false
+  # Refuse to render a link pointing at an endpoint that isn't routable
+  self.validate_links = true
 
   # Render relationship links: true, false, or :on_demand
   self.relationship_links = true

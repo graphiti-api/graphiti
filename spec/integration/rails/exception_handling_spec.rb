@@ -94,6 +94,17 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
+    context "paginating a sideload across multiple parents" do
+      let(:error) { Graphiti::Errors::UnsupportedPagination.new }
+
+      it "renders a 400, not the 500 an unregistered error would give" do
+        get_errors
+
+        expect(response.status).to eq(400)
+        expect(json["errors"][0]["detail"]).to match(/pagination of a sideload/)
+      end
+    end
+
     context "an unregistered exception" do
       let(:error) { RuntimeError.new("boom") }
 
