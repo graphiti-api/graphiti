@@ -1,5 +1,27 @@
 graphiti changelog
 
+# [2.0.0-beta.10](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.9...v2.0.0-beta.10) (2026-08-24)
+
+
+### Bug Fixes
+
+* apply sideloads at definition once setup! has run ([39ef393](https://github.com/graphiti-api/graphiti/commit/39ef39383520816319282854c0ae99677bcd5127)), closes [#524](https://github.com/graphiti-api/graphiti/issues/524)
+* give client-caused errors real detail and stop 500ing on bad query params ([35acc3e](https://github.com/graphiti-api/graphiti/commit/35acc3e6c78f68eeeb05728ea16264b136455c30)), closes [#531](https://github.com/graphiti-api/graphiti/issues/531)
+* let an abstract resource declare relationships ([6036392](https://github.com/graphiti-api/graphiti/commit/6036392ebd611c7ed492beb3fe5754433eac9ffd)), closes [#453](https://github.com/graphiti-api/graphiti/issues/453)
+* reject a non-object data payload instead of raising TypeError ([51603b8](https://github.com/graphiti-api/graphiti/commit/51603b854270715b80a75d9aa05a4020e6bbdce5))
+* Update some missing sections and terms after renames, register unsupported pagination error ([39cff19](https://github.com/graphiti-api/graphiti/commit/39cff19f6f1f73126514c8b18234a18ad5eb7379))
+
+
+### Features
+
+* carry CurrentAttributes into concurrent sideloads ([7092096](https://github.com/graphiti-api/graphiti/commit/7092096f6d99ad277cc56817c616d946f655d55b))
+* fold allow_nil and deny_empty into one blanks: filter option ([a108403](https://github.com/graphiti-api/graphiti/commit/a108403e5cd87fd2fdf177da30c4c4f97b9fe750))
+* move link rendering onto the resource as page_links and relationship_links ([57878d1](https://github.com/graphiti-api/graphiti/commit/57878d14fdfc4741e8d418c8edbc4a8687335843))
+* move typecast_reads onto the resource and let the railtie own Rails config ([236e970](https://github.com/graphiti-api/graphiti/commit/236e9706d7d8f08e9640c5c22ac596e2f7466849))
+* one link mode per relationship, cascading from relationship_links ([f0e1da1](https://github.com/graphiti-api/graphiti/commit/f0e1da1e13a8d12b47458495b378779f5687ffe2))
+* point connection pool timeouts at the sizing formula and add an audit task to check ([6e017c6](https://github.com/graphiti-api/graphiti/commit/6e017c60fd45338e4e6c8527adebfd46be4bfd8d))
+* split validate_endpoints into validate_requests and validate_links ([100a370](https://github.com/graphiti-api/graphiti/commit/100a370deec6a0e6ae165bdf77e50b6b14d068d3))
+
 # [2.0.0-beta.9](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.8...v2.0.0-beta.9) (2026-08-22)
 
 
