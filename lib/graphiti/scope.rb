@@ -59,6 +59,9 @@ module Graphiti
       @query = query
       @opts = opts
 
+      @resolved_sideload_proxies = {}
+      @resolved_sideload_proxies_lock = Mutex.new
+
       @object = @resource.around_scoping(@object, @query.hash) { |scope|
         apply_scoping(scope, opts)
       }
@@ -156,9 +159,12 @@ module Graphiti
     def sync_resolve_sideloads(results)
       return if results == []
 
-      each_applicable_sideload do |sideload, sideload_query|
+      reset_captured_sideload_proxies
+      each_applicable_sideload do |name, sideload, sideload_query|
         Graphiti.config.before_sideload&.call(Graphiti.context)
-        sideload.resolve(results, sideload_query, @resource)
+        sideload.resolve(results, sideload_query, @resource) do |proxy|
+          capture_sideload_proxy(name, proxy)
+        end
       end
     end
 
@@ -176,7 +182,7 @@ module Graphiti
       assign_serializer(resolved)
       yield resolved if block_given?
       @opts[:after_resolve]&.call(resolved)
-      resolved
+      @resolved_records = resolved
     end
 
     # Must run before sideloads assign, so every include path populates the
@@ -218,18 +224,34 @@ module Graphiti
         sideload = @resource.class.sideload(name)
         next if sideload.nil? || sideload.shared_remote?
 
-        yield sideload, sideload_query
+        yield name, sideload, sideload_query
+      end
+    end
+
+    # The write path resolves sideloads twice on one scope, which would double every proxy in the cache key.
+    def reset_captured_sideload_proxies
+      @resolved_sideload_proxies_lock.synchronize { @resolved_sideload_proxies.clear }
+    end
+
+    # A proxy built while resolving is already resolved all the way down.
+    def capture_sideload_proxy(name, proxy)
+      @resolved_sideload_proxies_lock.synchronize do
+        captured = (@resolved_sideload_proxies[name] ||= [])
+        captured << proxy unless proxy.nil? || proxy == []
       end
     end
 
     def future_resolve_sideloads(results)
       return Concurrent::Promises.fulfilled_future(nil, self.class.global_thread_pool_executor) if results == []
 
+      reset_captured_sideload_proxies
       sideload_promises = []
-      each_applicable_sideload do |sideload, sideload_query|
+      each_applicable_sideload do |name, sideload, sideload_query|
         promise = future_with_context(results, sideload_query, @resource) do |parent_results, future_query, parent_resource|
           Graphiti.config.before_sideload&.call(Graphiti.context)
-          sideload.future_resolve(parent_results, future_query, parent_resource)
+          sideload.future_resolve(parent_results, future_query, parent_resource) do |proxy|
+            capture_sideload_proxy(name, proxy)
+          end
         end
         sideload_promises << promise.flat
       end
@@ -361,15 +383,19 @@ module Graphiti
 
     def sideload_resource_proxies
       @sideload_resource_proxies ||= begin
-        @object = @resource.before_resolve(@object, @query)
-        results = @resource.resolve(@object)
+        # Reached after the response resolved, where resolving again re-applies before_resolve to a mutated scope.
+        results = @resolved_records
+        if results.nil?
+          @object = @resource.before_resolve(@object, @query)
+          results = @resource.resolve(@object)
+        end
 
         [].tap do |proxies|
-          unless @query.sideloads.empty?
-            @query.sideloads.each_pair do |name, q|
-              sideload = @resource.class.sideload(name)
-              next if sideload.nil? || sideload.shared_remote?
-
+          each_applicable_sideload do |name, sideload, q|
+            captured = @resolved_sideload_proxies[name]
+            if captured
+              proxies.concat(captured)
+            else
               proxies << sideload.build_resource_proxy(results, q, parent_resource)
             end
           end

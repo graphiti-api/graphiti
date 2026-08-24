@@ -107,18 +107,18 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
     end
   end
 
-  def resolve(parents, query, graph_parent)
+  def resolve(parents, query, graph_parent, &proxy_block)
     if ::Graphiti::Scope.resolve_synchronously?
-      sync_resolve(parents, query, graph_parent)
+      sync_resolve(parents, query, graph_parent, &proxy_block)
     else
-      future_resolve(parents, query, graph_parent).value!
+      future_resolve(parents, query, graph_parent, &proxy_block).value!
     end
   end
 
-  def future_resolve(parents, query, graph_parent)
+  def future_resolve(parents, query, graph_parent, &proxy_block)
     promises = []
     each_resolvable_group(parents, query) do |child, group, child_query|
-      promises << child.future_resolve(group, child_query, graph_parent)
+      promises << child.future_resolve(group, child_query, graph_parent, &proxy_block)
     end
     return promises.first if promises.one?
 
@@ -132,9 +132,9 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
 
   private
 
-  def sync_resolve(parents, query, graph_parent)
+  def sync_resolve(parents, query, graph_parent, &proxy_block)
     each_resolvable_group(parents, query) do |child, group, child_query|
-      child.resolve(group, child_query, graph_parent)
+      child.resolve(group, child_query, graph_parent, &proxy_block)
     end
   end
 

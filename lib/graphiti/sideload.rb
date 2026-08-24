@@ -285,11 +285,13 @@ module Graphiti
       proxy
     end
 
-    def load(parents, query, graph_parent)
+    def load(parents, query, graph_parent, &proxy_block)
       if Scope.resolve_synchronously?
-        build_resource_proxy(parents, query, graph_parent).to_a
+        proxy = build_resource_proxy(parents, query, graph_parent)
+        proxy_block&.call(proxy)
+        proxy.to_a
       else
-        future_load(parents, query, graph_parent).value!
+        future_load(parents, query, graph_parent, &proxy_block).value!
       end
     end
 
@@ -340,15 +342,16 @@ module Graphiti
       children.replace(associated) if track_associated
     end
 
-    def resolve(parents, query, graph_parent)
+    def resolve(parents, query, graph_parent, &proxy_block)
       if Scope.resolve_synchronously?
-        sync_resolve(parents, query, graph_parent)
+        sync_resolve(parents, query, graph_parent, &proxy_block)
       else
-        future_resolve(parents, query, graph_parent).value!
+        future_resolve(parents, query, graph_parent, &proxy_block).value!
       end
     end
 
-    def future_resolve(parents, query, graph_parent)
+    # A scope_proc builds a Scope rather than a proxy, and a Scope's cache key omits what a proxy's carries.
+    def future_resolve(parents, query, graph_parent, &proxy_block)
       assert_singular!(parents)
 
       if self.class.scope_proc
@@ -356,7 +359,7 @@ module Graphiti
           fire_assign(parents, sideload_results)
         end
       else
-        future_load(parents, query, graph_parent)
+        future_load(parents, query, graph_parent, &proxy_block)
       end
     end
 
@@ -423,7 +426,7 @@ module Graphiti
     # Synchronous counterpart to #future_resolve, used when concurrency is off.
     # Resolves inline via the synchronous Scope#resolve / #load paths (no
     # promises). See Scope#sync_resolve_sideloads.
-    def sync_resolve(parents, query, graph_parent)
+    def sync_resolve(parents, query, graph_parent, &proxy_block)
       assert_singular!(parents)
 
       if self.class.scope_proc
@@ -431,7 +434,7 @@ module Graphiti
           fire_assign(parents, sideload_results)
         end
       else
-        load(parents, query, graph_parent)
+        load(parents, query, graph_parent, &proxy_block)
       end
     end
 
@@ -451,8 +454,9 @@ module Graphiti
         default_paginate: false
     end
 
-    def future_load(parents, query, graph_parent)
+    def future_load(parents, query, graph_parent, &proxy_block)
       proxy = build_resource_proxy(parents, query, graph_parent)
+      proxy_block&.call(proxy)
       proxy.respond_to?(:future_resolve_data) ? proxy.future_resolve_data : Concurrent::Promises.fulfilled_future(proxy)
     end
 
