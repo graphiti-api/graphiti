@@ -142,8 +142,7 @@ RSpec.describe "polymorphic resource behavior" do
 
     it "does not render the relationship when it does not pertain" do
       render
-      commercials = json["data"][1]["relationships"]["commercials"]
-      expect(commercials["meta"]["included"]).to eq(false)
+      expect(json["data"][1]["relationships"]).to_not have_key("commercials")
     end
   end
 

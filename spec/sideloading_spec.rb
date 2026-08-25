@@ -365,13 +365,9 @@ RSpec.describe "sideloading" do
         "type" => "mastercards", "id" => "1"
       })
       expect(jsonapi_included[0].jsonapi_type).to eq("visas")
-      expect(jsonapi_included[0].relationships).to eq({
-        "visa_rewards" => {"meta" => {"included" => false}}
-      })
+      expect(jsonapi_included[0].relationships).to eq({})
       expect(jsonapi_included[1].jsonapi_type).to eq("mastercards")
-      expect(jsonapi_included[1].relationships).to eq({
-        "commercials" => {"meta" => {"included" => false}}
-      })
+      expect(jsonapi_included[1].relationships).to eq({})
     end
 
     context "when defaults" do
@@ -537,13 +533,9 @@ RSpec.describe "sideloading" do
           "type" => "paypals", "id" => "1"
         })
         expect(jsonapi_included[0].jsonapi_type).to eq("visas")
-        expect(jsonapi_included[0].relationships).to eq({
-          "visa_rewards" => {"meta" => {"included" => false}}
-        })
+        expect(jsonapi_included[0].relationships).to eq({})
         expect(jsonapi_included[1].jsonapi_type).to eq("mastercards")
-        expect(jsonapi_included[1].relationships).to eq({
-          "commercials" => {"meta" => {"included" => false}}
-        })
+        expect(jsonapi_included[1].relationships).to eq({})
         expect(jsonapi_included[2].jsonapi_type).to eq("paypals")
         expect(jsonapi_included[2].relationships).to be_nil
       end

@@ -86,7 +86,7 @@ module Graphiti
 
     def as_jsonapi(kwargs = {})
       super(**kwargs).tap do |hash|
-        strip_relationships!(hash) if strip_relationships?
+        strip_relationships!(hash)
         add_links!(hash)
       end
     end
@@ -112,17 +112,28 @@ module Graphiti
       hash[:links] = @resource.links(@object) if @resource.links?
     end
 
-    # A relationship whose only content would be an unrequested on-demand link
-    # serializes as an empty stub, which JSON:API forbids.
+    # The meta: {included: false} stub is jsonapi-serializable's filler, not JSON:API.
     def strip_relationships!(hash)
+      placeholders = relationship_placeholders?
+      return if placeholders && !strip_on_demand_relationships?
+
       hash[:relationships]&.reject! do |name, payload|
         next false if payload.key?(:data) || payload.key?(:links)
+        next true unless placeholders
 
         self.class.relationship_sideloads[name]&.link_mode == :on_demand
       end
     end
 
-    def strip_relationships?
+    # A remote resource exposes a stand-in object rather than a Resource.
+    def relationship_placeholders?
+      resource_class = @resource.class
+      return Resource.relationship_placeholders unless resource_class.respond_to?(:relationship_placeholders)
+
+      resource_class.relationship_placeholders
+    end
+
+    def strip_on_demand_relationships?
       return false unless self.class.on_demand_links?
 
       context = Graphiti.context[:object]

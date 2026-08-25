@@ -809,6 +809,7 @@ RSpec.describe "serialization" do
         resource.has_many :positions,
           resource: PORO::PositionResource,
           readable: :admin?
+        resource.relationship_placeholders = true
         Graphiti.setup!
         PORO::Employee.create(first_name: "John")
       end
@@ -1182,10 +1183,10 @@ RSpec.describe "serialization" do
         resource.relationship_links = false
       end
 
-      it "does not generate links by default" do
+      it "does not render the relationship at all" do
         resource.has_many :positions
         render
-        expect(positions).to_not have_key("links")
+        expect(json["data"][0]["relationships"]).to_not have_key("positions")
       end
 
       it "does generate links when link: true passed" do
@@ -1274,6 +1275,18 @@ RSpec.describe "serialization" do
     describe "placeholder relationships" do
       before do
         resource.has_many :positions
+        resource.relationship_placeholders = true
+      end
+
+      context "when placeholders are off, as they are by default" do
+        before do
+          resource.relationship_placeholders = false
+        end
+
+        it "is not present" do
+          render
+          expect(json["data"][0]["relationships"]).to eq({})
+        end
       end
 
       context "when links on demand" do
@@ -1401,9 +1414,9 @@ RSpec.describe "serialization" do
             resource.has_many :positions, link: false
           end
 
-          it "does not link" do
+          it "does not render the relationship at all" do
             render
-            expect(positions).to_not have_key("links")
+            expect(json["data"][0]["relationships"]).to_not have_key("positions")
           end
         end
 
@@ -1609,11 +1622,10 @@ RSpec.describe "serialization" do
             mastercard_resource.endpoint = nil
           end
 
-          it "does not link" do
+          it "does not render the relationship at all" do
             define_relationship
             render
-            credit_card = json["data"][0]["relationships"]["credit_card"]
-            expect(credit_card).to_not have_key("links")
+            expect(json["data"][0]["relationships"]).to_not have_key("credit_card")
           end
         end
 
@@ -1857,6 +1869,7 @@ RSpec.describe "serialization" do
         "attrpositions"
       end
       resource.has_many :positions
+      resource.relationship_placeholders = true
     end
 
     context "when relationship is included" do
@@ -1921,6 +1934,7 @@ RSpec.describe "serialization" do
           end
           has_many :things, resource: PORO::PositionResource,
             foreign_key: :employee_id
+          self.relationship_placeholders = true
         end
       end
 

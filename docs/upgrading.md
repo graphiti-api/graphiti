@@ -166,6 +166,25 @@ The three settings, and when a `belongs_to` cannot use its foreign key, are cove
 </details>
 
 <details>
+<summary>A relationship with no ids and no link is left out of the payload, where 1.x rendered <code>meta: {included: false}</code></summary>
+
+A relationship that renders neither resource ids nor a link used to look like this:
+
+```json
+"employee": { "meta": { "included": false } }
+```
+
+That shape comes from `jsonapi-serializable`, which fills in a relationship object it would otherwise render empty. It is not part of JSON:API and carries nothing a client can act on. Some clients read it as an empty relationship and clear data they already hold. 1.x left these out too when `links_on_demand` was on globally and the request did not ask for links.
+
+To keep them, on one resource or on the resource everything inherits from:
+
+```ruby
+self.relationship_placeholders = true
+```
+
+</details>
+
+<details>
 <summary>`ConflictRequest` renders `code: "conflict"` at 409, where `graphiti-rails` surfaced it as a 500</summary>
 
 Graphiti 1.x shipped two exception systems, `graphiti_errors` in core and `rescue_registry` in `graphiti-rails`, and both loaded in every Rails app. `rescue_registry` is now the only one, and installs automatically as a dependency.

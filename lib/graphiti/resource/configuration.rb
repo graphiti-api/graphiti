@@ -21,6 +21,7 @@ module Graphiti
         relationships: {
           relationships_readable_by_default: {default: true},
           relationships_writable_by_default: {default: true},
+          relationship_placeholders: {default: false, note: "render placeholders for relationships with no ids and no link"},
           belongs_to_resource_ids_by_default: {
             default: :foreign_key,
             values: BELONGS_TO_RESOURCE_IDS_MODES,

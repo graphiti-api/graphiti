@@ -192,7 +192,7 @@ class ApplicationResource < Graphiti::Resource
 end
 ```
 
-`relationship_links` accepts `true` (always render, the default), `false` (no links), or `:on_demand`. Set it on `ApplicationResource` to apply everywhere, on an individual resource to override, or per relationship with `link:`. A relationship whose only content would be an unrequested on-demand link is omitted from the payload entirely, since JSON:API forbids empty relationship objects.
+`relationship_links` accepts `true` (always render, the default), `false` (no links), or `:on_demand`. Set it on `ApplicationResource` to apply everywhere, on an individual resource to override, or per relationship with `link:`. A relationship with no link and no ids is left out of the payload.
 
 ### Pagination Links {#pagination-links}
 

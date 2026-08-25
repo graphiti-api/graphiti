@@ -24,6 +24,7 @@ RSpec.describe Graphiti::Resource do
         expect(klass.attributes_schema_by_default).to eq(true)
         expect(klass.relationships_readable_by_default).to eq(true)
         expect(klass.relationships_writable_by_default).to eq(true)
+        expect(klass.relationship_placeholders).to eq(false)
         expect(klass.filters_blanks_by_default).to eq(:as_literal)
       end
 

@@ -54,16 +54,18 @@ RSpec.describe "relationship identifiers" do
         end.to raise_error(Graphiti::SpecHelpers::Errors::NoSideloads)
       end
 
-      it "specifies meta[:included] = false" do
+      it "does not render the relationship at all" do
         jsonapi_data.each do |record|
-          expect(record.relationships["employees"]["meta"]["included"]).to eq(false)
+          expect(record.relationships).to_not have_key("employees")
         end
       end
 
-      it "does not includes relationship identifiers" do
+      it "renders meta[:included] = false when placeholders are on" do
+        resource.relationship_placeholders = true
+        render
+
         jsonapi_data.each do |record|
-          data = record.relationships["employees"]["data"]
-          expect(data).to be_nil
+          expect(record.relationships["employees"]).to eq("meta" => {"included" => false})
         end
       end
     end
@@ -219,7 +221,7 @@ RSpec.describe "relationship identifiers" do
         render
 
         record = jsonapi_data.find { |node| node.id == named_position.id }
-        expect(record.relationships["employee"].keys).to_not include("data")
+        expect(record.relationships).to_not have_key("employee")
       end
 
       it "still renders the related id when the relationship is included" do
@@ -258,8 +260,7 @@ RSpec.describe "relationship identifiers" do
 
       it "has no relationship identifiers" do
         jsonapi_data.each do |record|
-          data = record.relationships["employee"]
-          expect(data.keys).to_not include("data")
+          expect(record.relationships).to_not have_key("employee")
         end
       end
     end
@@ -320,7 +321,7 @@ RSpec.describe "relationship identifiers" do
 
         it "honors the relationship over the default" do
           jsonapi_data.each do |record|
-            expect(record.relationships["employee"].keys).to_not include("data")
+            expect(record.relationships).to_not have_key("employee")
           end
         end
       end
@@ -403,7 +404,7 @@ RSpec.describe "relationship identifiers" do
         render
 
         jsonapi_data.each do |record|
-          expect(record.relationships["employee"].keys).to_not include("data")
+          expect(record.relationships).to_not have_key("employee")
         end
       end
 
