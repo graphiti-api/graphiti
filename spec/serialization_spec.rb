@@ -1296,7 +1296,7 @@ RSpec.describe "serialization" do
 
         context "and ?links param given" do
           before do
-            graphiti_context.params = {links: true}
+            params[:links] = true
           end
 
           it "is present" do

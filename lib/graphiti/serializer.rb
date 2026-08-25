@@ -1,7 +1,5 @@
 module Graphiti
   class Serializer < JSONAPI::Serializable::Resource
-    UNREQUESTED_LINKS = [false, nil, "false"].freeze
-
     include Graphiti::Extensions::BooleanAttribute
     include Graphiti::Extensions::ExtraAttribute
     include Graphiti::SerializableHash
@@ -134,12 +132,7 @@ module Graphiti
     end
 
     def strip_on_demand_relationships?
-      return false unless self.class.on_demand_links?
-
-      context = Graphiti.context[:object]
-      params = context.params if context.respond_to?(:params)
-
-      UNREQUESTED_LINKS.include?(params && params[:links])
+      self.class.on_demand_links? && !@proxy&.query&.render_link?(:on_demand)
     end
   end
 end
