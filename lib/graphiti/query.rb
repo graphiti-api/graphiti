@@ -43,6 +43,10 @@ module Graphiti
       !association?
     end
 
+    def includes_requested?
+      @include_param.present?
+    end
+
     def links_requested?
       return @links_requested if defined?(@links_requested)
 

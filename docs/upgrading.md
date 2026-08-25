@@ -185,6 +185,13 @@ self.relationship_placeholders = true
 </details>
 
 <details>
+<summary>A request with <code>?include=</code> always gets an <code>included</code> key back</summary>
+
+When nothing comes back with the response, that key now holds an empty array. 1.x left it out entirely, so a client had to handle both a missing key and an empty one.
+
+</details>
+
+<details>
 <summary>`ConflictRequest` renders `code: "conflict"` at 409, where `graphiti-rails` surfaced it as a 500</summary>
 
 Graphiti 1.x shipped two exception systems, `graphiti_errors` in core and `rescue_registry` in `graphiti-rails`, and both loaded in every Rails app. `rescue_registry` is now the only one, and installs automatically as a dependency.

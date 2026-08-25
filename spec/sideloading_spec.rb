@@ -623,6 +623,19 @@ RSpec.describe "sideloading" do
     end
   end
 
+  describe "the included member" do
+    it "is present, and empty, when the include turns up nothing" do
+      params[:include] = "credit_cards"
+      render
+      expect(json["included"]).to eq([])
+    end
+
+    it "is absent when nothing was included" do
+      render
+      expect(json).to_not have_key("included")
+    end
+  end
+
   context "when the associated resource has default pagination" do
     before do
       resource.class_eval do
