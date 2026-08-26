@@ -204,6 +204,8 @@ module Graphiti
 
     # A customized sideload can load a record another path would not, so it keeps its own instances.
     def deduplicable?
+      return false unless @query.repeated_resource_classes.include?(@resource.class)
+
       sideload = @opts[:sideload]
       return true unless sideload
 

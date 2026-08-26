@@ -39,6 +39,29 @@ module Graphiti
       @entity_map
     end
 
+    # Deduplication exists for a row two include paths both resolve, so a
+    # resource class sitting at one node has nothing to collide with.
+    def repeated_resource_classes
+      return root.repeated_resource_classes unless root == self
+
+      @repeated_resource_classes ||= begin
+        counts = Hash.new(0)
+        walk = [self]
+        while (query = walk.pop)
+          counts[query.resource.class] += 1
+          query.sideloads.each_pair do |name, sideload_query|
+            walk << sideload_query
+            sideload = query.resource.class.sideload(name)
+            next unless sideload.respond_to?(:children)
+
+            # A polymorphic child resolves under a class no node names.
+            sideload.children.each_value { |child| counts[child.resource.class] += 2 }
+          end
+        end
+        counts.select { |_, count| count > 1 }.keys.to_set
+      end
+    end
+
     def top_level?
       !association?
     end
