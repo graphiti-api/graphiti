@@ -152,8 +152,12 @@ module Graphiti
       !!@polymorphic_as
     end
 
+    # Every check behind the blocker is static sideload configuration, and this
+    # is asked once per rendered record per relationship.
     def resource_ids_from_foreign_key?
-      resource_ids_blocker.nil?
+      return @resource_ids_from_foreign_key unless @resource_ids_from_foreign_key.nil?
+
+      @resource_ids_from_foreign_key = resource_ids_blocker.nil?
     end
 
     def resource_ids_blocker
