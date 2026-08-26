@@ -1115,6 +1115,15 @@ RSpec.describe "sideloading" do
       expect(pos1.length).to eq(1)
     end
 
+    it "does not assign the same children twice when a resource repeats in the include path" do
+      params[:include] = "positions.department.positions"
+      json = PORO::DepartmentResource.all(params).to_jsonapi
+      rendered = JSON.parse(json)["data"].map { |record|
+        record.dig("relationships", "positions", "data").map { |ref| ref["id"] }
+      }
+      expect(rendered).to all(satisfy { |ids| ids == ids.uniq })
+    end
+
     it "has all correct assocations" do
       render
       sl = jsonapi_data[0].sideload(:current_position)
