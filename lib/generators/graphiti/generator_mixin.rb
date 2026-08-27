@@ -50,11 +50,12 @@ module Graphiti
     end
 
     def resource_setting_hint(setting)
-      return setting[:note] if setting[:note]
-      return unless setting[:values]
+      hint = setting[:note] || setting[:values]&.map(&:inspect)
+        &.to_sentence(two_words_connector: " or ", last_word_connector: ", or ")
 
-      setting[:values].map(&:inspect)
-        .to_sentence(two_words_connector: " or ", last_word_connector: ", or ")
+      return hint unless setting[:deprecated]
+
+      ["deprecated, removed in 3.0", hint].compact.join(". ")
     end
 
     def graphiti_config
