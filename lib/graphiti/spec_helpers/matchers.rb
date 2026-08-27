@@ -186,7 +186,7 @@ module Graphiti
       # @param [Symbol] type
       #
       # @example expect(subject).to filter_attribute(:name, :string)
-      # @example expect(subject).to filter_attribute(:name, :string).with_options(blanks: :as_nil)
+      # @example expect(subject).to filter_attribute(:name, :string).with_options(blanks: :null)
       # @example expect(subject).not_to filter_attribute(:name, :string)
       def filter_attribute(attribute, type)
         FilterAttributeMatcher.new(attribute, type)

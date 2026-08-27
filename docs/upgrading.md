@@ -271,16 +271,16 @@ Every name below still works, warns, and will be removed in the next major. They
 | `self.default_page_size = 10` | `self.page_default_size = 10` |
 | `self.max_page_size = 500` | `self.page_max_size = 500` |
 | `self.cursor_paginatable = true` | `self.page_cursors = true` |
-| `self.filters_accept_nil_by_default = true` | `self.filters_blanks_by_default = :as_nil` |
-| `self.filters_deny_empty_by_default = true` | `self.filters_blanks_by_default = :reject` |
-| `filter :name, allow_nil: true` | `filter :name, blanks: :as_nil` |
-| `filter :name, deny_empty: true` | `filter :name, blanks: :reject` |
+| `self.filters_accept_nil_by_default = true` | `self.filter_blanks_treated_as = :null` |
+| `self.filters_deny_empty_by_default = true` | `self.filter_blanks_treated_as = :rejected` |
+| `filter :name, allow_nil: true` | `filter :name, blanks: :null` |
+| `filter :name, deny_empty: true` | `filter :name, blanks: :rejected` |
 
 Link rendering is one mode per link now. It takes `true`, `false`, or `:on_demand`, which renders only when the request asks with `?links=true` (or `?page_links=true` for the pagination set). `self.relationship_links` sets the resource default, `link:` overrides it per relationship, and `self.page_links` does the same for pagination links, which have no per-relationship level. Set them on `ApplicationResource` for the old global behavior.
 
 Everything relating to the `page` param shares its prefix: `page_default_size`, `page_max_size`, `page_cursors` and `page_links`. The on-demand param follows, so use `?page_links=true` (`?pagination_links=true` still works).
 
-`allow_nil:` and `deny_empty:` were two booleans answering one question, and they contradicted each other on `"null"`. The empty check raised before the coercion could run. One `blanks:` option replaces them, taking `:as_literal`, `:as_nil` or `:reject`, defaulted by `filters_blanks_by_default`.
+`allow_nil:` and `deny_empty:` were two booleans answering one question, and they contradicted each other on `"null"`. The empty check raised before the coercion could run. One `blanks:` option replaces them, taking `:literal`, `:null` or `:rejected`, defaulted by `filter_blanks_treated_as`.
 
 `validate_endpoints` did two unrelated jobs, so it split. `validate_requests` refuses requests to undeclared endpoints, and `validate_links` refuses to render links to unroutable ones. The old name sets both, and turning off link validation no longer disarms the inbound guard.
 

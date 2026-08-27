@@ -28,7 +28,7 @@ RSpec.describe Graphiti::SpecHelpers::Matchers do
       self.model = PORO::Employee
 
       attribute :title, :string, sortable: false
-      filter :body, :string, blanks: :as_nil
+      filter :body, :string, blanks: :null
 
       belongs_to :author, resource: author
       has_many :comments, resource: author
@@ -107,12 +107,12 @@ RSpec.describe Graphiti::SpecHelpers::Matchers do
 
     it "matches on options" do
       expect(resource).to filter_attribute(:body, :string)
-        .with_options(blanks: :as_nil)
+        .with_options(blanks: :null)
     end
 
     it "fails when an option does not match" do
       expect(resource).not_to filter_attribute(:body, :string)
-        .with_options(blanks: :as_literal)
+        .with_options(blanks: :literal)
     end
   end
 

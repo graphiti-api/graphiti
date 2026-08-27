@@ -719,11 +719,11 @@ module Graphiti
 
       def message
         <<~MSG
-          #{@resource_class.name}: #{@attribute} must be one of :as_literal, :as_nil, or :reject. Got #{@value.inspect}.
+          #{@resource_class.name}: #{@attribute} must be one of :literal, :null, or :rejected. Got #{@value.inspect}.
 
-            :as_literal - "null" and "" reach the filter as strings (default)
-            :as_nil     - "null" becomes nil, so the filter can query for NULL
-            :reject     - a blank value raises InvalidFilterValue
+            :literal  - "null" and "" reach the filter as strings (default)
+            :null     - "null" becomes nil, so the filter can query for NULL
+            :rejected - a blank value raises InvalidFilterValue
         MSG
       end
     end

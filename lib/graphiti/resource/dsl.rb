@@ -208,16 +208,16 @@ module Graphiti
 
         def blanks_for(name, opts)
           if opts.key?(:deny_empty)
-            DEPRECATOR.warn("The deny_empty: filter option is deprecated. Use blanks: :reject.")
-            return :reject if opts[:deny_empty]
+            DEPRECATOR.warn("The deny_empty: filter option is deprecated. Use blanks: :rejected.")
+            return :rejected if opts[:deny_empty]
           end
 
           if opts.key?(:allow_nil)
-            DEPRECATOR.warn("The allow_nil: filter option is deprecated. Use blanks: :as_nil.")
-            return opts[:allow_nil] ? :as_nil : :as_literal
+            DEPRECATOR.warn("The allow_nil: filter option is deprecated. Use blanks: :null.")
+            return opts[:allow_nil] ? :null : :literal
           end
 
-          blanks = opts.fetch(:blanks, filters_blanks_by_default)
+          blanks = opts.fetch(:blanks, filter_blanks_treated_as)
           unless Resource::BLANK_MODES.include?(blanks)
             raise Errors::InvalidFilterBlanks.new(self, name, blanks)
           end

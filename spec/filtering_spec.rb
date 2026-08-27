@@ -286,14 +286,14 @@ RSpec.describe "filtering" do
   end
 
   context "when the filter uses the deprecated blank options" do
-    it "maps allow_nil to :as_nil" do
+    it "maps allow_nil to :null" do
       resource.filter :first_name, allow_nil: true
-      expect(resource.filters[:first_name][:blanks]).to eq(:as_nil)
+      expect(resource.filters[:first_name][:blanks]).to eq(:null)
     end
 
-    it "maps deny_empty to :reject" do
+    it "maps deny_empty to :rejected" do
       resource.filter :first_name, deny_empty: true
-      expect(resource.filters[:first_name][:blanks]).to eq(:reject)
+      expect(resource.filters[:first_name][:blanks]).to eq(:rejected)
     end
   end
 
@@ -301,14 +301,14 @@ RSpec.describe "filtering" do
     it "raises" do
       expect {
         resource.filter :first_name, blanks: :whatever
-      }.to raise_error(Graphiti::Errors::InvalidFilterBlanks, /must be one of :as_literal, :as_nil, or :reject/)
+      }.to raise_error(Graphiti::Errors::InvalidFilterBlanks, /must be one of :literal, :null, or :rejected/)
     end
   end
 
-  context "when passed null and filter marked blanks: :as_nil" do
+  context "when passed null and filter marked blanks: :null" do
     context "with string type" do
       before do
-        resource.filter :first_name, blanks: :as_nil
+        resource.filter :first_name, blanks: :null
         employee2.update_attributes(first_name: nil)
         params[:filter] = {first_name: "null"}
       end
@@ -332,7 +332,7 @@ RSpec.describe "filtering" do
     context "with integer type" do
       before do
         resource.attribute :age, :integer
-        resource.filter :age, blanks: :as_nil
+        resource.filter :age, blanks: :null
         employee1.update_attributes(age: 20)
         employee2.update_attributes(age: nil)
         employee3.update_attributes(age: 30)
@@ -358,9 +358,9 @@ RSpec.describe "filtering" do
     end
   end
 
-  context "when passed a blank value and blanks is :reject" do
+  context "when passed a blank value and blanks is :rejected" do
     before do
-      resource.filter :first_name, blanks: :reject
+      resource.filter :first_name, blanks: :rejected
       employee2.update_attributes(first_name: value)
       params[:filter] = {first_name: "null"}
     end

@@ -1481,7 +1481,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             required: false,
             operators:
               {eq: nil, not_eq: nil, gt: nil, gte: nil, lt: nil, lte: nil},
-            blanks: :as_literal
+            blanks: :literal
           }
         }
 

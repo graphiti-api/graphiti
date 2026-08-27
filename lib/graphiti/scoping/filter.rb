@@ -209,7 +209,7 @@ module Graphiti
     end
 
     def parse_string_null(filter, value)
-      return value unless filter[:blanks] == :as_nil
+      return value unless filter[:blanks] == :null
       return value.map { |item| (item == "null") ? nil : item } if value.is_a?(Array)
       return if value == "null"
 
@@ -217,7 +217,7 @@ module Graphiti
     end
 
     def check_blank_filters!(resource, filter, value)
-      return unless filter.values[0][:blanks] == :reject
+      return unless filter.values[0][:blanks] == :rejected
 
       if value.nil? || value.empty? || value == "null"
         raise Errors::InvalidFilterValue.new(resource, filter, "(empty)")
