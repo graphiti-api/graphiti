@@ -1,5 +1,29 @@
 graphiti changelog
 
+# [2.0.0-beta.11](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.10...v2.0.0-beta.11) (2026-08-27)
+
+
+### Bug Fixes
+
+* always render included when the client asked to include ([8691b3f](https://github.com/graphiti-api/graphiti/commit/8691b3fd08f3cae0481ba72839911fdc71ef5634))
+* autolink = true no longer clobbers an inherited :on_demand ([2d26f8c](https://github.com/graphiti-api/graphiti/commit/2d26f8cb567e82a16918345de9114b8ceef64523))
+* read the links param from the query, not the context object ([3b934cb](https://github.com/graphiti-api/graphiti/commit/3b934cb25be049e1e80ba400123da944cfd23d04))
+* stop assigning the same child twice when a resource repeats in the include path ([588503b](https://github.com/graphiti-api/graphiti/commit/588503b109508495d8170373d80019c6971f7d9c))
+
+
+### Features
+
+* omit relationships that render no ids and no link ([916aa8c](https://github.com/graphiti-api/graphiti/commit/916aa8c9c596c5d9b6c802c5ab13b766a13d1e70))
+
+
+### Performance Improvements
+
+* memoize whether a belongs_to renders ids from its foreign key ([dcb60b2](https://github.com/graphiti-api/graphiti/commit/dcb60b2096c414756ccff534773d2e45594f0144))
+* only deduplicate resources that two include paths can both reach ([744f014](https://github.com/graphiti-api/graphiti/commit/744f014249382bc25d5ea43f692778ad7adc25c3))
+* resolve a lone sideload inline rather than through the pool ([3415592](https://github.com/graphiti-api/graphiti/commit/3415592d75900389a8f11f53b65ab399e297e4a9))
+* reuse the resolved data and proxies when building cache keys ([8a17350](https://github.com/graphiti-api/graphiti/commit/8a17350542ba0062fdcddd115afe8041b62198c7))
+* skip the on-demand link strip when no relationship renders links on demand ([cf86a8c](https://github.com/graphiti-api/graphiti/commit/cf86a8c249077d9f9d5a13de49989d102bbaed04))
+
 # [2.0.0-beta.10](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.9...v2.0.0-beta.10) (2026-08-24)
 
 
