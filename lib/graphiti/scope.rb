@@ -70,7 +70,7 @@ module Graphiti
     def resolve(&blk)
       # The caller blocks on .value! either way, so concurrency only benefits parallel sideloads
       # See https://github.com/graphiti-api/graphiti/issues/505
-      if self.class.resolve_synchronously? || !applicable_sideloads?
+      if self.class.resolve_synchronously? || !overlapping_sideloads?
         sync_resolve(&blk)
       else
         future_resolve(&blk).value!
@@ -143,9 +143,6 @@ module Graphiti
 
     private
 
-    # Synchronous counterpart to #future_resolve, used when concurrency is off.
-    # Resolves the resource and its sideloads inline without any promise
-    # machinery. See #resolve.
     def sync_resolve(&blk)
       return [] if @query.zero_results?
 
@@ -154,15 +151,13 @@ module Graphiti
       resolved
     end
 
-    # Synchronous counterpart to #future_resolve_sideloads, used when
-    # concurrency is off. Resolves each sideload inline. See #resolve_sideloads.
     def sync_resolve_sideloads(results)
       return if results == []
 
       reset_captured_sideload_proxies
       each_applicable_sideload do |name, sideload, sideload_query|
         Graphiti.config.before_sideload&.call(Graphiti.context)
-        sideload.resolve(results, sideload_query, @resource) do |proxy|
+        sideload.sync_resolve(results, sideload_query, @resource) do |proxy|
           capture_sideload_proxy(name, proxy)
         end
       end
@@ -215,9 +210,15 @@ module Graphiti
         sideload.primary_key == :id
     end
 
-    # Nothing to post to the pool means the future would wrap work already done.
-    def applicable_sideloads?
-      each_applicable_sideload { return true }
+    # One sideload has nothing to run beside it, so the pool would hand the work
+    # to another thread and wait for it. A chain is one at every level. A
+    # polymorphic sideload counts as its children, which do run beside each other.
+    def overlapping_sideloads?
+      found = 0
+      each_applicable_sideload do |_, sideload, _|
+        found += sideload.respond_to?(:children) ? sideload.children.size : 1
+        return true if found > 1
+      end
       false
     end
 

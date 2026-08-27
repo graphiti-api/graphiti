@@ -28,9 +28,11 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
       end
       resource_class.has_many :probe_positions, resource: position_resource, foreign_key: :employee_id
+      # Two sideloads, since one on its own resolves inline and never reaches the pool.
+      resource_class.has_many :other_positions, resource: position_resource, foreign_key: :employee_id
 
       expect {
-        resource_class.all(filter: {id: employee.id}, include: "probe_positions").to_a
+        resource_class.all(filter: {id: employee.id}, include: "probe_positions,other_positions").to_a
       }.to raise_error(ActiveRecord::ConnectionTimeoutError) { |error|
         expect(error.message).to include("could not obtain a connection")
         expect(error.message).to include("concurrency_max_threads")

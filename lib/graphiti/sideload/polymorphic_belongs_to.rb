@@ -130,13 +130,13 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
       end
   end
 
-  private
-
   def sync_resolve(parents, query, graph_parent, &proxy_block)
     each_resolvable_group(parents, query) do |child, group, child_query|
-      child.resolve(group, child_query, graph_parent, &proxy_block)
+      child.sync_resolve(group, child_query, graph_parent, &proxy_block)
     end
   end
+
+  private
 
   # Group parents by their polymorphic type and yield each group's child
   # sideload alongside a query pruned to the sideloads that child supports.

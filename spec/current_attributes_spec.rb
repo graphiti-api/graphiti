@@ -51,7 +51,8 @@ RSpec.describe "CurrentAttributes propagation into concurrent sideloads" do
     end
 
     CurrentAttributesTest::Current.user = "jeff"
-    params[:include] = "probe_positions"
+    # Two sideloads, because one resolves inline and never reaches the pool.
+    params[:include] = "probe_positions,positions"
     resource.all(params).to_a
 
     expect(observed[:thread]).to_not eq(Thread.current.object_id)
@@ -67,7 +68,8 @@ RSpec.describe "CurrentAttributes propagation into concurrent sideloads" do
     end
 
     CurrentAttributesTest::Current.user = "jeff"
-    params[:include] = "probe_positions"
+    # Two sideloads, because one resolves inline and never reaches the pool.
+    params[:include] = "probe_positions,positions"
     resource.all(params).to_a
 
     expect(CurrentAttributesTest::Current.user).to eq("jeff")

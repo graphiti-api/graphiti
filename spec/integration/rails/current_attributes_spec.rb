@@ -36,8 +36,13 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
       end
 
+      # A second sideload, since one on its own resolves inline and never reaches the pool.
+      resource_class.has_many :other_positions, resource: PositionResource, foreign_key: :employee_id do
+        scope { |_employee_ids| Position.none }
+      end
+
       RailsCurrentAttributesTest::Current.user = "jeff"
-      resource_class.all(filter: {id: employee.id}, include: "probe_positions").to_a
+      resource_class.all(filter: {id: employee.id}, include: "probe_positions,other_positions").to_a
 
       expect(observed[:thread]).to_not eq(Thread.current.object_id)
       expect(observed[:user]).to eq("jeff")

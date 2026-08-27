@@ -291,12 +291,16 @@ module Graphiti
 
     def load(parents, query, graph_parent, &proxy_block)
       if Scope.resolve_synchronously?
-        proxy = build_resource_proxy(parents, query, graph_parent)
-        proxy_block&.call(proxy)
-        proxy.to_a
+        sync_load(parents, query, graph_parent, &proxy_block)
       else
         future_load(parents, query, graph_parent, &proxy_block).value!
       end
+    end
+
+    def sync_load(parents, query, graph_parent, &proxy_block)
+      proxy = build_resource_proxy(parents, query, graph_parent)
+      proxy_block&.call(proxy)
+      proxy.to_a
     end
 
     # Override in subclass
@@ -351,6 +355,20 @@ module Graphiti
         sync_resolve(parents, query, graph_parent, &proxy_block)
       else
         future_resolve(parents, query, graph_parent, &proxy_block).value!
+      end
+    end
+
+    # Called by a scope that already decided to stay inline, so it must not consult the pool again.
+    # A scope_proc builds a Scope rather than a proxy, and that nested scope decides for itself.
+    def sync_resolve(parents, query, graph_parent, &proxy_block)
+      assert_singular!(parents)
+
+      if self.class.scope_proc
+        build_sideload_scope(parents, query, graph_parent).resolve do |sideload_results|
+          fire_assign(parents, sideload_results)
+        end
+      else
+        sync_load(parents, query, graph_parent, &proxy_block)
       end
     end
 
@@ -426,21 +444,6 @@ module Graphiti
     end
 
     private
-
-    # Synchronous counterpart to #future_resolve, used when concurrency is off.
-    # Resolves inline via the synchronous Scope#resolve / #load paths (no
-    # promises). See Scope#sync_resolve_sideloads.
-    def sync_resolve(parents, query, graph_parent, &proxy_block)
-      assert_singular!(parents)
-
-      if self.class.scope_proc
-        build_sideload_scope(parents, query, graph_parent).resolve do |sideload_results|
-          fire_assign(parents, sideload_results)
-        end
-      else
-        load(parents, query, graph_parent, &proxy_block)
-      end
-    end
 
     def assert_singular!(parents)
       if single? && parents.length > 1
