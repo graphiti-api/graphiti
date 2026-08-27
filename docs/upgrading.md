@@ -166,7 +166,7 @@ The three settings, and when a `belongs_to` cannot use its foreign key, are cove
 </details>
 
 <details>
-<summary>A relationship with no ids and no link is left out of the payload, where 1.x rendered <code>meta: {included: false}</code></summary>
+<summary>A relationship with no ids and no link is left out of the payload, where 1.x rendered <code>meta: &#123;included: false&#125;</code></summary>
 
 A relationship that renders neither resource ids nor a link used to look like this:
 
