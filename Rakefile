@@ -11,31 +11,36 @@ RSpec::Core::RakeTask.new(:spec) do |t|
   end
 end
 
+# Allocations mean the same anywhere and timings do not, so the history has a
+# reference CPU, named on every row, and recording timings refuses to mix them.
 namespace :performance do
   # Shelling out keeps a failure to the script's own message, with no rake backtrace on top.
   def measure(*arguments)
     exit(1) unless system("bundle", "exec", "ruby", "spec/performance/measure_releases.rb", *arguments)
   end
 
-  desc "Compare the working tree to the last release, and plot it"
-  task :current do
-    measure
+  desc "Read a change: measure the working tree, print the comparison and plot it"
+  task :read do
+    measure("--read")
   end
 
-  desc "Plot the release history plus the working tree to tmp/performance.html and open it"
-  task :page do
-    exit(1) unless system("bundle", "exec", "ruby", "spec/performance/chart_page.rb")
+  desc "Open the recorded history as a chart. Any machine, measures nothing"
+  task :chart do
+    exit(1) unless system("bundle", "exec", "ruby", "spec/performance/chart_page.rb", "--no-current")
   end
 
-  desc "Measure one release and record it (TAG=v2.0.0-beta.9)"
+  desc "Fill in the history. Missing releases by default, TAG=v2.0.0-beta.9 for one, ALL=1 for every. Reference CPU"
   task :record do
-    tag = ENV["TAG"] or abort "pass the release to record, e.g. rake performance:record TAG=v2.0.0-beta.9"
-    measure(tag)
+    measure(*(if ENV["TAG"]
+                [ENV["TAG"]]
+              else
+                ENV["ALL"] ? ["--all"] : ["--missing"]
+              end))
   end
 
-  desc "Re-record every release for this ruby, replacing its rows"
-  task :record_all do
-    measure("--all")
+  desc "Measure the working tree for the release to name, and commit it. Reference CPU"
+  task :pending do
+    measure("--pending")
   end
 end
 

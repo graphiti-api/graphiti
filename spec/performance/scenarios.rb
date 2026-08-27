@@ -1,5 +1,12 @@
 # performance_history.tsv stores the id, so it must never change. The description is only displayed.
+#
+# latency is what every adapter call waits, standing in for a database. Only
+# scenarios whose sideloads can overlap carry it, since a wait is the only thing
+# the thread pool has to overlap. The rest measure graphiti's own work.
 module Scenarios
+  # Measured once: the pool breaks even around a millisecond a query and saves a third by five.
+  QUERY_LATENCY = 0.005
+
   ALL = {
     "flat_10" => {
       description: "page[size]=10",
@@ -31,12 +38,32 @@ module Scenarios
       seed: {employees: 50, positions_per_employee: 4, departments: 5},
       params: {page: {size: 50}, include: "positions.department.positions"}
     },
+    "siblings_50" => {
+      description: "page[size]=50&include=positions,credit_cards",
+      seed: {employees: 50, positions_per_employee: 4, departments: 5, credit_cards_per_employee: 2},
+      params: {page: {size: 50}, include: "positions,credit_cards"},
+      latency: QUERY_LATENCY
+    },
+    "chain_and_sibling_50" => {
+      description: "page[size]=50&include=positions.department,credit_cards",
+      seed: {employees: 50, positions_per_employee: 4, departments: 5, credit_cards_per_employee: 2},
+      params: {page: {size: 50}, include: "positions.department,credit_cards"},
+      latency: QUERY_LATENCY
+    },
+    "deep_and_sibling_50" => {
+      description: "page[size]=50&include=positions.department.positions,credit_cards",
+      seed: {employees: 50, positions_per_employee: 4, departments: 5, credit_cards_per_employee: 2},
+      params: {page: {size: 50}, include: "positions.department.positions,credit_cards"},
+      latency: QUERY_LATENCY
+    },
     "stats_100" => {
       description: "page[size]=100&stats[total]=count",
       seed: {employees: 100},
       params: {page: {size: 100}, stats: {total: "count"}}
     }
   }.freeze
+
+  PHASES = %w[resolve render].freeze
 
   module_function
 
@@ -46,5 +73,13 @@ module Scenarios
 
   def descriptions
     ALL.transform_values { |scenario| scenario[:description] }
+  end
+
+  def latency(id)
+    ALL.dig(id, :latency).to_f
+  end
+
+  def waiting
+    ALL.select { |_, scenario| scenario[:latency].to_f.positive? }.keys
   end
 end

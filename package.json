@@ -142,7 +142,7 @@
       [
         "@semantic-release/exec",
         {
-          "prepareCmd": "bundle exec ruby spec/performance/measure_releases.rb --pending v${nextRelease.version}"
+          "prepareCmd": "bundle exec ruby spec/performance/measure_releases.rb --promote v${nextRelease.version}"
         }
       ],
       [
