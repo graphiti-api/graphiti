@@ -106,7 +106,7 @@ module ChartPage
     @media (max-width:1180px){.panes{grid-template-columns:minmax(0,1fr)}}
     h1{font-size:26px;letter-spacing:-.02em;margin:0}
     .sub{color:var(--muted);margin:6px 0 0;font-size:14px}
-    #charts{position:relative;height:400px}
+    #charts{position:relative;height:clamp(400px,58vh,780px)}
     #counts{position:relative;height:170px;margin-top:6px}
     .controls{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:flex-end}
     .tablebar{margin-bottom:10px}
@@ -218,6 +218,7 @@ module ChartPage
     }
 
     const WORKING_TREE = "working tree";
+    const PENDING = "pending";
     const RELEASES = (() => {
       const seen = [];
       ROWS.forEach(r => { if(r.version !== WORKING_TREE && !seen.includes(r.version)) seen.push(r.version); });
@@ -242,9 +243,7 @@ module ChartPage
     const baselineChoice = document.getElementById("baseline");
     baselineChoice.add(new Option("earliest release measured", ""));
     RELEASES.forEach(v => baselineChoice.add(new Option(v, v)));
-    // The newest stable release, so zero on the axis is what shipped rather
-    // than a version picked at random.
-    const PREFERRED = RELEASES.filter(v => !v.includes("-")).pop();
+    const PREFERRED = RELEASES.filter(v => v !== PENDING && !v.includes("-")).pop();
     if(PREFERRED) baselineChoice.value = PREFERRED;
     // The ruby on screen is its own denominator, so zero means that ruby.
     function baseline(){
@@ -316,8 +315,16 @@ module ChartPage
         const found = keys.map(k => valueAt(ruby, concurrency, v, k, metricName)).filter(n => n != null);
         return found.length ? found.reduce((a,b) => a+b, 0) : null;
       });
-      const baseTotal = base.filter(n => n != null).reduce((a, b) => a+b, 0);
-      return {ruby, concurrency, metric: metricName, versions, points, totals, baseTotal,
+      const own = keys.map(k => valueAt(origin.ruby, concurrency, origin.version, k, metricName));
+      const sincePoints = versions.map(v => {
+        const ratios = keys.map((k, i) => {
+          const n = valueAt(ruby, concurrency, v, k, metricName);
+          return (n && own[i]) ? n/own[i] : null;
+        }).filter(x => x != null);
+        return ratios.length ? ratios.reduce((a,b) => a+b, 0)/ratios.length : null;
+      });
+      const baseTotal = own.filter(n => n != null).reduce((a, b) => a+b, 0);
+      return {ruby, concurrency, metric: metricName, versions, points, sincePoints, totals, baseTotal,
         unit: {count: "objects", ms: "ms"}[metricName],
         color: CONC_COLOR[concurrency],
         label: `${SERIES_LABEL[metricName]}, concurrency ${concurrency}`,
@@ -601,7 +608,7 @@ module ChartPage
           rows.push({release: v, order: idx, concurrency: series.concurrency,
             ruby: series.ruby, value: point, change, counted,
             text: counted ? Math.round(total).toLocaleString() : fmt(point),
-            since: point - 1,
+            since: series.sincePoints[idx] == null ? null : series.sincePoints[idx] - 1,
             changeObjects: previousTotal == null ? null : Math.round(total - previousTotal),
             sinceObjects: Math.round(total - series.baseTotal),
             moved: change != null && Math.abs(change) >= threshold(series)});
