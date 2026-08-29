@@ -20,6 +20,16 @@ module Graphiti
         load File.expand_path("../../tasks/graphiti.rake", __dir__)
       end
 
+      # ActionDispatch has already copied config.action_dispatch.rescue_responses into the wrapper by now.
+      initializer "graphiti-rails.rescue_responses", after: "action_dispatch.configure" do
+        responses = ActionDispatch::ExceptionWrapper.rescue_responses
+
+        Graphiti::Rails::CLIENT_ERROR_STATUSES.each do |exception, status|
+          # rescue_responses answers :internal_server_error for a missing key, so ||= never assigns.
+          responses[exception] = status unless responses.key?(exception)
+        end
+      end
+
       initializer "graphiti-rails.config" do |app|
         Graphiti::Rails.handled_exception_formats = app.config.graphiti.handled_exception_formats
         Graphiti::Rails.respond_to_formats = app.config.graphiti.respond_to_formats

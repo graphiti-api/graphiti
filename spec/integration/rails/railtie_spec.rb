@@ -48,6 +48,43 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
+    describe "rescue_responses" do
+      let(:controller) do
+        Class.new(ActionController::Base) { include Graphiti::Rails::Controller }
+      end
+
+      it "tells Rails which Graphiti errors are client errors" do
+        expect(ActionDispatch::ExceptionWrapper.rescue_responses)
+          .to include(Graphiti::Rails::CLIENT_ERROR_STATUSES)
+      end
+
+      it "keeps them out of the error reporter" do
+        wrapper = ActionDispatch::ExceptionWrapper
+          .new(nil, Graphiti::Errors::RecordNotFound.new)
+
+        expect(wrapper.rescue_response?).to eq(true)
+      end
+
+      it "gives each the status the controller renders" do
+        Graphiti::Rails::CLIENT_ERROR_STATUSES.each do |name, status|
+          registered = controller.rescue_registry
+            .status_code_for_exception(name.constantize, passthrough: false)
+
+          expect(registered).to eq(Rack::Utils.status_code(status)), name
+        end
+      end
+
+      it "covers every client error the controller registers" do
+        handlers = controller.rescue_registry.instance_variable_get(:@handlers)
+        client_errors = handlers.select { |_, (_, options)|
+          (400..499).cover?(options[:status])
+        }
+
+        expect(client_errors.keys.map(&:name))
+          .to match_array(Graphiti::Rails::CLIENT_ERROR_STATUSES.keys)
+      end
+    end
+
     describe "rake tasks" do
       it "ships the graphiti tasks the Railtie loads" do
         task_path = File.expand_path("../../../lib/tasks/graphiti.rake", __dir__)

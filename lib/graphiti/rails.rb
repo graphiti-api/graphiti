@@ -38,6 +38,24 @@ module Graphiti
       DEPRECATOR
     )
 
+    # Rails reports an exception to the error reporter unless its rescue_responses names it.
+    CLIENT_ERROR_STATUSES = {
+      "Graphiti::Errors::InvalidRequest" => :bad_request,
+      "Graphiti::Errors::RemoteWrite" => :bad_request,
+      "Graphiti::Errors::SingularSideload" => :bad_request,
+      "Graphiti::Errors::InvalidInclude" => :bad_request,
+      "Graphiti::Errors::UnsupportedSort" => :bad_request,
+      "Graphiti::Errors::UnsupportedOperator" => :bad_request,
+      "Graphiti::Errors::InvalidFilterValue" => :bad_request,
+      "Graphiti::Errors::RequiredFilter" => :bad_request,
+      "Graphiti::Errors::UnsupportedPageSize" => :bad_request,
+      "Graphiti::Errors::UnsupportedBeforeCursor" => :bad_request,
+      "Graphiti::Errors::UnsupportedPagination" => :bad_request,
+      "Graphiti::Errors::FilterGroupMissingRequiredFilters" => :bad_request,
+      "Graphiti::Errors::RecordNotFound" => :not_found,
+      "Graphiti::Errors::ConflictRequest" => :conflict
+    }.freeze
+
     # @!attribute self.handled_exception_formats
     # A list of formats as symbols whose exceptions will be handled by Graphiti. See {Railtie}.
     cattr_accessor :handled_exception_formats, default: []

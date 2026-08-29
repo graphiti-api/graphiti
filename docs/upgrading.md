@@ -9,7 +9,7 @@ Graphiti 2.0 requires **Ruby 3.2+** and **ActiveSupport 7.1+**. Rails is not a d
 
 ## What you have to change {#what-you-have-to-change}
 
-Four things, and three of them fail loudly if you skip them.
+Five things, and four of them fail loudly if you skip them.
 
 **1. Drop three gems.** `graphiti-rails`, `graphiti_spec_helpers` and `graphiti_errors` are now part of `graphiti` itself.
 
@@ -30,14 +30,14 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-If the controller already has `include Graphiti::Rails`, replace it with `include Graphiti::Rails::Controller`. 
+If the controller already has `include Graphiti::Rails`, replace it with `include Graphiti::Rails::Controller`.
 
 <details>
 <summary>What the include actually brings, and what a controller without it loses</summary>
 
 Until 2.0, Graphiti added itself to **every** controller in the application: an `around_action` wrapping each request in a Graphiti context, another wrapping it in the debugger, and a catch-all exception handler, on Devise controllers, admin controllers, HTML pages, everything.
 
-`Graphiti::Rails::Controller` now bundles all of it, and including it is required. Including it in `ApplicationController` matches 1.x behavior. Including it in an API base class scopes it and leaves the rest of the app alone. A controller without it gets no Graphiti context, no debugger, and none of Graphiti's exception handlers, so if a resource action sees an empty `Graphiti.context`, this include is what is missing. It also carries `ActionController::MimeResponds`, so `respond_to` works in `ActionController::API` apps — under 1.x that only came with `Graphiti::Rails::Responders`.
+`Graphiti::Rails::Controller` now bundles all of it, and including it is required. Including it in `ApplicationController` matches 1.x behavior. Including it in an API base class scopes it and leaves the rest of the app alone. A controller without it gets no Graphiti context, no debugger, and none of Graphiti's exception handlers, so if a resource action sees an empty `Graphiti.context`, this include is what is missing. It also carries `ActionController::MimeResponds`, so `respond_to` works in `ActionController::API` apps, which under 1.x only came with `Graphiti::Rails::Responders`.
 
 The class-level DSL travels with it, which is the one failure you see before a request is ever served:
 
@@ -53,7 +53,19 @@ end
 
 </details>
 
-**3. Update `around_persistence` hooks**, if you have any.
+**3. Delete any `rescue_from` that called `handle_exception`**, if you have one.
+
+```ruby
+# 1.x, on a controller that included GraphitiErrors
+rescue_from Exception do |e|
+  handle_exception(e)
+  Sentry.capture_exception(e) unless registered_exception?(e)
+end
+```
+
+Rendering is middleware's job now, so `handle_exception` is gone and there is nothing left to call. Use `RescueRegistry.handles_exception?` if you still want the check. Exceptions reach your tracker's middleware on their own, and Graphiti's 400s and 404s stay out of `Rails.error` because they sit in Rails' `rescue_responses`.
+
+**4. Update `around_persistence` hooks**, if you have any.
 
 They now receive the already-assigned model where they used to receive the attributes hash, so a hook doing `attributes[:tenant_id] = current_tenant.id` raises. Move that to `before_attributes`, or set it on the model.
 
@@ -97,7 +109,7 @@ To migrate, move attribute-hash modifications to `before_attributes` (which stil
 
 </details>
 
-**4. Wrap specs that assert on error payloads.**
+**5. Wrap specs that assert on error payloads.**
 
 ```ruby
 RSpec.configure do |config|
@@ -113,10 +125,14 @@ end
 
 Exceptions now propagate untouched in tests rather than rendering, so a spec expecting a 404 body sees the exception raised instead. This is the one that breaks the suite that would otherwise have told you the app was fine.
 
+You do not have to edit them one by one. An `around` hook restores 1.x behavior for every request spec, and puts the setting back after each example:
+
+```ruby
+config.around(type: :request) { |example| handle_request_exceptions { example.run } }
+```
+
 <details>
 <summary>Why it has to be a request spec</summary>
-
-Exceptions propagate untouched in tests as of 2.0. A spec that asserts on a rendered error payload sees the exception raised instead, so wrap the request in `handle_request_exceptions`. The setup is [step 4 of the migration](/upgrading#what-you-have-to-change).
 
 It has to be a request spec. Exceptions are rendered in Rack middleware, which controller specs bypass, so the same assertion in a controller spec never sees a rendered payload no matter how it is wrapped.
 
@@ -126,7 +142,7 @@ It has to be a request spec. Exceptions are rendered in Rack middleware, which c
 
 ## Behavior changes to be aware of {#behavior-changes}
 
-Nothing to do here. These change what a client receives or when a callback runs, and none of them warns you, because none of them is a rename.
+Nothing to do here. These change what a client gets back, or when a callback runs, and nothing warns you about them the way the renames below do.
 
 <details>
 <summary>A `belongs_to` renders resource ids when its foreign key already holds them, where 1.x sent only a link</summary>
@@ -207,6 +223,8 @@ register_exception MyApp::Throttled, status: 429, handler: MyApp::ThrottleHandle
 
 Only formats in `config.graphiti.handled_exception_formats` (default `[:jsonapi]`) are rendered by Graphiti. Everything else falls through to Rails.
 
+Registering one of these classes again replaces Graphiti's, and the last call wins. `graphiti_errors` apps often did, `UnsupportedPageSize` at 422 most of all. Put the include at the top of the class and your own registrations below it.
+
 If you subclassed `GraphitiErrors::ExceptionHandler`, note the interface changed with the gem: it is now `build_payload` / `formatted_response` / `status_code`, not `error_payload` / `status_code(error)`.
 
 Registering and customizing handlers is covered in [Error Handling](/topics/error-handling).
@@ -260,7 +278,7 @@ Since 1.8, `Current` was empty inside a concurrent sideload, so `Current.user` r
 
 ## Deprecations you should fix {#deprecations-you-should-fix}
 
-Every name below still works, warns, and will be removed in the next major. They're easy fixes though, so why not now?
+Every name below still works, warns, and goes away in the next major. They are all quick to fix now.
 
 | 1.x | 2.0 |
 | --- | --- |
@@ -310,7 +328,7 @@ One behavior shift: `link: true` on a resource now always renders, even when the
 
 | 1.x | 2.0 |
 | --- | --- |
-| `include GraphitiErrors` | `register_exception` is available on every controller |
+| `include GraphitiErrors` | `include Graphiti::Rails::Controller`, and `register_exception` is on every controller either way |
 | `GraphitiErrors::ExceptionHandler` | subclass `Graphiti::Rails::ExceptionHandler` |
 | `GraphitiErrors.enable!` / `.disable!` | `handle_request_exceptions` |
 | `self.always_include_resource_ids_by_default` | `self.belongs_to_resource_ids_by_default`, which takes `:foreign_key`, `:always` or `:never` |

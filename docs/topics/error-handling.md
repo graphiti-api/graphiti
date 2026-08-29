@@ -137,6 +137,18 @@ class FooController < ApplicationController
 end
 ```
 
+### Replacing Graphiti's own registrations {#replacing}
+
+Registering one of Graphiti's own errors again replaces its entry, and the last call wins. Keep the include above your own:
+
+```ruby
+class ApiController < ActionController::API
+  include Graphiti::Rails::Controller
+
+  register_exception Graphiti::Errors::UnsupportedPageSize, status: 422
+end
+```
+
 ### Titles and details {#copy}
 
 Title and detail come from a locale key named after the error code:
@@ -175,6 +187,26 @@ en:
 `rails g graphiti:locale` writes that file, and `graphiti:install` calls it for you.
 
 A message goes into `meta.message` bare, and `format` joins it to the attribute for `detail`. Where that word order does not suit, a message can name its own `%{attribute}`. Translations hold up inside concurrent sideloads, since `I18n.locale` travels to the pool threads.
+
+### Error reporting {#error-reporting}
+
+Graphiti's client errors are in Rails' `rescue_responses`, so a 400 or 404 renders without being reported to `Rails.error` as an unhandled failure. Rails still logs them, and everything else is reported as before.
+
+This only changes what `Rails.error` hears about. An error tracker with its own middleware still catches everything, so you filter there too.
+
+Exceptions you register yourself are not in there, so a 403 of your own still counts as a failure. Name it the same way Rails names its own:
+
+```ruby
+# config/application.rb
+config.action_dispatch.rescue_responses["MyApp::Forbidden"] = :forbidden
+```
+
+To go the other way and hear about one of Graphiti's, drop it in an initializer, which runs after the railtie that installs them:
+
+```ruby
+# config/initializers/graphiti.rb
+ActionDispatch::ExceptionWrapper.rescue_responses.delete("Graphiti::Errors::RecordNotFound")
+```
 
 ### Advanced {#advanced}
 

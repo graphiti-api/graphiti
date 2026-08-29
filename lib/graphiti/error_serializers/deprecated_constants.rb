@@ -1,25 +1,15 @@
-# The graphiti_errors gem was absorbed into graphiti in 2.0. Only its
-# serializers survived, as Graphiti::ErrorSerializers. The rest of it (the
-# GraphitiErrors controller mixin and its exception handlers) is replaced by
-# rescue_registry rather than renamed, so there is deliberately nothing here to
-# alias it to. A custom error renderer reaching for one of the serializers gets
-# pointed at the new name instead of a bare NameError. Remove in 3.0.
+# Only graphiti_errors' serializers survived the 2.0 merge. Remove in 3.0.
 module GraphitiErrors
-  # `include GraphitiErrors` in ApplicationController was this gem's headline
-  # usage. Including an empty module succeeds, so without this an upgraded app
-  # boots clean and then serves Rails' default HTML error pages instead of
-  # JSON:API ones, with nothing to indicate why.
+  # Including an empty module succeeds, so silence here means HTML error pages.
   def self.included(klass)
     raise <<~MSG
-      GraphitiErrors was merged into graphiti as of 2.0 and `include GraphitiErrors`
-      no longer does anything.
-
-      Exception handling now goes through rescue_registry. Replace it with:
+      GraphitiErrors merged into graphiti in 2.0 and this include does nothing. Use:
 
         include Graphiti::Rails::Controller
 
-      which registers Graphiti's own handlers. Your own go alongside them with
-      `register_exception`, available on every controller.
+      Your own exceptions register alongside Graphiti's with `register_exception`.
+      `registered_exception?` is now `RescueRegistry.handles_exception?`, and
+      `handle_exception` went with the rendering. See graphiti.dev/upgrading.
     MSG
   end
 
