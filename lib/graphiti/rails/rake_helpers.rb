@@ -15,6 +15,11 @@ module Graphiti
         @session ||= ActionDispatch::Integration::Session.new(::Rails.application)
       end
 
+      # An engine runs the task from its own directory, not the host application's root.
+      def schema_path(path = nil)
+        path.nil? ? Graphiti.config.schema_path : File.expand_path(path, Dir.pwd)
+      end
+
       def setup_rails!
         ::Rails.application.eager_load!
         ::Rails.application.config.cache_classes = true

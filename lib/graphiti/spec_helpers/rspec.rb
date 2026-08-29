@@ -127,22 +127,14 @@ module Graphiti
         end
       end
 
-      def self.schema!(resources = nil)
+      def self.schema!(resources = nil, path: nil)
         ::RSpec.describe "Graphiti Schema" do
           it "generates a backwards-compatible schema" do
-            message = <<~MSG
-              Found backwards-incompatibilities in schema! Run with FORCE_SCHEMA=true to ignore.
+            check = Graphiti::Schema.check(resources, path: path || Graphiti.config.schema_path)
+            forced = ENV["FORCE_SCHEMA"] == "true"
+            check.write! if check.compatible? || forced
 
-              Incompatibilities:
-
-            MSG
-
-            errors = Graphiti::Schema.generate!(resources)
-            errors.each do |e|
-              message << "#{e}\n"
-            end
-
-            expect(errors.empty?).to eq(true), message
+            expect(check.compatible? || forced).to eq(true), check.message
           end
         end
       end

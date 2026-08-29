@@ -11,17 +11,16 @@ module Graphiti
       new(resources).generate
     end
 
-    def self.generate!(resources = nil)
-      schema = generate(resources)
+    def self.generate!(resources = nil, path: Graphiti.config.schema_path, force: ENV["FORCE_SCHEMA"] == "true")
+      result = check(resources, path: path)
+      return result.errors if !force && !result.compatible?
 
-      if ENV["FORCE_SCHEMA"] != "true" && File.exist?(Graphiti.config.schema_path)
-        old = JSON.parse(File.read(Graphiti.config.schema_path))
-        errors = Graphiti::SchemaDiff.new(old, schema).compare
-        return errors if errors.any?
-      end
-      FileUtils.mkdir_p(Graphiti.config.schema_path.to_s.gsub("/schema.json", ""))
-      File.write(Graphiti.config.schema_path, JSON.pretty_generate(schema))
+      result.write!
       []
+    end
+
+    def self.check(resources = nil, path: Graphiti.config.schema_path)
+      Check.new(generate(resources), path)
     end
 
     def initialize(resources)

@@ -889,6 +889,21 @@ There are times when you want to accept an incompatibility and move on anyway. I
 $ FORCE_SCHEMA=true bin/rspec
 ```
 
+The same checks run as rake tasks, for a CI step that does not run the suite:
+
+```bash
+$ bin/rake graphiti:schema:check     # fails if the file is missing, outdated, or backwards-incompatible
+$ bin/rake graphiti:schema:generate  # writes it, refusing incompatible changes unless FORCE_SCHEMA=true
+```
+
+Both use `Graphiti.config.schema_path`. An engine that keeps its own schema file passes a path instead, resolved against the directory the task runs in:
+
+```bash
+$ bin/rake "graphiti:schema:check[spec/support/schema.json]"
+```
+
+`schema!` takes the same path as a keyword argument, `Graphiti::SpecHelpers::RSpec.schema!(path: "spec/support/schema.json")`. For anything else, `Graphiti::Schema.check` answers `missing?`, `stale?`, `compatible?` and `errors` for a given path without writing.
+
 ## Generators {#generators}
 
 The [Resource generator](/concepts/resources#generators) will create both Resource and API tests for you. Use these as templates to implement your tests.
