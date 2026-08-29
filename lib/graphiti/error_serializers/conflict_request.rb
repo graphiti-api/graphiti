@@ -11,7 +11,7 @@ module Graphiti
         "conflict"
       end
 
-      def title
+      def default_title
         "Conflict Error"
       end
     end

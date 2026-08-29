@@ -1,4 +1,5 @@
 require_relative "generator_mixin"
+require_relative "locale_generator"
 
 module Graphiti
   class InstallGenerator < ::Rails::Generators::Base
@@ -16,6 +17,8 @@ module Graphiti
     def install
       to = File.join("app/resources", "application_resource.rb")
       template("application_resource.rb.erb", to)
+
+      invoke(Graphiti::LocaleGenerator, [], options)
 
       inject_into_file "app/controllers/application_controller.rb", after: "class ApplicationController < ActionController::API\n" do
         app_controller_code

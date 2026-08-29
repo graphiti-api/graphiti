@@ -1,0 +1,22 @@
+<%- unless omit_comments? -%>
+# Everything Graphiti puts in an errors payload.
+# For another language, add a block below or a graphiti.<locale>.yml file.
+<%- end -%>
+en:
+  graphiti:
+    errors:
+<%- unless omit_comments? -%>
+      # Titles and details are keyed by error code, and Graphiti ships none.
+      # Without a key you get the HTTP status name and no detail.
+      #
+      # internal_server_error:
+      #   title: "Something went wrong"
+      #   detail: "We've probably received an error report already, but please contact us if the issue persists."
+      #
+      # format joins them: "data.attributes.title is an unknown attribute".
+<%- end -%>
+      format: <%= default_format.inspect %>
+      messages:
+<%- default_messages.each do |code, message| -%>
+        <%= code %>: <%= message.inspect %>
+<%- end -%>

@@ -49,6 +49,12 @@ module Graphiti
       end
 
       def title
+        return default_title unless defined?(::I18n)
+
+        ::I18n.t :title, scope: [:graphiti, :errors, code], default: default_title
+      end
+
+      def default_title
         "Request Error"
       end
 

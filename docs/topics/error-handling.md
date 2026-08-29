@@ -15,8 +15,7 @@ the error.
     {
       "code": "internal_server_error",
       "status": "500",
-      "title": "Internal Server Error",
-      "detail": "We've notified our engineers and hope to address this issue shortly."
+      "title": "Internal Server Error"
     }
   ]
 }
@@ -60,7 +59,6 @@ When raw errors are on, the same payload carries the underlying exception under 
       "code": "internal_server_error",
       "status": "500",
       "title": "Internal Server Error",
-      "detail": "We've notified our engineers and hope to address this issue shortly.",
       "meta": {
         "__raw_error__": {
           "message": "EmployeesController::SomeError",
@@ -138,6 +136,45 @@ class FooController < ApplicationController
   register_exception FooError, status: 422
 end
 ```
+
+### Titles and details {#copy}
+
+Title and detail come from a locale key named after the error code:
+
+```yaml
+en:
+  graphiti:
+    errors:
+      internal_server_error:
+        title: "Something went wrong"
+        detail: "We've probably received an error report already, but please contact us if the issue persists."
+      not_found:
+        title: "Not found"
+```
+
+`register_exception`'s own `title:` or `detail:` wins. With no key, the title is the HTTP status name and there is no detail.
+
+Validation messages are keyed the same way, by the code the payload reports in `meta.code`:
+
+```yaml
+en:
+  graphiti:
+    errors:
+      format: "%{attribute} %{message}"
+      messages:
+        missing: "is missing"
+        invalid: "must be an object"
+        invalid_relationship: "is not a valid relationship"
+        unwritable_relationship: "cannot be written"
+        unknown_attribute: "is an unknown attribute"
+        unwritable_attribute: "cannot be written"
+        type_error: "should be type %{type}"
+        attribute_mismatch: "does not match the server endpoint"
+```
+
+`rails g graphiti:locale` writes that file, and `graphiti:install` calls it for you.
+
+A message goes into `meta.message` bare, and `format` joins it to the attribute for `detail`. Where that word order does not suit, a message can name its own `%{attribute}`. Translations hold up inside concurrent sideloads, since `I18n.locale` travels to the pool threads.
 
 ### Advanced {#advanced}
 

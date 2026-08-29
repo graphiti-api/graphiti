@@ -115,6 +115,38 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(response.content_type).to start_with("application/vnd.api+json")
       end
 
+      it "claims nothing on the application's behalf" do
+        get_errors
+
+        expect(json["errors"][0]).to eq(
+          "code" => "internal_server_error",
+          "status" => "500",
+          "title" => "Internal Server Error"
+        )
+      end
+
+      context "when a locale names the error" do
+        around do |example|
+          original = ::I18n.backend
+          ::I18n.backend = ::I18n::Backend::Simple.new
+          ::I18n.backend.store_translations(:en, graphiti: {
+            errors: {internal_server_error: {title: "Omethingsay entway ongwray", detail: "Ytray againway ortlyshay."}}
+          })
+          example.run
+        ensure
+          ::I18n.backend = original
+        end
+
+        it "renders the title and detail from it" do
+          get_errors
+
+          expect(json["errors"][0]).to include(
+            "title" => "Omethingsay entway ongwray",
+            "detail" => "Ytray againway ortlyshay."
+          )
+        end
+      end
+
       # FallbackHandler returns nil for anything outside
       # handled_exception_formats, handing the request back to Rails.
       it "is left to Rails for formats Graphiti does not handle" do

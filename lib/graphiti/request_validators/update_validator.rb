@@ -13,11 +13,7 @@ module Graphiti
 
       def attribute_mismatch(attr_path)
         @error_class = Graphiti::Errors::ConflictRequest
-        @errors.add(
-          attr_path.join("."),
-          :attribute_mismatch,
-          message: "does not match the server endpoint"
-        )
+        @errors.add(attr_path.join("."), :attribute_mismatch)
       end
 
       def required_payload?

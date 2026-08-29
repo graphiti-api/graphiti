@@ -40,6 +40,23 @@ module Graphiti
         end
         super
       end
+
+      private
+
+      def title_from_status
+        translate(:title) || super
+      end
+
+      # rescue_registry's default tells the client its engineers have been notified.
+      def default_detail_for_status
+        translate(:detail)
+      end
+
+      def translate(key)
+        return unless defined?(::I18n)
+
+        ::I18n.t key, scope: [:graphiti, :errors, error_code], default: nil
+      end
     end
 
     class FallbackHandler < ExceptionHandler

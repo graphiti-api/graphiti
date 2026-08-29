@@ -1,7 +1,9 @@
 if ENV["APPRAISAL_INITIALIZED"]
   RSpec.describe "i18n features" do
+    # An earlier lookup leaves the backend initialized, and it reads load_path once.
     before(:all) do
       I18n.load_path << File.expand_path("../../support/locale/documentation_i18n.yml", __dir__)
+      I18n.reload!
     end
 
     describe "Type descriptions" do

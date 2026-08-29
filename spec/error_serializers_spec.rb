@@ -22,6 +22,16 @@ RSpec.describe Graphiti::ErrorSerializers do
       )
     end
 
+    it "takes its title from a locale key named after the code" do
+      original = I18n.backend
+      I18n.backend = I18n::Backend::Simple.new
+      I18n.backend.store_translations(:en, graphiti: {errors: {bad_request: {title: "Equestray Errorway"}}})
+
+      expect(errors[0][:title]).to eq("Equestray Errorway")
+    ensure
+      I18n.backend = original
+    end
+
     it "turns the attribute path into a JSON pointer" do
       source.add(:"filter.tags[0]", :unsupported, message: "is not supported")
 

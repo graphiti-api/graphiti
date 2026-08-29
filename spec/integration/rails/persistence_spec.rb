@@ -310,7 +310,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             make_request
           }.to(raise_error { |e|
             expect(e).to be_a Graphiti::Errors::InvalidRequest
-            expect(e.errors.full_messages).to eq ["data.relationships.positions is unwritable relationship"]
+            expect(e.errors.full_messages).to eq ["data.relationships.positions cannot be written"]
           })
         end
       end
@@ -352,7 +352,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             make_request
           }.to(raise_error { |e|
             expect(e).to be_a Graphiti::Errors::InvalidRequest
-            expect(e.errors.full_messages).to eq ["data.relationships.classification is unwritable relationship"]
+            expect(e.errors.full_messages).to eq ["data.relationships.classification cannot be written"]
           })
         end
       end

@@ -216,6 +216,24 @@ Registering and customizing handlers is covered in [Error Handling](/topics/erro
 </details>
 
 <details>
+<summary>A 500 no longer claims your engineers have been notified</summary>
+
+`rescue_registry` gave every 5xx that detail. Graphiti drops it, so a 500 renders `code`, `status` and `title` alone. To say something there, set a locale key rather than subclassing a handler:
+
+```yaml
+en:
+  graphiti:
+    errors:
+      internal_server_error:
+        title: "Something went wrong"
+        detail: "We've probably received an error report already, but please contact us if the issue persists."
+```
+
+`rails g graphiti:locale` writes the file for you. Keyed by error code, so it works for any status. See [Error Handling](/topics/error-handling#copy).
+
+</details>
+
+<details>
 <summary>`Node#respond_to?` answers `true` for any attribute present in the payload</summary>
 
 `Node#respond_to?` is now a proper `respond_to_missing?`, so `node.respond_to?(:first_name)` returns `true` for attributes present in the payload where it used to return `false`. Nothing to do unless a spec asserted on the old `false`.
