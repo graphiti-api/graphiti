@@ -62,12 +62,6 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
   end
 
-  # Avoid checking, because Rails is defined but we dont have autoloading
-  Graphiti::Sideload.class_eval do
-    def check!
-    end
-  end
-
   require "database_cleaner"
   require "kaminari"
   require "active_record"

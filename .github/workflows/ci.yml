@@ -85,6 +85,12 @@ jobs:
           bundler-cache: true
       - name: Run tests
         run: bundle exec rspec
+      # spec_helper narrows "bundle exec rspec" to spec/integration/rails when
+      # APPRAISAL_INITIALIZED is set, so the step above never runs the library
+      # suite. This is the only cell that runs it against a pinned Rails.
+      - name: Run the library suite against this Rails
+        if: matrix.appraisal
+        run: env -u APPRAISAL_INITIALIZED bundle exec rspec
   example-app:
     name: "Example app (employee_directory)"
     runs-on: ubuntu-latest
