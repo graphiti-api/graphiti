@@ -3,6 +3,8 @@ module Graphiti
     # Walks into related objects so nested writes report against the record
     # that actually failed.
     class Validation
+      include TranslatedTitle
+
       attr_reader :object
 
       def initialize(object, relationship_payloads = {}, relationship_meta = {})
@@ -13,14 +15,14 @@ module Graphiti
 
       def attribute_errors
         [].tap do |errors|
-          each_error do |attribute, message, code|
+          each_error do |attribute, message, validation_code|
             errors << {
-              code: "unprocessable_entity",
+              code: code,
               status: "422",
-              title: "Validation Error",
+              title: title,
               detail: detail_for(attribute, message),
               source: {pointer: pointer_for(object, attribute)},
-              meta: meta_for(attribute, message, code, @relationship_meta)
+              meta: meta_for(attribute, message, validation_code, @relationship_meta)
             }
           end
         end
@@ -33,6 +35,14 @@ module Graphiti
       end
 
       private
+
+      def code
+        "unprocessable_entity"
+      end
+
+      def default_title
+        "Validation Error"
+      end
 
       def each_error
         object.errors.messages.each_pair do |attribute, messages|

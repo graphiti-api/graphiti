@@ -111,6 +111,17 @@ RSpec.describe Graphiti::ErrorSerializers do
       )
     end
 
+    it "takes its title from a locale key named after the code" do
+      original = I18n.backend
+      I18n.backend = I18n::Backend::Simple.new
+      I18n.backend.store_translations(:en, graphiti: {errors: {unprocessable_entity: {title: "Nope"}}})
+
+      expect(errors[0][:title]).to eq("Nope")
+      expect(errors[0][:code]).to eq("unprocessable_entity")
+    ensure
+      I18n.backend = original
+    end
+
     it "is empty for an object that cannot have errors" do
       expect(described_class.new(Object.new).errors).to eq([])
     end

@@ -1,6 +1,8 @@
 module Graphiti
   module ErrorSerializers
     class InvalidRequest
+      include TranslatedTitle
+
       STATUS = 400
 
       attr_reader :source
@@ -46,12 +48,6 @@ module Graphiti
 
       def code
         "bad_request"
-      end
-
-      def title
-        return default_title unless defined?(::I18n)
-
-        ::I18n.t :title, scope: [:graphiti, :errors, code], default: default_title
       end
 
       def default_title

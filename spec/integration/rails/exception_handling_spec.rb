@@ -147,6 +147,33 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
       end
 
+      # The override dropped rescue_registry's status_code >= 500 guard, so the
+      # lookup runs at every status the fallback passes through to.
+      context "when the exception passes through to a status of its own" do
+        let(:error) { ActionController::RoutingError.new("nope") }
+
+        around do |example|
+          original = ::I18n.backend
+          ::I18n.backend = ::I18n::Backend::Simple.new
+          ::I18n.backend.store_translations(:en, graphiti: {
+            errors: {not_found: {detail: "Onegay orevermoreflay."}}
+          })
+          example.run
+        ensure
+          ::I18n.backend = original
+        end
+
+        it "reads the detail keyed by that status, not the fallback's" do
+          get_errors
+
+          expect(response.status).to eq(404)
+          expect(json["errors"][0]).to include(
+            "code" => "not_found",
+            "detail" => "Onegay orevermoreflay."
+          )
+        end
+      end
+
       # FallbackHandler returns nil for anything outside
       # handled_exception_formats, handing the request back to Rails.
       it "is left to Rails for formats Graphiti does not handle" do
