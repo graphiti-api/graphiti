@@ -278,51 +278,100 @@ Since 1.8, `Current` was empty inside a concurrent sideload, so `Current.user` r
 
 ## Deprecations you should fix {#deprecations-you-should-fix}
 
-Every name below still works, warns, and goes away in the next major. They are all quick to fix now.
+Every name below still works, warns, and goes away in the next major. They're all pretty easy fixes though, so why not now?
+
+### Requires you can delete {#deprecated-requires}
 
 | 1.x | 2.0 |
 | --- | --- |
-| `require "graphiti_spec_helpers/rspec"` | `require "graphiti/spec_helpers/rspec"` |
-| `GraphitiSpecHelpers::RSpec` / `::Sugar` / `::Errors::*` | `Graphiti::SpecHelpers::*` |
-| `include Graphiti::SpecHelpers::Sugar` (`d`, `included`, `errors`, `dt`) | call `jsonapi_data`, `jsonapi_included`, `jsonapi_errors`, `json_datetime` directly |
 | `require "graphiti-rails"` | remove / no longer needed |
+| `require "graphiti_errors"`, `require "graphiti/responders"` | remove / no longer needed |
+| `require "graphiti_spec_helpers/rspec"` | `require "graphiti/spec_helpers/rspec"` |
+
+### Includes and constants {#deprecated-includes}
+
+| 1.x | 2.0 |
+| --- | --- |
 | `include Graphiti::Rails` | `include Graphiti::Rails::Controller`|
 | `include Graphiti::Responders` | `include Graphiti::Rails::Responders` |
 | `jsonapi_context` | `graphiti_context` |
+| `Graphiti::Rails::DEPRECATOR` | `Graphiti::DEPRECATOR` (the old name still resolves) |
+
+### Error serializers {#deprecated-error-serializers}
+
+| 1.x | 2.0 |
+| --- | --- |
 | `GraphitiErrors::Validation::Serializer` | `Graphiti::ErrorSerializers::Validation` |
 | `GraphitiErrors::InvalidRequest::Serializer` | `Graphiti::ErrorSerializers::InvalidRequest` |
 | `GraphitiErrors::ConflictRequest::Serializer` | `Graphiti::ErrorSerializers::ConflictRequest` |
+
+### Spec helpers {#deprecated-spec-helpers}
+
+| 1.x | 2.0 |
+| --- | --- |
+| `GraphitiSpecHelpers::RSpec` / `::Sugar` / `::Errors::*` | `Graphiti::SpecHelpers::*` |
+| `include Graphiti::SpecHelpers::Sugar` (`d`, `included`, `errors`, `dt`) | call `jsonapi_data`, `jsonapi_included`, `jsonapi_errors`, `json_datetime` directly |
 | rspec shared contexts `"resource testing"`, `"remote api"` | `"graphiti resource testing"`, `"graphiti remote api"` |
 | `GraphitiContextProxy` | `Graphiti::SpecHelpers::ContextProxy` |
 | `context_namespace` | `current_action` |
-| `Graphiti::Rails::DEPRECATOR` | `Graphiti::DEPRECATOR` (the old name still resolves) |
-| `require "graphiti_errors"`, `require "graphiti/responders"` | remove / no longer needed |
-| `always_include_resource_ids: true` on a relationship | `resource_ids: true` |
-| `Graphiti.config.links_on_demand = true` | `self.relationship_links = :on_demand` on ApplicationResource |
-| `Graphiti.config.pagination_links = true` | `self.page_links = true` on ApplicationResource |
-| `Graphiti.config.pagination_links_on_demand = true` | `self.page_links = :on_demand` on ApplicationResource |
-| `Graphiti.config.typecast_reads = false` | `self.typecast_reads = false` on ApplicationResource |
+
+### Move these off `Graphiti.config` {#deprecated-global-config}
+
+These are now resource settings. Set them on `ApplicationResource` to keep the old API-wide behavior, or on individual resources to scope them.
+
+| 1.x | 2.0 |
+| --- | --- |
+| `Graphiti.config.links_on_demand = true` | `self.relationship_links = :on_demand` |
+| `Graphiti.config.pagination_links = true` | `self.page_links = true` |
+| `Graphiti.config.pagination_links_on_demand = true` | `self.page_links = :on_demand` |
+| `Graphiti.config.typecast_reads = false` | `self.typecast_reads = false` |
+
+### Link rendering {#deprecated-links}
+
+| 1.x | 2.0 |
+| --- | --- |
 | `self.autolink = false` | `self.relationship_links = false` |
-| `self.validate_endpoints = false` | `self.validate_requests = false`, `self.validate_links = false` |
+
+Link rendering is one mode per link now. It takes `true`, `false`, or `:on_demand`, which renders only when the request asks with `?links=true`. `self.relationship_links` sets the resource default and `link:` overrides it per relationship.
+
+One behavior shift: `link: true` on a resource now always renders, even when the resource is `:on_demand`. Under the old global `links_on_demand` it stayed hidden until `?links=true`, so change those to `link: :on_demand`.
+
+### Pagination {#deprecated-pagination}
+
+| 1.x | 2.0 |
+| --- | --- |
 | `self.default_page_size = 10` | `self.page_default_size = 10` |
 | `self.max_page_size = 500` | `self.page_max_size = 500` |
 | `self.cursor_paginatable = true` | `self.page_cursors = true` |
+
+Everything relating to the `page` param shares its prefix: `page_default_size`, `page_max_size`, `page_cursors` and `page_links`. The on-demand param follows, so use `?page_links=true` (`?pagination_links=true` still works). `page_links` takes the same three modes as `relationship_links`, but has no per-relationship level.
+
+### Filter blanks {#deprecated-filter-blanks}
+
+| 1.x | 2.0 |
+| --- | --- |
 | `self.filters_accept_nil_by_default = true` | `self.filter_blanks_treated_as = :null` |
 | `self.filters_deny_empty_by_default = true` | `self.filter_blanks_treated_as = :rejected` |
 | `filter :name, allow_nil: true` | `filter :name, blanks: :null` |
 | `filter :name, deny_empty: true` | `filter :name, blanks: :rejected` |
 
-Link rendering is one mode per link now. It takes `true`, `false`, or `:on_demand`, which renders only when the request asks with `?links=true` (or `?page_links=true` for the pagination set). `self.relationship_links` sets the resource default, `link:` overrides it per relationship, and `self.page_links` does the same for pagination links, which have no per-relationship level. Set them on `ApplicationResource` for the old global behavior.
-
-Everything relating to the `page` param shares its prefix: `page_default_size`, `page_max_size`, `page_cursors` and `page_links`. The on-demand param follows, so use `?page_links=true` (`?pagination_links=true` still works).
-
 `allow_nil:` and `deny_empty:` were two booleans answering one question, and they contradicted each other on `"null"`. The empty check raised before the coercion could run. One `blanks:` option replaces them, taking `:literal`, `:null` or `:rejected`, defaulted by `filter_blanks_treated_as`.
+
+### Endpoint validation {#deprecated-endpoint-validation}
+
+| 1.x | 2.0 |
+| --- | --- |
+| `self.validate_endpoints = false` | `self.validate_requests = false`, `self.validate_links = false` |
 
 `validate_endpoints` did two unrelated jobs, so it split. `validate_requests` refuses requests to undeclared endpoints, and `validate_links` refuses to render links to unroutable ones. The old name sets both, and turning off link validation no longer disarms the inbound guard.
 
-One behavior shift: `link: true` on a resource now always renders, even when the resource is `:on_demand`. Under the old global `links_on_demand` it stayed hidden until `?links=true`, so change those to `link: :on_demand`.
+### Relationship resource ids {#deprecated-resource-ids}
 
-`RSpec.describe PostResource, type: :resource` still picks up the resource-testing context automatically. That has not changed.
+| 1.x | 2.0 |
+| --- | --- |
+| `always_include_resource_ids: true` on a relationship | `resource_ids: true` |
+
+The resource-wide version of this setting was removed rather than deprecated. See [`always_include_resource_ids_by_default`](#removed-outright) below.
 
 ## Removed outright {#removed-outright}
 
@@ -333,7 +382,7 @@ One behavior shift: `link: true` on a resource now always renders, even when the
 | `GraphitiErrors.enable!` / `.disable!` | `handle_request_exceptions` |
 | `self.always_include_resource_ids_by_default` | `self.belongs_to_resource_ids_by_default`, which takes `:foreign_key`, `:always` or `:never` |
 
-`always_include_resource_ids_by_default` only ever shipped in `2.0.0.beta.4`, so it is gone rather than deprecated and raises `NoMethodError` at class-definition time. It applied to every relationship type, and only a `belongs_to` can render resource ids without loading an association, so the replacement covers `belongs_to` alone. `= false` becomes `:never`. There is no equivalent of `= true`, because arming every collection API-wide is the behavior it was removed for. Use `:always` for `belongs_to`.
+`always_include_resource_ids_by_default` raises `NoMethodError` at class-definition time. It applied to every relationship type, and only a `belongs_to` can render resource ids without loading an association, so the replacement covers `belongs_to` alone. `= false` becomes `:never`. There is no equivalent of `= true`, because arming every collection API-wide is the behavior it was removed for. Use `:always` for `belongs_to`.
 
 ## Without Rails {#without-rails}
 

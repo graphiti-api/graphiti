@@ -164,7 +164,7 @@ en:
         title: "Not found"
 ```
 
-`register_exception`'s own `title:` or `detail:` wins. With no key, the title is the HTTP status name and there is no detail.
+`register_exception`'s own `title:` or `detail:` wins, and Graphiti registers its own client errors with `detail: :exception` so each reports the specific problem. With no key, the title is the HTTP status name and there is no detail.
 
 Validation messages are keyed the same way, by the code the payload reports in `meta.code`:
 
