@@ -171,7 +171,8 @@ module Graphiti
       code << %(, controller: "#{controller_path}") if options[:controller]
       code << %(, only: [#{actions.map { |a| ":#{a}" }.join(", ")}]) if actions.length < 5
       code << "\n"
-      inject_into_file "config/routes.rb", after: /ApplicationResource.*$\n/ do
+      # Matches the install generator's scope, including its pre-2.0 form.
+      inject_into_file "config/routes.rb", after: /format: :jsonapi.*$\n/ do
         indent(code, 4)
       end
     end

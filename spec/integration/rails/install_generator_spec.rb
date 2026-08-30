@@ -45,10 +45,50 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     after { FileUtils.remove_entry(destination) }
 
+    it "still finishes when the app has no rails_helper to inject into" do
+      install!
+
+      expect(generated("config/routes.rb")).to include("scope path:")
+    end
+
+    it "wires the schema check into an existing rails_helper" do
+      FileUtils.mkdir_p(File.join(destination, "spec"))
+      File.write(File.join(destination, "spec/rails_helper.rb"), <<~RUBY)
+        RSpec.configure do |config|
+        end
+      RUBY
+
+      install!
+
+      expect(generated("spec/rails_helper.rb")).to include("Graphiti::SpecHelpers::RSpec.schema!")
+      expect(generated("config/routes.rb")).to include("scope path:")
+    end
+
     it "writes the locale file too" do
       install!
 
       expect(File.exist?(File.join(destination, "config/locales/graphiti.en.yml"))).to eq(true)
+    end
+
+    it "leaves config/application.rb alone" do
+      install!
+
+      expect(generated("config/application.rb")).to_not include("default_url_options")
+    end
+
+    it "scopes routes under the namespace without naming ApplicationResource" do
+      install!
+
+      expect(generated("config/routes.rb"))
+        .to include(%(scope path: "/api/v1", defaults: {format: :jsonapi} do))
+      expect(generated("config/routes.rb")).to_not include("ApplicationResource")
+    end
+
+    it "gives ApplicationResource a base_url that stands on its own" do
+      install!
+
+      expect(generated("app/resources/application_resource.rb"))
+        .to include(%(self.base_url = ENV.fetch('BASE_URL', 'http://localhost:3000')))
     end
   end
 end

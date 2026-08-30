@@ -26,7 +26,7 @@ you already have Vandal installed. Check your routes to see it mounted.
 
 ```ruby
 # config/routes.rb
-scope path: ApplicationResource.endpoint_namespace, defaults: { format: :jsonapi } do
+scope path: "/api/v1", defaults: {format: :jsonapi} do
   # ... routes ...
   mount VandalUi::Engine, at: '/vandal'
 end

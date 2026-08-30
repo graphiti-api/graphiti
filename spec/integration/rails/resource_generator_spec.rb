@@ -34,8 +34,8 @@ if ENV["APPRAISAL_INITIALIZED"]
       hide_const("PostResource")
 
       FileUtils.mkdir_p(File.join(destination, "config"))
-      # The shape the install generator leaves behind. Resource routes are
-      # injected after the scope line, which is matched on ApplicationResource.
+      # The shape apps installed before 2.0 still have. Resource routes are
+      # injected after the scope line, matched on its format default.
       File.write(File.join(destination, "config/routes.rb"), <<~RUBY)
         Rails.application.routes.draw do
           scope path: ApplicationResource.endpoint_namespace, defaults: { format: :jsonapi } do
@@ -74,6 +74,19 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
 
       it "routes the resource under the configured namespace" do
+        expect(generated("config/routes.rb")).to include("resources :posts")
+      end
+
+      it "routes into the scope the current install generator writes" do
+        File.write(File.join(destination, "config/routes.rb"), <<~RUBY)
+          Rails.application.routes.draw do
+            scope path: "/api/v1", defaults: {format: :jsonapi} do
+            end
+          end
+        RUBY
+
+        generate!("Post", "title:string")
+
         expect(generated("config/routes.rb")).to include("resources :posts")
       end
 

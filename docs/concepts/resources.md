@@ -580,9 +580,9 @@ class ApplicationResource < Graphiti::Resource
   self.attributes_filterable_by_default = true
 
   # Used for link generation
-  self.base_url = Rails.application.routes.default_url_options[:host]
+  self.base_url = ENV.fetch('BASE_URL', 'http://localhost:3000')
   # Suggest referencing this in config/routes.rb:
-  #   scope path: ApplicationResource.endpoint_namespace do
+  #   scope path: '/api/v1' do
   #     resources :posts
   #   end
   self.endpoint_namespace = '/api/v1'

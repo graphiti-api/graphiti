@@ -1,21 +1,18 @@
 <%- unless omit_comments? -%>
-# ApplicationResource is similar to ApplicationRecord - a base class that
-# holds configuration/methods for subclasses.
 # All Resources should inherit from ApplicationResource.
 <%- end -%>
 class ApplicationResource < Graphiti::Resource
-  <%- unless omit_comments? -%>
-  # Use the ActiveRecord Adapter for all subclasses.
-  # Subclasses can still override this default.
-  <%- end -%>
   self.abstract_class = true
   self.adapter = Graphiti::Adapters::ActiveRecord
-  self.base_url = Rails.application.routes.default_url_options[:host]
+  <%- unless omit_comments? -%>
+  # Or follow config/environments:
+  #   self.base_url = ActionDispatch::Http::URL.url_for(Rails.application.routes.default_url_options)
+  <%- end -%>
+  self.base_url = ENV.fetch('BASE_URL', 'http://localhost:3000')
   self.endpoint_namespace = '<%= api_namespace %>'
   <%- unless omit_comments? -%>
 
-  # Defaults every Resource inherits. Uncomment to change them API-wide, or set
-  # them on individual Resources. See https://graphiti.dev/concepts/resources
+  # Defaults every Resource inherits. See https://graphiti.dev/concepts/resources
   <%- resource_setting_groups.each_pair do |group, lines| -%>
 
   # <%= group.to_s.humanize %>

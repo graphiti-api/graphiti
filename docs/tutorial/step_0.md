@@ -26,7 +26,7 @@ Feel free to run `git diff` to see what the generator did, otherwise commit the 
 You'll see some boilerplate in `config/routes.rb`:
 
 ```ruby
-scope path: ApplicationResource.endpoint_namespace, defaults: { format: :jsonapi } do
+scope path: "/api/v1", defaults: {format: :jsonapi} do
   # your routes go here
 end
 ```
@@ -44,8 +44,7 @@ class ApplicationResource < Graphiti::Resource
   self.adapter = Graphiti::Adapters::ActiveRecord
 
   # Links are generated from base_url + endpoint_namespace
-  self.base_url = Rails.application.routes
-    .default_url_options[:host]
+  self.base_url = ENV.fetch('BASE_URL', 'http://localhost:3000')
   self.endpoint_namespace = '/api/v1'
 end
 ```
@@ -53,27 +52,15 @@ end
 This should be pretty self-explanatory except for
 
 ```ruby
-self.base_url = Rails.application.routes
-  .default_url_options[:host]
+self.base_url = ENV.fetch('BASE_URL', 'http://localhost:3000')
 ```
 
-This is configured in `config/application.rb`:
-
-```ruby
-module EmployeeDirectory
-  class Application < Rails::Application
-    routes.default_url_options[:host] = ENV.fetch('HOST', 'http://localhost:3000')
-    # ... code ...
-  end
-end
-```
-
-When deriving and validating [Links](/concepts/links), we'll use the `HOST` variable if
+When deriving and validating [Links](/concepts/links), we'll use the `BASE_URL` variable if
 present, falling back to the Rails development default of
-`http://localhost:3000`. This means our Links will look like:
+`http://localhost:3000`. Unlike a Rails URL helper this needs the scheme and port, because it is the whole prefix every link is built on. This means our Links will look like:
 
 ```ruby
-"#{ENV['HOST']}/#{ApplicationRecord.endpoint_namespace}/#{Resource.type}"
+"#{ENV['BASE_URL']}/#{Resource.endpoint_namespace}/#{Resource.type}"
 ```
 
 For example:
