@@ -1,5 +1,20 @@
 graphiti changelog
 
+# [2.0.0-beta.12](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.11...v2.0.0-beta.12) (2026-08-30)
+
+
+### Bug Fixes
+
+* compare each concurrency path against itself in the table to better illustrate the performance wins ([d0f0e92](https://github.com/graphiti-api/graphiti/commit/d0f0e92860b3b4affe3fca6dbb9b871fe8a1374f))
+
+
+### Features
+
+* add schema rake tasks, so checking a schema no longer means running the suite ([6f4783d](https://github.com/graphiti-api/graphiti/commit/6f4783d5654659125b7eb358bf1175b6feaacb7c))
+* declare Graphiti's client errors in rescue_responses ([e369824](https://github.com/graphiti-api/graphiti/commit/e369824d6e11b671ffd212caad3d0a43a7ceefcf))
+* mark deprecated settings in the generated ApplicationResource ([52b0642](https://github.com/graphiti-api/graphiti/commit/52b0642e689a16d14dacaf4e28a2641f10774cf0))
+* take error text from locale keys ([d01fd06](https://github.com/graphiti-api/graphiti/commit/d01fd06fc1ede8c3dd798ec48de4d5b01645d87e)), closes [#216](https://github.com/graphiti-api/graphiti/issues/216)
+
 # [2.0.0-beta.11](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.10...v2.0.0-beta.11) (2026-08-27)
 
 
