@@ -618,7 +618,7 @@ describe 'updating' do
 
   it 'works' do
     expect {
-      expect(instance.update_attributes).to eq(true)
+      expect(instance.update).to eq(true)
     }.to change { employee.reload.updated_at }
      .and change { employee.first_name }.to('changed!')
   end

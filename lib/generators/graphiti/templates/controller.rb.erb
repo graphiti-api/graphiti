@@ -56,7 +56,7 @@ class <%= controller_class_name %> < ApplicationController
   def update
     <%= file_name %> = <%= resource_klass %>.find(params)
 
-    if <%= file_name %>.update_attributes
+    if <%= file_name %>.update
       render jsonapi: <%= file_name %>
     else
       render jsonapi_errors: <%= file_name %>

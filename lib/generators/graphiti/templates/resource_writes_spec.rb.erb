@@ -45,7 +45,7 @@ RSpec.describe <%= resource_class %>, type: :resource do
 
     xit 'works (add some attributes and enable this spec)' do
       expect {
-        expect(instance.update_attributes).to eq(true)
+        expect(instance.update).to eq(true)
       }.to change { <%= var %>.reload.updated_at }
       # .and change { <%= var %>.foo }.to('bar') <- example
     end
