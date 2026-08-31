@@ -26,6 +26,7 @@ module Graphiti
       @parents = parents
       @action = parse_action(action)
       @entity_map = Concurrent::Map.new if parents.empty?
+      @association_owners = Concurrent::Map.new if parents.empty?
     end
 
     def association?
@@ -37,6 +38,12 @@ module Graphiti
       return root.entity_map unless root == self
 
       @entity_map
+    end
+
+    def association_owners
+      return root.association_owners unless root == self
+
+      @association_owners
     end
 
     # Deduplication exists for a row two include paths both resolve, so a

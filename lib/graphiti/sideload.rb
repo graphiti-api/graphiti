@@ -61,6 +61,27 @@ module Graphiti
       self.scope_proc = blk
     end
 
+    ASSIGNING_QUERY = :__graphiti_assigning_query
+    private_constant :ASSIGNING_QUERY
+
+    def self.assigning_node(query)
+      return yield if query.nil?
+
+      previous = Fiber[ASSIGNING_QUERY]
+      Fiber[ASSIGNING_QUERY] = query
+      yield
+    ensure
+      Fiber[ASSIGNING_QUERY] = previous unless query.nil?
+    end
+
+    def self.current_assigning_query
+      Fiber[ASSIGNING_QUERY]
+    end
+
+    def self.assigned?(query, record, association_name)
+      query.association_owners.key?([record.object_id, association_name])
+    end
+
     def self.assign(&blk)
       self.assign_proc = blk
     end
@@ -365,7 +386,7 @@ module Graphiti
 
       if self.class.scope_proc
         build_sideload_scope(parents, query, graph_parent).resolve do |sideload_results|
-          fire_assign(parents, sideload_results)
+          fire_assign(parents, sideload_results, query)
         end
       else
         sync_load(parents, query, graph_parent, &proxy_block)
@@ -378,7 +399,7 @@ module Graphiti
 
       if self.class.scope_proc
         build_sideload_scope(parents, query, graph_parent).future_resolve do |sideload_results|
-          fire_assign(parents, sideload_results)
+          fire_assign(parents, sideload_results, query)
         end
       else
         future_load(parents, query, graph_parent, &proxy_block)
@@ -413,10 +434,14 @@ module Graphiti
     end
 
     def associate_all(parent, children)
+      return unless claim_association(parent)
+
       parent_resource.associate_all(parent, children, association_name, type)
     end
 
     def associate(parent, child)
+      return unless claim_association(parent)
+
       parent_resource.associate(parent, child, association_name, type)
     end
 
@@ -506,7 +531,7 @@ module Graphiti
         opts[:sideload_parent_length] = parents.length
         opts[:query] = query
         opts[:after_resolve] = ->(results) {
-          fire_assign(parents, results)
+          fire_assign(parents, results, query)
         }
       end
     end
@@ -519,14 +544,26 @@ module Graphiti
       end
     end
 
-    def fire_assign(parents, children)
-      with_error_handling Errors::SideloadAssignError do
-        if self.class.assign_proc
-          instance_exec(parents, children, &self.class.assign_proc)
-        else
-          assign(parents, children)
+    def fire_assign(parents, children, query = nil)
+      self.class.assigning_node(query) do
+        with_error_handling Errors::SideloadAssignError do
+          if self.class.assign_proc
+            instance_exec(parents, children, &self.class.assign_proc)
+          else
+            assign(parents, children)
+          end
         end
       end
+    end
+
+    # A record can be shared by two nodes of the include tree, and a node that narrows
+    # differently returns different rows, so the first node to populate an association owns it.
+    def claim_association(parent)
+      query = self.class.current_assigning_query
+      return true if query.nil?
+
+      key = [parent.object_id, association_name]
+      query.association_owners.compute_if_absent(key) { query.hash } == query.hash
     end
 
     def with_error_handling(error_class)
