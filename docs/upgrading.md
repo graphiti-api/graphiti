@@ -102,8 +102,8 @@ To migrate, move attribute-hash modifications to `before_attributes` (which stil
 
 #### Fine print
 
-- If you inspect the model before saving, the attributes callbacks run at inspection time (in your controller, outside the save transaction). On the plain `save` path they run inside the transaction, at the same point as 1.x.
-- Writable guards judge persisted state: a guard asking for the model gets a fresh build/find, never the current request's unsaved changes. A payload cannot influence its own authorization.
+- If you inspect the model before saving, the attributes callbacks run at inspection time (in the controller) outside the save transaction, and before sideposted parents are persisted. On the plain `save` path they run inside the transaction, at the same point as 1.x. If a hook needs the foreign key of a sideposted parent, use `before_save` instead, which always gets the model with those keys set.
+- A writable guard asking for the model gets a fresh build/find, never the current request's unsaved changes.
 - Sideposted child models are still built and assigned during save, and `data` exposes the pre-assigned root model only.
 - The 1.x runtime warning fires when a hook mutates the hash, which is all it can detect. A hook that only reads it (e.g. Rails.logger.info `attributes[:name]`) gets no warning and now reads the model instead. On ActiveRecord `model[:name]` still answers, but hash-only calls like `attributes.key?`, `dig` or `except` raise.
 
