@@ -77,7 +77,7 @@ module Graphiti
       end
 
       def register_mime_type
-        Mime::Type.register(MEDIA_TYPE, :jsonapi)
+        Mime::Type.register(MEDIA_TYPE, :jsonapi) if Mime[:jsonapi].nil?
       end
 
       def register_parameter_parser
