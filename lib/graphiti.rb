@@ -51,18 +51,20 @@ module Graphiti
 
   # @api private
   def self.context
-    Thread.current[:context] ||= {}
+    Thread.current[:context] ||= ContextHash.new
   end
 
   # @api private
   def self.context=(val)
-    Thread.current[:context] = val
+    Thread.current[:context] = ContextHash.new.tap do |hash|
+      val.each { |key, value| hash[key] = value }
+    end
   end
 
   # @api private
-  def self.with_context(obj, namespace = nil)
+  def self.with_context(obj, action = nil)
     prior = context
-    self.context = {object: obj, namespace: namespace}
+    self.context = {object: obj, action: action}
     yield
   ensure
     self.context = prior
@@ -169,6 +171,7 @@ require "graphiti/version"
 require "graphiti/jsonapi_serializable_ext"
 require "graphiti/configuration"
 require "graphiti/context"
+require "graphiti/context_hash"
 require "graphiti/errors"
 require "graphiti/types"
 require "graphiti/audit"

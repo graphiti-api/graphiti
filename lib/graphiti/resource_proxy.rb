@@ -177,9 +177,9 @@ module Graphiti
     def save(action: :create)
       # TODO: remove this. Only used for persisting many-to-many with AR
       # (see activerecord adapter)
-      original = Graphiti.context[:namespace]
+      original = Graphiti.context[:action]
       begin
-        Graphiti.context[:namespace] = action
+        Graphiti.context[:action] = action
         # An assigned model can only come from #assign_attributes, which
         # validated the payload it stored - re-validating here would run the
         # writable guards (and their guard_model lookups) a redundant time.
@@ -194,12 +194,12 @@ module Graphiti
             assigned_model: @assigned_model
         }
       ensure
-        Graphiti.context[:namespace] = original
+        Graphiti.context[:action] = original
       end
       @data, success = validator.to_a
 
       if success
-        # If the context namespace is `update` or `create`, certain
+        # If the context action is `update` or `create`, certain
         # adapters will cause N+1 validation calls, so lets explicitly
         # switch to a lookup context.
         Graphiti.with_context(Graphiti.context[:object], :show) do

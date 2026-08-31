@@ -297,6 +297,13 @@ Every name below still works, warns, and goes away in the next major. They're al
 | `jsonapi_context` | `graphiti_context` |
 | `Graphiti::Rails::DEPRECATOR` | `Graphiti::DEPRECATOR` (the old name still resolves) |
 
+### Request context {#deprecated-context}
+
+| 1.x | 2.0 |
+| --- | --- |
+| `context_namespace` | `current_action` |
+| `Graphiti.context[:namespace]` | `current_action` |
+
 ### Error serializers {#deprecated-error-serializers}
 
 | 1.x | 2.0 |
@@ -313,7 +320,6 @@ Every name below still works, warns, and goes away in the next major. They're al
 | `include Graphiti::SpecHelpers::Sugar` (`d`, `included`, `errors`, `dt`) | call `jsonapi_data`, `jsonapi_included`, `jsonapi_errors`, `json_datetime` directly |
 | rspec shared contexts `"resource testing"`, `"remote api"` | `"graphiti resource testing"`, `"graphiti remote api"` |
 | `GraphitiContextProxy` | `Graphiti::SpecHelpers::ContextProxy` |
-| `context_namespace` | `current_action` |
 
 ### Move these off `Graphiti.config` {#deprecated-global-config}
 

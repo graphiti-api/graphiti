@@ -421,7 +421,7 @@ module Graphiti
     end
 
     def parse_action(action)
-      action ||= @params.fetch(:action, Graphiti.context[:namespace]).try(:to_sym)
+      action ||= @params.fetch(:action, Graphiti.context[:action]).try(:to_sym)
       case action
       when :index
         :all

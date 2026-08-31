@@ -37,8 +37,8 @@ module Graphiti
       end
     end
 
-    def with_context(object, namespace = nil)
-      Graphiti.with_context(object, namespace) do
+    def with_context(object, action = nil)
+      Graphiti.with_context(object, action) do
         yield
       end
     end
@@ -55,7 +55,7 @@ module Graphiti
     # is called, not a fixed list. Persistence overrides it with :create/:update
     # while saving, and :show while resolving sideloads afterwards.
     def self.current_action
-      Graphiti.context[:namespace]
+      Graphiti.context[:action]
     end
 
     def current_action

@@ -4,7 +4,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       def index
         render json: {
           object: Graphiti.context[:object].class.name,
-          namespace: Graphiti.context[:namespace]
+          action: Graphiti.context[:action]
         }
       end
     end
@@ -19,9 +19,9 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     it "wraps the action in a context of the controller and the action name" do
       wrapped = nil
-      allow(Graphiti).to receive(:with_context).and_wrap_original do |original, object, namespace, &block|
-        wrapped = [object, namespace]
-        original.call(object, namespace, &block)
+      allow(Graphiti).to receive(:with_context).and_wrap_original do |original, object, action, &block|
+        wrapped = [object, action]
+        original.call(object, action, &block)
       end
 
       get :index
@@ -34,7 +34,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       body = JSON.parse(response.body)
       expect(body["object"]).to eq(controller.class.name)
-      expect(body["namespace"]).to eq("index")
+      expect(body["action"]).to eq("index")
     end
 
     it "unsets the context once the action returns" do
