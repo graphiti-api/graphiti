@@ -159,7 +159,7 @@ module Graphiti
       params = normalized_params_copy(params)
       add_endpoint_filter(params, action)
       validator = ::Graphiti::RequestValidator.new(@resource, params, action)
-      validator.validate!
+      with_context_action(action) { validator.validate! }
 
       if @assigned_model && same_write_payload?(validator.deserialized_payload)
         return @assigned_model
@@ -174,27 +174,31 @@ module Graphiti
       )
     end
 
-    def save(action: :create)
-      # TODO: remove this. Only used for persisting many-to-many with AR
-      # (see activerecord adapter)
+    # TODO: remove this. Only used for persisting many-to-many with AR
+    # (see activerecord adapter)
+    def with_context_action(action)
       original = Graphiti.context[:action]
-      begin
-        Graphiti.context[:action] = action
+      Graphiti.context[:action] = action
+      yield
+    ensure
+      Graphiti.context[:action] = original
+    end
+
+    def save(action: :create)
+      validator = with_context_action(action) do
         # An assigned model can only come from #assign_attributes, which
         # validated the payload it stored - re-validating here would run the
         # writable guards (and their guard_model lookups) a redundant time.
         unless @assigned_model
           ::Graphiti::RequestValidator.new(@resource, @payload.params, action).validate!
         end
-        validator = persist {
+        persist {
           @resource.persist_with_relationships \
             @payload.meta(action: action),
             @payload.attributes,
             @payload.relationships,
             assigned_model: @assigned_model
         }
-      ensure
-        Graphiti.context[:action] = original
       end
       @data, success = validator.to_a
 
