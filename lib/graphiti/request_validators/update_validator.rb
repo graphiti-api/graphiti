@@ -28,7 +28,7 @@ module Graphiti
       end
 
       def payload_matches_endpoint?
-        unless @params.dig(:data, :id) == @params.dig(:filter, :id)
+        unless @params.dig(:data, :id).to_s == @params.dig(:filter, :id).to_s
           attribute_mismatch([:data, :id])
         end
 
