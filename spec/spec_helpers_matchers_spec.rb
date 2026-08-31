@@ -58,6 +58,16 @@ RSpec.describe Graphiti::SpecHelpers::Matchers do
       expect(resource).not_to belong_to_resource(:author)
         .with_options(foreign_key: :wrong_id)
     end
+
+    it "matches on options backed by predicate methods" do
+      expect(resource).to belong_to_resource(:author)
+        .with_options(readable: true, writable: true, single: false)
+    end
+
+    it "fails when a predicate-backed option does not match" do
+      expect(resource).not_to belong_to_resource(:author)
+        .with_options(readable: false)
+    end
   end
 
   describe "#have_many_resources" do

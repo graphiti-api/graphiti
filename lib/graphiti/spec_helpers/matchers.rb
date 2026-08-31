@@ -59,6 +59,7 @@ module Graphiti
 
       class RelationMatcher < BaseMatcher
         GRAPHITI_OPTS = %i[primary_key foreign_key resource readable writable link single].freeze
+        SIDELOAD_METHODS = {resource: :resource_class, readable: :readable?, writable: :writable?, single: :single?}.freeze
         GRAPHITI_CONFIG_KEY = :sideloads
         EXPECTED_ACTION = ""
 
@@ -73,7 +74,7 @@ module Graphiti
         attr_reader :target, :opts, :resource
 
         def assert_opt(opt)
-          asserted_opt = (opt == :resource) ? :resource_class : opt
+          asserted_opt = SIDELOAD_METHODS.fetch(opt, opt)
           return true if config.send(asserted_opt) == opts[opt]
 
           @opt_failures << opt_failure_message(opt, opts[opt], config.send(asserted_opt))
