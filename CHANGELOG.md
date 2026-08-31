@@ -1,5 +1,29 @@
 graphiti changelog
 
+# [2.0.0-beta.13](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.12...v2.0.0-beta.13) (2026-08-31)
+
+
+### Bug Fixes
+
+* compare the endpoint id to the payload id as strings ([62051d7](https://github.com/graphiti-api/graphiti/commit/62051d7531432357db7bc464cce77ccc55168d07))
+* evaluate writable guards under the action being performed ([d56b86a](https://github.com/graphiti-api/graphiti/commit/d56b86a5ffaac4106aaea1e2ee5400069a4205fe))
+* **generators:** stop injecting a routes host into config/application.rb ([db92d06](https://github.com/graphiti-api/graphiti/commit/db92d0649ca0246662a86b1172229eaa2a817d2b))
+* keep a belongs_to linkage when another include shares its name ([2c9c7c7](https://github.com/graphiti-api/graphiti/commit/2c9c7c7ac06cd319ac95e1445eb55a0322841de2))
+* keep deep filters narrow when an include path repeats ([833a10b](https://github.com/graphiti-api/graphiti/commit/833a10be120a4f2cd615ad05f750c7f246d62801))
+* keep request state in fiber storage so it survives into child fibers ([6569935](https://github.com/graphiti-api/graphiti/commit/6569935c2140d4dd91cd6d4a7f9ec7c1bd05c888))
+* only register the jsonapi mime type when it is missing ([88401ab](https://github.com/graphiti-api/graphiti/commit/88401abc8c77f1e859b4b8da3f9574c75834eb43))
+* with_options accepts the predicate backed relationship options ([71ab441](https://github.com/graphiti-api/graphiti/commit/71ab4418bccc4cff7e6cc10151c1728641d25d34))
+
+
+### Features
+
+* write every error code Graphiti renders into the generated locale file ([15f19c1](https://github.com/graphiti-api/graphiti/commit/15f19c1dbe56559d9d041fa50e2cc5ea7b2dcf4b))
+
+
+### Performance Improvements
+
+* record latest performance stats ([7380ef9](https://github.com/graphiti-api/graphiti/commit/7380ef912e9f3b99618bf47ed04e06d1efad4e6c))
+
 # [2.0.0-beta.12](https://github.com/graphiti-api/graphiti/compare/v2.0.0-beta.11...v2.0.0-beta.12) (2026-08-30)
 
 
