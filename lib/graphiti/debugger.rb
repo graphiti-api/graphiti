@@ -11,13 +11,13 @@ module Graphiti
     private_constant :CHUNKS
 
     class << self
-      # Pool threads inherit this through the thread-local copy Scope#future_with_context makes, so their chunks reach the right request.
+      # Pool threads inherit this through the fiber storage copy Scope#future_with_context makes, so their chunks reach the right request.
       def chunks
-        Thread.current[CHUNKS] ||= Concurrent::Array.new
+        Fiber[CHUNKS] ||= Concurrent::Array.new
       end
 
       def chunks=(value)
-        Thread.current[CHUNKS] = value
+        Fiber[CHUNKS] = value
       end
 
       def on_data(name, start, stop, id, payload)

@@ -3,6 +3,9 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in graphiti.gemspec
 gemspec
 
+# Until rescue_registry 1.1 ships with the fiber storage fix.
+gem "rescue_registry", github: "wagenet/rescue_registry", branch: "develop"
+
 group :test do
   gem "database_cleaner"
   gem "pry"

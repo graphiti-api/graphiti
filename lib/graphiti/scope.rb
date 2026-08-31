@@ -39,18 +39,17 @@ module Graphiti
       !Graphiti.config.concurrency || on_pool_thread?
     end
 
-    # TODO: move to Fiber[] once the floor is Ruby 3.2
     def self.on_pool_thread?
-      Thread.current[POOL_THREAD] == true
+      Fiber[POOL_THREAD] == true
     end
 
     # Restores rather than clears because :caller_runs may have run the task on a request thread.
     def self.marking_pool_thread
-      previous = Thread.current[POOL_THREAD]
-      Thread.current[POOL_THREAD] = true
+      previous = Fiber[POOL_THREAD]
+      Fiber[POOL_THREAD] = true
       yield
     ensure
-      Thread.current[POOL_THREAD] = previous
+      Fiber[POOL_THREAD] = previous
     end
 
     def initialize(object, resource, query, opts = {})

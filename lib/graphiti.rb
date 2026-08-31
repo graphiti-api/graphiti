@@ -51,12 +51,12 @@ module Graphiti
 
   # @api private
   def self.context
-    Thread.current[:context] ||= ContextHash.new
+    Fiber[:context] ||= ContextHash.new
   end
 
   # @api private
   def self.context=(val)
-    Thread.current[:context] = ContextHash.new.tap do |hash|
+    Fiber[:context] = ContextHash.new.tap do |hash|
       val.each { |key, value| hash[key] = value }
     end
   end

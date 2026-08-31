@@ -36,5 +36,16 @@ RSpec.describe Graphiti do
         expect(described_class.context[:action]).to eq(:update)
       end
     end
+
+    it "is visible to a fiber started within the request" do
+      object = double
+      seen = nil
+
+      described_class.with_context(object, :index) do
+        Fiber.new { seen = described_class.context[:object] }.resume
+      end
+
+      expect(seen).to eq(object)
+    end
   end
 end
