@@ -71,7 +71,7 @@ module Graphiti
           # not predict, so the loaded records win. Only the un-included case
           # is worth short-circuiting.
           if sideload_ref.resource_ids_from_foreign_key? &&
-              !self_ref.send(:included_anywhere?, @proxy.query.include_hash, sideload_ref.name)
+              !::Graphiti::Sideload.assigned?(@proxy.query, @object, sideload_ref.association_name)
             linkage always: sideload_ref.render_resource_ids? do
               foreign_key = begin
                 @object.public_send(sideload_ref.foreign_key)
@@ -101,15 +101,6 @@ module Graphiti
               ::Graphiti::Util::Link.new(sideload_ref, @object).generate
             end
           end
-        end
-      end
-
-      # A relationship nested under another one is still loaded and can still
-      # be narrowed by a deep filter, so the foreign key is not a safe
-      # stand-in for what the request actually returns.
-      def included_anywhere?(include_hash, name)
-        include_hash.any? do |key, nested|
-          key == name || included_anywhere?(nested, name)
         end
       end
 
