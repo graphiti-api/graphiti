@@ -79,7 +79,8 @@ module Graphiti
     end
 
     def self.assigned?(query, record, association_name)
-      query.association_owners.key?([record.object_id, association_name])
+      owners = query.association_owners[association_name]
+      !owners.nil? && owners.key?(record.object_id)
     end
 
     def self.assign(&blk)
@@ -562,8 +563,8 @@ module Graphiti
       query = self.class.current_assigning_query
       return true if query.nil?
 
-      key = [parent.object_id, association_name]
-      query.association_owners.compute_if_absent(key) { query.hash } == query.hash
+      owners = query.association_owners.compute_if_absent(association_name) { Concurrent::Map.new }
+      owners.compute_if_absent(parent.object_id) { query.hash } == query.hash
     end
 
     def with_error_handling(error_class)
