@@ -139,8 +139,8 @@ const config = {
   themeConfig: {
     announcementBar: {
       // Changing the id un-dismisses the bar for everyone who has closed it.
-      id: 'graphiti-2-0-beta-upgrade',
-      content: `Graphiti 2.0 is in beta. Coming from 1.x? Start with the <a href="${baseUrl}upgrading">upgrade guide</a>.`,
+      id: 'graphiti-2-0-upgrade',
+      content: `Graphiti 2.0 is out. Coming from 1.x? Start with the <a href="${baseUrl}upgrading">upgrade guide</a>.`,
       isCloseable: true,
     },
     colorMode: {
