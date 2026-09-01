@@ -121,8 +121,8 @@ module MeasureReleases
       "Pass --force to make this the reference, or rake performance:read to read the change."
   end
 
-  def stamp(rows)
-    rows.map { |row| row.fill("", row.length...MACHINE) + [machine, measured_tree, scenario_fingerprint] }
+  def stamp(rows, tree = measured_tree)
+    rows.map { |row| row.fill("", row.length...MACHINE) + [machine, tree, scenario_fingerprint] }
   end
 
   # What was measured rather than the file that describes it, so editing a
@@ -150,20 +150,28 @@ module MeasureReleases
       "rake performance:record ALL=1, or pass --force to record beside them anyway."
   end
 
-  # What the numbers depend on, read off disk rather than out of a commit, so
-  # rewriting history does not invalidate a measurement of the same code.
-  MEASURED_BY = ["lib", "spec/fixtures/poro.rb", "spec/performance/measure_release.rb",
-    "spec/performance/scenarios.rb"].freeze
-
-  # The release bumps this between recording the pending measurement and promoting it.
+  MEASURED_BY = ["lib", "spec/fixtures/poro.rb"].freeze
+  PROBED_BY = ["spec/performance/measure_release.rb", "spec/performance/scenarios.rb"].freeze
   NOT_MEASURED_BY = ["lib/graphiti/version.rb"].freeze
 
-  def measured_tree
-    @measured_tree ||= begin
-      files = `git -C #{ROOT} ls-files #{MEASURED_BY.join(" ")}`.lines.map(&:strip) - NOT_MEASURED_BY
-      digest = files.sort.map { |file| "#{file}#{File.read(File.join(ROOT, file))}" }.join
+  def measured_tree(directory = ROOT)
+    tree_fingerprints[directory] ||= begin
+      measured = tracked(directory, MEASURED_BY)
+      abort "nothing to fingerprint in #{directory}, so a measurement of it could not be told apart" if measured.empty?
+
+      sources = measured.map { |file| [file, File.join(directory, file)] } +
+        tracked(ROOT, PROBED_BY).map { |file| [file, File.join(ROOT, file)] }
+      digest = sources.sort.map { |file, path| "#{file}#{File.read(path)}" }.join
       Digest::SHA256.hexdigest(digest)[0, 12]
     end
+  end
+
+  def tree_fingerprints
+    @tree_fingerprints ||= {}
+  end
+
+  def tracked(directory, paths)
+    `git -C #{directory} ls-files #{paths.join(" ")}`.lines.map(&:strip) - NOT_MEASURED_BY
   end
 
   def measurements_per_mode
@@ -179,7 +187,7 @@ module MeasureReleases
     wanted = only_missing ? tags - recorded.select { |row| row[1] == RUBY }.map(&:first) : tags
     measured = measure_sequence(wanted).flatten(1)
     kept = recorded.reject { |row| row[1] == RUBY && (!only_missing || wanted.include?(row.first)) }
-    write(in_release_order(kept + stamp(measured)))
+    write(in_release_order(kept + measured))
     report_skipped(wanted.length)
   ensure
     remove_worktrees
@@ -245,7 +253,7 @@ module MeasureReleases
     assert_same_scenarios!
     rows = measure_release(tag)
     abort "#{tag} could not be measured" if rows.nil? || rows.empty?
-    store(tag, stamp(rows))
+    store(tag, rows)
   ensure
     remove_worktrees
   end
@@ -513,11 +521,12 @@ module MeasureReleases
     Progress.waiting("bundle install")
     return skip(tag, "bundle install failed") unless bundled?
 
+    tree = measured_tree(WORKTREE)
     measured = MODES.map { |mode| [mode, measure_in(WORKTREE, mode)] }
     empty = measured.find { |_, rows| rows.nil? }
     return skip(tag, failure(empty.first)) if empty
 
-    measured.flat_map { |mode, rows| rows.map { |row| [tag, RUBY, mode, *row] } }
+    stamp(measured.flat_map { |mode, rows| rows.map { |row| [tag, RUBY, mode, *row] } }, tree)
   ensure
     Progress.finish
   end
