@@ -4,7 +4,7 @@ source "https://rubygems.org"
 gemspec
 
 # Until rescue_registry 1.1 ships with the fiber storage fix.
-gem "rescue_registry", github: "wagenet/rescue_registry", branch: "develop"
+gem "rescue_registry", "~> 1.1"
 
 group :test do
   gem "database_cleaner"
