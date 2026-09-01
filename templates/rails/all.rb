@@ -40,7 +40,7 @@ STR
 say(set_color(welcome.rstrip, :cyan, :bold))
 api_namespace
 
-gem "graphiti", "~> 2.0.0.beta"
+gem "graphiti", "~> 2.0"
 gem "vandal_ui"
 gem "kaminari"
 
