@@ -1,0 +1,22 @@
+require 'rails_helper'
+
+RSpec.describe "<%= type %>#index", type: :request do
+  let(:params) { {} }
+
+  subject(:make_request) do
+    jsonapi_get "<%= api_namespace %>/<%= type %>", params: params
+  end
+
+  describe 'basic fetch' do
+    let!(:<%= var %>1) { create(:<%= var %>) }
+    let!(:<%= var %>2) { create(:<%= var %>) }
+
+    it 'works' do
+      expect(<%= resource_class %>).to receive(:all).and_call_original
+      make_request
+      expect(response.status).to eq(200), response.body
+      expect(jsonapi_data.map(&:jsonapi_type).uniq).to match_array(['<%= type %>'])
+      expect(jsonapi_data.map(&:<%= id_or_rawid %>)).to match_array([<%= var %>1.id, <%= var %>2.id])
+    end
+  end
+end

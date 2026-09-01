@@ -1,6 +1,6 @@
 if ENV["APPRAISAL_INITIALIZED"]
   RSpec.describe "integrated resources and adapters", type: :controller do
-    include GraphitiSpecHelpers
+    include Graphiti::SpecHelpers
 
     controller(ApplicationController) do
       def index
@@ -74,22 +74,22 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     it "allows basic sorting" do
       do_index({sort: "-id"})
-      expect(d.map(&:id)).to eq([author2.id, author1.id])
+      expect(jsonapi_data.map(&:id)).to eq([author2.id, author1.id])
     end
 
     it "allows allowlisted filters (and other configs)" do
       do_index({filter: {first_name: "George"}})
-      expect(d.map(&:id)).to eq([author2.id])
+      expect(jsonapi_data.map(&:id)).to eq([author2.id])
     end
 
     it "allows basic sideloading" do
       do_index({include: "books"})
-      expect(included.map(&:jsonapi_type).uniq).to match_array(%w[books])
+      expect(jsonapi_included.map(&:jsonapi_type).uniq).to match_array(%w[books])
     end
 
     it "allows nested sideloading" do
       do_index({include: "books.genre"})
-      expect(included.map(&:jsonapi_type).uniq)
+      expect(jsonapi_included.map(&:jsonapi_type).uniq)
         .to match_array(%w[books genres])
     end
 
@@ -99,7 +99,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       subject do
         do_index(page: params)
-        d.map(&:id)
+        jsonapi_data.map(&:id)
       end
 
       context "by number and size" do
@@ -130,13 +130,10 @@ if ENV["APPRAISAL_INITIALIZED"]
         let(:params) { {size: 1, number: 2} }
 
         around do |e|
-          original = Graphiti.config.pagination_links
-          begin
-            Graphiti.config.pagination_links = true
-            e.run
-          ensure
-            Graphiti.config.pagination_links = original
-          end
+          Legacy::AuthorResource.page_links = true
+          e.run
+        ensure
+          Legacy::AuthorResource.page_links = false
         end
 
         let(:links) do
@@ -174,7 +171,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             it "works" do
               do_index(page: params)
 
-              expect(d[0].id).to eq(author3.id)
+              expect(jsonapi_data[0].id).to eq(author3.id)
               expect(links["self"])
                 .to eq("page[number]=2&page[offset]=1&page[size]=1")
               expect(links["first"])
@@ -194,7 +191,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
               it "does not render 'next'" do
                 do_index(page: params)
-                expect(d[0].id).to eq(author4.id)
+                expect(jsonapi_data[0].id).to eq(author4.id)
                 expect(links).to_not have_key("next")
               end
             end
@@ -206,7 +203,7 @@ if ENV["APPRAISAL_INITIALIZED"]
     describe "filtering" do
       subject(:ids) do
         do_index({filter: filter})
-        d.map(&:id)
+        jsonapi_data.map(&:id)
       end
 
       let!(:author3) do
@@ -253,24 +250,24 @@ if ENV["APPRAISAL_INITIALIZED"]
         context "eq" do
           it "executes case-sensitive search (invalid)" do
             do_index({filter: {identifier: "abc123"}})
-            expect(d.map(&:id)).to eq([])
+            expect(jsonapi_data.map(&:id)).to eq([])
           end
 
           it "executes case-sensitive search (valid)" do
             do_index({filter: {identifier: "AbC123"}})
-            expect(d.map(&:id)).to eq([author3.id])
+            expect(jsonapi_data.map(&:id)).to eq([author3.id])
           end
         end
 
         context "!eq" do
           it "executes case-sensitive search (invalid)" do
             do_index({filter: {identifier: {not_eq: "abc123"}}})
-            expect(d.map(&:id).length).to eq(3)
+            expect(jsonapi_data.map(&:id).length).to eq(3)
           end
 
           it "executes case-sensitive search (valid)" do
             do_index({filter: {identifier: {not_eq: "AbC123"}}})
-            expect(d.map(&:id).length).to eq(2)
+            expect(jsonapi_data.map(&:id).length).to eq(2)
           end
         end
       end
@@ -321,14 +318,14 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!eq" do
-          let(:value) { {'!eq': "george"} }
+          let(:value) { {"!eq": "george"} }
 
           it "executes case-insensitive NOT search" do
             expect(ids).to eq([author1.id])
           end
 
           context "with nil value" do
-            let(:value) { {'!eq': nil} }
+            let(:value) { {"!eq": nil} }
             let!(:author3) { Legacy::Author.create! }
 
             it "works" do
@@ -365,7 +362,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!eql" do
-          let(:value) { {'!eql': "GeOrge"} }
+          let(:value) { {"!eql": "GeOrge"} }
 
           it "executes case-sensitive search" do
             expect(ids).to eq([author1.id, author2.id])
@@ -399,7 +396,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!prefix" do
-          let(:value) { {'!prefix': "Geo"} }
+          let(:value) { {"!prefix": "Geo"} }
 
           it "executes case-insensitive prefix NOT query" do
             expect(ids).to eq([author1.id])
@@ -433,7 +430,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!suffix" do
-          let(:value) { {'!suffix': "orge"} }
+          let(:value) { {"!suffix": "orge"} }
 
           it "executes case-insensitive suffix NOT query" do
             expect(ids).to eq([author1.id])
@@ -467,7 +464,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!match" do
-          let(:value) { {'!match': "org"} }
+          let(:value) { {"!match": "org"} }
 
           it "executes case-insensitive NOT match query" do
             expect(ids).to eq([author1.id])
@@ -487,7 +484,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!eq" do
-          let(:value) { {'!eq': 65} }
+          let(:value) { {"!eq": 65} }
 
           it "works" do
             expect(ids).to eq([author1.id, author3.id])
@@ -539,14 +536,14 @@ if ENV["APPRAISAL_INITIALIZED"]
         let(:filter) { {decimal_age: value} }
 
         context "eq" do
-          let(:value) { {eq: 70.011.to_d} }
+          let(:value) { {eq: BigDecimal("70.011")} }
 
           it "works" do
             expect(ids).to eq([author2.id])
           end
 
           context "as a string" do
-            let(:value) { {eq: 70.011.to_d.to_s} }
+            let(:value) { {eq: BigDecimal("70.011").to_s} }
 
             it "works" do
               expect(ids).to eq([author2.id])
@@ -555,7 +552,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!eq" do
-          let(:value) { {'!eq': 70.011.to_d} }
+          let(:value) { {"!eq": BigDecimal("70.011")} }
 
           it "works" do
             expect(ids).to eq([author1.id, author3.id])
@@ -563,7 +560,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "nothing" do
-          let(:value) { 70.011.to_d }
+          let(:value) { BigDecimal("70.011") }
 
           it "defaults to eq" do
             expect(ids).to eq([author2.id])
@@ -571,7 +568,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "gt" do
-          let(:value) { {gt: 70.033.to_d} }
+          let(:value) { {gt: BigDecimal("70.033")} }
 
           it "works" do
             expect(ids).to eq([author3.id])
@@ -579,7 +576,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "gte" do
-          let(:value) { {gte: 70.033.to_d} }
+          let(:value) { {gte: BigDecimal("70.033")} }
 
           it "works" do
             expect(ids).to eq([author1.id, author3.id])
@@ -587,7 +584,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "lt" do
-          let(:value) { {lt: 70.033.to_d} }
+          let(:value) { {lt: BigDecimal("70.033")} }
 
           it "works" do
             expect(ids).to eq([author2.id])
@@ -595,7 +592,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "lte" do
-          let(:value) { {lte: 70.033.to_d} }
+          let(:value) { {lte: BigDecimal("70.033")} }
 
           it "works" do
             expect(ids).to eq([author1.id, author2.id])
@@ -615,7 +612,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!eq" do
-          let(:value) { {'!eq': 70.01} }
+          let(:value) { {"!eq": 70.01} }
 
           it "works" do
             expect(ids).to eq([author1.id, author3.id])
@@ -675,7 +672,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!eq" do
-          let(:value) { {'!eq': two_days_ago.to_date.iso8601} }
+          let(:value) { {"!eq": two_days_ago.to_date.iso8601} }
 
           it "works" do
             expect(ids).to eq([author1.id, author3.id])
@@ -744,7 +741,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         end
 
         context "!eq" do
-          let(:value) { {'!eq': two_days_ago.iso8601} }
+          let(:value) { {"!eq": two_days_ago.iso8601} }
 
           it "works" do
             expect(ids).to eq([author1.id, author3.id])
@@ -752,7 +749,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
           context "when value is nil" do
             let(:filter) { {last_login: value} }
-            let(:value) { {'!eq': "null"} }
+            let(:value) { {"!eq": "null"} }
 
             it "works" do
               expect(ids).to eq([author1.id, author2.id])
@@ -1035,7 +1032,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           "decimal_age" => "70.033",
           "active" => true
         })
-        expect(included.map(&:jsonapi_type).uniq).to match_array(%w[books])
+        expect(jsonapi_included.map(&:jsonapi_type).uniq).to match_array(%w[books])
       end
 
       context "and record not found" do
@@ -1057,7 +1054,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             include: "books"
           })
           expect(json["data"][0]["relationships"]).to be_present
-          expect(included.map(&:jsonapi_type).uniq).to match_array(%w[books])
+          expect(jsonapi_included.map(&:jsonapi_type).uniq).to match_array(%w[books])
         end
       end
     end
@@ -1065,7 +1062,7 @@ if ENV["APPRAISAL_INITIALIZED"]
     context "sideloading has_many" do
       it "can sideload" do
         do_index({include: "books"})
-        expect(included("books").map(&:id)).to eq([book1.id, book2.id])
+        expect(jsonapi_included("books").map(&:id)).to eq([book1.id, book2.id])
       end
 
       context "when paginating the sideload" do
@@ -1083,7 +1080,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
           it "works" do
             request
-            expect(included("books").map(&:id)).to eq([book2.id])
+            expect(jsonapi_included("books").map(&:id)).to eq([book2.id])
           end
         end
 
@@ -1102,17 +1099,17 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       it "allows sorting of sideloaded resource" do
         do_index({include: "books", sort: "-books.id"})
-        expect(included("books").map(&:id)).to eq([book2.id, book1.id])
+        expect(jsonapi_included("books").map(&:id)).to eq([book2.id, book1.id])
       end
 
       it "allows filtering of sideloaded resource" do
         do_index({include: "books", filter: {books: {id: book2.id}}})
-        expect(included("books").map(&:id)).to eq([book2.id])
+        expect(jsonapi_included("books").map(&:id)).to eq([book2.id])
       end
 
       it "allows extra fields for sideloaded resource" do
         do_index({include: "books", extra_fields: {books: "alternate_title"}})
-        book = included("books")[0]
+        book = jsonapi_included("books")[0]
         expect(book["title"]).to be_present
         expect(book["pages"]).to be_present
         expect(book["alternate_title"]).to eq("alt title")
@@ -1120,7 +1117,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       it "allows sparse fieldsets for the sideloaded resource" do
         do_index({include: "books", fields: {books: "pages"}})
-        book = included("books")[0]
+        book = jsonapi_included("books")[0]
         expect(book).to_not have_key("title")
         expect(book).to_not have_key("alternate_title")
         expect(book["pages"]).to eq(500)
@@ -1128,7 +1125,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       it "allows extra fields and sparse fieldsets for the sideloaded resource" do
         do_index({include: "books", fields: {books: "pages"}, extra_fields: {books: "alternate_title"}})
-        book = included("books")[0]
+        book = jsonapi_included("books")[0]
         expect(book).to have_key("pages")
         expect(book).to have_key("alternate_title")
         expect(book).to_not have_key("title")
@@ -1149,7 +1146,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         it "still works" do
           do_index({include: "books"})
-          expect(included("books").map(&:id)).to eq([book1.id, book2.id])
+          expect(jsonapi_included("books").map(&:id)).to eq([book1.id, book2.id])
         end
       end
     end
@@ -1157,12 +1154,12 @@ if ENV["APPRAISAL_INITIALIZED"]
     context "sideloading belongs_to" do
       it "can sideload" do
         do_index({include: "state"})
-        expect(included("states").map(&:id)).to eq([state.id])
+        expect(jsonapi_included("states").map(&:id)).to eq([state.id])
       end
 
       it "allows extra fields for sideloaded resource" do
         do_index({include: "state", extra_fields: {states: "population"}})
-        state = included("states")[0]
+        state = jsonapi_included("states")[0]
         expect(state["name"]).to be_present
         expect(state["abbreviation"]).to be_present
         expect(state["population"]).to be_present
@@ -1170,7 +1167,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       it "allows sparse fieldsets for the sideloaded resource" do
         do_index({include: "state", fields: {states: "name"}})
-        state = included("states")[0]
+        state = jsonapi_included("states")[0]
         expect(state["name"]).to be_present
         expect(state).to_not have_key("abbreviation")
         expect(state).to_not have_key("population")
@@ -1178,7 +1175,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       it "allows extra fields and sparse fieldsets for the sideloaded resource" do
         do_index({include: "state", fields: {states: "name"}, extra_fields: {states: "population"}})
-        state = included("states")[0]
+        state = jsonapi_included("states")[0]
         expect(state).to have_key("name")
         expect(state).to have_key("population")
         expect(state).to_not have_key("abbreviation")
@@ -1188,12 +1185,12 @@ if ENV["APPRAISAL_INITIALIZED"]
     context "sideloading has_one" do
       it "can sideload" do
         do_index({include: "bio"})
-        expect(included("bios").map(&:id)).to eq([bio.id])
+        expect(jsonapi_included("bios").map(&:id)).to eq([bio.id])
       end
 
       it "allows extra fields for sideloaded resource" do
         do_index({include: "bio", extra_fields: {bios: "created_at"}})
-        bio = included("bios")[0]
+        bio = jsonapi_included("bios")[0]
         expect(bio["description"]).to be_present
         expect(bio["created_at"]).to be_present
         expect(bio["picture"]).to be_present
@@ -1201,7 +1198,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       it "allows sparse fieldsets for the sideloaded resource" do
         do_index({include: "bio", fields: {bios: "description"}})
-        bio = included("bios")[0]
+        bio = jsonapi_included("bios")[0]
         expect(bio["description"]).to be_present
         expect(bio).to_not have_key("created_at")
         expect(bio).to_not have_key("picture")
@@ -1209,7 +1206,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       it "allows extra fields and sparse fieldsets for the sideloaded resource" do
         do_index({include: "bio", fields: {bios: "description"}, extra_fields: {bios: "created_at"}})
-        bio = included("bios")[0]
+        bio = jsonapi_included("bios")[0]
         expect(bio).to have_key("description")
         expect(bio).to have_key("created_at")
         expect(bio).to_not have_key("picture")
@@ -1240,7 +1237,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
           it "still works" do
             do_index({include: "bio.bio_labels"})
-            expect(included("bio_labels").length).to eq(1)
+            expect(jsonapi_included("bio_labels").length).to eq(1)
           end
         end
       end
@@ -1249,12 +1246,12 @@ if ENV["APPRAISAL_INITIALIZED"]
     context "sideloading many_to_many" do
       it "can sideload" do
         do_index({include: "hobbies"})
-        expect(included("hobbies").map(&:id)).to eq([hobby1.id, hobby2.id])
+        expect(jsonapi_included("hobbies").map(&:id)).to eq([hobby1.id, hobby2.id])
       end
 
       it "allows sorting of sideloaded resource" do
         do_index({include: "hobbies", sort: "-hobbies.name"})
-        expect(included("hobbies").map(&:id)).to eq([hobby2.id, hobby1.id])
+        expect(jsonapi_included("hobbies").map(&:id)).to eq([hobby2.id, hobby1.id])
       end
 
       it "allows filtering of sideloaded resource" do
@@ -1262,7 +1259,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           include: "hobbies",
           filter: {hobbies: {id: hobby2.id}}
         })
-        expect(included("hobbies").map(&:id)).to eq([hobby2.id])
+        expect(jsonapi_included("hobbies").map(&:id)).to eq([hobby2.id])
       end
 
       it "allows extra fields for sideloaded resource" do
@@ -1270,7 +1267,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           include: "hobbies",
           extra_fields: {hobbies: "reason"}
         })
-        hobby = included("hobbies")[0]
+        hobby = jsonapi_included("hobbies")[0]
         expect(hobby["name"]).to be_present
         expect(hobby["description"]).to be_present
         expect(hobby["reason"]).to eq("hobby reason")
@@ -1278,7 +1275,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       it "allows sparse fieldsets for the sideloaded resource" do
         do_index({include: "hobbies", fields: {hobbies: "name"}})
-        hobby = included("hobbies")[0]
+        hobby = jsonapi_included("hobbies")[0]
         expect(hobby["name"]).to be_present
         expect(hobby).to_not have_key("description")
         expect(hobby).to_not have_key("reason")
@@ -1290,7 +1287,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           fields: {hobbies: "name"},
           extra_fields: {hobbies: "reason"}
         })
-        hobby = included("hobbies")[0]
+        hobby = jsonapi_included("hobbies")[0]
         expect(hobby).to have_key("name")
         expect(hobby).to have_key("reason")
         expect(hobby).to_not have_key("description")
@@ -1302,8 +1299,8 @@ if ENV["APPRAISAL_INITIALIZED"]
           fields: {hobbies: "name", books: "title"},
           extra_fields: {hobbies: "reason", books: "alternate_title"}
         })
-        hobby = included("hobbies")[0]
-        book = included("books")[0]
+        hobby = jsonapi_included("hobbies")[0]
+        book = jsonapi_included("books")[0]
         expect(hobby).to have_key("name")
         expect(hobby).to have_key("reason")
         expect(hobby).to_not have_key("description")
@@ -1320,7 +1317,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         author1_hobbies = author1_relationships["hobbies"]["data"]
         author2_hobbies = author2_relationships["hobbies"]["data"]
 
-        expect(included("hobbies").size).to eq(2)
+        expect(jsonapi_included("hobbies").size).to eq(2)
         expect(author1_hobbies.size).to eq(2)
         expect(author2_hobbies.size).to eq(1)
       end
@@ -1329,14 +1326,14 @@ if ENV["APPRAISAL_INITIALIZED"]
         let(:shop) { Legacy::Sales::Shop.create(name: "shop") }
 
         before do
-          allow(Legacy::Sales::ShopResource).to receive(:validate_endpoints?) { false }
+          allow(Legacy::Sales::ShopResource).to receive(:validate_requests?) { false }
           allow(controller).to receive(:resource).and_return(Legacy::Sales::ShopResource)
           Legacy::Sales::Stock.create(shop_id: shop.id, book_id: book1.id, amount: 2)
         end
 
         it "works" do
           do_index({include: "books"})
-          expect(included("books").map(&:id)).to eq([book1.id])
+          expect(jsonapi_included("books").map(&:id)).to eq([book1.id])
         end
       end
 
@@ -1392,7 +1389,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         it "still works" do
           do_index({include: "mentors"})
-          target = d.find { |e| e.id == author_with_mentors.id }
+          target = jsonapi_data.find { |e| e.id == author_with_mentors.id }
           expect(target.relationships["mentors"]).to eq({
             "data" => [
               {"type" => "authors", "id" => author_with_mentees.id.to_s},
@@ -1404,7 +1401,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         it "allows filtering by the association" do
           do_index({filter: {mentor_id: author_with_mentees.id}})
 
-          expect(d.map(&:id)).to eq([author_with_mentors.id, author_with_both.id])
+          expect(jsonapi_data.map(&:id)).to eq([author_with_mentors.id, author_with_both.id])
         end
       end
 
@@ -1413,7 +1410,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           Legacy::UserResource.class_eval do
             many_to_many :books, resource: Legacy::BookResource
           end
-          allow(Legacy::BookResource).to receive(:validate_endpoints?) { false }
+          allow(Legacy::BookResource).to receive(:validate_requests?) { false }
           allow(controller).to receive(:resource) { Legacy::BookResource }
         end
 
@@ -1426,7 +1423,7 @@ if ENV["APPRAISAL_INITIALIZED"]
         it "correctly infers the filter name for the association from the inverse_of option" do
           do_index({filter: {reader_id: reader.id}})
 
-          expect(d.map(&:id)).to eq([book2.id])
+          expect(jsonapi_data.map(&:id)).to eq([book2.id])
         end
 
         context "when the graphiti association manually sets inverse_filter" do
@@ -1439,7 +1436,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           it "overrides the inferred one" do
             do_index({filter: {the_reader_id: reader.id}})
 
-            expect(d.map(&:id)).to eq([book2.id])
+            expect(jsonapi_data.map(&:id)).to eq([book2.id])
           end
         end
       end
@@ -1466,7 +1463,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         it "still works" do
           do_index({include: "hobbies"})
-          expect(included("hobbies").map(&:id))
+          expect(jsonapi_included("hobbies").map(&:id))
             .to eq([other_table_hobby1.id, other_table_hobby2.id])
         end
       end
@@ -1484,8 +1481,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             required: false,
             operators:
               {eq: nil, not_eq: nil, gt: nil, gte: nil, lt: nil, lte: nil},
-            allow_nil: false,
-            deny_empty: false
+            blanks: :literal
           }
         }
 
@@ -1533,7 +1529,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
         it "still works" do
           do_index({include: "hobbies"})
-          expect(included("hobbies").map(&:id)).to eq([hobby1.id, hobby2.id])
+          expect(jsonapi_included("hobbies").map(&:id)).to eq([hobby1.id, hobby2.id])
         end
 
         describe "filtering relationship" do
@@ -1551,7 +1547,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
           it "can filter the relationship by the custom name" do
             do_index(filter: {the_id_of_the_author: [author1.id, author2.id].join(",")})
-            expect(d.map(&:id)).to eq([hobby1.id, hobby2.id])
+            expect(jsonapi_data.map(&:id)).to eq([hobby1.id, hobby2.id])
           end
         end
       end
@@ -1569,9 +1565,9 @@ if ENV["APPRAISAL_INITIALIZED"]
 
           it "still works" do
             do_index({include: "tags"})
-            sl = d[0].sideload(:tags)
+            sl = jsonapi_data[0].sideload(:tags)
             expect(sl.map(&:id)).to eq([tag1.id])
-            sl = d[1].sideload(:tags)
+            sl = jsonapi_data[1].sideload(:tags)
             expect(sl.map(&:id)).to eq([tag1.id, tag2.id])
           end
         end
@@ -1584,12 +1580,12 @@ if ENV["APPRAISAL_INITIALIZED"]
           end
 
           it "still works" do
-            allow(Legacy::BookResource).to receive(:validate_endpoints?) { false }
+            allow(Legacy::BookResource).to receive(:validate_requests?) { false }
             allow(controller).to receive(:resource) { Legacy::BookResource }
             do_index({include: "tags"})
-            sl = d[0].sideload(:tags)
+            sl = jsonapi_data[0].sideload(:tags)
             expect(sl.map(&:id)).to eq([tag1.id, tag2.id])
-            sl = d[1].sideload(:tags)
+            sl = jsonapi_data[1].sideload(:tags)
             expect(sl.map(&:id)).to eq([tag1.id])
           end
         end
@@ -1605,7 +1601,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             end
 
             it "still works" do
-              allow(Legacy::TagResource).to receive(:validate_endpoints?) { false }
+              allow(Legacy::TagResource).to receive(:validate_requests?) { false }
               allow(controller).to receive(:resource) { Legacy::TagResource }
               do_index({
                 filter: {
@@ -1615,7 +1611,7 @@ if ENV["APPRAISAL_INITIALIZED"]
                   ]
                 }
               })
-              expect(d.map(&:name)).to eq(%w[One Two Three])
+              expect(jsonapi_data.map(&:name)).to eq(%w[One Two Three])
             end
           end
         end
@@ -1625,7 +1621,7 @@ if ENV["APPRAISAL_INITIALIZED"]
     context "sideloading self-referential" do
       it "works" do
         do_index({include: "organization.children"})
-        includes = included("organizations")
+        includes = jsonapi_included("organizations")
         expect(includes[0]["name"]).to eq("Org1")
         expect(includes[1]["name"]).to eq("Org2")
       end
@@ -1651,7 +1647,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           filter: {books: {id: book1.id}, other_books: {id: book2.id}},
           include: "books.genre,other_books.genre"
         })
-        expect(included("genres").length).to eq(2)
+        expect(jsonapi_included("genres").length).to eq(2)
       end
     end
 
@@ -1661,11 +1657,11 @@ if ENV["APPRAISAL_INITIALIZED"]
           include: "dwelling",
           extra_fields: {houses: "house_price", condos: "condo_price"}
         })
-        house = included("houses")[0]
+        house = jsonapi_included("houses")[0]
         expect(house["name"]).to be_present
         expect(house["house_description"]).to be_present
         expect(house["house_price"]).to eq(1_000_000)
-        condo = included("condos")[0]
+        condo = jsonapi_included("condos")[0]
         expect(condo["name"]).to be_present
         expect(condo["condo_description"]).to be_present
         expect(condo["condo_price"]).to eq(500_000)
@@ -1676,11 +1672,11 @@ if ENV["APPRAISAL_INITIALIZED"]
           include: "dwelling",
           fields: {houses: "name", condos: "condo_description"}
         })
-        house = included("houses")[0]
+        house = jsonapi_included("houses")[0]
         expect(house["name"]).to be_present
         expect(house).to_not have_key("house_description")
         expect(house).to_not have_key("house_price")
-        condo = included("condos")[0]
+        condo = jsonapi_included("condos")[0]
         expect(condo["condo_description"]).to be_present
         expect(condo).to_not have_key("name")
         expect(condo).to_not have_key("condo_price")
@@ -1692,8 +1688,8 @@ if ENV["APPRAISAL_INITIALIZED"]
           fields: {houses: "name", condos: "condo_description"},
           extra_fields: {houses: "house_price", condos: "condo_price"}
         })
-        house = included("houses")[0]
-        condo = included("condos")[0]
+        house = jsonapi_included("houses")[0]
+        condo = jsonapi_included("condos")[0]
         expect(house).to have_key("name")
         expect(house).to have_key("house_price")
         expect(house).to_not have_key("house_description")
@@ -1705,7 +1701,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       # NB: Condo does NOT have a state relationship
       it "allows additional levels of nesting" do
         do_index({include: "dwelling.state"})
-        expect(included("states").length).to eq(1)
+        expect(jsonapi_included("states").length).to eq(1)
       end
     end
 
@@ -1720,7 +1716,7 @@ if ENV["APPRAISAL_INITIALIZED"]
 
       it "can query stats total count" do
         do_index({stats: {total: "count"}})
-        expect(d.map(&:id)).to eq([author1.id, author2.id])
+        expect(jsonapi_data.map(&:id)).to eq([author1.id, author2.id])
       end
     end
   end

@@ -1,9 +1,18 @@
 fix: true
 parallel: true
-ruby_version: 2.7
+ruby_version: 3.2
 
 ignore:
   - 'vendor/**/*'
+  # The Rails app template's heredocs are written into the user's files, so
+  # their literal indentation is load-bearing and the <<~ autofix would
+  # change what gets generated.
+  - 'templates/**/*':
+    - Layout/HeredocIndentation
+    - Layout/ClosingHeredocIndentation
+  # The docs site, including the frozen 1.x archive under static/. None of it
+  # is ours to restyle, and some of it is generated.
+  - 'website/**/*'
   - 'spec/**/*':
     # There are some false hits when doing repeated
     # Class.new blocks in different test cases

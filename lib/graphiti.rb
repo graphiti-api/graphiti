@@ -3,6 +3,12 @@ require "forwardable"
 require "uri"
 require "ostruct" unless defined?(::OpenStruct)
 
+# The umbrella require, not just the core_ext files below: Graphiti.broadcast
+# calls ActiveSupport::Notifications.instrument, which reaches for
+# ActiveSupport::IsolatedExecutionState. That constant is autoloaded here and
+# nowhere else, so without this a non-Rails app raises NameError on the first
+# render unless something else happened to load ActiveSupport for us.
+require "active_support"
 require "active_support/version"
 require "active_support/deprecation"
 require "active_support/deprecator" if ::ActiveSupport.version >= Gem::Version.new("7.1")
@@ -14,27 +20,51 @@ require "active_support/concern"
 require "active_support/time"
 
 require "dry-types"
-require "graphiti_errors"
 
 require "jsonapi/serializable"
 
+# These gems are merged into graphiti as of 2.0, but their 1.x/0.x releases
+# still resolve against graphiti 2.x. Leaving one installed is never harmless:
+# graphiti_spec_helpers and graphiti-rails ship files that collide with ours
+# (lib/graphiti_spec_helpers.rb, lib/graphiti/rails.rb), so which copy a require
+# picks up comes down to load path order, and graphiti_errors installs a second,
+# competing exception handler on any controller that includes it. Fail loudly
+# rather than let either happen quietly. Checked here because graphiti is loaded
+# either way, whichever copy wins.
+{
+  "graphiti_spec_helpers" => 'The "graphiti_spec_helpers/rspec" require and the GraphitiSpecHelpers namespace are unchanged.',
+  "graphiti-rails" => 'Graphiti::Rails and its config.graphiti options are unchanged. Drop the "graphiti-rails" require if you have one, and add `include Graphiti::Rails::Controller` to controllers serving Graphiti resources. graphiti-rails installed that on every controller automatically. See graphiti.dev/upgrading.',
+  "graphiti_errors" => "Exception handling now goes through rescue_registry. Remove `include GraphitiErrors` from your controllers — Graphiti registers its own handlers, and you can add yours with `register_exception`."
+}.each do |gem_name, guidance|
+  next unless Gem.loaded_specs.key?(gem_name)
+
+  raise <<~MSG
+    #{gem_name} is merged into graphiti as of 2.0 and is no longer published
+    separately. Remove it from your Gemfile.
+
+    #{guidance}
+  MSG
+end
+
 module Graphiti
-  DEPRECATOR = ActiveSupport::Deprecation.new("2.0", "Graphiti")
+  DEPRECATOR = ActiveSupport::Deprecation.new("3.0", "Graphiti")
 
   # @api private
   def self.context
-    Thread.current[:context] ||= {}
+    Fiber[:context] ||= ContextHash.new
   end
 
   # @api private
   def self.context=(val)
-    Thread.current[:context] = val
+    Fiber[:context] = ContextHash.new.tap do |hash|
+      val.each { |key, value| hash[key] = value }
+    end
   end
 
   # @api private
-  def self.with_context(obj, namespace = nil)
+  def self.with_context(obj, action = nil)
     prior = context
-    self.context = {object: obj, namespace: namespace}
+    self.context = {object: obj, action: action}
     yield
   ensure
     self.context = prior
@@ -121,6 +151,11 @@ module Graphiti
     resources.each do |r|
       r.apply_sideloads_to_serializer
     end
+    @setup = true
+  end
+
+  def self.setup?
+    !!@setup
   end
 
   def self.cache=(val)
@@ -136,10 +171,14 @@ require "graphiti/version"
 require "graphiti/jsonapi_serializable_ext"
 require "graphiti/configuration"
 require "graphiti/context"
+require "graphiti/context_hash"
 require "graphiti/errors"
 require "graphiti/types"
+require "graphiti/audit"
+require "graphiti/audit/report"
 require "graphiti/schema"
 require "graphiti/schema_diff"
+require "graphiti/schema/check"
 require "graphiti/adapters/abstract"
 require "graphiti/resource/sideloading"
 require "graphiti/resource/links"
@@ -203,6 +242,11 @@ require "graphiti/query"
 require "graphiti/debugger"
 require "graphiti/util/cache_debug"
 require "graphiti/util/uri_decoder"
+require "graphiti/error_serializers/translated_title"
+require "graphiti/error_serializers/validation"
+require "graphiti/error_serializers/invalid_request"
+require "graphiti/error_serializers/conflict_request"
+require "graphiti/error_serializers/deprecated_constants"
 
 if defined?(ActiveRecord)
   require "graphiti/adapters/active_record"
@@ -210,14 +254,6 @@ end
 
 if defined?(Rails)
   require "graphiti/rails"
-  require "graphiti/responders"
-
-  # graphiti-rails has own Railtie
-  begin
-    require "graphiti-rails"
-  rescue LoadError
-    require "graphiti/railtie"
-  end
 end
 
 require "graphiti/runner"

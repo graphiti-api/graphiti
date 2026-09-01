@@ -8,6 +8,8 @@ module Graphiti
       end
 
       def apply
+        return unless @serializer
+
         @sideloads.each_pair do |name, sideload|
           if apply?(sideload)
             SerializerRelationship
@@ -19,7 +21,14 @@ module Graphiti
       private
 
       def apply?(sideload)
-        @serializer.relationship_blocks[sideload.name].nil?
+        return true if @serializer.relationship_blocks[sideload.name].nil?
+
+        # A subclass inherits its parent's relationship blocks, each closed
+        # over the parent's sideload. Redeclaring the relationship has to
+        # replace that block or the override never reaches the payload.
+        # Anything not generated here was written by hand, so leave it.
+        applied = @serializer.relationship_sideloads[sideload.name]
+        !applied.nil? && !applied.equal?(sideload)
       end
     end
 
@@ -32,6 +41,10 @@ module Graphiti
 
       def apply
         sideload = @sideload
+        # Reassign rather than mutate: ancestors share the hash by reference
+        # until a subclass writes to it.
+        @serializer.relationship_sideloads =
+          @serializer.relationship_sideloads.merge(@sideload.name => @sideload)
         @serializer.relationship(@sideload.name, if: -> { sideload.readable? }, &block)
       end
 
@@ -44,8 +57,8 @@ module Graphiti
       private
 
       def block
-        link_ref = link?
         sideload_ref = @sideload
+        resource_class_ref = @resource_class
         data_proc_ref = data_proc
         self_ref = self
         validate_link! if eagerly_validate_links?
@@ -53,17 +66,39 @@ module Graphiti
         proc do
           data { instance_eval(&data_proc_ref) }
 
-          # include relationship links for belongs_to relationships
-          # https://github.com/graphiti-api/graphiti/issues/167
-          linkage always: sideload_ref.always_include_resource_ids?
+          # An included relationship is already loaded, and a customized
+          # sideload can resolve it to something the foreign key alone would
+          # not predict, so the loaded records win. Only the un-included case
+          # is worth short-circuiting.
+          if sideload_ref.resource_ids_from_foreign_key? &&
+              !::Graphiti::Sideload.assigned?(@proxy.query, @object, sideload_ref.association_name)
+            linkage always: sideload_ref.render_resource_ids? do
+              foreign_key = begin
+                @object.public_send(sideload_ref.foreign_key)
+              rescue NoMethodError => error
+                raise unless defined?(ActiveModel::MissingAttributeError) &&
+                  error.is_a?(ActiveModel::MissingAttributeError)
 
-          if link_ref
-            if @proxy.query.links?
-              self_ref.send(:validate_link!) unless self_ref.send(:eagerly_validate_links?)
-
-              link(:related) do
-                ::Graphiti::Util::Link.new(sideload_ref, @object).generate
+                raise Errors::UnselectedForeignKey
+                  .new(resource_class_ref, sideload_ref, @object)
               end
+
+              unless foreign_key.nil?
+                {
+                  type: sideload_ref.resource.type,
+                  id: foreign_key.to_s
+                }
+              end
+            end
+          else
+            linkage always: sideload_ref.render_resource_ids?
+          end
+
+          if @proxy.query.render_link?(sideload_ref.link_mode) && self_ref.send(:linkable?)
+            self_ref.send(:validate_link!) unless self_ref.send(:eagerly_validate_links?)
+
+            link(:related) do
+              ::Graphiti::Util::Link.new(sideload_ref, @object).generate
             end
           end
         end
@@ -71,8 +106,31 @@ module Graphiti
 
       def data_proc
         sideload_ref = @sideload
+        resource_class_ref = @resource_class
         ->(_) {
-          if (records = @object.public_send(sideload_ref.association_name))
+          begin
+            records = @object.public_send(sideload_ref.association_name)
+          rescue NoMethodError => error
+            # #receiver raises ArgumentError when the error was built by hand
+            # rather than raised by a failed call, and a hand-built one can
+            # still carry a matching #name.
+            receiver = begin
+              error.receiver
+            rescue ArgumentError
+              nil
+            end
+
+            raise unless error.name == sideload_ref.association_name &&
+              receiver.equal?(@object)
+
+            # A private method exists, so "has no such method" would be a lie.
+            raise if @object.respond_to?(sideload_ref.association_name, true)
+
+            raise Errors::MissingRelationshipMethod
+              .new(resource_class_ref, sideload_ref, @object)
+          end
+
+          if records
             if records.respond_to?(:to_ary)
               records.each { |r| sideload_ref.resource.decorate_record(r) }
             else
@@ -85,7 +143,7 @@ module Graphiti
       end
 
       def eagerly_validate_links?
-        # TODO: Maybe handle this in graphiti-rails
+        # TODO: Maybe handle this in the Rails integration
         if defined?(::Rails) && (app = ::Rails.application)
           app.config.eager_load
         else
@@ -94,8 +152,8 @@ module Graphiti
       end
 
       def validate_link!
-        return unless link?
-        return unless @resource_class.validate_endpoints?
+        return unless @sideload.link? && linkable?
+        return unless @resource_class.validate_links?
         return if @sideload.link_proc
 
         unless Graphiti.config.context_for_endpoint
@@ -114,7 +172,7 @@ module Graphiti
       def validate_link_for_sideload!(sideload)
         return if sideload.resource.remote?
 
-        action = sideload.type == :belongs_to ? :show : :index
+        action = (sideload.type == :belongs_to) ? :show : :index
         cache_key = :"#{@sideload.object_id}-#{action}"
         return if self.class.validated_link_cache.include?(cache_key)
         prc = Graphiti.config.context_for_endpoint
@@ -124,14 +182,16 @@ module Graphiti
         self.class.validated_link_cache << cache_key
       end
 
-      def link?
-        return true if @sideload.link_proc
+      # Checked lazily so a sideload with no endpoint only raises when a link is actually wanted.
+      def linkable?
+        return @linkable if defined?(@linkable)
 
-        if @sideload.respond_to?(:children)
-          @sideload.link? &&
-            @sideload.children.values.all? { |c| !c.resource.endpoint.nil? }
+        @linkable = if @sideload.link_proc
+          true
+        elsif @sideload.respond_to?(:children)
+          @sideload.children.values.all? { |c| !c.resource.endpoint.nil? }
         else
-          !!(@sideload.link? && @sideload.resource.endpoint)
+          !@sideload.resource.endpoint.nil?
         end
       end
     end

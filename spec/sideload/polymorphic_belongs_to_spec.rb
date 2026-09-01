@@ -61,7 +61,7 @@ RSpec.describe Graphiti::Sideload::PolymorphicBelongsTo do
 
     it "resolves each group synchronously by default" do
       expect(instance).not_to receive(:future_resolve)
-      expect(child_sideload).to receive(:resolve).with(parents, query, graph_parent)
+      expect(child_sideload).to receive(:sync_resolve).with(parents, query, graph_parent)
       instance.resolve(parents, query, graph_parent)
     end
 

@@ -17,9 +17,9 @@ module Graphiti
         # In the future these should have their own validation logic, but
         # for now we can just bypass
         return errors.blank? unless @params.has_key?(:data)
+        return false unless validate_data_shape
 
         resource = @root_resource
-
         if @params[:data].has_key?(:type)
           if (meta_type = deserialized_payload.meta[:type].try(:to_sym))
             if @root_resource.type != meta_type && @root_resource.polymorphic?
@@ -54,14 +54,22 @@ module Graphiti
         page = @params[:page]
         return if page.nil? || page.respond_to?(:each_pair)
 
-        @errors.add(:page, :invalid, message: "must be an object")
+        @errors.add(:page, :invalid)
+      end
+
+      def validate_data_shape
+        data = @params[:data]
+        return true if data.nil? || data.respond_to?(:each_pair)
+
+        @errors.add(:data, :invalid)
+        false
       end
 
       def process_relationships(resource, relationships, payload_path)
         relationships.each_key do |name|
           unless resource.class.sideload(name.to_sym)
             full_key = fully_qualified_key(name, payload_path, :relationships)
-            @errors.add(full_key, :invalid_relationship, message: "is not a valid relationship")
+            @errors.add(full_key, :invalid_relationship)
           end
         end
 
@@ -102,11 +110,11 @@ module Graphiti
             begin
               attributes[key] = resource.typecast(key, value, :writable)
             rescue Graphiti::Errors::UnknownAttribute
-              @errors.add(fully_qualified_key(key, payload_path), :unknown_attribute, message: "is an unknown attribute")
+              @errors.add(fully_qualified_key(key, payload_path), :unknown_attribute)
             rescue Graphiti::Errors::InvalidAttributeAccess
-              @errors.add(fully_qualified_key(key, payload_path), :unwritable_attribute, message: "cannot be written")
+              @errors.add(fully_qualified_key(key, payload_path), :unwritable_attribute)
             rescue Graphiti::Errors::TypecastFailed => e
-              @errors.add(fully_qualified_key(key, payload_path), :type_error, message: "should be type #{e.type_name}")
+              @errors.add(fully_qualified_key(key, payload_path), :type_error, type: e.type_name)
             end
           end
         end

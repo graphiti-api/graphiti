@@ -137,8 +137,8 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     context "after_save" do
       before do
-        book_data << {'temp-id': "abc123", type: "books", method: "create"}
-        book_included << {'temp-id': "abc123", type: "books", attributes: {title: "one"}}
+        book_data << {"temp-id": "abc123", type: "books", method: "create"}
+        book_included << {"temp-id": "abc123", type: "books", attributes: {title: "one"}}
         book_data << {id: update_book.id.to_s, type: "books", method: "update"}
         book_included << {id: update_book.id.to_s, type: "books", attributes: {title: "updated!"}}
       end
@@ -146,10 +146,10 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     context "after_create" do
       before do
-        book_data << {'temp-id': "abc123", type: "books", method: "create"}
-        book_included << {'temp-id': "abc123", type: "books", attributes: {title: "one"}}
-        book_data << {'temp-id': "abc456", type: "books", method: "create"}
-        book_included << {'temp-id': "abc456", type: "books", attributes: {title: "two"}}
+        book_data << {"temp-id": "abc123", type: "books", method: "create"}
+        book_included << {"temp-id": "abc123", type: "books", attributes: {title: "one"}}
+        book_data << {"temp-id": "abc456", type: "books", method: "create"}
+        book_included << {"temp-id": "abc456", type: "books", attributes: {title: "two"}}
       end
 
       it "fires hooks correctly" do
@@ -230,10 +230,10 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     context "belongs_to" do
-      let(:state_data) { {'temp-id': "abc123", type: "states", method: "create"} }
+      let(:state_data) { {"temp-id": "abc123", type: "states", method: "create"} }
 
       before do
-        state_included << {'temp-id': "abc123", type: "states", attributes: {name: "New York"}}
+        state_included << {"temp-id": "abc123", type: "states", attributes: {name: "New York"}}
       end
 
       it "also works" do

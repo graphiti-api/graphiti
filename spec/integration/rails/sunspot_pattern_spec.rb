@@ -9,7 +9,7 @@ if ENV["APPRAISAL_INITIALIZED"]
   #
   # This scenario is likely specific to ActiveRecord.
   RSpec.describe "a non-ActiveRecord adapter that returns ActiveRecord models", type: :controller do
-    include GraphitiSpecHelpers
+    include Graphiti::SpecHelpers
 
     controller(ApplicationController) do
       def index
@@ -35,13 +35,13 @@ if ENV["APPRAISAL_INITIALIZED"]
 
     it "works" do
       do_index({include: "special_books"})
-      expect(d[0].sideload(:special_books).map(&:id)).to eq([book.id])
+      expect(jsonapi_data[0].sideload(:special_books).map(&:id)).to eq([book.id])
     end
 
     context "belongs_to" do
       it "works" do
         do_index({include: "special_state"})
-        expect(d[0].sideload(:special_state).id).to eq(state.id)
+        expect(jsonapi_data[0].sideload(:special_state).id).to eq(state.id)
       end
     end
   end

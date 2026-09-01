@@ -13,10 +13,26 @@ module Graphiti
     class_attribute :attributes_applied_via_resource
     class_attribute :extra_attributes_applied_via_resource
     class_attribute :relationship_condition_blocks
+    # Which sideload each generated relationship block was built for. A
+    # subclass inherits its parent's blocks, so this is how a redeclared
+    # relationship is told apart from one already applied, and from one the
+    # application wrote by hand.
+    class_attribute :relationship_sideloads
     self.attributes_applied_via_resource = []
     self.extra_attributes_applied_via_resource = []
     # See #requested_relationships
     self.relationship_condition_blocks ||= {}
+    self.relationship_sideloads ||= {}
+
+    # Keyed on the sideloads hash itself, which is reassigned whenever a
+    # relationship is applied, so the answer is recomputed exactly then.
+    def self.on_demand_links?
+      sideloads = relationship_sideloads
+      return @on_demand_links.last if @on_demand_links&.first.equal?(sideloads)
+
+      @on_demand_links = [sideloads, sideloads.each_value.any? { |sideload| sideload.link_mode == :on_demand }]
+      @on_demand_links.last
+    end
 
     def self.inherited(klass)
       super
@@ -53,7 +69,7 @@ module Graphiti
       starting_offset = 0
       page_param = @proxy.query.pagination
       if (page_number = page_param[:number])
-        page_size = page_param[:size] || @resource.default_page_size
+        page_size = page_param[:size] || @resource.page_default_size
         starting_offset = (page_number - 1) * page_size
       end
 
@@ -68,7 +84,7 @@ module Graphiti
 
     def as_jsonapi(kwargs = {})
       super(**kwargs).tap do |hash|
-        strip_relationships!(hash) if strip_relationships?
+        strip_relationships!(hash)
         add_links!(hash)
       end
     end
@@ -94,16 +110,29 @@ module Graphiti
       hash[:links] = @resource.links(@object) if @resource.links?
     end
 
+    # The meta: {included: false} stub is jsonapi-serializable's filler, not JSON:API.
     def strip_relationships!(hash)
-      hash[:relationships]&.select! do |name, payload|
-        payload.key?(:data)
+      placeholders = relationship_placeholders?
+      return if placeholders && !strip_on_demand_relationships?
+
+      hash[:relationships]&.reject! do |name, payload|
+        next false if payload.key?(:data) || payload.key?(:links)
+        next true unless placeholders
+
+        self.class.relationship_sideloads[name]&.link_mode == :on_demand
       end
     end
 
-    def strip_relationships?
-      return false unless Graphiti.config.links_on_demand
-      params = Graphiti.context[:object]&.params || {}
-      [false, nil, "false"].include?(params[:links])
+    # A remote resource exposes a stand-in object rather than a Resource.
+    def relationship_placeholders?
+      resource_class = @resource.class
+      return Resource.relationship_placeholders unless resource_class.respond_to?(:relationship_placeholders)
+
+      resource_class.relationship_placeholders
+    end
+
+    def strip_on_demand_relationships?
+      self.class.on_demand_links? && !@proxy&.query&.render_link?(:on_demand)
     end
   end
 end

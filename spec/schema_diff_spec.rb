@@ -504,7 +504,7 @@ RSpec.describe Graphiti::SchemaDiff do
 
     context "when default page size is added" do
       before do
-        resource_b.default_page_size = 10
+        resource_b.page_default_size = 10
       end
 
       it "returns error" do
@@ -516,8 +516,8 @@ RSpec.describe Graphiti::SchemaDiff do
 
     context "when default page size is removed" do
       before do
-        resource_a.default_page_size = 30
-        resource_b.default_page_size = nil
+        resource_a.page_default_size = 30
+        resource_b.page_default_size = nil
       end
 
       it "returns error" do
@@ -529,8 +529,8 @@ RSpec.describe Graphiti::SchemaDiff do
 
     context "when default page size changes" do
       before do
-        resource_a.default_page_size = 30
-        resource_b.default_page_size = 10
+        resource_a.page_default_size = 30
+        resource_b.page_default_size = 10
       end
 
       it "returns error" do
@@ -1023,6 +1023,34 @@ RSpec.describe Graphiti::SchemaDiff do
           readable: :admin?,
           resource: position_resource
         resource_b.has_many :positions,
+          resource: position_resource
+      end
+
+      it { is_expected.to eq([]) }
+    end
+
+    context "when relationship stops including resource linkage" do
+      before do
+        resource_a.has_many :positions,
+          resource_ids: true,
+          resource: position_resource
+        resource_b.has_many :positions,
+          resource: position_resource
+      end
+
+      it "returns error" do
+        expect(diff).to eq([
+          "SchemaDiff::EmployeeResource: relationship :positions no longer includes resource linkage."
+        ])
+      end
+    end
+
+    context "when relationship starts including resource linkage" do
+      before do
+        resource_a.has_many :positions,
+          resource: position_resource
+        resource_b.has_many :positions,
+          resource_ids: true,
           resource: position_resource
       end
 

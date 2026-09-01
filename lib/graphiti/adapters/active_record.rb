@@ -246,7 +246,7 @@ module Graphiti
 
           children.each do |child|
             if association_type == :many_to_many &&
-                [:create, :update].include?(Graphiti.context[:namespace]) &&
+                [:create, :update].include?(Graphiti.context[:action]) &&
                 !parent.send(association_name).exists?(child.id) &&
                 child.errors.blank?
               parent.send(association_name) << child
@@ -279,20 +279,6 @@ module Graphiti
           parent.send(association_name).delete(child)
         end
         # Nothing to do in the else case, happened when we merged foreign key
-      end
-
-      # (see Adapters::Abstract#create)
-      def create(model_class, create_params)
-        instance = model_class.new(create_params)
-        instance.save
-        instance
-      end
-
-      # (see Adapters::Abstract#update)
-      def update(model_class, update_params)
-        instance = model_class.find(update_params.only(:id))
-        instance.update_attributes(update_params.except(:id))
-        instance
       end
 
       def save(model_instance)

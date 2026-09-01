@@ -85,7 +85,7 @@ class Graphiti::Deserializer
   def meta(action: :update)
     {
       type: data[:type],
-      temp_id: data[:'temp-id'],
+      temp_id: data[:"temp-id"],
       method: action,
       payload_path: ["data"]
     }
@@ -162,12 +162,12 @@ class Graphiti::Deserializer
   end
 
   def process_relationship_datum(datum)
-    temp_id = datum[:'temp-id']
+    temp_id = datum[:"temp-id"]
     included_object = included.find { |i|
       next unless i[:type] == datum[:type]
 
       (i[:id] && i[:id] == datum[:id]) ||
-        (i[:'temp-id'] && i[:'temp-id'] == temp_id)
+        (i[:"temp-id"] && i[:"temp-id"] == temp_id)
     }
     included_idx = included.index(included_object)
 

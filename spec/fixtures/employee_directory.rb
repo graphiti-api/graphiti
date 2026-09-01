@@ -47,10 +47,17 @@ ActiveRecord::Schema.define(version: 1) do
   create_table :positions do |t|
     t.belongs_to :department, index: true
     t.belongs_to :employee, index: true
+    t.string :region_name
     t.string :title
   end
 
   create_table :departments do |t|
+    t.string :name
+  end
+
+  # Keyed by a string rather than an integer :id, so a belongs_to pointing at
+  # it has a foreign key that is not the related resource's rendered id.
+  create_table :regions, primary_key: :code, id: :string do |t|
     t.string :name
   end
 
@@ -154,10 +161,16 @@ end
 class Position < ApplicationRecord
   belongs_to :employee
   belongs_to :department
+  belongs_to :region, foreign_key: :region_name, primary_key: :name, optional: true
 end
 
 class Department < ApplicationRecord
   has_many :positions
+end
+
+class Region < ApplicationRecord
+  self.primary_key = "code"
+  has_many :positions, foreign_key: :region_name, primary_key: :name
 end
 
 class Salary < ApplicationRecord
@@ -181,6 +194,10 @@ class TeamResource < ApplicationResource
 end
 
 class DepartmentResource < ApplicationResource
+  attribute :name, :string
+end
+
+class RegionResource < ApplicationResource
   attribute :name, :string
 end
 

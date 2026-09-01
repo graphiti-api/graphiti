@@ -16,7 +16,7 @@ RSpec.describe Graphiti::Resource do
         expect(klass.adapter.ancestors[0])
           .to eq(Graphiti::Adapters::Abstract)
         expect(klass.default_sort).to be_nil
-        expect(klass.default_page_size).to be_nil
+        expect(klass.page_default_size).to be_nil
         expect(klass.attributes_readable_by_default).to eq(true)
         expect(klass.attributes_writable_by_default).to eq(true)
         expect(klass.attributes_sortable_by_default).to eq(true)
@@ -24,8 +24,8 @@ RSpec.describe Graphiti::Resource do
         expect(klass.attributes_schema_by_default).to eq(true)
         expect(klass.relationships_readable_by_default).to eq(true)
         expect(klass.relationships_writable_by_default).to eq(true)
-        expect(klass.filters_accept_nil_by_default).to eq(false)
-        expect(klass.filters_deny_empty_by_default).to eq(false)
+        expect(klass.relationship_placeholders).to eq(false)
+        expect(klass.filter_blanks_treated_as).to eq(:literal)
       end
 
       it "does not have serializer, type, model, or graphql_entrypoint" do
@@ -37,6 +37,41 @@ RSpec.describe Graphiti::Resource do
 
       it "adds to global list of resources" do
         expect(Graphiti.resources).to include(klass)
+      end
+    end
+
+    describe "an abstract resource declaring relationships" do
+      let(:app_resource) do
+        Class.new(described_class) do
+          self.abstract_class = true
+          has_many :positions, resource: PORO::PositionResource
+        end
+      end
+
+      it "does not raise" do
+        expect { app_resource }.to_not raise_error
+        expect(app_resource.serializer).to be_nil
+      end
+
+      it "applies the relationship to a subclass's serializer" do
+        klass = Class.new(app_resource)
+        expect(klass.serializer.relationship_blocks.keys).to include(:positions)
+      end
+
+      context "when rails eager loading" do
+        before do
+          rails = double \
+            application: double(config: double(eager_load: true))
+          stub_const("Rails", rails.as_null_object)
+          Graphiti.instance_variable_set(:@setup, false)
+        end
+
+        it "applies to the subclass's serializer via setup!" do
+          klass = Class.new(app_resource)
+          expect(klass.serializer.relationship_blocks).to be_blank
+          expect { Graphiti.setup! }.to_not raise_error
+          expect(klass.serializer.relationship_blocks.keys).to include(:positions)
+        end
       end
     end
 
@@ -63,7 +98,7 @@ RSpec.describe Graphiti::Resource do
         expect(klass.adapter.ancestors[0])
           .to eq(Graphiti::Adapters::Abstract)
         expect(klass.default_sort).to be_nil
-        expect(klass.default_page_size).to be_nil
+        expect(klass.page_default_size).to be_nil
         expect(klass.attributes_readable_by_default).to eq(true)
         expect(klass.attributes_writable_by_default).to eq(true)
         expect(klass.attributes_sortable_by_default).to eq(true)
@@ -71,8 +106,7 @@ RSpec.describe Graphiti::Resource do
         expect(klass.attributes_schema_by_default).to eq(true)
         expect(klass.relationships_readable_by_default).to eq(true)
         expect(klass.relationships_writable_by_default).to eq(true)
-        expect(klass.filters_accept_nil_by_default).to eq(false)
-        expect(klass.filters_deny_empty_by_default).to eq(false)
+        expect(klass.filter_blanks_treated_as).to eq(:literal)
       end
 
       context "when rails" do
@@ -85,10 +119,20 @@ RSpec.describe Graphiti::Resource do
         context "and eager loading" do
           let(:eager_load) { true }
 
+          before do
+            Graphiti.instance_variable_set(:@setup, false)
+          end
+
           it "does NOT assign relationships to the serializer" do
             klass.has_many :positions, resource: PORO::PositionResource
             expect(klass.serializer.relationship_blocks).to be_blank
             Graphiti.setup!
+            expect(klass.serializer.relationship_blocks).to_not be_blank
+          end
+
+          it "assigns relationships at definition once setup! has run" do
+            Graphiti.setup!
+            klass.has_many :positions, resource: PORO::PositionResource
             expect(klass.serializer.relationship_blocks).to_not be_blank
           end
         end
@@ -150,7 +194,7 @@ RSpec.describe Graphiti::Resource do
           Class.new(app_resource) do
             self.adapter = PORO::Adapter
             self.default_sort = [{name: :asc}]
-            self.default_page_size = 4
+            self.page_default_size = 4
             self.attributes_readable_by_default = false
             self.attributes_writable_by_default = false
             self.attributes_sortable_by_default = false
@@ -158,15 +202,14 @@ RSpec.describe Graphiti::Resource do
             self.attributes_schema_by_default = false
             self.relationships_readable_by_default = false
             self.relationships_writable_by_default = false
-            self.filters_accept_nil_by_default = true
-            self.filters_deny_empty_by_default = true
+            self.filter_blanks_treated_as = :rejected
           end
         end
 
         it "works" do
           expect(klass.adapter).to eq(PORO::Adapter)
           expect(klass.default_sort).to eq([{name: :asc}])
-          expect(klass.default_page_size).to eq(4)
+          expect(klass.page_default_size).to eq(4)
           expect(klass.attributes_readable_by_default).to eq(false)
           expect(klass.attributes_writable_by_default).to eq(false)
           expect(klass.attributes_sortable_by_default).to eq(false)
@@ -174,8 +217,7 @@ RSpec.describe Graphiti::Resource do
           expect(klass.attributes_schema_by_default).to eq(false)
           expect(klass.relationships_readable_by_default).to eq(false)
           expect(klass.relationships_writable_by_default).to eq(false)
-          expect(klass.filters_accept_nil_by_default).to eq(true)
-          expect(klass.filters_deny_empty_by_default).to eq(true)
+          expect(klass.filter_blanks_treated_as).to eq(:rejected)
         end
       end
 
@@ -309,7 +351,7 @@ RSpec.describe Graphiti::Resource do
           Class.new(app_resource) do
             self.adapter = PORO::Adapter
             self.default_sort = [{name: :asc}]
-            self.default_page_size = 4
+            self.page_default_size = 4
             self.attributes_readable_by_default = false
             self.attributes_writable_by_default = false
             self.attributes_sortable_by_default = false
@@ -317,15 +359,14 @@ RSpec.describe Graphiti::Resource do
             self.attributes_schema_by_default = false
             self.relationships_readable_by_default = false
             self.relationships_writable_by_default = false
-            self.filters_accept_nil_by_default = true
-            self.filters_deny_empty_by_default = true
+            self.filter_blanks_treated_as = :rejected
           end
         end
 
         it "carries them over to the subclass" do
           expect(klass2.adapter).to eq(PORO::Adapter)
           expect(klass2.default_sort).to eq([{name: :asc}])
-          expect(klass2.default_page_size).to eq(4)
+          expect(klass2.page_default_size).to eq(4)
           expect(klass2.attributes_readable_by_default).to eq(false)
           expect(klass2.attributes_writable_by_default).to eq(false)
           expect(klass2.attributes_sortable_by_default).to eq(false)
@@ -333,8 +374,7 @@ RSpec.describe Graphiti::Resource do
           expect(klass2.attributes_schema_by_default).to eq(false)
           expect(klass2.relationships_readable_by_default).to eq(false)
           expect(klass2.relationships_writable_by_default).to eq(false)
-          expect(klass2.filters_accept_nil_by_default).to eq(true)
-          expect(klass2.filters_deny_empty_by_default).to eq(true)
+          expect(klass2.filter_blanks_treated_as).to eq(:rejected)
         end
       end
 
@@ -416,10 +456,10 @@ RSpec.describe Graphiti::Resource do
       dbl = double
       instance.with_context(dbl, :index) do
         expect(instance.context).to eq(dbl)
-        expect(instance.context_namespace).to eq(:index)
+        expect(instance.current_action).to eq(:index)
       end
       expect(instance.context).to be_nil
-      expect(instance.context_namespace).to be_nil
+      expect(instance.current_action).to be_nil
     end
 
     context "when an error" do
@@ -436,7 +476,17 @@ RSpec.describe Graphiti::Resource do
           end
         }.to raise_error("foo")
         expect(instance.context).to eq("orig")
-        expect(instance.context_namespace).to eq("orig namespace")
+        expect(instance.current_action).to eq("orig namespace")
+      end
+    end
+  end
+
+  describe "#context_namespace" do
+    it "is a deprecated alias of #current_action" do
+      instance.with_context(double, :index) do
+        expect(Graphiti::DEPRECATOR).to receive(:deprecation_warning)
+          .with(:context_namespace, /current_action/)
+        expect(instance.context_namespace).to eq(:index)
       end
     end
   end
@@ -447,15 +497,116 @@ RSpec.describe Graphiti::Resource do
     end
   end
 
-  describe "#default_page_size" do
+  describe "#page_default_size" do
     it "defaults" do
-      expect(instance.default_page_size).to be_nil
+      expect(instance.page_default_size).to be_nil
     end
   end
 
-  describe "#max_page_size" do
+  describe "#page_max_size" do
     it "defaults" do
-      expect(instance.max_page_size).to eq(1_000)
+      expect(instance.page_max_size).to eq(1_000)
+    end
+  end
+
+  describe "the deprecated page setting names" do
+    it "reads and writes through to the page_ family" do
+      klass.default_page_size = 5
+      klass.max_page_size = 50
+      klass.cursor_paginatable = true
+
+      expect(klass.page_default_size).to eq(5)
+      expect(klass.page_max_size).to eq(50)
+      expect(klass.page_cursors).to eq(true)
+      expect(klass.cursor_paginatable?).to eq(true)
+    end
+  end
+
+  describe "the deprecated filter blank settings" do
+    it "maps accept_nil onto the blanks modes" do
+      klass.filters_accept_nil_by_default = true
+      expect(klass.filter_blanks_treated_as).to eq(:null)
+      expect(klass.filters_accept_nil_by_default).to eq(true)
+
+      klass.filters_accept_nil_by_default = false
+      expect(klass.filter_blanks_treated_as).to eq(:literal)
+    end
+
+    it "maps deny_empty onto the blanks modes" do
+      klass.filters_deny_empty_by_default = true
+      expect(klass.filter_blanks_treated_as).to eq(:rejected)
+      expect(klass.filters_deny_empty_by_default).to eq(true)
+
+      klass.filters_deny_empty_by_default = false
+      expect(klass.filter_blanks_treated_as).to eq(:literal)
+    end
+  end
+
+  describe "#filter_blanks_treated_as" do
+    it "rejects other values" do
+      expect {
+        klass.filter_blanks_treated_as = :nope
+      }.to raise_error(Graphiti::Errors::InvalidFilterBlanks, /must be one of :literal, :null, or :rejected/)
+    end
+  end
+
+  describe "#page_links" do
+    it "defaults" do
+      expect(instance.page_links).to eq(false)
+    end
+
+    it "accepts true, false, and :on_demand" do
+      klass.page_links = :on_demand
+      expect(klass.page_links).to eq(:on_demand)
+    end
+
+    it "rejects other values" do
+      expect {
+        klass.page_links = :always
+      }.to raise_error(Graphiti::Errors::InvalidLinkRendering, /page_links must be true, false, or :on_demand/)
+    end
+  end
+
+  describe "#typecast_reads" do
+    it "defaults" do
+      expect(instance.typecast_reads).to eq(true)
+    end
+  end
+
+  describe "#relationship_links" do
+    it "inherits the base setting" do
+      expect(instance.relationship_links).to eq(Graphiti::Resource.relationship_links)
+    end
+
+    it "is inherited" do
+      klass.relationship_links = :on_demand
+      expect(Class.new(klass).relationship_links).to eq(:on_demand)
+    end
+
+    it "rejects other values" do
+      expect {
+        klass.relationship_links = :never
+      }.to raise_error(Graphiti::Errors::InvalidLinkRendering, /relationship_links must be true, false, or :on_demand/)
+    end
+  end
+
+  describe "the deprecated autolink setting" do
+    it "reads and writes through to relationship_links" do
+      klass.autolink = false
+      expect(klass.relationship_links).to eq(false)
+      expect(klass.autolink?).to eq(false)
+
+      klass.relationship_links = :on_demand
+      expect(klass.autolink).to eq(true)
+    end
+
+    it "leaves an on-demand mode alone" do
+      klass.relationship_links = :on_demand
+      klass.autolink = true
+      expect(klass.relationship_links).to eq(:on_demand)
+
+      klass.autolink = false
+      expect(klass.relationship_links).to eq(false)
     end
   end
 
@@ -963,9 +1114,9 @@ RSpec.describe Graphiti::Resource do
 
     it "infers from name" do
       expect(klass.endpoint).to eq({
-        path: :'/employees',
-        full_path: :'/employees',
-        url: :'/employees',
+        path: :"/employees",
+        full_path: :"/employees",
+        url: :"/employees",
         actions: [:index, :show, :create, :update, :destroy]
       })
     end
@@ -976,11 +1127,11 @@ RSpec.describe Graphiti::Resource do
       end
 
       it "is applied to url" do
-        expect(klass.endpoint[:url]).to eq(:'http://example.com/employees')
+        expect(klass.endpoint[:url]).to eq(:"http://example.com/employees")
       end
 
       it "is NOT applied to full_path" do
-        expect(klass.endpoint[:full_path]).to eq(:'/employees')
+        expect(klass.endpoint[:full_path]).to eq(:"/employees")
       end
     end
 
@@ -990,11 +1141,11 @@ RSpec.describe Graphiti::Resource do
       end
 
       it "is applied to full_path" do
-        expect(klass.endpoint[:full_path]).to eq(:'/api/v1/employees')
+        expect(klass.endpoint[:full_path]).to eq(:"/api/v1/employees")
       end
 
       it "is applied to url" do
-        expect(klass.endpoint[:url]).to eq(:'/api/v1/employees')
+        expect(klass.endpoint[:url]).to eq(:"/api/v1/employees")
       end
     end
 
@@ -1009,9 +1160,9 @@ RSpec.describe Graphiti::Resource do
 
       it "adds to path" do
         expect(klass.endpoint).to eq({
-          path: :'/poro/employees',
-          full_path: :'/poro/employees',
-          url: :'/poro/employees',
+          path: :"/poro/employees",
+          full_path: :"/poro/employees",
+          url: :"/poro/employees",
           actions: [:index, :show, :create, :update, :destroy]
         })
       end
@@ -1028,7 +1179,7 @@ RSpec.describe Graphiti::Resource do
     end
 
     it "infers path from name" do
-      expect(instance.endpoint[:path]).to eq(:'/employees')
+      expect(instance.endpoint[:path]).to eq(:"/employees")
     end
 
     it "defaults actions" do
@@ -1047,7 +1198,7 @@ RSpec.describe Graphiti::Resource do
       end
 
       it "infers path from module + name" do
-        expect(instance.endpoint[:path]).to eq(:'/poro/employees')
+        expect(instance.endpoint[:path]).to eq(:"/poro/employees")
       end
     end
   end
@@ -1086,6 +1237,28 @@ RSpec.describe Graphiti::Resource do
       it "still works" do
         expect(klass.endpoints).to eq([])
       end
+    end
+  end
+
+  describe ".validate_endpoints" do
+    let(:klass) { Class.new(Graphiti::Resource) }
+
+    it "defaults both halves on" do
+      expect(klass.validate_requests).to eq(true)
+      expect(klass.validate_links).to eq(true)
+      expect(klass.validate_endpoints).to eq(true)
+    end
+
+    it "sets both halves" do
+      klass.validate_endpoints = false
+      expect(klass.validate_requests).to eq(false)
+      expect(klass.validate_links).to eq(false)
+    end
+
+    it "reads false once either half is off" do
+      klass.validate_links = false
+      expect(klass.validate_endpoints).to eq(false)
+      expect(klass.validate_requests).to eq(true)
     end
   end
 
@@ -1280,8 +1453,8 @@ RSpec.describe Graphiti::Resource do
                 klass.all
               }.to raise_error(Graphiti::Errors::InvalidEndpoint) { |error|
                 expect(error.message).to include("QueryAllSpec::EmployeeResource cannot be called directly from endpoint /api/v1/employees")
-                expect(error.message).to include("self.validate_endpoints = false")
-                expect(error.message).to include("https://www.graphiti.dev/guides/concepts/links")
+                expect(error.message).to include("self.validate_requests = false")
+                expect(error.message).to include("https://graphiti.dev/concepts/links")
               }
             end
           end
@@ -1330,14 +1503,14 @@ RSpec.describe Graphiti::Resource do
             end
           end
 
-          context "but endpoint checks are turned off" do
+          context "but request checks are turned off" do
             around do |e|
-              orig = klass.validate_endpoints
+              orig = klass.validate_requests
               begin
-                klass.validate_endpoints = false
+                klass.validate_requests = false
                 e.run
               ensure
-                klass.validate_endpoints = orig
+                klass.validate_requests = orig
               end
             end
 

@@ -290,7 +290,7 @@ RSpec.describe Graphiti::Query do
 
       context "via relationship name dot syntax" do
         before do
-          params[:filter] = {'positions.title': {eq: "asdf"}}
+          params[:filter] = {"positions.title": {eq: "asdf"}}
         end
 
         let(:expected) do
@@ -312,7 +312,7 @@ RSpec.describe Graphiti::Query do
 
         context "when multiple levels" do
           before do
-            params[:filter] = {'positions.department.name': {eq: "asdf"}}
+            params[:filter] = {"positions.department.name": {eq: "asdf"}}
           end
 
           let(:expected) do
@@ -608,10 +608,10 @@ RSpec.describe Graphiti::Query do
         before do
           params[:page] = {
             number: 2, size: 1,
-            'positions.size': 2,
-            'positions.number': 3,
-            'positions.department.size': 3,
-            'positions.department.number': 4
+            "positions.size": 2,
+            "positions.number": 3,
+            "positions.department.size": 3,
+            "positions.department.number": 4
           }
         end
 
@@ -897,8 +897,10 @@ RSpec.describe Graphiti::Query do
     end
   end
 
-  describe "#links?" do
-    subject { instance.links? }
+  describe "#render_link?" do
+    subject { instance.render_link?(mode) }
+
+    let(:mode) { true }
 
     it { is_expected.to eq(true) }
 
@@ -918,16 +920,14 @@ RSpec.describe Graphiti::Query do
       it { is_expected.to eq(false) }
     end
 
-    context "when links_on_demand" do
-      around do |e|
-        original = Graphiti.config.links_on_demand
-        begin
-          Graphiti.config.links_on_demand = true
-          e.run
-        ensure
-          Graphiti.config.links_on_demand = original
-        end
-      end
+    context "when mode is false" do
+      let(:mode) { false }
+
+      it { is_expected.to eq(false) }
+    end
+
+    context "when mode is :on_demand" do
+      let(:mode) { :on_demand }
 
       context "and requested" do
         context "as string" do
@@ -940,7 +940,7 @@ RSpec.describe Graphiti::Query do
 
         context "as boolean" do
           before do
-            params[:links] = "true"
+            params[:links] = true
           end
 
           it { is_expected.to eq(true) }
@@ -953,12 +953,23 @@ RSpec.describe Graphiti::Query do
     end
   end
 
+  describe "deprecated positional arguments" do
+    it "warns and maps them to keywords" do
+      expect(Graphiti::DEPRECATOR).to receive(:warn).once.and_return(nil)
+
+      query = described_class.new(resource, params, :positions, nil, [], :create)
+
+      expect(query.association_name).to eq(:positions)
+      expect(query.action).to eq(:create)
+    end
+  end
+
   describe "#action" do
     subject { instance.action }
     let(:provided_action) { :create }
 
     context "when provided explicitly" do
-      let(:instance) { described_class.new(resource, params, nil, nil, [], provided_action) }
+      let(:instance) { described_class.new(resource, params, action: provided_action) }
       it { is_expected.to eq(provided_action) }
 
       context "and the action provided is show" do
@@ -1015,28 +1026,34 @@ RSpec.describe Graphiti::Query do
   end
 
   describe "#pagination_links?" do
-    subject { instance.pagination_links? }
-    let(:pagination_links) { Graphiti.config.pagination_links }
-    let(:pagination_links_on_demand) { Graphiti.config.pagination_links_on_demand }
-
-    around do |e|
-      original_pagination_links = Graphiti.config.pagination_links
-      original_pagination_links_on_demand = Graphiti.config.pagination_links_on_demand
-      Graphiti.config.pagination_links = pagination_links
-      Graphiti.config.pagination_links_on_demand = pagination_links_on_demand
-      begin
-        e.run
-      ensure
-        Graphiti.config.pagination_links = original_pagination_links
-        Graphiti.config.pagination_links_on_demand = original_pagination_links_on_demand
-      end
+    it "is the deprecated name for #page_links?" do
+      employee_resource.page_links = true
+      expect(instance.pagination_links?).to eq(true)
     end
+  end
 
-    context "when pagination_links_on_demand" do
-      let(:pagination_links_on_demand) { true }
+  describe "#page_links?" do
+    subject { instance.page_links? }
+
+    context "when page_links is :on_demand" do
+      before do
+        employee_resource.page_links = :on_demand
+      end
 
       context "when params ask for pagination" do
+        let(:params) { {page_links: true} }
+
+        it { is_expected.to eq(true) }
+      end
+
+      context "when params ask with the deprecated param name" do
         let(:params) { {pagination_links: true} }
+
+        it { is_expected.to eq(true) }
+      end
+
+      context "when params ask as a string" do
+        let(:params) { {page_links: "true"} }
 
         it { is_expected.to eq(true) }
       end
@@ -1048,13 +1065,15 @@ RSpec.describe Graphiti::Query do
 
     context "when action is equal to find" do
       let(:params) { {action: "show"} }
-      let(:pagination_links_on_demand) { false }
 
       it { is_expected.to eq(false) }
 
-      context "when pagination_links_on_demand and param is present" do
+      context "when pagination_links is :on_demand and param is present" do
         let(:params) { {action: "show", pagination_links: true} }
-        let(:pagination_links_on_demand) { true }
+
+        before do
+          employee_resource.page_links = :on_demand
+        end
 
         it { is_expected.to eq(false) }
       end
@@ -1062,17 +1081,16 @@ RSpec.describe Graphiti::Query do
 
     context "when action is equal to all" do
       let(:params) { {action: "index"} }
-      let(:pagination_links_on_demand) { false }
 
-      context "when is equal config.pagination_links is true" do
-        let(:pagination_links) { true }
+      context "when pagination_links is true" do
+        before do
+          employee_resource.page_links = true
+        end
 
         it { is_expected.to eq(true) }
       end
 
-      context "when is equal config.pagination_links is false" do
-        let(:pagination_links) { false }
-
+      context "when pagination_links is false" do
         it { is_expected.to eq(false) }
       end
     end

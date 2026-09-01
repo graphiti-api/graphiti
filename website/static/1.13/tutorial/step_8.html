@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Boogaloo" rel="stylesheet">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/1.13/assets/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/1.13/assets/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/1.13/assets/favicons/favicon-16x16.png">
+  <link rel="manifest" href="/1.13/assets/favicons/site.webmanifest">
+  <link rel="mask-icon" href="/1.13/assets/favicons/safari-pinned-tab.svg" color="#F86DA7">
+  <link rel="shortcut icon" href="/1.13/assets/favicons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#F86DA7">
+  <meta name="msapplication-config" content="/1.13/assets/favicons/browserconfig.xml">
+  <meta name="theme-color" content="#F86DA7">
+
+  <title>Graphiti</title>
+  <meta name="description" content="Stylish Graph APIs">
+
+  <link rel="stylesheet" href="/1.13/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/1.13/feed.xml">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-127904727-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-127904727-1');
+  </script>
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <a href="/1.13/1.13" class="navbar-brand">
+        <img alt="logo" src="/1.13/assets/img/logo.png">
+      </a>
+    </div>
+    <nav class="" role="navigation">
+      <ul class="nav navbar-nav nav-links">
+        <li>
+          <a class="quickstart nav-link" href="/1.13/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="guides nav-link" href="/1.13/guides">Guides</a>
+        </li>
+        <li>
+          <a class="tutorial nav-link" href="/1.13/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="spraypaint nav-link" href="/1.13/js">Spraypaint</a>
+        </li>
+      </ul>
+      <ul class="nav gh navbar-nav navbar-right visible-lg visible-md">
+        <li>
+          <span class="star">⭐</span>
+          <a href="https://github.com/graphiti-api/graphiti">
+            <img alt="github-star" style="margin-right: 65px;margin-top: -20px" src="/1.13/assets/img/gh.png">
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="toc col-md-3">
+  <h1 id="tutorial">Tutorial</h1>
+
+  <ul>
+    <li><a href="/1.13/tutorial/step_0">Step 0: Bootstrapping</a></li>
+    <li><a href="/1.13/tutorial/step_1">Step 1: Initial Resource</a></li>
+    <li><a href="/1.13/tutorial/step_2">Step 2: Has Many</a></li>
+    <li><a href="/1.13/tutorial/step_3">Step 3: Belongs To</a></li>
+    <li><a href="/1.13/tutorial/step_4">Step 4: Customizing Queries</a></li>
+    <li><a href="/1.13/tutorial/step_5">Step 5: Has One</a></li>
+    <li><a href="/1.13/tutorial/step_6">Step 6: Customizing Writes</a></li>
+    <li><a href="/1.13/tutorial/step_7">Step 7: Many-to-Many</a></li>
+    <li><a href="/1.13/tutorial/step_8">Step 8: Polymorphic Relationships</a></li>
+    <li><a href="/1.13/tutorial/step_9">Step 9: Polymorphic Resources</a></li>
+  </ul>
+</div>
+
+<div class="col-md-8">
+
+  <h3 id="step-8-polymorphic-relationships">Step 8: Polymorphic Relationships</h3>
+
+  <blockquote>
+    <p><a href="https://github.com/graphiti-api/employee_directory/compare/step_7_many_to_many...step_8_polymorphic_belongs_to">View the Diff</a></p>
+  </blockquote>
+
+  <p>Let’s introduce the concept of a Note. A Note can belong to a
+Department, an Employee, or a Team. For this, we’ll need to introduce
+the concept of <a href="https://guides.rubyonrails.org/v5.2/association_basics.html#polymorphic-associations">polymorphism</a>.</p>
+
+  <table class="table table-small text-center">
+  <thead>
+    <tr>
+      <th class="text-center">id</th>
+      <th class="text-center">notable_id</th>
+      <th class="text-center">notable_type</th>
+      <th class="text-center">body</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>1</td>
+      <td>Employee</td>
+      <td>A Sample Note!</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>1</td>
+      <td>Department</td>
+      <td>Another Sample Note!</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>1</td>
+      <td>Team</td>
+      <td>A Third Sample Note!</td>
+    </tr>
+  </tbody>
+</table>
+
+  <h3 id="the-rails-stuff-">The Rails Stuff 🚂</h3>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>rails generate model Note notable:references<span class="o">{</span>polymorphic<span class="o">}</span>:index
+<span class="nv">$ </span>bin/rails db:migrate</code></pre></figure>
+
+  <p>Make sure to add the corresponding model relationships:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/models/employee.rb</span>
+<span class="n">has_many</span> <span class="ss">:notes</span><span class="p">,</span> <span class="ss">as: :notable</span>
+<span class="c1"># app/models/team.rb</span>
+<span class="n">has_many</span> <span class="ss">:notes</span><span class="p">,</span> <span class="ss">as: :notable</span>
+<span class="c1"># app/models/department.rb</span>
+<span class="n">has_many</span> <span class="ss">:notes</span><span class="p">,</span> <span class="ss">as: :notable</span>
+
+<span class="c1"># app/models/note.rb</span>
+<span class="n">belongs_to</span> <span class="ss">:notable</span><span class="p">,</span> <span class="ss">polymorphic: </span><span class="kp">true</span></code></pre></figure>
+
+  <p>Finally, make sure to edit your seed file - check out the <a href="https://github.com/graphiti-api/employee_directory/compare/step_7_many_to_many...step_8_polymorphic_belongs_to">diff</a> to see the necessary adjustments.</p>
+
+  <h3 id="the-graphiti-stuff-">The Graphiti Stuff 🎨</h3>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bin/rails g graphiti:resource Note body:string</code></pre></figure>
+
+  <p>Let’s create our <code class="language-plaintext highlighter-rouge">NoteResource</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">NoteResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="n">attribute</span> <span class="ss">:body</span><span class="p">,</span> <span class="ss">:string</span>
+
+  <span class="n">filter</span> <span class="ss">:notable_id</span><span class="p">,</span> <span class="ss">:integer</span>
+  <span class="n">filter</span> <span class="ss">:notable_type</span><span class="p">,</span> <span class="ss">:string</span><span class="p">,</span> <span class="ss">allow: </span><span class="sx">%w(Employee Department Team)</span>
+
+  <span class="n">polymorphic_belongs_to</span> <span class="ss">:notable</span> <span class="k">do</span>
+    <span class="n">group_by</span><span class="p">(</span><span class="ss">:notable_type</span><span class="p">)</span> <span class="k">do</span>
+      <span class="n">on</span><span class="p">(</span><span class="ss">:Employee</span><span class="p">)</span>
+      <span class="n">on</span><span class="p">(</span><span class="ss">:Team</span><span class="p">)</span>
+      <span class="n">on</span><span class="p">(</span><span class="ss">:Department</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>And corresponding associations:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="n">polymorphic_has_many</span> <span class="ss">:notes</span><span class="p">,</span> <span class="ss">as: :notable</span>
+<span class="c1"># app/resources/team_resource.rb</span>
+<span class="n">polymorphic_has_many</span> <span class="ss">:notes</span><span class="p">,</span> <span class="ss">as: :notable</span>
+<span class="c1"># app/resources/department_resource.rb</span>
+<span class="n">polymorphic_has_many</span> <span class="ss">:notes</span><span class="p">,</span> <span class="ss">as: :notable</span></code></pre></figure>
+
+  <h4 id="digging-deeper-">Digging Deeper 🧐</h4>
+
+  <p>When defining a polymorphic relationship for our API, we’re saying “grab
+all the parent records, group them by a <code class="language-plaintext highlighter-rouge">type</code> column, and execute
+different queries for each type”. This way records with <code class="language-plaintext highlighter-rouge">notable_type ==
+'Employee'</code> can hit the <code class="language-plaintext highlighter-rouge">employees</code> table, but records with
+<code class="language-plaintext highlighter-rouge">notable_type == 'Department'</code> could in theory load from a different API
+altogether.</p>
+
+  <p>Each of the <code class="language-plaintext highlighter-rouge">on</code> lines defines a new <code class="language-plaintext highlighter-rouge">belongs_to</code> association. That
+means you can customize just like always:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">on</span><span class="p">(</span><span class="ss">:Team</span><span class="p">).</span><span class="nf">belongs_to</span> <span class="ss">:team</span><span class="p">,</span> <span class="ss">resource: </span><span class="no">SomeCustomTeamResource</span> <span class="k">do</span>
+  <span class="c1"># assign {}</span>
+  <span class="c1"># link {}</span>
+  <span class="c1"># ... etc ...</span>
+<span class="k">end</span></code></pre></figure>
+
+</div>
+
+<div class="clearfix">
+  <h2 id="next">
+    <a href="/1.13/tutorial/step_9">
+      NEXT - 
+      <small>Step 9: Polymorphic Resources</small>
+      &raquo;
+    </a>
+  </h2>
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="/1.13/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="/1.13/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="/1.13/guides">Guides</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Contact</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://discord.gg/wgqkMBsSRV">Discord Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Email</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

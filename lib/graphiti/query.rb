@@ -2,9 +2,20 @@ require "digest"
 
 module Graphiti
   class Query
+    TRUTHY_LINKS = [true, "true"].freeze
+    LINKLESS_FORMATS = [:json, :xml, "json", "xml"].freeze
+
     attr_reader :resource, :association_name, :params, :action
 
-    def initialize(resource, params, association_name = nil, nested_include = nil, parents = [], action = nil)
+    def initialize(resource, params, *positional, association_name: nil, nested_include: nil, parents: [], action: nil)
+      if positional.any?
+        Graphiti::DEPRECATOR.warn("Passing Query.new trailing arguments positionally is deprecated. Use association_name:/nested_include:/parents:/action: keywords.")
+        association_name ||= positional[0]
+        nested_include ||= positional[1]
+        parents = positional[2] if positional.length > 2
+        action ||= positional[3]
+      end
+
       @resource = resource
       @association_name = association_name
       @params = params
@@ -14,33 +25,89 @@ module Graphiti
       @include_param = nested_include || @params[:include]
       @parents = parents
       @action = parse_action(action)
+      @entity_map = Concurrent::Map.new if parents.empty?
+      @association_owners = Concurrent::Map.new if parents.empty?
     end
 
     def association?
       !!@association_name
     end
 
+    # Concurrent::Map because sideload scopes resolve on pool threads
+    def entity_map
+      return root.entity_map unless root == self
+
+      @entity_map
+    end
+
+    def association_owners
+      return root.association_owners unless root == self
+
+      @association_owners
+    end
+
+    # Deduplication exists for a row two include paths both resolve, so a
+    # resource class sitting at one node has nothing to collide with.
+    def repeated_resource_classes
+      return root.repeated_resource_classes unless root == self
+
+      @repeated_resource_classes ||= begin
+        counts = Hash.new(0)
+        walk = [self]
+        while (query = walk.pop)
+          counts[query.resource.class] += 1
+          query.sideloads.each_pair do |name, sideload_query|
+            walk << sideload_query
+            sideload = query.resource.class.sideload(name)
+            next unless sideload.respond_to?(:children)
+
+            # A polymorphic child resolves under a class no node names.
+            sideload.children.each_value { |child| counts[child.resource.class] += 2 }
+          end
+        end
+        counts.select { |_, count| count > 1 }.keys.to_set
+      end
+    end
+
     def top_level?
       !association?
     end
 
-    def links?
-      return false if [:json, :xml, "json", "xml"].include?(params[:format])
-      if Graphiti.config.links_on_demand
-        [true, "true"].include?(@params[:links])
+    def includes_requested?
+      @include_param.present?
+    end
+
+    def links_requested?
+      return @links_requested if defined?(@links_requested)
+
+      @links_requested = TRUTHY_LINKS.include?(@params[:links])
+    end
+
+    def suppress_links?
+      return @suppress_links if defined?(@suppress_links)
+
+      @suppress_links = LINKLESS_FORMATS.include?(params[:format])
+    end
+
+    def render_link?(mode)
+      return false if suppress_links?
+
+      (mode == :on_demand) ? links_requested? : mode == true
+    end
+
+    def page_links?
+      if action == :find
+        false
+      elsif @resource.page_links == :on_demand
+        page_links_requested?
       else
-        true
+        @resource.page_links
       end
     end
 
-    def pagination_links?
-      if action == :find
-        false
-      elsif Graphiti.config.pagination_links_on_demand
-        [true, "true"].include?(@params[:pagination_links])
-      else
-        Graphiti.config.pagination_links
-      end
+    def page_links_requested?
+      [@params[:page_links], @params[:pagination_links]]
+        .any? { |value| [true, "true"].include?(value) }
     end
 
     def debug_requested?
@@ -109,9 +176,10 @@ module Graphiti
             relationship_name = sideload ? sideload.name : key
             hash[relationship_name] = Query.new sl_resource,
               @params,
-              key,
-              sub_hash,
-              query_parents, :all
+              association_name: key,
+              nested_include: sub_hash,
+              parents: query_parents,
+              action: :all
           else
             handle_missing_sideload(key)
           end
@@ -121,6 +189,10 @@ module Graphiti
 
     def parents
       @parents ||= []
+    end
+
+    def root
+      parents.first || self
     end
 
     def fields
@@ -208,14 +280,14 @@ module Graphiti
         allowlist = nil
         if @resource.context&.respond_to?(:sideload_allowlist)
           allowlist = @resource.context.sideload_allowlist
-          allowlist = allowlist[@resource.context_namespace] if allowlist
+          allowlist = allowlist[@resource.current_action] if allowlist
         end
 
         scrubbed = allowlist ? Util::IncludeParams.scrub(requested, allowlist) : requested
 
         scrubbed.filter do |key, value|
           sideload = @resource.class.sideload(key)
-          sideload.nil? ? true : sideload.readable?
+          sideload.nil? || sideload.readable?
         end
       end
     end
@@ -246,8 +318,8 @@ module Graphiti
     def query_cache_key
       attrs = {extra_fields: extra_fields,
                fields: fields,
-               links: links?,
-               pagination_links: pagination_links?,
+               links: suppress_links? ? :none : links_requested?,
+               page_links: page_links?,
                format: params[:format]}
 
       Digest::SHA1.hexdigest(attrs.to_s)
@@ -291,7 +363,7 @@ module Graphiti
       return false unless association?
 
       split = name.to_s.split(".")
-      query_names = split[0..split.length - 2].map(&:to_sym)
+      query_names = split[0..-2].map(&:to_sym)
       my_names = parents.map(&:association_name).compact + [association_name].compact
       query_names == my_names
     end
@@ -323,7 +395,7 @@ module Graphiti
     end
 
     def sort_hash(attr)
-      value = attr[0] == "-" ? :desc : :asc
+      value = (attr[0] == "-") ? :desc : :asc
       key = attr.sub("-", "").to_sym
 
       {key => value}
@@ -356,7 +428,7 @@ module Graphiti
     end
 
     def parse_action(action)
-      action ||= @params.fetch(:action, Graphiti.context[:namespace]).try(:to_sym)
+      action ||= @params.fetch(:action, Graphiti.context[:action]).try(:to_sym)
       case action
       when :index
         :all
@@ -366,5 +438,9 @@ module Graphiti
         action
       end
     end
+
+    alias_method :pagination_links?, :page_links?
+    DEPRECATOR.deprecate_methods(self,
+      pagination_links?: "Use `page_links?`")
   end
 end

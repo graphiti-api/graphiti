@@ -1,3 +1,3 @@
 module Graphiti
-  VERSION = "1.13.4"
+  VERSION = "2.0.0.beta.13"
 end

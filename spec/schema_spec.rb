@@ -645,7 +645,7 @@ RSpec.describe Graphiti::Schema do
 
     context "when a default page size" do
       before do
-        employee_resource.default_page_size = 10
+        employee_resource.page_default_size = 10
       end
 
       it "is present in the resource schema" do
@@ -798,7 +798,7 @@ RSpec.describe Graphiti::Schema do
 
       it "generates correctly" do
         expect(schema[:endpoints]).to eq({
-          '/api/v1/schema/employees': {
+          "/api/v1/schema/employees": {
             actions: {
               index: {resource: "Schema::EmployeeResource"},
               show: {resource: "Schema::EmployeeResource"},
@@ -807,7 +807,7 @@ RSpec.describe Graphiti::Schema do
               destroy: {resource: "Schema::EmployeeResource"}
             }
           },
-          '/api/v1/special_employees': {
+          "/api/v1/special_employees": {
             actions: {
               index: {resource: "Schema::EmployeeResource"}
             }
@@ -837,7 +837,7 @@ RSpec.describe Graphiti::Schema do
       end
 
       it "does not add the action to the schema" do
-        expect(schema[:endpoints][:'/api/v1/schema/employees'][:actions].keys)
+        expect(schema[:endpoints][:"/api/v1/schema/employees"][:actions].keys)
           .to eq([:show, :create])
       end
     end
@@ -903,7 +903,6 @@ RSpec.describe Graphiti::Schema do
 
       before do
         stub_const("Rails", rails)
-        allow_any_instance_of(Graphiti::Sideload).to receive(:check!)
       end
 
       it "eager loads classes" do
@@ -1031,6 +1030,96 @@ RSpec.describe Graphiti::Schema do
             expect(described_class.generate!).to eq([])
           end
         end
+      end
+    end
+
+    context "when given a path" do
+      before do
+        allow(File).to receive(:exist?).with("/other/schema.json") { false }
+        allow(FileUtils).to receive(:mkdir_p).with("/other")
+      end
+
+      it "writes there instead of the configured path" do
+        expect(File).to receive(:write)
+          .with("/other/schema.json", JSON.pretty_generate(new_schema))
+        described_class.generate!(path: "/other/schema.json")
+      end
+    end
+  end
+
+  describe ".check" do
+    subject(:check) { described_class.check }
+
+    let(:schema) { {resources: [], endpoints: {}, types: {}} }
+    let(:committed) { JSON.pretty_generate(schema) }
+
+    before do
+      allow(described_class).to receive(:generate) { schema }
+      allow(Graphiti.config).to receive(:schema_path) { "/schema/path/schema.json" }
+      allow(File).to receive(:exist?).with("/schema/path/schema.json") { true }
+      allow(File).to receive(:read).with("/schema/path/schema.json") { committed }
+    end
+
+    context "when the file matches what the app generates" do
+      it "is ok" do
+        expect(check).to be_ok
+        expect(check.message).to eq("Schema is up to date: /schema/path/schema.json")
+      end
+    end
+
+    context "when the file does not exist" do
+      before do
+        allow(File).to receive(:exist?).with("/schema/path/schema.json") { false }
+      end
+
+      it "is missing" do
+        expect(check).to be_missing
+        expect(check).to_not be_ok
+        expect(check.message).to include("Schema file not found")
+      end
+
+      it "does not diff" do
+        expect(Graphiti::SchemaDiff).to_not receive(:new)
+        check.missing?
+      end
+    end
+
+    context "when the file is out of date but still compatible" do
+      let(:committed) { JSON.pretty_generate(endpoints: {}, types: {}, resources: []) }
+
+      before do
+        allow_any_instance_of(Graphiti::SchemaDiff).to receive(:compare) { [] }
+        allow(described_class).to receive(:generate) {
+          {resources: [{name: "PostResource"}], endpoints: {}, types: {}}
+        }
+      end
+
+      it "is stale" do
+        expect(check).to be_stale
+        expect(check).to be_compatible
+        expect(check).to_not be_ok
+        expect(check.message).to include("Schema file is outdated")
+      end
+    end
+
+    context "when the file holds backwards-incompatibilities" do
+      before do
+        allow_any_instance_of(Graphiti::SchemaDiff).to receive(:compare) { ["some diff error"] }
+      end
+
+      it "reports them" do
+        expect(check).to_not be_compatible
+        expect(check.errors).to eq(["some diff error"])
+        expect(check.message).to include("some diff error")
+      end
+    end
+
+    describe "#write!" do
+      it "writes the generated schema" do
+        expect(FileUtils).to receive(:mkdir_p).with("/schema/path")
+        expect(File).to receive(:write)
+          .with("/schema/path/schema.json", JSON.pretty_generate(schema))
+        expect(check.write!).to eq("/schema/path/schema.json")
       end
     end
   end

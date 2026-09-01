@@ -13,8 +13,11 @@ module Graphiti
       @records ||= @proxy.data
     end
 
+    # JSON:API requires the key even when the include turns up nothing.
     def to_jsonapi
-      render(self.class.jsonapi_renderer).to_json
+      rendered = render(self.class.jsonapi_renderer)
+      rendered[:included] ||= [] if proxy.query.includes_requested?
+      rendered.to_json
     end
 
     def as_graphql

@@ -12,13 +12,7 @@ if ENV["APPRAISAL_INITIALIZED"]
     include ConcurrencyHarness
 
     before(:all) do
-      FileUtils.mkdir_p(File.dirname(StressTest::DB_PATH))
-      FileUtils.rm_f(StressTest::DB_PATH)
-
-      StressTest.const_set(:Base, Class.new(ActiveRecord::Base) { self.abstract_class = true })
-      StressTest::Base.establish_connection(
-        adapter: "sqlite3", database: StressTest::DB_PATH, pool: StressTest::DB_POOL_SIZE, timeout: 5000
-      )
+      FileBackedDatabase.connect(StressTest, StressTest::DB_PATH, pool: StressTest::DB_POOL_SIZE)
 
       StressTest::Base.connection.create_table(:departments, force: true) do |t|
         t.string :name
@@ -53,11 +47,8 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     after(:all) do
-      StressTest::Base.remove_connection
-      FileUtils.rm_f(StressTest::DB_PATH)
-      %i[EmployeeResource Employee Department Base].each do |name|
-        StressTest.send(:remove_const, name) if StressTest.const_defined?(name, false)
-      end
+      FileBackedDatabase.disconnect(StressTest, StressTest::DB_PATH,
+        %i[EmployeeResource Employee Department])
     end
 
     before do

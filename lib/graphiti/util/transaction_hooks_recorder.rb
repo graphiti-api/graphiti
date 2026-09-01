@@ -58,11 +58,11 @@ module Graphiti
         private
 
         def _hooks
-          Thread.current[:_graphiti_hooks]
+          Fiber[:_graphiti_hooks]
         end
 
         def reset_hooks
-          Thread.current[:_graphiti_hooks] = {
+          Fiber[:_graphiti_hooks] = {
             after_graph_persist: [],
             before_commit: [],
             after_commit: []

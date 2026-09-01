@@ -1,0 +1,30 @@
+<%- unless omit_comments? -%>
+# For another language, add a block below or a graphiti.<locale>.yml file.
+<%- end -%>
+en:
+  graphiti:
+    errors:
+<%- unless omit_comments? -%>
+      # Keyed by error code. Edit any value to reword it. Comments name what
+      # raises each code, relative to Graphiti::Errors.
+<%- end -%>
+<%- error_titles.each_pair do |code, title| -%>
+      <%= code %>:
+    <%- unless omit_comments? -%>
+      <%- error_source_lines(code).each do |line| -%>
+        # <%= line %>
+      <%- end -%>
+    <%- end -%>
+        title: <%= title.inspect %>
+    <%- if error_detail(code) -%>
+        detail: <%= error_detail(code).inspect %>
+    <%- end -%>
+<%- end -%>
+<%- unless omit_comments? -%>
+      # format joins the two below: "data.attributes.title is an unknown attribute".
+<%- end -%>
+      format: <%= default_format.inspect %>
+      messages:
+<%- default_messages.each do |code, message| -%>
+        <%= code %>: <%= message.inspect %>
+<%- end -%>

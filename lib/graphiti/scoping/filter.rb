@@ -62,7 +62,7 @@ module Graphiti
             value = parse_string_value(filter.values[0], value)
           end
 
-          check_deny_empty_filters!(resource, filter, value)
+          check_blank_filters!(resource, filter, value)
           value = parse_string_null(filter.values[0], value)
           validate_singular(resource, filter, value)
           value = coerce_types(filter.values[0], param_name.to_sym, value)
@@ -82,7 +82,7 @@ module Graphiti
       if is_array
         @resource.typecast(name, value, :filterable)
       else
-        value = value.nil? || value.is_a?(Hash) ? [value] : Array(value)
+        value = (value.nil? || value.is_a?(Hash)) ? [value] : Array(value)
         value.map { |v| @resource.typecast(name, v, :filterable) }
       end
     end
@@ -100,7 +100,7 @@ module Graphiti
 
       param_value.map do |operator, value|
         if type == :hash
-          value, operator = \
+          value, operator =
             parse_hash_value(filter, param_value, value, operator)
         end
 
@@ -209,15 +209,15 @@ module Graphiti
     end
 
     def parse_string_null(filter, value)
-      return value unless filter[:allow_nil]
-      return value.map { |item| item == "null" ? nil : item } if value.is_a?(Array)
+      return value unless filter[:blanks] == :null
+      return value.map { |item| (item == "null") ? nil : item } if value.is_a?(Array)
       return if value == "null"
 
       value
     end
 
-    def check_deny_empty_filters!(resource, filter, value)
-      return unless filter.values[0][:deny_empty]
+    def check_blank_filters!(resource, filter, value)
+      return unless filter.values[0][:blanks] == :rejected
 
       if value.nil? || value.empty? || value == "null"
         raise Errors::InvalidFilterValue.new(resource, filter, "(empty)")

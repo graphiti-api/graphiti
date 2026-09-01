@@ -371,10 +371,11 @@ module Graphiti
           activerecord_adapter.associate \
             parent, child, association_name, association_type
         elsif [:has_many, :many_to_many].include?(association_type)
-          if parent.send(:"#{association_name}").nil?
+          associated = parent.send(:"#{association_name}")
+          if associated.nil?
             parent.send(:"#{association_name}=", [child])
-          else
-            parent.send(:"#{association_name}") << child
+          elsif associated.none? { |existing| existing.equal?(child) }
+            associated << child
           end
         else
           parent.send(:"#{association_name}=", child)

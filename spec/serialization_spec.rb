@@ -105,7 +105,7 @@ RSpec.describe "serialization" do
       it "can call methods on the resource" do
         define_resource
         render
-        expect(d[0].foo).to eq("foo!")
+        expect(jsonapi_data[0].foo).to eq("foo!")
       end
 
       context "when application serializer defined" do
@@ -117,7 +117,7 @@ RSpec.describe "serialization" do
 
           it "can call methods on the namespaced ApplicationSerializer" do
             render
-            expect(d[0].foo).to eq("bar!")
+            expect(jsonapi_data[0].foo).to eq("bar!")
           end
         end
 
@@ -131,7 +131,7 @@ RSpec.describe "serialization" do
 
           it "can call methods on ApplicationSerializer" do
             render
-            expect(d[0].foo).to eq("bar!")
+            expect(jsonapi_data[0].foo).to eq("bar!")
           end
         end
 
@@ -141,7 +141,7 @@ RSpec.describe "serialization" do
           it "cannot call methods on ApplicationSerializer" do
             define_resource
             render
-            expect(d[0].foo).to eq("foo!")
+            expect(jsonapi_data[0].foo).to eq("foo!")
           end
         end
       end
@@ -158,6 +158,18 @@ RSpec.describe "serialization" do
           PORO::Employee.create(age: 1)
           render
           expect(attributes["age"]).to eq("1")
+        end
+
+        context "when the resource disables typecast_reads" do
+          before do
+            resource.typecast_reads = false
+          end
+
+          it "does not coerce" do
+            PORO::Employee.create(age: 1)
+            render
+            expect(attributes["age"]).to eq(1)
+          end
         end
       end
 
@@ -797,6 +809,7 @@ RSpec.describe "serialization" do
         resource.has_many :positions,
           resource: PORO::PositionResource,
           readable: :admin?
+        resource.relationship_placeholders = true
         Graphiti.setup!
         PORO::Employee.create(first_name: "John")
       end
@@ -1165,15 +1178,15 @@ RSpec.describe "serialization" do
       Graphiti.config.context_for_endpoint = nil
     end
 
-    context "when not autolinked by default" do
+    context "when links are off by default" do
       before do
-        resource.autolink = false
+        resource.relationship_links = false
       end
 
-      it "does not generate links by default" do
+      it "does not render the relationship at all" do
         resource.has_many :positions
         render
-        expect(positions).to_not have_key("links")
+        expect(json["data"][0]["relationships"]).to_not have_key("positions")
       end
 
       it "does generate links when link: true passed" do
@@ -1197,10 +1210,18 @@ RSpec.describe "serialization" do
             .to eq("/special/positions?blah=1")
         end
 
-        context "when links_on_demand" do
-          around do |e|
-            Graphiti.config.with_option(:links_on_demand, true) do
-              e.run
+        context "when the sideload resource renders links on demand" do
+          let(:position_resource) do
+            Class.new(PORO::PositionResource) do
+              self.relationship_links = :on_demand
+            end
+          end
+
+          before do
+            resource.has_many :positions, resource: position_resource do
+              link do |employee|
+                "/special/positions?blah=#{employee.id}"
+              end
             end
           end
 
@@ -1214,21 +1235,68 @@ RSpec.describe "serialization" do
       end
     end
 
+    context "when a relationship overrides the resource default" do
+      context "with link: :on_demand on an always-linked resource" do
+        before do
+          resource.relationship_links = true
+          resource.has_many :positions, link: :on_demand
+        end
+
+        it "strips the relationship by default" do
+          render
+          expect(positions).to be_nil
+        end
+
+        context "and links are requested" do
+          before do
+            params[:links] = true
+          end
+
+          it "renders the link" do
+            render
+            expect(positions["links"]["related"]).to be_present
+          end
+        end
+      end
+
+      context "with link: true on an on-demand resource" do
+        before do
+          resource.relationship_links = :on_demand
+          resource.has_many :positions, link: true
+        end
+
+        it "renders the link without being asked" do
+          render
+          expect(positions["links"]["related"]).to be_present
+        end
+      end
+    end
+
     describe "placeholder relationships" do
       before do
-        resource.has_many :positions, link: true
+        resource.has_many :positions
+        resource.relationship_placeholders = true
+      end
+
+      context "when placeholders are off, as they are by default" do
+        before do
+          resource.relationship_placeholders = false
+        end
+
+        it "is not present" do
+          render
+          expect(json["data"][0]["relationships"]).to eq({})
+        end
       end
 
       context "when links on demand" do
-        around do |e|
-          Graphiti.config.with_option(:links_on_demand, true) do
-            e.run
-          end
+        before do
+          resource.relationship_links = :on_demand
         end
 
         context "and ?links param given" do
           before do
-            graphiti_context.params = {links: true}
+            params[:links] = true
           end
 
           it "is present" do
@@ -1246,12 +1314,6 @@ RSpec.describe "serialization" do
       end
 
       context "and links not on demand" do
-        around do |e|
-          Graphiti.config.with_option(:links_on_demand, false) do
-            e.run
-          end
-        end
-
         context "and a relationship is sideloaded" do
           before do
             params[:include] = "positions"
@@ -1273,14 +1335,16 @@ RSpec.describe "serialization" do
     end
 
     context "when only linking if requested" do
-      around do |e|
-        resource.autolink = true
-        params[:include] = "positions"
-        resource.has_many :positions
-
-        Graphiti.config.with_option(:links_on_demand, true) do
-          e.run
+      let(:position_resource) do
+        Class.new(PORO::PositionResource) do
+          self.relationship_links = :on_demand
         end
+      end
+
+      before do
+        resource.relationship_links = :on_demand
+        params[:include] = "positions"
+        resource.has_many :positions, resource: position_resource
       end
 
       context "and not requested in url" do
@@ -1308,9 +1372,9 @@ RSpec.describe "serialization" do
       end
     end
 
-    context "when autolinked by default" do
+    context "when links are on by default" do
       before do
-        resource.autolink = true
+        resource.relationship_links = true
       end
 
       context "and a has_many relationship" do
@@ -1350,9 +1414,9 @@ RSpec.describe "serialization" do
             resource.has_many :positions, link: false
           end
 
-          it "does not link" do
+          it "does not render the relationship at all" do
             render
-            expect(positions).to_not have_key("links")
+            expect(json["data"][0]["relationships"]).to_not have_key("positions")
           end
         end
 
@@ -1440,13 +1504,13 @@ RSpec.describe "serialization" do
         context "that does not have an index endpoint" do
           before do
             Graphiti.config.context_for_endpoint = ->(path, action) {
-              action == :index ? nil : double
+              (action == :index) ? nil : double
             }
           end
 
-          context "when validating endpoints" do
+          context "when validating links" do
             before do
-              resource.validate_endpoints = true
+              resource.validate_links = true
             end
 
             it "raises error" do
@@ -1456,9 +1520,9 @@ RSpec.describe "serialization" do
             end
           end
 
-          context "when not validating endpoints" do
+          context "when not validating links" do
             before do
-              resource.validate_endpoints = false
+              resource.validate_links = false
             end
 
             it "does not raise error" do
@@ -1474,9 +1538,9 @@ RSpec.describe "serialization" do
             Graphiti.config.context_for_endpoint = nil
           end
 
-          context "when validating endpoints" do
+          context "when validating links" do
             before do
-              resource.validate_endpoints = true
+              resource.validate_links = true
             end
 
             it "raises error" do
@@ -1486,9 +1550,9 @@ RSpec.describe "serialization" do
             end
           end
 
-          context "when not validating endpoints" do
+          context "when not validating links" do
             before do
-              resource.validate_endpoints = false
+              resource.validate_links = false
             end
 
             it "does not raise error" do
@@ -1558,11 +1622,10 @@ RSpec.describe "serialization" do
             mastercard_resource.endpoint = nil
           end
 
-          it "does not link" do
+          it "does not render the relationship at all" do
             define_relationship
             render
-            credit_card = json["data"][0]["relationships"]["credit_card"]
-            expect(credit_card).to_not have_key("links")
+            expect(json["data"][0]["relationships"]).to_not have_key("credit_card")
           end
         end
 
@@ -1691,13 +1754,13 @@ RSpec.describe "serialization" do
         context "that does not have a show endpoint" do
           before do
             Graphiti.config.context_for_endpoint = ->(path, action) {
-              action == :show ? nil : double
+              (action == :show) ? nil : double
             }
           end
 
-          context "when validating endpoints" do
+          context "when validating links" do
             before do
-              resource.validate_endpoints = true
+              resource.validate_links = true
             end
 
             it "raises error" do
@@ -1707,9 +1770,9 @@ RSpec.describe "serialization" do
             end
           end
 
-          context "when not validating endpoints" do
+          context "when not validating links" do
             before do
-              resource.validate_endpoints = false
+              resource.validate_links = false
             end
 
             it "does not raise error" do
@@ -1806,6 +1869,7 @@ RSpec.describe "serialization" do
         "attrpositions"
       end
       resource.has_many :positions
+      resource.relationship_placeholders = true
     end
 
     context "when relationship is included" do
@@ -1869,7 +1933,8 @@ RSpec.describe "serialization" do
             false
           end
           has_many :things, resource: PORO::PositionResource,
-                            foreign_key: :employee_id
+            foreign_key: :employee_id
+          self.relationship_placeholders = true
         end
       end
 
@@ -1988,7 +2053,7 @@ RSpec.describe "serialization" do
 
       context "on the resource" do
         before do
-          resource.cursor_paginatable = true
+          resource.page_cursors = true
         end
 
         it "renders cursors" do
@@ -2006,7 +2071,7 @@ RSpec.describe "serialization" do
 
           context "and implicit page size" do
             before do
-              resource.default_page_size = 1
+              resource.page_default_size = 1
             end
 
             it "is respected in the offset" do

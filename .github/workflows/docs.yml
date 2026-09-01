@@ -1,0 +1,60 @@
+name: Docs
+
+# Publishes the documentation site from beta, and from main once 2.0 lands
+# there. graphiti.dev now points at this repo via website/static/CNAME, so this
+# deploy is the live site: the 1.x Jekyll site is frozen under
+# website/static/1.13 and ships with every build, and graphiti-api.github.io no
+# longer serves the domain.
+on:
+  push:
+    branches: [beta, main]
+    paths:
+      - 'docs/**'
+      - 'website/**'
+      - '.github/workflows/docs.yml'
+  workflow_dispatch: {}
+
+# One static group: deploys from different branches force-push the same
+# gh-pages branch, so they must not interleave.
+concurrency:
+  group: docs
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    name: Build and publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+
+      - name: Install
+        working-directory: website
+        run: npm ci
+
+      - name: Build
+        working-directory: website
+        run: npm run build
+
+      - name: Publish to gh-pages
+        working-directory: website/build
+        run: |
+          set -euo pipefail
+          # Pages skips directories beginning with an underscore unless Jekyll
+          # is switched off, and Docusaurus emits some.
+          touch .nojekyll
+          git init --quiet --initial-branch=gh-pages
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --all
+          git commit --quiet -m "docs: build ${GITHUB_SHA::7} from ${GITHUB_REF_NAME}"
+          git push --force --quiet \
+            "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
+            gh-pages

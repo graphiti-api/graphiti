@@ -17,6 +17,20 @@ RSpec.describe "concurrent sideloading under load" do
     end
   end
 
+  # The request thread resolves the root, so only pool threads are of interest.
+  def threads_used(*resource_classes)
+    request_thread = Thread.current.object_id
+    threads = Concurrent::Array.new
+    resource_classes.each do |resource_class|
+      allow_any_instance_of(resource_class).to receive(:resolve).and_wrap_original do |original, *args|
+        threads << Thread.current.object_id unless Thread.current.object_id == request_thread
+        original.call(*args)
+      end
+    end
+    yield
+    threads
+  end
+
   def resolve(resource_class, params)
     resource_class.all({page: {size: 100}}.merge(params)).to_a
   end
@@ -100,6 +114,70 @@ RSpec.describe "concurrent sideloading under load" do
         employees.each do |employee|
           expect(employee.positions.length).to eq(4)
           expect(employee.positions.map(&:employee_id).uniq).to eq([employee.id])
+        end
+      end
+    end
+  end
+
+  describe "two sideloads at the top level" do
+    before { seed_employees(count: 20, positions_per_employee: 3, departments: 4) }
+
+    let(:two_branches) do
+      employee_resource do
+        has_many :positions, resource: PORO::PositionResource
+        has_many :credit_cards, resource: PORO::CreditCardResource
+      end
+    end
+
+    it "resolves them on separate threads" do
+      threads = threads_used(PORO::PositionResource, PORO::CreditCardResource) do
+        resolve(two_branches, include: "positions,credit_cards")
+      end
+
+      expect(threads.uniq.length).to be > 1
+    end
+  end
+
+  describe "two sideloads under the same parent" do
+    before { seed_employees(count: 20, positions_per_employee: 3, departments: 4) }
+
+    let(:nested_siblings) do
+      Class.new(PORO::PositionResource) do
+        def self.name
+          "PORO::PositionResource"
+        end
+
+        belongs_to :employee, resource: PORO::EmployeeResource, foreign_key: :employee_id
+      end
+    end
+
+    let(:parent) do
+      sibling_resource = nested_siblings
+      employee_resource { has_many :positions, resource: sibling_resource }
+    end
+
+    # Siblings a level down are independent queries, so they resolve in parallel.
+    it "resolves them on separate threads" do
+      threads = threads_used(PORO::DepartmentResource, PORO::EmployeeResource) do
+        resolve(parent, include: "positions.department,positions.employee")
+      end
+
+      expect(threads.uniq.length).to be > 1
+    end
+
+    it "keeps both branches populated under concurrent load" do
+      resource_class = parent
+
+      results = run_concurrent_requests(count: pool_size * 2, timeout: 30) do
+        resolve(resource_class, include: "positions.department,positions.employee")
+      end
+
+      results.each do |employees|
+        employees.each do |employee|
+          employee.positions.each do |position|
+            expect(position.department).not_to be_nil
+            expect(position.employee).not_to be_nil
+          end
         end
       end
     end

@@ -271,7 +271,7 @@ RSpec.describe "serialization" do
         context "via dot syntax" do
           before do
             params[:include] = "positions.department.positions.department"
-            params[:fields] = {'positions.department.positions.department': "description"}
+            params[:fields] = {"positions.department.positions.department": "description"}
           end
 
           it "works" do

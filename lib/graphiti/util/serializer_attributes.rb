@@ -30,7 +30,7 @@ module Graphiti
         @serializer.send(:"#{applied_method}=", [@name] | existing)
 
         @serializer.meta do
-          if !!@resource.try(:cursor_paginatable?) && !Graphiti.context[:graphql]
+          if !!@resource.try(:page_cursors?) && !Graphiti.context[:graphql]
             {cursor: cursor}
           end
         end
@@ -121,10 +121,11 @@ module Graphiti
 
       def default_proc
         name_ref = @name
+        resource_ref = @resource
         typecast_ref = typecast(Graphiti::Types[@attr[:type]][:read])
         ->(_) {
           val = @object.send(name_ref)
-          if Graphiti.config.typecast_reads
+          if resource_ref.typecast_reads
             typecast_ref.call(val)
           else
             val
@@ -133,10 +134,11 @@ module Graphiti
       end
 
       def wrap_proc(inner)
+        resource_ref = @resource
         typecast_ref = typecast(Graphiti::Types[@attr[:type]][:read])
         ->(serializer_instance = nil) {
           val = serializer_instance.instance_eval(&inner)
-          if Graphiti.config.typecast_reads
+          if resource_ref.typecast_reads
             typecast_ref.call(val)
           else
             val

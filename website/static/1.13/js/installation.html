@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Boogaloo" rel="stylesheet">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/1.13/assets/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/1.13/assets/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/1.13/assets/favicons/favicon-16x16.png">
+  <link rel="manifest" href="/1.13/assets/favicons/site.webmanifest">
+  <link rel="mask-icon" href="/1.13/assets/favicons/safari-pinned-tab.svg" color="#F86DA7">
+  <link rel="shortcut icon" href="/1.13/assets/favicons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#F86DA7">
+  <meta name="msapplication-config" content="/1.13/assets/favicons/browserconfig.xml">
+  <meta name="theme-color" content="#F86DA7">
+
+  <title>Graphiti</title>
+  <meta name="description" content="Stylish Graph APIs">
+
+  <link rel="stylesheet" href="/1.13/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/1.13/feed.xml">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-127904727-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-127904727-1');
+  </script>
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <a href="/1.13/1.13" class="navbar-brand">
+        <img alt="logo" src="/1.13/assets/img/logo.png">
+      </a>
+    </div>
+    <nav class="" role="navigation">
+      <ul class="nav navbar-nav nav-links">
+        <li>
+          <a class="quickstart nav-link" href="/1.13/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="guides nav-link" href="/1.13/guides">Guides</a>
+        </li>
+        <li>
+          <a class="tutorial nav-link" href="/1.13/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="spraypaint nav-link" href="/1.13/js">Spraypaint</a>
+        </li>
+      </ul>
+      <ul class="nav gh navbar-nav navbar-right visible-lg visible-md">
+        <li>
+          <span class="star">⭐</span>
+          <a href="https://github.com/graphiti-api/graphiti">
+            <img alt="github-star" style="margin-right: 65px;margin-top: -20px" src="/1.13/assets/img/gh.png">
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <h1>
+  Spraypaint
+  <small>the isomorphic, framework-agnostic Graphiti ORM</small>
+</h1>
+
+<div class="js-toc col-md-3">
+  <ul>
+    <li><a href="/1.13/js/index">Home</a></li>
+    <li><a href="/1.13/js/introduction">Introduction</a></li>
+    <li><a href="/1.13/js/installation">Installation</a>
+      <ul>
+        <li><a href="/1.13/js/installation#typescript">Typescript</a></li>
+        <li><a href="/1.13/js/installation#defining-models">Defining Models</a></li>
+        <li><a href="/1.13/js/installation#connecting-to-the-api">Connecting to the API</a></li>
+        <li><a href="/1.13/js/installation#defining-attributes">Defining Attributes</a></li>
+        <li><a href="/1.13/js/installation#defining-relationships">Defining Relationships</a></li>
+      </ul>
+    </li>
+    <li><a href="/1.13/js/reads">Reads</a>
+      <ul>
+        <li><a href="/1.13/js/reads/sorting">Sorting</a></li>
+        <li><a href="/1.13/js/reads/pagination">Pagination</a></li>
+        <li><a href="/1.13/js/reads/filtering">Filtering</a></li>
+        <li><a href="/1.13/js/reads/fieldsets">Fieldsets</a></li>
+        <li><a href="/1.13/js/reads/statistics">Statistics</a></li>
+        <li><a href="/1.13/js/reads/includes">Includes</a></li>
+        <li><a href="/1.13/js/reads/nested-queries">Nested Queries</a></li>
+      </ul>
+    </li>
+    <li><a href="/1.13/js/writes">Writes</a>
+      <ul>
+        <li><a href="/1.13/js/writes/validations">Validations</a></li>
+        <li><a href="/1.13/js/writes/dirty-tracking">Dirty Tracking</a></li>
+        <li><a href="/1.13/js/writes/nested">Nested Writes</a></li>
+        <li><a href="/1.13/js/writes/deferred">Deferred Action</a></li>
+      </ul>
+    </li>
+    <li><a href="/1.13/js/middleware">Middleware</a></li>
+    <li><a href="/1.13/js/authentication">Authentication</a></li>
+    <li><a href="/1.13/js/state-syncing">State Syncing</a></li>
+    <li><a href="/1.13/js/ddau">Data Down, Actions Up</a></li>
+    <li><a href="/1.13/js/extra-params">Extra params</a></li>
+  </ul>
+</div>
+
+<div class="col-md-8 col-md-offset-1">
+  <h3 id="installation">Installation</h3>
+
+  <p>Installation is straightforward. Since we use <code class="language-plaintext highlighter-rouge">fetch</code> underneath the
+hood, we recommend installing alongside a <code class="language-plaintext highlighter-rouge">fetch</code> polyfill.</p>
+
+  <p>If using <code class="language-plaintext highlighter-rouge">yarn</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>yarn add spraypaint isomorphic-fetch</code></pre></figure>
+
+  <p>If using <code class="language-plaintext highlighter-rouge">npm</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>npm <span class="nb">install </span>spraypaint isomorphic-fetch</code></pre></figure>
+
+  <p>Now import it:</p>
+
+  <div class="tabs">
+  <div class="tab typescript active">
+    <span>Typescript</span>
+  </div>
+  <div class="tab javascript">
+    <span>Javascript</span>
+  </div>
+</div>
+
+  <div class="code-tabs">
+
+    <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="k">import</span> <span class="p">{</span>
+  <span class="nx">Model</span><span class="p">,</span>
+  <span class="nx">SpraypaintBase</span><span class="p">,</span>
+  <span class="nx">Attr</span><span class="p">,</span>
+  <span class="nx">BelongsTo</span><span class="p">,</span>
+  <span class="nx">HasMany</span>
+  <span class="c1">// etc</span>
+<span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">spraypaint</span><span class="dl">"</span></code></pre></figure>
+
+    <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">const</span> <span class="p">{</span>
+  <span class="nx">SpraypaintBase</span><span class="p">,</span>
+  <span class="nx">attr</span><span class="p">,</span>
+  <span class="nx">belongsTo</span><span class="p">,</span>
+  <span class="nx">hasMany</span>
+  <span class="c1">// etc</span>
+<span class="p">}</span> <span class="o">=</span> <span class="nf">require</span><span class="p">(</span><span class="dl">"</span><span class="s2">spraypaint/dist/spraypaint</span><span class="dl">"</span><span class="p">)</span></code></pre></figure>
+
+  </div>
+
+  <p>…or, if you’re avoiding JS modules, <code class="language-plaintext highlighter-rouge">spraypaint</code> will be available as a global in
+the browser.</p>
+
+  <h3 id="typescript">Typescript</h3>
+
+  <p>Spraypaint supports Typescript versions <code class="language-plaintext highlighter-rouge">&gt;= 2.8</code>.</p>
+
+  <p>By default you will need a <code class="language-plaintext highlighter-rouge">!</code> after each attribute and relationship:</p>
+
+  <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="p">@</span><span class="nd">Attr</span> <span class="nx">first_name</span><span class="o">!</span><span class="p">:</span> <span class="kr">string</span>
+<span class="p">@</span><span class="nd">HasMany</span><span class="p">()</span> <span class="nx">positions</span><span class="o">!</span><span class="p">:</span> <span class="nx">Position</span><span class="p">[]</span></code></pre></figure>
+
+  <p>This is due to <a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-7.html#strict-class-initialization">Strict Class Initialization</a>. For the purposes of Spraypaint, we don’t need this. Remove the need for
+<code class="language-plaintext highlighter-rouge">!</code> (as the rest of these guides do) by setting</p>
+
+  <p><code class="language-plaintext highlighter-rouge">"strictPropertyInitialization": false</code></p>
+
+  <p>in <code class="language-plaintext highlighter-rouge">tsconfig.json</code>.</p>
+
+  <h3 id="defining-models">Defining Models</h3>
+
+  <h4 id="connecting-to-the-api">Connecting to the API</h4>
+
+  <p>Just like <code class="language-plaintext highlighter-rouge">ActiveRecord</code>, our models will inherit from a base class that
+holds connection information (<code class="language-plaintext highlighter-rouge">ApplicationRecord</code>, or
+<code class="language-plaintext highlighter-rouge">ActiveRecord::Base</code> in Rails &lt; 5):</p>
+
+  <div class="tabs">
+  <div class="tab typescript active">
+    <span>Typescript</span>
+  </div>
+  <div class="tab javascript">
+    <span>Javascript</span>
+  </div>
+</div>
+
+  <div class="code-tabs">
+
+    <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="p">@</span><span class="nd">Model</span><span class="p">()</span>
+<span class="kd">class</span> <span class="nc">ApplicationRecord</span> <span class="kd">extends</span> <span class="nc">SpraypaintBase</span> <span class="p">{</span>
+  <span class="k">static</span> <span class="nx">baseUrl</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">http://my-api.com</span><span class="dl">"</span>
+  <span class="k">static</span> <span class="nx">apiNamespace</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">/api/v1</span><span class="dl">"</span>
+<span class="p">}</span></code></pre></figure>
+
+    <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">const</span> <span class="nx">ApplicationRecord</span> <span class="o">=</span> <span class="nx">SpraypaintBase</span><span class="p">.</span><span class="nf">extend</span><span class="p">({</span>
+  <span class="na">static</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">baseUrl</span><span class="p">:</span> <span class="dl">"</span><span class="s2">http://my-api.com</span><span class="dl">"</span><span class="p">,</span>
+    <span class="na">apiNamespace</span><span class="p">:</span> <span class="dl">"</span><span class="s2">/api/v1</span><span class="dl">"</span>
+  <span class="p">}</span>
+<span class="p">})</span></code></pre></figure>
+
+    <p>All URLs follow the following pattern:</p>
+
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">baseUrl</code> + <code class="language-plaintext highlighter-rouge">apiNamespace</code> + <code class="language-plaintext highlighter-rouge">jsonapiType</code></li>
+    </ul>
+
+    <p>As you can see above, typically <code class="language-plaintext highlighter-rouge">baseUrl</code> and <code class="language-plaintext highlighter-rouge">apiNamespace</code> are set on
+a top-level <code class="language-plaintext highlighter-rouge">ApplicationRecord</code> (though any subclass can override).
+<code class="language-plaintext highlighter-rouge">jsonapiType</code>, however, is set per-model:</p>
+
+    <div class="tabs">
+  <div class="tab typescript active">
+    <span>Typescript</span>
+  </div>
+  <div class="tab javascript">
+    <span>Javascript</span>
+  </div>
+</div>
+
+    <div class="code-tabs">
+
+      <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="p">@</span><span class="nd">Model</span><span class="p">()</span>
+<span class="kd">class</span> <span class="nc">Person</span> <span class="kd">extends</span> <span class="nc">ApplicationRecord</span> <span class="p">{</span>
+  <span class="k">static</span> <span class="nx">jsonapiType</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">people</span><span class="dl">"</span>
+<span class="p">}</span></code></pre></figure>
+
+      <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">const</span> <span class="nx">Person</span> <span class="o">=</span> <span class="nx">ApplicationRecord</span><span class="p">.</span><span class="nf">extend</span><span class="p">({</span>
+  <span class="na">static</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">jsonapiType</span><span class="p">:</span> <span class="dl">"</span><span class="s2">people</span><span class="dl">"</span>
+  <span class="p">}</span>
+<span class="p">})</span></code></pre></figure>
+
+    </div>
+
+    <p>With the above configuration, all <code class="language-plaintext highlighter-rouge">Person</code> endpoints will begin
+<code class="language-plaintext highlighter-rouge">http://my-api.com/api/v1/people</code>.</p>
+
+    <blockquote>
+      <p><strong>TIP</strong>: Avoid CORS and use relative paths by simply setting <code class="language-plaintext highlighter-rouge">baseUrl</code> to
+<code class="language-plaintext highlighter-rouge">""</code></p>
+    </blockquote>
+
+    <blockquote>
+      <p><strong>TIP</strong>: You can always use the <code class="language-plaintext highlighter-rouge">endpoint</code> option to override this pattern
+and set the endpoint manually.</p>
+    </blockquote>
+
+    <h5 id="setting-application-name">Setting Application Name</h5>
+
+    <p>It can be helpful to send the name of your client application in request
+headers. With this information, servers can keep track of which clients
+are hitting which APIs.</p>
+
+    <p>To do this:</p>
+
+    <div class="tabs">
+  <div class="tab typescript active">
+    <span>Typescript</span>
+  </div>
+  <div class="tab javascript">
+    <span>Javascript</span>
+  </div>
+</div>
+
+    <div class="code-tabs">
+
+      <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="p">@</span><span class="nd">Model</span><span class="p">()</span>
+<span class="kd">class</span> <span class="nc">Person</span> <span class="kd">extends</span> <span class="nc">ApplicationRecord</span> <span class="p">{</span>
+  <span class="k">static</span> <span class="nx">clientApplication</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">sales-backend</span><span class="dl">"</span>
+<span class="p">}</span></code></pre></figure>
+
+      <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">const</span> <span class="nx">Person</span> <span class="o">=</span> <span class="nx">ApplicationRecord</span><span class="p">.</span><span class="nf">extend</span><span class="p">({</span>
+  <span class="na">static</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">clientApplication</span><span class="p">:</span> <span class="dl">"</span><span class="s2">sales-backend</span><span class="dl">"</span>
+  <span class="p">}</span>
+<span class="p">})</span></code></pre></figure>
+
+    </div>
+
+    <h4 id="defining-attributes">Defining Attributes</h4>
+
+    <p><code class="language-plaintext highlighter-rouge">ActiveRecord</code> automatically sets attributes by introspecting database
+columns. We could do the same - <code class="language-plaintext highlighter-rouge">swagger.json</code> is our schema - but tend
+to agree with those who feel this aspect of <code class="language-plaintext highlighter-rouge">ActiveRecord</code> is a bit too
+“magical”. In addition, explicitly defining our attributes can be used
+to track which applications are using which attributes of the API.</p>
+
+    <p>Though this is configurable, by default we expect the API to be
+<code class="language-plaintext highlighter-rouge">under_scored</code> and attributes to be <code class="language-plaintext highlighter-rouge">camelCased</code>.</p>
+
+    <div class="tabs">
+  <div class="tab typescript active">
+    <span>Typescript</span>
+  </div>
+  <div class="tab javascript">
+    <span>Javascript</span>
+  </div>
+</div>
+
+    <div class="code-tabs">
+
+      <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="p">@</span><span class="nd">Model</span><span class="p">()</span>
+<span class="kd">class</span> <span class="nc">Person</span> <span class="kd">extends</span> <span class="nc">ApplicationRecord</span> <span class="p">{</span>
+  <span class="c1">// ... code ...</span>
+  <span class="p">@</span><span class="nd">Attr</span><span class="p">()</span> <span class="nx">firstName</span><span class="p">:</span> <span class="kr">string</span>
+  <span class="p">@</span><span class="nd">Attr</span><span class="p">()</span> <span class="nx">lastName</span><span class="p">:</span> <span class="kr">string</span>
+  <span class="p">@</span><span class="nd">Attr</span><span class="p">()</span> <span class="nx">age</span><span class="p">:</span> <span class="kr">number</span>
+
+  <span class="kd">get</span> <span class="nf">fullName</span><span class="p">()</span> <span class="p">:</span> <span class="kr">string</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="s2">`</span><span class="p">${</span><span class="k">this</span><span class="p">.</span><span class="nx">firstName</span><span class="p">}</span><span class="s2"> </span><span class="p">${</span><span class="k">this</span><span class="p">.</span><span class="nx">lastName</span><span class="p">}</span><span class="s2">`</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">let</span> <span class="nx">person</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Person</span><span class="p">({</span> <span class="na">firstName</span><span class="p">:</span> <span class="dl">"</span><span class="s2">John</span><span class="dl">"</span> <span class="p">})</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">firstName</span> <span class="c1">// "John"</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">lastName</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">Doe</span><span class="dl">"</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">attributes</span> <span class="c1">// { firstName: "John", lastName: "Doe" }</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">fullName</span> <span class="c1">// "John Doe"</span></code></pre></figure>
+
+      <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">const</span> <span class="nx">attr</span> <span class="o">=</span> <span class="nx">spraypaint</span><span class="p">.</span><span class="nx">attr</span>
+<span class="kd">const</span> <span class="nx">Person</span> <span class="o">=</span> <span class="nx">ApplicationRecord</span><span class="p">.</span><span class="nf">extend</span><span class="p">({</span>
+  <span class="c1">// ... code ...</span>
+  <span class="na">attrs</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="nf">attr</span><span class="p">(),</span>
+    <span class="na">lastName</span><span class="p">:</span> <span class="nf">attr</span><span class="p">(),</span>
+    <span class="na">age</span><span class="p">:</span> <span class="nf">attr</span><span class="p">()</span>
+  <span class="p">},</span>
+  <span class="na">methods</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">fullName</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">firstName</span> <span class="o">+</span> <span class="dl">"</span><span class="s2"> </span><span class="dl">"</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">lastName</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">})</span>
+
+<span class="kd">var</span> <span class="nx">person</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Person</span><span class="p">({</span> <span class="na">firstName</span><span class="p">:</span> <span class="dl">"</span><span class="s2">John</span><span class="dl">"</span> <span class="p">})</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">firstName</span> <span class="c1">// "John"</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">lastName</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">Doe</span><span class="dl">"</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">attributes</span> <span class="c1">// { firstName: "John", lastName: "Doe" }</span>
+<span class="nx">person</span><span class="p">.</span><span class="nf">fullName</span><span class="p">()</span> <span class="c1">// "John Doe"</span></code></pre></figure>
+
+    </div>
+
+    <p>Attributes can be marked read-only, so they are never sent to the server
+on a write request:</p>
+
+    <div class="tabs">
+  <div class="tab typescript active">
+    <span>Typescript</span>
+  </div>
+  <div class="tab javascript">
+    <span>Javascript</span>
+  </div>
+</div>
+
+    <div class="code-tabs">
+
+      <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="p">@</span><span class="nd">Attr</span><span class="p">({</span> <span class="na">persist</span><span class="p">:</span> <span class="kc">false</span> <span class="p">})</span> <span class="nx">createdAt</span><span class="p">:</span> <span class="kr">string</span>
+<span class="p">@</span><span class="nd">Attr</span><span class="p">({</span> <span class="na">persist</span><span class="p">:</span> <span class="kc">false</span> <span class="p">})</span> <span class="nx">updatedAt</span><span class="p">:</span> <span class="kr">string</span></code></pre></figure>
+
+      <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">attrs</span><span class="p">:</span> <span class="p">{</span>
+  <span class="nl">createdAt</span><span class="p">:</span> <span class="nf">attr</span><span class="p">({</span> <span class="na">persist</span><span class="p">:</span> <span class="kc">false</span> <span class="p">}),</span>
+  <span class="nx">updatedAt</span><span class="p">:</span> <span class="nf">attr</span><span class="p">({</span> <span class="na">persist</span><span class="p">:</span> <span class="kc">false</span> <span class="p">})</span>
+<span class="p">}</span></code></pre></figure>
+
+    </div>
+
+    <h4 id="defining-relationships">Defining Relationships</h4>
+
+    <p>Just like <code class="language-plaintext highlighter-rouge">ActiveRecord</code>, there are <code class="language-plaintext highlighter-rouge">HasMany</code>, <code class="language-plaintext highlighter-rouge">BelongsTo</code>, and
+<code class="language-plaintext highlighter-rouge">HasOne</code> relationships:</p>
+
+    <div class="tabs">
+  <div class="tab typescript active">
+    <span>Typescript</span>
+  </div>
+  <div class="tab javascript">
+    <span>Javascript</span>
+  </div>
+</div>
+
+    <div class="code-tabs">
+
+      <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="p">@</span><span class="nd">Model</span><span class="p">()</span>
+<span class="kd">class</span> <span class="nc">Dog</span> <span class="kd">extends</span> <span class="nc">ApplicationRecord</span> <span class="p">{</span>
+  <span class="c1">// ... code ...</span>
+  <span class="p">@</span><span class="nd">BelongsTo</span><span class="p">()</span> <span class="nx">person</span><span class="p">:</span> <span class="nx">Person</span><span class="p">[]</span>
+<span class="p">}</span>
+
+<span class="kd">class</span> <span class="nc">Person</span> <span class="kd">extends</span> <span class="nc">ApplicationRecord</span> <span class="p">{</span>
+  <span class="c1">// ... code ...</span>
+  <span class="p">@</span><span class="nd">HasMany</span><span class="p">()</span> <span class="nx">dogs</span><span class="p">:</span> <span class="nx">Dog</span><span class="p">[]</span>
+<span class="p">}</span></code></pre></figure>
+
+      <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">const</span> <span class="nx">hasMany</span> <span class="o">=</span> <span class="nx">spraypaint</span><span class="p">.</span><span class="nx">hasMany</span>
+<span class="kd">const</span> <span class="nx">belongsTo</span> <span class="o">=</span> <span class="nx">spraypaint</span><span class="p">.</span><span class="nx">belongsTo</span>
+
+<span class="kd">const</span> <span class="nx">Person</span> <span class="o">=</span> <span class="nx">ApplicationRecord</span><span class="p">.</span><span class="nf">extend</span><span class="p">({</span>
+  <span class="c1">// ... code ...</span>
+  <span class="na">attrs</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">dogs</span><span class="p">:</span> <span class="nf">hasMany</span><span class="p">()</span>
+  <span class="p">}</span>
+<span class="p">})</span>
+
+<span class="kd">const</span> <span class="nx">Dog</span> <span class="o">=</span> <span class="nx">ApplicationRecord</span><span class="p">.</span><span class="nf">extend</span><span class="p">({</span>
+  <span class="c1">// ... code ...</span>
+  <span class="na">attrs</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">person</span><span class="p">:</span> <span class="nf">belongsTo</span><span class="p">()</span>
+  <span class="p">}</span>
+<span class="p">})</span></code></pre></figure>
+
+    </div>
+
+    <p>By default, we expect the relationship name to correspond to a
+pluralized <code class="language-plaintext highlighter-rouge">jsonapiType</code> on a separate <code class="language-plaintext highlighter-rouge">Model</code>. If your models don’t
+use this convention, feel free to supply it explicitly:</p>
+
+    <div class="tabs">
+  <div class="tab typescript active">
+    <span>Typescript</span>
+  </div>
+  <div class="tab javascript">
+    <span>Javascript</span>
+  </div>
+</div>
+
+    <div class="code-tabs">
+
+      <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="p">@</span><span class="nd">Model</span><span class="p">()</span>
+<span class="kd">class</span> <span class="nc">Dog</span> <span class="kd">extends</span> <span class="nc">ApplicationRecord</span> <span class="p">{</span>
+  <span class="c1">// ... code ...</span>
+  <span class="p">@</span><span class="nd">BelongsTo</span><span class="p">(</span><span class="dl">'</span><span class="s1">people</span><span class="dl">'</span><span class="p">)</span> <span class="nx">owner</span><span class="p">:</span> <span class="nx">Person</span><span class="p">[]</span>
+<span class="p">}</span>
+
+<span class="c1">// alternatively, specify the class directly</span>
+
+<span class="kd">class</span> <span class="nc">Dog</span> <span class="kd">extends</span> <span class="nc">ApplicationRecord</span> <span class="p">{</span>
+  <span class="c1">// ... code ...</span>
+  <span class="p">@</span><span class="nd">BelongsTo</span><span class="p">(</span><span class="nx">Person</span><span class="p">)</span> <span class="nx">owner</span><span class="p">:</span> <span class="nx">Person</span><span class="p">[]</span>
+<span class="p">}</span></code></pre></figure>
+
+      <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">const</span> <span class="nx">Dog</span> <span class="o">=</span> <span class="nx">ApplicationRecord</span><span class="p">.</span><span class="nf">extend</span><span class="p">({</span>
+  <span class="c1">// ... code ...</span>
+  <span class="na">attrs</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">owner</span><span class="p">:</span> <span class="nf">belongsTo</span><span class="p">(</span><span class="dl">'</span><span class="s1">people</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">})</span></code></pre></figure>
+
+    </div>
+
+    <p>Relationships can be:</p>
+
+    <ul>
+      <li>Assigned via constructor</li>
+      <li>Assigned directly</li>
+      <li>Automatically loaded via <code class="language-plaintext highlighter-rouge">.includes()</code> (see <a href="/1.13/js/reads">reads</a>)</li>
+      <li>Saved in a single request <code class="language-plaintext highlighter-rouge">.save({ with: 'dogs' })</code> (see
+<a href="/1.13/js/writes">writes</a>)</li>
+    </ul>
+
+    <div class="tabs">
+  <div class="tab typescript active">
+    <span>Typescript</span>
+  </div>
+  <div class="tab javascript">
+    <span>Javascript</span>
+  </div>
+</div>
+
+    <div class="code-tabs">
+
+      <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="kd">let</span> <span class="nx">dog</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Dog</span><span class="p">({</span> <span class="na">name</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Fido</span><span class="dl">"</span> <span class="p">})</span>
+<span class="kd">let</span> <span class="nx">person</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Person</span><span class="p">({</span> <span class="na">dogs</span><span class="p">:</span> <span class="p">[</span><span class="nx">dog</span><span class="p">]</span> <span class="p">})</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">dogs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">name</span> <span class="c1">// "Fido"</span>
+
+<span class="kd">let</span> <span class="nx">person</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Person</span><span class="p">()</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">dogs</span> <span class="o">=</span> <span class="p">[</span><span class="nx">dog</span><span class="p">]</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">dogs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">name</span> <span class="c1">// "Fido"</span>
+
+<span class="c1">// Will auto-create Dog instance</span>
+<span class="kd">let</span> <span class="nx">person</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Person</span><span class="p">({</span> <span class="na">dogs</span><span class="p">:</span> <span class="p">[{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Scooby</span><span class="dl">"</span> <span class="p">}]</span> <span class="p">})</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">dogs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">name</span> <span class="c1">// "Scooby"</span>
+
+<span class="kd">let</span> <span class="nx">person</span> <span class="o">=</span> <span class="p">(</span><span class="k">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nf">includes</span><span class="p">(</span><span class="dl">'</span><span class="s1">dogs</span><span class="dl">'</span><span class="p">)).</span><span class="nx">data</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">dogs</span> <span class="c1">// array of Dog instances from the server</span>
+  </code></pre></figure>
+
+      <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">dog</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Dog</span><span class="p">({</span> <span class="na">name</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Fido</span><span class="dl">"</span> <span class="p">})</span>
+<span class="kd">var</span> <span class="nx">person</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Person</span><span class="p">({</span> <span class="na">dogs</span><span class="p">:</span> <span class="p">[</span><span class="nx">dog</span><span class="p">]</span> <span class="p">})</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">dogs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">name</span> <span class="c1">// "Fido"</span>
+
+<span class="kd">let</span> <span class="nx">person</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Person</span><span class="p">()</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">dogs</span> <span class="o">=</span> <span class="p">[</span><span class="nx">dog</span><span class="p">]</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">dogs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">name</span> <span class="c1">// "Fido"</span>
+
+<span class="c1">// Will auto-create Dog instance</span>
+<span class="kd">var</span> <span class="nx">person</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Person</span><span class="p">({</span> <span class="na">dogs</span><span class="p">:</span> <span class="p">[{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Scooby</span><span class="dl">"</span> <span class="p">}]</span> <span class="p">})</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">dogs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">name</span> <span class="c1">// "Scooby"</span>
+
+<span class="nx">Person</span><span class="p">.</span><span class="nf">includes</span><span class="p">(</span><span class="dl">'</span><span class="s1">dogs</span><span class="dl">'</span><span class="p">).</span><span class="nf">then</span><span class="p">((</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span>
+  <span class="nx">person</span><span class="p">.</span><span class="nx">dogs</span> <span class="c1">// array of Dog instances from the server</span>
+<span class="p">})</span>
+  </code></pre></figure>
+
+    </div>
+
+    <div class="clearfix">
+  <h2 id="next">
+    <a href="/1.13/js/reads">
+      NEXT:
+      <small>Reads</small>
+      &raquo;
+    </a>
+  </h2>
+</div>
+  </div>
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="/1.13/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="/1.13/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="/1.13/guides">Guides</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Contact</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://discord.gg/wgqkMBsSRV">Discord Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Email</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

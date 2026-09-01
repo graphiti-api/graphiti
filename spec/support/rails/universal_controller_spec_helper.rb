@@ -1,10 +1,6 @@
 module UniversalControllerSpecHelper
   def universal_process(method, action, params)
-    if Rails::VERSION::MAJOR == 4
-      send(method, action, params)
-    else
-      send(method, action, params: params)
-    end
+    send(method, action, params: params)
   end
 
   def do_create(params)

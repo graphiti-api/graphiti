@@ -10,27 +10,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         with:
-          submodules: true
           persist-credentials: false
+          # semantic-release reads the tag history to work out the next version
+          fetch-depth: 0
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.1"
+          ruby-version: "4.0"
       - name: Build
         run: |
           gem install bundler
-          git submodule update --init --recursive
           bundle install --jobs 4 --retry 3
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: 14
+          # semantic-release 25 and its plugins require ^22.22.2 || >=24.15
+          node-version: "24"
+          cache: npm
       - name: Install Dependencies
-        run: yarn install --frozen-lockfile
+        run: npm ci
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GEM_HOST_API_KEY: ${{ secrets.GEM_HOST_API_KEY }}
-        run: node_modules/.bin/semantic-release
+        run: npx semantic-release

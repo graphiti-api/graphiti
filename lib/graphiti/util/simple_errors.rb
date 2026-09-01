@@ -6,6 +6,21 @@ module Graphiti
     class SimpleErrors
       include Enumerable
 
+      # Overridable under graphiti.errors.messages.
+      DEFAULT_MESSAGES = {
+        missing: "is missing",
+        invalid: "must be an object",
+        invalid_relationship: "is not a valid relationship",
+        unwritable_relationship: "cannot be written",
+        unknown_attribute: "is an unknown attribute",
+        unwritable_attribute: "cannot be written",
+        type_error: "should be type %{type}",
+        attribute_mismatch: "does not match the server endpoint"
+      }.freeze
+
+      # Joins an attribute to its message, like Rails' own errors.format.
+      DEFAULT_FORMAT = "%{attribute} %{message}"
+
       attr_reader :messages, :details
 
       def initialize(validation_target)
@@ -50,11 +65,9 @@ module Graphiti
       end
       alias_method :blank?, :empty?
 
-      def add(attribute, code, message: nil)
-        message ||= "is #{code.to_s.humanize.downcase}"
-
+      def add(attribute, code, message: nil, **interpolations)
         details[attribute.to_sym] << {error: code}
-        messages[attribute.to_sym] << message
+        messages[attribute.to_sym] << translate(code, message, **interpolations, attribute: attribute)
       end
 
       def added?(attribute, code)
@@ -73,10 +86,18 @@ module Graphiti
 
       def full_message(attribute, message)
         return message if attribute == :base
-        "#{attribute} #{message}"
+
+        translate(:format, DEFAULT_FORMAT, [:graphiti, :errors], attribute: attribute, message: message)
       end
 
       private
+
+      def translate(key, fallback, scope = [:graphiti, :errors, :messages], **interpolations)
+        fallback ||= DEFAULT_MESSAGES.fetch(key) { "is #{key.to_s.humanize.downcase}" }
+        return fallback % interpolations unless defined?(::I18n)
+
+        ::I18n.t(key, scope: scope, default: fallback, **interpolations)
+      end
 
       def apply_default_array(hash)
         hash.default_proc = proc { |h, key| h[key] = [] }

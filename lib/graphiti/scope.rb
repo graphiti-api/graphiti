@@ -39,18 +39,17 @@ module Graphiti
       !Graphiti.config.concurrency || on_pool_thread?
     end
 
-    # TODO: move to Fiber[] once the floor is Ruby 3.2
     def self.on_pool_thread?
-      Thread.current[POOL_THREAD] == true
+      Fiber[POOL_THREAD] == true
     end
 
     # Restores rather than clears because :caller_runs may have run the task on a request thread.
     def self.marking_pool_thread
-      previous = Thread.current[POOL_THREAD]
-      Thread.current[POOL_THREAD] = true
+      previous = Fiber[POOL_THREAD]
+      Fiber[POOL_THREAD] = true
       yield
     ensure
-      Thread.current[POOL_THREAD] = previous
+      Fiber[POOL_THREAD] = previous
     end
 
     def initialize(object, resource, query, opts = {})
@@ -59,18 +58,18 @@ module Graphiti
       @query = query
       @opts = opts
 
+      @resolved_sideload_proxies = {}
+      @resolved_sideload_proxies_lock = Mutex.new
+
       @object = @resource.around_scoping(@object, @query.hash) { |scope|
         apply_scoping(scope, opts)
       }
     end
 
     def resolve(&blk)
-      # When concurrency is disabled, take a synchronous path that mirrors the
-      # pre-1.8 semantics. This avoids allocating Concurrent::Promises futures,
-      # Thread/Fiber storage snapshots, and Rails executor wrappers on every
-      # request purely to drive a thread pool that is intentionally synchronous.
+      # The caller blocks on .value! either way, so concurrency only benefits parallel sideloads
       # See https://github.com/graphiti-api/graphiti/issues/505
-      if self.class.resolve_synchronously?
+      if self.class.resolve_synchronously? || !overlapping_sideloads?
         sync_resolve(&blk)
       else
         future_resolve(&blk).value!
@@ -83,6 +82,9 @@ module Graphiti
       else
         future_resolve_sideloads(results).value!
       end
+
+      # Never return the sideloads hash, a caller mutating it would mess up the cache key
+      nil
     end
 
     def future_resolve(&blk)
@@ -151,17 +153,18 @@ module Graphiti
     def sync_resolve_sideloads(results)
       return if results == []
 
-      each_applicable_sideload do |sideload, sideload_query|
+      reset_captured_sideload_proxies
+      each_applicable_sideload do |name, sideload, sideload_query|
         Graphiti.config.before_sideload&.call(Graphiti.context)
-        sideload.resolve(results, sideload_query, @resource)
+        sideload.sync_resolve(results, sideload_query, @resource) do |proxy|
+          capture_sideload_proxy(name, proxy)
+        end
       end
-
-      # resolve_sideloads is public, and without this it would return @query.sideloads itself,
-      # where a delete would silently drop that sideload from the cache key.
-      nil
     end
 
-    # Runs inline on the calling thread in both the sync and future paths.
+    # Resolve this scope's own data: run hooks, resolve the resource, and
+    # decorate the results. Shared by the sync and future paths — everything
+    # here runs inline on the calling thread in both modes.
     def resolve_primary_data
       resolved = broadcast_data { |payload|
         @object = @resource.before_resolve(@object, @query)
@@ -169,10 +172,53 @@ module Graphiti
         payload[:results]
       }
       resolved.compact!
+      deduplicate_entities!(resolved)
       assign_serializer(resolved)
       yield resolved if block_given?
       @opts[:after_resolve]&.call(resolved)
-      resolved
+      @resolved_records = resolved
+    end
+
+    # Must run before sideloads assign, so every include path populates the
+    # canonical instance. The resource class in the key keeps two resources
+    # serving the same model from sharing an instance and a serializer.
+    def deduplicate_entities!(resolved)
+      return unless deduplicable?
+
+      # Nested maps are built once, a composite key meant a new array for every record
+      by_model = @query.entity_map.compute_if_absent(@resource.class) { Concurrent::Map.new }
+
+      resolved.map! do |record|
+        next record unless record.respond_to?(:id) && !record.id.nil?
+
+        by_id = by_model.compute_if_absent(record.class) { Concurrent::Map.new }
+        by_id.compute_if_absent(record.id) { record }
+      end
+    end
+
+    # A customized sideload can load a record another path would not, so it keeps its own instances.
+    def deduplicable?
+      return false unless @query.repeated_resource_classes.include?(@resource.class)
+
+      sideload = @opts[:sideload]
+      return true unless sideload
+
+      sideload.scope_proc.nil? &&
+        sideload.params_proc.nil? &&
+        !sideload.customized_base_scope? &&
+        sideload.primary_key == :id
+    end
+
+    # One sideload has nothing to run beside it, so the pool would hand the work
+    # to another thread and wait for it. A chain is one at every level. A
+    # polymorphic sideload counts as its children, which do run beside each other.
+    def overlapping_sideloads?
+      found = 0
+      each_applicable_sideload do |_, sideload, _|
+        found += sideload.respond_to?(:children) ? sideload.children.size : 1
+        return true if found > 1
+      end
+      false
     end
 
     def each_applicable_sideload
@@ -180,21 +226,39 @@ module Graphiti
         sideload = @resource.class.sideload(name)
         next if sideload.nil? || sideload.shared_remote?
 
-        yield sideload, sideload_query
+        yield name, sideload, sideload_query
+      end
+    end
+
+    # The write path resolves sideloads twice on one scope, which would double every proxy in the cache key.
+    def reset_captured_sideload_proxies
+      @resolved_sideload_proxies_lock.synchronize { @resolved_sideload_proxies.clear }
+    end
+
+    # A proxy built while resolving is already resolved all the way down.
+    def capture_sideload_proxy(name, proxy)
+      @resolved_sideload_proxies_lock.synchronize do
+        captured = (@resolved_sideload_proxies[name] ||= [])
+        captured << proxy unless proxy.nil? || proxy == []
       end
     end
 
     def future_resolve_sideloads(results)
       return Concurrent::Promises.fulfilled_future(nil, self.class.global_thread_pool_executor) if results == []
 
+      reset_captured_sideload_proxies
       sideload_promises = []
-      each_applicable_sideload do |sideload, sideload_query|
+      each_applicable_sideload do |name, sideload, sideload_query|
         promise = future_with_context(results, sideload_query, @resource) do |parent_results, future_query, parent_resource|
           Graphiti.config.before_sideload&.call(Graphiti.context)
-          sideload.future_resolve(parent_results, future_query, parent_resource)
+          sideload.future_resolve(parent_results, future_query, parent_resource) do |proxy|
+            capture_sideload_proxy(name, proxy)
+          end
         end
         sideload_promises << promise.flat
       end
+
+      return sideload_promises.first if sideload_promises.one?
 
       Concurrent::Promises.zip_futures_on(self.class.global_thread_pool_executor, *sideload_promises)
         .rescue_on(self.class.global_thread_pool_executor) do |*reasons|
@@ -217,21 +281,66 @@ module Graphiti
           end
         end
 
+      current_attributes = current_attributes_snapshot
+
       Concurrent::Promises.future_on(
-        self.class.global_thread_pool_executor, Thread.current.object_id, thread_storage, fiber_storage, *args
-      ) do |thread_id, thread_storage, fiber_storage, *args|
+        self.class.global_thread_pool_executor, Thread.current.object_id, thread_storage, fiber_storage, current_attributes, *args
+      ) do |thread_id, thread_storage, fiber_storage, current_attributes, *args|
         self.class.marking_pool_thread do
           wrap_in_rails_executor do
             with_thread_locals(thread_storage) do
               with_fiber_locals(fiber_storage) do
-                Graphiti.broadcast(:global_thread_pool_task_run, self.class.global_thread_pool_stats) do
-                  yield(*args)
+                with_current_attributes(current_attributes) do
+                  with_connection_pool_hint do
+                    Graphiti.broadcast(:global_thread_pool_task_run, self.class.global_thread_pool_stats) do
+                      yield(*args)
+                    end
+                  end
                 end
               end
             end
           end
         end
       end
+    end
+
+    def current_attributes_snapshot
+      return unless defined?(ActiveSupport::CurrentAttributes)
+
+      snapshot = {}
+      klasses = ActiveSupport::CurrentAttributes.subclasses
+      while (klass = klasses.shift)
+        klasses.concat(klass.subclasses)
+        attributes = klass.attributes
+        snapshot[klass] = attributes.dup if attributes.any?
+      end
+      snapshot
+    end
+
+    # Restored inside the Rails executor, whose entry hands the pool thread a
+    # fresh Current. Restoring through set scopes the values to the block.
+    def with_current_attributes(snapshot, &block)
+      return yield if snapshot.nil? || snapshot.empty?
+
+      klass, attributes = snapshot.first
+      rest = snapshot.except(klass)
+      klass.set(attributes) { with_current_attributes(rest, &block) }
+    end
+
+    # A timeout inside a sideload task nearly always means database.yml's pool
+    # was not sized for the sideload threads, and the bare error does not say so.
+    def with_connection_pool_hint
+      yield
+    rescue => error
+      raise unless defined?(ActiveRecord::ConnectionTimeoutError) && error.is_a?(ActiveRecord::ConnectionTimeoutError)
+
+      hinted = error.exception(<<~MSG.strip)
+        #{error.message}
+
+        Raised while resolving a sideload concurrently. Each concurrent sideload holds its own database connection, so `pool` in database.yml must be at least web threads + concurrency_max_threads (#{Graphiti.config.concurrency_max_threads}) + 1. See graphiti.dev/concepts/resources#concurrency-pool-sizing.
+      MSG
+      hinted.set_backtrace(error.backtrace)
+      raise hinted
     end
 
     def with_thread_locals(thread_locals)
@@ -276,15 +385,19 @@ module Graphiti
 
     def sideload_resource_proxies
       @sideload_resource_proxies ||= begin
-        @object = @resource.before_resolve(@object, @query)
-        results = @resource.resolve(@object)
+        # Reached after the response resolved, where resolving again re-applies before_resolve to a mutated scope.
+        results = @resolved_records
+        if results.nil?
+          @object = @resource.before_resolve(@object, @query)
+          results = @resource.resolve(@object)
+        end
 
         [].tap do |proxies|
-          unless @query.sideloads.empty?
-            @query.sideloads.each_pair do |name, q|
-              sideload = @resource.class.sideload(name)
-              next if sideload.nil? || sideload.shared_remote?
-
+          each_applicable_sideload do |name, sideload, q|
+            captured = @resolved_sideload_proxies[name]
+            if captured
+              proxies.concat(captured)
+            else
               proxies << sideload.build_resource_proxy(results, q, parent_resource)
             end
           end

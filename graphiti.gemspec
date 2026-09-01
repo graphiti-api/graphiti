@@ -12,26 +12,32 @@ Gem::Specification.new do |spec|
   spec.homepage = "https://github.com/graphiti-api/graphiti"
   spec.license = "MIT"
 
-  spec.files = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.files = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features|templates|website|docs|examples)/}) }
   spec.bindir = "exe"
   spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
-  spec.required_ruby_version = ">= 2.7"
+  spec.required_ruby_version = ">= 3.2"
 
   spec.add_dependency "jsonapi-serializable", "~> 0.3.0"
   spec.add_dependency "jsonapi-renderer", "~> 0.2", ">= 0.2.2"
   spec.add_dependency "dry-types", ">= 0.15.0", "< 2.0"
-  spec.add_dependency "graphiti_errors", "~> 1.1.0"
+  spec.add_dependency "rescue_registry", "~> 1.1"
   spec.add_dependency "concurrent-ruby", ">= 1.2", "< 2.0"
-  spec.add_dependency "activesupport", ">= 5.2"
-  # Bundled (no longer default) as of Ruby 3.5; graphiti uses OpenStruct in lib/
+  spec.add_dependency "activesupport", ">= 7.1"
+  # Bundled (no longer default) as of Ruby 4.0; graphiti uses OpenStruct in lib/
   spec.add_dependency "ostruct", ">= 0.5"
 
-  spec.add_development_dependency "faraday", "~> 0.15"
-  spec.add_development_dependency "kaminari", "~> 0.17"
+  spec.add_development_dependency "faraday", ">= 2.0", "< 3"
+  spec.add_development_dependency "kaminari", "~> 1.2"
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake", ">= 10.0"
-  spec.add_development_dependency "standard", "~> 1.4.0"
-  spec.add_development_dependency "activemodel", ">= 5.2"
-  spec.add_development_dependency "graphiti_spec_helpers", "1.0.beta.4"
+  spec.add_development_dependency "standard", "~> 1.56"
+  spec.add_development_dependency "activemodel", ">= 7.1"
+  # Only the specs need this, for ActiveSupport's Hash.from_xml when asserting
+  # on to_xml output. It used to arrive transitively via rubocop; rubocop 1.88
+  # dropped it, and it is a bundled (not default) gem since Ruby 3.0.
+  spec.add_development_dependency "rexml"
+  # Was reaching the suite transitively through graphiti_spec_helpers, which is
+  # now part of this gem.
+  spec.add_development_dependency "rspec", "~> 3.0"
 end

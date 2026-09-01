@@ -9,7 +9,7 @@ module Graphiti
           opts = args.extract_options!
           type_override = args[0]
 
-          if (att = (attributes[name] || extra_attributes[name]))
+          if (att = attributes[name] || extra_attributes[name])
             # We're opting in to filtering, so force this
             # UNLESS the filter is guarded at the attribute level
             att[:filterable] = true if att[:filterable] == false
@@ -27,7 +27,7 @@ module Graphiti
             end
 
             required = att[:filterable] == :required || !!opts[:required]
-            schema = !!opts[:via_attribute_dsl] ? att[:schema] : opts[:schema] != false
+            schema = (!!opts[:via_attribute_dsl]) ? att[:schema] : opts[:schema] != false
 
             config[:filters][name.to_sym] = {
               aliases: aliases,
@@ -40,8 +40,7 @@ module Graphiti
               required: required,
               schema: schema,
               operators: operators.to_hash,
-              allow_nil: opts.fetch(:allow_nil, filters_accept_nil_by_default),
-              deny_empty: opts.fetch(:deny_empty, filters_deny_empty_by_default)
+              blanks: blanks_for(name, opts)
             }
           elsif (type = args[0])
             attribute name, type, only: [:filterable], allow: opts[:allow]
@@ -206,6 +205,26 @@ module Graphiti
           end
         end
         private :relationship_option
+
+        def blanks_for(name, opts)
+          if opts.key?(:deny_empty)
+            DEPRECATOR.warn("The deny_empty: filter option is deprecated. Use blanks: :rejected.")
+            return :rejected if opts[:deny_empty]
+          end
+
+          if opts.key?(:allow_nil)
+            DEPRECATOR.warn("The allow_nil: filter option is deprecated. Use blanks: :null.")
+            return opts[:allow_nil] ? :null : :literal
+          end
+
+          blanks = opts.fetch(:blanks, filter_blanks_treated_as)
+          unless Resource::BLANK_MODES.include?(blanks)
+            raise Errors::InvalidFilterBlanks.new(self, name, blanks)
+          end
+
+          blanks
+        end
+        private :blanks_for
       end
     end
   end

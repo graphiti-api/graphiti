@@ -6,7 +6,8 @@ module Graphiti
       included do
         self.adapter = Graphiti::Adapters::GraphitiAPI
         self.model = OpenStruct
-        self.validate_endpoints = false
+        self.validate_requests = false
+        self.validate_links = false
 
         class_attribute :timeout,
           :open_timeout
@@ -38,8 +39,8 @@ module Graphiti
       # Forward all headers
       def request_headers
         {}.tap do |headers|
-          # TODO: Maybe handle this in graphiti-rails
-          if defined?(Rails) && context
+          # TODO: Maybe handle this in the Rails integration
+          if defined?(::Rails) && context
             raw = context.request.headers.to_h
             if (auth = raw["HTTP_AUTHORIZATION"])
               headers["Authorization"] = auth

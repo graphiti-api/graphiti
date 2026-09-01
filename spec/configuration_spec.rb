@@ -24,52 +24,6 @@ RSpec.describe Graphiti::Configuration do
     end
   end
 
-  # FIXME: Deprecated
-  describe "when rails is defined" do
-    let(:logger) { double(debug?: false) }
-
-    let(:rails) do
-      double(root: Pathname.new("/foo/bar"), logger: logger)
-    end
-
-    before do
-      stub_const("::Rails", rails)
-      Graphiti.instance_variable_set(:@config, nil)
-    end
-
-    after do
-      Graphiti.instance_variable_set(:@config, nil)
-    end
-
-    describe "#schema_path" do
-      it "defaults" do
-        expect(Graphiti.config.schema_path.to_s)
-          .to eq("/foo/bar/public/schema.json")
-      end
-    end
-
-    describe "#debug" do
-      subject { Graphiti.config.debug }
-
-      # FIXME: Deprecated
-      context "when rails logger is debug level" do
-        let(:logger) { double(debug?: true) }
-
-        it { is_expected.to eq(true) }
-      end
-
-      # FIXME: Deprecated
-      context "when rails logger is not debug level" do
-        it { is_expected.to eq(false) }
-      end
-    end
-
-    it "sets the graphiti logger to the rails logger" do
-      Graphiti.config
-      expect(Graphiti.logger).to eq(rails.logger)
-    end
-  end
-
   describe "#debug=" do
     it "toggles Debugger.enabled" do
       Graphiti.config.debug = true
@@ -102,20 +56,6 @@ RSpec.describe Graphiti::Configuration do
     it "returns value when value set" do
       Graphiti.config.schema_path = "foo"
       expect(Graphiti.config.schema_path).to eq("foo")
-    end
-
-    # FIXME: Deprecated
-    context "when Rails is defined" do
-      before do
-        rails = double(root: Pathname.new("/foo/bar"), logger: double.as_null_object)
-        stub_const("::Rails", rails)
-        Graphiti.instance_variable_set(:@config, nil)
-      end
-
-      it "defaults" do
-        expect(Graphiti.config.schema_path.to_s)
-          .to eq("/foo/bar/public/schema.json")
-      end
     end
   end
 
@@ -177,6 +117,64 @@ RSpec.describe Graphiti::Configuration do
         c.raise_on_missing_sideload = false
       end
       expect(Graphiti.config.raise_on_missing_sideload).to eq(false)
+    end
+  end
+
+  describe "deprecated resource-level settings" do
+    around do |e|
+      relationship_links = Graphiti::Resource.relationship_links
+      page_links = Graphiti::Resource.page_links
+      typecast_reads = Graphiti::Resource.typecast_reads
+      e.run
+    ensure
+      Graphiti::Resource.relationship_links = relationship_links
+      Graphiti::Resource.page_links = page_links
+      Graphiti::Resource.typecast_reads = typecast_reads
+    end
+
+    describe "#typecast_reads" do
+      it "maps to Resource.typecast_reads" do
+        Graphiti.config.typecast_reads = false
+        expect(Graphiti::Resource.typecast_reads).to eq(false)
+        expect(Graphiti.config.typecast_reads).to eq(false)
+      end
+    end
+
+    describe "#links_on_demand" do
+      it "maps to Resource.relationship_links" do
+        Graphiti.config.links_on_demand = true
+        expect(Graphiti::Resource.relationship_links).to eq(:on_demand)
+        expect(Graphiti.config.links_on_demand).to eq(true)
+
+        Graphiti.config.links_on_demand = false
+        expect(Graphiti::Resource.relationship_links).to eq(true)
+        expect(Graphiti.config.links_on_demand).to eq(false)
+      end
+    end
+
+    describe "#pagination_links" do
+      it "maps to Resource.page_links" do
+        Graphiti.config.pagination_links = true
+        expect(Graphiti::Resource.page_links).to eq(true)
+        expect(Graphiti.config.pagination_links).to eq(true)
+      end
+
+      it "does not clobber :on_demand" do
+        Graphiti.config.pagination_links_on_demand = true
+        Graphiti.config.pagination_links = false
+        expect(Graphiti::Resource.page_links).to eq(:on_demand)
+      end
+    end
+
+    describe "#pagination_links_on_demand" do
+      it "maps to Resource.page_links" do
+        Graphiti.config.pagination_links_on_demand = true
+        expect(Graphiti::Resource.page_links).to eq(:on_demand)
+        expect(Graphiti.config.pagination_links_on_demand).to eq(true)
+
+        Graphiti.config.pagination_links_on_demand = false
+        expect(Graphiti::Resource.page_links).to eq(false)
+      end
     end
   end
 

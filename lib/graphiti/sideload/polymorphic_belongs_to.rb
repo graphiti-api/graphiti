@@ -107,30 +107,39 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
     end
   end
 
-  def resolve(parents, query, graph_parent)
+  def resolve(parents, query, graph_parent, &proxy_block)
     if ::Graphiti::Scope.resolve_synchronously?
-      sync_resolve(parents, query, graph_parent)
+      sync_resolve(parents, query, graph_parent, &proxy_block)
     else
-      future_resolve(parents, query, graph_parent).value!
+      future_resolve(parents, query, graph_parent, &proxy_block).value!
     end
   end
 
-  def future_resolve(parents, query, graph_parent)
+  def future_resolve(parents, query, graph_parent, &proxy_block)
     promises = []
     each_resolvable_group(parents, query) do |child, group, child_query|
-      promises << child.future_resolve(group, child_query, graph_parent)
+      promises << child.future_resolve(group, child_query, graph_parent, &proxy_block)
     end
-    Concurrent::Promises.zip(*promises)
+    return promises.first if promises.one?
+
+    executor = ::Graphiti::Scope.global_thread_pool_executor
+    Concurrent::Promises.zip_futures_on(executor, *promises)
+      .rescue_on(executor) do |*reasons|
+        first_error = reasons.find { |reason| reason.is_a?(Exception) }
+        raise first_error
+      end
+  end
+
+  def sync_resolve(parents, query, graph_parent, &proxy_block)
+    each_resolvable_group(parents, query) do |child, group, child_query|
+      child.sync_resolve(group, child_query, graph_parent, &proxy_block)
+    end
   end
 
   private
 
-  def sync_resolve(parents, query, graph_parent)
-    each_resolvable_group(parents, query) do |child, group, child_query|
-      child.resolve(group, child_query, graph_parent)
-    end
-  end
-
+  # Group parents by their polymorphic type and yield each group's child
+  # sideload alongside a query pruned to the sideloads that child supports.
   def each_resolvable_group(parents, query)
     parents.group_by(&grouper.field_name).each_pair do |group_name, group|
       next if group_name.nil? || grouper.ignore?(group_name)

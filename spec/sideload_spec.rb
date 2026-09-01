@@ -26,6 +26,44 @@ RSpec.describe Graphiti::Sideload do
   let(:name) { :foo }
   let(:instance) { Class.new(described_class).new(name, opts) }
 
+  describe "#link_mode" do
+    subject { instance.link_mode }
+
+    it "inherits the parent resource default" do
+      parent_resource_class.relationship_links = :on_demand
+      expect(instance.link_mode).to eq(:on_demand)
+    end
+
+    context "when the link option is given" do
+      before do
+        opts[:link] = :on_demand
+        parent_resource_class.relationship_links = true
+      end
+
+      it { is_expected.to eq(:on_demand) }
+    end
+
+    context "when the link option is not a valid mode" do
+      before do
+        opts[:link] = :always
+      end
+
+      it "raises" do
+        expect { instance }
+          .to raise_error(Graphiti::Errors::InvalidLinkRendering, /foo link must be true, false, or :on_demand/)
+      end
+    end
+
+    context "when a link block is defined and the default is false" do
+      before do
+        parent_resource_class.relationship_links = false
+        instance.class.link_proc = proc { "/foo" }
+      end
+
+      it { is_expected.to eq(true) }
+    end
+  end
+
   context "when passed both :remote and :resource options" do
     before do
       opts[:remote] = "asdf"

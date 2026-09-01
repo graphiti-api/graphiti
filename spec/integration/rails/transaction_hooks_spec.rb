@@ -274,7 +274,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             relationships: {
               positions: {
                 data: [
-                  {'temp-id': "a", type: "positions", method: "create"}
+                  {"temp-id": "a", type: "positions", method: "create"}
                 ]
               }
             }
@@ -282,18 +282,18 @@ if ENV["APPRAISAL_INITIALIZED"]
           included: [
             {
               type: "positions",
-              'temp-id': "a",
+              "temp-id": "a",
               relationships: {
                 department: {
                   data: {
-                    'temp-id': "b", type: "departments", method: "create"
+                    "temp-id": "b", type: "departments", method: "create"
                   }
                 }
               }
             },
             {
               type: "departments",
-              'temp-id': "b"
+              "temp-id": "b"
             }
           ]
         }
@@ -351,7 +351,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             attr_accessor :meta
           end
           self.model = ::Employee
-          self.validate_endpoints = false
+          self.validate_requests = false
 
           attribute :first_name, :string
 
@@ -383,7 +383,7 @@ if ENV["APPRAISAL_INITIALIZED"]
             relationships: {
               positions: {
                 data: {
-                  type: "positions", 'temp-id': "abc123", method: "create"
+                  type: "positions", "temp-id": "abc123", method: "create"
                 }
               }
             }
@@ -391,7 +391,7 @@ if ENV["APPRAISAL_INITIALIZED"]
           included: [
             {
               type: "positions",
-              'temp-id': "abc123",
+              "temp-id": "abc123",
               attributes: {title: "foo"}
             }
           ]
