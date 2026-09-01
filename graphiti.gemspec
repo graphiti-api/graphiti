@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "jsonapi-serializable", "~> 0.3.0"
   spec.add_dependency "jsonapi-renderer", "~> 0.2", ">= 0.2.2"
   spec.add_dependency "dry-types", ">= 0.15.0", "< 2.0"
-  spec.add_dependency "rescue_registry", "~> 1.0"
+  spec.add_dependency "rescue_registry", "~> 1.1"
   spec.add_dependency "concurrent-ruby", ">= 1.2", "< 2.0"
   spec.add_dependency "activesupport", ">= 7.1"
   # Bundled (no longer default) as of Ruby 4.0; graphiti uses OpenStruct in lib/

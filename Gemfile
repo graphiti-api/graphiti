@@ -3,7 +3,6 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in graphiti.gemspec
 gemspec
 
-# Until rescue_registry 1.1 ships with the fiber storage fix.
 gem "rescue_registry", "~> 1.1"
 
 group :test do
