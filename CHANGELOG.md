@@ -228,6 +228,14 @@ GraphitiErrors::Validation::Serializer is now Graphiti::ErrorSerializers::Valida
 * around_persistence hooks receive the assigned model instead of the attributes hash. Move attribute-hash modifications to before_attributes, or set values on the model. Custom create/update overrides that should receive a pre-assigned model must accept an assigned_model: keyword. See UPGRADING.md
 * Ruby >= 3.0 / Rails >= 6 are now required.
 
+## [1.13.4](https://github.com/graphiti-api/graphiti/compare/v1.13.3...v1.13.4) (2026-08-20)
+
+
+### Bug Fixes
+
+* resolve inline when already on a sideload pool thread ([11c9de7](https://github.com/graphiti-api/graphiti/commit/11c9de7fb4bfc2d83b02aaba3e58c1f94c84cec4))
+* scope debugger chunks to the request rather than the class ([9a77896](https://github.com/graphiti-api/graphiti/commit/9a77896c6e56d23b89d0a2aef358d8e8e0c28c54))
+
 ## [1.13.3](https://github.com/graphiti-api/graphiti/compare/v1.13.2...v1.13.3) (2026-08-09)
 
 
