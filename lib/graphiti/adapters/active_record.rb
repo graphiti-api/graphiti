@@ -281,20 +281,6 @@ module Graphiti
         # Nothing to do in the else case, happened when we merged foreign key
       end
 
-      # (see Adapters::Abstract#create)
-      def create(model_class, create_params)
-        instance = model_class.new(create_params)
-        instance.save
-        instance
-      end
-
-      # (see Adapters::Abstract#update)
-      def update(model_class, update_params)
-        instance = model_class.find(update_params.only(:id))
-        instance.update_attributes(update_params.except(:id))
-        instance
-      end
-
       def save(model_instance)
         model_instance.save
         model_instance

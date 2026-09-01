@@ -387,6 +387,7 @@ The resource-wide version of this setting was removed rather than deprecated. Se
 | `GraphitiErrors::ExceptionHandler` | subclass `Graphiti::Rails::ExceptionHandler` |
 | `GraphitiErrors.enable!` / `.disable!` | `handle_request_exceptions` |
 | `self.always_include_resource_ids_by_default` | `self.belongs_to_resource_ids_by_default`, which takes `:foreign_key`, `:always` or `:never` |
+| `Adapters::ActiveRecord#create` / `#update` | override `#save` |
 
 `always_include_resource_ids_by_default` raises `NoMethodError` at class-definition time. It applied to every relationship type, and only a `belongs_to` can render resource ids without loading an association, so the replacement covers `belongs_to` alone. `= false` becomes `:never`. There is no equivalent of `= true`, because arming every collection API-wide is the behavior it was removed for. Use `:always` for `belongs_to`.
 
