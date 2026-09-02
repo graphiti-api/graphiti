@@ -92,6 +92,21 @@ RSpec.describe Graphiti::Delegates::Pagination do
         expect(page_links).to all(satisfy { |v| v["format=jsonapi"].nil? })
       end
     end
+
+    context "with a request body" do
+      let(:params) {
+        {
+          data: {type: "foos", attributes: {deprecated: "1"}},
+          included: [{type: "foos", attributes: {deprecated: "2"}}]
+        }
+      }
+
+      it "removes it" do
+        page_links = subject.values
+        expect(page_links).to all(satisfy { |v| !v.include?("data") })
+        expect(page_links).to all(satisfy { |v| !v.include?("included") })
+      end
+    end
   end
 
   def pagination_link(number, size: current_per_page)
