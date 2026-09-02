@@ -9,7 +9,7 @@ namespace :graphiti do
     Graphiti.logger = Graphiti.stdout_logger
     Graphiti::Debugger.preserve = true
     require "pp"
-    path, debug = args[:path], args[:debug]
+    path, debug = args[:path], Graphiti::Types.flag(args[:debug])
     puts "Graphiti Request: #{path}"
     json = helpers.make_request(path, debug)
     pp json
@@ -20,7 +20,7 @@ namespace :graphiti do
     desc "Write the schema file. Refuses backwards-incompatible changes unless FORCE_SCHEMA=true. Takes an optional path, defaulting to Graphiti.config.schema_path."
     task :generate, [:path] => [:environment] do |_, args|
       check = Graphiti::Schema.check(path: helpers.schema_path(args[:path]))
-      abort check.message unless check.compatible? || ENV["FORCE_SCHEMA"] == "true"
+      abort check.message unless check.compatible? || Graphiti::Schema.forced?
 
       puts "Schema written: #{check.write!}"
     end
@@ -49,12 +49,15 @@ namespace :graphiti do
 
   desc "Execute benchmark without web server."
   task :benchmark, [:path, :requests] => [:environment] do |_, args|
+    requests = args[:requests].to_i
+    abort "Needs a request count, as in graphiti:benchmark[/path,100]" unless requests > 0
+
     helpers.setup_rails!
     took = Benchmark.ms {
-      args[:requests].to_i.times do
+      requests.times do
         helpers.make_request(args[:path])
       end
     }
-    puts "Took: #{(took / args[:requests].to_f).round(2)}ms"
+    puts "Took: #{(took / requests).round(2)}ms"
   end
 end

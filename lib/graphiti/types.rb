@@ -222,6 +222,12 @@ module Graphiti
       map[key.to_sym] = value
     end
 
+    def self.flag(value)
+      self[:boolean][:params].call(value.to_s.strip)
+    rescue Dry::Types::CoercionError
+      false
+    end
+
     def self.name_for(key)
       key = key.to_sym
       type = map[key]

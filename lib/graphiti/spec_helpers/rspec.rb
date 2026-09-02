@@ -131,7 +131,7 @@ module Graphiti
         ::RSpec.describe "Graphiti Schema" do
           it "generates a backwards-compatible schema" do
             check = Graphiti::Schema.check(resources, path: path || Graphiti.config.schema_path)
-            forced = ENV["FORCE_SCHEMA"] == "true"
+            forced = Graphiti::Schema.forced?
             check.write! if check.compatible? || forced
 
             expect(check.compatible? || forced).to eq(true), check.message

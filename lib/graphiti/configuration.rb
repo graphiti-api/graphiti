@@ -72,11 +72,8 @@ module Graphiti
       Debugger.debug_models = @debug_models
     end
 
-    # every value comes back from ENV as a string and "false" is truthy
     def coerce_flag(val)
-      return false if ["false", "0", ""].include?(val.to_s.strip.downcase)
-
-      !!val
+      Types.flag(val)
     end
 
     def with_option(key, value)

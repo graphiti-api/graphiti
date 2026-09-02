@@ -95,4 +95,26 @@ RSpec.describe Graphiti::Types do
       end
     end
   end
+
+  describe ".flag" do
+    {
+      "true" => true, "TRUE" => true, "1" => true, "t" => true,
+      "yes" => true, "y" => true, " true " => true, true => true,
+      "false" => false, "FALSE" => false, "0" => false, "f" => false,
+      "no" => false, "off" => false, false => false
+    }.each_pair do |value, expected|
+      it "reads #{value.inspect} as #{expected}" do
+        expect(described_class.flag(value)).to eq(expected)
+      end
+    end
+
+    it "is false when absent" do
+      expect(described_class.flag(nil)).to eq(false)
+      expect(described_class.flag("")).to eq(false)
+    end
+
+    it "is false rather than raising on a value it cannot read" do
+      expect(described_class.flag("banana")).to eq(false)
+    end
+  end
 end

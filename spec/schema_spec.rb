@@ -1123,4 +1123,30 @@ RSpec.describe Graphiti::Schema do
       end
     end
   end
+
+  describe ".forced?" do
+    def with_force_schema(value)
+      original = ENV["FORCE_SCHEMA"]
+      ENV["FORCE_SCHEMA"] = value
+      yield
+    ensure
+      ENV["FORCE_SCHEMA"] = original
+    end
+
+    it "is false when unset" do
+      with_force_schema(nil) { expect(described_class.forced?).to eq(false) }
+    end
+
+    it "is true for true" do
+      with_force_schema("true") { expect(described_class.forced?).to eq(true) }
+    end
+
+    it "is false for false" do
+      with_force_schema("false") { expect(described_class.forced?).to eq(false) }
+    end
+
+    it "reads the other spellings of true" do
+      with_force_schema("1") { expect(described_class.forced?).to eq(true) }
+    end
+  end
 end

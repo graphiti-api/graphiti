@@ -2,7 +2,6 @@ require "digest"
 
 module Graphiti
   class Query
-    TRUTHY_LINKS = [true, "true"].freeze
     LINKLESS_FORMATS = [:json, :xml, "json", "xml"].freeze
 
     attr_reader :resource, :association_name, :params, :action
@@ -80,7 +79,7 @@ module Graphiti
     def links_requested?
       return @links_requested if defined?(@links_requested)
 
-      @links_requested = TRUTHY_LINKS.include?(@params[:links])
+      @links_requested = Types.flag(@params[:links])
     end
 
     def suppress_links?
@@ -107,11 +106,11 @@ module Graphiti
 
     def page_links_requested?
       [@params[:page_links], @params[:pagination_links]]
-        .any? { |value| [true, "true"].include?(value) }
+        .any? { |value| Types.flag(value) }
     end
 
     def debug_requested?
-      !!@params[:debug]
+      Types.flag(@params[:debug])
     end
 
     def hash

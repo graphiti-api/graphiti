@@ -11,7 +11,11 @@ module Graphiti
       new(resources).generate
     end
 
-    def self.generate!(resources = nil, path: Graphiti.config.schema_path, force: ENV["FORCE_SCHEMA"] == "true")
+    def self.forced?
+      Types.flag(ENV["FORCE_SCHEMA"])
+    end
+
+    def self.generate!(resources = nil, path: Graphiti.config.schema_path, force: forced?)
       result = check(resources, path: path)
       return result.errors if !force && !result.compatible?
 

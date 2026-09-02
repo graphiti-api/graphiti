@@ -1058,6 +1058,18 @@ RSpec.describe Graphiti::Query do
         it { is_expected.to eq(true) }
       end
 
+      context "when params ask with another truthy string" do
+        let(:params) { {page_links: "1"} }
+
+        it { is_expected.to eq(true) }
+      end
+
+      context "when params say not to" do
+        let(:params) { {page_links: "false"} }
+
+        it { is_expected.to eq(false) }
+      end
+
       context "when params dont ask pagination" do
         it { is_expected.to eq(false) }
       end
