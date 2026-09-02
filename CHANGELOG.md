@@ -1,5 +1,16 @@
 graphiti changelog
 
+## [2.0.1](https://github.com/graphiti-api/graphiti/compare/v2.0.0...v2.0.1) (2026-09-02)
+
+
+### Bug Fixes
+
+* count distinct on the primary key rather than every column ([be85c18](https://github.com/graphiti-api/graphiti/commit/be85c18b695bf482f95ae72496600b40e3531c44)), closes [#439](https://github.com/graphiti-api/graphiti/issues/439)
+* keep the request body out of pagination links ([64040f2](https://github.com/graphiti-api/graphiti/commit/64040f200c307062d0b04204013e35963cec4ceb)), closes [#369](https://github.com/graphiti-api/graphiti/issues/369)
+* read flags through one coercion ([72a39a7](https://github.com/graphiti-api/graphiti/commit/72a39a7c126e2d6d89fb4a829cad20efd207df4d))
+* respect polymorphic_name when sideposting ([45d9eb7](https://github.com/graphiti-api/graphiti/commit/45d9eb73b1dba2e4587ee67387f0c3117c9c4fcf)), closes [#437](https://github.com/graphiti-api/graphiti/issues/437)
+* stop the debugger requiring an id on every model ([8111b68](https://github.com/graphiti-api/graphiti/commit/8111b6897bd735bed84a63c312a6a01cf69317a1)), closes [#152](https://github.com/graphiti-api/graphiti/issues/152)
+
 # [2.0.0](https://github.com/graphiti-api/graphiti/compare/v1.13.3...v2.0.0) (2026-09-01)
 
 
