@@ -281,6 +281,10 @@ module Graphiti
         # Nothing to do in the else case, happened when we merged foreign key
       end
 
+      def polymorphic_type_value(parent_object)
+        parent_object.class.polymorphic_name
+      end
+
       def save(model_instance)
         model_instance.save
         model_instance

@@ -1602,6 +1602,17 @@ if ENV["APPRAISAL_INITIALIZED"]
           make_request
           expect(employee.reload.notes.map(&:body)).to eq(["foo"])
         end
+
+        context "and the parent overrides polymorphic_name" do
+          before do
+            allow(Employee).to receive(:polymorphic_name).and_return("Staff")
+          end
+
+          it "stores the overridden name as the type" do
+            make_request
+            expect(Note.last.notable_type).to eq("Staff")
+          end
+        end
       end
 
       context "when updating" do
