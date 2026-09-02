@@ -22,6 +22,35 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
+    context "when a filter joins and duplicates rows" do
+      let!(:employee) { Employee.create!(first_name: "Jane") }
+
+      let(:resource) do
+        Class.new(EmployeeResource) do
+          self.model = Employee
+
+          filter :has_positions, :boolean do
+            eq do |scope, value|
+              scope.joins(:positions)
+            end
+          end
+
+          def self.name
+            "EmployeeResource"
+          end
+        end
+      end
+
+      before do
+        3.times { |i| Position.create!(title: "p#{i}", employee_id: employee.id) }
+      end
+
+      it "counts each row once" do
+        proxy = resource.all(filter: {has_positions: true}, stats: {total: "count"})
+        expect(proxy.stats[:total][:count]).to eq(1)
+      end
+    end
+
     context "when grouping" do
       it "works" do
         proxy = PositionResource.all(stats: {total: "count", group_by: :employee_id})

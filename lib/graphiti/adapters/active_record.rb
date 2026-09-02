@@ -198,7 +198,7 @@ module Graphiti
       # (see Adapters::Abstract#count)
       def count(scope, attr)
         if attr.to_sym == :total
-          scope.distinct.count(:all)
+          scope.distinct.count(distinct_count_column(scope))
         else
           scope.distinct.count(attr)
         end
@@ -312,6 +312,13 @@ module Graphiti
       end
 
       private
+
+      def distinct_count_column(scope)
+        primary_key = scope.klass.primary_key
+        return :all unless primary_key.is_a?(String)
+
+        scope.klass.arel_table[primary_key]
+      end
 
       def column_for(scope, name)
         table = scope.klass.arel_table
