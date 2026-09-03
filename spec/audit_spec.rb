@@ -9,6 +9,51 @@ RSpec.describe Graphiti::Audit do
     audit(resource_class).find { |f| f.check == check }
   end
 
+  describe "a link hidden behind a public id" do
+    let(:employee_resource) do
+      Class.new(PORO::EmployeeResource) do
+        def self.name
+          "PORO::EmployeeResource"
+        end
+
+        public_id :public_id
+      end
+    end
+
+    let(:resource) do
+      employee_resource_class = employee_resource
+      Class.new(PORO::PositionResource) do
+        def self.name
+          "PORO::PositionResource"
+        end
+
+        belongs_to :employee, resource: employee_resource_class, primary_key: :nickname, link: true
+      end
+    end
+
+    it "warns that the relationship renders no link" do
+      found = finding(resource, :link_hidden)
+
+      expect(found.severity).to eq(:warning)
+      expect(found.message).to eq("PORO::EmployeeResource publishes a public id the relationship cannot translate to")
+    end
+
+    it "stays quiet once the relationship has a link block" do
+      employee_resource_class = employee_resource
+      resource = Class.new(PORO::PositionResource) do
+        def self.name
+          "PORO::PositionResource"
+        end
+
+        belongs_to :employee, resource: employee_resource_class, primary_key: :nickname do
+          link { |position| "/employees/#{position.employee_id}" }
+        end
+      end
+
+      expect(finding(resource, :link_hidden)).to be_nil
+    end
+  end
+
   describe "missing association method" do
     let(:resource) do
       Class.new(PORO::TeamResource) do

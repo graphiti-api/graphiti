@@ -61,6 +61,14 @@ module Graphiti
         filter_string_eql(scope, attribute, value.presence, is_not: true)
       end
 
+      def filter_public_id_eq(scope, attribute, value)
+        filter_string_eql(scope, attribute, value)
+      end
+
+      def filter_public_id_not_eq(scope, attribute, value)
+        filter_string_not_eql(scope, attribute, value)
+      end
+
       # Arel has different match escaping behavior before rails 5.
       # Since rails 4.x does not expose methods to escape LIKE statements
       # anyway, we just don't support proper LIKE escaping in those versions.

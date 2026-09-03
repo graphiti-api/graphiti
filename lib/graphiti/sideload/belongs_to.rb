@@ -17,7 +17,7 @@ class Graphiti::Sideload::BelongsTo < Graphiti::Sideload
 
   def resource_ids_blocker
     return :unreadable unless renderable_at_all?
-    return :custom_primary_key unless foreign_key_is_related_id?
+    return :custom_primary_key unless foreign_key_is_related_id? || resolves_public_ids?
     return :polymorphic_child if polymorphic_child?
     return :scope_block if self.class.scope_proc
     return :params_block if self.class.params_proc
@@ -26,12 +26,6 @@ class Graphiti::Sideload::BelongsTo < Graphiti::Sideload
     return :polymorphic_resource if resource.class.polymorphic.present?
 
     nil
-  end
-
-  # base_filter matches the foreign key against primary_key, so a custom
-  # primary_key means the key holds that column's value, not the related id.
-  def foreign_key_is_related_id?
-    primary_key == :id
   end
 
   def load_params(parents, query)
@@ -43,7 +37,49 @@ class Graphiti::Sideload::BelongsTo < Graphiti::Sideload
 
   def base_filter(parents)
     parent_ids = ids_for_parents(parents)
-    {primary_key => parent_ids.join(",")}
+    return {primary_key_filter => Graphiti::Util::InternalParam.new(parent_ids)} if primary_key_filter == :_primary_key
+
+    {primary_key_filter => parent_ids.join(",")}
+  end
+
+  def resolves_public_ids?
+    @resolves_public_ids ||= target_publishes_id? && resource_class.filters.key?(primary_key_filter)
+  end
+
+  def link_hides_primary_key?
+    !target_publishes_id? || resolves_public_ids?
+  end
+
+  def register_public_id_source
+    return unless target_publishes_id? && resource_class_loaded? && parent_resource_class.model_declared?
+
+    parent_resource_class.guard_public_id_leak!(foreign_key)
+  end
+
+  def rendered_id_for(foreign_key, query)
+    return foreign_key unless target_publishes_id?
+    return unless resolves_public_ids?
+
+    public_id_map(query)[foreign_key]
+  end
+
+  # The serializer reports a foreign key the record cannot answer with a better error.
+  def collect_foreign_keys(parents, query)
+    return unless resource_class_loaded? && resolves_public_ids?
+    return unless parents.first.respond_to?(foreign_key)
+
+    public_id_map(query).add(ids_for_parents(parents))
+  end
+
+  def primary_key_filter
+    return primary_key unless target_publishes_id?
+    return :_primary_key if primary_key == :id || primary_key.to_s == resource_class.model_primary_key.to_s
+
+    primary_key
+  end
+
+  def foreign_key_is_related_id?
+    primary_key_filter == :id
   end
 
   def ids_for_parents(parents)
@@ -74,6 +110,14 @@ class Graphiti::Sideload::BelongsTo < Graphiti::Sideload
   end
 
   private
+
+  def target_publishes_id?
+    @target_publishes_id ||= Graphiti.public_ids_declared? && resource_class.publishes_public_id?
+  end
+
+  def public_id_map(query)
+    query.public_id_maps.compute_if_absent(self) { Graphiti::Util::PublicIdMap.new(resource_class, primary_key_filter) }
+  end
 
   def child_map(children)
     children.index_by(&primary_key)

@@ -1,7 +1,7 @@
 require "spec_helper"
 
 RSpec.describe Graphiti::Stats::Payload do
-  let(:dsl) { double }
+  let(:dsl) { double(model_attribute_for: :attr1) }
   let(:query) { double(stats: {attr1: [:count, :average], attr2: [:maximum]}) }
   let(:scope) { double.as_null_object }
   let(:data) { double.as_null_object }

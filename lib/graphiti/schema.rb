@@ -103,6 +103,10 @@ module Graphiti
           stats: stats(r)
         }
 
+        if r.publishes_public_id?
+          config[:public_id] = r.config[:public_id]&.to_s || true
+        end
+
         if r.grouped_filters.any?
           config[:filter_group] = r.grouped_filters
         end

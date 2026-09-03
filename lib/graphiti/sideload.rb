@@ -198,14 +198,38 @@ module Graphiti
 
     # A custom link block means the author wants the link, so a false default does not silence it.
     def link_mode
-      return @link unless @link.nil?
+      mode = requested_link_mode
+      return false unless mode
+      return false unless link_proc || link_hides_primary_key?
 
+      mode
+    end
+
+    def requested_link_mode
+      @link.nil? ? default_link_mode : @link
+    end
+
+    def default_link_mode
       default = @parent_resource_class.relationship_links
       (link_proc && default == false) ? true : default
     end
 
     def link?
       link_mode != false
+    end
+
+    def link_hides_primary_key?
+      true
+    end
+
+    def collect_foreign_keys(parents, query)
+    end
+
+    def register_public_id_source
+    end
+
+    def rendered_id_for(foreign_key, query)
+      foreign_key
     end
 
     def link_filter(parents)

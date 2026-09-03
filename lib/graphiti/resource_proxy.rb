@@ -125,14 +125,17 @@ module Graphiti
         scope = @scope.unpaginated_object
         if resource.adapter.can_group?
           if (group = @query.hash[:stats].delete(:group_by))
-            resource.get_attr!(group[0], :readable, request: true)
-            scope = resource.adapter.group(scope, group[0])
+            # A foreign key whose values render as public ids exposes nothing, so it may group even when unreadable.
+            flag = resource.class.public_id_source_for(group[0]) ? :filterable : :readable
+            resource.get_attr!(group[0], flag, request: true)
+            scope = resource.adapter.group(scope, resource.model_attribute_for(group[0]))
           end
         end
         payload = Stats::Payload.new @resource,
           @query,
           scope,
-          data
+          data,
+          group_by: group&.first
         payload.generate
       else
         {}

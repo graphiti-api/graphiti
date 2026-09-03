@@ -108,7 +108,7 @@ module Graphiti
               resource.class.config[:attributes][:id][:writable] == false
 
             begin
-              attributes[key] = resource.typecast(key, value, :writable)
+              attributes[key] = typecast_attribute(resource, key, value)
             rescue Graphiti::Errors::UnknownAttribute
               @errors.add(fully_qualified_key(key, payload_path), :unknown_attribute)
             rescue Graphiti::Errors::InvalidAttributeAccess
@@ -118,6 +118,15 @@ module Graphiti
             end
           end
         end
+      end
+
+      # A writable foreign key arrives as the public id of the record it names, and is decoded when assigned.
+      def typecast_attribute(resource, key, value)
+        source = (key == :id) ? nil : resource.class.public_id_source_for(key)
+        return resource.typecast(key, value, :writable) unless source
+
+        resource.get_attr!(key, :writable, request: true)
+        source.new.typecast(:id, value, :filterable)
       end
 
       def normalized_params(raw_params)

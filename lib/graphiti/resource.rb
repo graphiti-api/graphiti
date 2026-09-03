@@ -150,6 +150,10 @@ module Graphiti
       persistence.run
     end
 
+    def model_attribute_for(name)
+      self.class.model_attribute_for(name)
+    end
+
     def stat(attribute, calculation)
       stats_dsl = stats[attribute] || stats[attribute.to_sym]
       raise Errors::StatNotFound.new(attribute, calculation) unless stats_dsl

@@ -14,11 +14,12 @@ module Graphiti
     #     meta: { stats: { total: { count: 100 } } }
     #   }
     class Payload
-      def initialize(resource, query, scope, data)
+      def initialize(resource, query, scope, data, group_by: nil)
         @resource = resource
         @query = query
         @scope = scope
         @data = data
+        @group_by = group_by
       end
 
       # Generate the payload for +{ meta: { stats: { ... } } }+
@@ -38,13 +39,29 @@ module Graphiti
       end
 
       def calculate_stat(name, function)
-        args = [@scope, name]
+        args = [@scope, @resource.model_attribute_for(name)]
         args << @resource.context if function.arity >= 3
         args << @data if function.arity == 4
-        function.call(*args)
+        translate_group_keys(function.call(*args))
       end
 
       private
+
+      def translate_group_keys(result)
+        return result unless result.is_a?(Hash) && @group_by
+
+        source = @resource.class.public_id_source_for(@group_by)
+        return result unless source
+
+        public_ids = source.public_ids_by(:_primary_key, result.keys.compact)
+        result.each_with_object({}) do |(primary_key, value), translated|
+          if primary_key.nil?
+            translated[nil] = value
+          elsif public_ids.key?(primary_key)
+            translated[public_ids[primary_key]] = value
+          end
+        end
+      end
 
       def each_calculation(name, calculations)
         calculations.each do |calc|

@@ -1,9 +1,10 @@
 module Graphiti
   module Util
     class Link
-      def initialize(sideload, model)
+      def initialize(sideload, model, query = nil)
         @sideload = sideload
         @model = model
+        @query = query
         @linkable = true
 
         if @sideload.type == :polymorphic_belongs_to
@@ -30,10 +31,16 @@ module Graphiti
         return false if @polymorphic_sideload_not_found
 
         if @sideload.type == :belongs_to
-          !@model.send(@sideload.foreign_key).nil?
+          !related_id.nil?
         else
           @linkable
         end
+      end
+
+      def related_id
+        return @related_id if defined?(@related_id)
+
+        @related_id = @sideload.rendered_id_for(@model.send(@sideload.foreign_key), @query)
       end
 
       def raw_url
@@ -76,7 +83,7 @@ module Graphiti
         @path ||=
           path = @sideload.resource.endpoint[:url].to_s
         if @sideload.type == :belongs_to && !@sideload.remote?
-          path = "#{path}/#{@model.send(@sideload.foreign_key)}"
+          path = "#{path}/#{related_id}"
         end
         path
       end

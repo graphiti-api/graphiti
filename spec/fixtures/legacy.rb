@@ -2,12 +2,14 @@ ActiveRecord::Schema.define(version: 1) do
   create_table :authors do |t|
     t.boolean :active, default: true
     t.string :first_name
+    t.string :public_id
     t.string :last_name
     t.integer :age
     t.float :float_age
     t.float :decimal_age
     t.string :dwelling_type
     t.integer :state_id
+    t.string :region_code
     t.integer :dwelling_id
     t.integer :organization_id
     t.date :created_at_date
@@ -78,7 +80,15 @@ ActiveRecord::Schema.define(version: 1) do
 
   create_table :states do |t|
     t.string :name
+    t.string :public_id
     t.timestamps
+  end
+
+  # A model whose primary key is neither :id nor an integer, so public_id
+  # has something other than the default to remap around.
+  create_table :legacy_regions, primary_key: :code, id: :string do |t|
+    t.string :name
+    t.string :public_id
   end
 
   create_table :taggings do |t|
@@ -116,9 +126,16 @@ module Legacy
     has_many :books
   end
 
+  class Region < ApplicationRecord
+    # employee_directory.rb owns the plain :regions table in this database.
+    self.table_name = "legacy_regions"
+    self.primary_key = "code"
+  end
+
   class Author < ApplicationRecord
     belongs_to :dwelling, polymorphic: true
     belongs_to :state
+    belongs_to :region, foreign_key: :region_code, primary_key: :code, optional: true
     belongs_to :organization
     has_many :books
     has_many :author_hobbies
@@ -285,6 +302,10 @@ module Legacy
       has_many :stocks
       many_to_many :books, resource: Legacy::BookResource, foreign_key: {sales_stocks: :shop_id}
     end
+  end
+
+  class RegionResource < ApplicationResource
+    attribute :name, :string
   end
 
   class StateResource < ApplicationResource

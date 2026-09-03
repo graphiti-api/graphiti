@@ -7,7 +7,8 @@ module Graphiti
         broken_relationship: "raised while being inspected",
         missing_association_method: "will raise when the relationship is included: the model has no association method",
         missing_guard_method: "will raise whenever the resource renders: the readable guard is not defined",
-        missing_sideload_filter: "will raise when the relationship is included: the related resource is missing the filter"
+        missing_sideload_filter: "will raise when the relationship is included: the related resource is missing the filter",
+        link_hidden: "renders no related link: it would expose a primary key the related resource hides"
       }.freeze
 
       CHECKLIST = {
@@ -15,6 +16,7 @@ module Graphiti
         missing_association_method: ["all association methods defined", "association method", "missing"],
         missing_guard_method: ["all readable guards defined", "readable guard", "missing"],
         missing_sideload_filter: ["all sideload filters declared", "sideload filter", "missing"],
+        link_hidden: ["all relationship links renderable", "relationship link", "hidden"],
         loads_on_every_render: ["all id-rendering loads preloaded", "relationship", "loading ids without preloading"]
       }.freeze
 

@@ -39,7 +39,9 @@ module Graphiti
               dependencies: opts[:dependent],
               required: required,
               schema: schema,
+              internal: !!opts[:internal],
               operators: operators.to_hash,
+              operators_taking_primary_keys: operators_taking_primary_keys(operators.to_hash),
               blanks: blanks_for(name, opts)
             }
           elsif (type = args[0])
@@ -131,7 +133,9 @@ module Graphiti
           attribute_option(options, :schema, true)
           options[:type] = type
           options[:proc] = blk
+          options[:proc] ||= public_id_proc if name == :id && publishes_public_id?
           config[:attributes][name] = options
+          guard_public_id_leak!(name)
           apply_attributes_to_serializer
           options[:sortable] ? sort(name) : config[:sorts].delete(name)
 
@@ -140,6 +144,44 @@ module Graphiti
           else
             config[:filters].delete(name)
           end
+        end
+
+        def public_id(name = nil, type = nil, &blk)
+          raise Errors::InvalidPublicId.new(self, "takes a column name or a block, not both") if name && blk
+          raise Errors::InvalidPublicId.new(self, "needs a column name or a block") unless name || blk
+
+          if blk
+            block = Util::PublicIdBlock.new
+            block.instance_eval(&blk)
+            raise Errors::InvalidPublicId.new(self, "block must define both encode and decode") unless block.encoder && block.decoder
+            config[:public_id_encode] = block.encoder
+            config[:public_id_decode] = block.decoder
+          end
+          config[:public_id] = name
+          config[:public_id_type] = type
+          Graphiti.public_ids_declared = true
+          apply_public_id
+        end
+
+        def operators_taking_primary_keys(operators)
+          operators.select { |_, block| block && takes_primary_keys?(block) }.keys
+        end
+
+        def takes_primary_keys?(block)
+          block.parameters.any? { |kind, name| kind == :keyrest || (name == :primary_keys && %i[key keyreq].include?(kind)) }
+        end
+
+        # The hidden filter only ever sees keys Graphiti read off models, so its type is never used to cast anything.
+        def public_id_proc
+          proc { @resource.class.public_id_for(@object) }
+        end
+
+        def apply_public_id
+          attribute :id, config[:public_id_type] || inferred_public_id_type, &public_id_proc
+          attribute :_primary_key, :integer_id, only: [:filterable], schema: false
+          filter :_primary_key, schema: false, internal: true
+          attribute :_public_id, config[:public_id_type] || inferred_public_id_type, only: [:filterable], schema: false
+          filter :_public_id, schema: false, internal: true
         end
 
         def extra_attribute(name, type, options = {}, &blk)
@@ -175,6 +217,7 @@ module Graphiti
           attributes.merge(extra_attributes)
         end
 
+        # An abstract resource has no serializer until a concrete subclass is given one.
         def apply_attributes_to_serializer
           return unless serializer
 

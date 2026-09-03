@@ -19,8 +19,8 @@ module Graphiti
           resource, missing_dependent_filters
       end
 
-      each_filter do |filter, operator, value|
-        @scope = filter_scope(filter, operator, value)
+      each_filter do |filter, operator, value, primary_keys, decoded|
+        @scope = filter_scope(filter, operator, value, primary_keys, decoded)
       end
 
       resource.after_filtering(@scope)
@@ -28,18 +28,24 @@ module Graphiti
 
     private
 
-    def filter_scope(filter, operator, value)
+    def filter_scope(filter, operator, value, primary_keys, decoded)
       if (custom_scope = filter.values[0][:operators][operator])
-        @resource.instance_exec(@scope, value, resource.context, &custom_scope)
+        if takes_primary_keys?(filter, operator)
+          @resource.instance_exec(@scope, value, resource.context, primary_keys: primary_keys, &custom_scope)
+        else
+          @resource.instance_exec(@scope, value, resource.context, &custom_scope)
+        end
       else
-        filter_via_adapter(filter, operator, value)
+        filter_via_adapter(filter, operator, value, decoded)
       end
     end
 
-    def filter_via_adapter(filter, operator, value)
-      type_name = Types.name_for(filter.values.first[:type])
+    # A foreign key filter holds primary keys once its public ids are decoded, whatever type the attribute renders as.
+    def filter_via_adapter(filter, operator, value, decoded = false)
+      type_name = Types.name_for(decoded ? :integer_id : filter.values.first[:type])
+      type_name = :public_id if type_name == :string && [:eq, :not_eq].include?(operator) && resource.class.public_id_attribute?(filter.keys.first)
       method = :"filter_#{type_name}_#{operator}"
-      attribute = filter.keys.first
+      attribute = resource.model_attribute_for(filter.keys.first)
 
       if resource.adapter.respond_to?(method)
         resource.adapter.send(method, @scope, attribute, value)
@@ -53,25 +59,78 @@ module Graphiti
       filter_param.each_pair do |param_name, param_value|
         filter = find_filter!(param_name)
 
+        internal = param_value.is_a?(Util::InternalParam)
+        if internal
+          param_value = param_value.value
+        elsif filter.values[0][:internal]
+          raise Errors::InvalidAttributeAccess.new(resource, param_name, :filterable, request: true)
+        else
+          source = resource.class.public_id_source_for(filter.keys[0])
+        end
+
         normalize_param(filter, param_value).each do |operator, value|
           operator = operator.to_s.gsub("!", "not_").to_sym
           validate_operator(filter, operator)
+          custom = filter.values[0][:operators][operator]
+          decoded = !!source && !custom
+          value = decode_public_ids(source, value) if decoded
 
-          type = Types[filter.values[0][:type]]
-          unless type[:canonical_name] == :hash || !value.is_a?(String)
-            value = parse_string_value(filter.values[0], value)
-          end
-
-          check_blank_filters!(resource, filter, value)
-          value = parse_string_null(filter.values[0], value)
-          validate_singular(resource, filter, value)
-          value = coerce_types(filter.values[0], param_name.to_sym, value)
-          validate_allowlist(resource, filter, value)
-          validate_denylist(resource, filter, value)
+          decoding = source && takes_primary_keys?(filter, operator)
+          value = validated_and_cast(filter, param_name, value, decoding ? source : nil) unless internal
           value = value[0] if filter.values[0][:single]
-          yield filter, operator, value
+          primary_keys = decoded_for_block(filter, operator, source, value)
+          yield filter, operator, value, primary_keys, decoded
         end
       end
+    end
+
+    # A block asking for primary_keys: was sent public ids, which cast like the source's id rather than the key.
+    def validated_and_cast(filter, param_name, value, public_id_source)
+      type = Types[filter.values[0][:type]]
+      unless type[:canonical_name] == :hash || !value.is_a?(String)
+        value = parse_string_value(filter.values[0], value)
+      end
+
+      check_blank_filters!(resource, filter, value)
+      value = parse_string_null(filter.values[0], value)
+      validate_singular(resource, filter, value)
+      value = public_id_source ? cast_as_public_ids(public_id_source, value) : coerce_types(filter.values[0], param_name.to_sym, value)
+      validate_allowlist(resource, filter, value)
+      validate_denylist(resource, filter, value)
+      value
+    end
+
+    def cast_as_public_ids(source, value)
+      source_instance = source.new
+      Array(value).map { |public_id| source_instance.typecast(:id, public_id, :filterable) }
+    end
+
+    def takes_primary_keys?(filter, operator)
+      Array(filter.values[0][:operators_taking_primary_keys]).include?(operator)
+    end
+
+    def decoded_for_block(filter, operator, source, value)
+      return unless takes_primary_keys?(filter, operator)
+      source ||= resource.class if filter.keys[0] == :id && resource.class.publishes_public_id?
+      return value unless source
+
+      keys = decode_public_ids(source, value)
+      filter.values[0][:single] ? keys.first : keys
+    end
+
+    def decode_public_ids(source_resource_class, value)
+      case value
+      when Hash
+        value.transform_values { |operand| decode_public_ids(source_resource_class, operand) }
+      when Array
+        lookup_primary_keys(source_resource_class, value)
+      else
+        lookup_primary_keys(source_resource_class, value.to_s.split(","))
+      end
+    end
+
+    def lookup_primary_keys(source_resource_class, public_ids)
+      source_resource_class.decode_public_ids(public_ids)
     end
 
     def coerce_types(filter, name, value)

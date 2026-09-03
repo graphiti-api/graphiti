@@ -153,6 +153,7 @@ module Graphiti
     def sync_resolve_sideloads(results)
       return if results == []
 
+      collect_foreign_keys(results)
       reset_captured_sideload_proxies
       each_applicable_sideload do |name, sideload, sideload_query|
         Graphiti.config.before_sideload&.call(Graphiti.context)
@@ -221,6 +222,12 @@ module Graphiti
       false
     end
 
+    def collect_foreign_keys(results)
+      return unless Graphiti.public_ids_declared? && !@opts[:translating_public_ids]
+
+      @resource.class.sideloads.each_value { |sideload| sideload.collect_foreign_keys(results, @query) }
+    end
+
     def each_applicable_sideload
       @query.sideloads.each_pair do |name, sideload_query|
         sideload = @resource.class.sideload(name)
@@ -246,6 +253,7 @@ module Graphiti
     def future_resolve_sideloads(results)
       return Concurrent::Promises.fulfilled_future(nil, self.class.global_thread_pool_executor) if results == []
 
+      collect_foreign_keys(results)
       reset_captured_sideload_proxies
       sideload_promises = []
       each_applicable_sideload do |name, sideload, sideload_query|

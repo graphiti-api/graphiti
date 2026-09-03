@@ -102,7 +102,7 @@ class Graphiti::Util::Persistence
   def apply_derived_attributes(attributes, payload_attributes)
     return unless @assigned_model
 
-    derived = attributes.reject { |key, value| payload_attributes[key] == value }
+    derived = @resource.decode_foreign_keys(attributes).reject { |key, value| payload_attributes[key] == value }
     return if derived.empty?
 
     @resource.assign_attributes(@assigned_model, derived, metadata)
