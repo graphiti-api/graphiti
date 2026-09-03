@@ -28,6 +28,40 @@ module Graphiti
         end
 
         # @api private
+        def public_ids_by(filter_name, keys)
+          encode = config[:public_id_encode]
+          return keys.to_h { |key| [key, encode.call(key)] } if encode && filter_name == :_primary_key
+
+          attribute = model_attribute_for(filter_name)
+          value = (filter_name == :_primary_key) ? Util::InternalParam.new(keys) : keys.join(",")
+          translate_ids(filter_name => value).each_with_object({}) do |record, map|
+            map[record.send(attribute)] = public_id_for(record)
+          end
+        end
+
+        # @api private
+        # Sqids decodes any string in its alphabet, so "42" yields some unrelated record.
+        # A decode only counts if encoding the result gives back the string that was sent.
+        def decode_encoded_id(public_id)
+          primary_key = config[:public_id_decode].call(public_id)
+          return if primary_key.nil?
+
+          primary_key if config[:public_id_encode].call(primary_key) == public_id
+        end
+
+        def decode_public_id(public_id)
+          decode_public_ids([public_id]).first
+        end
+
+        def decode_public_ids(public_ids)
+          if config[:public_id_decode]
+            return public_ids.map { |public_id| decode_encoded_id(public_id) }.compact
+          end
+
+          translate_ids(_public_id: Util::InternalParam.new(public_ids)).map { |record| record.send(model_primary_key) }
+        end
+
+        # @api private
         def _find(params = {}, base_scope = nil)
           guard_nil_id!(params[:data])
           guard_nil_id!(params)
@@ -77,6 +111,11 @@ module Graphiti
 
         def caching_options
           {cache: @cache_resource, cache_expires_in: @cache_expires_in, cache_tag: @cache_tag}
+        end
+
+        def translate_ids(filter)
+          opts = {default_paginate: false, bypass_required_filters: true, bypass_default_filters: true, translating_public_ids: true}
+          _all({filter: filter}, opts, nil).data
         end
 
         def validate_request!(params)

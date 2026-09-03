@@ -16,7 +16,7 @@ class Graphiti::Sideload::ManyToMany < Graphiti::Sideload::HasMany
   end
 
   def base_filter(parents)
-    {true_foreign_key => parent_filter(parents)}
+    {true_foreign_key => internal_parent_filter(parents, true_foreign_key)}
   end
 
   def infer_foreign_key
@@ -39,8 +39,8 @@ class Graphiti::Sideload::ManyToMany < Graphiti::Sideload::HasMany
     # Do not recreate if filter already exists
     unless resource_class.config[:filters].has_key?(inverse_filter.to_sym)
       resource_class.filter inverse_filter, fk_type do
-        eq do |scope, value|
-          self_ref.belongs_to_many_filter(scope, value)
+        eq do |scope, value, primary_keys:|
+          self_ref.belongs_to_many_filter(scope, primary_keys)
         end
       end
     end

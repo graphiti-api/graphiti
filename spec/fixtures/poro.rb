@@ -112,7 +112,7 @@ module PORO
   class Base
     include ActiveModel::Validations
 
-    attr_accessor :id
+    attr_accessor :id, :public_id
 
     def self.create(attrs = {})
       record = new(attrs)

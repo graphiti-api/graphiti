@@ -740,6 +740,42 @@ module Graphiti
       end
     end
 
+    class ConflictingPublicIdSource < Base
+      def initialize(resource_class, filter_name, registered, claimant)
+        @resource_class = resource_class
+        @filter_name = filter_name
+        @registered = registered
+        @claimant = claimant
+      end
+
+      def message
+        "#{@resource_class.name}: filter #{@filter_name.inspect} already resolves public ids through #{@registered.name}, so #{@claimant.name} cannot claim it too. Give one of the relationships a different `inverse_filter`."
+      end
+    end
+
+    class InvalidPublicId < Base
+      def initialize(resource_class, reason)
+        @resource_class = resource_class
+        @reason = reason
+      end
+
+      def message
+        "#{@resource_class.name}: public_id #{@reason}."
+      end
+    end
+
+    class PublicIdLeak < Base
+      def initialize(resource_class, attribute_name, source_resource_class)
+        @resource_class = resource_class
+        @attribute_name = attribute_name
+        @source_resource_class = source_resource_class
+      end
+
+      def message
+        "#{@resource_class.name}: attribute #{@attribute_name.inspect} is readable, but it holds the primary key #{@source_resource_class.name} hides behind its public id. Declare it `only: [:filterable]` or drop it."
+      end
+    end
+
     class UnselectedForeignKey < Base
       def initialize(resource_class, sideload, model)
         @resource_class = resource_class

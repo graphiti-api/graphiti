@@ -324,6 +324,60 @@ RSpec.describe Graphiti::SchemaDiff do
       end
     end
 
+    context "when a resource gains an public_id" do
+      before do
+        resource_b.attribute :public_id, :string
+        resource_b.public_id :public_id
+      end
+
+      it "returns error" do
+        expect(diff).to include(
+          'SchemaDiff::EmployeeResource changed public_id from nil to "public_id".'
+        )
+      end
+    end
+
+    context "when a resource changes which attribute it publishes as the id" do
+      before do
+        resource_a.attribute :public_id, :string
+        resource_a.public_id :public_id
+        resource_b.attribute :slug, :string
+        resource_b.public_id :slug
+      end
+
+      it "returns error" do
+        expect(diff).to include(
+          'SchemaDiff::EmployeeResource changed public_id from "public_id" to "slug".'
+        )
+      end
+    end
+
+    context "when a resource moves from a public id column to an encoded one" do
+      before do
+        resource_a.attribute :public_id, :string
+        resource_a.public_id :public_id
+        resource_b.public_id do
+          encode { |primary_key| primary_key.to_s }
+          decode { |public_id| public_id.to_i }
+        end
+      end
+
+      it "returns error" do
+        expect(diff).to include(
+          'SchemaDiff::EmployeeResource changed public_id from "public_id" to true.'
+        )
+      end
+    end
+
+    context "when a resource keeps the same public_id" do
+      before do
+        resource_a.attribute :public_id, :string
+        resource_a.public_id :public_id
+      end
+
+      it { is_expected.to eq([]) }
+    end
+
     context "when extra attribute added" do
       before do
         resource_b.extra_attribute :foo, :string

@@ -31,7 +31,7 @@ module Graphiti
           @scope = if sort[:proc]
             resource.instance_exec(@scope, direction, &sort[:proc])
           else
-            resource.adapter.order(@scope, attribute, direction)
+            resource.adapter.order(@scope, resource.model_attribute_for(attribute), direction)
           end
         end
       end

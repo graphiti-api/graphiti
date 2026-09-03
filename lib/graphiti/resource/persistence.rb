@@ -78,7 +78,15 @@ module Graphiti
         if action_name == :update
           id = assign_params[:id]
           assign_params = assign_params.except(:id)
+        elsif assign_params.key?(:id) && (public_id = self.class.config[:public_id])
+          assign_params = assign_params.except(:id).merge(public_id => assign_params[:id])
+        elsif assign_params.key?(:id) && self.class.config[:public_id_decode]
+          primary_key = self.class.decode_public_id(assign_params[:id])
+          raise Errors::ConflictRequest, unresolvable_id_errors(assign_params) if primary_key.nil?
+          assign_params = assign_params.except(:id).merge(self.class.model_primary_key => primary_key)
         end
+
+        assign_params = decode_foreign_keys(assign_params)
 
         run_callbacks :attributes, action_name, assign_params, meta do |params|
           model_instance ||= if action_name == :update
@@ -121,6 +129,27 @@ module Graphiti
         end
 
         model_instance
+      end
+
+      def decode_foreign_keys(assign_params)
+        return assign_params unless Graphiti.public_ids_declared?
+
+        assign_params.each_with_object({}) do |(name, value), decoded|
+          source = (name == :id || value.nil?) ? nil : self.class.public_id_source_for(name)
+          decoded[name] = if value.is_a?(Util::InternalParam)
+            value.value
+          elsif source
+            source.decode_public_id(value.to_s) or raise Errors::RecordNotFound.new(source.type, value, name)
+          else
+            value
+          end
+        end
+      end
+
+      def unresolvable_id_errors(assign_params)
+        Util::SimpleErrors.new(assign_params).tap do |errors|
+          errors.add("data.id", :unresolvable, message: "does not name a record of this resource")
+        end
       end
 
       def update(update_params, meta = nil)

@@ -83,10 +83,12 @@ module Graphiti
                   .new(resource_class_ref, sideload_ref, @object)
               end
 
-              unless foreign_key.nil?
+              related_id = sideload_ref.rendered_id_for(foreign_key, @proxy.query)
+
+              unless related_id.nil?
                 {
                   type: sideload_ref.resource.type,
-                  id: foreign_key.to_s
+                  id: related_id.to_s
                 }
               end
             end
@@ -98,7 +100,7 @@ module Graphiti
             self_ref.send(:validate_link!) unless self_ref.send(:eagerly_validate_links?)
 
             link(:related) do
-              ::Graphiti::Util::Link.new(sideload_ref, @object).generate
+              ::Graphiti::Util::Link.new(sideload_ref, @object, @proxy.query).generate
             end
           end
         end

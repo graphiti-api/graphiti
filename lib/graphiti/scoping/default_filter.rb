@@ -36,6 +36,8 @@ module Graphiti
     #
     # @return scope the scope object we are chaining/modifying
     def apply
+      return @scope if @opts[:bypass_default_filters]
+
       resource.default_filters.each_pair do |name, opts|
         next if overridden?(name)
         @scope = resource.instance_exec(@scope, resource.context, &opts[:filter])

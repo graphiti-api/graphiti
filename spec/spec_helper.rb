@@ -41,10 +41,14 @@ RSpec.configure do |config|
   # earlier examples defined - which makes results depend on spec order.
   config.around do |example|
     registered = Graphiti.resources.dup
+    public_id_sources = Graphiti.public_id_sources.instance_variable_get(:@sources).dup
+    public_ids_declared = Graphiti.public_ids_declared?
     setup_was = Graphiti.setup?
     example.run
   ensure
     Graphiti.resources.replace(registered)
+    Graphiti.public_id_sources.instance_variable_get(:@sources).replace(public_id_sources)
+    Graphiti.public_ids_declared = public_ids_declared
     Graphiti.instance_variable_set(:@setup, setup_was)
   end
 

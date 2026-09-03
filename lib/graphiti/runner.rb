@@ -70,7 +70,9 @@ module Graphiti
         :sideload,
         :parent,
         :params,
-        :bypass_required_filters
+        :bypass_required_filters,
+        :bypass_default_filters,
+        :translating_public_ids
       )
 
       scope = jsonapi_scope(base, scope_opts)

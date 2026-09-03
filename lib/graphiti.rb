@@ -92,6 +92,18 @@ module Graphiti
     @resources ||= []
   end
 
+  def self.public_id_sources
+    @public_id_sources ||= Util::PublicIdSources.new
+  end
+
+  def self.public_ids_declared?
+    !!@public_ids_declared
+  end
+
+  def self.public_ids_declared=(value)
+    @public_ids_declared = value
+  end
+
   # Every guarded relationship, e.g. ["EmployeeResource.positions"]
   def self.guarded_relationships
     ::Rails.application.eager_load! if defined?(::Rails) && ::Rails.respond_to?(:application) && ::Rails.application
@@ -226,6 +238,10 @@ require "graphiti/util/sideload"
 require "graphiti/util/simple_errors"
 require "graphiti/util/transaction_hooks_recorder"
 require "graphiti/util/attribute_check"
+require "graphiti/util/internal_param"
+require "graphiti/util/public_id_block"
+require "graphiti/util/public_id_map"
+require "graphiti/util/public_id_sources"
 require "graphiti/util/serializer_attributes"
 require "graphiti/util/serializer_relationships"
 require "graphiti/util/class"

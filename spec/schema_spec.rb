@@ -248,6 +248,25 @@ RSpec.describe Graphiti::Schema do
       expect(schema[:types].to_a).to eq(expected[:types].sort)
     end
 
+    context "when a resource publishes a different attribute as its id" do
+      before do
+        employee_resource.attribute :public_id, :string
+        employee_resource.public_id :public_id
+      end
+
+      it "records which attribute that is" do
+        expect(schema[:resources][0][:public_id]).to eq("public_id")
+      end
+
+      it "hides the internal primary key filter" do
+        expect(schema[:resources][0][:filters]).to_not have_key(:_primary_key)
+      end
+    end
+
+    it "omits public_id when the id is the primary key" do
+      expect(schema[:resources][0]).to_not have_key(:public_id)
+    end
+
     # Dynamically-created resources, e.g. remote resources
     context "when resource has missing name" do
       let(:no_name) do

@@ -68,6 +68,14 @@ module Graphiti
         raise Errors::AdapterNotImplemented.new(self, attribute, :filter_string_not_eql)
       end
 
+      def filter_public_id_eq(scope, attribute, value)
+        filter_string_eq(scope, attribute, value)
+      end
+
+      def filter_public_id_not_eq(scope, attribute, value)
+        filter_string_not_eq(scope, attribute, value)
+      end
+
       def filter_string_prefix(scope, attribute, value)
         raise Errors::AdapterNotImplemented.new(self, attribute, :filter_string_prefix)
       end

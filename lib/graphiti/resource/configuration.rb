@@ -129,6 +129,12 @@ module Graphiti
           }
         end
 
+        def model=(val)
+          super
+          apply_public_id if publishes_public_id?
+          config[:sideloads].each_value { |sideload| sideload.register_public_id_source if eagerly_apply_sideload?(sideload) }
+        end
+
         def model
           klass = super
           unless klass || abstract_class?
@@ -239,6 +245,96 @@ module Graphiti
 
         def cursor_paginatable?
           !!page_cursors
+        end
+
+        def publishes_public_id?
+          !!(config[:public_id] || config[:public_id_encode])
+        end
+
+        def public_id_attribute?(name)
+          !!config[:public_id] && [:id, :_public_id].include?(name.to_sym)
+        end
+
+        def model_declared?
+          !!model
+        rescue Errors::ModelNotFound
+          false
+        end
+
+        def public_id_for(model)
+          if (encode = config[:public_id_encode])
+            encode.call(model.send(model_primary_key))
+          else
+            model.send(config[:public_id])
+          end
+        end
+
+        def model_attribute_for(name)
+          return name unless publishes_public_id?
+
+          case name
+          when :id then config[:public_id] || model_primary_key
+          when :_primary_key then model_primary_key
+          when :_public_id then config[:public_id]
+          else name
+          end
+        end
+
+        def model_primary_key
+          if model.respond_to?(:primary_key)
+            model.primary_key.to_sym
+          else
+            :id
+          end
+        end
+
+        def inferred_public_id_type
+          column = config[:public_id]
+          return :string unless column && model_loaded? && model.respond_to?(:type_for_attribute)
+
+          case model.type_for_attribute(column.to_s).type
+          when :integer then :integer
+          when :uuid then :uuid
+          else :string
+          end
+        end
+
+        def model_loaded?
+          model
+          true
+        rescue Errors::ModelNotFound
+          false
+        end
+
+        def guard_public_id_leak!(attribute_name)
+          return if attribute_name.to_sym == :id
+
+          attribute = attributes[attribute_name.to_sym]
+          return unless attribute && attribute[:readable] && !attribute[:proc]
+
+          source = public_id_source_for(attribute_name)
+          raise Errors::PublicIdLeak.new(self, attribute_name, source) if source
+        end
+
+        # A custom block owns its value, so the generated link can only carry a public id if the block asked to decode it.
+        def filter_accepts_public_ids?(filter_name)
+          filter = filters[filter_name.to_sym]
+          return false unless filter
+
+          filter[:operators][:eq].nil? || Array(filter[:operators_taking_primary_keys]).include?(:eq)
+        end
+
+        def public_id_source_for(filter_name)
+          return unless Graphiti.public_ids_declared?
+
+          name = filter_name.to_sym
+          return self if name == :id && config[:public_id_decode]
+
+          source = Graphiti.public_id_sources[self, name]
+          return source if source
+
+          sideload = sideloads.values.find { |candidate| candidate.type == :belongs_to && candidate.foreign_key == name }
+          sideload.resource_class if sideload&.primary_key_filter == :_primary_key
         end
 
         def get_attr!(name, flag, opts = {})

@@ -23,10 +23,12 @@ module Graphiti
         end
 
         def apply_sideload_to_serializer(name)
+          config[:sideloads][name].register_public_id_source
           Util::SerializerRelationships.new(self, config[:sideloads].slice(name)).apply
         end
 
         def apply_sideloads_to_serializer
+          config[:sideloads].each_value(&:register_public_id_source)
           Util::SerializerRelationships.new(self, config[:sideloads]).apply
         end
 

@@ -79,7 +79,8 @@ module Graphiti
         findings: [
           missing_association_method(sideload, model),
           missing_guard_method(resource_class, sideload),
-          missing_sideload_filter(sideload)
+          missing_sideload_filter(sideload),
+          link_hidden(sideload)
         ].compact
       )
     rescue => error
@@ -192,6 +193,18 @@ module Graphiti
         check: :missing_sideload_filter,
         message: "#{related.name} is missing `filter #{key.inspect}`",
         remedy: "declare the filter on the related resource"
+      )
+    end
+
+    def link_hidden(sideload)
+      return if sideload.link_proc || sideload.link_hides_primary_key?
+      return unless sideload.requested_link_mode
+
+      Finding.new(
+        severity: :warning,
+        check: :link_hidden,
+        message: "#{target_name(sideload)} publishes a public id the relationship cannot translate to",
+        remedy: "declare the filter the relationship links through on the related resource, have its block take `primary_keys:`, or give the relationship a `link` block"
       )
     end
 

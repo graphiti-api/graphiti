@@ -46,6 +46,11 @@ module Graphiti
       if old_resource[:type] != new_resource[:type]
         @errors << "#{old_resource[:name]} changed type from #{old_resource[:type].inspect} to #{new_resource[:type].inspect}."
       end
+
+      # Every id a client holds, and every url built from one, stops resolving.
+      if old_resource[:public_id] != new_resource[:public_id]
+        @errors << "#{old_resource[:name]} changed public_id from #{old_resource[:public_id].inspect} to #{new_resource[:public_id].inspect}."
+      end
       yield
     end
 

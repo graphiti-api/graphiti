@@ -101,6 +101,54 @@ attribute :name, :string do
 end
 ```
 
+### Public Ids {#public-ids}
+
+By default the JSON:API `id` is the model's primary key. To hide your real database ids from clients, specify a public_id column:
+
+```ruby
+class PostResource < ApplicationResource
+  public_id :slug
+end
+```
+Now `id` is the slug everywhere a client interacts with it, including filters, sorts, stats, groups, and links. Graphiti internals like foreign keys, sideloads and joins still run on the primary key, which clients never see.
+
+If you don't have a dedicated column and just want to obfuscate your database ids: you provide a block to encode and decode them on the fly, using something like [Sqids](https://sqids.org):
+
+```ruby
+class PostResource < ApplicationResource
+  public_id do
+    encode { |primary_key| Sqids.new.encode([primary_key]) }
+    decode { |public_id| Sqids.new.decode(public_id).first }
+  end
+end
+```
+
+If someone sends an id that doesn't decode, or that decodes to something which wouldn't encode back to the same string, Graphiti treats it as not found. Your `decode` block doesn't need to validate anything.
+
+Declare `public_id` on an abstract resource, like `ApplicationResource`, and every subclass inherits it.
+
+**Types.** The public id takes its type from the ActiveRecord column, and is a string anywhere that can't be read. Pass a type to override: `public_id :code, :integer`.
+
+**Foreign keys.** If you expose a foreign key as a readable attribute, say `attribute :author_id, :integer`, it would print the author's real database id. So Graphiti raises when `AuthorResource` has a public id. Mark the attribute `readable: false` or `only: [:filterable]` instead. Clients can still write to it, filter on it and group by it, using the author's public id.
+
+If you write your own filter block, you get the value exactly as the client sent it. Ask for `primary_keys:` when you want it decoded for you:
+
+```ruby
+filter :author_id, :string do
+  eq do |scope, value, primary_keys:|
+    scope.where(author_id: primary_keys).or(scope.where(coauthor_id: primary_keys))
+  end
+end
+```
+
+A filter that isn't named after the foreign key can decode by hand with `AuthorResource.decode_public_ids(value)`, or `decode_public_id` for one.
+
+**Links.** Relationships link by public id in both directions. For a `belongs_to` that means one extra query per relationship to translate the foreign keys in the response, or no query at all with the encode and decode blocks. The translation goes through the target resource's `base_scope`, so a record the current user can't see simply renders no linkage.
+
+When Graphiti can't build a link without exposing a real id, it leaves the link out. That happens for a `belongs_to` whose `primary_key` isn't something the target can filter on, and for a `has_many` whose child filter has a custom block that doesn't ask for `primary_keys:`. Run `bin/rake graphiti:audit` to see which relationships are affected, and give any of them a `link` block if you'd rather build the URL yourself. If two parent resources both link into the same child filter, one of them needs an `inverse_filter`.
+
+**Schema.** `schema.json` records the public id column, or `true` when you're encoding, and the schema check flags any change to it. Every id a client has stored would stop working.
+
 ### Types {#types}
 
 | Type | Notes |
