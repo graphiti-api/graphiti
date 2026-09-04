@@ -12,6 +12,8 @@ on:
       - 'docs/**'
       - 'website/**'
       - '.github/workflows/docs.yml'
+  release:
+    types: [published]
   workflow_dispatch: {}
 
 # One static group: deploys from different branches force-push the same
@@ -38,6 +40,11 @@ jobs:
       - name: Install
         working-directory: website
         run: npm ci
+
+      - name: Find the latest release
+        run: |
+          git fetch --tags --quiet
+          echo "GRAPHITI_RELEASE=$(git tag --list 'v2*' --sort=-v:refname | head -1 | sed 's/^v//')" >> "$GITHUB_ENV"
 
       - name: Build
         working-directory: website

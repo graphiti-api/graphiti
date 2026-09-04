@@ -53,11 +53,15 @@ const config = {
           routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/graphiti-api/graphiti/tree/main/docs/',
-          // Unversioned docs serve at the root, and would otherwise be
-          // labelled "Next" in the dropdown. Once `npm run docusaurus
-          // docs:version 2.0` cuts a version, that becomes the root and the
-          // working copy moves to /next.
-          versions: {current: {label: '2.0'}},
+          // The working copy documents the latest release, and the docs build
+          // stamps that release's number into its label (see docs.yml). Cut
+          // versions (bin/cut-docs-version) freeze a copy for readers on
+          // an older line.
+          lastVersion: 'current',
+          versions: {
+            current: {label: process.env.GRAPHITI_RELEASE ? `Latest (${process.env.GRAPHITI_RELEASE})` : 'Latest', badge: false},
+            '2.0': {badge: false},
+          },
         },
         blog: false,
         theme: {customCss: require.resolve('./src/css/custom.css')},
