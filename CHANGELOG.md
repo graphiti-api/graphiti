@@ -1,5 +1,14 @@
 graphiti changelog
 
+## [1.13.5](https://github.com/graphiti-api/graphiti/compare/v1.13.4...v1.13.5) (2026-09-04)
+
+
+### Bug Fixes
+
+* resolve inline when already on a sideload pool thread ([11c9de7](https://github.com/graphiti-api/graphiti/commit/11c9de7fb4bfc2d83b02aaba3e58c1f94c84cec4))
+* scope debugger chunks to the request rather than the class ([9a77896](https://github.com/graphiti-api/graphiti/commit/9a77896c6e56d23b89d0a2aef358d8e8e0c28c54))
+* stats[group_by] only groups by an attribute the resource reads ([cfb9b84](https://github.com/graphiti-api/graphiti/commit/cfb9b8453c5f18fd9edaefdfefdd8dab5876ce99))
+
 ## [1.13.4](https://github.com/graphiti-api/graphiti/compare/v1.13.3...v1.13.4) (2026-08-20)
 
 
