@@ -38,6 +38,7 @@ const config = {
   baseUrl,
   organizationName: 'graphiti-api',
   projectName: 'graphiti',
+  customFields: {release: process.env.GRAPHITI_RELEASE},
 
   onBrokenLinks: 'warn',
   markdown: {hooks: {onBrokenMarkdownLinks: 'warn'}},
