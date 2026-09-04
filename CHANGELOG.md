@@ -1,5 +1,12 @@
 graphiti changelog
 
+## [2.0.2](https://github.com/graphiti-api/graphiti/compare/v2.0.1...v2.0.2) (2026-09-04)
+
+
+### Bug Fixes
+
+* stats[group_by] only groups by an attribute the resource reads ([5b52b36](https://github.com/graphiti-api/graphiti/commit/5b52b368de3a8fd94bfdaf61d05e0dd2e487bd92))
+
 ## [2.0.1](https://github.com/graphiti-api/graphiti/compare/v2.0.0...v2.0.1) (2026-09-02)
 
 
