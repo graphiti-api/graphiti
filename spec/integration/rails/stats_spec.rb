@@ -52,8 +52,18 @@ if ENV["APPRAISAL_INITIALIZED"]
     end
 
     context "when grouping" do
+      let(:resource) do
+        Class.new(PositionResource) do
+          attribute :employee_id, :integer
+
+          def self.name
+            "PositionResource"
+          end
+        end
+      end
+
       it "works" do
-        proxy = PositionResource.all(stats: {total: "count", group_by: :employee_id})
+        proxy = resource.all(stats: {total: "count", group_by: :employee_id})
         expect(proxy.stats).to eq({
           total: {
             count: {

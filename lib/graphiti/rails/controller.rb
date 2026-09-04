@@ -36,6 +36,10 @@ module Graphiti
           status: 400, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
         register_exception Graphiti::Errors::InvalidInclude,
           status: 400, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
+        register_exception Graphiti::Errors::UnknownAttribute,
+          status: 400, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
+        register_exception Graphiti::Errors::InvalidAttributeAccess,
+          status: 400, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
         register_exception Graphiti::Errors::UnsupportedSort,
           status: 400, detail: :exception, handler: Graphiti::Rails::ExceptionHandler
         register_exception Graphiti::Errors::UnsupportedOperator,
