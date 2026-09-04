@@ -57,7 +57,7 @@ const config = {
           // labelled "Next" in the dropdown. Once `npm run docusaurus
           // docs:version 2.0` cuts a version, that becomes the root and the
           // working copy moves to /next.
-          versions: {current: {label: '2.0 beta'}},
+          versions: {current: {label: '2.0'}},
         },
         blog: false,
         theme: {customCss: require.resolve('./src/css/custom.css')},

@@ -14,7 +14,7 @@ Five things, and four of them fail loudly if you skip them.
 **1. Drop three gems.** `graphiti-rails`, `graphiti_spec_helpers` and `graphiti_errors` are now part of `graphiti` itself.
 
 ```diff title="Gemfile"
-+ gem "graphiti", "~> 2.0.0.beta" # follows the betas and picks up 2.0 final when it ships
++ gem "graphiti", "~> 2.0"
 - gem "graphiti-rails"
 - gem "graphiti_spec_helpers"
 - gem "graphiti_errors"
