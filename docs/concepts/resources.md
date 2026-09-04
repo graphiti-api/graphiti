@@ -76,17 +76,17 @@ The model is only looked up when a guard declares a parameter for it, so zero-ar
 
 ```ruby
 # On ApplicationResource, affects every subclass
-self.attributes_readable_by_default = false   # default true
-self.attributes_writable_by_default = false   # default true
-self.attributes_filterable_by_default = false # default true
-self.attributes_sortable_by_default = false   # default true
-self.attributes_schema_by_default = false     # default true
+attributes_readable_by_default false   # default true
+attributes_writable_by_default false   # default true
+attributes_filterable_by_default false # default true
+attributes_sortable_by_default false   # default true
+attributes_schema_by_default false     # default true
 ```
 
 Each `*_by_default` setting can also be a guard symbol, delegating the check to a method. Useful for wiring every attribute through one authorization system:
 
 ```ruby
-self.attributes_readable_by_default = :attribute_readable?
+attributes_readable_by_default :attribute_readable?
 
 def attribute_readable?(model_instance, attribute_name)
   PolicyChecker.new(model_instance).attribute_readable?(attribute_name)
@@ -194,7 +194,7 @@ To serialize values exactly as the model returns them, skipping the type's `read
 
 ```ruby
 class ApplicationResource < Graphiti::Resource
-  self.typecast_reads = false
+  typecast_reads false
 end
 ```
 
@@ -479,8 +479,8 @@ Two settings you might want to adjust, both usually set on `ApplicationResource`
 
 ```ruby
 class ApplicationResource < Graphiti::Resource
-  self.page_default_size = 10  # unset falls back to 20
-  self.page_max_size = 100     # default 1_000
+  page_default_size 10  # unset falls back to 20
+  page_max_size 100     # default 1_000
 end
 ```
 
@@ -509,7 +509,7 @@ end
 
 ```ruby
 class PostResource < ApplicationResource
-  self.page_cursors = true  # default false
+  page_cursors true  # default false
 end
 ```
 
@@ -600,14 +600,14 @@ end
 
 ```ruby
 class PostResource < ApplicationResource
-  self.model = Post
-  self.type = 'posts'
+  model Post
+  type 'posts'
 
   # Only used if you care about Links
   primary_endpoint '/posts', [:index, :show, :create, :update, :destroy]
 
-  self.default_sort = [{ title: :asc }]  # default nil
-  self.page_default_size = 10             # default 20
+  default_sort [{ title: :asc }]  # default nil
+  page_default_size 10             # default 20
 end
 ```
 
@@ -616,35 +616,37 @@ Typically inherited from `ApplicationResource`, where cross-cutting settings liv
 ```ruby
 class ApplicationResource < Graphiti::Resource
   # Required when there's no corresponding model
-  self.abstract_class = true
+  abstract_class
 
   # Subclasses override as needed
-  self.adapter = Graphiti::Adapters::ActiveRecord
+  adapter :active_record
 
   # Default attribute flags. See #limiting-behavior
-  self.attributes_readable_by_default = true
-  self.attributes_writable_by_default = true
-  self.attributes_sortable_by_default = true
-  self.attributes_filterable_by_default = true
+  attributes_readable_by_default true
+  attributes_writable_by_default true
+  attributes_sortable_by_default true
+  attributes_filterable_by_default true
 
   # Used for link generation
-  self.base_url = ENV.fetch('BASE_URL', 'http://localhost:3000')
+  base_url ENV.fetch('BASE_URL', 'http://localhost:3000')
   # Suggest referencing this in config/routes.rb:
   #   scope path: '/api/v1' do
   #     resources :posts
   #   end
-  self.endpoint_namespace = '/api/v1'
+  endpoint_namespace '/api/v1'
 
   # Refuse requests reaching this Resource from a URL it isn't allowlisted for
-  self.validate_requests = true
+  validate_requests true
 
   # Refuse to render a link pointing at an endpoint that isn't routable
-  self.validate_links = true
+  validate_links true
 
   # Render relationship links: true, false, or :on_demand
-  self.relationship_links = true
+  relationship_links true
 end
 ```
+
+The bare form arrived in 2.1. Every setting also accepts the assignment form, `self.page_default_size = 10`, which is what code written for earlier versions uses, and the two are interchangeable.
 
 ### Polymorphic Resources {#polymorphic-resources}
 
@@ -683,7 +685,7 @@ end
 ```ruby
 class TaskResource < ApplicationResource
   # Reference child classes
-  self.polymorphic = [
+  polymorphic [
     'BugResource',
     'FeatureResource',
     'EpicResource'

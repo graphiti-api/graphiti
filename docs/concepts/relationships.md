@@ -164,7 +164,7 @@ To change how far a `belongs_to` goes, across a whole API, set it on the resourc
 
 ```ruby
 class ApplicationResource < Graphiti::Resource
-  self.belongs_to_resource_ids_by_default = :foreign_key
+  belongs_to_resource_ids_by_default :foreign_key
 end
 ```
 
@@ -191,7 +191,7 @@ A client never has to work out which rule applied. The relationship object says 
 
 A relationship with neither is left out of the payload. Relationships are linked by default, so the link shape is the one you normally see.
 
-`self.relationship_placeholders = true` brings back the 1.x shape, `{"meta": {"included": false}}`. It is not part of JSON:API and carries nothing a client can act on.
+`relationship_placeholders true` brings back the 1.x shape, `{"meta": {"included": false}}`. It is not part of JSON:API and carries nothing a client can act on.
 
 The setting covers `belongs_to` and `polymorphic_belongs_to`, and no collection, deliberately. An API-wide `:always` on collections would be the N+1 from [#167](https://github.com/graphiti-api/graphiti/issues/167#issuecomment-686866646) applied everywhere at once.
 

@@ -63,7 +63,27 @@ module Graphiti
 
       SETTINGS = SETTING_GROUPS.values.reduce(:merge).freeze # :nodoc:
 
+      DSL_SETTINGS = [:adapter, :base_url, :endpoint_namespace, :model, :remote, :remote_base_url, :type, :polymorphic, :polymorphic_child, :serializer, :graphql_entrypoint, *SETTINGS.keys].freeze # :nodoc:
+
+      UNSET = Object.new.freeze # :nodoc:
+
+      module DslReaders # :nodoc:
+        # Real methods with a default, not define_method with a splat: these readers run per attribute per record.
+        DSL_SETTINGS.each do |name|
+          class_eval <<~RUBY, __FILE__, __LINE__ + 1
+            def #{name}(value = UNSET)
+              value.equal?(UNSET) ? super() : (self.#{name} = value)
+            end
+          RUBY
+        end
+      end
+
+      # Rails 7 class_attribute writers redefine the reader on the receiving class itself, ahead of anything prepended on Resource.
+      READERS_REDEFINED_PER_CLASS = ActiveSupport::VERSION::MAJOR < 8 # :nodoc:
+
       module Overrides
+        include DslReaders
+
         SETTINGS.each_pair do |name, setting|
           next unless setting[:values]
 
@@ -113,6 +133,7 @@ module Graphiti
         # The .stat call stores a proc based on adapter
         # So if we assign a new adapter, reconfigure
         def adapter=(val)
+          val = Adapters.const_get(Adapters.constants.find { |name| name.to_s.underscore == val.to_s }) if val.is_a?(Symbol)
           super
           stat total: [:count]
         end
@@ -135,8 +156,10 @@ module Graphiti
           config[:sideloads].each_value { |sideload| sideload.register_public_id_source if eagerly_apply_sideload?(sideload) }
         end
 
-        def model
-          klass = super
+        def model(value = UNSET)
+          return public_send(:model=, value) unless value.equal?(UNSET)
+
+          klass = super()
           unless klass || abstract_class?
             if (klass = infer_model)
               self.model = klass
@@ -174,6 +197,7 @@ module Graphiti
 
         def self.inherited(klass)
           super
+          klass.singleton_class.prepend(DslReaders) if READERS_REDEFINED_PER_CLASS
           klass.config = Util::Hash.deep_dup(config)
           klass.adapter ||= Adapters::Abstract
           # re-assigning causes a new Class.new
@@ -349,11 +373,11 @@ module Graphiti
         end
 
         def abstract_class?
-          !!abstract_class
+          !!@abstract_class
         end
 
         def abstract_class
-          @abstract_class
+          self.abstract_class = true
         end
 
         def abstract_class=(val)

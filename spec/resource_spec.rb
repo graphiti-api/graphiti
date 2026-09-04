@@ -221,6 +221,57 @@ RSpec.describe Graphiti::Resource do
         end
       end
 
+      context "when overriding defaults in the DSL form" do
+        let(:klass) do
+          Class.new(app_resource) do
+            model PORO::Employee
+            adapter PORO::Adapter
+            default_sort [{name: :asc}]
+            page_default_size 4
+            attributes_writable_by_default false
+            filter_blanks_treated_as :rejected
+          end
+        end
+
+        it "assigns like the setter" do
+          expect(klass.model).to eq(PORO::Employee)
+          expect(klass.adapter).to eq(PORO::Adapter)
+          expect(klass.default_sort).to eq([{name: :asc}])
+          expect(klass.page_default_size).to eq(4)
+          expect(klass.attributes_writable_by_default).to eq(false)
+          expect(klass.filter_blanks_treated_as).to eq(:rejected)
+        end
+
+        it "assigns nil rather than reading" do
+          klass.default_sort nil
+          expect(klass.default_sort).to be_nil
+        end
+
+        it "still validates values" do
+          expect { klass.filter_blanks_treated_as :bogus }.to raise_error(Graphiti::Errors::InvalidFilterBlanks)
+        end
+
+        it "assigns the link settings too" do
+          klass.base_url "http://example.test"
+          klass.endpoint_namespace "/api/v2"
+          expect(klass.base_url).to eq("http://example.test")
+          expect(klass.endpoint_namespace).to eq("/api/v2")
+        end
+
+        it "resolves a symbol adapter" do
+          klass.adapter :null
+          expect(klass.adapter).to eq(Graphiti::Adapters::Null)
+          klass.adapter :graphiti_api
+          expect(klass.adapter).to eq(Graphiti::Adapters::GraphitiAPI)
+        end
+
+        it "marks abstract with a bare call" do
+          abstract = Class.new(app_resource) { abstract_class }
+          expect(abstract).to be_abstract_class
+          expect(Class.new(abstract)).not_to be_abstract_class
+        end
+      end
+
       context "when manually setting serializer" do
         let(:klass) do
           Class.new(app_resource) do

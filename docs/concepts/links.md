@@ -80,7 +80,7 @@ this happens automatically:
 ```ruby
 class ApplicationResource < Graphiti::Resource
   # ... code ...
-  self.endpoint_namespace = '/api/v1'
+  endpoint_namespace '/api/v1'
 end
 
 class PostResource < ApplicationResource
@@ -145,7 +145,7 @@ secondary_endpoint '/top_posts', [:index]
 
 ```ruby
 class ApplicationResource < Graphiti::Resource
-  self.relationship_links = false
+  relationship_links false
 end
 
 class PostResource < ApplicationResource
@@ -166,7 +166,7 @@ Endpoints are validated in two directions, each with its own setting.
 
 ```ruby
 class ApplicationResource < Graphiti::Resource
-  self.validate_requests = false
+  validate_requests false
 end
 ```
 
@@ -174,7 +174,7 @@ end
 
 ```ruby
 class ApplicationResource < Graphiti::Resource
-  self.validate_links = false
+  validate_links false
 end
 ```
 
@@ -188,7 +188,7 @@ To only render relationship links when requested in the URL with `?links=true`:
 
 ```ruby
 class ApplicationResource < Graphiti::Resource
-  self.relationship_links = :on_demand
+  relationship_links :on_demand
 end
 ```
 
@@ -206,7 +206,7 @@ Every collection response returns pagination links:
 
 ```ruby
 class ApplicationResource < Graphiti::Resource
-  self.page_links = true
+  page_links true
 end
 ```
 
@@ -216,7 +216,7 @@ Links are rendered only when the request asks for them with `?page_links=true` (
 
 ```ruby
 class ApplicationResource < Graphiti::Resource
-  self.page_links = :on_demand
+  page_links :on_demand
 end
 ```
 
@@ -231,7 +231,7 @@ To change the URL associated with a Resource:
 ```ruby
 class PostResource < ApplicationResource
   # Most commonly seen in ApplicationResource
-  self.endpoint_namespace = '/api/v1'
+  endpoint_namespace '/api/v1'
 
   primary_endpoint '/posts', [:index, :show]
   # OR

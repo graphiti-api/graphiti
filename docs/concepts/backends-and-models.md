@@ -14,7 +14,7 @@ A **scope** is whatever your backend needs to run a query. Graphiti doesn't care
 
 ```ruby
 class EmployeeResource < ApplicationResource
-  self.adapter = Graphiti::Adapters::Null
+  adapter :null
 
   attribute :name, :string
 
@@ -49,7 +49,7 @@ Writing that per Resource gets old. Once the pattern stabilizes, move it into an
 
 ```ruby
 class EmployeeResource < ApplicationResource
-  self.adapter = BackendAdapter
+  adapter BackendAdapter
   attribute :name, :string
 end
 ```

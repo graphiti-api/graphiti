@@ -1,9 +1,9 @@
 ---
-title: 'Upgrading to Graphiti 2.0'
+title: 'Upgrading from 1.x'
 slug: /upgrading
 ---
 
-# Upgrading to Graphiti 2.0
+# Upgrading from 1.x
 
 Graphiti 2.0 requires **Ruby 3.2+** and **ActiveSupport 7.1+**. Rails is not a dependency, but if you use it, 7.1+. Ruby 3.1 and earlier are past end of life, and Rails 6.1 and 7.0 do not support Ruby 3.2. Apps that cannot move yet should stay on the 1.x branch, which remains open for hotfixes.
 
@@ -169,13 +169,13 @@ Or for the whole API, on the resource everything inherits from:
 
 ```ruby
 class ApplicationResource < Graphiti::Resource
-  self.abstract_class = true
+  abstract_class
 
-  self.belongs_to_resource_ids_by_default = :never
+  belongs_to_resource_ids_by_default :never
 end
 ```
 
-If you carry the `Sideload::BelongsTo` monkey patch from [#167](https://github.com/graphiti-api/graphiti/issues/167), delete it and set nothing. The default now covers the safe cases on its own. To force ids onto the rest the way the patch did, set `self.belongs_to_resource_ids_by_default = :always`, at a query per record for each one.
+If you carry the `Sideload::BelongsTo` monkey patch from [#167](https://github.com/graphiti-api/graphiti/issues/167), delete it and set nothing. The default now covers the safe cases on its own. To force ids onto the rest the way the patch did, set `belongs_to_resource_ids_by_default :always`, at a query per record for each one.
 
 The three settings, and when a `belongs_to` cannot use its foreign key, are covered in [Customizing Relationships](/concepts/relationships#belongs-to-resource-ids).
 
@@ -195,7 +195,7 @@ That shape comes from `jsonapi-serializable`, which fills in a relationship obje
 To keep them, on one resource or on the resource everything inherits from:
 
 ```ruby
-self.relationship_placeholders = true
+relationship_placeholders true
 ```
 
 </details>
@@ -327,16 +327,16 @@ These are now resource settings. Set them on `ApplicationResource` to keep the o
 
 | 1.x | 2.0 |
 | --- | --- |
-| `Graphiti.config.links_on_demand = true` | `self.relationship_links = :on_demand` |
-| `Graphiti.config.pagination_links = true` | `self.page_links = true` |
-| `Graphiti.config.pagination_links_on_demand = true` | `self.page_links = :on_demand` |
-| `Graphiti.config.typecast_reads = false` | `self.typecast_reads = false` |
+| `Graphiti.config.links_on_demand = true` | `relationship_links :on_demand` |
+| `Graphiti.config.pagination_links = true` | `page_links true` |
+| `Graphiti.config.pagination_links_on_demand = true` | `page_links :on_demand` |
+| `Graphiti.config.typecast_reads = false` | `typecast_reads false` |
 
 ### Link rendering {#deprecated-links}
 
 | 1.x | 2.0 |
 | --- | --- |
-| `self.autolink = false` | `self.relationship_links = false` |
+| `self.autolink = false` | `relationship_links false` |
 
 Link rendering is one mode per link now. It takes `true`, `false`, or `:on_demand`, which renders only when the request asks with `?links=true`. `self.relationship_links` sets the resource default and `link:` overrides it per relationship.
 
@@ -346,9 +346,9 @@ One behavior shift: `link: true` on a resource now always renders, even when the
 
 | 1.x | 2.0 |
 | --- | --- |
-| `self.default_page_size = 10` | `self.page_default_size = 10` |
-| `self.max_page_size = 500` | `self.page_max_size = 500` |
-| `self.cursor_paginatable = true` | `self.page_cursors = true` |
+| `self.default_page_size = 10` | `page_default_size 10` |
+| `self.max_page_size = 500` | `page_max_size 500` |
+| `self.cursor_paginatable = true` | `page_cursors true` |
 
 Everything relating to the `page` param shares its prefix: `page_default_size`, `page_max_size`, `page_cursors` and `page_links`. The on-demand param follows, so use `?page_links=true` (`?pagination_links=true` still works). `page_links` takes the same three modes as `relationship_links`, but has no per-relationship level.
 
@@ -356,8 +356,8 @@ Everything relating to the `page` param shares its prefix: `page_default_size`, 
 
 | 1.x | 2.0 |
 | --- | --- |
-| `self.filters_accept_nil_by_default = true` | `self.filter_blanks_treated_as = :null` |
-| `self.filters_deny_empty_by_default = true` | `self.filter_blanks_treated_as = :rejected` |
+| `self.filters_accept_nil_by_default = true` | `filter_blanks_treated_as :null` |
+| `self.filters_deny_empty_by_default = true` | `filter_blanks_treated_as :rejected` |
 | `filter :name, allow_nil: true` | `filter :name, blanks: :null` |
 | `filter :name, deny_empty: true` | `filter :name, blanks: :rejected` |
 
@@ -367,7 +367,7 @@ Everything relating to the `page` param shares its prefix: `page_default_size`, 
 
 | 1.x | 2.0 |
 | --- | --- |
-| `self.validate_endpoints = false` | `self.validate_requests = false`, `self.validate_links = false` |
+| `self.validate_endpoints = false` | `validate_requests false`, `validate_links false` |
 
 `validate_endpoints` did two unrelated jobs, so it split. `validate_requests` refuses requests to undeclared endpoints, and `validate_links` refuses to render links to unroutable ones. The old name sets both, and turning off link validation no longer disarms the inbound guard.
 
@@ -414,3 +414,10 @@ handler.formatted_response(:json) # => [404, "{\"errors\":[...]}", :json]
 `GraphitiErrors.logger` has no replacement. `Graphiti.logger` is the nearest thing.
 
 </details>
+
+## 2.1 {#2-1}
+
+Nothing to change. New, and optional:
+
+- Resource settings can be declared without `self.` and `=`: `model Show`, `default_sort [{id: :desc}]`, `abstract_class`. The assignment form still works. See [Configuration](/concepts/resources#configuration).
+- `public_id` hides database ids from clients behind a column or an encoding. See [Public Ids](/concepts/resources#public-ids).

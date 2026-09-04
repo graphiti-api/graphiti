@@ -54,9 +54,9 @@ So, that means we can build an Adapter that makes an HTTP request to another Gra
 
 ```ruby
 class CommentResource < ApplicationResource
-  self.remote = "http://my-api.com/api/v1/comments"
+  remote "http://my-api.com/api/v1/comments"
   # under-the-hood, this sets:
-  # self.adapter = Graphiti::Adapters::GraphitiAPI
+  # adapter :graphiti_api
 end
 ```
 
@@ -96,7 +96,7 @@ We need only define the association locally:
 
 ```ruby
 class CommentResource < ApplicationResource
-  self.remote = "http://my-api.com/api/v1/comments"
+  remote "http://my-api.com/api/v1/comments"
 
   belongs_to :author
 end
@@ -107,7 +107,7 @@ remote API. Again, works just like normal:
 
 ```ruby
 class CommentResource < ApplicationResource
-  self.remote = "http://my-api.com/api/v1/comments"
+  remote "http://my-api.com/api/v1/comments"
 
   attribute :body, :string do
     @object.body.truncate(100)
@@ -137,7 +137,7 @@ end
 # end
 #
 # class CommentResource < ApplicationResource
-#   self.remote = 'http://my-api.com/api/v1/comments'
+#   remote 'http://my-api.com/api/v1/comments'
 # end
 ```
 
@@ -154,7 +154,7 @@ which allows for various adapters and middleware. In addition:
 
 ```ruby
 class CommentResource < ApplicationResource
-  self.remote = "..."
+  remote "..."
 
   # Customize faraday timeout
   self.timeout = 10
@@ -166,7 +166,7 @@ end
 
 ```ruby
 class CommentResource < ApplicationResource
-  self.remote = "..."
+  remote "..."
 
   def make_request(url)
     # request here is from Faraday:

@@ -64,7 +64,7 @@ Adapter.
 
 ```ruby
 class PostResource < ApplicationResource
-  self.adapter = Graphiti::Adapters::Null
+  adapter :null
 
   attribute :title, :string
 

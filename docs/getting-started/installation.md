@@ -56,7 +56,7 @@ Resource:
 ```ruby
 # Assuming you already have a Post ActiveRecord Model
 class PostResource < Graphiti::Resource
-  self.adapter = Graphiti::Adapters::ActiveRecord
+  adapter :active_record
   attribute :title, :string
 end
 
