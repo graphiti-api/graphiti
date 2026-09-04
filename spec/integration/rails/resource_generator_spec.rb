@@ -168,8 +168,8 @@ if ENV["APPRAISAL_INITIALIZED"]
         contents = generated("app/resources/application_resource.rb")
 
         expect(contents).to include("  # Links\n")
-        expect(contents).to include("# self.relationship_links                 = true          # true, false, or :on_demand")
-        expect(contents).to include("# self.belongs_to_resource_ids_by_default = :foreign_key  # :foreign_key, :always, or :never")
+        expect(contents).to include("# relationship_links                 true          # true, false, or :on_demand")
+        expect(contents).to include("# belongs_to_resource_ids_by_default :foreign_key  # :foreign_key, :always, or :never")
       end
 
       it "only generates request specs for the requested actions" do

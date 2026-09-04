@@ -20,7 +20,7 @@ Here is the whole loop. A Resource declares what's exposed:
 
 ```ruby title="app/resources/employee_resource.rb"
 class EmployeeResource < ApplicationResource
-  self.model = Employee # usually inferred from the class name, here for clarity
+  model Employee # usually inferred from the class name, here for clarity
 
   attribute :first_name, :string
   attribute :last_name, :string
@@ -113,21 +113,21 @@ Every Resource inherits from an `ApplicationResource`, the same way models inher
 ```ruby title="app/resources/application_resource.rb"
 class ApplicationResource < Graphiti::Resource
   # Required when there's no corresponding model
-  self.abstract_class = true
+  abstract_class
 
   # Subclasses override as needed
-  self.adapter = Graphiti::Adapters::ActiveRecord
+  adapter :active_record
 
   # Flip any of these to lock down every Resource at once,
   # e.g. a read-only API
-  self.attributes_readable_by_default = true
-  self.attributes_writable_by_default = true
-  self.attributes_sortable_by_default = true
-  self.attributes_filterable_by_default = true
+  attributes_readable_by_default true
+  attributes_writable_by_default true
+  attributes_sortable_by_default true
+  attributes_filterable_by_default true
 
   # Used for link generation
-  self.base_url = ENV.fetch('BASE_URL', 'http://localhost:3000')
-  self.endpoint_namespace = '/api/v1'
+  base_url ENV.fetch('BASE_URL', 'http://localhost:3000')
+  endpoint_namespace '/api/v1'
 
   def current_user
     context.current_user
@@ -142,11 +142,11 @@ An individual Resource declares its attributes and relationships, plus anything 
 ```ruby
 class EmployeeResource < ApplicationResource
   # Both inferred from the class name. Set them only when they differ
-  self.model = Employee
-  self.type = :employees # the JSONAPI type
+  model Employee
+  type :employees # the JSONAPI type
 
-  self.default_sort = [{ name: :desc }] # default nil
-  self.page_default_size = 10           # default 20
+  default_sort [{ name: :desc }] # default nil
+  page_default_size 10           # default 20
 
   attribute :name, :string
   attribute :age, :integer

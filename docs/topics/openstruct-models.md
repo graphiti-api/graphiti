@@ -4,7 +4,7 @@ title: 'OpenStruct Models'
 
 # OpenStruct Models
 
-[Model Requirements](/concepts/backends-and-models#model-requirements) covers what any Model needs to respond to, and [Usage Without ActiveRecord](/topics/without-activerecord) walks through building a Resource around a PORO. `OpenStruct` satisfies those requirements with zero boilerplate - no `attr_accessor` list, no constructor - which is exactly why Graphiti uses it internally for [remote resources](/topics/remote-resources): `Resource::Remote` and the default `Sideload` model both set `self.model = OpenStruct` (`lib/graphiti/resource/remote.rb`, `lib/graphiti/sideload.rb`), since a remote resource doesn't know its shape ahead of time. That convenience comes with sharp edges if you reach for `OpenStruct` as a model in your own Resources.
+[Model Requirements](/concepts/backends-and-models#model-requirements) covers what any Model needs to respond to, and [Usage Without ActiveRecord](/topics/without-activerecord) walks through building a Resource around a PORO. `OpenStruct` satisfies those requirements with zero boilerplate - no `attr_accessor` list, no constructor - which is exactly why Graphiti uses it internally for [remote resources](/topics/remote-resources): `Resource::Remote` and the default `Sideload` model both set `model OpenStruct` (`lib/graphiti/resource/remote.rb`, `lib/graphiti/sideload.rb`), since a remote resource doesn't know its shape ahead of time. That convenience comes with sharp edges if you reach for `OpenStruct` as a model in your own Resources.
 
 ## What Graphiti expects from it {#expectations}
 

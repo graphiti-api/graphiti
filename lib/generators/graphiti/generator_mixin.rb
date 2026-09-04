@@ -37,7 +37,7 @@ module Graphiti
       name_width = Graphiti::Resource::SETTINGS.keys.map(&:length).max
       assignments = Graphiti::Resource::SETTINGS.to_h do |name, setting|
         value = setting[:format] || setting[:default].inspect
-        [name, "self.#{name.to_s.ljust(name_width)} = #{value}"]
+        [name, "#{name.to_s.ljust(name_width)} #{value}"]
       end
       hint_column = assignments.values.map(&:length).max + 2
 

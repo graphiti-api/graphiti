@@ -88,7 +88,7 @@ if ENV["APPRAISAL_INITIALIZED"]
       install!
 
       expect(generated("app/resources/application_resource.rb"))
-        .to include(%(self.base_url = ENV.fetch('BASE_URL', 'http://localhost:3000')))
+        .to include(%(base_url ENV.fetch('BASE_URL', 'http://localhost:3000')))
     end
   end
 end

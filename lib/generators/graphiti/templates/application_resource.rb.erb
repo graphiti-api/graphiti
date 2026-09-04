@@ -2,14 +2,14 @@
 # All Resources should inherit from ApplicationResource.
 <%- end -%>
 class ApplicationResource < Graphiti::Resource
-  self.abstract_class = true
-  self.adapter = Graphiti::Adapters::ActiveRecord
+  abstract_class
+  adapter :active_record
   <%- unless omit_comments? -%>
   # Or follow config/environments:
-  #   self.base_url = ActionDispatch::Http::URL.url_for(Rails.application.routes.default_url_options)
+  #   base_url ActionDispatch::Http::URL.url_for(Rails.application.routes.default_url_options)
   <%- end -%>
-  self.base_url = ENV.fetch('BASE_URL', 'http://localhost:3000')
-  self.endpoint_namespace = '<%= api_namespace %>'
+  base_url ENV.fetch('BASE_URL', 'http://localhost:3000')
+  endpoint_namespace '<%= api_namespace %>'
   <%- unless omit_comments? -%>
 
   # Defaults every Resource inherits. See https://graphiti.dev/concepts/resources

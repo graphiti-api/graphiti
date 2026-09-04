@@ -38,21 +38,21 @@ Let's look at the above `ApplicationResource`:
 
 ```ruby
 class ApplicationResource < Graphiti::Resource
-  self.abstract_class = true
+  abstract_class
 
   # We'll be using ActiveRecord
-  self.adapter = Graphiti::Adapters::ActiveRecord
+  adapter :active_record
 
   # Links are generated from base_url + endpoint_namespace
-  self.base_url = ENV.fetch('BASE_URL', 'http://localhost:3000')
-  self.endpoint_namespace = '/api/v1'
+  base_url ENV.fetch('BASE_URL', 'http://localhost:3000')
+  endpoint_namespace '/api/v1'
 end
 ```
 
 This should be pretty self-explanatory except for
 
 ```ruby
-self.base_url = ENV.fetch('BASE_URL', 'http://localhost:3000')
+base_url ENV.fetch('BASE_URL', 'http://localhost:3000')
 ```
 
 When deriving and validating [Links](/concepts/links), we'll use the `BASE_URL` variable if

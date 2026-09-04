@@ -107,7 +107,7 @@ You can set the same guard for every attribute on a Resource with `attributes_re
 
 ```ruby
 class ApplicationResource < Graphiti::Resource
-  self.attributes_writable_by_default = :writable_by_default?
+  attributes_writable_by_default :writable_by_default?
 
   def writable_by_default?(model_instance, attribute_name)
     PolicyChecker.new(context.current_user).writable?(model_instance, attribute_name)
