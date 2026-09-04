@@ -1,0 +1,199 @@
+---
+title: 'Step 1'
+---
+
+## Step 1: Basic Resource
+
+> [View the Diff](https://github.com/graphiti-api/employee_directory/commit/45c1c92e14fb1c3a47b8ed246ceb2cba50e97c72)
+
+We'll be working with a single database table, `employees`:
+
+<table class="table table-small">
+  <thead>
+    <tr>
+      <th>id</th>
+      <th>first_name</th>
+      <th>last_name</th>
+      <th>age</th>
+      <th>created_at</th>
+      <th>updated_at</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Homer</td>
+      <td>Simpson</td>
+      <td>39</td>
+      <td>2018-09-04</td>
+      <td>2018-09-04</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Waylon</td>
+      <td>Smithers</td>
+      <td>65</td>
+      <td>2018-09-04</td>
+      <td>2018-09-04</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Monty</td>
+      <td>Burns</td>
+      <td>123</td>
+      <td>2018-09-04</td>
+      <td>2018-09-04</td>
+    </tr>
+  </tbody>
+</table>
+
+### The Rails Stuff 🚂
+
+Use the built-in generator to create the database table
+and corresponding `ActiveRecord` model:
+
+```bash
+$ bin/rails g model Employee first_name:string last_name:string age:integer
+$ bin/rails db:migrate
+```
+
+Now let's seed some random development data, using [Faker](https://github.com/stympy/faker) (which was installed in [Step 0](/tutorial/step_0)):
+
+```ruby
+# db/seeds.rb
+Employee.delete_all # Ensure the DB is cleaned each run
+
+100.times do
+  Employee.create! first_name: Faker::Name.first_name,
+    last_name: Faker::Name.last_name,
+    age: rand(20..80)
+end
+```
+
+Run this seed file with
+
+```bash
+$ bin/rails db:seed
+```
+
+### The Graphiti Stuff 🎨
+
+Just like Rails, Graphiti has built-in generators. Let's generate
+the corresponding Resource for our `Employee` model:
+
+```bash
+$ bin/rails g graphiti:resource Employee first_name:string last_name:string age:integer created_at:datetime updated_at:datetime
+```
+
+This generated a few things, but for now let's focus on
+`EmployeeResource`:
+
+```ruby
+class EmployeeResource < ApplicationResource
+  attribute :first_name, :string
+  attribute :last_name, :string
+  attribute :age, :integer
+  attribute :created_at, :datetime, writable: false
+  attribute :updated_at, :datetime, writable: false
+end
+```
+
+This code defined the [RESTful Resource](https://restful-api-design.readthedocs.io/en/latest/resources.html) we want our API to expose. Let's run our server and see what it does:
+
+```bash
+$ bin/rails s
+```
+
+Visit `localhost:3000/api/v1/employees`. You should see a [JSONAPI Response](http://jsonapi.org):
+
+<br />
+
+![jsonapi](/assets/img/legacy/legacy-0378a3bb39.png)
+
+<br />
+
+If you find the payload a little intimidating, add `.json` to the URL for a more traditional response, or `.xml` for XML. Both are different **renderings** of the same `EmployeeResource`.
+
+`Resources` are comprised of `Attribute`s:
+
+```ruby
+# app/resources/employee_resource.rb
+attribute :first_name, :string
+```
+
+Each attribute defines behavior for:
+
+* Reading (display)
+* Writing
+* Sorting
+* Filtering
+* Fieldsets
+
+Let's start with simple display, turning `first_name` into all capital
+letters:
+
+```ruby
+# app/resources/employee_resource.rb
+attribute :first_name, :string do
+  # @object is your model instance
+  @object.first_name.upcase
+end
+```
+
+This is the most important thing to understand about Resources: they are just a collection of defaults, all of which can be overridden. `attribute :first_name` is shorthand for `attribute :first_name do @object.first_name end`.
+
+We'll go into further Resource customizations over the course of this tutorial. For now, undo the capitalization change above, and verify our out-of-the-box defaults: the same filter, sort, and pagination capabilities you exercised in the [Quickstart](/getting-started/first-api#querying) work here too, just against `employees` instead of `posts`. See the [Overview guide](/concepts/overview) for the full capability reference.
+
+Write operations are easiest to verify with integration tests, which were created when we generated our Resource: an **API Spec** covering the request/response cycle, and a **Resource Spec** covering the Resource's logic directly. See the [Testing Guide](/topics/testing) for what these look like and how they differ. The example there uses the same `create` payload shape the generator produced for `EmployeeResource`.
+
+Before we run these specs, we need to edit our [factories](https://github.com/thoughtbot/factory_bot) to ensure
+dynamic, randomized data. Let's change this:
+
+```ruby
+# spec/factories/employee.rb
+
+FactoryBot.define do
+  factory :employee do
+    first_name { "MyString" }
+    last_name { "MyString" }
+    age { 1 }
+  end
+end
+```
+
+To
+
+```ruby
+# spec/factories/employee.rb
+
+FactoryBot.define do
+  factory :employee do
+    first_name { Faker::Name.first_name }
+    last_name { Faker::Name.last_name }
+    age { rand(20..80) }
+  end
+end
+```
+
+Now run the generated specs:
+
+```bash
+$ bundle exec rspec
+```
+
+You'll see 11 tests pass, with 3 pending. One of the pending specs was
+autogenerated by rails - you can delete `spec/models/employee_spec.rb`
+for now.
+
+That leaves us with two "update" specs. These are marked pending so you
+can manage the data yourself. Follow the comments in these specs to add
+attributes and get them passing.
+
+
+  <h2 id="next">
+    <a href="/tutorial/step_2">
+      NEXT - 
+      <small>Step 2: Has Many</small>
+      &raquo;
+    </a>
+  </h2>

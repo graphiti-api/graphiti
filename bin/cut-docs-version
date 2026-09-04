@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'TEXT'
+Usage: bin/cut-docs-version <version>      e.g. bin/cut-docs-version 2.1
+
+Freezes docs/ as website/versioned_docs/version-<version>, served at /<version>/.
+docs/ itself keeps serving at the root as "Latest". Run it before merging docs
+whose syntax the current release lacks, naming the release being left behind.
+Review the new files and commit them.
+TEXT
+}
+
+case "${1:-}" in
+  ""|-h|--help) usage; exit 0 ;;
+esac
+
+cd "$(dirname "$0")/../website"
+[ -d node_modules ] || npm ci
+npm run docusaurus docs:version "$1"
+
+echo
+echo "Cut $1. Review website/versioned_docs/version-$1 and commit it."
