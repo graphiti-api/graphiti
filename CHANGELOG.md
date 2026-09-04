@@ -1,5 +1,18 @@
 graphiti changelog
 
+# [2.1.0](https://github.com/graphiti-api/graphiti/compare/v2.0.2...v2.1.0) (2026-09-04)
+
+
+### Bug Fixes
+
+* attribute :id declared on an abstract resource is inherited instead of failing on the missing serializer ([8faf217](https://github.com/graphiti-api/graphiti/commit/8faf217bcf0d560ff81a067a8f3ef1473724b933)), closes [#151](https://github.com/graphiti-api/graphiti/issues/151)
+
+
+### Features
+
+* declare resource settings in the DSL form (adapter :active_record, model Employee), matching `attribute :name` ([14f1722](https://github.com/graphiti-api/graphiti/commit/14f17222770ba8577048775a45c893e85aef7e94))
+* hide your database ids from clients by specifying an alternate public_id, or an obfuscation transform ([81b97f9](https://github.com/graphiti-api/graphiti/commit/81b97f979bf35c3fa8c2eda8651a40a3f989e0ea)), closes [#409](https://github.com/graphiti-api/graphiti/issues/409)
+
 ## [2.0.2](https://github.com/graphiti-api/graphiti/compare/v2.0.1...v2.0.2) (2026-09-04)
 
 
