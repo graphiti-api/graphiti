@@ -94,6 +94,19 @@ if ENV["APPRAISAL_INITIALIZED"]
       end
     end
 
+    context "an attribute the request may not use" do
+      let(:error) do
+        Graphiti::Errors::InvalidAttributeAccess.new(PORO::PositionResource.new, :employee_id, :readable, request: true)
+      end
+
+      it "renders a 400 naming the attribute" do
+        get_errors
+
+        expect(response.status).to eq(400)
+        expect(json["errors"][0]["detail"]).to match(/employee_id/)
+      end
+    end
+
     context "paginating a sideload across multiple parents" do
       let(:error) { Graphiti::Errors::UnsupportedPagination.new }
 

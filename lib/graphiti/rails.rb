@@ -52,6 +52,8 @@ module Graphiti
       "Graphiti::Errors::UnsupportedBeforeCursor" => :bad_request,
       "Graphiti::Errors::UnsupportedPagination" => :bad_request,
       "Graphiti::Errors::FilterGroupMissingRequiredFilters" => :bad_request,
+      "Graphiti::Errors::UnknownAttribute" => :bad_request,
+      "Graphiti::Errors::InvalidAttributeAccess" => :bad_request,
       "Graphiti::Errors::RecordNotFound" => :not_found,
       "Graphiti::Errors::ConflictRequest" => :conflict
     }.freeze
