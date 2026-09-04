@@ -36,3 +36,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GEM_HOST_API_KEY: ${{ secrets.GEM_HOST_API_KEY }}
         run: npx semantic-release
+      # A release published with GITHUB_TOKEN never fires other workflows' release triggers, so the docs are rebuilt by hand.
+      - name: Rebuild docs with the new version label
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run docs.yml --ref "$GITHUB_REF_NAME"

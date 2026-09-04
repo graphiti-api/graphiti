@@ -12,8 +12,6 @@ on:
       - 'docs/**'
       - 'website/**'
       - '.github/workflows/docs.yml'
-  release:
-    types: [published]
   workflow_dispatch: {}
 
 # One static group: deploys from different branches force-push the same
