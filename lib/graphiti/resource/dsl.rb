@@ -176,12 +176,16 @@ module Graphiti
         end
 
         def apply_attributes_to_serializer
+          return unless serializer
+
           serializer.type(type)
           Util::SerializerAttributes.new(self, attributes).apply
         end
         private :apply_attributes_to_serializer
 
         def apply_extra_attributes_to_serializer
+          return unless serializer
+
           Util::SerializerAttributes.new(self, extra_attributes, true).apply
         end
 

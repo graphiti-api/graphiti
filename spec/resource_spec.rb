@@ -278,6 +278,25 @@ RSpec.describe Graphiti::Resource do
         expect(klass2.serializer.ancestors[1]).to eq(klass1.serializer)
       end
 
+      it "inherits a custom attribute :id declared on the abstract resource" do
+        base = Class.new(PORO::ApplicationResource) do
+          self.abstract_class = true
+          attribute :id, :string do
+            "custom-#{@object.id}"
+          end
+        end
+        child = Class.new(base) do
+          def self.name
+            "PORO::EmployeeResource"
+          end
+          self.model = PORO::Employee
+          attribute :first_name, :string
+        end
+        PORO::DB.data[:employees] = [{id: 1}, {id: 2}]
+
+        expect(JSON.parse(child.all({}).to_jsonapi)["data"].map { |row| row["id"] }).to eq(%w[custom-1 custom-2])
+      end
+
       context "when overriding type" do
         let(:klass1) do
           Class.new(app_resource) do
