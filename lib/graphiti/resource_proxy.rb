@@ -120,6 +120,7 @@ module Graphiti
         scope = @scope.unpaginated_object
         if resource.adapter.can_group?
           if (group = @query.hash[:stats].delete(:group_by))
+            resource.get_attr!(group[0], :readable, request: true)
             scope = resource.adapter.group(scope, group[0])
           end
         end
