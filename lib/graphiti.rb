@@ -268,6 +268,10 @@ if defined?(ActiveRecord)
   require "graphiti/adapters/active_record"
 end
 
+if defined?(Sequel)
+  require "graphiti/adapters/sequel"
+end
+
 if defined?(Rails)
   require "graphiti/rails"
 end
