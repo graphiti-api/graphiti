@@ -16,6 +16,7 @@ module Graphiti
 
             aliases = [name, opts[:aliases]].flatten.compact
             operators = FilterOperators.build(self, att[:type], opts, &blk)
+            operators = operators.merge(custom_operators(name)) if opts[:via_attribute_dsl]
 
             case Graphiti::Types[att[:type]][:canonical_name]
             when :boolean
@@ -252,6 +253,12 @@ module Graphiti
           end
         end
         private :relationship_option
+
+        # Declaring an attribute regenerates its filter, which must not silently outrank a filter declared by hand.
+        def custom_operators(name)
+          (config[:filters][name]&.[](:operators) || {}).compact
+        end
+        private :custom_operators
 
         def blanks_for(name, opts)
           if opts.key?(:deny_empty)

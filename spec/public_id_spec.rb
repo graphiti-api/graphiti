@@ -510,6 +510,38 @@ RSpec.describe "public_id" do
       expect(resource.all(sort: "-id").data.map(&:id))
         .to eq([employee2.id, employee1.id])
     end
+
+    context "with a custom id filter" do
+      let(:public_base) do
+        Class.new(PORO::ApplicationResource) do
+          def self.name
+            "PublicApplicationResource"
+          end
+
+          self.abstract_class = true
+          public_id :public_id
+
+          filter :id, :string do
+            eq do |scope, value, primary_keys:|
+              (scope[:conditions] ||= {})[:id] = primary_keys + value.grep(/\A\d+\z/)
+              scope
+            end
+          end
+        end
+      end
+
+      it "survives the subclass declaring its model" do
+        expect(resource.filters[:id][:operators][:eq]).to be_present
+        expect(resource.filters[:id][:operators_taking_primary_keys]).to eq([:eq])
+      end
+
+      it "still resolves public ids, and the retired primary key besides" do
+        expect(resource.all(filter: {id: "emp-def"}).data.map(&:id))
+          .to eq([employee2.id])
+        expect(resource.all(filter: {id: employee2.id.to_s}).data.map(&:id))
+          .to eq([employee2.id])
+      end
+    end
   end
 
   describe "the public id type" do

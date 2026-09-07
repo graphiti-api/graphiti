@@ -29,6 +29,85 @@ RSpec.describe "filtering" do
     expect(records.map(&:id)).to eq([employee1.id])
   end
 
+  context "when an attribute is declared alongside a custom filter" do
+    # The filter matches on last_name, so it only takes effect if the block survived.
+    def self.custom_filter
+      proc do
+        filter :first_name, :string do
+          eq do |scope, value|
+            scope[:conditions][:last_name] = value
+            scope
+          end
+        end
+      end
+    end
+
+    before { params[:filter] = {first_name: "Christie"} }
+
+    context "and the attribute comes after it" do
+      let(:resource) do
+        blk = self.class.custom_filter
+        Class.new(PORO::EmployeeResource) do
+          def self.name
+            "PORO::EmployeeResource"
+          end
+
+          instance_eval(&blk)
+          attribute :first_name, :string
+        end
+      end
+
+      it "keeps the custom filter" do
+        expect(records.map(&:id)).to eq([employee2.id])
+      end
+    end
+
+    context "and the attribute comes before it" do
+      let(:resource) do
+        blk = self.class.custom_filter
+        Class.new(PORO::EmployeeResource) do
+          def self.name
+            "PORO::EmployeeResource"
+          end
+
+          attribute :first_name, :string
+          instance_eval(&blk)
+        end
+      end
+
+      it "keeps the custom filter" do
+        expect(records.map(&:id)).to eq([employee2.id])
+      end
+    end
+
+    context "and the filter is inherited while the subclass declares the attribute" do
+      let(:resource) do
+        blk = self.class.custom_filter
+        parent = Class.new(PORO::EmployeeResource) do
+          def self.name
+            "PORO::AbstractEmployeeResource"
+          end
+
+          self.abstract_class = true
+          instance_eval(&blk)
+        end
+
+        Class.new(parent) do
+          def self.name
+            "PORO::EmployeeResource"
+          end
+
+          self.model = PORO::Employee
+          attribute :first_name, :string
+        end
+      end
+
+      it "keeps the custom filter" do
+        expect(records.map(&:id)).to eq([employee2.id])
+      end
+    end
+  end
+
   context "retains filtering value" do
     it "when value includes curly brackets" do
       params[:filter] = {first_name: "{{John}}"}
