@@ -1,5 +1,12 @@
 graphiti changelog
 
+## [2.1.1](https://github.com/graphiti-api/graphiti/compare/v2.1.0...v2.1.1) (2026-09-07)
+
+
+### Bug Fixes
+
+* a filter you declare by hand always beats the one an attribute generates ([955875b](https://github.com/graphiti-api/graphiti/commit/955875b2a28ef67980e240399deb70620f44b935))
+
 # [2.1.0](https://github.com/graphiti-api/graphiti/compare/v2.0.2...v2.1.0) (2026-09-04)
 
 
