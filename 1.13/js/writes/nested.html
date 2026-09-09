@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Boogaloo" rel="stylesheet">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/1.13/assets/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/1.13/assets/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/1.13/assets/favicons/favicon-16x16.png">
+  <link rel="manifest" href="/1.13/assets/favicons/site.webmanifest">
+  <link rel="mask-icon" href="/1.13/assets/favicons/safari-pinned-tab.svg" color="#F86DA7">
+  <link rel="shortcut icon" href="/1.13/assets/favicons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#F86DA7">
+  <meta name="msapplication-config" content="/1.13/assets/favicons/browserconfig.xml">
+  <meta name="theme-color" content="#F86DA7">
+
+  <title>Graphiti</title>
+  <meta name="description" content="Stylish Graph APIs">
+
+  <link rel="stylesheet" href="/1.13/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/1.13/feed.xml">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-127904727-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-127904727-1');
+  </script>
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <a href="/1.13/1.13" class="navbar-brand">
+        <img alt="logo" src="/1.13/assets/img/logo.png">
+      </a>
+    </div>
+    <nav class="" role="navigation">
+      <ul class="nav navbar-nav nav-links">
+        <li>
+          <a class="quickstart nav-link" href="/1.13/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="guides nav-link" href="/1.13/guides">Guides</a>
+        </li>
+        <li>
+          <a class="tutorial nav-link" href="/1.13/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="spraypaint nav-link" href="/1.13/js">Spraypaint</a>
+        </li>
+      </ul>
+      <ul class="nav gh navbar-nav navbar-right visible-lg visible-md">
+        <li>
+          <span class="star">⭐</span>
+          <a href="https://github.com/graphiti-api/graphiti">
+            <img alt="github-star" style="margin-right: 65px;margin-top: -20px" src="/1.13/assets/img/gh.png">
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <h1>
+  Spraypaint
+  <small>the isomorphic, framework-agnostic Graphiti ORM</small>
+</h1>
+
+<div class="js-toc col-md-3">
+  <ul>
+    <li><a href="/1.13/js/index">Home</a></li>
+    <li><a href="/1.13/js/introduction">Introduction</a></li>
+    <li><a href="/1.13/js/installation">Installation</a>
+      <ul>
+        <li><a href="/1.13/js/installation#typescript">Typescript</a></li>
+        <li><a href="/1.13/js/installation#defining-models">Defining Models</a></li>
+        <li><a href="/1.13/js/installation#connecting-to-the-api">Connecting to the API</a></li>
+        <li><a href="/1.13/js/installation#defining-attributes">Defining Attributes</a></li>
+        <li><a href="/1.13/js/installation#defining-relationships">Defining Relationships</a></li>
+      </ul>
+    </li>
+    <li><a href="/1.13/js/reads">Reads</a>
+      <ul>
+        <li><a href="/1.13/js/reads/sorting">Sorting</a></li>
+        <li><a href="/1.13/js/reads/pagination">Pagination</a></li>
+        <li><a href="/1.13/js/reads/filtering">Filtering</a></li>
+        <li><a href="/1.13/js/reads/fieldsets">Fieldsets</a></li>
+        <li><a href="/1.13/js/reads/statistics">Statistics</a></li>
+        <li><a href="/1.13/js/reads/includes">Includes</a></li>
+        <li><a href="/1.13/js/reads/nested-queries">Nested Queries</a></li>
+      </ul>
+    </li>
+    <li><a href="/1.13/js/writes">Writes</a>
+      <ul>
+        <li><a href="/1.13/js/writes/validations">Validations</a></li>
+        <li><a href="/1.13/js/writes/dirty-tracking">Dirty Tracking</a></li>
+        <li><a href="/1.13/js/writes/nested">Nested Writes</a></li>
+        <li><a href="/1.13/js/writes/deferred">Deferred Action</a></li>
+      </ul>
+    </li>
+    <li><a href="/1.13/js/middleware">Middleware</a></li>
+    <li><a href="/1.13/js/authentication">Authentication</a></li>
+    <li><a href="/1.13/js/state-syncing">State Syncing</a></li>
+    <li><a href="/1.13/js/ddau">Data Down, Actions Up</a></li>
+    <li><a href="/1.13/js/extra-params">Extra params</a></li>
+  </ul>
+</div>
+
+<div class="col-md-8 col-md-offset-1">
+  <h3 id="nested-writes">Nested Writes</h3>
+
+  <p>You can write a <code class="language-plaintext highlighter-rouge">Model</code> and all of its relationships in a single
+request. Keep in mind normal dirty tracking rules still apply - nothing
+is sent to the server unless it is dirty.</p>
+
+  <div class="tabs">
+  <div class="tab typescript active">
+    <span>Typescript</span>
+  </div>
+  <div class="tab javascript">
+    <span>Javascript</span>
+  </div>
+</div>
+
+  <div class="code-tabs">
+
+    <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript">  <span class="kd">let</span> <span class="nx">author</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Author</span><span class="p">()</span>
+  <span class="kd">let</span> <span class="nx">comment</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Comment</span><span class="p">({</span> <span class="nx">author</span> <span class="p">})</span>
+  <span class="kd">let</span> <span class="nx">post</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Post</span><span class="p">({</span> <span class="na">comments</span><span class="p">:</span> <span class="p">[</span><span class="nx">comment</span><span class="p">]</span> <span class="p">})</span>
+
+  <span class="c1">// post.save({ with: "comments" })</span>
+  <span class="c1">// post.save({ with: ["comments", "blog"] })</span>
+  <span class="nx">post</span><span class="p">.</span><span class="nf">save</span><span class="p">({</span> <span class="na">with</span><span class="p">:</span> <span class="p">{</span> <span class="na">comments</span><span class="p">:</span> <span class="dl">'</span><span class="s1">author</span><span class="dl">'</span> <span class="p">}})</span>
+  </code></pre></figure>
+
+    <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">  <span class="kd">var</span> <span class="nx">author</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Author</span><span class="p">();</span>
+  <span class="kd">var</span> <span class="nx">comment</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Comment</span><span class="p">({</span> <span class="na">author</span><span class="p">:</span> <span class="nx">author</span> <span class="p">});</span>
+  <span class="kd">var</span> <span class="nx">post</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Post</span><span class="p">({</span> <span class="na">comments</span><span class="p">:</span> <span class="p">[</span><span class="nx">comment</span><span class="p">]</span> <span class="p">});</span>
+
+  <span class="c1">// post.save({ with: "comments" })</span>
+  <span class="c1">// post.save({ with: ["comments", "blog"] })</span>
+  <span class="nx">post</span><span class="p">.</span><span class="nf">save</span><span class="p">({</span> <span class="na">with</span><span class="p">:</span> <span class="p">{</span> <span class="na">comments</span><span class="p">:</span> <span class="dl">"</span><span class="s2">author</span><span class="dl">"</span> <span class="p">}});</span>
+  </code></pre></figure>
+
+  </div>
+
+  <p>Use <code class="language-plaintext highlighter-rouge">model.isMarkedForDestruction = true</code> to delete the associated
+object. Use <code class="language-plaintext highlighter-rouge">model.isMarkedForDisassociation = true</code> to remove the association
+without deleting the underlying object:</p>
+
+  <div class="tabs">
+  <div class="tab typescript active">
+    <span>Typescript</span>
+  </div>
+  <div class="tab javascript">
+    <span>Javascript</span>
+  </div>
+</div>
+
+  <div class="code-tabs">
+
+    <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript">  <span class="kd">let</span> <span class="nx">post</span> <span class="o">=</span> <span class="p">(</span><span class="k">await</span> <span class="nx">Post</span><span class="p">.</span><span class="nf">includes</span><span class="p">(</span><span class="dl">"</span><span class="s2">comments</span><span class="dl">"</span><span class="p">).</span><span class="nf">first</span><span class="p">()).</span><span class="nx">data</span>
+  <span class="nx">post</span><span class="p">.</span><span class="nx">comments</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">isMarkedForDestruction</span> <span class="o">=</span> <span class="kc">true</span>
+  <span class="nx">post</span><span class="p">.</span><span class="nx">comments</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">isMarkedForDisassociation</span> <span class="o">=</span> <span class="kc">true</span>
+
+  <span class="c1">// destroys the first comment</span>
+  <span class="c1">// disassociates the second comment</span>
+  <span class="k">await</span> <span class="nx">post</span><span class="p">.</span><span class="nf">save</span><span class="p">({</span> <span class="na">with</span><span class="p">:</span> <span class="dl">"</span><span class="s2">comments</span><span class="dl">"</span> <span class="p">})</span>
+  </code></pre></figure>
+
+    <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">  <span class="nx">Post</span><span class="p">.</span><span class="nf">includes</span><span class="p">(</span><span class="dl">"</span><span class="s2">comments</span><span class="dl">"</span><span class="p">).</span><span class="nf">first</span><span class="p">().</span><span class="nf">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">post</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+    <span class="nx">post</span><span class="p">.</span><span class="nx">comments</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">isMarkedForDestruction</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="nx">post</span><span class="p">.</span><span class="nx">comments</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">isMarkedForDisassociation</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+
+    <span class="c1">// destroys the first comment</span>
+    <span class="c1">// disassociates the second comment</span>
+    <span class="nx">post</span><span class="p">.</span><span class="nf">save</span><span class="p">({</span> <span class="na">with</span><span class="p">:</span> <span class="dl">"</span><span class="s2">comments</span><span class="dl">"</span> <span class="p">})</span>
+  <span class="p">});</span>
+  </code></pre></figure>
+
+  </div>
+
+  <p>You may want to send <em>only</em> the <code class="language-plaintext highlighter-rouge">id</code> of the related object to the server - ensuring the models are associated without updating attributes by
+accident. Just add <code class="language-plaintext highlighter-rouge">.id</code> to the relationship name:</p>
+
+  <div class="tabs">
+  <div class="tab typescript active">
+    <span>Typescript</span>
+  </div>
+  <div class="tab javascript">
+    <span>Javascript</span>
+  </div>
+</div>
+
+  <div class="code-tabs">
+
+    <figure class="highlight"><pre><code class="language-typescript" data-lang="typescript">  <span class="nx">post</span><span class="p">.</span><span class="nf">save</span><span class="p">({</span> <span class="na">with</span><span class="p">:</span> <span class="dl">"</span><span class="s2">comments.id</span><span class="dl">"</span> <span class="p">})</span>
+  </code></pre></figure>
+
+    <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">  <span class="nx">post</span><span class="p">.</span><span class="nf">save</span><span class="p">({</span> <span class="na">with</span><span class="p">:</span> <span class="dl">"</span><span class="s2">comments.id</span><span class="dl">"</span> <span class="p">})</span>
+  </code></pre></figure>
+
+  </div>
+
+  <div class="clearfix">
+  <h2 id="next">
+    <a href="/1.13/js/writes/deferred">
+      NEXT:
+      <small>Deferred Action</small>
+      &raquo;
+    </a>
+  </h2>
+</div>
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="/1.13/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="/1.13/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="/1.13/guides">Guides</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Contact</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://discord.gg/wgqkMBsSRV">Discord Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Email</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

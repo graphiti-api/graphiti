@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Boogaloo" rel="stylesheet">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/1.13/assets/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/1.13/assets/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/1.13/assets/favicons/favicon-16x16.png">
+  <link rel="manifest" href="/1.13/assets/favicons/site.webmanifest">
+  <link rel="mask-icon" href="/1.13/assets/favicons/safari-pinned-tab.svg" color="#F86DA7">
+  <link rel="shortcut icon" href="/1.13/assets/favicons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#F86DA7">
+  <meta name="msapplication-config" content="/1.13/assets/favicons/browserconfig.xml">
+  <meta name="theme-color" content="#F86DA7">
+
+  <title>Graphiti</title>
+  <meta name="description" content="Stylish Graph APIs">
+
+  <link rel="stylesheet" href="/1.13/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/1.13/feed.xml">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-127904727-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-127904727-1');
+  </script>
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <a href="/1.13/1.13" class="navbar-brand">
+        <img alt="logo" src="/1.13/assets/img/logo.png">
+      </a>
+    </div>
+    <nav class="" role="navigation">
+      <ul class="nav navbar-nav nav-links">
+        <li>
+          <a class="quickstart nav-link" href="/1.13/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="guides nav-link" href="/1.13/guides">Guides</a>
+        </li>
+        <li>
+          <a class="tutorial nav-link" href="/1.13/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="spraypaint nav-link" href="/1.13/js">Spraypaint</a>
+        </li>
+      </ul>
+      <ul class="nav gh navbar-nav navbar-right visible-lg visible-md">
+        <li>
+          <span class="star">⭐</span>
+          <a href="https://github.com/graphiti-api/graphiti">
+            <img alt="github-star" style="margin-right: 65px;margin-top: -20px" src="/1.13/assets/img/gh.png">
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="toc col-md-3">
+  <h1 id="tutorial">Tutorial</h1>
+
+  <ul>
+    <li><a href="/1.13/tutorial/step_0">Step 0: Bootstrapping</a></li>
+    <li><a href="/1.13/tutorial/step_1">Step 1: Initial Resource</a></li>
+    <li><a href="/1.13/tutorial/step_2">Step 2: Has Many</a></li>
+    <li><a href="/1.13/tutorial/step_3">Step 3: Belongs To</a></li>
+    <li><a href="/1.13/tutorial/step_4">Step 4: Customizing Queries</a></li>
+    <li><a href="/1.13/tutorial/step_5">Step 5: Has One</a></li>
+    <li><a href="/1.13/tutorial/step_6">Step 6: Customizing Writes</a></li>
+    <li><a href="/1.13/tutorial/step_7">Step 7: Many-to-Many</a></li>
+    <li><a href="/1.13/tutorial/step_8">Step 8: Polymorphic Relationships</a></li>
+    <li><a href="/1.13/tutorial/step_9">Step 9: Polymorphic Resources</a></li>
+  </ul>
+</div>
+
+<div class="col-md-8">
+
+  <h2 id="step-2-has-many">Step 2: Has Many</h2>
+
+  <blockquote>
+    <p><a href="https://github.com/graphiti-api/employee_directory/compare/step_1_employees...step_2_positions">View the Code</a></p>
+  </blockquote>
+
+  <p>We’ll be adding the database table <code class="language-plaintext highlighter-rouge">positions</code>:</p>
+
+  <table class="table table-small text-center">
+  <thead>
+    <tr>
+      <th class="text-center">id</th>
+      <th class="text-center">employee_id</th>
+      <th class="text-center">title</th>
+      <th class="text-center">active</th>
+      <th class="text-center">historical_index</th>
+      <th class="text-center">created_at</th>
+      <th class="text-center">updated_at</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>900</td>
+      <td>Engineer</td>
+      <td>true</td>
+      <td>1</td>
+      <td>2018-09-04</td>
+      <td>2018-09-04</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>900</td>
+      <td>Intern</td>
+      <td>true</td>
+      <td>2</td>
+      <td>2018-09-04</td>
+      <td>2018-09-04</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>800</td>
+      <td>Manager</td>
+      <td>true</td>
+      <td>1</td>
+      <td>2018-09-04</td>
+      <td>2018-09-04</td>
+    </tr>
+  </tbody>
+</table>
+
+  <p>Because this table tracks all historical positions, we have the
+<code class="language-plaintext highlighter-rouge">historical_index</code> column. This tells the order the employee moved
+through each position, where <code class="language-plaintext highlighter-rouge">1</code> is most recent.</p>
+
+  <h3 id="the-rails-stuff-">The Rails Stuff 🚂</h3>
+
+  <p>Generate the <code class="language-plaintext highlighter-rouge">Position</code> model:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bin/rails g model Position title:string active:boolean historical_index:integer employee:belongs_to
+<span class="nv">$ </span>bin/rails db:migrate</code></pre></figure>
+
+  <p>Update the <code class="language-plaintext highlighter-rouge">Employee</code> model with the association, too:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/models/employee.rb</span>
+<span class="n">has_many</span> <span class="ss">:positions</span></code></pre></figure>
+
+  <p>And update our seed data:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># db/seeds.rb</span>
+<span class="p">[</span><span class="no">Employee</span><span class="p">,</span> <span class="no">Position</span><span class="p">].</span><span class="nf">each</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:delete_all</span><span class="p">)</span>
+
+<span class="mi">100</span><span class="p">.</span><span class="nf">times</span> <span class="k">do</span>
+  <span class="n">employee</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">create!</span> <span class="ss">first_name: </span><span class="no">Faker</span><span class="o">::</span><span class="no">Name</span><span class="p">.</span><span class="nf">first_name</span><span class="p">,</span>
+    <span class="ss">last_name: </span><span class="no">Faker</span><span class="o">::</span><span class="no">Name</span><span class="p">.</span><span class="nf">last_name</span><span class="p">,</span>
+    <span class="ss">age: </span><span class="nb">rand</span><span class="p">(</span><span class="mi">20</span><span class="o">..</span><span class="mi">80</span><span class="p">)</span>
+
+  <span class="p">(</span><span class="mi">1</span><span class="o">..</span><span class="mi">2</span><span class="p">).</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span>
+    <span class="n">employee</span><span class="p">.</span><span class="nf">positions</span><span class="p">.</span><span class="nf">create!</span> <span class="ss">title: </span><span class="no">Faker</span><span class="o">::</span><span class="no">Job</span><span class="p">.</span><span class="nf">title</span><span class="p">,</span>
+      <span class="ss">historical_index: </span><span class="n">i</span><span class="p">,</span>
+      <span class="ss">active: </span><span class="n">i</span> <span class="o">==</span> <span class="mi">1</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bin/rails db:seed</code></pre></figure>
+
+  <h3 id="the-graphiti-stuff-">The Graphiti Stuff 🎨</h3>
+
+  <p>Let’s start by running the same command as before to create
+<code class="language-plaintext highlighter-rouge">PositionResource</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bin/rails g graphiti:resource Position title:string active:boolean</code></pre></figure>
+
+  <p>We’ll need to add the association, just like ActiveRecord:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/employee_resource.rb</span>
+<span class="n">has_many</span> <span class="ss">:positions</span></code></pre></figure>
+
+  <p>…and a corresponding filter:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/position_resource.rb</span>
+<span class="n">filter</span> <span class="ss">:employee_id</span><span class="p">,</span> <span class="ss">:integer</span></code></pre></figure>
+
+  <p>If you visit <code class="language-plaintext highlighter-rouge">/api/v1/employees</code>, you’ll see a number of HTTP
+<a href="/1.13/guides/concepts/links">Links</a>
+that allow lazy-loading positions. Or, if you visit
+<code class="language-plaintext highlighter-rouge">/api/v1/employees?include=positions</code>, you’ll load the employees and
+positions in a single request. We’ll dig a bit deeper into this logic
+in the section below.</p>
+
+  <p>Before we get there, let’s revisit the <code class="language-plaintext highlighter-rouge">historical_index</code> column. For now, let’s
+treat this as an implementation detail that the API should not expose -
+let’s say we want to support sorting on this attribute but nothing else:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">attribute</span> <span class="ss">:historical_index</span><span class="p">,</span> <span class="ss">:integer</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:sortable</span><span class="p">]</span></code></pre></figure>
+
+  <p>We’re almost done, but if you run your tests you’ll see two outstanding
+errors. This is because <a href="https://blog.bigbinary.com/2016/02/15/rails-5-makes-belong-to-association-required-by-default.html">Rails 5 belongs_to associations are required by
+default</a>. We can’t save a <code class="language-plaintext highlighter-rouge">Position</code> without its corresponding <code class="language-plaintext highlighter-rouge">Employee</code>.</p>
+
+  <p>We can solve this in three ways:</p>
+
+  <ul>
+    <li>Turn this off globally, with <a href="https://edgeguides.rubyonrails.org/configuring.html#configuring-active-record">config.active_record.belongs_to_required_by_default</a>. You may want to do this in test-mode only.</li>
+    <li>Turn this off for the specific association: <code class="language-plaintext highlighter-rouge">belongs_to :employee,
+optional: true</code>.</li>
+    <li>Associate an <code class="language-plaintext highlighter-rouge">Employee</code> as part of the API request.</li>
+  </ul>
+
+  <p>We’ll take for the last option. Look at
+<code class="language-plaintext highlighter-rouge">spec/resources/position/writes_spec.rb</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">RSpec</span><span class="p">.</span><span class="nf">describe</span> <span class="no">PositionResource</span><span class="p">,</span> <span class="ss">type: :resource</span> <span class="k">do</span>
+  <span class="n">describe</span> <span class="s1">'creating'</span> <span class="k">do</span>
+    <span class="n">let</span><span class="p">(</span><span class="ss">:payload</span><span class="p">)</span> <span class="k">do</span>
+      <span class="p">{</span>
+        <span class="ss">data: </span><span class="p">{</span>
+          <span class="ss">type: </span><span class="s1">'positions'</span><span class="p">,</span>
+          <span class="ss">attributes: </span><span class="p">{</span> <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="k">end</span>
+
+    <span class="n">let</span><span class="p">(</span><span class="ss">:instance</span><span class="p">)</span> <span class="k">do</span>
+      <span class="no">PositionResource</span><span class="p">.</span><span class="nf">build</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="n">it</span> <span class="s1">'works'</span> <span class="k">do</span>
+      <span class="n">expect</span> <span class="p">{</span>
+        <span class="n">expect</span><span class="p">(</span><span class="n">instance</span><span class="p">.</span><span class="nf">save</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span><span class="p">(</span><span class="kp">true</span><span class="p">)</span>
+      <span class="p">}.</span><span class="nf">to</span> <span class="n">change</span> <span class="p">{</span> <span class="no">Position</span><span class="p">.</span><span class="nf">count</span> <span class="p">}.</span><span class="nf">by</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>When running our tests, let’s make sure the <code class="language-plaintext highlighter-rouge">historical_index</code> column
+reflects the order we created the positions. This code recalculates
+everything after a record is saved:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># spec/factories/position.rb</span>
+<span class="no">FactoryBot</span><span class="p">.</span><span class="nf">define</span> <span class="k">do</span>
+  <span class="n">factory</span> <span class="ss">:position</span> <span class="k">do</span>
+    <span class="n">employee</span>
+
+    <span class="n">title</span> <span class="p">{</span> <span class="no">Faker</span><span class="o">::</span><span class="no">Job</span><span class="p">.</span><span class="nf">title</span> <span class="p">}</span>
+
+    <span class="n">after</span><span class="p">(</span><span class="ss">:create</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">position</span><span class="o">|</span>
+      <span class="k">unless</span> <span class="n">position</span><span class="p">.</span><span class="nf">historical_index</span>
+        <span class="n">scope</span> <span class="o">=</span> <span class="no">Position</span>
+          <span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">employee_id: </span><span class="n">position</span><span class="p">.</span><span class="nf">employee</span><span class="p">.</span><span class="nf">id</span><span class="p">)</span>
+          <span class="p">.</span><span class="nf">order</span><span class="p">(</span><span class="ss">created_at: :desc</span><span class="p">)</span>
+        <span class="n">scope</span><span class="p">.</span><span class="nf">each_with_index</span> <span class="k">do</span> <span class="o">|</span><span class="nb">p</span><span class="p">,</span> <span class="n">index</span><span class="o">|</span>
+          <span class="nb">p</span><span class="p">.</span><span class="nf">update_attribute</span><span class="p">(</span><span class="ss">:historical_index</span><span class="p">,</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Let’s associate an <code class="language-plaintext highlighter-rouge">Employee</code>. Start by seeding the data:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">let!</span><span class="p">(</span><span class="ss">:employee</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:employee</span><span class="p">)</span> <span class="p">}</span></code></pre></figure>
+
+  <p>And associate via <code class="language-plaintext highlighter-rouge">relationships</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">let</span><span class="p">(</span><span class="ss">:payload</span><span class="p">)</span> <span class="k">do</span>
+  <span class="p">{</span>
+    <span class="ss">data: </span><span class="p">{</span>
+      <span class="ss">type: </span><span class="s1">'positions'</span><span class="p">,</span>
+      <span class="ss">attributes: </span><span class="p">{</span> <span class="p">},</span>
+      <span class="ss">relationships: </span><span class="p">{</span>
+        <span class="ss">employee: </span><span class="p">{</span>
+          <span class="ss">data: </span><span class="p">{</span>
+            <span class="ss">id: </span><span class="n">employee</span><span class="p">.</span><span class="nf">id</span><span class="p">.</span><span class="nf">to_s</span><span class="p">,</span>
+            <span class="ss">type: </span><span class="s1">'employees'</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>To ensure the <code class="language-plaintext highlighter-rouge">PositionResource</code> will process this relationship, the
+last step is to add it:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/position_resource.rb</span>
+<span class="n">belongs_to</span> <span class="ss">:employee</span></code></pre></figure>
+
+  <p>This will associate the <code class="language-plaintext highlighter-rouge">Position</code> to the <code class="language-plaintext highlighter-rouge">Employee</code> as part of the
+creation process. The test should now pass - make the same change to
+<code class="language-plaintext highlighter-rouge">spec/api/v1/positions/create_spec.rb</code> to get a fully-passing test
+suite.</p>
+
+  <h4 id="digging-deeper-">Digging Deeper 🧐</h4>
+
+  <p>Why did we need the <code class="language-plaintext highlighter-rouge">employee_id</code> filter above? To explain that, let’s dive deeper into the logic connecting Resources.</p>
+
+  <p>If you hit <code class="language-plaintext highlighter-rouge">/api/v1/employees</code>, you’ll see a number of
+<a href="/1.13/guides/concepts/links">Links</a> in the
+response. These are useful for lazy-loading, but the same logic
+applies to eager loading. Let’s take a look at a Link to see how these
+Resources connect together:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="p">{</span>
+  <span class="o">...</span>
+  <span class="ss">relationships: </span><span class="p">{</span>
+    <span class="ss">positions: </span><span class="p">{</span>
+      <span class="ss">links: </span><span class="p">{</span>
+        <span class="ss">related: </span><span class="s2">"http://localhost:3000/api/v1/positions?filter[employee_id]=1"</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="o">...</span>
+<span class="p">}</span></code></pre></figure>
+
+  <p>The salient bit: <code class="language-plaintext highlighter-rouge">/positions?filter[employee_id]=1</code>. In other words,
+fetch all Positions for the given Employee id.That means, whether we’re lazy-loading data in separate requests or
+eager-loading in a single request, <strong>the same logic fires
+under-the-hood</strong>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">PositionResource</span><span class="p">.</span><span class="nf">all</span><span class="p">({</span>
+  <span class="ss">filter: </span><span class="p">{</span> <span class="ss">employee_id: </span><span class="mi">1</span> <span class="p">}</span>
+<span class="p">})</span></code></pre></figure>
+
+  <p>This means we need <code class="language-plaintext highlighter-rouge">filter :employee_id, :integer</code> to satisfy the query.</p>
+
+  <p>We can customize the logic connecting Resources in a few different
+ways. First some simple options:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">has_many</span> <span class="ss">:positions</span><span class="p">,</span> <span class="ss">foreign_key: :emp_id</span><span class="p">,</span> <span class="ss">primary_key: :eid</span></code></pre></figure>
+
+  <p>So far so good. The logic, and corresponding Link, both update as you’d
+expect (though we’d of course need a corresponding <code class="language-plaintext highlighter-rouge">filter
+:emp_id, :integer</code> on <code class="language-plaintext highlighter-rouge">PositionResource</code>).</p>
+
+  <p>Those options are just simple versions of parameter customization.
+You can customize parameters connecting Resources with the <code class="language-plaintext highlighter-rouge">params</code> block:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">has_many</span> <span class="ss">:positions</span> <span class="k">do</span>
+  <span class="n">params</span> <span class="k">do</span> <span class="o">|</span><span class="nb">hash</span><span class="p">,</span> <span class="n">employees</span><span class="o">|</span>
+    <span class="nb">hash</span><span class="p">[</span><span class="ss">:filter</span><span class="p">]</span> <span class="c1"># =&gt; { employee_id: employees.map(&amp;:id) }</span>
+    <span class="nb">hash</span><span class="p">[</span><span class="ss">:filter</span><span class="p">][</span><span class="ss">:active</span><span class="p">]</span> <span class="o">=</span> <span class="kp">true</span>
+    <span class="nb">hash</span><span class="p">[</span><span class="ss">:sort</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'-created_at'</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Customizing these params affects the Link as well as the eager-load
+logic. Remember the parameters here should reflect the JSON:API
+specification, or anything <code class="language-plaintext highlighter-rouge">PositionResource.all</code> accepts.</p>
+
+  <p>These are the most common options, but there’s a bunch more. Check
+out the <a href="/1.13/guides/concepts/resources#relationships">Resource Relationships Guide</a> to dig even deeper.</p>
+
+</div>
+
+<div class="clearfix">
+  <h2 id="next">
+    <a href="/1.13/tutorial/step_3">
+      NEXT - 
+      <small>Step 3: Belongs To</small>
+      &raquo;
+    </a>
+  </h2>
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="/1.13/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="/1.13/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="/1.13/guides">Guides</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Contact</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://discord.gg/wgqkMBsSRV">Discord Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Email</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

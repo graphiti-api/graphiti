@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Boogaloo" rel="stylesheet">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/1.13/assets/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/1.13/assets/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/1.13/assets/favicons/favicon-16x16.png">
+  <link rel="manifest" href="/1.13/assets/favicons/site.webmanifest">
+  <link rel="mask-icon" href="/1.13/assets/favicons/safari-pinned-tab.svg" color="#F86DA7">
+  <link rel="shortcut icon" href="/1.13/assets/favicons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#F86DA7">
+  <meta name="msapplication-config" content="/1.13/assets/favicons/browserconfig.xml">
+  <meta name="theme-color" content="#F86DA7">
+
+  <title>Graphiti</title>
+  <meta name="description" content="Stylish Graph APIs">
+
+  <link rel="stylesheet" href="/1.13/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/1.13/feed.xml">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-127904727-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-127904727-1');
+  </script>
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <a href="/1.13/1.13" class="navbar-brand">
+        <img alt="logo" src="/1.13/assets/img/logo.png">
+      </a>
+    </div>
+    <nav class="" role="navigation">
+      <ul class="nav navbar-nav nav-links">
+        <li>
+          <a class="quickstart nav-link" href="/1.13/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="guides nav-link" href="/1.13/guides">Guides</a>
+        </li>
+        <li>
+          <a class="tutorial nav-link" href="/1.13/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="spraypaint nav-link" href="/1.13/js">Spraypaint</a>
+        </li>
+      </ul>
+      <ul class="nav gh navbar-nav navbar-right visible-lg visible-md">
+        <li>
+          <span class="star">⭐</span>
+          <a href="https://github.com/graphiti-api/graphiti">
+            <img alt="github-star" style="margin-right: 65px;margin-top: -20px" src="/1.13/assets/img/gh.png">
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <h1 id="vandal">Vandal</h1>
+
+<p>Vandal is the Graphiti UI. It’s helpful for exploring data, testing and
+generating URLs. To take Vandal for a spin, <a href="https://jsonapi-employee-directory.herokuapp.com/vandal">view our sample app</a> (<em>initial load may take a second</em>).</p>
+
+<p><br />
+<img width="100%" src="https://user-images.githubusercontent.com/55264/50740077-61dbe880-11b7-11e9-8919-34e1a48dd630.png" /></p>
+
+<div class="toc col-md-3">
+
+  <ul>
+    <li>1 <a href="#installation">Installation</a>
+      <ul>
+        <li><a href="#installing-via-template">Via the Template</a></li>
+        <li><a href="#installing-via-gem">Via the Gem</a></li>
+        <li><a href="#manual-installation">Manual</a></li>
+      </ul>
+    </li>
+    <li>2 <a href="#usage">Usage</a></li>
+  </ul>
+
+</div>
+
+<div class="col-md-8">
+
+<a class="anchor" id="installation" />
+  <a class="header" href="#installation">
+    <h2>
+      1 Installation
+    </h2>
+  </a>
+
+<a class="anchor" id="installing-via-template" />
+  <a class="header" href="#installing-via-template">
+    <h3>
+      1.1 Installing via Template
+    </h3>
+  </a>
+
+  <p>If you ran our <a href="/1.13/guides/getting-started/installation">application template</a>,
+you already have Vandal installed. Check your routes to see it mounted.</p>
+
+<a class="anchor" id="installing-via-gem" />
+  <a class="header" href="#installing-via-gem">
+    <h3>
+      1.2 Installing via Gem
+    </h3>
+  </a>
+
+  <ul>
+    <li>Add the <code class="language-plaintext highlighter-rouge">vandal_ui</code> gem.</li>
+    <li>Run <code class="language-plaintext highlighter-rouge">rake vandal:install</code></li>
+    <li>Mount the engine:</li>
+  </ul>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># config/routes.rb</span>
+<span class="n">scope</span> <span class="ss">path: </span><span class="no">ApplicationResource</span><span class="p">.</span><span class="nf">endpoint_namespace</span><span class="p">,</span> <span class="ss">defaults: </span><span class="p">{</span> <span class="ss">format: :jsonapi</span> <span class="p">}</span> <span class="k">do</span>
+  <span class="c1"># ... routes ...</span>
+  <span class="n">mount</span> <span class="no">VandalUi</span><span class="o">::</span><span class="no">Engine</span><span class="p">,</span> <span class="ss">at: </span><span class="s1">'/vandal'</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>That’s it! Vandal will dynamically generate a schema at <code class="language-plaintext highlighter-rouge">&lt;api_namespace&gt;/vandal/schema.json</code>, and you can view the UI at <code class="language-plaintext highlighter-rouge">&lt;api_namespace&gt;/vandal</code>.</p>
+
+<a class="anchor" id="manual-installation" />
+  <a class="header" href="#manual-installation">
+    <h3>
+      1.3 Manual Installation
+    </h3>
+  </a>
+
+  <p><a href="https://github.com/graphiti-api/vandal">Vandal</a> is a VueJS
+application. Just grab the <a href="https://github.com/graphiti-api/vandal/tree/master/dist">dist files</a> and put them anywhere you’d like.</p>
+
+  <p>Note that <code class="language-plaintext highlighter-rouge">index.html</code> has a placeholder, <code class="language-plaintext highlighter-rouge">__SCHEMA_PATH__</code>. Replace
+this with a URL hosting your schema, and you’ll be good to go.</p>
+
+<a class="anchor" id="usage" />
+  <a class="header" href="#usage">
+    <h2>
+      2 Usage
+    </h2>
+  </a>
+
+  <p>First, make sure your schema is being correctly generated. You should
+see Vandal make a request something like <code class="language-plaintext highlighter-rouge">/vandal/schema.json</code> - make
+sure that looks correct. If it doesn’t, you may need to bounce your
+server.</p>
+
+  <p>After selecting an endpoint, use the left rail to configure your
+request. Click a relationship once to include it in the response.
+If a relationship is included, you can click any row in the table to
+view related data.</p>
+
+  <p>Click a relationship twice and you can configure the deep query of
+the associated Resource. In other words, if you’re fetching Posts and
+Comments, click <code class="language-plaintext highlighter-rouge">comments</code> twice to say things like “only active
+comments should be returned”.</p>
+
+  <p>When you hit ‘submit’, the top URL bar will change to reflect your query
+and results will show in the center table.</p>
+
+  <p><br />
+<br /></p>
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="/1.13/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="/1.13/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="/1.13/guides">Guides</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Contact</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://discord.gg/wgqkMBsSRV">Discord Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Email</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>
