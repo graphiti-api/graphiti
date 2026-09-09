@@ -114,14 +114,14 @@ class PostResource < ApplicationResource
     model_instance
   end
 
-  # Finally, you may want to hook around *all* the above steps:
+  # Finally, you may want to hook around the save itself:
   # Only applies to #create/#update
   around_persistence :do_around_persistence
 
-  def do_around_persistence(attributes)
-    attributes[:foo] = 'bar'
-    model = yield # build/find, assign attrs, save
-    model.update_counter_cache
+  def do_around_persistence(model)
+    model.foo = 'bar' # last chance to touch the model before it saves
+    saved = yield
+    saved.update_counter_cache
   end
 end
 ```
