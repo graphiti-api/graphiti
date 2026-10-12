@@ -65,7 +65,7 @@ module Graphiti
         elsif filter.values[0][:internal]
           raise Errors::InvalidAttributeAccess.new(resource, param_name, :filterable, request: true)
         else
-          source = resource.class.public_id_source_for(filter.keys[0])
+          source = resource.class.public_id_source_for(filter.keys[0], requested_polymorphic_type(filter.keys[0]))
         end
 
         normalize_param(filter, param_value).each do |operator, value|
@@ -82,6 +82,18 @@ module Graphiti
           yield filter, operator, value, primary_keys, decoded
         end
       end
+    end
+
+    def requested_polymorphic_type(filter_name)
+      return unless Graphiti.public_ids_declared?
+
+      type_filter = Graphiti.public_id_sources.type_filter(resource.class, filter_name)
+      return unless type_filter
+
+      requested = filter_param[type_filter]
+      requested = requested.values.first if requested.is_a?(Hash)
+      types = requested.is_a?(String) ? requested.split(",") : Array(requested)
+      types.first if types.one?
     end
 
     # A block asking for primary_keys: was sent public ids, which cast like the source's id rather than the key.

@@ -31,8 +31,12 @@ class Graphiti::Sideload::HasMany < Graphiti::Sideload
   def link_hides_primary_key?
     return true unless links_by_public_id?
 
-    resource_class.public_id_source_for(inverse_filter) == parent_resource_class &&
+    resource_class.public_id_source_for(inverse_filter, polymorphic_type) == parent_resource_class &&
       resource_class.filter_accepts_public_ids?(inverse_filter)
+  end
+
+  def polymorphic_type
+    parent_resource_class.model.name if polymorphic_has_many?
   end
 
   def links_by_public_id?
@@ -43,7 +47,8 @@ class Graphiti::Sideload::HasMany < Graphiti::Sideload
     return unless links_by_public_id? && resource_class_loaded?
     return if parent_resource_class.abstract_class? || !parent_resource_class.model_loaded?
 
-    Graphiti.public_id_sources.register(resource_class, inverse_filter, parent_resource_class)
+    type_filter = :"#{polymorphic_as}_type" if polymorphic_has_many?
+    Graphiti.public_id_sources.register(resource_class, inverse_filter, parent_resource_class, polymorphic_type: polymorphic_type, type_filter: type_filter)
     resource_class.guard_public_id_leak!(inverse_filter)
   end
 
@@ -54,7 +59,7 @@ class Graphiti::Sideload::HasMany < Graphiti::Sideload
   end
 
   def internal_parent_filter(parents, filter_name)
-    return parent_filter(parents) unless resource_class.public_id_source_for(filter_name)
+    return parent_filter(parents) unless resource_class.public_id_source_for(filter_name, polymorphic_type)
 
     Graphiti::Util::InternalParam.new(ids_for_parents(parents))
   end

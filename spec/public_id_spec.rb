@@ -1158,4 +1158,82 @@ RSpec.describe "public_id" do
         .to eq([["visas", "visa-abc"], ["mastercards", mastercard.id.to_s]])
     end
   end
+
+  describe "a polymorphic has_many shared by two publishing parents" do
+    let(:note_resource) do
+      Class.new(PORO::ApplicationResource) do
+        def self.name
+          "PORO::NoteResource"
+        end
+
+        self.model = PORO::Note
+        self.type = :notes
+        attribute :notable_id, :integer, only: [:filterable]
+        attribute :notable_type, :string, only: [:filterable]
+        attribute :body, :string
+      end
+    end
+
+    let(:team_resource) do
+      Class.new(PORO::TeamResource) do
+        def self.name
+          "PORO::TeamResource"
+        end
+
+        self.model = PORO::Team
+        public_id :public_id
+      end
+    end
+
+    let!(:team) { PORO::Team.create(name: "Platform", public_id: "team-abc") }
+    let!(:employee_note) { PORO::Note.create(notable_id: employee1.id, notable_type: "PORO::Employee", body: "employee") }
+    let!(:team_note) { PORO::Note.create(notable_id: team.id, notable_type: "PORO::Team", body: "team") }
+
+    around do |e|
+      previous = Graphiti.config.context_for_endpoint
+      Graphiti.config.context_for_endpoint = ->(path, action) { double("context", sideload_allowlist: nil) }
+      e.run
+      Graphiti.config.context_for_endpoint = previous
+    end
+
+    before do
+      resource.polymorphic_has_many :notes, as: :notable, resource: note_resource, link: true
+      team_resource.polymorphic_has_many :notes, as: :notable, resource: note_resource, link: true
+    end
+
+    it "sideloads only each parent's own records, though their primary keys collide" do
+      expect(team.id).to eq(employee1.id)
+      params[:include] = "notes"
+      render
+
+      expect(jsonapi_included("notes").map { |note| note.attributes["body"] }).to eq(["employee"])
+    end
+
+    it "links by public id alongside the parent's type" do
+      render
+
+      link = json["data"][0]["relationships"]["notes"]["links"]["related"]
+      expect(link).to include("filter[notable_id]=emp-abc", "filter[notable_type][eql]=PORO::Employee")
+    end
+
+    it "resolves each parent's public id against the type the request names" do
+      employee_notes = note_resource.all(filter: {notable_id: "emp-abc", notable_type: {eql: "PORO::Employee"}})
+      team_notes = note_resource.all(filter: {notable_id: "team-abc", notable_type: {eql: "PORO::Team"}})
+
+      expect(employee_notes.data.map(&:body)).to eq(["employee"])
+      expect(team_notes.data.map(&:body)).to eq(["team"])
+    end
+
+    it "matches nothing when the public id belongs to a different type than the one named" do
+      notes = note_resource.all(filter: {notable_id: "team-abc", notable_type: {eql: "PORO::Employee"}})
+
+      expect(notes.data).to be_empty
+    end
+
+    it "refuses a readable attribute holding any of the parents' primary keys" do
+      expect {
+        note_resource.attribute :notable_id, :integer
+      }.to raise_error(Graphiti::Errors::PublicIdLeak)
+    end
+  end
 end

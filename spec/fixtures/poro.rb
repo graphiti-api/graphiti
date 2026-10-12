@@ -19,7 +19,8 @@ module PORO
             mastercard_commercials: [],
             books: [],
             states: [],
-            actors: []
+            actors: [],
+            notes: []
           }
       end
 
@@ -45,7 +46,8 @@ module PORO
           visa_rewards: PORO::VisaReward,
           books: PORO::Book,
           states: PORO::State,
-          actors: PORO::Actor
+          actors: PORO::Actor,
+          notes: PORO::Note
         }
       end
 
@@ -199,7 +201,8 @@ module PORO
       :payment_processor,
       :salary,
       :credit_cards,
-      :things
+      :things,
+      :notes
 
     def initialize(*)
       super
@@ -236,7 +239,11 @@ module PORO
   end
 
   class Team < Base
-    attr_accessor :name, :team_memberships
+    attr_accessor :name, :team_memberships, :notes
+  end
+
+  class Note < Base
+    attr_accessor :notable_id, :notable_type, :body
   end
 
   class CreditCard < Base
@@ -317,6 +324,7 @@ module PORO
 
     alias_method :filter_integer_eq, :filter
     alias_method :filter_string_eq, :filter
+    alias_method :filter_string_eql, :filter
     alias_method :filter_big_decimal_eq, :filter
     alias_method :filter_float_eq, :filter
     alias_method :filter_date_eq, :filter

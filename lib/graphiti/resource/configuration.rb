@@ -337,7 +337,7 @@ module Graphiti
           attribute = attributes[attribute_name.to_sym]
           return unless attribute && attribute[:readable] && !attribute[:proc]
 
-          source = public_id_source_for(attribute_name)
+          source = public_id_source_for(attribute_name) || (Graphiti.public_ids_declared? && Graphiti.public_id_sources.any(self, attribute_name))
           raise Errors::PublicIdLeak.new(self, attribute_name, source) if source
         end
 
@@ -349,10 +349,11 @@ module Graphiti
           filter[:operators][:eq].nil? || Array(filter[:operators_taking_primary_keys]).include?(:eq)
         end
 
-        def public_id_source_for(filter_name)
+        def public_id_source_for(filter_name, polymorphic_type = nil)
           return unless Graphiti.public_ids_declared?
 
           name = filter_name.to_sym
+          return Graphiti.public_id_sources[self, name, polymorphic_type] if polymorphic_type
           return self if name == :id && config[:public_id_decode]
 
           source = Graphiti.public_id_sources[self, name]
