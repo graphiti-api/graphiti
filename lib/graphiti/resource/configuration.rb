@@ -99,6 +99,7 @@ module Graphiti
         def serializer=(val)
           if val
             if super(Class.new(val))
+              serializer.resource_class = self if serializer.respond_to?(:resource_class=)
               apply_attributes_to_serializer
             end
           else

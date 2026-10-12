@@ -174,7 +174,7 @@ module Graphiti
 
         # The hidden filter only ever sees keys Graphiti read off models, so its type is never used to cast anything.
         def public_id_proc
-          proc { @resource.class.public_id_for(@object) }
+          proc { (self.class.resource_class || @resource.class).public_id_for(@object) }
         end
 
         def apply_public_id

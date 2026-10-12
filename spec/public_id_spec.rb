@@ -1119,4 +1119,43 @@ RSpec.describe "public_id" do
       expect(json["included"][0]["id"]).to eq(employee1.id.to_s)
     end
   end
+
+  describe "declared on one child of a polymorphic resource" do
+    let(:visa_resource) do
+      Class.new(PORO::VisaResource) do
+        def self.name
+          "PORO::VisaResource"
+        end
+
+        self.model = PORO::Visa
+        self.type = :visas
+        public_id :public_id
+      end
+    end
+
+    let(:resource) do
+      children = [visa_resource, PORO::MastercardResource]
+      Class.new(PORO::ApplicationResource) do
+        def self.name
+          "PORO::CreditCardResource"
+        end
+
+        self.type = :credit_cards
+        self.polymorphic = children
+        attribute :number, :integer
+      end
+    end
+
+    let(:base_scope) { {type: [:visas, :mastercards]} }
+
+    let!(:visa) { PORO::Visa.create(number: 1, public_id: "visa-abc") }
+    let!(:mastercard) { PORO::Mastercard.create(number: 2) }
+
+    it "renders the publishing child by public id and the plain one by primary key" do
+      render
+
+      expect(json["data"].map { |node| [node["type"], node["id"]] })
+        .to eq([["visas", "visa-abc"], ["mastercards", mastercard.id.to_s]])
+    end
+  end
 end

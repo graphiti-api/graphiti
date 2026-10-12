@@ -18,6 +18,7 @@ module Graphiti
     # relationship is told apart from one already applied, and from one the
     # application wrote by hand.
     class_attribute :relationship_sideloads
+    class_attribute :resource_class
     self.attributes_applied_via_resource = []
     self.extra_attributes_applied_via_resource = []
     # See #requested_relationships
