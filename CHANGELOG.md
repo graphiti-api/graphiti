@@ -1,5 +1,12 @@
 graphiti changelog
 
+## [2.1.3](https://github.com/graphiti-api/graphiti/compare/v2.1.2...v2.1.3) (2026-10-12)
+
+
+### Bug Fixes
+
+* including a polymorphic many_to_many on a resource that publishes public ids returned nothing ([44127c7](https://github.com/graphiti-api/graphiti/commit/44127c743752e8d7c35f1356bf7ec557ea125c6e))
+
 ## [2.1.2](https://github.com/graphiti-api/graphiti/compare/v2.1.1...v2.1.2) (2026-10-12)
 
 
