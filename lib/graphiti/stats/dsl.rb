@@ -49,7 +49,6 @@ module Graphiti
       def method_missing(meth, *args, &blk)
         @calculations[meth] = blk
       end
-      # rubocop: enable Style/MethodMissingSuper
 
       def respond_to_missing?(*args)
         true

@@ -16,9 +16,12 @@
 #   Rails 8.0 / 8.1 -> gem "sqlite3", ">= 2.1"
 # "~> 1.4" rather than "~> 1.4.0" is deliberate: it resolves to 1.7.x, which
 # still builds on modern Rubies, where 1.4.x no longer does.
+#
+# Rails 7.1 through 8.0 pass quirks_mode to JSON.generate, which json 3 rejects.
 
 appraise "rails-7-1" do
   gem "rails", "~> 7.1.0"
+  gem "json", "< 3"
   gem "rspec-rails"
   gem "responders"
   gem "sqlite3", "~> 1.4"
@@ -26,6 +29,7 @@ end
 
 appraise "rails-7-2" do
   gem "rails", "~> 7.2.0"
+  gem "json", "< 3"
   gem "rspec-rails"
   gem "responders"
   gem "sqlite3", "~> 2.1"
@@ -33,6 +37,7 @@ end
 
 appraise "rails-8-0" do
   gem "rails", "~> 8.0.0"
+  gem "json", "< 3"
   gem "rspec-rails"
   gem "responders"
   gem "sqlite3", "~> 2.1"

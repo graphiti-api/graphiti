@@ -20,7 +20,6 @@ module Graphiti
       def method_missing(name, *args, &blk)
         @procs[name] = blk
       end
-      # rubocop: enable Style/MethodMissingSuper
 
       def respond_to_missing?(*args)
         true

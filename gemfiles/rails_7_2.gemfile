@@ -3,6 +3,7 @@
 source "https://rubygems.org"
 
 gem "rails", "~> 7.2.0"
+gem "json", "< 3"
 gem "rspec-rails"
 gem "responders"
 gem "sqlite3", "~> 2.1"

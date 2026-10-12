@@ -10,7 +10,6 @@ class Graphiti::Sideload::PolymorphicBelongsTo < Graphiti::Sideload::BelongsTo
     def method_missing(name, *args, &blk)
       @calls << [name, args, blk]
     end
-    # rubocop: enable Style/MethodMissingSuper
 
     def respond_to_missing?(*args)
       true
