@@ -45,6 +45,14 @@ class Graphiti::Adapters::ActiveRecord::ManyToManySideload < Graphiti::Sideload:
 
   private
 
+  # An internal param skips the :hash typecast that would parse each polymorphic JSON group.
+  def internal_parent_filter(parents, filter_name)
+    filter = super
+    return filter unless polymorphic? && filter.is_a?(Graphiti::Util::InternalParam)
+
+    Graphiti::Util::InternalParam.new(filter.value.map { |group| JSON.parse(group) })
+  end
+
   def filter_for(scope, value, type = nil)
     scope
       .includes(through_relationship_name)

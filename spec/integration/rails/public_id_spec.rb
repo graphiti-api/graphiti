@@ -465,5 +465,35 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(json["included"][0]["id"]).to eq("off-#{office.id}")
       end
     end
+
+    context "a many_to_many through a polymorphic join, from a parent that publishes public ids" do
+      let(:author_resource) do
+        Class.new(Legacy::AuthorResource) do
+          def self.name
+            "Legacy::AuthorResource"
+          end
+
+          public_id :public_id
+          many_to_many :tags
+        end
+      end
+
+      let!(:author) { Legacy::Author.create!(first_name: "Stephen", public_id: "auth-abc") }
+      let!(:book) { Legacy::Book.create!(title: "The Shining", author: author) }
+      let!(:horror) { Legacy::Tag.create!(name: "Horror") }
+      let!(:classic) { Legacy::Tag.create!(name: "Classic") }
+
+      before do
+        Legacy::Tagging.create!(tag: horror, taggable: author)
+        Legacy::Tagging.create!(tag: classic, taggable: book)
+      end
+
+      it "sideloads only the parent's own tags" do
+        json = JSON.parse(author_resource.all(include: "tags", filter: {id: "auth-abc"}).to_jsonapi)
+
+        expect(json["data"][0]["relationships"]["tags"]["data"]).to eq([{"type" => "tags", "id" => horror.id.to_s}])
+        expect(json["included"].map { |node| node["attributes"]["name"] }).to eq(["Horror"])
+      end
+    end
   end
 end
