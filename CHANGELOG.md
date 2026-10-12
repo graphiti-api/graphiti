@@ -1,5 +1,13 @@
 graphiti changelog
 
+## [2.1.2](https://github.com/graphiti-api/graphiti/compare/v2.1.1...v2.1.2) (2026-10-12)
+
+
+### Bug Fixes
+
+* a polymorphic resource renders each child that publishes a public id by that id instead of raising ([8d5e0fb](https://github.com/graphiti-api/graphiti/commit/8d5e0fbbdd71d706c3a57b11c866fc36727d6ef8))
+* several resources can declare the same polymorphic_has_many while publishing public ids ([d6e332c](https://github.com/graphiti-api/graphiti/commit/d6e332c73e4ef7ed969e10c3444e802701f46232))
+
 ## [2.1.1](https://github.com/graphiti-api/graphiti/compare/v2.1.0...v2.1.1) (2026-09-07)
 
 
