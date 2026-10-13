@@ -2677,6 +2677,20 @@ RSpec.describe "persistence" do
         })
       end
 
+      context "when nullable" do
+        before do
+          klass.attribute :age, :array_of_integers, nullable: true
+        end
+
+        it "allows nils" do
+          expect(save(nil)).to eq(nil)
+        end
+
+        it "still coerces arrays" do
+          expect(save(["1", "2"])).to eq([1, 2])
+        end
+      end
+
       context "when cannot coerce" do
         it "raises error" do
           expect {

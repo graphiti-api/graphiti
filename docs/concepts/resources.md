@@ -72,6 +72,12 @@ The model is only looked up when a guard declares a parameter for it, so zero-ar
 | `readable` | The attribute is omitted from the response. |
 | `writable` | The request is rejected with an `unwritable_attribute` validation error, before anything is persisted. |
 
+**Nullable arrays.** A write of `null` to an array attribute is rejected as the wrong type. Mark the attribute `nullable: true` when `null` means something, such as "use the default list":
+
+```ruby
+attribute :tags, :array_of_strings, nullable: true
+```
+
 ### Default Behavior {#default-behavior}
 
 ```ruby
