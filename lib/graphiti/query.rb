@@ -289,7 +289,7 @@ module Graphiti
           allowlist = allowlist[@resource.current_action] if allowlist
         end
 
-        scrubbed = allowlist ? Util::IncludeParams.scrub(requested, allowlist) : requested
+        scrubbed = (top_level? && allowlist) ? Util::IncludeParams.scrub(requested, allowlist) : requested
 
         scrubbed.filter do |key, value|
           sideload = @resource.class.sideload(key)
