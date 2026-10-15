@@ -14,6 +14,21 @@ if ENV["APPRAISAL_INITIALIZED"]
       json["included"].select { |i| i["type"] == type }
     end
 
+    def queries_while
+      queries = []
+      subscriber = ActiveSupport::Notifications
+        .subscribe("sql.active_record") do |_, _, _, _, payload|
+          sql = payload[:sql]
+          next if payload[:name].to_s == "SCHEMA"
+          next if sql.start_with?("PRAGMA", "begin", "commit")
+          queries << sql
+        end
+      yield
+      queries
+    ensure
+      ActiveSupport::Notifications.unsubscribe(subscriber)
+    end
+
     let!(:author) { Legacy::Author.create!(first_name: "Stephen") }
     let!(:book) { Legacy::Book.create!(title: "The Shining", author: author, genre: genre) }
     let!(:genre) { Legacy::Genre.create!(name: "Horror") }
@@ -47,6 +62,24 @@ if ENV["APPRAISAL_INITIALIZED"]
         do_index({include: "books.genre"})
         expect(json_includes("books")).to_not be_blank
         expect(json_includes("genres")).to be_blank
+      end
+    end
+
+    context "when the sideload allowlist has nested includes" do
+      before do
+        controller.class.sideload_allowlist = {
+          index: {books: :genre}
+        }
+      end
+
+      it "loads the nested sideload in one query" do
+        other_genre = Legacy::Genre.create!(name: "Fantasy")
+        Legacy::Book.create!(title: "The Dark Tower", author: author, genre: other_genre)
+
+        queries = queries_while { do_index({include: "books.genre"}) }
+
+        expect(json_includes("genres").length).to eq(2)
+        expect(queries.grep(/FROM "genres"/).length).to eq(1)
       end
     end
   end
