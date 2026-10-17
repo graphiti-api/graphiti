@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Boogaloo" rel="stylesheet">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/1.13/assets/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/1.13/assets/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/1.13/assets/favicons/favicon-16x16.png">
+  <link rel="manifest" href="/1.13/assets/favicons/site.webmanifest">
+  <link rel="mask-icon" href="/1.13/assets/favicons/safari-pinned-tab.svg" color="#F86DA7">
+  <link rel="shortcut icon" href="/1.13/assets/favicons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#F86DA7">
+  <meta name="msapplication-config" content="/1.13/assets/favicons/browserconfig.xml">
+  <meta name="theme-color" content="#F86DA7">
+
+  <title>Graphiti</title>
+  <meta name="description" content="Stylish Graph APIs">
+
+  <link rel="stylesheet" href="/1.13/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/1.13/feed.xml">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-127904727-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-127904727-1');
+  </script>
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <a href="/1.13/1.13" class="navbar-brand">
+        <img alt="logo" src="/1.13/assets/img/logo.png">
+      </a>
+    </div>
+    <nav class="" role="navigation">
+      <ul class="nav navbar-nav nav-links">
+        <li>
+          <a class="quickstart nav-link" href="/1.13/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="guides nav-link" href="/1.13/guides">Guides</a>
+        </li>
+        <li>
+          <a class="tutorial nav-link" href="/1.13/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="spraypaint nav-link" href="/1.13/js">Spraypaint</a>
+        </li>
+      </ul>
+      <ul class="nav gh navbar-nav navbar-right visible-lg visible-md">
+        <li>
+          <span class="star">⭐</span>
+          <a href="https://github.com/graphiti-api/graphiti">
+            <img alt="github-star" style="margin-right: 65px;margin-top: -20px" src="/1.13/assets/img/gh.png">
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="toc col-md-3">
+  <h1 id="remote-resources">Remote Resources</h1>
+
+  <ul>
+    <li>1 <a href="#overview">Overview</a>
+      <ul>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#customizing">Customizing</a></li>
+        <li><a href="#error-handling">Error Handling</a></li>
+      </ul>
+    </li>
+    <li>2 <a href="#testing">Testing</a></li>
+  </ul>
+</div>
+
+<div class="col-md-8">
+
+<a class="anchor" id="overview" />
+  <a class="header" href="#overview">
+    <h2>
+      1 Overview
+    </h2>
+  </a>
+
+  <p>Too often it seems the thinking is, “🤔 <em>We want separate services,
+we’ll figure out our API contract along the way</em>”. Graphiti approaches
+from the opposite angle - figure out the API contract, and you get separate services as a side-effect 😃💡</p>
+
+  <p align="center">
+  <img width="100%" src="https://labs.sogeti.com/wp-content/uploads/2016/11/microservices.gif" />
+</p>
+
+  <p>Resources have a defined query contract, and connect together with <a href="/1.13/guides/concepts/links">Links</a>. Put two and two together, and you’ll see a Resource doesn’t need to be local to a single application. We can have Remote Resources as well:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">has_many</span> <span class="ss">:comments</span><span class="p">,</span>
+  <span class="ss">remote: </span><span class="s1">'http://blog-api.com/api/v1/comments'</span></code></pre></figure>
+
+  <p>You might want separate applications that are independently deployable,
+or you might want to break apart that slow test suite. The draw of
+isolated services is clear. Though you should be aware of the tradeoffs
+when breaking apart a <a href="https://m.signalvnoise.com/the-majestic-monolith">Majestic Monolith</a>,
+Graphiti helps you <strong><em>lessen</em></strong> those tradeoffs.</p>
+
+  <p>The most common service problem I see is a <strong>breakdown in cross-service
+communication</strong>:</p>
+
+  <ul>
+    <li>🚫 No consistent or flexible query interface</li>
+    <li>🚫 No consistent error handling</li>
+    <li>🚫 No clear patterns on when and why to separate services</li>
+    <li>🚫 No types or backwards-compatibility checks (unless GraphQL)</li>
+    <li>🚫 A fair amount of <a href="https://www.apollographql.com/docs/graphql-tools/schema-stitching.html">glue code</a> required</li>
+  </ul>
+
+  <p>Graphiti was built from the ground up to address all these points. We
+have a defined query contract, errors payload, a schema with types and
+backwards-compatibility checks, and organize code into RESTful
+Resources. Not only can we <strong><em>facilitate</em></strong> cross-service communication,
+we can <strong><em>automate</em></strong> it.</p>
+
+  <blockquote>
+    <p>Note: Remote Resources are for <strong>read</strong> operations only. The exception
+is associating to an existing <code class="language-plaintext highlighter-rouge">belongs_to</code> remote entity.</p>
+  </blockquote>
+
+  <blockquote>
+    <p>Note: We use <a href="https://github.com/lostisland/faraday">Faraday</a> to hit
+the remote API. You must add <code class="language-plaintext highlighter-rouge">faraday</code> to your Gemfile to enable
+remote resources.</p>
+  </blockquote>
+
+<a class="anchor" id="how-it-works" />
+  <a class="header" href="#how-it-works">
+    <h3>
+      How it Works
+    </h3>
+  </a>
+
+  <p>Let’s take a simple association:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">PostResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="n">has_many</span> <span class="ss">:comments</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>This would generate a <a href="/1.13/guides/concepts/links">Link</a> for
+lazy-loading comments:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="p">{</span>
+  <span class="ss">related: </span><span class="s2">"http://my-api.com/api/v1/comments?filter[post_id]=123"</span>
+<span class="p">}</span></code></pre></figure>
+
+  <p>Critically, <strong>those same lazy-loading parameters are used when
+eager-loading</strong>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># under the hood</span>
+<span class="n">posts</span> <span class="o">=</span> <span class="no">PostResource</span><span class="p">.</span><span class="nf">all</span><span class="p">.</span><span class="nf">data</span>
+<span class="no">CommentResource</span><span class="p">.</span><span class="nf">all</span><span class="p">(</span><span class="ss">filter: </span><span class="p">{</span> <span class="ss">post_id: </span><span class="mi">123</span> <span class="p">})</span></code></pre></figure>
+
+  <p>OK, and we also know Resources support <a href="/1.13/guides/concepts/backends-and-models">any backend</a>, and we can build an <a href="/1.13/cookbooks/without-activerecord#adapters">Adapter</a> if our backend supports common operations like filtering, sorting, and pagination.</p>
+
+  <p>So, that means we can build an Adapter that makes an HTTP request to another Graphiti Resource that lives in a separate API. That adapter is built into Graphiti and comes out-of-the-box: <code class="language-plaintext highlighter-rouge">Graphiti::Adapters::GraphitiAPI</code></p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">CommentResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">remote</span> <span class="o">=</span> <span class="s2">"http://my-api.com/api/v1/comments"</span>
+  <span class="c1"># under-the-hood, this sets:</span>
+  <span class="c1"># self.adapter = Graphiti::Adapters::GraphitiAPI</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>This Resource works as normal. We can execute queries:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">comments</span> <span class="o">=</span> <span class="no">CommentResource</span><span class="p">.</span><span class="nf">all</span><span class="p">({</span>
+  <span class="ss">sort: </span><span class="s1">'-id'</span><span class="p">,</span>
+  <span class="ss">filter: </span><span class="p">{</span> <span class="ss">active: </span><span class="kp">true</span> <span class="p">}</span>
+<span class="p">})</span>
+
+<span class="c1"># The model instances are OpenStructs</span>
+<span class="n">comments</span><span class="p">.</span><span class="nf">data</span> <span class="c1"># =&gt; [#&lt;OpenStruct&gt;, #&lt;OpenStruct&gt;, ...]</span>
+
+<span class="c1"># Those models reflect all the properties returned from the API:</span>
+<span class="n">comments</span><span class="p">.</span><span class="nf">data</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:author</span><span class="p">)</span> <span class="c1"># =&gt; ["Jane Doe", "John Doe", ...]</span></code></pre></figure>
+
+  <p>And we can sideload just like we always do:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">PostResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="c1"># Nothing to see here!</span>
+  <span class="n">has_many</span> <span class="ss">:comments</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>We’ll still support Deep Querying - let’s fetch the Post and its
+active comments, ordered by <code class="language-plaintext highlighter-rouge">created_at</code>:</p>
+
+  <p><code class="language-plaintext highlighter-rouge">/posts?include=comments&amp;sort=comments.created_at&amp;filter[active]=true</code></p>
+
+  <p>Let’s say <code class="language-plaintext highlighter-rouge">CommentResource</code> has an association to <code class="language-plaintext highlighter-rouge">Author</code>. If
+<code class="language-plaintext highlighter-rouge">AuthorResource</code> is defined in the remote API, we can fetch it as
+normal - no special configuration needed to fetch the <code class="language-plaintext highlighter-rouge">Post</code>, <code class="language-plaintext highlighter-rouge">Comment</code>s
+and <code class="language-plaintext highlighter-rouge">Author</code>s in a single request.</p>
+
+  <p>But maybe only <code class="language-plaintext highlighter-rouge">CommentResource</code> is remote, and <code class="language-plaintext highlighter-rouge">Authors</code> are local.
+We need only define the association locally:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">CommentResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">remote</span> <span class="o">=</span> <span class="s2">"http://my-api.com/api/v1/comments"</span>
+
+  <span class="n">belongs_to</span> <span class="ss">:author</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Let’s say we need to tweak the display of a property coming from the
+remote API. Again, works just like normal:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">CommentResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">remote</span> <span class="o">=</span> <span class="s2">"http://my-api.com/api/v1/comments"</span>
+
+  <span class="n">attribute</span> <span class="ss">:body</span><span class="p">,</span> <span class="ss">:string</span> <span class="k">do</span>
+    <span class="vi">@object</span><span class="p">.</span><span class="nf">body</span><span class="p">.</span><span class="nf">truncate</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>You only need to define attributes when overriding this logic -
+otherwise we’ll take them directly from the API response. This means you
+don’t have to update two repos and coordinate deploys - as soon as you
+add a property to the remote API and deploy it, it will be reflected in
+the local API response.</p>
+
+  <p>For the typical use case, we don’t even <em>need</em> to create this Resource
+class. The sideload definition accepts a <code class="language-plaintext highlighter-rouge">remote:</code> option, which will
+create a Remote Resource under-the-hood:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">PostResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="n">has_many</span> <span class="ss">:comments</span><span class="p">,</span> <span class="ss">remote: </span><span class="s1">'http://my-api.com/api/v1/comments'</span>
+<span class="k">end</span>
+
+<span class="c1"># Equivalent to:</span>
+<span class="c1">#</span>
+<span class="c1"># class PostResource &lt; ApplicationResource</span>
+<span class="c1">#   has_many :comments</span>
+<span class="c1"># end</span>
+<span class="c1">#</span>
+<span class="c1"># class CommentResource &lt; ApplicationResource</span>
+<span class="c1">#   self.remote = 'http://my-api.com/api/v1/comments'</span>
+<span class="c1"># end</span></code></pre></figure>
+
+  <blockquote>
+    <p>NOTE: When sending a request to a remote API, we request page size
+<code class="language-plaintext highlighter-rouge">999</code> so results don’t get accidentally cut off. If you need
+successive requests, please <a href="https://github.com/graphiti-api/graphiti/issues">submit an issue</a>.</p>
+  </blockquote>
+
+<a class="anchor" id="customizing" />
+  <a class="header" href="#customizing">
+    <h3>
+      Customizing
+    </h3>
+  </a>
+
+  <p>We use <a href="https://github.com/lostisland/faraday">Faraday</a> under-the-hood,
+which allows for various adapters and middleware. In addition:</p>
+
+<a class="anchor" id="configure-timeout" />
+  <a class="header" href="#configure-timeout">
+    <h4>
+      Configure Timeout
+    </h4>
+  </a>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">CommentResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">remote</span> <span class="o">=</span> <span class="s2">"..."</span>
+
+  <span class="c1"># Customize faraday timeout</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">timeout</span> <span class="o">=</span> <span class="mi">10</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">open_timeout</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="k">end</span></code></pre></figure>
+
+<a class="anchor" id="configure-request" />
+  <a class="header" href="#configure-request">
+    <h4>
+      Configure Request
+    </h4>
+  </a>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">CommentResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">remote</span> <span class="o">=</span> <span class="s2">"..."</span>
+
+  <span class="k">def</span> <span class="nf">make_request</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="c1"># request here is from Faraday:</span>
+    <span class="c1">#</span>
+    <span class="c1"># conn.get do |req|</span>
+    <span class="c1">#   yield req</span>
+    <span class="c1"># end</span>
+    <span class="c1">#</span>
+    <span class="k">super</span> <span class="k">do</span> <span class="o">|</span><span class="n">request</span><span class="o">|</span>
+      <span class="n">request</span><span class="p">.</span><span class="nf">headers</span><span class="p">[</span><span class="s2">"Custom"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"Header"</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<a class="anchor" id="configure-headers" />
+  <a class="header" href="#configure-headers">
+    <h4>
+      Configure Headers
+    </h4>
+  </a>
+
+  <p>By default we’re going to <em>forward</em> the <code class="language-plaintext highlighter-rouge">Authorization</code> header of the request to the remote API. To override the default headers sent:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/comment_resource.rb</span>
+<span class="k">def</span> <span class="nf">request_headers</span>
+  <span class="p">{</span> <span class="s2">"Some-Foo"</span> <span class="o">=&gt;</span> <span class="s2">"bar"</span> <span class="p">}</span>
+<span class="k">end</span></code></pre></figure>
+
+<a class="anchor" id="error-handling" />
+  <a class="header" href="#error-handling">
+    <h3>
+      Error Handling
+    </h3>
+  </a>
+
+  <p>If the remote API has an error, we want to re-raise that same error. But
+unless you’ve enabled <a href="/1.13/guides/concepts/error-handling#displaying-raw-errors">displaying raw errors</a>, we won’t be able to - the only information we have is what’s returned from the API.</p>
+
+  <p>You’re encouraged to display raw errors when an internal or privileged
+user:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">rescue_from</span> <span class="no">Exception</span> <span class="k">do</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span>
+  <span class="n">handle_exception</span><span class="p">(</span><span class="n">e</span><span class="p">,</span>  <span class="ss">show_raw_error: </span><span class="n">current_user</span><span class="p">.</span><span class="nf">developer?</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>If you do this, we’ll be able to re-raise the original error, including
+stacktrace. If raw errors are not enabled, we’ll raise whatever
+information is given.</p>
+
+  <p>Both styles will be wrapped in <code class="language-plaintext highlighter-rouge">Graphiti::Errors::Remote</code>, so you can
+differentiate between a local error and a remote one.</p>
+
+<a class="anchor" id="testing" />
+  <a class="header" href="#testing">
+    <h2>
+      Testing
+    </h2>
+  </a>
+
+  <p>When testing a remote resource, we need to mock the API request and
+response. Graphiti gives you a spec helper to do just that -
+<code class="language-plaintext highlighter-rouge">include_context "remote api"</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">describe</span> <span class="s1">'comments'</span> <span class="k">do</span>
+  <span class="n">include_context</span> <span class="s1">'remote api'</span>
+
+  <span class="n">let</span><span class="p">(</span><span class="ss">:api_response</span><span class="p">)</span> <span class="k">do</span>
+    <span class="p">{</span>
+      <span class="ss">data: </span><span class="p">[{</span>
+        <span class="ss">id: </span><span class="s1">'1'</span><span class="p">,</span>
+        <span class="ss">type: </span><span class="s1">'comments'</span><span class="p">,</span>
+        <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">body: </span><span class="s1">'hello'</span> <span class="p">}</span>
+      <span class="p">}]</span>
+    <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="n">it</span> <span class="s1">'does something'</span> <span class="k">do</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s1">'http://my-api.com/api/v1/comments?page[size]=999'</span>
+    <span class="n">mock_api</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">api_response</span><span class="p">)</span>
+    <span class="c1"># ... test ...</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>This shows all the pieces needed to test remote APIs. We want to test</p>
+
+  <ul>
+    <li>The correct URL is hit</li>
+    <li>When given a valid response, the rest of the flow works as expected.</li>
+  </ul>
+
+  <blockquote>
+    <p>NOTE: if the remote relationship is a has_many, the API will need to
+return the foreign key as part of the response. Otherwise, we won’t
+know how to associate these children to their parents.</p>
+  </blockquote>
+
+  <p>Here’s a slightly longer version, showing that <code class="language-plaintext highlighter-rouge">Post</code> can sideload
+<code class="language-plaintext highlighter-rouge">Comment</code>s:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">describe</span> <span class="s1">'sideloading'</span> <span class="k">do</span>
+  <span class="n">describe</span> <span class="s1">'comments'</span> <span class="k">do</span>
+    <span class="n">include_context</span> <span class="s1">'remote api'</span>
+
+    <span class="n">let!</span><span class="p">(</span><span class="ss">:post</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:post</span><span class="p">)</span> <span class="p">}</span>
+
+    <span class="n">let</span><span class="p">(</span><span class="ss">:api_response</span><span class="p">)</span> <span class="k">do</span>
+      <span class="p">{</span>
+        <span class="ss">data: </span><span class="p">[{</span>
+          <span class="ss">id: </span><span class="s1">'789'</span><span class="p">,</span>
+          <span class="ss">type: </span><span class="s1">'comments'</span><span class="p">,</span>
+          <span class="ss">attributes: </span><span class="p">{</span> <span class="ss">body: </span><span class="s1">'hello'</span> <span class="p">}</span>
+        <span class="p">}]</span>
+      <span class="p">}</span>
+    <span class="k">end</span>
+
+    <span class="n">before</span> <span class="k">do</span>
+      <span class="n">params</span><span class="p">[</span><span class="ss">:include</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'comments'</span>
+    <span class="k">end</span>
+
+    <span class="n">it</span> <span class="s1">'does something'</span> <span class="k">do</span>
+      <span class="n">url</span> <span class="o">=</span> <span class="s2">"http://my-api.com/api/v1/comments"</span>
+      <span class="n">url</span> <span class="o">+=</span> <span class="s2">"?filter[post_id]=</span><span class="si">#{</span><span class="n">post_id</span><span class="si">}</span><span class="s2">"</span>
+      <span class="n">mock_api</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">api_response</span><span class="p">)</span>
+      <span class="n">render</span>
+      <span class="n">sl</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nf">sideload</span><span class="p">(</span><span class="ss">:comments</span><span class="p">)</span>
+      <span class="n">expect</span><span class="p">(</span><span class="n">sl</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:id</span><span class="p">)).</span><span class="nf">to</span> <span class="n">eq</span><span class="p">([</span><span class="s1">'789'</span><span class="p">])</span>
+      <span class="n">expect</span><span class="p">(</span><span class="n">sl</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:jsonapi_type</span><span class="p">).</span><span class="nf">uniq</span><span class="p">)</span>
+      <span class="p">.</span><span class="nf">to</span> <span class="n">eq</span><span class="p">([</span><span class="s1">'comments'</span><span class="p">])</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <blockquote>
+    <p>Make sure to include <code class="language-plaintext highlighter-rouge">page[size]=999</code> in the test URL!</p>
+  </blockquote>
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="/1.13/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="/1.13/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="/1.13/guides">Guides</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Contact</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://discord.gg/wgqkMBsSRV">Discord Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Email</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

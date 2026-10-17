@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Boogaloo" rel="stylesheet">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/1.13/assets/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/1.13/assets/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/1.13/assets/favicons/favicon-16x16.png">
+  <link rel="manifest" href="/1.13/assets/favicons/site.webmanifest">
+  <link rel="mask-icon" href="/1.13/assets/favicons/safari-pinned-tab.svg" color="#F86DA7">
+  <link rel="shortcut icon" href="/1.13/assets/favicons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#F86DA7">
+  <meta name="msapplication-config" content="/1.13/assets/favicons/browserconfig.xml">
+  <meta name="theme-color" content="#F86DA7">
+
+  <title>Graphiti</title>
+  <meta name="description" content="Stylish Graph APIs">
+
+  <link rel="stylesheet" href="/1.13/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/1.13/feed.xml">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-127904727-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-127904727-1');
+  </script>
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <a href="/1.13/1.13" class="navbar-brand">
+        <img alt="logo" src="/1.13/assets/img/logo.png">
+      </a>
+    </div>
+    <nav class="" role="navigation">
+      <ul class="nav navbar-nav nav-links">
+        <li>
+          <a class="quickstart nav-link" href="/1.13/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="guides nav-link" href="/1.13/guides">Guides</a>
+        </li>
+        <li>
+          <a class="tutorial nav-link" href="/1.13/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="spraypaint nav-link" href="/1.13/js">Spraypaint</a>
+        </li>
+      </ul>
+      <ul class="nav gh navbar-nav navbar-right visible-lg visible-md">
+        <li>
+          <span class="star">⭐</span>
+          <a href="https://github.com/graphiti-api/graphiti">
+            <img alt="github-star" style="margin-right: 65px;margin-top: -20px" src="/1.13/assets/img/gh.png">
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="toc col-md-3">
+  <h1 id="error-handling">Error Handling</h1>
+
+  <ul>
+    <li>1 <a href="#overview">Overview</a>
+      <ul>
+        <li><a href="#setup">Setup</a></li>
+        <li><a href="#displaying-raw-errors">Displaying Raw Errors</a></li>
+      </ul>
+    </li>
+    <li>2 <a href="#usage">Usage</a>
+      <ul>
+        <li><a href="#basic">Basic</a></li>
+        <li><a href="#advanced">Advanced</a></li>
+      </ul>
+    </li>
+    <li>3 <a href="#testing">Testing</a></li>
+  </ul>
+
+</div>
+
+<div class="col-md-8">
+
+<a class="anchor" id="overview" />
+  <a class="header" href="#overview">
+    <h2>
+      1 Overview
+    </h2>
+  </a>
+
+  <p>Whenever we have an application error, we want to respond with a
+<a href="http://jsonapi.org/format/#errors">JSONAPI-compliant errors payload</a>.
+This way clients have a predictable response detailing information about
+the error.</p>
+
+  <p align="center">
+  <img width="100%" src="https://user-images.githubusercontent.com/55264/45879320-06096300-bd72-11e8-8920-6e83f4a2fce3.png" />
+</p>
+
+  <p>We’ll also need a way to customize this payload. For instance, if a
+<code class="language-plaintext highlighter-rouge">NotAuthorized</code> error is raised, the response should have a <code class="language-plaintext highlighter-rouge">403</code> status
+code. For other errors, we may want to render a helpful error message:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">API</span>
+  <span class="n">register_exception</span> <span class="no">NotAuthorized</span><span class="p">,</span> <span class="ss">status: </span><span class="mi">403</span>
+  <span class="n">register_exception</span> <span class="no">ShipmentDelayed</span><span class="p">,</span>
+    <span class="ss">detail: </span><span class="o">-&gt;</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="p">{</span> <span class="s2">"Contact us at 123-456-7899"</span> <span class="p">}</span>
+  <span class="c1"># ... code ...</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Exception handling lives in Graphiti’s Rails integration. Customizing the behavior based on error class happens in the <a href="https://github.com/wagenet/rescue_registry">RescueRegistry</a> dependency.</p>
+
+<a class="anchor" id="setup" />
+  <a class="header" href="#setup">
+    <h3>
+      1.1 Setup
+    </h3>
+  </a>
+
+  <p>Include the Rails integration in the controllers serving your resources:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">Base</span>
+  <span class="kp">include</span> <span class="no">Graphiti</span><span class="o">::</span><span class="no">Rails</span><span class="o">::</span><span class="no">Controller</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>That registers handlers for Graphiti’s own exceptions and renders anything else as JSON:API. <code class="language-plaintext highlighter-rouge">register_exception</code> itself is available on every controller without it — see below.</p>
+
+<a class="anchor" id="displaying-raw-errors" />
+  <a class="header" href="#displaying-raw-errors">
+    <h4>
+      1.1.1 Displaying Raw Errors
+    </h4>
+  </a>
+
+  <p align="center">
+  <img width="100%" src="https://user-images.githubusercontent.com/55264/45879208-9bf0be00-bd71-11e8-8427-282c5a426394.png" />
+</p>
+  <p><br /></p>
+
+  <p>It can be useful to display the raw error as part of the JSON response -
+but you probably don’t want to expose your stack trace to customers.
+Let’s only show raw errors for the <code class="language-plaintext highlighter-rouge">staging</code> environment:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">API</span>
+  <span class="c1"># ... code ...</span>
+
+  <span class="k">def</span> <span class="nf">show_detailed_exceptions?</span>
+    <span class="no">Rails</span><span class="p">.</span><span class="nf">env</span><span class="p">.</span><span class="nf">staging?</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Another common pattern is to only show raw errors when the user is
+privileged to see them:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">API</span>
+  <span class="c1"># ... code ...</span>
+
+  <span class="k">def</span> <span class="nf">show_detailed_exceptions?</span>
+    <span class="n">current_user</span><span class="p">.</span><span class="nf">admin?</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>When <code class="language-plaintext highlighter-rouge">#show_detailed_exceptions?</code> returns <code class="language-plaintext highlighter-rouge">true</code>, you’ll get the raw error class,
+message, and backtrace in the JSON response.</p>
+
+<a class="anchor" id="usage" />
+  <a class="header" href="#usage">
+    <h2>
+      2 Usage
+    </h2>
+  </a>
+
+<a class="anchor" id="basic" />
+  <a class="header" href="#basic">
+    <h3>
+      2.1 Basic
+    </h3>
+  </a>
+
+  <p>Let’s register an error with a custom response code:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">register_exception</span> <span class="no">Errors</span><span class="o">::</span><span class="no">NotAuthorized</span><span class="p">,</span> <span class="ss">status: </span><span class="mi">403</span></code></pre></figure>
+
+  <p>Now if we <code class="language-plaintext highlighter-rouge">raise Errors::NotAuthorized</code>, the response code will be
+<code class="language-plaintext highlighter-rouge">403</code>.</p>
+
+  <p>Additional options:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">register_exception</span> <span class="no">Errors</span><span class="o">::</span><span class="no">NotAuthorized</span><span class="p">,</span>
+  <span class="ss">status: </span><span class="mi">403</span><span class="p">,</span>
+  <span class="ss">title: </span><span class="s2">"You cannot perform this action"</span><span class="p">,</span>
+  <span class="ss">detail: :exception</span><span class="p">,</span> <span class="c1"># render the raw error message</span>
+  <span class="ss">detail: </span><span class="o">-&gt;</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span> <span class="s2">"Invalid Action"</span> <span class="p">}</span> <span class="c1"># message via proc</span></code></pre></figure>
+
+  <p><a href="https://github.com/wagenet/rescue_registry">See full documentation in the RescueRegistry README</a>.</p>
+
+  <p>All controllers will inherit any registered exceptions from their parent. They can also add their own. In this example, <code class="language-plaintext highlighter-rouge">FooError</code> will only throw a custom status code when thrown from <code class="language-plaintext highlighter-rouge">FooController</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">FooController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">register_exception</span> <span class="no">FooError</span><span class="p">,</span> <span class="ss">status: </span><span class="mi">422</span>
+<span class="k">end</span></code></pre></figure>
+
+<a class="anchor" id="advanced" />
+  <a class="header" href="#advanced">
+    <h3>
+      2.2 Advanced
+    </h3>
+  </a>
+
+  <p>The final option <code class="language-plaintext highlighter-rouge">register_exception</code> accepts is <code class="language-plaintext highlighter-rouge">handler</code>. Here you can inject your own error handling class that customize <code class="language-plaintext highlighter-rouge">RescueRegistry::ExceptionHandler</code>. For example:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">MyCustomHandler</span> <span class="o">&lt;</span> <span class="no">Graphiti</span><span class="o">::</span><span class="no">Rails</span><span class="o">::</span><span class="no">ExceptionHandler</span>
+  <span class="c1"># self.exception accessible within all instance methods</span>
+
+  <span class="k">def</span> <span class="nf">status_code</span>
+    <span class="c1"># ...customize...</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">error_code</span>
+    <span class="c1"># ...customize...</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">title</span>
+    <span class="c1"># ...customize...</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">detail</span>
+    <span class="c1"># ...customize...</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">meta</span>
+    <span class="c1"># ...customize...</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">register_exception</span> <span class="no">FooError</span><span class="p">,</span> <span class="ss">handler: </span><span class="no">MyCustomHandler</span></code></pre></figure>
+
+  <p>If you would like to use the same custom handler for all errors, override <code class="language-plaintext highlighter-rouge">default_exception_handler</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/application_controller.rb</span>
+<span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">default_exception_handler</span>
+  <span class="no">MyCustomHandler</span>
+<span class="k">end</span></code></pre></figure>
+
+<a class="anchor" id="testing" />
+  <a class="header" href="#testing">
+    <h2>
+      3 Testing
+    </h2>
+  </a>
+
+  <p>This pattern of globally rescuing exceptions makes sense when
+running our live application…but during testing, we may want to
+raise real errors and bypass this rescue logic.</p>
+
+  <p>This is why we turn off error-handling during tests by default:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># spec/rails_helper.rb</span>
+<span class="no">RSpec</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">include</span> <span class="no">Graphiti</span><span class="o">::</span><span class="no">Rails</span><span class="o">::</span><span class="no">TestHelpers</span>
+  <span class="c1"># ... code ...</span>
+
+  <span class="n">config</span><span class="p">.</span><span class="nf">before</span> <span class="ss">:each</span> <span class="k">do</span>
+    <span class="n">handle_request_exceptions</span><span class="p">(</span><span class="kp">false</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>If you want to turn this on for an individual test (so you can test
+error codes, etc):</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">before</span> <span class="k">do</span>
+  <span class="n">handle_request_exceptions</span><span class="p">(</span><span class="kp">true</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p><br />
+<br /></p>
+
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="/1.13/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="/1.13/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="/1.13/guides">Guides</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Contact</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://discord.gg/wgqkMBsSRV">Discord Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Email</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

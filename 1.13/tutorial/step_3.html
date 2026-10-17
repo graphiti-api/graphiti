@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Boogaloo" rel="stylesheet">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/1.13/assets/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/1.13/assets/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/1.13/assets/favicons/favicon-16x16.png">
+  <link rel="manifest" href="/1.13/assets/favicons/site.webmanifest">
+  <link rel="mask-icon" href="/1.13/assets/favicons/safari-pinned-tab.svg" color="#F86DA7">
+  <link rel="shortcut icon" href="/1.13/assets/favicons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#F86DA7">
+  <meta name="msapplication-config" content="/1.13/assets/favicons/browserconfig.xml">
+  <meta name="theme-color" content="#F86DA7">
+
+  <title>Graphiti</title>
+  <meta name="description" content="Stylish Graph APIs">
+
+  <link rel="stylesheet" href="/1.13/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/1.13/feed.xml">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-127904727-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-127904727-1');
+  </script>
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <a href="/1.13/1.13" class="navbar-brand">
+        <img alt="logo" src="/1.13/assets/img/logo.png">
+      </a>
+    </div>
+    <nav class="" role="navigation">
+      <ul class="nav navbar-nav nav-links">
+        <li>
+          <a class="quickstart nav-link" href="/1.13/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="guides nav-link" href="/1.13/guides">Guides</a>
+        </li>
+        <li>
+          <a class="tutorial nav-link" href="/1.13/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="spraypaint nav-link" href="/1.13/js">Spraypaint</a>
+        </li>
+      </ul>
+      <ul class="nav gh navbar-nav navbar-right visible-lg visible-md">
+        <li>
+          <span class="star">⭐</span>
+          <a href="https://github.com/graphiti-api/graphiti">
+            <img alt="github-star" style="margin-right: 65px;margin-top: -20px" src="/1.13/assets/img/gh.png">
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="toc col-md-3">
+  <h1 id="tutorial">Tutorial</h1>
+
+  <ul>
+    <li><a href="/1.13/tutorial/step_0">Step 0: Bootstrapping</a></li>
+    <li><a href="/1.13/tutorial/step_1">Step 1: Initial Resource</a></li>
+    <li><a href="/1.13/tutorial/step_2">Step 2: Has Many</a></li>
+    <li><a href="/1.13/tutorial/step_3">Step 3: Belongs To</a></li>
+    <li><a href="/1.13/tutorial/step_4">Step 4: Customizing Queries</a></li>
+    <li><a href="/1.13/tutorial/step_5">Step 5: Has One</a></li>
+    <li><a href="/1.13/tutorial/step_6">Step 6: Customizing Writes</a></li>
+    <li><a href="/1.13/tutorial/step_7">Step 7: Many-to-Many</a></li>
+    <li><a href="/1.13/tutorial/step_8">Step 8: Polymorphic Relationships</a></li>
+    <li><a href="/1.13/tutorial/step_9">Step 9: Polymorphic Resources</a></li>
+  </ul>
+</div>
+
+<div class="col-md-8">
+
+  <h3 id="step-3-belongs-to">Step 3: Belongs To</h3>
+
+  <blockquote>
+    <p><a href="https://github.com/graphiti-api/employee_directory/compare/step_2_positions...step_3_departments">View the Diff</a></p>
+  </blockquote>
+
+  <p>We’ll be adding the database table <code class="language-plaintext highlighter-rouge">departments</code>:</p>
+
+  <table class="table table-small text-center">
+  <thead>
+    <tr>
+      <th class="text-center">id</th>
+      <th class="text-center">name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Engineering</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Safety</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>QA</td>
+    </tr>
+  </tbody>
+</table>
+
+  <p>We’ll also be adding a <code class="language-plaintext highlighter-rouge">department_id:integer</code> foreign key column to
+the <code class="language-plaintext highlighter-rouge">positions</code> table.</p>
+
+  <h3 id="the-rails-stuff-">The Rails Stuff 🚂</h3>
+
+  <p>Generate the <code class="language-plaintext highlighter-rouge">Department</code> model:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bin/rails g model Department name:string</code></pre></figure>
+
+  <p>To add the foreign key to <code class="language-plaintext highlighter-rouge">positions</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bin/rails g migration add_department_id_to_positions</code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">AddDepartmentIdToPositions</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span><span class="p">[</span><span class="mf">5.2</span><span class="p">]</span>
+  <span class="k">def</span> <span class="nf">change</span>
+    <span class="n">add_foreign_key</span> <span class="ss">:positions</span><span class="p">,</span> <span class="ss">:departments</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Update the database:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bin/rails db:migrate</code></pre></figure>
+
+  <p>Update our seed file:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="p">[</span><span class="no">Employee</span><span class="p">,</span> <span class="no">Position</span><span class="p">,</span> <span class="no">Department</span><span class="p">].</span><span class="nf">each</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:delete_all</span><span class="p">)</span>
+
+<span class="n">engineering</span> <span class="o">=</span> <span class="no">Department</span><span class="p">.</span><span class="nf">create!</span> <span class="ss">name: </span><span class="s1">'Engineering'</span>
+<span class="n">safety</span> <span class="o">=</span> <span class="no">Department</span><span class="p">.</span><span class="nf">create!</span> <span class="ss">name: </span><span class="s1">'Safety'</span>
+<span class="n">qa</span> <span class="o">=</span> <span class="no">Department</span><span class="p">.</span><span class="nf">create!</span> <span class="ss">name: </span><span class="s1">'QA'</span>
+<span class="n">departments</span> <span class="o">=</span> <span class="p">[</span><span class="n">engineering</span><span class="p">,</span> <span class="n">safety</span><span class="p">,</span> <span class="n">qa</span><span class="p">]</span>
+
+<span class="mi">100</span><span class="p">.</span><span class="nf">times</span> <span class="k">do</span>
+  <span class="n">employee</span> <span class="o">=</span> <span class="no">Employee</span><span class="p">.</span><span class="nf">create!</span> <span class="ss">first_name: </span><span class="no">Faker</span><span class="o">::</span><span class="no">Name</span><span class="p">.</span><span class="nf">first_name</span><span class="p">,</span>
+    <span class="ss">last_name: </span><span class="no">Faker</span><span class="o">::</span><span class="no">Name</span><span class="p">.</span><span class="nf">last_name</span><span class="p">,</span>
+    <span class="ss">age: </span><span class="nb">rand</span><span class="p">(</span><span class="mi">20</span><span class="o">..</span><span class="mi">80</span><span class="p">)</span>
+
+  <span class="p">(</span><span class="mi">1</span><span class="o">..</span><span class="mi">2</span><span class="p">).</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span>
+    <span class="n">employee</span><span class="p">.</span><span class="nf">positions</span><span class="p">.</span><span class="nf">create!</span> <span class="ss">title: </span><span class="no">Faker</span><span class="o">::</span><span class="no">Job</span><span class="p">.</span><span class="nf">title</span><span class="p">,</span>
+      <span class="ss">historical_index: </span><span class="n">i</span><span class="p">,</span>
+      <span class="ss">active: </span><span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="ss">department: </span><span class="n">departments</span><span class="p">.</span><span class="nf">sample</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Make sure to update <code class="language-plaintext highlighter-rouge">spec/factories/departments.rb</code> with randomized
+data. Then, since this is also a required relationship, update
+<code class="language-plaintext highlighter-rouge">spec/factories/positions.rb</code> to always seed a department when we ask to
+create a position:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">factory</span> <span class="ss">:position</span> <span class="k">do</span>
+  <span class="n">employee</span>
+  <span class="n">department</span>
+
+  <span class="c1"># ... code ...</span>
+<span class="k">end</span></code></pre></figure>
+
+  <h3 id="the-graphiti-stuff-">The Graphiti Stuff 🎨</h3>
+
+  <p>You should be used to this by now:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash">bin/rails g graphiti:resource Department name:string</code></pre></figure>
+
+  <p>Add the association:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/resources/position_resource.rb</span>
+<span class="n">belongs_to</span> <span class="ss">:department</span></code></pre></figure>
+
+  <p>And review the end of <a href="/1.13/tutorial/step_2">Step 2</a> to get all your specs
+passing (add the department to the request payload). Practice makes perfect!</p>
+
+  <h4 id="digging-deeper-">Digging Deeper 🧐</h4>
+
+  <p>Note that we didn’t need a filter like we did in step two. That’s
+because the primary key connecting the Resources is <code class="language-plaintext highlighter-rouge">id</code> by
+default. In other words, the Link would be something like:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash">/departments?filter[id]<span class="o">=</span>1</code></pre></figure>
+
+  <p>Which we get out-of-the-📦</p>
+
+  <p>But remember, you can customize these relationships just like the
+previous <code class="language-plaintext highlighter-rouge">has_many</code> section.</p>
+
+</div>
+
+<div class="clearfix">
+  <h2 id="next">
+    <a href="/1.13/tutorial/step_4">
+      NEXT - 
+      <small>Step 4: Customizing Queries</small>
+      &raquo;
+    </a>
+  </h2>
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="/1.13/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="/1.13/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="/1.13/guides">Guides</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Contact</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://discord.gg/wgqkMBsSRV">Discord Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Email</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>
