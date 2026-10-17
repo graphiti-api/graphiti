@@ -86,8 +86,6 @@ module Graphiti
           assign_params = assign_params.except(:id).merge(self.class.model_primary_key => primary_key)
         end
 
-        assign_params = decode_foreign_keys(assign_params)
-
         run_callbacks :attributes, action_name, assign_params, meta do |params|
           model_instance ||= if action_name == :update
             self.class._find(id: id).data

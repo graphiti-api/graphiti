@@ -29,7 +29,7 @@ class Graphiti::Util::Persistence
   end
 
   def assign
-    attributes = @adapter.persistence_attributes(self, @attributes)
+    attributes = decode_foreign_keys(@adapter.persistence_attributes(self, @attributes))
     assigned = @resource.assign(attributes, metadata, @meta[:method], model_instance: @assigned_model)
     @resource.decorate_record(assigned)
 
@@ -60,7 +60,9 @@ class Graphiti::Util::Persistence
 
     payload_attributes = attributes.dup
     parents = @adapter.process_belongs_to(self, attributes)
-    apply_derived_attributes(attributes, payload_attributes)
+    derived_keys = derived_keys(attributes, payload_attributes)
+    attributes = decode_foreign_keys(attributes)
+    apply_derived_attributes(attributes.slice(*derived_keys))
     persisted = persist_object(@meta[:method], attributes)
     @resource.decorate_record(persisted)
 
@@ -99,13 +101,21 @@ class Graphiti::Util::Persistence
   # +attributes+. A model that was already assigned (see ResourceProxy#assign_attributes)
   # predates those keys, so apply just them - the payload attributes are already on it,
   # and re-applying them would clobber any changes made since.
-  def apply_derived_attributes(attributes, payload_attributes)
+  def apply_derived_attributes(derived)
     return unless @assigned_model
-
-    derived = @resource.decode_foreign_keys(attributes).reject { |key, value| payload_attributes[key] == value }
     return if derived.empty?
 
     @resource.assign_attributes(@assigned_model, derived, metadata)
+  end
+
+  def derived_keys(attributes, payload_attributes)
+    attributes.keys.reject { |key| payload_attributes.key?(key) && payload_attributes[key] == attributes[key] }
+  end
+
+  def decode_foreign_keys(attributes)
+    return attributes if @meta[:method] == :destroy
+
+    @resource.decode_foreign_keys(attributes)
   end
 
   def add_hook(prc, lifecycle_event)

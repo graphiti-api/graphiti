@@ -200,6 +200,19 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(proxy.data.reload.author).to eq(author)
       end
 
+      it "lets a create override look up records by the decoded foreign key" do
+        book_resource.attribute :author_id, :integer, readable: false
+        book_resource.define_method(:create) do |attributes|
+          Legacy::Book.find_by(author_id: attributes[:author_id], title: attributes[:title]) || super(attributes)
+        end
+        proxy = Graphiti.with_context({}, :create) do
+          book_resource.build(data: {type: "books", attributes: {title: "The Shining", author_id: "auth-abc"}}).tap(&:save)
+        end
+
+        expect(proxy.data).to eq(book)
+        expect(Legacy::Book.where(title: "The Shining").count).to eq(1)
+      end
+
       it "translates a public id through the generated many_to_many filter" do
         hobby_resource = Class.new(Legacy::HobbyResource) do
           def self.name

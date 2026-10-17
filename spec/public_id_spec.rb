@@ -338,6 +338,58 @@ RSpec.describe "public_id" do
         expect { proxy.save }.to raise_error(Graphiti::Errors::RecordNotFound, /'employees' with id '#{employee2.id}'.*employee_id/)
       end
 
+      it "hands a create override the decoded foreign key" do
+        received = nil
+        position_resource.define_method(:create) do |attributes|
+          received = attributes[:employee_id]
+          super(attributes)
+        end
+        proxy = position_resource.build(data: {type: "positions", attributes: {title: "Lead", employee_id: "emp-def"}})
+
+        expect(proxy.save).to eq(true)
+        expect(received).to eq(employee2.id)
+      end
+
+      it "hands an update override the decoded foreign key" do
+        received = nil
+        position_resource.define_method(:update) do |attributes|
+          received = attributes[:employee_id]
+          super(attributes)
+        end
+        payload = {data: {type: "positions", id: position.id.to_s, attributes: {employee_id: "emp-def"}}}
+        proxy = Graphiti.with_context({}, :update) { position_resource.find(payload) }
+
+        expect(proxy.update_attributes).to eq(true)
+        expect(received).to eq(employee2.id)
+        expect(PORO::Position.find(position.id).employee_id).to eq(employee2.id)
+      end
+
+      it "hands an override the plain primary key of a sideposted parent" do
+        received = nil
+        position_resource.define_method(:create) do |attributes|
+          received = attributes[:employee_id]
+          super(attributes)
+        end
+        payload = {
+          data: {
+            type: "positions",
+            attributes: {title: "Lead"},
+            relationships: {employee: {data: {type: "employees", id: "emp-def"}}}
+          }
+        }
+
+        expect(position_resource.build(payload).save).to eq(true)
+        expect(received).to eq(employee2.id)
+      end
+
+      it "keeps a foreign key changed on an assigned model before save" do
+        proxy = position_resource.build(data: {type: "positions", attributes: {title: "Lead", employee_id: "emp-def"}})
+        proxy.data.employee_id = employee1.id
+
+        expect(proxy.save).to eq(true)
+        expect(proxy.data.employee_id).to eq(employee1.id)
+      end
+
       it "decodes a foreign key typed as the target's id, not the key's" do
         position_resource.attribute :employee_id, :integer, readable: false
         proxy = position_resource.build(data: {type: "positions", attributes: {title: "Lead", employee_id: "emp-def"}})
