@@ -1,5 +1,12 @@
 graphiti changelog
 
+## [2.2.1](https://github.com/graphiti-api/graphiti/compare/v2.2.0...v2.2.1) (2026-10-17)
+
+
+### Bug Fixes
+
+* a create or update override receives decoded foreign keys, not the public ids the client posted ([971d144](https://github.com/graphiti-api/graphiti/commit/971d144a323625b5d1b03f6e4ab551a4dfee12c4))
+
 # [2.2.0](https://github.com/graphiti-api/graphiti/compare/v2.1.3...v2.2.0) (2026-10-13)
 
 
