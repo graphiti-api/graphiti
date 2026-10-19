@@ -106,6 +106,35 @@ if ENV["APPRAISAL_INITIALIZED"]
         expect(jsonapi_data["first_name"]).to eq("Jane")
       end
 
+      context "when the save changes included records" do
+        before do
+          office = Office.create(address: "old")
+          employee.create_salary(base_rate: 500)
+          employee.update!(workspace: office)
+
+          allow_any_instance_of(Employee).to receive(:save).and_wrap_original do |original, *args|
+            original.call(*args).tap do
+              office.update!(address: "new")
+              employee.salary.update!(base_rate: 1000)
+            end
+          end
+        end
+
+        subject(:make_request) do
+          do_update(payload.merge(include: "workspace,salary"))
+        end
+
+        it "renders a fresh polymorphic target" do
+          make_request
+          expect(jsonapi_included("offices")[0].attributes["address"]).to eq("new")
+        end
+
+        it "renders a fresh plain record" do
+          make_request
+          expect(jsonapi_included("salaries")[0].attributes["base_rate"]).to eq(1000.0)
+        end
+      end
+
       context "when reserved parameter used" do
         before do
           resource = Class.new(EmployeeResource) do

@@ -211,6 +211,7 @@ module Graphiti
         # adapters will cause N+1 validation calls, so lets explicitly
         # switch to a lookup context.
         Graphiti.with_context(Graphiti.context[:object], :show) do
+          @query.entity_map.clear
           @scope.resolve_sideloads([@data])
         end
       end
