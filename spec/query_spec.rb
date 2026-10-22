@@ -64,6 +64,22 @@ RSpec.describe Graphiti::Query do
         end
       end
 
+      context "when the sideload allowlist has nested includes" do
+        let(:ctx) do
+          OpenStruct.new(sideload_allowlist: {update: {positions: {department: {}}}})
+        end
+
+        around do |e|
+          Graphiti.with_context ctx, :update do
+            e.run
+          end
+        end
+
+        it "keeps valid nested includes" do
+          expect(hash).to eq(include: {positions: {include: {department: {}}}})
+        end
+      end
+
       context "when context does not respond to #sideload_allowlist" do
         before do
           params[:include] = "positions.department"
