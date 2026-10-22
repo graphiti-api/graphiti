@@ -1,5 +1,13 @@
 graphiti changelog
 
+## [2.2.2](https://github.com/graphiti-api/graphiti/compare/v2.2.1...v2.2.2) (2026-10-22)
+
+
+### Bug Fixes
+
+* nested includes dropped by sideload_allowlist ([#549](https://github.com/graphiti-api/graphiti/issues/549)) ([96b05df](https://github.com/graphiti-api/graphiti/commit/96b05df9b4514d946c639ed157b08e99e37b3ac0))
+* render fresh included records after an update ([#552](https://github.com/graphiti-api/graphiti/issues/552)) ([aba46ac](https://github.com/graphiti-api/graphiti/commit/aba46acf22414fbc3922e579b44ebdcde6f4c9b4))
+
 ## [2.2.1](https://github.com/graphiti-api/graphiti/compare/v2.2.0...v2.2.1) (2026-10-17)
 
 
