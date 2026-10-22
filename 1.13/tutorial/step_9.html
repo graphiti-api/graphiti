@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Boogaloo" rel="stylesheet">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/1.13/assets/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/1.13/assets/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/1.13/assets/favicons/favicon-16x16.png">
+  <link rel="manifest" href="/1.13/assets/favicons/site.webmanifest">
+  <link rel="mask-icon" href="/1.13/assets/favicons/safari-pinned-tab.svg" color="#F86DA7">
+  <link rel="shortcut icon" href="/1.13/assets/favicons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#F86DA7">
+  <meta name="msapplication-config" content="/1.13/assets/favicons/browserconfig.xml">
+  <meta name="theme-color" content="#F86DA7">
+
+  <title>Graphiti</title>
+  <meta name="description" content="Stylish Graph APIs">
+
+  <link rel="stylesheet" href="/1.13/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/1.13/feed.xml">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-127904727-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-127904727-1');
+  </script>
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <a href="/1.13/1.13" class="navbar-brand">
+        <img alt="logo" src="/1.13/assets/img/logo.png">
+      </a>
+    </div>
+    <nav class="" role="navigation">
+      <ul class="nav navbar-nav nav-links">
+        <li>
+          <a class="quickstart nav-link" href="/1.13/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="guides nav-link" href="/1.13/guides">Guides</a>
+        </li>
+        <li>
+          <a class="tutorial nav-link" href="/1.13/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="spraypaint nav-link" href="/1.13/js">Spraypaint</a>
+        </li>
+      </ul>
+      <ul class="nav gh navbar-nav navbar-right visible-lg visible-md">
+        <li>
+          <span class="star">⭐</span>
+          <a href="https://github.com/graphiti-api/graphiti">
+            <img alt="github-star" style="margin-right: 65px;margin-top: -20px" src="/1.13/assets/img/gh.png">
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="toc col-md-3">
+  <h1 id="tutorial">Tutorial</h1>
+
+  <ul>
+    <li><a href="/1.13/tutorial/step_0">Step 0: Bootstrapping</a></li>
+    <li><a href="/1.13/tutorial/step_1">Step 1: Initial Resource</a></li>
+    <li><a href="/1.13/tutorial/step_2">Step 2: Has Many</a></li>
+    <li><a href="/1.13/tutorial/step_3">Step 3: Belongs To</a></li>
+    <li><a href="/1.13/tutorial/step_4">Step 4: Customizing Queries</a></li>
+    <li><a href="/1.13/tutorial/step_5">Step 5: Has One</a></li>
+    <li><a href="/1.13/tutorial/step_6">Step 6: Customizing Writes</a></li>
+    <li><a href="/1.13/tutorial/step_7">Step 7: Many-to-Many</a></li>
+    <li><a href="/1.13/tutorial/step_8">Step 8: Polymorphic Relationships</a></li>
+    <li><a href="/1.13/tutorial/step_9">Step 9: Polymorphic Resources</a></li>
+  </ul>
+</div>
+
+<div class="col-md-8">
+
+  <h3 id="step-9-polymorphic-resources">Step 9: Polymorphic Resources</h3>
+
+  <blockquote>
+    <p><a href="https://github.com/graphiti-api/employee_directory/compare/step_8_polymorphic_belongs_to...step_9_polymorphic_resource">View the Diff</a></p>
+  </blockquote>
+
+  <p>In the last step, we covered polymorphic relationships: a single
+relationship can point to many different Resources. Polymorphic
+Resources are the same concept, without an association: a single
+Resource can resolve to many different sub-Resources. It’s a very similar
+to <a href="https://api.rubyonrails.org/classes/ActiveRecord/Inheritance.html">Single-Table Inheritance in ActiveRecord</a>.</p>
+
+  <p>To illustrate this, we’ll add a <code class="language-plaintext highlighter-rouge">tasks</code> table and corresponding <code class="language-plaintext highlighter-rouge">Task</code>
+superclass. Each record in this table will resolve to one of <code class="language-plaintext highlighter-rouge">Bug</code>,
+<code class="language-plaintext highlighter-rouge">Epic</code>, or <code class="language-plaintext highlighter-rouge">Feature</code>.</p>
+
+  <table class="table table-small text-center">
+  <thead>
+    <tr>
+      <th class="text-center">id</th>
+      <th class="text-center">milestone_id</th>
+      <th class="text-center">type</th>
+      <th class="text-center">title</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>null</td>
+      <td>Bug</td>
+      <td>Incorrect Value!</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>null</td>
+      <td>Feature</td>
+      <td>Build great stuff!</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>1</td>
+      <td>Epic</td>
+      <td>Build TONS of great stuff!</td>
+    </tr>
+  </tbody>
+</table>
+
+  <p>Why not just stick with a single <code class="language-plaintext highlighter-rouge">Task</code> model? Because each of these
+types has specific behavior: only <code class="language-plaintext highlighter-rouge">Feature</code>s have a <code class="language-plaintext highlighter-rouge">points</code> attribute,
+and only <code class="language-plaintext highlighter-rouge">Epic</code>s have a <code class="language-plaintext highlighter-rouge">milestones</code> relationship.</p>
+
+  <h3 id="the-rails-stuff-">The Rails Stuff 🚂</h3>
+
+  <p>Let’s create our <code class="language-plaintext highlighter-rouge">Task</code> model:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bin/rails g model Task employee:belongs_to team:belongs_to <span class="nb">type</span>:string
+title:string
+<span class="nv">$ </span>bin/rails db:migrate</code></pre></figure>
+
+  <p>And create models to reflect our STI logic:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/models/task.rb</span>
+<span class="k">class</span> <span class="nc">Task</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="no">TYPES</span> <span class="o">=</span> <span class="sx">%w(Bug Feature Epic)</span>
+
+  <span class="n">belongs_to</span> <span class="ss">:team</span><span class="p">,</span> <span class="ss">optional: </span><span class="kp">true</span>
+  <span class="n">belongs_to</span> <span class="ss">:employee</span><span class="p">,</span> <span class="ss">optional: </span><span class="kp">true</span>
+<span class="k">end</span>
+
+<span class="c1"># app/models/bug.rb</span>
+<span class="k">class</span> <span class="nc">Bug</span> <span class="o">&lt;</span> <span class="no">Task</span>
+<span class="k">end</span>
+
+<span class="c1"># app/models/feature.rb</span>
+<span class="k">class</span> <span class="nc">Feature</span> <span class="o">&lt;</span> <span class="no">Task</span>
+<span class="k">end</span>
+
+<span class="c1"># Only Epics have Milestones</span>
+<span class="c1"># app/models/epic.rb</span>
+<span class="k">class</span> <span class="nc">Epic</span> <span class="o">&lt;</span> <span class="no">Task</span>
+  <span class="n">has_many</span> <span class="ss">:milestones</span>
+<span class="k">end</span>
+
+<span class="c1"># app/models/milestone.rb</span>
+<span class="k">class</span> <span class="nc">Milestone</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">belongs_to</span> <span class="ss">:epic</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Add the association:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/models/team.rb</span>
+<span class="n">has_many</span> <span class="ss">:tasks</span>
+<span class="n">has_many</span> <span class="ss">:bugs</span>
+<span class="n">has_many</span> <span class="ss">:features</span>
+<span class="n">has_many</span> <span class="ss">:epics</span>
+
+<span class="c1"># app/models/employee.rb</span>
+<span class="n">has_many</span> <span class="ss">:tasks</span>
+<span class="n">has_many</span> <span class="ss">:bugs</span>
+<span class="n">has_many</span> <span class="ss">:features</span>
+<span class="n">has_many</span> <span class="ss">:epics</span></code></pre></figure>
+
+  <p>Finally <a href="https://github.com/graphiti-api/employee_directory/compare/step_8_polymorphic_belongs_to...step_9_polymorphic_resource">view the diff</a> to edit your <code class="language-plaintext highlighter-rouge">seeds.rb</code> file.</p>
+
+  <h3 id="the-graphiti-stuff-">The Graphiti Stuff 🎨</h3>
+
+  <p>Start by creating our Resource as normal:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bin/rails g graphiti:resource Task title:string</code></pre></figure>
+
+  <p>Now edit to support polymorphism and associations:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">TaskResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">polymorphic</span> <span class="o">=</span> <span class="sx">%w(FeatureResource BugResource EpicResource)</span>
+
+  <span class="n">attribute</span> <span class="ss">:employee_id</span><span class="p">,</span> <span class="ss">:integer</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:filterable</span><span class="p">]</span>
+  <span class="n">attribute</span> <span class="ss">:team_id</span><span class="p">,</span> <span class="ss">:integer</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:filterable</span><span class="p">]</span>
+  <span class="n">attribute</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:string</span>
+
+  <span class="n">belongs_to</span> <span class="ss">:employee</span>
+  <span class="n">belongs_to</span> <span class="ss">:team</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>The point of this was to show how responses could be specific to type,
+so let’s customize <code class="language-plaintext highlighter-rouge">Features</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">FeatureResource</span> <span class="o">&lt;</span> <span class="no">TaskResource</span>
+  <span class="n">attribute</span> <span class="ss">:points</span><span class="p">,</span> <span class="ss">:integer</span> <span class="k">do</span>
+    <span class="nb">rand</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Only Epics have milestones, but let’s support those as well:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bin/rails g graphiti:resource Milestone name:string</code></pre></figure>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">MilestoneResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="n">attribute</span> <span class="ss">:epic_id</span><span class="p">,</span> <span class="ss">:integer</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:filterable</span><span class="p">]</span>
+  <span class="n">attribute</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:string</span>
+
+  <span class="c1"># Customize the link to the Tasks endpoint, as we</span>
+  <span class="c1"># didn't create an Epics endpoint</span>
+  <span class="n">belongs_to</span> <span class="ss">:epic</span> <span class="k">do</span>
+    <span class="n">link</span> <span class="k">do</span> <span class="o">|</span><span class="n">milestone</span><span class="o">|</span>
+      <span class="n">helpers</span> <span class="o">=</span> <span class="no">Rails</span><span class="p">.</span><span class="nf">application</span><span class="p">.</span><span class="nf">routes</span><span class="p">.</span><span class="nf">url_helpers</span>
+      <span class="n">helpers</span><span class="p">.</span><span class="nf">task_url</span><span class="p">(</span><span class="n">milestone</span><span class="p">.</span><span class="nf">epic_id</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <h4 id="digging-deeper-">Digging Deeper 🧐</h4>
+
+  <p>We can now resolve <code class="language-plaintext highlighter-rouge">Tasks</code>, either as a relationship or through the
+<code class="language-plaintext highlighter-rouge">/tasks</code> endpoint directly. When <code class="language-plaintext highlighter-rouge">Task</code> is type <code class="language-plaintext highlighter-rouge">'Feature'</code> it will have
+an extra attribute of <code class="language-plaintext highlighter-rouge">points</code>. When it’s an <code class="language-plaintext highlighter-rouge">Epic</code>, it will have an
+additional relationship <code class="language-plaintext highlighter-rouge">Milestone</code>.</p>
+
+  <p>Graphiti is smart enough to fetch the appropriate relationships. A hit
+to <code class="language-plaintext highlighter-rouge">/tasks?include=milestones</code> will only query for milestones when the
+resulting <code class="language-plaintext highlighter-rouge">Task</code> records are <code class="language-plaintext highlighter-rouge">Epic</code>s.</p>
+
+  <p><br />
+<br />
+<br />
+<br />
+<br /></p>
+
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="/1.13/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="/1.13/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="/1.13/guides">Guides</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Contact</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://discord.gg/wgqkMBsSRV">Discord Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Email</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>
