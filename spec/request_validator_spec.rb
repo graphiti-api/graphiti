@@ -455,6 +455,15 @@ RSpec.describe Graphiti::RequestValidator do
             instance.validate!
           }.to raise_error(Graphiti::Errors::InvalidRequest)
         end
+
+        context "and the document is wrapped in _jsonapi" do
+          let(:instance) { described_class.new(root_resource, {id: "1", _jsonapi: payload}, action) }
+
+          it "has an unknown relationship error" do
+            expect(validate).to eq false
+            expect(instance.errors).to be_added(:'data.relationships.pets', :invalid_relationship)
+          end
+        end
       end
 
       context "when the payload contains a valid relationship" do
