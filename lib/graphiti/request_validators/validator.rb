@@ -16,11 +16,11 @@ module Graphiti
         # Right now, all requests - even reads - go through the validator
         # In the future these should have their own validation logic, but
         # for now we can just bypass
-        return errors.blank? unless @params.has_key?(:data)
+        return errors.blank? unless document.has_key?(:data)
         return false unless validate_data_shape
 
         resource = @root_resource
-        if @params[:data].has_key?(:type)
+        if document[:data].has_key?(:type)
           if (meta_type = deserialized_payload.meta[:type].try(:to_sym))
             if @root_resource.type != meta_type && @root_resource.polymorphic?
               resource = @root_resource.class.resource_for_type(meta_type).new
@@ -50,6 +50,10 @@ module Graphiti
 
       private
 
+      def document
+        deserialized_payload.params
+      end
+
       def validate_page
         page = @params[:page]
         return if page.nil? || page.respond_to?(:each_pair)
@@ -58,7 +62,7 @@ module Graphiti
       end
 
       def validate_data_shape
-        data = @params[:data]
+        data = document[:data]
         return true if data.nil? || data.respond_to?(:each_pair)
 
         @errors.add(:data, :invalid)
