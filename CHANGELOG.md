@@ -1,5 +1,12 @@
 graphiti changelog
 
+## [1.13.6](https://github.com/graphiti-api/graphiti/compare/v1.13.5...v1.13.6) (2026-10-30)
+
+
+### Bug Fixes
+
+* validate the relationships of a document wrapped in _jsonapi ([cfb624c](https://github.com/graphiti-api/graphiti/commit/cfb624c284f0ad357709ebb2297b831aa6746feb))
+
 ## [1.13.5](https://github.com/graphiti-api/graphiti/compare/v1.13.4...v1.13.5) (2026-09-04)
 
 
