@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Boogaloo" rel="stylesheet">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/1.13/assets/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/1.13/assets/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/1.13/assets/favicons/favicon-16x16.png">
+  <link rel="manifest" href="/1.13/assets/favicons/site.webmanifest">
+  <link rel="mask-icon" href="/1.13/assets/favicons/safari-pinned-tab.svg" color="#F86DA7">
+  <link rel="shortcut icon" href="/1.13/assets/favicons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#F86DA7">
+  <meta name="msapplication-config" content="/1.13/assets/favicons/browserconfig.xml">
+  <meta name="theme-color" content="#F86DA7">
+
+  <title>Graphiti</title>
+  <meta name="description" content="Stylish Graph APIs">
+
+  <link rel="stylesheet" href="/1.13/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/1.13/feed.xml">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-127904727-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-127904727-1');
+  </script>
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <a href="/1.13/1.13" class="navbar-brand">
+        <img alt="logo" src="/1.13/assets/img/logo.png">
+      </a>
+    </div>
+    <nav class="" role="navigation">
+      <ul class="nav navbar-nav nav-links">
+        <li>
+          <a class="quickstart nav-link" href="/1.13/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="guides nav-link" href="/1.13/guides">Guides</a>
+        </li>
+        <li>
+          <a class="tutorial nav-link" href="/1.13/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="spraypaint nav-link" href="/1.13/js">Spraypaint</a>
+        </li>
+      </ul>
+      <ul class="nav gh navbar-nav navbar-right visible-lg visible-md">
+        <li>
+          <span class="star">⭐</span>
+          <a href="https://github.com/graphiti-api/graphiti">
+            <img alt="github-star" style="margin-right: 65px;margin-top: -20px" src="/1.13/assets/img/gh.png">
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <h1 id="usage-without-activerecord">Usage Without ActiveRecord</h1>
+
+<p>Graphiti was built to be used with any ORM or datastore, from PostgreSQL
+to elasticsearch to <code class="language-plaintext highlighter-rouge">Net::HTTP</code>. In fact, Graphiti itself is tested with
+Plain Old Ruby Objects (POROs).</p>
+
+<p>This cookbook will show how to customize a resource around a particular datastore, and how to package those
+customizations into a reusable adapter. We’ll use an in-memory datastore
+and Plain Old Ruby Objects (POROs) here, but the lessons apply to any
+datastore.</p>
+
+<p>For working code, see <a href="https://github.com/graphiti-api/employee_directory/blob/poro/app/resources/post_resource.rb">this branch of the sample application</a>.</p>
+
+<p>We’ll start with this PORO model:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Post</span>
+  <span class="c1"># Define getters/setters</span>
+  <span class="c1"># e.g. post.title = 'foo'</span>
+  <span class="no">ATTRS</span> <span class="o">=</span> <span class="p">[</span><span class="ss">:id</span><span class="p">,</span> <span class="ss">:title</span><span class="p">]</span>
+  <span class="no">ATTRS</span><span class="p">.</span><span class="nf">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">a</span><span class="o">|</span> <span class="nb">attr_accessor</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="p">}</span>
+
+  <span class="c1"># Instantiate with hash of attributes</span>
+  <span class="c1"># e.g. Post.new(title: 'foo')</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">attrs</span> <span class="o">=</span> <span class="p">{})</span>
+    <span class="n">attrs</span><span class="p">.</span><span class="nf">each_pair</span> <span class="p">{</span> <span class="o">|</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="o">|</span> <span class="nb">send</span><span class="p">(</span><span class="ss">:"</span><span class="si">#{</span><span class="n">k</span><span class="si">}</span><span class="ss">="</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="c1"># This part only needed for our particular</span>
+  <span class="c1"># persistence implementation; you may not need it</span>
+  <span class="c1"># e.g. post.attributes # =&gt; { title: 'foo' }</span>
+  <span class="k">def</span> <span class="nf">attributes</span>
+    <span class="p">{}.</span><span class="nf">tap</span> <span class="k">do</span> <span class="o">|</span><span class="n">attrs</span><span class="o">|</span>
+      <span class="no">ATTRS</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="nb">name</span><span class="o">|</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="nb">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">send</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>And this in-memory datastore:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># If we were working with more than just Posts, we'd need a 'type'</span>
+<span class="c1"># field here as well, to simulate a table name.</span>
+<span class="no">DATA</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="ss">id: </span><span class="mi">1</span><span class="p">,</span> <span class="ss">title: </span><span class="s1">'Graphiti'</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="ss">id: </span><span class="mi">2</span><span class="p">,</span> <span class="ss">title: </span><span class="s1">'is'</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="ss">id: </span><span class="mi">3</span><span class="p">,</span> <span class="ss">title: </span><span class="s1">'super'</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="ss">id: </span><span class="mi">4</span><span class="p">,</span> <span class="ss">title: </span><span class="s1">'dope'</span> <span class="p">}</span>
+<span class="p">]</span></code></pre></figure>
+
+<a class="anchor" id="resource-overrides" />
+  <a class="header" href="#resource-overrides">
+    <h2>
+      Resource Overrides
+    </h2>
+  </a>
+
+<p>If it’s your first time with a new ORM or datastore, we recommend
+putting the logic in the Resource first. Once things are working <em>and</em>
+there are multiple uses of the same overrides, package them into an
+Adapter.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">PostResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">adapter</span> <span class="o">=</span> <span class="no">Graphiti</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">Null</span>
+
+  <span class="n">attribute</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:string</span>
+
+  <span class="k">def</span> <span class="nf">base_scope</span>
+    <span class="p">{}</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+    <span class="no">DATA</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">d</span><span class="o">|</span> <span class="no">Post</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Here we’re using the <code class="language-plaintext highlighter-rouge">Null</code> adapter, which acts as a dumb pass-through.
+This can be helpful when you just want to get running for a simple use
+case and don’t want errors around features you haven’t implemented yet.
+But it can also be confusing when you expect certain codepaths to
+be hit. Mostly just be aware of <code class="language-plaintext highlighter-rouge">Null</code>’s behavior, or use
+<code class="language-plaintext highlighter-rouge">Graphiti::Adapters::Abstract</code> to get helpful errors around what’s not
+implemented.</p>
+
+<p>We’re also supplying an explicit <code class="language-plaintext highlighter-rouge">base_scope</code>. This is the beginning
+query object we’ll modify as params come in. In the case of
+ActiveRecord, we might want an <code class="language-plaintext highlighter-rouge">ActiveRecord::Relation</code> like
+<code class="language-plaintext highlighter-rouge">Post.all</code>. For our example, we’ll modify a simple ruby hash (keep in
+mind the premise of building a hash of options and passing it off to a
+client can apply to any datastore).</p>
+
+<p>Finally, we’re <a href="/1.13/guides/concepts/resources#resolve">resolving that scope</a>,
+returning the full dataset for now. The contract of <code class="language-plaintext highlighter-rouge">#resolve</code> is to
+return an array of model instances, hence <code class="language-plaintext highlighter-rouge">DATA.map { |d| Post.new(d)
+}</code>.</p>
+
+<a class="anchor" id="sorting" />
+  <a class="header" href="#sorting">
+    <h4>
+      Sorting
+    </h4>
+  </a>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">sort_all</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">direction</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">[</span><span class="ss">:sort</span><span class="p">].</span><span class="nf">merge!</span><span class="p">(</span><span class="ss">attribute: </span><span class="n">att</span><span class="p">,</span> <span class="ss">direction: </span><span class="n">dir</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">base_scope</span>
+  <span class="p">{</span> <span class="ss">sort: </span><span class="p">{}</span> <span class="p">}</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">sort</span> <span class="o">=</span> <span class="n">scope</span><span class="p">[</span><span class="ss">:sort</span><span class="p">].</span><span class="nf">presence</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="no">DATA</span><span class="p">.</span><span class="nf">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">d</span><span class="o">|</span> <span class="n">d</span><span class="p">[</span><span class="n">sort</span><span class="p">[</span><span class="ss">:attribute</span><span class="p">].</span><span class="nf">to_sym</span><span class="p">]</span> <span class="p">}</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="nf">reverse</span> <span class="k">if</span> <span class="n">sort</span><span class="p">[</span><span class="ss">:direction</span><span class="p">]</span> <span class="o">==</span> <span class="ss">:desc</span>
+  <span class="k">end</span>
+  <span class="no">DATA</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">d</span><span class="o">|</span> <span class="no">Post</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="p">}</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>We modified the base scope with a default hash key, <code class="language-plaintext highlighter-rouge">:sort</code>. When the
+user requests sorting, we record this by merging into the hash. We can
+then reference that information on the scope when resolving.</p>
+
+<p>Note the <code class="language-plaintext highlighter-rouge">sort_all</code> scope block, in fact all scope blocks, must return the scope.</p>
+
+<a class="anchor" id="paginating" />
+  <a class="header" href="#paginating">
+    <h4>
+      Paginating
+    </h4>
+  </a>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">paginate</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">current_page</span><span class="p">,</span> <span class="n">per_page</span><span class="o">|</span>
+  <span class="n">scope</span><span class="p">.</span><span class="nf">merge!</span><span class="p">(</span><span class="ss">current_page: </span><span class="n">current</span><span class="p">,</span> <span class="ss">per_page: </span><span class="n">per</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+  <span class="c1"># ... sorting ...</span>
+  <span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="n">scope</span><span class="p">[</span><span class="ss">:current_page</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">scope</span><span class="p">[</span><span class="ss">:per_page</span><span class="p">]</span>
+  <span class="n">stop</span>  <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">scope</span><span class="p">[</span><span class="ss">:per_page</span><span class="p">]</span>
+  <span class="n">data</span>  <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">start</span><span class="o">...</span><span class="n">stop</span><span class="p">]</span>
+  <span class="c1"># ... return models ...</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Again: merge into the scope, then reference the scope data when
+resolving.</p>
+
+<a class="anchor" id="filtering" />
+  <a class="header" href="#filtering">
+    <h4>
+      Filtering
+    </h4>
+  </a>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">filter</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:eq</span><span class="p">]</span> <span class="k">do</span>
+  <span class="n">eq</span> <span class="k">do</span> <span class="o">|</span><span class="n">scope</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span>
+    <span class="n">scope</span><span class="p">[</span><span class="ss">:filters</span><span class="p">][</span><span class="n">attribute</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="n">scope</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">base_scope</span><span class="p">(</span><span class="o">*</span><span class="p">)</span>
+  <span class="p">{</span> <span class="ss">sort: </span><span class="p">{},</span> <span class="ss">filters: </span><span class="p">{}</span> <span class="p">}</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+  <span class="c1"># ... sorting ...</span>
+  <span class="n">scope</span><span class="p">[</span><span class="ss">:filters</span><span class="p">].</span><span class="nf">each_pair</span> <span class="k">do</span> <span class="o">|</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="o">|</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="nf">select</span> <span class="p">{</span> <span class="o">|</span><span class="n">d</span><span class="o">|</span> <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">.</span><span class="nf">to_sym</span><span class="p">].</span><span class="nf">in?</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="p">}</span>
+  <span class="k">end</span>
+  <span class="c1"># ... pagination ...</span>
+  <span class="c1"># ... return models ...</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Same as above examples. Again, note that we must return the scope object
+from the filter function.</p>
+
+<a class="anchor" id="persisting" />
+  <a class="header" href="#persisting">
+    <h4>
+      Persisting
+    </h4>
+  </a>
+
+<p>All at once:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Instantiate a model for #create</span>
+<span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="n">model_class</span><span class="p">)</span>
+  <span class="n">model_class</span><span class="p">.</span><span class="nf">new</span>
+<span class="k">end</span>
+
+<span class="c1"># Used for create/update</span>
+<span class="k">def</span> <span class="nf">assign_attributes</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+  <span class="n">attributes</span><span class="p">.</span><span class="nf">each_pair</span> <span class="k">do</span> <span class="o">|</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="o">|</span>
+    <span class="n">model</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="ss">:"</span><span class="si">#{</span><span class="n">k</span><span class="si">}</span><span class="ss">="</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># Used for create/update</span>
+<span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+  <span class="n">attrs</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="nf">attributes</span><span class="p">.</span><span class="nf">dup</span>
+  <span class="n">attrs</span><span class="p">[</span><span class="ss">:id</span><span class="p">]</span> <span class="o">||=</span> <span class="no">DATA</span><span class="p">.</span><span class="nf">length</span> <span class="o">+</span> <span class="mi">1</span>
+  <span class="k">if</span> <span class="n">existing</span> <span class="o">=</span> <span class="no">DATA</span><span class="p">.</span><span class="nf">find</span> <span class="p">{</span> <span class="o">|</span><span class="n">d</span><span class="o">|</span> <span class="n">d</span><span class="p">[</span><span class="ss">:id</span><span class="p">].</span><span class="nf">to_s</span> <span class="o">==</span> <span class="n">attrs</span><span class="p">[</span><span class="ss">:id</span><span class="p">].</span><span class="nf">to_s</span> <span class="p">}</span>
+    <span class="n">existing</span><span class="p">.</span><span class="nf">merge!</span><span class="p">(</span><span class="n">attrs</span><span class="p">)</span>
+  <span class="k">else</span>
+    <span class="no">DATA</span> <span class="o">&lt;&lt;</span> <span class="n">attrs</span>
+  <span class="k">end</span>
+  <span class="n">model</span>
+<span class="k">end</span>
+
+<span class="c1"># Used for destroy</span>
+<span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+  <span class="no">DATA</span><span class="p">.</span><span class="nf">reject!</span> <span class="p">{</span> <span class="o">|</span><span class="n">d</span><span class="o">|</span> <span class="n">d</span><span class="p">[</span><span class="ss">:id</span><span class="p">].</span><span class="nf">to_s</span> <span class="o">==</span> <span class="n">model</span><span class="p">.</span><span class="nf">id</span><span class="p">.</span><span class="nf">to_s</span> <span class="p">}</span>
+  <span class="n">model</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>These are the overrides for persistence operations. You are encouraged
+<strong>not</strong> to override <code class="language-plaintext highlighter-rouge">create/update/destroy</code> directly and instead use
+<a href="/1.13/guides/concepts/resources#persistence-lifecycle-hooks">Persistence Lifecycle Hooks</a>.</p>
+
+<a class="anchor" id="adapters" />
+  <a class="header" href="#adapters">
+    <h2>
+      Adapters
+    </h2>
+  </a>
+
+<p>OK so we have all our read and write operations working correctly. But
+if we had multiple Resources all using an in-memory datastore, you’d see
+this logic repeated all over the place. Let’s create an adapter to <a href="https://en.wikipedia.org/wiki/Don%27t_repeat_yourself">DRY</a>
+up this logic.</p>
+
+<p>There isn’t much more to do than copy/paste what we’ve already done.
+Let’s start with our <code class="language-plaintext highlighter-rouge">base_scope</code>, sorting, and pagination:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">POROAdapter</span> <span class="o">&lt;</span> <span class="no">Graphiti</span><span class="o">::</span><span class="no">Adapters</span><span class="o">::</span><span class="no">Abstract</span>
+  <span class="k">def</span> <span class="nf">base_scope</span><span class="p">(</span><span class="o">*</span><span class="p">)</span>
+    <span class="p">{</span> <span class="ss">sort: </span><span class="p">{},</span> <span class="ss">filters: </span><span class="p">{}</span> <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">paginate</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">current</span><span class="p">,</span> <span class="n">per</span><span class="p">)</span>
+    <span class="n">scope</span><span class="p">.</span><span class="nf">merge!</span><span class="p">(</span><span class="ss">current_page: </span><span class="n">current</span><span class="p">,</span> <span class="ss">per_page: </span><span class="n">per</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">order</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">att</span><span class="p">,</span> <span class="n">dir</span><span class="p">)</span>
+    <span class="n">scope</span><span class="p">[</span><span class="ss">:sort</span><span class="p">].</span><span class="nf">merge!</span><span class="p">(</span><span class="ss">attribute: </span><span class="n">att</span><span class="p">,</span> <span class="ss">direction: </span><span class="n">dir</span><span class="p">)</span>
+    <span class="n">scope</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="no">DATA</span>
+    <span class="k">if</span> <span class="n">sort</span> <span class="o">=</span> <span class="n">scope</span><span class="p">[</span><span class="ss">:sort</span><span class="p">].</span><span class="nf">presence</span>
+      <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="nf">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">d</span><span class="o">|</span> <span class="n">d</span><span class="p">[</span><span class="n">sort</span><span class="p">[</span><span class="ss">:attribute</span><span class="p">].</span><span class="nf">to_sym</span><span class="p">]</span> <span class="p">}</span>
+      <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="nf">reverse</span> <span class="k">if</span> <span class="n">sort</span><span class="p">[</span><span class="ss">:direction</span><span class="p">]</span> <span class="o">==</span> <span class="ss">:desc</span>
+    <span class="k">end</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="n">scope</span><span class="p">[</span><span class="ss">:current_page</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">scope</span><span class="p">[</span><span class="ss">:per_page</span><span class="p">]</span>
+    <span class="n">stop</span>  <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">scope</span><span class="p">[</span><span class="ss">:per_page</span><span class="p">]</span>
+    <span class="n">data</span>  <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">start</span><span class="o">...</span><span class="n">stop</span><span class="p">]</span>
+
+    <span class="n">data</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">d</span><span class="o">|</span> <span class="n">resource</span><span class="p">.</span><span class="nf">model</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>There’s really nothing here we haven’t seen before. We’re taking the
+code we originally wrote, and sticking it into the interface defined by
+<code class="language-plaintext highlighter-rouge">Graphiti::Adapters::Abstract</code>.</p>
+
+<p>There’s a <em>little</em> more to do with filtering:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+  <span class="n">scope</span><span class="p">[</span><span class="ss">:filters</span><span class="p">][</span><span class="n">attribute</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+  <span class="n">scope</span>
+<span class="k">end</span>
+<span class="k">alias</span> <span class="ss">:filter_string_eq</span> <span class="ss">:filter</span>
+<span class="k">alias</span> <span class="ss">:filter_integer_eq</span> <span class="ss">:filter</span>
+<span class="k">alias</span> <span class="ss">:filter_date_eq</span> <span class="ss">:filter</span>
+<span class="c1"># ... etc ...</span></code></pre></figure>
+
+<p>The logic is the same, but we have a separate method for each filter
+operator. This allows us to query differently based on the type - for
+instance, ActiveRecord will default to case-insensitive for strings, but
+straight equality for integers. If you don’t need operator-specific
+logic, just <code class="language-plaintext highlighter-rouge">alias</code> as you see here.</p>
+
+<p>You may want to limit the default operators we expect to work with a
+given type. Let’s say your backend allows straight equality for strings,
+but doesn’t support <code class="language-plaintext highlighter-rouge">prefix</code>, <code class="language-plaintext highlighter-rouge">suffix</code>, etc. You can specify this in
+your adapter:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">default_operators</span>
+  <span class="k">super</span><span class="p">.</span><span class="nf">tap</span> <span class="k">do</span> <span class="o">|</span><span class="n">built_in</span><span class="o">|</span>
+    <span class="n">built_in</span><span class="p">[</span><span class="ss">:string</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="ss">:eq</span><span class="p">]</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># or avoid super altogether</span>
+
+<span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">default_operators</span>
+  <span class="p">{</span>
+    <span class="ss">string: </span><span class="p">[</span><span class="ss">:eq</span><span class="p">],</span>
+    <span class="ss">integer: </span><span class="p">[</span><span class="ss">:eq</span><span class="p">]</span>
+    <span class="c1"># ... etc ...</span>
+  <span class="p">}</span>
+<span class="k">end</span></code></pre></figure>
+
+<p><strong>That’s it for reads</strong>. For writes, I’ll post the entire adapter code
+below - again, it’s just copy/pasting what we already wrote into a
+slightly different format.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+  <span class="no">Post</span><span class="o">::</span><span class="no">DATA</span><span class="p">.</span><span class="nf">reject!</span> <span class="p">{</span> <span class="o">|</span><span class="n">d</span><span class="o">|</span> <span class="n">d</span><span class="p">[</span><span class="ss">:id</span><span class="p">].</span><span class="nf">to_s</span> <span class="o">==</span> <span class="n">model</span><span class="p">.</span><span class="nf">id</span><span class="p">.</span><span class="nf">to_s</span> <span class="p">}</span>
+  <span class="n">model</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+  <span class="n">attrs</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="nf">attributes</span><span class="p">.</span><span class="nf">dup</span>
+  <span class="n">attrs</span><span class="p">[</span><span class="ss">:id</span><span class="p">]</span> <span class="o">||=</span> <span class="no">Post</span><span class="o">::</span><span class="no">DATA</span><span class="p">.</span><span class="nf">length</span> <span class="o">+</span> <span class="mi">1</span>
+  <span class="k">if</span> <span class="n">existing</span> <span class="o">=</span> <span class="no">Post</span><span class="o">::</span><span class="no">DATA</span><span class="p">.</span><span class="nf">find</span> <span class="p">{</span> <span class="o">|</span><span class="n">d</span><span class="o">|</span> <span class="n">d</span><span class="p">[</span><span class="ss">:id</span><span class="p">].</span><span class="nf">to_s</span> <span class="o">==</span> <span class="n">attrs</span><span class="p">[</span><span class="ss">:id</span><span class="p">].</span><span class="nf">to_s</span> <span class="p">}</span>
+    <span class="n">existing</span><span class="p">.</span><span class="nf">merge!</span><span class="p">(</span><span class="n">attrs</span><span class="p">)</span>
+  <span class="k">else</span>
+    <span class="no">Post</span><span class="o">::</span><span class="no">DATA</span> <span class="o">&lt;&lt;</span> <span class="n">attrs</span>
+  <span class="k">end</span>
+  <span class="n">model</span>
+<span class="k">end</span>
+
+<span class="c1"># For wrapping persistence operations in a DB transactions</span>
+<span class="c1"># Our in-memory DB doesn't have transactions, so just yield</span>
+<span class="k">def</span> <span class="nf">transaction</span><span class="p">(</span><span class="o">*</span><span class="p">)</span>
+  <span class="k">yield</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>That’s really it. <a href="https://github.com/graphiti-api/employee_directory/blob/poro/app/resources/post_resource.rb">See the working code in Employee Directory here</a>.</p>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="/1.13/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="/1.13/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="/1.13/guides">Guides</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Contact</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://discord.gg/wgqkMBsSRV">Discord Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Email</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

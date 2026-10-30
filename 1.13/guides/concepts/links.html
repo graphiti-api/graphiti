@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Boogaloo" rel="stylesheet">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/1.13/assets/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/1.13/assets/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/1.13/assets/favicons/favicon-16x16.png">
+  <link rel="manifest" href="/1.13/assets/favicons/site.webmanifest">
+  <link rel="mask-icon" href="/1.13/assets/favicons/safari-pinned-tab.svg" color="#F86DA7">
+  <link rel="shortcut icon" href="/1.13/assets/favicons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#F86DA7">
+  <meta name="msapplication-config" content="/1.13/assets/favicons/browserconfig.xml">
+  <meta name="theme-color" content="#F86DA7">
+
+  <title>Graphiti</title>
+  <meta name="description" content="Stylish Graph APIs">
+
+  <link rel="stylesheet" href="/1.13/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/1.13/feed.xml">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-127904727-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-127904727-1');
+  </script>
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <a href="/1.13/1.13" class="navbar-brand">
+        <img alt="logo" src="/1.13/assets/img/logo.png">
+      </a>
+    </div>
+    <nav class="" role="navigation">
+      <ul class="nav navbar-nav nav-links">
+        <li>
+          <a class="quickstart nav-link" href="/1.13/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="guides nav-link" href="/1.13/guides">Guides</a>
+        </li>
+        <li>
+          <a class="tutorial nav-link" href="/1.13/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="spraypaint nav-link" href="/1.13/js">Spraypaint</a>
+        </li>
+      </ul>
+      <ul class="nav gh navbar-nav navbar-right visible-lg visible-md">
+        <li>
+          <span class="star">⭐</span>
+          <a href="https://github.com/graphiti-api/graphiti">
+            <img alt="github-star" style="margin-right: 65px;margin-top: -20px" src="/1.13/assets/img/gh.png">
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="toc col-md-3">
+  <h1 id="links">Links</h1>
+
+  <ul>
+    <li>1 <a href="#overview">Overview</a>
+      <ul>
+        <li><a href="#linking-relationships">Linking Relationships</a></li>
+      </ul>
+    </li>
+    <li>2 <a href="#resource-endpoints">Resource Endpoints</a>
+      <ul>
+        <li><a href="#validation">Validation</a></li>
+      </ul>
+    </li>
+    <li>3 <a href="#configuration">Configuration</a>
+      <ul>
+        <li><a href="#autolinking">Autolinking</a></li>
+        <li><a href="#endpoint-validation">Endpoint Validation</a></li>
+        <li><a href="#links-on-demand">Links-On-Demand</a></li>
+        <li><a href="#pagination-links">Pagination Links</a></li>
+        <li><a href="#custom-endpoint-urls">Custom Endpoint URLs</a></li>
+      </ul>
+    </li>
+  </ul>
+
+</div>
+
+<div class="col-md-8">
+
+  <p align="center">
+  <img width="100%" src="https://pbs.twimg.com/media/CeKlfWPUIAATWZZ.jpg" />
+</p>
+
+<a class="anchor" id="overview" />
+  <a class="header" href="#overview">
+    <h2>
+      1 Overview
+    </h2>
+  </a>
+
+  <p>Links are useful for:</p>
+
+  <ul>
+    <li>Discoverability</li>
+    <li>Lazy-loading</li>
+    <li>Hiding implementation details</li>
+  </ul>
+
+  <p>Let’s say we’re loading a Post and its “Top Comments”. On Day One, we
+might <strong>eager load</strong> the data like so:</p>
+
+  <p><code class="language-plaintext highlighter-rouge">/posts/123?include=top_comments</code></p>
+
+  <p>This fetches all the data in a single request. But after some UI
+testing, we decide to add a “show comments” button. This way our
+page can load more quickly - it only needs to load the Post
+initially, and loading Top Comments can be deferred. We
+want to <strong>lazy load</strong> the relationship.</p>
+
+  <p>How would we do this? We <em>could</em> bake this logic into our next request:</p>
+
+  <p><code class="language-plaintext highlighter-rouge">/comments?filter[post_id]=123&amp;filter[upvotes][gte]=100</code></p>
+
+  <p>But this requires the client to have knowledge of what a “Top Comment”
+is. If this logic ever changed, we’d have to update every client - our
+desktop app, mobile apps, reports, etc… Not to mention, third parties who
+just want to display Top Comments are required to have this knowledge
+and update their implementations as well.</p>
+
+  <p>Maybe we could hide what “Top Comment” means with a special endpoint:</p>
+
+  <p><code class="language-plaintext highlighter-rouge">/top_comments?filter[post_id]=123</code></p>
+
+  <p>But now clients <em>need to know</em> to hit this special endpoint instead of
+the normal <code class="language-plaintext highlighter-rouge">/comments</code> endpoint. How would they know? What if
+<code class="language-plaintext highlighter-rouge">top_comments</code> had special caching rules and <em>shouldn’t</em> be used for
+this purpose?</p>
+
+  <p>The main problem here is <strong>there is no way to guarantee our lazy-loaded data will
+match our eager loaded data</strong>. Whether we fetch the Post and its Top
+Comments in a single request, or lazy-load that data in a separate
+request, the same data should always be returned.</p>
+
+  <p align="center">
+  <img width="100%" src="/1.13/assets/img/rest2.gif" />
+</p>
+
+  <p><a href="http://jsonapi.org/format/#document-links">Links</a> solve this problem. When we fetch the Post, the <code class="language-plaintext highlighter-rouge">top_comments</code>
+relationship will contain a URL. Clients can simply follow that URL to
+lazy-load the same data. We can now change the definition of a Top
+Comment - 500 upvotes, factor in recency, apply downvotes - and no
+clients need to change. They simple continue to follow a Link.</p>
+
+<a class="anchor" id="linking-relationships" />
+  <a class="header" href="#linking-relationships">
+    <h3>
+      1.1 Linking Relationships
+    </h3>
+  </a>
+
+  <p>When defining a relationship, we get a Link for free:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">PostResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="n">has_many</span> <span class="ss">:comments</span>
+<span class="k">end</span></code></pre></figure>
+
+  <blockquote>
+    <p><code class="language-plaintext highlighter-rouge">/comments?filter[post_id]=123</code></p>
+  </blockquote>
+
+  <p>And when customizing a relationship with <code class="language-plaintext highlighter-rouge">params</code>, our Link will be
+updated:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">has_many</span> <span class="ss">:comments</span> <span class="k">do</span>
+  <span class="n">params</span> <span class="k">do</span> <span class="o">|</span><span class="nb">hash</span><span class="o">|</span>
+    <span class="nb">hash</span><span class="p">[</span><span class="ss">:filter</span><span class="p">][</span><span class="ss">:upvotes</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">gte: </span><span class="mi">100</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <blockquote>
+    <p><code class="language-plaintext highlighter-rouge">/comments?filter[post_id]=123&amp;filter[upvotes][gte]=100</code></p>
+  </blockquote>
+
+  <p>Note: if you use the <code class="language-plaintext highlighter-rouge">scope</code> block directly, it may cause incorrect
+links. Avoid using <code class="language-plaintext highlighter-rouge">scope</code> directly and instead use <code class="language-plaintext highlighter-rouge">params</code> and
+<code class="language-plaintext highlighter-rouge">pre_load</code> if possible.</p>
+
+  <p>To manually generate a Link:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">has_many</span> <span class="ss">:comments</span> <span class="k">do</span>
+  <span class="n">link</span> <span class="k">do</span> <span class="o">|</span><span class="n">post</span><span class="o">|</span>
+    <span class="n">helpers</span> <span class="o">=</span> <span class="no">Rails</span><span class="p">.</span><span class="nf">application</span><span class="p">.</span><span class="nf">routes</span><span class="p">.</span><span class="nf">url_helpers</span>
+    <span class="n">helpers</span><span class="p">.</span><span class="nf">comments_url</span><span class="p">(</span><span class="ss">params: </span><span class="p">{</span> <span class="ss">filter: </span><span class="p">{</span> <span class="ss">post_id: </span><span class="n">post</span><span class="p">.</span><span class="nf">id</span> <span class="p">}</span> <span class="p">})</span>
+    <span class="c1"># or</span>
+    <span class="c1"># http://example.com/api/v1/comments?filter[post_id]=123</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>To avoid a Relationship Link altogether:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">has_many</span> <span class="ss">:comments</span><span class="p">,</span> <span class="ss">link: </span><span class="kp">false</span></code></pre></figure>
+
+<a class="anchor" id="resource-endpoints" />
+  <a class="header" href="#resource-endpoints">
+    <h2>
+      2 Resource Endpoints
+    </h2>
+  </a>
+
+  <p>To generate links, we need to associate a Resource to a URL. By default,
+this happens automatically:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">ApplicationResource</span> <span class="o">&lt;</span> <span class="no">Graphiti</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="c1"># ... code ...</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">endpoint_namespace</span> <span class="o">=</span> <span class="s1">'/api/v1'</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">PostResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="c1"># under the hood:</span>
+  <span class="n">primary_endpoint</span> <span class="s1">'posts'</span><span class="p">,</span>
+    <span class="p">[</span><span class="ss">:index</span><span class="p">,</span> <span class="ss">:show</span><span class="p">,</span> <span class="ss">:create</span><span class="p">,</span> <span class="ss">:update</span><span class="p">,</span> <span class="ss">:destroy</span><span class="p">]</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Which would generate links to <code class="language-plaintext highlighter-rouge">/api/v1/posts</code>.</p>
+
+<a class="anchor" id="validation" />
+  <a class="header" href="#validation">
+    <h3>
+      2.1 Validation
+    </h3>
+  </a>
+
+  <p>Associating a Resource to an Endpoint serves two purposes. We’ve gone
+over link generation. But we also want to make sure we’re not linking to
+something that doesn’t actually exist. That’s why we perform <strong>Endpoint
+Validation</strong>.</p>
+
+  <p>If we tried to access the above resource at a <code class="language-plaintext highlighter-rouge">/comments</code> endpoint:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">CommentsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="no">PostResource</span><span class="p">.</span><span class="nf">all</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="c1"># ...</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>We’d get a <code class="language-plaintext highlighter-rouge">Graphiti::Errors::InvalidEndpoint</code> error. Endpoint
+validation ensures that our auto-generated Links are actually valid.</p>
+
+  <p>To change the endpoint associated to a Resource:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">primary_endpoint</span> <span class="s1">'special_posts'</span><span class="p">,</span> <span class="p">[</span><span class="ss">:index</span><span class="p">,</span> <span class="ss">:show</span><span class="p">]</span></code></pre></figure>
+
+  <p>Or to alter only the <strong>path</strong>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="nb">self</span><span class="p">.</span><span class="nf">endpoint</span><span class="p">[</span><span class="ss">:path</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'special_posts'</span></code></pre></figure>
+
+  <p>Or to alter only the <strong>actions</strong> supported:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="nb">self</span><span class="p">.</span><span class="nf">endpoint</span><span class="p">[</span><span class="ss">:actions</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="ss">:index</span><span class="p">,</span> <span class="ss">:show</span><span class="p">]</span></code></pre></figure>
+
+  <p>A resource may be accessible by multiple endpoints. Maybe <code class="language-plaintext highlighter-rouge">PostResource</code>
+is also used at <code class="language-plaintext highlighter-rouge">/top_posts</code>. We want to keep all auto-generated links
+pointing to <code class="language-plaintext highlighter-rouge">/posts</code> (the primary endpoint), but <em>allow</em> accessing
+<code class="language-plaintext highlighter-rouge">PostResource</code> from the <code class="language-plaintext highlighter-rouge">/top_posts</code> endpoint:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">secondary_endpoint</span> <span class="s1">'/top_posts'</span><span class="p">,</span> <span class="p">[</span><span class="ss">:index</span><span class="p">]</span></code></pre></figure>
+
+<a class="anchor" id="configuration" />
+  <a class="header" href="#configuration">
+    <h2>
+      3 Configuration
+    </h2>
+  </a>
+
+<a class="anchor" id="autolinking" />
+  <a class="header" href="#autolinking">
+    <h3>
+      3.1 Autolinking
+    </h3>
+  </a>
+
+  <p>To turn off automatically generated links:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">ApplicationResource</span> <span class="o">&lt;</span> <span class="no">Graphiti</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">autolink</span> <span class="o">=</span> <span class="kp">false</span>
+<span class="k">end</span></code></pre></figure>
+
+<a class="anchor" id="endpoint-validation" />
+  <a class="header" href="#endpoint-validation">
+    <h3>
+      3.2 Endpoint Validation
+    </h3>
+  </a>
+
+  <p>To turn off Endpoint Validation:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">ApplicationResource</span> <span class="o">&lt;</span> <span class="no">Graphiti</span><span class="o">::</span><span class="no">Resource</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">validate_endpoints</span> <span class="o">=</span> <span class="kp">false</span>
+<span class="k">end</span></code></pre></figure>
+
+<a class="anchor" id="links-on-demand" />
+  <a class="header" href="#links-on-demand">
+    <h3>
+      3.3 Links-on-Demand
+    </h3>
+  </a>
+
+  <p>To only render links when requested in the URL with <code class="language-plaintext highlighter-rouge">?links=true</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">Graphiti</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span>
+  <span class="n">c</span><span class="p">.</span><span class="nf">links_on_demand</span> <span class="o">=</span> <span class="kp">true</span>
+<span class="k">end</span></code></pre></figure>
+
+<a class="anchor" id="pagination-links" />
+  <a class="header" href="#pagination-links">
+    <h3>
+      3.4 Pagination Links
+    </h3>
+  </a>
+
+  <p>Requesting big collections can result into slow responses sometimes. In order to avoid this, you could use <a href="https://jsonapi.org/format/#fetching-pagination">pagination</a>. It’ll break your response into smaller pieces that will make your server responds faster. Paginations links can be present in your response in the following ways:</p>
+
+<a class="anchor" id="pagination-links-showing-by-default" />
+  <a class="header" href="#pagination-links-showing-by-default">
+    <h4>
+      3.4.1 Showing by default
+    </h4>
+  </a>
+
+  <p>With this configuration, all the responses will return the pagination links</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">Graphiti</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span>
+  <span class="n">c</span><span class="p">.</span><span class="nf">pagination_links</span> <span class="o">=</span> <span class="kp">true</span>
+<span class="k">end</span></code></pre></figure>
+
+<a class="anchor" id="pagination-links-when-requested" />
+  <a class="header" href="#pagination-links-when-requested">
+    <h4>
+      3.4.2 When requested
+    </h4>
+  </a>
+
+  <p>You can showing the pagination links when it was requested in the URL with <code class="language-plaintext highlighter-rouge">?pagination_links=true</code></p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">Graphiti</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span>
+  <span class="n">c</span><span class="p">.</span><span class="nf">pagination_links_on_demand</span> <span class="o">=</span> <span class="kp">true</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Pagination links won’t show up for <em>#show</em> actions.</p>
+
+<a class="anchor" id="custom-endpoint-urls" />
+  <a class="header" href="#custom-endpoint-urls">
+    <h3>
+      3.5 Custom Endpoint URLs
+    </h3>
+  </a>
+
+  <p>To change the URL associated with a Resource:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">PostResource</span> <span class="o">&lt;</span> <span class="no">ApplicationResource</span>
+  <span class="c1"># Most commonly seen in ApplicationResource</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">endpoint_namespace</span> <span class="o">=</span> <span class="s1">'/api/v1'</span>
+
+  <span class="n">primary_endpoint</span> <span class="s1">'/posts'</span><span class="p">,</span> <span class="p">[</span><span class="ss">:index</span><span class="p">,</span> <span class="ss">:show</span><span class="p">]</span>
+  <span class="c1"># OR</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">endpoint</span><span class="p">[</span><span class="ss">:path</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'/posts'</span>
+  <span class="c1"># OR</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">endpoint</span><span class="p">[</span><span class="ss">:actions</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="ss">:index</span><span class="p">,</span> <span class="ss">:show</span><span class="p">]</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>To generate a Relationship Link manually:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">has_many</span> <span class="ss">:comments</span> <span class="k">do</span>
+  <span class="n">link</span> <span class="k">do</span> <span class="o">|</span><span class="n">post</span><span class="o">|</span>
+    <span class="n">helpers</span> <span class="o">=</span> <span class="no">Rails</span><span class="p">.</span><span class="nf">application</span><span class="p">.</span><span class="nf">routes</span><span class="p">.</span><span class="nf">url_helpers</span>
+    <span class="n">helpers</span><span class="p">.</span><span class="nf">comments_url</span><span class="p">(</span><span class="ss">params: </span><span class="p">{</span> <span class="ss">filter: </span><span class="p">{</span> <span class="ss">post_id: </span><span class="n">post</span><span class="p">.</span><span class="nf">id</span> <span class="p">}</span> <span class="p">})</span>
+    <span class="c1"># or</span>
+    <span class="c1"># http://example.com/api/v1/comments?filter[post_id]=123</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="/1.13/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="/1.13/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="/1.13/guides">Guides</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Contact</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://discord.gg/wgqkMBsSRV">Discord Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Email</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>

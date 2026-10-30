@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Boogaloo" rel="stylesheet">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/1.13/assets/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/1.13/assets/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/1.13/assets/favicons/favicon-16x16.png">
+  <link rel="manifest" href="/1.13/assets/favicons/site.webmanifest">
+  <link rel="mask-icon" href="/1.13/assets/favicons/safari-pinned-tab.svg" color="#F86DA7">
+  <link rel="shortcut icon" href="/1.13/assets/favicons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#F86DA7">
+  <meta name="msapplication-config" content="/1.13/assets/favicons/browserconfig.xml">
+  <meta name="theme-color" content="#F86DA7">
+
+  <title>Graphiti</title>
+  <meta name="description" content="Stylish Graph APIs">
+
+  <link rel="stylesheet" href="/1.13/assets/main.css?ref=wh4t3v45">
+  <link rel="alternate" type="application/rss+xml" title="Graphiti" href="/1.13/feed.xml">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-127904727-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-127904727-1');
+  </script>
+
+  <!-- javascript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+</head>
+
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <header class="navbar navbar-inverse normal" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <a href="/1.13/1.13" class="navbar-brand">
+        <img alt="logo" src="/1.13/assets/img/logo.png">
+      </a>
+    </div>
+    <nav class="" role="navigation">
+      <ul class="nav navbar-nav nav-links">
+        <li>
+          <a class="quickstart nav-link" href="/1.13/quickstart">Quickstart</a>
+        </li>
+        <li>
+          <a class="guides nav-link" href="/1.13/guides">Guides</a>
+        </li>
+        <li>
+          <a class="tutorial nav-link" href="/1.13/tutorial">Tutorial</a>
+        </li>
+        <li>
+          <a class="spraypaint nav-link" href="/1.13/js">Spraypaint</a>
+        </li>
+      </ul>
+      <ul class="nav gh navbar-nav navbar-right visible-lg visible-md">
+        <li>
+          <span class="star">⭐</span>
+          <a href="https://github.com/graphiti-api/graphiti">
+            <img alt="github-star" style="margin-right: 65px;margin-top: -20px" src="/1.13/assets/img/gh.png">
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+        <div class="container">
+          <div class="toc col-md-3">
+  <h1 id="debugging">Debugging</h1>
+
+  <ul>
+    <li>1 <a href="#debugger">Debugger</a>
+      <ul>
+        <li><a href="#json-output">JSON Output</a></li>
+        <li><a href="#configuration">Configuration</a></li>
+      </ul>
+    </li>
+    <li>2 <a href="#rake-tasks">Rake Tasks</a>
+      <ul>
+        <li><a href="#graphiti-request">graphiti:request</a></li>
+        <li><a href="#graphiti-benchmark">graphiti:benchmark</a></li>
+        <li><a href="#Authorization-headers">Authorization headers</a></li>
+      </ul>
+    </li>
+    <li>3 <a href="#tips">Tips</a></li>
+  </ul>
+
+</div>
+
+<div class="col-md-8">
+
+<a class="anchor" id="debugger" />
+  <a class="header" href="#debugger">
+    <h2>
+      Debugger
+    </h2>
+  </a>
+
+  <p>Graphiti comes with a debugger that shows the queries executed for a
+given request. Remember that Resources <a href="/1.13/guides/concepts/resources#query-interface">have a query interface</a> independent of a request or response. And Resources connect similar to ActiveRecord’s <code class="language-plaintext highlighter-rouge">includes</code>:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">employees</span> <span class="o">=</span> <span class="no">EmployeeResource</span><span class="p">.</span><span class="nf">all</span>
+<span class="no">PositionResource</span><span class="p">.</span><span class="nf">all</span><span class="p">(</span><span class="ss">filter: </span><span class="p">{</span> <span class="ss">employee_id: </span><span class="n">employees</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:id</span><span class="p">)</span> <span class="p">})</span></code></pre></figure>
+
+  <blockquote>
+    <p><em>Remember, this is all <a href="/1.13/guides/concepts/resources#customizing-relationships">customizable</a></em>.</p>
+  </blockquote>
+
+  <p>That means we can log the requests made by individual Resources:</p>
+
+  <p><code class="language-plaintext highlighter-rouge">/api/v1/employees?include=notes,positions.department.teams</code></p>
+  <p align="center">
+  <img width="100%" src="https://user-images.githubusercontent.com/55264/46084994-f5425e00-c172-11e8-8c40-aa7074e6dc6d.png" />
+</p>
+
+  <p>And even copy/paste these queries into a console session to debug:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bin/rails c
+<span class="o">&gt;&gt;</span> TeamResource.all<span class="o">({</span>:filter<span class="o">=&gt;{</span>:department_id<span class="o">=&gt;</span><span class="s2">"1,2,3"</span><span class="o">}})</span></code></pre></figure>
+
+  <p>If you’re having trouble with a request, see if you can isolate to a
+specific Resource, then test that Resource directly.</p>
+
+  <p>Finally: if an error occurs, we’ll note the query that caused it:</p>
+
+  <p align="center">
+  <img width="100%" src="https://user-images.githubusercontent.com/55264/46086595-6c2d2600-c176-11e8-9b57-1b27d380e9fe.png" />
+</p>
+
+<a class="anchor" id="json-output" />
+  <a class="header" href="#json-output">
+    <h3>
+      JSON Output
+    </h3>
+  </a>
+
+  <p>It can be helpful to have this debug output come back as part of the
+JSON response. To enable this:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/application_controller.rb</span>
+<span class="k">def</span> <span class="nf">allow_graphiti_debug_json?</span>
+  <span class="kp">true</span>
+  <span class="c1"># or, current_user.admin?</span>
+  <span class="c1"># or, Rails.env.development?</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>And request the debug output:</p>
+
+  <p><code class="language-plaintext highlighter-rouge">/your/url?debug=true</code></p>
+
+  <p>You should now see the debug output in <code class="language-plaintext highlighter-rouge">meta</code>:</p>
+
+  <p align="center">
+  <img width="100%" src="https://user-images.githubusercontent.com/55264/46085006-fe332f80-c172-11e8-946e-bf1386362a90.png" />
+</p>
+
+  <p><br /></p>
+
+  <p>If there’s an error, and you’ve <a href="/1.13/guides/concepts/error-handling#displaying-raw-errors">enabled raw errors</a>, you’ll also see the query that caused the error in the JSON response:</p>
+
+  <p><br /></p>
+
+  <p align="center">
+  <img width="100%" src="https://user-images.githubusercontent.com/55264/46086370-ef01b100-c175-11e8-81b9-917d95e195c7.png" />
+</p>
+
+  <p><br /></p>
+
+<a class="anchor" id="configuration" />
+  <a class="header" href="#configuration">
+    <h3>
+      1.2 Configuration
+    </h3>
+  </a>
+
+  <p>By default, we’ll log to <code class="language-plaintext highlighter-rouge">Rails.logger</code>, and only enable debugging (logs
+or JSON) when <code class="language-plaintext highlighter-rouge">Rails.logger.level</code> is set to <code class="language-plaintext highlighter-rouge">debug</code>. Here are the
+various ways to configure.</p>
+
+  <p>Use <code class="language-plaintext highlighter-rouge">config.debug</code> to explicitly toggle debugging:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># config/initializers/graphiti.rb</span>
+<span class="no">Graphiti</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span>
+  <span class="n">c</span><span class="p">.</span><span class="nf">debug</span> <span class="o">=</span> <span class="kp">false</span>
+<span class="k">end</span>
+
+<span class="c1"># Or use environment variable</span>
+<span class="c1"># GRAPHITI_DEBUG=false</span></code></pre></figure>
+
+  <p>Use <code class="language-plaintext highlighter-rouge">config.debug_models</code> to get additional (but verbose) output:</p>
+
+  <p align="center">
+  <img width="100%" src="https://user-images.githubusercontent.com/55264/46088701-ef507b00-c17a-11e8-8d26-af17b19b8ce9.png" />
+</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># config/initializers/graphiti.rb</span>
+<span class="no">Graphiti</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span>
+  <span class="n">c</span><span class="p">.</span><span class="nf">debug_models</span> <span class="o">=</span> <span class="kp">true</span>
+<span class="k">end</span>
+
+<span class="c1"># Or use environment variable</span>
+<span class="c1"># GRAPHITI_DEBUG_MODELS=true</span></code></pre></figure>
+
+  <p>As noted above, <code class="language-plaintext highlighter-rouge">allow_graphiti_debug_json?</code> must return <code class="language-plaintext highlighter-rouge">true</code> if you
+want JSON output:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/application_controller.rb</span>
+<span class="k">def</span> <span class="nf">allow_graphiti_debug_json?</span>
+  <span class="kp">true</span>
+  <span class="c1"># or, current_user.admin?</span>
+  <span class="c1"># or, Rails.env.development?</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p>Note you need to explicitly pass <code class="language-plaintext highlighter-rouge">?debug=true</code> in the request.</p>
+
+  <p>Assign a different logger:</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">Graphiti</span><span class="p">.</span><span class="nf">logger</span> <span class="o">=</span> <span class="no">Logger</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="c1"># Or the built-in STDOUT logger:</span>
+<span class="no">Graphiti</span><span class="p">.</span><span class="nf">logger</span> <span class="o">=</span> <span class="no">Graphiti</span><span class="p">.</span><span class="nf">stdout_logger</span></code></pre></figure>
+
+  <p>Manually apply the debugging (when using Rails, this normally happens in
+a <code class="language-plaintext highlighter-rouge">around_action</code>):</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">Graphiti</span><span class="o">::</span><span class="no">Debugger</span><span class="p">.</span><span class="nf">debug</span> <span class="k">do</span>
+  <span class="no">EmployeeResource</span><span class="p">.</span><span class="nf">all</span>
+<span class="k">end</span></code></pre></figure>
+
+<a class="anchor" id="rake-tasks" />
+  <a class="header" href="#rake-tasks">
+    <h3>
+      2 Rake Tasks
+    </h3>
+  </a>
+
+  <p>There are some common debugging scenarios that are possible to do
+manually, but their frequency warrants common patterns. For these, we
+have rake tasks.</p>
+
+<a class="anchor" id="graphiti-request" />
+  <a class="header" href="#graphiti-request">
+    <h4>
+      2.1 graphiti:request
+    </h4>
+  </a>
+
+  <blockquote>
+    <p><code class="language-plaintext highlighter-rouge">bin/rake graphiti:request[PATH,DEBUG]</code></p>
+  </blockquote>
+
+  <p>Execute a request using <code class="language-plaintext highlighter-rouge">ActionDispatch::Integration::Session</code> (which
+underlies request specs).</p>
+
+  <p>This can be helpful when you don’t have, or don’t want to spin up, a web
+server. Imagine you want to debug something on production, so you shell
+into a docker container and edit some files locally. Now you want to
+execute a request and see if your changes worked:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bin/rake graphiti:request[/employees]</code></pre></figure>
+
+  <p>Will execute the request and spit out the JSON response. You may want to
+run with the Debugger enabled:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bin/rake graphiti:request[/employees,true]</code></pre></figure>
+
+  <p>Which add Debugger output as well.</p>
+
+  <p>The <code class="language-plaintext highlighter-rouge">PATH</code> should not contain the domain unless you want to hit a live
+API instead of a test server.</p>
+
+<a class="anchor" id="graphiti-benchmark" />
+  <a class="header" href="#graphiti-benchmark">
+    <h4>
+      2.2 graphiti:benchmark
+    </h4>
+  </a>
+
+  <blockquote>
+    <p><code class="language-plaintext highlighter-rouge">bin/rake graphiti:benchmark[PATH,NUM_REQUESTS]</code></p>
+  </blockquote>
+
+  <p>It can be helpful to run a quick benchmark without hitting a live web
+server, to eliminate the vagaries of latency. To do this:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bin/rake graphiti:benchmark[/employees,100]</code></pre></figure>
+
+  <p>Which will return the average response time.</p>
+
+<a class="anchor" id="Authorization-headers" />
+  <a class="header" href="#Authorization-headers">
+    <h4>
+      2.3 Authorization headers
+    </h4>
+  </a>
+
+  <p>If you have an Authorization scheme implemented (for example <a href="https://api.rubyonrails.org/classes/ActionController/HttpAuthentication/Token.html">authenticate_or_request_with_http_token</a> in rails) you can supply the <code class="language-plaintext highlighter-rouge">Authorization</code> http header value with the <code class="language-plaintext highlighter-rouge">AUTHORIZATION_HEADER</code> environment variable:</p>
+
+  <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">export </span><span class="nv">AUTHORIZATION_HEADER</span><span class="o">=</span><span class="s2">"Token --PRIVATE_API_KEY--"</span>
+<span class="nv">$ </span>bin/rake graphiti:request[/employees,true]</code></pre></figure>
+
+  <p>This also will work for <code class="language-plaintext highlighter-rouge">Basic</code> (<a href="https://api.rubyonrails.org/classes/ActionController/HttpAuthentication/Basic.html$$">request_http_basic_authentication</a>) and <code class="language-plaintext highlighter-rouge">Bearer</code> values</p>
+
+<a class="anchor" id="tips" />
+  <a class="header" href="#tips">
+    <h2>
+      3 Tips
+    </h2>
+  </a>
+
+  <p>When debugging an application, try to isolate the individual Resource
+call and debug the Resource directly (instead of running the entire
+request). This helps eliminate variables, and plain ruby code is easier
+to work with. If possible, try to remove Graphiti entirely and focus on
+your Models and Backends.</p>
+
+  <p>The most common scenario is debugging a query. We suggest overriding
+<code class="language-plaintext highlighter-rouge">resolve</code> and using <a href="https://github.com/pry/pry">pry</a> (or equivalent):</p>
+
+  <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Introspect the scope without firing a query</span>
+<span class="c1"># Call 'super' to fire the query</span>
+<span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+  <span class="nb">binding</span><span class="p">.</span><span class="nf">pry</span>
+<span class="k">end</span></code></pre></figure>
+
+  <p><br />
+<br /></p>
+
+</div>
+
+        </div>
+      </div>
+    </main>
+    <div class="main-footer main-footer--dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 menu">
+        <h3>Overview</h3>
+        <ul>
+          <li>
+            <a href="/1.13/quickstart">Quickstart</a>
+          </li>
+          <li>
+            <a href="/1.13/tutorial">Tutorial</a>
+          </li>
+          <li>
+            <a href="/1.13/guides">Guides</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Contact</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="https://discord.gg/wgqkMBsSRV">Discord Chat</a>
+          </li>
+          <li>
+            <a href="mailto:richmolj@gmail.com">Email</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4 menu">
+        <h3>Related</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://jsonapi.org">JSONAPI Spec</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://jsonapi-rb.org">jsonapi-rb</a>
+          </li>
+          <li>
+            <a target="_blank" href="https://vuejs.org/">VueJS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+$(function () {
+
+  var flipTabs = function() {
+    var isTS = true;
+    if (localStorage.getItem('js-lang') === 'javascript') {
+      isTS = false;
+    }
+
+    $('.code-tabs').each(function(index, el) {
+      if (isTS) {
+        console.log('hiding js');
+        $($(el).children()[1]).hide();
+        $($(el).children()[0]).show();
+      } else {
+        console.log('hiding ts');
+        $($(el).children()[0]).hide();
+        $($(el).children()[1]).show();
+      }
+    });
+
+    if (isTS) {
+      $('.tab.typescript').addClass('active');
+      $('.tab.javascript').removeClass('active');
+    } else {
+      $('.tab.typescript').removeClass('active');
+      $('.tab.javascript').addClass('active');
+    }
+  }
+
+  $('.tab').click(function() {
+    if ($(this).hasClass('typescript')) {
+      localStorage.setItem('js-lang', 'typescript');
+    } else {
+      localStorage.setItem('js-lang', 'javascript');
+    }
+
+    flipTabs();
+  });
+
+  flipTabs();
+})
+</script>
+
+  </body>
+</html>
